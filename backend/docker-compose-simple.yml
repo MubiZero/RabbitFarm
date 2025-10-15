@@ -1,0 +1,21 @@
+# Simplified Docker Compose for MySQL only
+# Use this if you have issues with the full docker-compose.yml
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rabbitfarm-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-RootPass2024!}
+      MYSQL_DATABASE: ${DB_NAME:-rabbitfarm}
+      MYSQL_USER: ${DB_USER:-rabbitfarm_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-RabbitFarm2024!}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
