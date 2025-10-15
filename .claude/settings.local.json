@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(npm run dev)",
+      "Bash(flutter pub get)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
