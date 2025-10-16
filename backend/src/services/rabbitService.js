@@ -314,11 +314,13 @@ class RabbitService {
   async getStatistics() {
     try {
       const total = await Rabbit.count();
-      const males = await Rabbit.count({ where: { sex: 'male', status: { [Op.ne]: 'dead' } } });
-      const females = await Rabbit.count({ where: { sex: 'female', status: { [Op.ne]: 'dead' } } });
-      const pregnant = await Rabbit.count({ where: { status: 'pregnant' } });
-      const sick = await Rabbit.count({ where: { status: 'sick' } });
-      const forSale = await Rabbit.count({ where: { purpose: 'sale', status: { [Op.notIn]: ['sold', 'dead'] } } });
+      const deadCount = await Rabbit.count({ where: { status: 'dead' } });
+      const aliveCount = total - deadCount;
+      const maleCount = await Rabbit.count({ where: { sex: 'male', status: { [Op.ne]: 'dead' } } });
+      const femaleCount = await Rabbit.count({ where: { sex: 'female', status: { [Op.ne]: 'dead' } } });
+      const pregnantCount = await Rabbit.count({ where: { status: 'pregnant' } });
+      const sickCount = await Rabbit.count({ where: { status: 'sick' } });
+      const forSaleCount = await Rabbit.count({ where: { purpose: 'sale', status: { [Op.notIn]: ['sold', 'dead'] } } });
 
       // Get breed distribution
       const breedDistribution = await Rabbit.findAll({
@@ -332,15 +334,23 @@ class RabbitService {
         raw: false
       });
 
+      // Format breed distribution to match mobile model
+      const byBreed = breedDistribution.map(item => ({
+        breed_id: item.breed_id,
+        breed_name: item.Breed?.name || null,
+        count: parseInt(item.get('count'))
+      }));
+
       return {
         total,
-        alive: total - await Rabbit.count({ where: { status: 'dead' } }),
-        males,
-        females,
-        pregnant,
-        sick,
-        forSale,
-        breedDistribution
+        alive_count: aliveCount,
+        male_count: maleCount,
+        female_count: femaleCount,
+        pregnant_count: pregnantCount,
+        sick_count: sickCount,
+        for_sale_count: forSaleCount,
+        dead_count: deadCount,
+        by_breed: byBreed
       };
     } catch (error) {
       logger.error('Get statistics error', { error: error.message });

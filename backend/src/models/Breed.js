@@ -22,7 +22,11 @@ module.exports = (sequelize) => {
     average_weight: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true,
-      comment: 'Average weight in kg'
+      comment: 'Average weight in kg',
+      get() {
+        const value = this.getDataValue('average_weight');
+        return value !== null ? parseFloat(value) : null;
+      }
     },
     average_litter_size: {
       type: DataTypes.INTEGER,

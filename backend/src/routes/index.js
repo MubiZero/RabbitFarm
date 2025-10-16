@@ -4,6 +4,7 @@ const router = express.Router();
 // Import route modules
 const authRoutes = require('./auth.routes');
 const rabbitRoutes = require('./rabbit.routes');
+const breedRoutes = require('./breed.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -28,5 +29,6 @@ router.get('/', (req, res) => {
 // Mount routes
 router.use('/auth', authRoutes);
 router.use('/rabbits', rabbitRoutes);
+router.use('/breeds', breedRoutes);
 
 module.exports = router;
