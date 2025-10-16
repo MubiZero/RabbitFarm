@@ -75,7 +75,11 @@ module.exports = (sequelize) => {
     current_weight: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true,
-      comment: 'Current weight in kg'
+      comment: 'Current weight in kg',
+      get() {
+        const value = this.getDataValue('current_weight');
+        return value !== null ? parseFloat(value) : null;
+      }
     },
     temperament: {
       type: DataTypes.STRING(100),
