@@ -7,6 +7,10 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     tag_id: {
       type: DataTypes.STRING(50),
       unique: true,
@@ -73,7 +77,7 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     current_weight: {
-      type: DataTypes.DECIMAL(5, 2),
+      type: DataTypes.FLOAT,
       allowNull: true,
       comment: 'Current weight in kg',
       get() {
@@ -101,6 +105,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     indexes: [
+      { fields: ['user_id'] },
       { fields: ['tag_id'] },
       { fields: ['name'] },
       { fields: ['breed_id'] },

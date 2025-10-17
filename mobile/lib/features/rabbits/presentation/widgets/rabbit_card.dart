@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/rabbit_model.dart';
+import '../../../../core/utils/image_url_helper.dart';
 
 class RabbitCard extends StatelessWidget {
   final RabbitModel rabbit;
@@ -17,6 +19,7 @@ class RabbitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final age = _calculateAge(rabbit.birthDate);
+    final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -35,10 +38,29 @@ class RabbitCard extends StatelessWidget {
                   color: _getSexColor().withOpacity(0.1),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Icon(
-                  _getSexIcon(),
-                  size: 30,
-                  color: _getSexColor(),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: photoUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: photoUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: _getSexColor(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Icon(
+                            _getSexIcon(),
+                            size: 30,
+                            color: _getSexColor(),
+                          ),
+                        )
+                      : Icon(
+                          _getSexIcon(),
+                          size: 30,
+                          color: _getSexColor(),
+                        ),
                 ),
               ),
               const SizedBox(width: 16),

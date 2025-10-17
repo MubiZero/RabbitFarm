@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 
+// Force number type for weight field
 module.exports = (sequelize) => {
   return sequelize.define('RabbitWeight', {
     id: {
@@ -12,8 +13,12 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     weight: {
-      type: DataTypes.DECIMAL(5, 2),
-      allowNull: false
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('weight');
+        return value !== null ? parseFloat(value) : null;
+      }
     },
     measured_at: {
       type: DataTypes.DATE,

@@ -5,6 +5,7 @@ const router = express.Router();
 const authRoutes = require('./auth.routes');
 const rabbitRoutes = require('./rabbit.routes');
 const breedRoutes = require('./breed.routes');
+const birthRoutes = require('./birth.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -30,5 +31,6 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/rabbits', rabbitRoutes);
 router.use('/breeds', breedRoutes);
+router.use('/births', birthRoutes);
 
 module.exports = router;

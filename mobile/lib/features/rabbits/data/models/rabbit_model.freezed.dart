@@ -21,29 +21,38 @@ RabbitModel _$RabbitModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RabbitModel {
+  @IntConverter()
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'tag_id')
   String get tagId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   int get breedId => throw _privateConstructorUsedError;
   String get sex => throw _privateConstructorUsedError;
   @JsonKey(name: 'birth_date')
+  @DateTimeConverter()
   DateTime get birthDate => throw _privateConstructorUsedError;
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'cage_id')
+  @IntConverter()
   int? get cageId => throw _privateConstructorUsedError;
   @JsonKey(name: 'father_id')
+  @IntConverter()
   int? get fatherId => throw _privateConstructorUsedError;
   @JsonKey(name: 'mother_id')
+  @IntConverter()
   int? get motherId => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   String get purpose => throw _privateConstructorUsedError;
   @JsonKey(name: 'acquired_date')
+  @NullableDateTimeConverter()
   DateTime? get acquiredDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'sold_date')
+  @NullableDateTimeConverter()
   DateTime? get soldDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'death_date')
+  @NullableDateTimeConverter()
   DateTime? get deathDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'death_reason')
   String? get deathReason => throw _privateConstructorUsedError;
@@ -54,8 +63,10 @@ mixin _$RabbitModel {
   @JsonKey(name: 'photo_url')
   String? get photoUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   DateTime get updatedAt => throw _privateConstructorUsedError; // Relations
   @JsonKey(name: 'Breed')
   BreedModel? get breed => throw _privateConstructorUsedError;
@@ -84,28 +95,32 @@ abstract class $RabbitModelCopyWith<$Res> {
   ) = _$RabbitModelCopyWithImpl<$Res, RabbitModel>;
   @useResult
   $Res call({
-    int id,
+    @IntConverter() int id,
     @JsonKey(name: 'tag_id') String tagId,
     String name,
-    @JsonKey(name: 'breed_id') int breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
-    @JsonKey(name: 'birth_date') DateTime birthDate,
+    @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
     String? color,
-    @JsonKey(name: 'cage_id') int? cageId,
-    @JsonKey(name: 'father_id') int? fatherId,
-    @JsonKey(name: 'mother_id') int? motherId,
+    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
+    @JsonKey(name: 'father_id') @IntConverter() int? fatherId,
+    @JsonKey(name: 'mother_id') @IntConverter() int? motherId,
     String status,
     String purpose,
-    @JsonKey(name: 'acquired_date') DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') DateTime? soldDate,
-    @JsonKey(name: 'death_date') DateTime? deathDate,
+    @JsonKey(name: 'acquired_date')
+    @NullableDateTimeConverter()
+    DateTime? acquiredDate,
+    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() DateTime? soldDate,
+    @JsonKey(name: 'death_date')
+    @NullableDateTimeConverter()
+    DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
     String? temperament,
     String? notes,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
     @JsonKey(name: 'Breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
@@ -338,28 +353,32 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    int id,
+    @IntConverter() int id,
     @JsonKey(name: 'tag_id') String tagId,
     String name,
-    @JsonKey(name: 'breed_id') int breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
-    @JsonKey(name: 'birth_date') DateTime birthDate,
+    @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
     String? color,
-    @JsonKey(name: 'cage_id') int? cageId,
-    @JsonKey(name: 'father_id') int? fatherId,
-    @JsonKey(name: 'mother_id') int? motherId,
+    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
+    @JsonKey(name: 'father_id') @IntConverter() int? fatherId,
+    @JsonKey(name: 'mother_id') @IntConverter() int? motherId,
     String status,
     String purpose,
-    @JsonKey(name: 'acquired_date') DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') DateTime? soldDate,
-    @JsonKey(name: 'death_date') DateTime? deathDate,
+    @JsonKey(name: 'acquired_date')
+    @NullableDateTimeConverter()
+    DateTime? acquiredDate,
+    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() DateTime? soldDate,
+    @JsonKey(name: 'death_date')
+    @NullableDateTimeConverter()
+    DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
     String? temperament,
     String? notes,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
     @JsonKey(name: 'Breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
@@ -532,28 +551,30 @@ class __$$RabbitModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$RabbitModelImpl implements _RabbitModel {
   const _$RabbitModelImpl({
-    required this.id,
+    @IntConverter() required this.id,
     @JsonKey(name: 'tag_id') required this.tagId,
     required this.name,
-    @JsonKey(name: 'breed_id') required this.breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() required this.breedId,
     required this.sex,
-    @JsonKey(name: 'birth_date') required this.birthDate,
+    @JsonKey(name: 'birth_date') @DateTimeConverter() required this.birthDate,
     this.color,
-    @JsonKey(name: 'cage_id') this.cageId,
-    @JsonKey(name: 'father_id') this.fatherId,
-    @JsonKey(name: 'mother_id') this.motherId,
+    @JsonKey(name: 'cage_id') @IntConverter() this.cageId,
+    @JsonKey(name: 'father_id') @IntConverter() this.fatherId,
+    @JsonKey(name: 'mother_id') @IntConverter() this.motherId,
     required this.status,
     required this.purpose,
-    @JsonKey(name: 'acquired_date') this.acquiredDate,
-    @JsonKey(name: 'sold_date') this.soldDate,
-    @JsonKey(name: 'death_date') this.deathDate,
+    @JsonKey(name: 'acquired_date')
+    @NullableDateTimeConverter()
+    this.acquiredDate,
+    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() this.soldDate,
+    @JsonKey(name: 'death_date') @NullableDateTimeConverter() this.deathDate,
     @JsonKey(name: 'death_reason') this.deathReason,
     @JsonKey(name: 'current_weight') this.currentWeight,
     this.temperament,
     this.notes,
     @JsonKey(name: 'photo_url') this.photoUrl,
-    @JsonKey(name: 'created_at') required this.createdAt,
-    @JsonKey(name: 'updated_at') required this.updatedAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required this.createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() required this.updatedAt,
     @JsonKey(name: 'Breed') this.breed,
     @JsonKey(name: 'Cage') this.cage,
     @JsonKey(name: 'father') this.father,
@@ -564,6 +585,7 @@ class _$RabbitModelImpl implements _RabbitModel {
       _$$RabbitModelImplFromJson(json);
 
   @override
+  @IntConverter()
   final int id;
   @override
   @JsonKey(name: 'tag_id')
@@ -572,22 +594,27 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String name;
   @override
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   final int breedId;
   @override
   final String sex;
   @override
   @JsonKey(name: 'birth_date')
+  @DateTimeConverter()
   final DateTime birthDate;
   @override
   final String? color;
   @override
   @JsonKey(name: 'cage_id')
+  @IntConverter()
   final int? cageId;
   @override
   @JsonKey(name: 'father_id')
+  @IntConverter()
   final int? fatherId;
   @override
   @JsonKey(name: 'mother_id')
+  @IntConverter()
   final int? motherId;
   @override
   final String status;
@@ -595,12 +622,15 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String purpose;
   @override
   @JsonKey(name: 'acquired_date')
+  @NullableDateTimeConverter()
   final DateTime? acquiredDate;
   @override
   @JsonKey(name: 'sold_date')
+  @NullableDateTimeConverter()
   final DateTime? soldDate;
   @override
   @JsonKey(name: 'death_date')
+  @NullableDateTimeConverter()
   final DateTime? deathDate;
   @override
   @JsonKey(name: 'death_reason')
@@ -617,9 +647,11 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String? photoUrl;
   @override
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   final DateTime createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   final DateTime updatedAt;
   // Relations
   @override
@@ -733,28 +765,40 @@ class _$RabbitModelImpl implements _RabbitModel {
 
 abstract class _RabbitModel implements RabbitModel {
   const factory _RabbitModel({
-    required final int id,
+    @IntConverter() required final int id,
     @JsonKey(name: 'tag_id') required final String tagId,
     required final String name,
-    @JsonKey(name: 'breed_id') required final int breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() required final int breedId,
     required final String sex,
-    @JsonKey(name: 'birth_date') required final DateTime birthDate,
+    @JsonKey(name: 'birth_date')
+    @DateTimeConverter()
+    required final DateTime birthDate,
     final String? color,
-    @JsonKey(name: 'cage_id') final int? cageId,
-    @JsonKey(name: 'father_id') final int? fatherId,
-    @JsonKey(name: 'mother_id') final int? motherId,
+    @JsonKey(name: 'cage_id') @IntConverter() final int? cageId,
+    @JsonKey(name: 'father_id') @IntConverter() final int? fatherId,
+    @JsonKey(name: 'mother_id') @IntConverter() final int? motherId,
     required final String status,
     required final String purpose,
-    @JsonKey(name: 'acquired_date') final DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') final DateTime? soldDate,
-    @JsonKey(name: 'death_date') final DateTime? deathDate,
+    @JsonKey(name: 'acquired_date')
+    @NullableDateTimeConverter()
+    final DateTime? acquiredDate,
+    @JsonKey(name: 'sold_date')
+    @NullableDateTimeConverter()
+    final DateTime? soldDate,
+    @JsonKey(name: 'death_date')
+    @NullableDateTimeConverter()
+    final DateTime? deathDate,
     @JsonKey(name: 'death_reason') final String? deathReason,
     @JsonKey(name: 'current_weight') final double? currentWeight,
     final String? temperament,
     final String? notes,
     @JsonKey(name: 'photo_url') final String? photoUrl,
-    @JsonKey(name: 'created_at') required final DateTime createdAt,
-    @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required final DateTime createdAt,
+    @JsonKey(name: 'updated_at')
+    @DateTimeConverter()
+    required final DateTime updatedAt,
     @JsonKey(name: 'Breed') final BreedModel? breed,
     @JsonKey(name: 'Cage') final CageInfo? cage,
     @JsonKey(name: 'father') final ParentInfo? father,
@@ -765,6 +809,7 @@ abstract class _RabbitModel implements RabbitModel {
       _$RabbitModelImpl.fromJson;
 
   @override
+  @IntConverter()
   int get id;
   @override
   @JsonKey(name: 'tag_id')
@@ -773,22 +818,27 @@ abstract class _RabbitModel implements RabbitModel {
   String get name;
   @override
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   int get breedId;
   @override
   String get sex;
   @override
   @JsonKey(name: 'birth_date')
+  @DateTimeConverter()
   DateTime get birthDate;
   @override
   String? get color;
   @override
   @JsonKey(name: 'cage_id')
+  @IntConverter()
   int? get cageId;
   @override
   @JsonKey(name: 'father_id')
+  @IntConverter()
   int? get fatherId;
   @override
   @JsonKey(name: 'mother_id')
+  @IntConverter()
   int? get motherId;
   @override
   String get status;
@@ -796,12 +846,15 @@ abstract class _RabbitModel implements RabbitModel {
   String get purpose;
   @override
   @JsonKey(name: 'acquired_date')
+  @NullableDateTimeConverter()
   DateTime? get acquiredDate;
   @override
   @JsonKey(name: 'sold_date')
+  @NullableDateTimeConverter()
   DateTime? get soldDate;
   @override
   @JsonKey(name: 'death_date')
+  @NullableDateTimeConverter()
   DateTime? get deathDate;
   @override
   @JsonKey(name: 'death_reason')
@@ -818,9 +871,11 @@ abstract class _RabbitModel implements RabbitModel {
   String? get photoUrl;
   @override
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   DateTime get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   DateTime get updatedAt; // Relations
   @override
   @JsonKey(name: 'Breed')
@@ -849,6 +904,7 @@ CageInfo _$CageInfoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CageInfo {
+  @IntConverter()
   int get id => throw _privateConstructorUsedError;
   String get number => throw _privateConstructorUsedError;
   String? get type => throw _privateConstructorUsedError;
@@ -869,7 +925,12 @@ abstract class $CageInfoCopyWith<$Res> {
   factory $CageInfoCopyWith(CageInfo value, $Res Function(CageInfo) then) =
       _$CageInfoCopyWithImpl<$Res, CageInfo>;
   @useResult
-  $Res call({int id, String number, String? type, String? location});
+  $Res call({
+    @IntConverter() int id,
+    String number,
+    String? type,
+    String? location,
+  });
 }
 
 /// @nodoc
@@ -925,7 +986,12 @@ abstract class _$$CageInfoImplCopyWith<$Res>
   ) = __$$CageInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String number, String? type, String? location});
+  $Res call({
+    @IntConverter() int id,
+    String number,
+    String? type,
+    String? location,
+  });
 }
 
 /// @nodoc
@@ -974,7 +1040,7 @@ class __$$CageInfoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CageInfoImpl implements _CageInfo {
   const _$CageInfoImpl({
-    required this.id,
+    @IntConverter() required this.id,
     required this.number,
     this.type,
     this.location,
@@ -984,6 +1050,7 @@ class _$CageInfoImpl implements _CageInfo {
       _$$CageInfoImplFromJson(json);
 
   @override
+  @IntConverter()
   final int id;
   @override
   final String number;
@@ -1029,7 +1096,7 @@ class _$CageInfoImpl implements _CageInfo {
 
 abstract class _CageInfo implements CageInfo {
   const factory _CageInfo({
-    required final int id,
+    @IntConverter() required final int id,
     required final String number,
     final String? type,
     final String? location,
@@ -1039,6 +1106,7 @@ abstract class _CageInfo implements CageInfo {
       _$CageInfoImpl.fromJson;
 
   @override
+  @IntConverter()
   int get id;
   @override
   String get number;
@@ -1061,6 +1129,7 @@ ParentInfo _$ParentInfoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ParentInfo {
+  @IntConverter()
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'tag_id')
@@ -1083,7 +1152,11 @@ abstract class $ParentInfoCopyWith<$Res> {
     $Res Function(ParentInfo) then,
   ) = _$ParentInfoCopyWithImpl<$Res, ParentInfo>;
   @useResult
-  $Res call({int id, String name, @JsonKey(name: 'tag_id') String tagId});
+  $Res call({
+    @IntConverter() int id,
+    String name,
+    @JsonKey(name: 'tag_id') String tagId,
+  });
 }
 
 /// @nodoc
@@ -1130,7 +1203,11 @@ abstract class _$$ParentInfoImplCopyWith<$Res>
   ) = __$$ParentInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String name, @JsonKey(name: 'tag_id') String tagId});
+  $Res call({
+    @IntConverter() int id,
+    String name,
+    @JsonKey(name: 'tag_id') String tagId,
+  });
 }
 
 /// @nodoc
@@ -1170,7 +1247,7 @@ class __$$ParentInfoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ParentInfoImpl implements _ParentInfo {
   const _$ParentInfoImpl({
-    required this.id,
+    @IntConverter() required this.id,
     required this.name,
     @JsonKey(name: 'tag_id') required this.tagId,
   });
@@ -1179,6 +1256,7 @@ class _$ParentInfoImpl implements _ParentInfo {
       _$$ParentInfoImplFromJson(json);
 
   @override
+  @IntConverter()
   final int id;
   @override
   final String name;
@@ -1221,7 +1299,7 @@ class _$ParentInfoImpl implements _ParentInfo {
 
 abstract class _ParentInfo implements ParentInfo {
   const factory _ParentInfo({
-    required final int id,
+    @IntConverter() required final int id,
     required final String name,
     @JsonKey(name: 'tag_id') required final String tagId,
   }) = _$ParentInfoImpl;
@@ -1230,6 +1308,7 @@ abstract class _ParentInfo implements ParentInfo {
       _$ParentInfoImpl.fromJson;
 
   @override
+  @IntConverter()
   int get id;
   @override
   String get name;

@@ -6,7 +6,15 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_detail_screen.dart';
+import '../../features/rabbits/presentation/screens/pedigree_screen.dart';
+import '../../features/rabbits/presentation/screens/breeds_list_screen.dart';
+import '../../features/rabbits/presentation/screens/breed_form_screen.dart';
+import '../../features/rabbits/presentation/screens/breeding_planner_screen.dart';
+import '../../features/rabbits/presentation/screens/birth_form_screen.dart';
+import '../../features/rabbits/presentation/screens/births_list_screen.dart';
 import '../../features/rabbits/data/models/rabbit_model.dart';
+import '../../features/rabbits/data/models/breed_model.dart';
+import '../../features/rabbits/data/models/breeding_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -75,6 +83,55 @@ final routerProvider = Provider<GoRouter>((ref) {
             rabbitId: id,
             rabbit: rabbit,
           );
+        },
+      ),
+      GoRoute(
+        path: '/rabbits/:id/pedigree',
+        name: 'rabbit-pedigree',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          final name = state.uri.queryParameters['name'] ?? 'Кролик';
+          return PedigreeScreen(
+            rabbitId: id,
+            rabbitName: name,
+          );
+        },
+      ),
+
+      // Breeds routes
+      GoRoute(
+        path: '/breeds',
+        name: 'breeds',
+        builder: (context, state) => const BreedsListScreen(),
+      ),
+      GoRoute(
+        path: '/breeds/form',
+        name: 'breed-form',
+        builder: (context, state) {
+          final breed = state.extra as BreedModel?;
+          return BreedFormScreen(breed: breed);
+        },
+      ),
+
+      // Breeding routes
+      GoRoute(
+        path: '/breeding/planner',
+        name: 'breeding-planner',
+        builder: (context, state) => const BreedingPlannerScreen(),
+      ),
+
+      // Births routes
+      GoRoute(
+        path: '/births',
+        name: 'births',
+        builder: (context, state) => const BirthsListScreen(),
+      ),
+      GoRoute(
+        path: '/births/new',
+        name: 'birth-new',
+        builder: (context, state) {
+          final breeding = state.extra as BreedingModel?;
+          return BirthFormScreen(breeding: breeding);
         },
       ),
     ],

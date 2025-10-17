@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/utils/image_url_helper.dart';
+import 'weight_history_screen.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -81,12 +84,68 @@ class RabbitDetailScreen extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, RabbitModel rabbit) {
     final age = _calculateAge(rabbit.birthDate);
+    final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Photo Section
+          if (photoUrl != null)
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () => _showPhotoDialog(context, photoUrl),
+                    child: Hero(
+                      tag: 'rabbit-photo-${rabbit.id}',
+                      child: CachedNetworkImage(
+                        imageUrl: photoUrl,
+                        width: double.infinity,
+                        height: 250,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          height: 250,
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: 250,
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.broken_image,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.touch_app, size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Нажмите для увеличения',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 16),
+
           // Header card with name and tag
           Card(
             child: Padding(
@@ -100,10 +159,29 @@ class RabbitDetailScreen extends ConsumerWidget {
                       color: _getSexColor(rabbit.sex).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(40),
                     ),
-                    child: Icon(
-                      _getSexIcon(rabbit.sex),
-                      size: 40,
-                      color: _getSexColor(rabbit.sex),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(40),
+                      child: photoUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: photoUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: _getSexColor(rabbit.sex),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Icon(
+                                _getSexIcon(rabbit.sex),
+                                size: 40,
+                                color: _getSexColor(rabbit.sex),
+                              ),
+                            )
+                          : Icon(
+                              _getSexIcon(rabbit.sex),
+                              size: 40,
+                              color: _getSexColor(rabbit.sex),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -156,6 +234,58 @@ class RabbitDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
+          // Quick Actions
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Быстрые действия',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WeightHistoryScreen(rabbit: rabbit),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.scale),
+                      label: const Text('История взвешиваний'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.push(
+                          '/rabbits/${rabbit.id}/pedigree?name=${Uri.encodeComponent(rabbit.name)}',
+                        );
+                      },
+                      icon: const Icon(Icons.account_tree),
+                      label: const Text('Родословная'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // Status
           _buildSection(
             context,
@@ -182,23 +312,38 @@ class RabbitDetailScreen extends ConsumerWidget {
 
           // Parents
           if (rabbit.father != null || rabbit.mother != null)
-            _buildSection(
-              context,
-              title: 'Родители',
-              children: [
-                if (rabbit.father != null)
-                  _buildInfoRow(
-                    context,
-                    'Отец',
-                    '${rabbit.father!.name} (${rabbit.father!.tagId})',
-                  ),
-                if (rabbit.mother != null)
-                  _buildInfoRow(
-                    context,
-                    'Мать',
-                    '${rabbit.mother!.name} (${rabbit.mother!.tagId})',
-                  ),
-              ],
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Родители',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    if (rabbit.father != null)
+                      _buildParentCard(
+                        context,
+                        rabbit.father!,
+                        'Отец',
+                        Icons.male,
+                        Colors.blue,
+                      ),
+                    if (rabbit.father != null && rabbit.mother != null)
+                      const SizedBox(height: 8),
+                    if (rabbit.mother != null)
+                      _buildParentCard(
+                        context,
+                        rabbit.mother!,
+                        'Мать',
+                        Icons.female,
+                        Colors.pink,
+                      ),
+                  ],
+                ),
+              ),
             ),
           const SizedBox(height: 16),
 
@@ -287,6 +432,69 @@ class RabbitDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildParentCard(
+    BuildContext context,
+    ParentInfo parent,
+    String label,
+    IconData icon,
+    Color color,
+  ) {
+    return InkWell(
+      onTap: () {
+        context.push('/rabbits/${parent.id}');
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          border: Border.all(color: color.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    parent.name,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    'Бирка: ${parent.tagId}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _calculateAge(DateTime birthDate) {
     final now = DateTime.now();
     final difference = now.difference(birthDate);
@@ -357,6 +565,49 @@ class RabbitDetailScreen extends ConsumerWidget {
       default:
         return purpose;
     }
+  }
+
+  void _showPhotoDialog(BuildContext context, String photoUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 0.5,
+                maxScale: 4,
+                child: CachedNetworkImage(
+                  imageUrl: photoUrl,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error,
+                    color: Colors.white,
+                    size: 64,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.of(context).pop(),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.black.withOpacity(0.5),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref, RabbitModel rabbit) {

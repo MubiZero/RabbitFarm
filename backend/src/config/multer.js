@@ -18,9 +18,14 @@ Object.values(uploadDirs).forEach(dir => {
 // Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const type = req.body.type || 'temp';
-    const dest = uploadDirs[type] || uploadDirs.temp;
-    cb(null, dest);
+    // Check if this is a rabbit photo upload from the route
+    if (req.originalUrl && req.originalUrl.includes('/rabbits/') && req.originalUrl.includes('/photo')) {
+      cb(null, uploadDirs.rabbits);
+    } else {
+      const type = req.body.type || 'temp';
+      const dest = uploadDirs[type] || uploadDirs.temp;
+      cb(null, dest);
+    }
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
