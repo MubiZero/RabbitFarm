@@ -6,6 +6,7 @@ const authRoutes = require('./auth.routes');
 const rabbitRoutes = require('./rabbit.routes');
 const breedRoutes = require('./breed.routes');
 const birthRoutes = require('./birth.routes');
+const cageRoutes = require('./cage.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -32,5 +33,6 @@ router.use('/auth', authRoutes);
 router.use('/rabbits', rabbitRoutes);
 router.use('/breeds', breedRoutes);
 router.use('/births', birthRoutes);
+router.use('/cages', cageRoutes);
 
 module.exports = router;

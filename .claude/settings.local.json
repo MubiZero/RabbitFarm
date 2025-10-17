@@ -10,7 +10,8 @@
       "Bash(npx sequelize-cli:*)",
       "Bash(flutter analyze:*)",
       "Bash(flutter build:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

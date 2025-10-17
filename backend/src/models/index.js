@@ -47,7 +47,7 @@ User.hasMany(Note, { foreignKey: 'created_by', onDelete: 'SET NULL' });
 Breed.hasMany(Rabbit, { foreignKey: 'breed_id', onDelete: 'RESTRICT' });
 
 // Cage associations
-Cage.hasMany(Rabbit, { foreignKey: 'cage_id', onDelete: 'SET NULL' });
+Cage.hasMany(Rabbit, { as: 'rabbits', foreignKey: 'cage_id', onDelete: 'SET NULL' });
 Cage.hasMany(FeedingRecord, { foreignKey: 'cage_id', onDelete: 'SET NULL' });
 Cage.hasMany(Task, { foreignKey: 'cage_id', onDelete: 'CASCADE' });
 Cage.hasMany(Note, { foreignKey: 'cage_id', onDelete: 'CASCADE' });
