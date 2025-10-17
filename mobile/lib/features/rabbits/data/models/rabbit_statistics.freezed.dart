@@ -21,22 +21,30 @@ RabbitStatistics _$RabbitStatisticsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RabbitStatistics {
+  @IntConverter()
   int get total => throw _privateConstructorUsedError;
   @JsonKey(name: 'alive_count')
+  @IntConverter()
   int get aliveCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'male_count')
+  @IntConverter()
   int get maleCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'female_count')
+  @IntConverter()
   int get femaleCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'pregnant_count')
+  @IntConverter()
   int get pregnantCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'sick_count')
+  @IntConverter()
   int get sickCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'for_sale_count')
+  @IntConverter()
   int get forSaleCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'by_breed')
   List<BreedStats> get byBreed => throw _privateConstructorUsedError;
   @JsonKey(name: 'dead_count')
+  @IntConverter()
   int get deadCount => throw _privateConstructorUsedError;
 
   /// Serializes this RabbitStatistics to a JSON map.
@@ -57,15 +65,15 @@ abstract class $RabbitStatisticsCopyWith<$Res> {
   ) = _$RabbitStatisticsCopyWithImpl<$Res, RabbitStatistics>;
   @useResult
   $Res call({
-    int total,
-    @JsonKey(name: 'alive_count') int aliveCount,
-    @JsonKey(name: 'male_count') int maleCount,
-    @JsonKey(name: 'female_count') int femaleCount,
-    @JsonKey(name: 'pregnant_count') int pregnantCount,
-    @JsonKey(name: 'sick_count') int sickCount,
-    @JsonKey(name: 'for_sale_count') int forSaleCount,
+    @IntConverter() int total,
+    @JsonKey(name: 'alive_count') @IntConverter() int aliveCount,
+    @JsonKey(name: 'male_count') @IntConverter() int maleCount,
+    @JsonKey(name: 'female_count') @IntConverter() int femaleCount,
+    @JsonKey(name: 'pregnant_count') @IntConverter() int pregnantCount,
+    @JsonKey(name: 'sick_count') @IntConverter() int sickCount,
+    @JsonKey(name: 'for_sale_count') @IntConverter() int forSaleCount,
     @JsonKey(name: 'by_breed') List<BreedStats> byBreed,
-    @JsonKey(name: 'dead_count') int deadCount,
+    @JsonKey(name: 'dead_count') @IntConverter() int deadCount,
   });
 }
 
@@ -148,15 +156,15 @@ abstract class _$$RabbitStatisticsImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    int total,
-    @JsonKey(name: 'alive_count') int aliveCount,
-    @JsonKey(name: 'male_count') int maleCount,
-    @JsonKey(name: 'female_count') int femaleCount,
-    @JsonKey(name: 'pregnant_count') int pregnantCount,
-    @JsonKey(name: 'sick_count') int sickCount,
-    @JsonKey(name: 'for_sale_count') int forSaleCount,
+    @IntConverter() int total,
+    @JsonKey(name: 'alive_count') @IntConverter() int aliveCount,
+    @JsonKey(name: 'male_count') @IntConverter() int maleCount,
+    @JsonKey(name: 'female_count') @IntConverter() int femaleCount,
+    @JsonKey(name: 'pregnant_count') @IntConverter() int pregnantCount,
+    @JsonKey(name: 'sick_count') @IntConverter() int sickCount,
+    @JsonKey(name: 'for_sale_count') @IntConverter() int forSaleCount,
     @JsonKey(name: 'by_breed') List<BreedStats> byBreed,
-    @JsonKey(name: 'dead_count') int deadCount,
+    @JsonKey(name: 'dead_count') @IntConverter() int deadCount,
   });
 }
 
@@ -231,15 +239,15 @@ class __$$RabbitStatisticsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$RabbitStatisticsImpl implements _RabbitStatistics {
   const _$RabbitStatisticsImpl({
-    this.total = 0,
-    @JsonKey(name: 'alive_count') this.aliveCount = 0,
-    @JsonKey(name: 'male_count') this.maleCount = 0,
-    @JsonKey(name: 'female_count') this.femaleCount = 0,
-    @JsonKey(name: 'pregnant_count') this.pregnantCount = 0,
-    @JsonKey(name: 'sick_count') this.sickCount = 0,
-    @JsonKey(name: 'for_sale_count') this.forSaleCount = 0,
+    @IntConverter() this.total = 0,
+    @JsonKey(name: 'alive_count') @IntConverter() this.aliveCount = 0,
+    @JsonKey(name: 'male_count') @IntConverter() this.maleCount = 0,
+    @JsonKey(name: 'female_count') @IntConverter() this.femaleCount = 0,
+    @JsonKey(name: 'pregnant_count') @IntConverter() this.pregnantCount = 0,
+    @JsonKey(name: 'sick_count') @IntConverter() this.sickCount = 0,
+    @JsonKey(name: 'for_sale_count') @IntConverter() this.forSaleCount = 0,
     @JsonKey(name: 'by_breed') final List<BreedStats> byBreed = const [],
-    @JsonKey(name: 'dead_count') this.deadCount = 0,
+    @JsonKey(name: 'dead_count') @IntConverter() this.deadCount = 0,
   }) : _byBreed = byBreed;
 
   factory _$RabbitStatisticsImpl.fromJson(Map<String, dynamic> json) =>
@@ -247,24 +255,31 @@ class _$RabbitStatisticsImpl implements _RabbitStatistics {
 
   @override
   @JsonKey()
+  @IntConverter()
   final int total;
   @override
   @JsonKey(name: 'alive_count')
+  @IntConverter()
   final int aliveCount;
   @override
   @JsonKey(name: 'male_count')
+  @IntConverter()
   final int maleCount;
   @override
   @JsonKey(name: 'female_count')
+  @IntConverter()
   final int femaleCount;
   @override
   @JsonKey(name: 'pregnant_count')
+  @IntConverter()
   final int pregnantCount;
   @override
   @JsonKey(name: 'sick_count')
+  @IntConverter()
   final int sickCount;
   @override
   @JsonKey(name: 'for_sale_count')
+  @IntConverter()
   final int forSaleCount;
   final List<BreedStats> _byBreed;
   @override
@@ -277,6 +292,7 @@ class _$RabbitStatisticsImpl implements _RabbitStatistics {
 
   @override
   @JsonKey(name: 'dead_count')
+  @IntConverter()
   final int deadCount;
 
   @override
@@ -341,45 +357,53 @@ class _$RabbitStatisticsImpl implements _RabbitStatistics {
 
 abstract class _RabbitStatistics implements RabbitStatistics {
   const factory _RabbitStatistics({
-    final int total,
-    @JsonKey(name: 'alive_count') final int aliveCount,
-    @JsonKey(name: 'male_count') final int maleCount,
-    @JsonKey(name: 'female_count') final int femaleCount,
-    @JsonKey(name: 'pregnant_count') final int pregnantCount,
-    @JsonKey(name: 'sick_count') final int sickCount,
-    @JsonKey(name: 'for_sale_count') final int forSaleCount,
+    @IntConverter() final int total,
+    @JsonKey(name: 'alive_count') @IntConverter() final int aliveCount,
+    @JsonKey(name: 'male_count') @IntConverter() final int maleCount,
+    @JsonKey(name: 'female_count') @IntConverter() final int femaleCount,
+    @JsonKey(name: 'pregnant_count') @IntConverter() final int pregnantCount,
+    @JsonKey(name: 'sick_count') @IntConverter() final int sickCount,
+    @JsonKey(name: 'for_sale_count') @IntConverter() final int forSaleCount,
     @JsonKey(name: 'by_breed') final List<BreedStats> byBreed,
-    @JsonKey(name: 'dead_count') final int deadCount,
+    @JsonKey(name: 'dead_count') @IntConverter() final int deadCount,
   }) = _$RabbitStatisticsImpl;
 
   factory _RabbitStatistics.fromJson(Map<String, dynamic> json) =
       _$RabbitStatisticsImpl.fromJson;
 
   @override
+  @IntConverter()
   int get total;
   @override
   @JsonKey(name: 'alive_count')
+  @IntConverter()
   int get aliveCount;
   @override
   @JsonKey(name: 'male_count')
+  @IntConverter()
   int get maleCount;
   @override
   @JsonKey(name: 'female_count')
+  @IntConverter()
   int get femaleCount;
   @override
   @JsonKey(name: 'pregnant_count')
+  @IntConverter()
   int get pregnantCount;
   @override
   @JsonKey(name: 'sick_count')
+  @IntConverter()
   int get sickCount;
   @override
   @JsonKey(name: 'for_sale_count')
+  @IntConverter()
   int get forSaleCount;
   @override
   @JsonKey(name: 'by_breed')
   List<BreedStats> get byBreed;
   @override
   @JsonKey(name: 'dead_count')
+  @IntConverter()
   int get deadCount;
 
   /// Create a copy of RabbitStatistics
@@ -397,9 +421,11 @@ BreedStats _$BreedStatsFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$BreedStats {
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   int? get breedId => throw _privateConstructorUsedError;
   @JsonKey(name: 'breed_name')
   String? get breedName => throw _privateConstructorUsedError;
+  @IntConverter()
   int get count => throw _privateConstructorUsedError;
 
   /// Serializes this BreedStats to a JSON map.
@@ -420,9 +446,9 @@ abstract class $BreedStatsCopyWith<$Res> {
   ) = _$BreedStatsCopyWithImpl<$Res, BreedStats>;
   @useResult
   $Res call({
-    @JsonKey(name: 'breed_id') int? breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() int? breedId,
     @JsonKey(name: 'breed_name') String? breedName,
-    int count,
+    @IntConverter() int count,
   });
 }
 
@@ -475,9 +501,9 @@ abstract class _$$BreedStatsImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'breed_id') int? breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() int? breedId,
     @JsonKey(name: 'breed_name') String? breedName,
-    int count,
+    @IntConverter() int count,
   });
 }
 
@@ -522,9 +548,9 @@ class __$$BreedStatsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BreedStatsImpl implements _BreedStats {
   const _$BreedStatsImpl({
-    @JsonKey(name: 'breed_id') this.breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() this.breedId,
     @JsonKey(name: 'breed_name') this.breedName,
-    this.count = 0,
+    @IntConverter() this.count = 0,
   });
 
   factory _$BreedStatsImpl.fromJson(Map<String, dynamic> json) =>
@@ -532,12 +558,14 @@ class _$BreedStatsImpl implements _BreedStats {
 
   @override
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   final int? breedId;
   @override
   @JsonKey(name: 'breed_name')
   final String? breedName;
   @override
   @JsonKey()
+  @IntConverter()
   final int count;
 
   @override
@@ -576,9 +604,9 @@ class _$BreedStatsImpl implements _BreedStats {
 
 abstract class _BreedStats implements BreedStats {
   const factory _BreedStats({
-    @JsonKey(name: 'breed_id') final int? breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() final int? breedId,
     @JsonKey(name: 'breed_name') final String? breedName,
-    final int count,
+    @IntConverter() final int count,
   }) = _$BreedStatsImpl;
 
   factory _BreedStats.fromJson(Map<String, dynamic> json) =
@@ -586,11 +614,13 @@ abstract class _BreedStats implements BreedStats {
 
   @override
   @JsonKey(name: 'breed_id')
+  @IntConverter()
   int? get breedId;
   @override
   @JsonKey(name: 'breed_name')
   String? get breedName;
   @override
+  @IntConverter()
   int get count;
 
   /// Create a copy of BreedStats

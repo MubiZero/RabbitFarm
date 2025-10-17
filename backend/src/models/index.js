@@ -35,6 +35,7 @@ const Note = require('./Note')(sequelize);
 User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 
+User.hasMany(Rabbit, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 User.hasMany(Task, { as: 'assignedTasks', foreignKey: 'assigned_to', onDelete: 'SET NULL' });
 User.hasMany(Task, { as: 'createdTasks', foreignKey: 'created_by', onDelete: 'SET NULL' });
 User.hasMany(Transaction, { foreignKey: 'created_by', onDelete: 'SET NULL' });
@@ -52,6 +53,7 @@ Cage.hasMany(Task, { foreignKey: 'cage_id', onDelete: 'CASCADE' });
 Cage.hasMany(Note, { foreignKey: 'cage_id', onDelete: 'CASCADE' });
 
 // Rabbit associations
+Rabbit.belongsTo(User, { foreignKey: 'user_id' });
 Rabbit.belongsTo(Breed, { foreignKey: 'breed_id' });
 Rabbit.belongsTo(Cage, { foreignKey: 'cage_id' });
 
@@ -79,9 +81,12 @@ Breeding.belongsTo(Rabbit, { as: 'female', foreignKey: 'female_id' });
 
 // Birth associations
 Breeding.hasMany(Birth, { foreignKey: 'breeding_id', onDelete: 'CASCADE' });
-Birth.belongsTo(Breeding, { foreignKey: 'breeding_id' });
+Birth.belongsTo(Breeding, { as: 'breeding', foreignKey: 'breeding_id' });
 Birth.belongsTo(Rabbit, { as: 'mother', foreignKey: 'mother_id' });
 Rabbit.hasMany(Birth, { as: 'births', foreignKey: 'mother_id', onDelete: 'RESTRICT' });
+
+// Birth-Kit relationship (через birth_id в таблице rabbits)
+// Note: Нужно будет добавить поле birth_id в модель Rabbit через миграцию, если требуется
 
 // Other associations
 RabbitWeight.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });

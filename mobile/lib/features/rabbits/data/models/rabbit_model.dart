@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/int_converter.dart';
+import '../../../../core/json/date_time_converter.dart';
 import 'breed_model.dart';
 
 part 'rabbit_model.freezed.dart';
@@ -7,28 +9,28 @@ part 'rabbit_model.g.dart';
 @freezed
 class RabbitModel with _$RabbitModel {
   const factory RabbitModel({
-    required int id,
+    @IntConverter() required int id,
     @JsonKey(name: 'tag_id') required String tagId,
     required String name,
-    @JsonKey(name: 'breed_id') required int breedId,
+    @JsonKey(name: 'breed_id') @IntConverter() required int breedId,
     required String sex,
-    @JsonKey(name: 'birth_date') required DateTime birthDate,
+    @JsonKey(name: 'birth_date') @DateTimeConverter() required DateTime birthDate,
     String? color,
-    @JsonKey(name: 'cage_id') int? cageId,
-    @JsonKey(name: 'father_id') int? fatherId,
-    @JsonKey(name: 'mother_id') int? motherId,
+    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
+    @JsonKey(name: 'father_id') @IntConverter() int? fatherId,
+    @JsonKey(name: 'mother_id') @IntConverter() int? motherId,
     required String status,
     required String purpose,
-    @JsonKey(name: 'acquired_date') DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') DateTime? soldDate,
-    @JsonKey(name: 'death_date') DateTime? deathDate,
+    @JsonKey(name: 'acquired_date') @NullableDateTimeConverter() DateTime? acquiredDate,
+    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() DateTime? soldDate,
+    @JsonKey(name: 'death_date') @NullableDateTimeConverter() DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
     String? temperament,
     String? notes,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() required DateTime updatedAt,
     // Relations
     @JsonKey(name: 'Breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
@@ -43,7 +45,7 @@ class RabbitModel with _$RabbitModel {
 @freezed
 class CageInfo with _$CageInfo {
   const factory CageInfo({
-    required int id,
+    @IntConverter() required int id,
     required String number,
     String? type,
     String? location,
@@ -56,7 +58,7 @@ class CageInfo with _$CageInfo {
 @freezed
 class ParentInfo with _$ParentInfo {
   const factory ParentInfo({
-    required int id,
+    @IntConverter() required int id,
     required String name,
     @JsonKey(name: 'tag_id') required String tagId,
   }) = _ParentInfo;

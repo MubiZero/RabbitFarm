@@ -119,4 +119,15 @@ router.post(
   rabbitController.uploadPhoto
 );
 
+/**
+ * @route   DELETE /api/v1/rabbits/:id/photo
+ * @desc    Delete rabbit photo
+ * @access  Private (Manager, Owner)
+ */
+router.delete(
+  '/:id/photo',
+  authorize(['manager', 'owner']),
+  rabbitController.deletePhoto
+);
+
 module.exports = router;

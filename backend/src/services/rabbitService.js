@@ -375,21 +375,37 @@ class RabbitService {
 
         const result = {
           id: currentRabbit.id,
-          name: currentRabbit.name,
-          tag_id: currentRabbit.tag_id,
-          sex: currentRabbit.sex,
-          birth_date: currentRabbit.birth_date,
-          breed: currentRabbit.Breed?.name
+          name: currentRabbit.name || 'Без имени',
+          tag_id: currentRabbit.tag_id || null,
+          sex: currentRabbit.sex || 'unknown',
+          birth_date: currentRabbit.birth_date || null,
+          breed: currentRabbit.Breed?.name || null
         };
 
         if (currentRabbit.father_id) {
-          const father = await this.getRabbitById(currentRabbit.father_id);
-          result.father = await buildPedigree(father, level + 1);
+          try {
+            const father = await this.getRabbitById(currentRabbit.father_id);
+            result.father = await buildPedigree(father, level + 1);
+          } catch (error) {
+            // Родитель не найден - пропускаем
+            logger.warn('Father not found for pedigree', {
+              rabbitId: currentRabbit.id,
+              fatherId: currentRabbit.father_id
+            });
+          }
         }
 
         if (currentRabbit.mother_id) {
-          const mother = await this.getRabbitById(currentRabbit.mother_id);
-          result.mother = await buildPedigree(mother, level + 1);
+          try {
+            const mother = await this.getRabbitById(currentRabbit.mother_id);
+            result.mother = await buildPedigree(mother, level + 1);
+          } catch (error) {
+            // Родитель не найден - пропускаем
+            logger.warn('Mother not found for pedigree', {
+              rabbitId: currentRabbit.id,
+              motherId: currentRabbit.mother_id
+            });
+          }
         }
 
         return result;

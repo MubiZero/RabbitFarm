@@ -22,7 +22,7 @@ dependencies:
 
   # Networking
   dio: ^5.4.0
-  json_annotation: ^4.8.1
+  json_annotation: ^4.9.0
 
   # Storage
   shared_preferences: ^2.2.2
@@ -34,10 +34,12 @@ dependencies:
   # UI helpers
   flutter_hooks: ^0.20.3
   cached_network_image: ^3.3.0
+  image_picker: ^1.0.7
 
   # Utils
   freezed_annotation: ^2.4.1
   intl: ^0.20.2
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:

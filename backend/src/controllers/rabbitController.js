@@ -212,7 +212,27 @@ class RabbitController {
         photo_url: photoUrl
       });
 
-      return ApiResponse.success(res, { photo_url: photoUrl }, 'Фото загружено успешно');
+      return ApiResponse.success(res, rabbit, 'Фото загружено успешно');
+    } catch (error) {
+      if (error.message === 'RABBIT_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Кролик не найден');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Delete rabbit photo
+   * DELETE /api/v1/rabbits/:id/photo
+   */
+  async deletePhoto(req, res, next) {
+    try {
+      // Update rabbit to remove photo
+      const rabbit = await rabbitService.updateRabbit(req.params.id, {
+        photo_url: null
+      });
+
+      return ApiResponse.success(res, rabbit, 'Фото удалено успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
         return ApiResponse.notFound(res, 'Кролик не найден');

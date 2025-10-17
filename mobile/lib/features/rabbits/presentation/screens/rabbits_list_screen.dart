@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/rabbit_card.dart';
@@ -59,6 +58,12 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
               if (value == 'logout') {
                 ref.read(authProvider.notifier).logout();
                 context.go('/login');
+              } else if (value == 'breeds') {
+                context.push('/breeds');
+              } else if (value == 'breeding') {
+                context.push('/breeding/planner');
+              } else if (value == 'births') {
+                context.push('/births');
               }
             },
             itemBuilder: (context) => [
@@ -69,6 +74,36 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                     const Icon(Icons.person),
                     const SizedBox(width: 8),
                     Text(user?.fullName ?? 'Профиль'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'breeds',
+                child: Row(
+                  children: [
+                    Icon(Icons.pets),
+                    SizedBox(width: 8),
+                    Text('Породы'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'breeding',
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite, color: Colors.purple),
+                    SizedBox(width: 8),
+                    Text('Планирование случек'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'births',
+                child: Row(
+                  children: [
+                    Icon(Icons.child_care, color: Colors.pink),
+                    SizedBox(width: 8),
+                    Text('Окролы'),
                   ],
                 ),
               ),

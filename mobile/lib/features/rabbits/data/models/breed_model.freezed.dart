@@ -21,12 +21,14 @@ BreedModel _$BreedModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BreedModel {
+  @IntConverter()
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   @JsonKey(name: 'average_weight')
   double? get averageWeight => throw _privateConstructorUsedError;
   @JsonKey(name: 'average_litter_size')
+  @IntConverter()
   int? get averageLitterSize => throw _privateConstructorUsedError;
   String? get purpose => throw _privateConstructorUsedError;
   @JsonKey(name: 'photo_url')
@@ -54,11 +56,13 @@ abstract class $BreedModelCopyWith<$Res> {
   ) = _$BreedModelCopyWithImpl<$Res, BreedModel>;
   @useResult
   $Res call({
-    int id,
+    @IntConverter() int id,
     String name,
     String? description,
     @JsonKey(name: 'average_weight') double? averageWeight,
-    @JsonKey(name: 'average_litter_size') int? averageLitterSize,
+    @JsonKey(name: 'average_litter_size')
+    @IntConverter()
+    int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -145,11 +149,13 @@ abstract class _$$BreedModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    int id,
+    @IntConverter() int id,
     String name,
     String? description,
     @JsonKey(name: 'average_weight') double? averageWeight,
-    @JsonKey(name: 'average_litter_size') int? averageLitterSize,
+    @JsonKey(name: 'average_litter_size')
+    @IntConverter()
+    int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -228,11 +234,13 @@ class __$$BreedModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BreedModelImpl implements _BreedModel {
   const _$BreedModelImpl({
-    required this.id,
+    @IntConverter() required this.id,
     required this.name,
     this.description,
     @JsonKey(name: 'average_weight') this.averageWeight,
-    @JsonKey(name: 'average_litter_size') this.averageLitterSize,
+    @JsonKey(name: 'average_litter_size')
+    @IntConverter()
+    this.averageLitterSize,
     this.purpose,
     @JsonKey(name: 'photo_url') this.photoUrl,
     @JsonKey(name: 'created_at') this.createdAt,
@@ -243,6 +251,7 @@ class _$BreedModelImpl implements _BreedModel {
       _$$BreedModelImplFromJson(json);
 
   @override
+  @IntConverter()
   final int id;
   @override
   final String name;
@@ -253,6 +262,7 @@ class _$BreedModelImpl implements _BreedModel {
   final double? averageWeight;
   @override
   @JsonKey(name: 'average_litter_size')
+  @IntConverter()
   final int? averageLitterSize;
   @override
   final String? purpose;
@@ -324,11 +334,13 @@ class _$BreedModelImpl implements _BreedModel {
 
 abstract class _BreedModel implements BreedModel {
   const factory _BreedModel({
-    required final int id,
+    @IntConverter() required final int id,
     required final String name,
     final String? description,
     @JsonKey(name: 'average_weight') final double? averageWeight,
-    @JsonKey(name: 'average_litter_size') final int? averageLitterSize,
+    @JsonKey(name: 'average_litter_size')
+    @IntConverter()
+    final int? averageLitterSize,
     final String? purpose,
     @JsonKey(name: 'photo_url') final String? photoUrl,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
@@ -339,6 +351,7 @@ abstract class _BreedModel implements BreedModel {
       _$BreedModelImpl.fromJson;
 
   @override
+  @IntConverter()
   int get id;
   @override
   String get name;
@@ -349,6 +362,7 @@ abstract class _BreedModel implements BreedModel {
   double? get averageWeight;
   @override
   @JsonKey(name: 'average_litter_size')
+  @IntConverter()
   int? get averageLitterSize;
   @override
   String? get purpose;

@@ -3,7 +3,14 @@
     "allow": [
       "Bash(test:*)",
       "Bash(npm run dev)",
-      "Bash(flutter pub get)"
+      "Bash(flutter pub get)",
+      "Bash(curl:*)",
+      "Bash(flutter pub add:*)",
+      "Bash(flutter pub run build_runner build:*)",
+      "Bash(npx sequelize-cli:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": []

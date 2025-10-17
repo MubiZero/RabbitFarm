@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_endpoints.dart';
 import 'api_interceptors.dart';
@@ -112,14 +114,32 @@ class ApiClient {
     return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/weights');
   }
 
-  Future<Response> uploadPhoto(int rabbitId, String filePath) async {
+  Future<Response> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+    final MultipartFile file;
+
+    if (kIsWeb && bytes != null) {
+      // For web, use bytes
+      file = MultipartFile.fromBytes(
+        bytes,
+        filename: 'photo.jpg',
+      );
+    } else {
+      // For mobile/desktop, use file path
+      file = await MultipartFile.fromFile(filePath);
+    }
+
     final formData = FormData.fromMap({
-      'photo': await MultipartFile.fromFile(filePath),
+      'photo': file,
     });
+
     return _dio.post(
       '${ApiEndpoints.rabbits}/$rabbitId/photo',
       data: formData,
     );
+  }
+
+  Future<Response> deletePhoto(int rabbitId) {
+    return _dio.delete('${ApiEndpoints.rabbits}/$rabbitId/photo');
   }
 
   // Breeds endpoints

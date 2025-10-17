@@ -1,8 +1,10 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/rabbit_model.dart';
 import '../models/rabbit_statistics.dart';
+import '../models/rabbit_weight_model.dart';
 
 class RabbitsRepository {
   final ApiClient _apiClient;
@@ -167,15 +169,85 @@ class RabbitsRepository {
     }
   }
 
-  // Add weight record
-  Future<void> addWeightRecord(int rabbitId, double weight, String? notes) async {
+  // Get weight history
+  Future<List<RabbitWeight>> getWeightHistory(int rabbitId) async {
     try {
-      await _apiClient.addWeightRecord(rabbitId, {
-        'weight': weight,
-        if (notes != null) 'notes': notes,
-      });
+      final response = await _apiClient.getWeightHistory(rabbitId);
+
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        response.data,
+        (json) => json as List<dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw Exception(apiResponse.message);
+      }
+
+      return apiResponse.data!
+          .map((item) => RabbitWeight.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw Exception(e.message ?? 'Ошибка загрузки истории взвешиваний');
+    }
+  }
+
+  // Add weight record
+  Future<RabbitWeight> addWeightRecord(int rabbitId, AddWeightRequest request) async {
+    try {
+      final response = await _apiClient.addWeightRecord(rabbitId, request.toJson());
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw Exception(apiResponse.message);
+      }
+
+      return RabbitWeight.fromJson(apiResponse.data!);
     } on DioException catch (e) {
       throw Exception(e.message ?? 'Ошибка добавления записи о весе');
+    }
+  }
+
+  // Upload photo
+  Future<RabbitModel> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+    try {
+      final response = await _apiClient.uploadPhoto(rabbitId, filePath, bytes: bytes);
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw Exception(apiResponse.message);
+      }
+
+      return RabbitModel.fromJson(apiResponse.data!);
+    } on DioException catch (e) {
+      throw Exception(e.message ?? 'Ошибка загрузки фото');
+    }
+  }
+
+  // Delete photo
+  Future<RabbitModel> deletePhoto(int rabbitId) async {
+    try {
+      final response = await _apiClient.deletePhoto(rabbitId);
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw Exception(apiResponse.message);
+      }
+
+      return RabbitModel.fromJson(apiResponse.data!);
+    } on DioException catch (e) {
+      throw Exception(e.message ?? 'Ошибка удаления фото');
     }
   }
 }
