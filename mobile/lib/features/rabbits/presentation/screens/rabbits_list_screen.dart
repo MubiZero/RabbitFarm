@@ -64,6 +64,8 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                 context.push('/breeding/planner');
               } else if (value == 'births') {
                 context.push('/births');
+              } else if (value == 'cages') {
+                context.push('/cages');
               }
             },
             itemBuilder: (context) => [
@@ -74,6 +76,16 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                     const Icon(Icons.person),
                     const SizedBox(width: 8),
                     Text(user?.fullName ?? 'Профиль'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'cages',
+                child: Row(
+                  children: [
+                    Icon(Icons.home_work, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Клетки'),
                   ],
                 ),
               ),

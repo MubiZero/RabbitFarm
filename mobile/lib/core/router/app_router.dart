@@ -15,6 +15,10 @@ import '../../features/rabbits/presentation/screens/births_list_screen.dart';
 import '../../features/rabbits/data/models/rabbit_model.dart';
 import '../../features/rabbits/data/models/breed_model.dart';
 import '../../features/rabbits/data/models/breeding_model.dart';
+import '../../features/cages/presentation/screens/cages_list_screen.dart';
+import '../../features/cages/presentation/screens/cage_form_screen.dart';
+import '../../features/cages/presentation/screens/cage_detail_screen.dart';
+import '../../features/cages/data/models/cage_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -132,6 +136,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final breeding = state.extra as BreedingModel?;
           return BirthFormScreen(breeding: breeding);
+        },
+      ),
+
+      // Cages routes
+      GoRoute(
+        path: '/cages',
+        name: 'cages',
+        builder: (context, state) => const CagesListScreen(),
+      ),
+      GoRoute(
+        path: '/cages/form',
+        name: 'cage-form',
+        builder: (context, state) {
+          final cage = state.extra as CageModel?;
+          return CageFormScreen(cage: cage);
+        },
+      ),
+      GoRoute(
+        path: '/cages/:id',
+        name: 'cage-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return CageDetailScreen(cageId: id);
         },
       ),
     ],
