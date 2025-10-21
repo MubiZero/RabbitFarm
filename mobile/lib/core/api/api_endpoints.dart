@@ -31,4 +31,10 @@ class ApiEndpoints {
 
   // Feed endpoints
   static const String feeds = '/feeds';
+
+  // Vaccinations endpoints
+  static const String vaccinations = '/vaccinations';
+  static const String vaccinationStatistics = '/vaccinations/statistics';
+  static const String vaccinationsUpcoming = '/vaccinations/upcoming';
+  static const String vaccinationsOverdue = '/vaccinations/overdue';
 }

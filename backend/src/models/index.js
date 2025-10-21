@@ -85,12 +85,9 @@ Birth.belongsTo(Breeding, { as: 'breeding', foreignKey: 'breeding_id' });
 Birth.belongsTo(Rabbit, { as: 'mother', foreignKey: 'mother_id' });
 Rabbit.hasMany(Birth, { as: 'births', foreignKey: 'mother_id', onDelete: 'RESTRICT' });
 
-// Birth-Kit relationship (через birth_id в таблице rabbits)
-// Note: Нужно будет добавить поле birth_id в модель Rabbit через миграцию, если требуется
-
 // Other associations
 RabbitWeight.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-Vaccination.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
+Vaccination.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 MedicalRecord.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
 
 Feed.hasMany(FeedingRecord, { foreignKey: 'feed_id', onDelete: 'RESTRICT' });

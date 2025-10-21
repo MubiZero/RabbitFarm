@@ -10,6 +10,7 @@ const {
   listRabbitsQuerySchema,
   addWeightSchema
 } = require('../validators/rabbitValidator');
+const vaccinationController = require('../controllers/vaccinationController');
 
 /**
  * Rabbit routes
@@ -129,5 +130,12 @@ router.delete(
   authorize(['manager', 'owner']),
   rabbitController.deletePhoto
 );
+
+/**
+ * @route   GET /api/v1/rabbits/:rabbitId/vaccinations
+ * @desc    Get rabbit vaccinations history
+ * @access  Private
+ */
+router.get('/:rabbitId/vaccinations', vaccinationController.getByRabbit);
 
 module.exports = router;

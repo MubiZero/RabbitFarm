@@ -19,6 +19,7 @@ import '../../features/cages/presentation/screens/cages_list_screen.dart';
 import '../../features/cages/presentation/screens/cage_form_screen.dart';
 import '../../features/cages/presentation/screens/cage_detail_screen.dart';
 import '../../features/cages/data/models/cage_model.dart';
+import '../../features/vaccinations/presentation/screens/vaccinations_list_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -137,6 +138,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           final breeding = state.extra as BreedingModel?;
           return BirthFormScreen(breeding: breeding);
         },
+      ),
+
+      // Vaccinations routes
+      GoRoute(
+        path: '/vaccinations',
+        name: 'vaccinations',
+        builder: (context, state) => const VaccinationsListScreen(),
       ),
 
       // Cages routes

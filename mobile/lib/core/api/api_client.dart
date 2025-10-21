@@ -98,6 +98,69 @@ class ApiClient {
     return _dio.put('${ApiEndpoints.rabbits}/$id', data: data);
   }
 
+  // Vaccinations endpoints
+  Future<Response> getVaccinations({
+    int page = 1,
+    int limit = 50,
+    int? rabbitId,
+    String? vaccineType,
+    String? fromDate,
+    String? toDate,
+    bool upcoming = false,
+    String sortBy = 'vaccination_date',
+    String sortOrder = 'DESC',
+  }) {
+    return _dio.get(
+      ApiEndpoints.vaccinations,
+      queryParameters: {
+        'page': page,
+        'limit': limit,
+        'sort_by': sortBy,
+        'sort_order': sortOrder,
+        if (rabbitId != null) 'rabbit_id': rabbitId,
+        if (vaccineType != null) 'vaccine_type': vaccineType,
+        if (fromDate != null) 'from_date': fromDate,
+        if (toDate != null) 'to_date': toDate,
+        if (upcoming) 'upcoming': 'true',
+      },
+    );
+  }
+
+  Future<Response> getVaccinationById(int id) {
+    return _dio.get('${ApiEndpoints.vaccinations}/$id');
+  }
+
+  Future<Response> createVaccination(Map<String, dynamic> data) {
+    return _dio.post(ApiEndpoints.vaccinations, data: data);
+  }
+
+  Future<Response> updateVaccination(int id, Map<String, dynamic> data) {
+    return _dio.put('${ApiEndpoints.vaccinations}/$id', data: data);
+  }
+
+  Future<Response> deleteVaccination(int id) {
+    return _dio.delete('${ApiEndpoints.vaccinations}/$id');
+  }
+
+  Future<Response> getRabbitVaccinations(int rabbitId) {
+    return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/vaccinations');
+  }
+
+  Future<Response> getVaccinationStatistics() {
+    return _dio.get(ApiEndpoints.vaccinationStatistics);
+  }
+
+  Future<Response> getUpcomingVaccinations({int days = 30}) {
+    return _dio.get(
+      ApiEndpoints.vaccinationsUpcoming,
+      queryParameters: {'days': days},
+    );
+  }
+
+  Future<Response> getOverdueVaccinations() {
+    return _dio.get(ApiEndpoints.vaccinationsOverdue);
+  }
+
   Future<Response> deleteRabbit(int id) {
     return _dio.delete('${ApiEndpoints.rabbits}/$id');
   }
