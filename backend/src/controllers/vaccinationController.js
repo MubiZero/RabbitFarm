@@ -139,7 +139,6 @@ class VaccinationController {
             include: [
               {
                 model: Breed,
-                as: 'breed',
                 attributes: ['id', 'name']
               }
             ]
@@ -228,7 +227,6 @@ class VaccinationController {
             include: [
               {
                 model: Breed,
-                as: 'breed',
                 attributes: ['id', 'name']
               }
             ]
@@ -388,7 +386,6 @@ class VaccinationController {
             include: [
               {
                 model: Breed,
-                as: 'breed',
                 attributes: ['id', 'name']
               }
             ]
@@ -441,7 +438,6 @@ class VaccinationController {
             include: [
               {
                 model: Breed,
-                as: 'breed',
                 attributes: ['id', 'name']
               }
             ]

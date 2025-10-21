@@ -7,6 +7,7 @@ const rabbitRoutes = require('./rabbit.routes');
 const breedRoutes = require('./breed.routes');
 const birthRoutes = require('./birth.routes');
 const cageRoutes = require('./cage.routes');
+const vaccinationRoutes = require('./vaccination.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -23,7 +24,8 @@ router.get('/', (req, res) => {
       finance: '/finance',
       farm: '/farm',
       tasks: '/tasks',
-      reports: '/reports'
+      reports: '/reports',
+      vaccinations: '/vaccinations'
     }
   });
 });
@@ -34,5 +36,6 @@ router.use('/rabbits', rabbitRoutes);
 router.use('/breeds', breedRoutes);
 router.use('/births', birthRoutes);
 router.use('/cages', cageRoutes);
+router.use('/vaccinations', vaccinationRoutes);
 
 module.exports = router;
