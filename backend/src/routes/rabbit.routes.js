@@ -12,6 +12,7 @@ const {
 } = require('../validators/rabbitValidator');
 const vaccinationController = require('../controllers/vaccinationController');
 const medicalRecordController = require('../controllers/medicalRecordController');
+const feedingRecordController = require('../controllers/feedingRecordController');
 
 /**
  * Rabbit routes
@@ -145,5 +146,12 @@ router.get('/:rabbitId/vaccinations', vaccinationController.getByRabbit);
  * @access  Private
  */
 router.get('/:rabbitId/medical-records', medicalRecordController.getByRabbit);
+
+/**
+ * @route   GET /api/v1/rabbits/:rabbitId/feeding-records
+ * @desc    Get rabbit feeding records history
+ * @access  Private
+ */
+router.get('/:rabbitId/feeding-records', feedingRecordController.getByRabbit);
 
 module.exports = router;

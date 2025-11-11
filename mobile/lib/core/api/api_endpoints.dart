@@ -31,6 +31,9 @@ class ApiEndpoints {
 
   // Feed endpoints
   static const String feeds = '/feeds';
+  static const String feedingRecords = '/feeding-records';
+  static String rabbitFeedingRecords(int rabbitId) =>
+      '/rabbits/$rabbitId/feeding-records';
 
   // Vaccinations endpoints
   static const String vaccinations = '/vaccinations';

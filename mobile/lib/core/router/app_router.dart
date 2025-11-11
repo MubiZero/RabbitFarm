@@ -25,6 +25,12 @@ import '../../features/health/data/models/vaccination_model.dart';
 import '../../features/health/presentation/screens/medical_records_list_screen.dart';
 import '../../features/health/presentation/screens/medical_record_form_screen.dart';
 import '../../features/health/data/models/medical_record_model.dart';
+import '../../features/feeding/presentation/screens/feeds_list_screen.dart';
+import '../../features/feeding/presentation/screens/feed_form_screen.dart';
+import '../../features/feeding/presentation/screens/feeding_records_list_screen.dart';
+import '../../features/feeding/presentation/screens/feeding_record_form_screen.dart';
+import '../../features/feeding/data/models/feed_model.dart';
+import '../../features/feeding/data/models/feeding_record_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -195,6 +201,36 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final medicalRecord = state.extra as MedicalRecord?;
           return MedicalRecordFormScreen(medicalRecord: medicalRecord);
+        },
+      ),
+
+      // Feeds routes
+      GoRoute(
+        path: '/feeds',
+        name: 'feeds',
+        builder: (context, state) => const FeedsListScreen(),
+      ),
+      GoRoute(
+        path: '/feeds/form',
+        name: 'feed-form',
+        builder: (context, state) {
+          final feed = state.extra as Feed?;
+          return FeedFormScreen(feed: feed);
+        },
+      ),
+
+      // Feeding Records routes
+      GoRoute(
+        path: '/feeding-records',
+        name: 'feeding-records',
+        builder: (context, state) => const FeedingRecordsListScreen(),
+      ),
+      GoRoute(
+        path: '/feeding-records/form',
+        name: 'feeding-record-form',
+        builder: (context, state) {
+          final record = state.extra as FeedingRecord?;
+          return FeedingRecordFormScreen(record: record);
         },
       ),
     ],
