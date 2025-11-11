@@ -37,4 +37,9 @@ class ApiEndpoints {
   static const String vaccinationStatistics = '/vaccinations/statistics';
   static const String vaccinationsUpcoming = '/vaccinations/upcoming';
   static const String vaccinationsOverdue = '/vaccinations/overdue';
+
+  // Medical Records endpoints
+  static const String medicalRecords = '/medical-records';
+  static String rabbitMedicalRecords(int rabbitId) =>
+      '/rabbits/$rabbitId/medical-records';
 }

@@ -11,6 +11,7 @@ const {
   addWeightSchema
 } = require('../validators/rabbitValidator');
 const vaccinationController = require('../controllers/vaccinationController');
+const medicalRecordController = require('../controllers/medicalRecordController');
 
 /**
  * Rabbit routes
@@ -137,5 +138,12 @@ router.delete(
  * @access  Private
  */
 router.get('/:rabbitId/vaccinations', vaccinationController.getByRabbit);
+
+/**
+ * @route   GET /api/v1/rabbits/:rabbitId/medical-records
+ * @desc    Get rabbit medical records history
+ * @access  Private
+ */
+router.get('/:rabbitId/medical-records', medicalRecordController.getByRabbit);
 
 module.exports = router;

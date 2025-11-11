@@ -22,6 +22,9 @@ import '../../features/cages/data/models/cage_model.dart';
 import '../../features/health/presentation/screens/vaccinations_list_screen.dart';
 import '../../features/health/presentation/screens/vaccination_form_screen.dart';
 import '../../features/health/data/models/vaccination_model.dart';
+import '../../features/health/presentation/screens/medical_records_list_screen.dart';
+import '../../features/health/presentation/screens/medical_record_form_screen.dart';
+import '../../features/health/data/models/medical_record_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -177,6 +180,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           return CageDetailScreen(cageId: id);
+        },
+      ),
+
+      // Medical Records routes
+      GoRoute(
+        path: '/medical-records',
+        name: 'medical-records',
+        builder: (context, state) => const MedicalRecordsListScreen(),
+      ),
+      GoRoute(
+        path: '/medical-records/form',
+        name: 'medical-record-form',
+        builder: (context, state) {
+          final medicalRecord = state.extra as MedicalRecord?;
+          return MedicalRecordFormScreen(medicalRecord: medicalRecord);
         },
       ),
     ],
