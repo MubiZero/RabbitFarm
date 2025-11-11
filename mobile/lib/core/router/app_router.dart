@@ -19,7 +19,9 @@ import '../../features/cages/presentation/screens/cages_list_screen.dart';
 import '../../features/cages/presentation/screens/cage_form_screen.dart';
 import '../../features/cages/presentation/screens/cage_detail_screen.dart';
 import '../../features/cages/data/models/cage_model.dart';
-import '../../features/vaccinations/presentation/screens/vaccinations_list_screen.dart';
+import '../../features/health/presentation/screens/vaccinations_list_screen.dart';
+import '../../features/health/presentation/screens/vaccination_form_screen.dart';
+import '../../features/health/data/models/vaccination_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -145,6 +147,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/vaccinations',
         name: 'vaccinations',
         builder: (context, state) => const VaccinationsListScreen(),
+      ),
+      GoRoute(
+        path: '/vaccinations/form',
+        name: 'vaccination-form',
+        builder: (context, state) {
+          final vaccination = state.extra as Vaccination?;
+          return VaccinationFormScreen(vaccination: vaccination);
+        },
       ),
 
       // Cages routes
