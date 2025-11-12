@@ -31,6 +31,9 @@ import '../../features/feeding/presentation/screens/feeding_records_list_screen.
 import '../../features/feeding/presentation/screens/feeding_record_form_screen.dart';
 import '../../features/feeding/data/models/feed_model.dart';
 import '../../features/feeding/data/models/feeding_record_model.dart';
+import '../../features/finance/presentation/screens/transactions_list_screen.dart';
+import '../../features/finance/presentation/screens/transaction_form_screen.dart';
+import '../../features/finance/data/models/transaction_model.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -231,6 +234,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final record = state.extra as FeedingRecord?;
           return FeedingRecordFormScreen(record: record);
+        },
+      ),
+
+      // Transactions routes
+      GoRoute(
+        path: '/transactions',
+        name: 'transactions',
+        builder: (context, state) => const TransactionsListScreen(),
+      ),
+      GoRoute(
+        path: '/transactions/form',
+        name: 'transaction-form',
+        builder: (context, state) {
+          final transaction = state.extra as Transaction?;
+          return TransactionFormScreen(transaction: transaction);
         },
       ),
     ],

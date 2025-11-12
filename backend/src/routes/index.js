@@ -11,6 +11,7 @@ const vaccinationRoutes = require('./vaccination.routes');
 const medicalRecordRoutes = require('./medical-record.routes');
 const feedRoutes = require('./feed.routes');
 const feedingRecordRoutes = require('./feeding-record.routes');
+const transactionRoutes = require('./transaction.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -31,7 +32,8 @@ router.get('/', (req, res) => {
       vaccinations: '/vaccinations',
       medical_records: '/medical-records',
       feeds: '/feeds',
-      feeding_records: '/feeding-records'
+      feeding_records: '/feeding-records',
+      transactions: '/transactions'
     }
   });
 });
@@ -46,5 +48,6 @@ router.use('/vaccinations', vaccinationRoutes);
 router.use('/medical-records', medicalRecordRoutes);
 router.use('/feeds', feedRoutes);
 router.use('/feeding-records', feedingRecordRoutes);
+router.use('/transactions', transactionRoutes);
 
 module.exports = router;

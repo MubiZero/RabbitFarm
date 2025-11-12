@@ -13,6 +13,7 @@ const {
 const vaccinationController = require('../controllers/vaccinationController');
 const medicalRecordController = require('../controllers/medicalRecordController');
 const feedingRecordController = require('../controllers/feedingRecordController');
+const transactionController = require('../controllers/transactionController');
 
 /**
  * Rabbit routes
@@ -153,5 +154,12 @@ router.get('/:rabbitId/medical-records', medicalRecordController.getByRabbit);
  * @access  Private
  */
 router.get('/:rabbitId/feeding-records', feedingRecordController.getByRabbit);
+
+/**
+ * @route   GET /api/v1/rabbits/:rabbitId/transactions
+ * @desc    Get rabbit financial transactions
+ * @access  Private
+ */
+router.get('/:rabbitId/transactions', transactionController.getRabbitTransactions);
 
 module.exports = router;
