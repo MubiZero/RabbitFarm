@@ -51,7 +51,7 @@ class MedicalRecord with _$MedicalRecord {
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   }) = _MedicalRecord;
 
   factory MedicalRecord.fromJson(Map<String, dynamic> json) =>
@@ -167,7 +167,7 @@ class MedicalRecordWithDays with _$MedicalRecordWithDays {
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') required int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   }) = _MedicalRecordWithDays;
 
   factory MedicalRecordWithDays.fromJson(Map<String, dynamic> json) =>

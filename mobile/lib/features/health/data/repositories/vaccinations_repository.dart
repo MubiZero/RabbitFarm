@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/vaccination_model.dart';
 

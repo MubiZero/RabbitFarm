@@ -373,7 +373,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       BuildContext context, int feedId, double quantity, bool isAddition) {
     final adjustment = StockAdjustment(
       quantity: quantity,
-      operation: isAddition ? StockOperation.add : StockOperation.subtract,
+      operation: isAddition ? 'add' : 'subtract',
     );
 
     ref.read(adjustFeedStockProvider((id: feedId, adjustment: adjustment)));

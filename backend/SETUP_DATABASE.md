@@ -1,27 +1,6 @@
 # Database Setup Guide
 
-## Option 1: Using Docker (Recommended)
-
-### Prerequisites
-- Docker Desktop installed and running
-
-### Steps
-```bash
-cd backend
-
-# Start MySQL container
-docker-compose up -d
-
-# Check if running
-docker-compose ps
-
-# View logs
-docker-compose logs mysql
-```
-
----
-
-## Option 2: Manual MySQL Installation
+## MySQL Installation
 
 ### Prerequisites
 - MySQL 8.0+ installed on your system
@@ -153,13 +132,6 @@ mysql -u root -p -e "CREATE DATABASE rabbitfarm CHARACTER SET utf8mb4 COLLATE ut
   - Mac: `brew services list`
 - Check port 3306 is not in use
 - Check firewall settings
-
-### Docker issues
-- Ensure Docker Desktop is running
-- Check Docker status: `docker ps`
-- Restart Docker Desktop
-- Remove old containers: `docker-compose down -v`
-- Start fresh: `docker-compose up -d --force-recreate`
 
 ---
 

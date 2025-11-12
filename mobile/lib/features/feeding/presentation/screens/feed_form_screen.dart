@@ -20,8 +20,6 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
   late TextEditingController _currentStockController;
   late TextEditingController _minStockController;
   late TextEditingController _costPerUnitController;
-  late TextEditingController _supplierController;
-  late TextEditingController _descriptionController;
 
   FeedType _selectedType = FeedType.pellets;
   FeedUnit _selectedUnit = FeedUnit.kg;
@@ -40,9 +38,6 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     _costPerUnitController = TextEditingController(
       text: widget.feed?.costPerUnit?.toString() ?? '',
     );
-    _supplierController = TextEditingController(text: widget.feed?.supplier ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.feed?.description ?? '');
 
     if (widget.feed != null) {
       _selectedType = widget.feed!.type;
@@ -56,8 +51,6 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     _currentStockController.dispose();
     _minStockController.dispose();
     _costPerUnitController.dispose();
-    _supplierController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -213,29 +206,6 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
-
-            // Поставщик
-            TextFormField(
-              controller: _supplierController,
-              decoration: const InputDecoration(
-                labelText: 'Поставщик',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.business),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Описание
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Описание',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
-              ),
-              maxLines: 3,
-            ),
             const SizedBox(height: 24),
 
             // Кнопка сохранения
@@ -278,17 +248,11 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         // Создание нового корма
         final feedCreate = FeedCreate(
           name: _nameController.text,
-          type: _selectedType,
-          unit: _selectedUnit,
+          type: _selectedType.name,
+          unit: _selectedUnit?.name,
           currentStock: currentStock,
           minStock: minStock,
           costPerUnit: costPerUnit,
-          supplier: _supplierController.text.isNotEmpty
-              ? _supplierController.text
-              : null,
-          description: _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
         );
 
         await ref.read(createFeedProvider(feedCreate).future);
@@ -303,17 +267,11 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         // Обновление существующего корма
         final feedUpdate = FeedUpdate(
           name: _nameController.text,
-          type: _selectedType,
-          unit: _selectedUnit,
+          type: _selectedType.name,
+          unit: _selectedUnit?.name,
           currentStock: currentStock,
           minStock: minStock,
           costPerUnit: costPerUnit,
-          supplier: _supplierController.text.isNotEmpty
-              ? _supplierController.text
-              : null,
-          description: _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
         );
 
         await ref.read(

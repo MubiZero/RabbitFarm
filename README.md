@@ -46,7 +46,6 @@ Complete farm management solution with Flutter mobile app (Android) and REST API
 - **Database**: MySQL 8.0
 - **ORM**: Sequelize
 - **Authentication**: JWT
-- **Deployment**: Docker + Docker Compose
 
 ### Frontend (Mobile)
 - **Framework**: Flutter 3.16+
@@ -91,52 +90,9 @@ RabbitFarm/
 
 - **Node.js** 18+ and npm
 - **MySQL** 8.0
-- **Docker** and Docker Compose (recommended)
 - **Flutter** 3.16+ (for mobile app)
 
 ### Backend Setup
-
-#### Option 1: Using Docker (Recommended)
-
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd RabbitFarm/backend
-```
-
-2. **Create environment file**
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and update the values:
-```env
-DB_ROOT_PASSWORD=your_secure_root_password
-DB_PASSWORD=your_secure_password
-JWT_SECRET=your_super_secret_jwt_key
-JWT_REFRESH_SECRET=your_super_secret_refresh_key
-```
-
-3. **Start with Docker Compose**
-```bash
-docker-compose up -d
-```
-
-4. **Run migrations**
-```bash
-docker-compose exec backend npm run migrate
-```
-
-5. **Seed database (optional)**
-```bash
-docker-compose exec backend npm run seed
-```
-
-6. **Access the API**
-- API: http://localhost:3000/api/v1
-- Health Check: http://localhost:3000/health
-
-#### Option 2: Manual Setup
 
 1. **Install dependencies**
 ```bash
@@ -309,42 +265,20 @@ npm run test:watch
 npm run test:coverage
 ```
 
-## 🐳 Docker
-
-### Build and run
-```bash
-docker-compose up -d
-```
-
-### Stop
-```bash
-docker-compose down
-```
-
-### View logs
-```bash
-docker-compose logs -f backend
-```
-
-### Rebuild
-```bash
-docker-compose up -d --build
-```
-
 ## 📊 Database
 
 ### Backup
 ```bash
 # Manual backup
-docker-compose exec mysql mysqldump -u root -p rabbitfarm > backup.sql
+mysqldump -u root -p rabbitfarm > backup.sql
 
 # Restore
-docker-compose exec -T mysql mysql -u root -p rabbitfarm < backup.sql
+mysql -u root -p rabbitfarm < backup.sql
 ```
 
 ### Access MySQL
 ```bash
-docker-compose exec mysql mysql -u root -p
+mysql -u root -p
 ```
 
 ## 🤝 Contributing

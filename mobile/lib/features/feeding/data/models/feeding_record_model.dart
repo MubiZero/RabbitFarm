@@ -20,7 +20,7 @@ class FeedingRecord with _$FeedingRecord {
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
   }) = _FeedingRecord;
 

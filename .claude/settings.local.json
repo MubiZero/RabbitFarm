@@ -11,7 +11,10 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter build:*)",
       "Bash(npm start)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(del \"C:\\projects\\RabbitFarm\\backend\\Dockerfile\")",
+      "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose.yml\")",
+      "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose-simple.yml\")"
     ],
     "deny": [],
     "ask": []

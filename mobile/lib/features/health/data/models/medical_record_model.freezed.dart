@@ -46,7 +46,7 @@ mixin _$MedicalRecord {
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit => throw _privateConstructorUsedError;
+  RabbitModel? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this MedicalRecord to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -81,8 +81,10 @@ abstract class $MedicalRecordCopyWith<$Res> {
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
+
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -182,10 +184,24 @@ class _$MedicalRecordCopyWithImpl<$Res, $Val extends MedicalRecord>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as Rabbit?,
+                      as RabbitModel?,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of MedicalRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RabbitModelCopyWith<$Res>? get rabbit {
+    if (_value.rabbit == null) {
+      return null;
+    }
+
+    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+      return _then(_value.copyWith(rabbit: value) as $Val);
+    });
   }
 }
 
@@ -214,8 +230,11 @@ abstract class _$$MedicalRecordImplCopyWith<$Res>
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
+
+  @override
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -314,7 +333,7 @@ class __$$MedicalRecordImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as Rabbit?,
+                  as RabbitModel?,
       ),
     );
   }
@@ -386,7 +405,7 @@ class _$MedicalRecordImpl implements _MedicalRecord {
   final DateTime? updatedAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final Rabbit? rabbit;
+  final RabbitModel? rabbit;
 
   @override
   String toString() {
@@ -422,7 +441,7 @@ class _$MedicalRecordImpl implements _MedicalRecord {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            const DeepCollectionEquality().equals(other.rabbit, rabbit));
+            (identical(other.rabbit, rabbit) || other.rabbit == rabbit));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -444,7 +463,7 @@ class _$MedicalRecordImpl implements _MedicalRecord {
     notes,
     createdAt,
     updatedAt,
-    const DeepCollectionEquality().hash(rabbit),
+    rabbit,
   );
 
   /// Create a copy of MedicalRecord
@@ -479,7 +498,8 @@ abstract class _MedicalRecord implements MedicalRecord {
     final String? notes,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
     @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) final Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final RabbitModel? rabbit,
   }) = _$MedicalRecordImpl;
 
   factory _MedicalRecord.fromJson(Map<String, dynamic> json) =
@@ -526,7 +546,7 @@ abstract class _MedicalRecord implements MedicalRecord {
   DateTime? get updatedAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit;
+  RabbitModel? get rabbit;
 
   /// Create a copy of MedicalRecord
   /// with the given fields replaced by the non-null parameter values.
@@ -2289,7 +2309,7 @@ mixin _$MedicalRecordWithDays {
   @JsonKey(name: 'days_ongoing')
   int get daysOngoing => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit => throw _privateConstructorUsedError;
+  RabbitModel? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this MedicalRecordWithDays to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2323,8 +2343,10 @@ abstract class $MedicalRecordWithDaysCopyWith<$Res> {
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
+
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -2422,10 +2444,24 @@ class _$MedicalRecordWithDaysCopyWithImpl<
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as Rabbit?,
+                      as RabbitModel?,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of MedicalRecordWithDays
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RabbitModelCopyWith<$Res>? get rabbit {
+    if (_value.rabbit == null) {
+      return null;
+    }
+
+    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+      return _then(_value.copyWith(rabbit: value) as $Val);
+    });
   }
 }
 
@@ -2453,8 +2489,11 @@ abstract class _$$MedicalRecordWithDaysImplCopyWith<$Res>
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
+
+  @override
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -2549,7 +2588,7 @@ class __$$MedicalRecordWithDaysImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as Rabbit?,
+                  as RabbitModel?,
       ),
     );
   }
@@ -2617,7 +2656,7 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
   final int daysOngoing;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final Rabbit? rabbit;
+  final RabbitModel? rabbit;
 
   @override
   String toString() {
@@ -2651,7 +2690,7 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.daysOngoing, daysOngoing) ||
                 other.daysOngoing == daysOngoing) &&
-            const DeepCollectionEquality().equals(other.rabbit, rabbit));
+            (identical(other.rabbit, rabbit) || other.rabbit == rabbit));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2672,7 +2711,7 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
     veterinarian,
     notes,
     daysOngoing,
-    const DeepCollectionEquality().hash(rabbit),
+    rabbit,
   );
 
   /// Create a copy of MedicalRecordWithDays
@@ -2710,7 +2749,8 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
     final String? veterinarian,
     final String? notes,
     @JsonKey(name: 'days_ongoing') required final int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) final Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final RabbitModel? rabbit,
   }) = _$MedicalRecordWithDaysImpl;
 
   factory _MedicalRecordWithDays.fromJson(Map<String, dynamic> json) =
@@ -2754,7 +2794,7 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
   int get daysOngoing;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit;
+  RabbitModel? get rabbit;
 
   /// Create a copy of MedicalRecordWithDays
   /// with the given fields replaced by the non-null parameter values.

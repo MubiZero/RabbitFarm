@@ -61,7 +61,7 @@ class Vaccination with _$Vaccination {
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     // Related rabbit info (from API) - не сериализуем, создаем вручную
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     // Calculated fields
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,

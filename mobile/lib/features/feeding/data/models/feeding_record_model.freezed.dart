@@ -45,7 +45,7 @@ mixin _$FeedingRecord {
   @JsonKey(includeFromJson: false, includeToJson: false)
   Feed? get feed => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit => throw _privateConstructorUsedError;
+  RabbitModel? get rabbit => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
   CageModel? get cage => throw _privateConstructorUsedError;
 
@@ -77,11 +77,12 @@ abstract class $FeedingRecordCopyWith<$Res> {
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
   });
 
   $FeedCopyWith<$Res>? get feed;
+  $RabbitModelCopyWith<$Res>? get rabbit;
   $CageModelCopyWith<$Res>? get cage;
 }
 
@@ -158,7 +159,7 @@ class _$FeedingRecordCopyWithImpl<$Res, $Val extends FeedingRecord>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as Rabbit?,
+                      as RabbitModel?,
             cage: freezed == cage
                 ? _value.cage
                 : cage // ignore: cast_nullable_to_non_nullable
@@ -179,6 +180,20 @@ class _$FeedingRecordCopyWithImpl<$Res, $Val extends FeedingRecord>
 
     return $FeedCopyWith<$Res>(_value.feed!, (value) {
       return _then(_value.copyWith(feed: value) as $Val);
+    });
+  }
+
+  /// Create a copy of FeedingRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RabbitModelCopyWith<$Res>? get rabbit {
+    if (_value.rabbit == null) {
+      return null;
+    }
+
+    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+      return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
 
@@ -217,12 +232,14 @@ abstract class _$$FeedingRecordImplCopyWith<$Res>
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
   });
 
   @override
   $FeedCopyWith<$Res>? get feed;
+  @override
+  $RabbitModelCopyWith<$Res>? get rabbit;
   @override
   $CageModelCopyWith<$Res>? get cage;
 }
@@ -299,7 +316,7 @@ class __$$FeedingRecordImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as Rabbit?,
+                  as RabbitModel?,
         cage: freezed == cage
             ? _value.cage
             : cage // ignore: cast_nullable_to_non_nullable
@@ -365,7 +382,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
   final Feed? feed;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final Rabbit? rabbit;
+  final RabbitModel? rabbit;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   final CageModel? cage;
@@ -393,7 +410,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.feed, feed) || other.feed == feed) &&
-            const DeepCollectionEquality().equals(other.rabbit, rabbit) &&
+            (identical(other.rabbit, rabbit) || other.rabbit == rabbit) &&
             (identical(other.cage, cage) || other.cage == cage));
   }
 
@@ -411,7 +428,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
     notes,
     createdAt,
     feed,
-    const DeepCollectionEquality().hash(rabbit),
+    rabbit,
     cage,
   );
 
@@ -441,7 +458,8 @@ abstract class _FeedingRecord implements FeedingRecord {
     final String? notes,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) final Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) final Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final CageModel? cage,
   }) = _$FeedingRecordImpl;
@@ -484,7 +502,7 @@ abstract class _FeedingRecord implements FeedingRecord {
   Feed? get feed;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit;
+  RabbitModel? get rabbit;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   CageModel? get cage;

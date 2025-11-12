@@ -74,7 +74,7 @@ class _MedicalRecordFormScreenState
 
   @override
   Widget build(BuildContext context) {
-    final rabbitsAsync = ref.watch(rabbitsProvider);
+    final rabbitsState = ref.watch(rabbitsListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -88,36 +88,34 @@ class _MedicalRecordFormScreenState
           padding: const EdgeInsets.all(16),
           children: [
             // Rabbit selection
-            rabbitsAsync.when(
-              data: (rabbits) {
-                return DropdownButtonFormField<int>(
-                  value: _selectedRabbitId,
-                  decoration: const InputDecoration(
-                    labelText: 'Кролик *',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: rabbits.map((rabbit) {
-                    return DropdownMenuItem(
-                      value: rabbit.id,
-                      child: Text('${rabbit.name} (${rabbit.tagId ?? ''})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedRabbitId = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Выберите кролика';
-                    }
-                    return null;
-                  },
-                );
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (e, s) => Text('Ошибка загрузки кроликов: $e'),
-            ),
+            rabbitsState.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : rabbitsState.error != null
+                    ? Text('Ошибка загрузки кроликов: ${rabbitsState.error}')
+                    : DropdownButtonFormField<int>(
+                        value: _selectedRabbitId,
+                        decoration: const InputDecoration(
+                          labelText: 'Кролик *',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: rabbitsState.rabbits.map((rabbit) {
+                          return DropdownMenuItem(
+                            value: rabbit.id,
+                            child: Text('${rabbit.name} (${rabbit.tagId ?? ''})'),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRabbitId = value;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Выберите кролика';
+                          }
+                          return null;
+                        },
+                      ),
             const SizedBox(height: 16),
 
             // Symptoms

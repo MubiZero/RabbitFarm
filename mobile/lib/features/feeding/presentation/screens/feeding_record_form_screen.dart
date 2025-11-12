@@ -63,8 +63,8 @@ class _FeedingRecordFormScreenState
     // Загружаем списки
     Future.microtask(() {
       ref.read(feedsProvider.notifier).loadFeeds(refresh: true);
-      ref.read(rabbitsProvider.notifier).loadRabbits(refresh: true);
-      ref.read(cagesProvider.notifier).loadCages(refresh: true);
+      ref.read(rabbitsListProvider.notifier).loadRabbits();
+      ref.read(cagesProvider.notifier).loadCages();
     });
   }
 
@@ -78,7 +78,7 @@ class _FeedingRecordFormScreenState
   @override
   Widget build(BuildContext context) {
     final feedsState = ref.watch(feedsProvider);
-    final rabbitsState = ref.watch(rabbitsProvider);
+    final rabbitsState = ref.watch(rabbitsListProvider);
     final cagesState = ref.watch(cagesProvider);
 
     return Scaffold(
@@ -244,7 +244,7 @@ class _FeedingRecordFormScreenState
     );
   }
 
-  Widget _buildRabbitSelector(RabbitsState rabbitsState) {
+  Widget _buildRabbitSelector(RabbitsListState rabbitsState) {
     if (rabbitsState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -259,7 +259,7 @@ class _FeedingRecordFormScreenState
       items: rabbitsState.rabbits.map((rabbit) {
         return DropdownMenuItem(
           value: rabbit.id,
-          child: Text('${rabbit.name} (${rabbit.earTag ?? "без бирки"})'),
+          child: Text('${rabbit.name} (${rabbit.tagId ?? "без бирки"})'),
         );
       }).toList(),
       onChanged: (value) {

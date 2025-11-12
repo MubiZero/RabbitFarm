@@ -14,9 +14,12 @@ cp .env.example .env
 npm install
 ```
 
-3. **Start MySQL** (if using Docker)
+3. **Ensure MySQL is running**
 ```bash
-docker-compose up -d mysql
+# Check MySQL service status
+# Windows: sc query MySQL80
+# Linux: sudo systemctl status mysql
+# Mac: brew services list
 ```
 
 4. **Run migrations**
@@ -498,13 +501,17 @@ curl http://localhost:3000/api/v1/rabbits/1/weights -H "Authorization: Bearer $T
 ### "Cannot connect to MySQL"
 ```bash
 # Check if MySQL is running
-docker-compose ps
-
-# Check logs
-docker-compose logs mysql
+# Windows: sc query MySQL80
+# Linux: sudo systemctl status mysql
+# Mac: brew services list
 
 # Restart MySQL
-docker-compose restart mysql
+# Windows: net stop MySQL80 && net start MySQL80
+# Linux: sudo systemctl restart mysql
+# Mac: brew services restart mysql
+
+# Check MySQL connection
+mysql -u root -p
 ```
 
 ### "Migration error"

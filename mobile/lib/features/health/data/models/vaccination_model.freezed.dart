@@ -43,7 +43,7 @@ mixin _$Vaccination {
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Related rabbit info (from API) - не сериализуем, создаем вручную
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit => throw _privateConstructorUsedError; // Calculated fields
+  RabbitModel? get rabbit => throw _privateConstructorUsedError; // Calculated fields
   @JsonKey(name: 'days_until')
   int? get daysUntil => throw _privateConstructorUsedError;
   @JsonKey(name: 'days_overdue')
@@ -80,11 +80,13 @@ abstract class $VaccinationCopyWith<$Res> {
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
+
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -167,7 +169,7 @@ class _$VaccinationCopyWithImpl<$Res, $Val extends Vaccination>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as Rabbit?,
+                      as RabbitModel?,
             daysUntil: freezed == daysUntil
                 ? _value.daysUntil
                 : daysUntil // ignore: cast_nullable_to_non_nullable
@@ -183,6 +185,20 @@ class _$VaccinationCopyWithImpl<$Res, $Val extends Vaccination>
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of Vaccination
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RabbitModelCopyWith<$Res>? get rabbit {
+    if (_value.rabbit == null) {
+      return null;
+    }
+
+    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+      return _then(_value.copyWith(rabbit: value) as $Val);
+    });
   }
 }
 
@@ -207,11 +223,14 @@ abstract class _$$VaccinationImplCopyWith<$Res>
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
+
+  @override
+  $RabbitModelCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -293,7 +312,7 @@ class __$$VaccinationImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as Rabbit?,
+                  as RabbitModel?,
         daysUntil: freezed == daysUntil
             ? _value.daysUntil
             : daysUntil // ignore: cast_nullable_to_non_nullable
@@ -370,7 +389,7 @@ class _$VaccinationImpl implements _Vaccination {
   // Related rabbit info (from API) - не сериализуем, создаем вручную
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final Rabbit? rabbit;
+  final RabbitModel? rabbit;
   // Calculated fields
   @override
   @JsonKey(name: 'days_until')
@@ -412,7 +431,7 @@ class _$VaccinationImpl implements _Vaccination {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            const DeepCollectionEquality().equals(other.rabbit, rabbit) &&
+            (identical(other.rabbit, rabbit) || other.rabbit == rabbit) &&
             (identical(other.daysUntil, daysUntil) ||
                 other.daysUntil == daysUntil) &&
             (identical(other.daysOverdue, daysOverdue) ||
@@ -436,7 +455,7 @@ class _$VaccinationImpl implements _Vaccination {
     notes,
     createdAt,
     updatedAt,
-    const DeepCollectionEquality().hash(rabbit),
+    rabbit,
     daysUntil,
     daysOverdue,
     isOverdue,
@@ -469,7 +488,8 @@ abstract class _Vaccination implements Vaccination {
     final String? notes,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
     @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) final Rabbit? rabbit,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final RabbitModel? rabbit,
     @JsonKey(name: 'days_until') final int? daysUntil,
     @JsonKey(name: 'days_overdue') final int? daysOverdue,
     @JsonKey(name: 'is_overdue') final bool? isOverdue,
@@ -512,7 +532,7 @@ abstract class _Vaccination implements Vaccination {
   DateTime? get updatedAt; // Related rabbit info (from API) - не сериализуем, создаем вручную
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Rabbit? get rabbit; // Calculated fields
+  RabbitModel? get rabbit; // Calculated fields
   @override
   @JsonKey(name: 'days_until')
   int? get daysUntil;

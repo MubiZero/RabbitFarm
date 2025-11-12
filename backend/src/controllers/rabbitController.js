@@ -18,6 +18,9 @@ class RabbitController {
         req.body.photo_url = `/uploads/rabbits/${req.file.filename}`;
       }
 
+      // Add user_id from authenticated user
+      req.body.user_id = req.user.id;
+
       const rabbit = await rabbitService.createRabbit(req.body);
 
       return ApiResponse.created(res, rabbit, 'Кролик успешно добавлен');

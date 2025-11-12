@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/feeding_record_model.dart';
+import '../../data/models/feed_model.dart';
 import '../providers/feeding_records_provider.dart';
 
 /// Экран списка записей о кормлении
@@ -425,13 +426,6 @@ class _FeedingRecordsListScreenState
 
   String _getFeedUnitName(FeedUnit? unit) {
     if (unit == null) return '';
-    switch (unit) {
-      case FeedUnit.kg:
-        return 'кг';
-      case FeedUnit.liter:
-        return 'л';
-      case FeedUnit.piece:
-        return 'шт';
-    }
+    return unit.displayName;
   }
 }
