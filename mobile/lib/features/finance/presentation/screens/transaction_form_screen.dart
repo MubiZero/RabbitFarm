@@ -65,7 +65,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
 
     // Загружаем список кроликов
     Future.microtask(() {
-      ref.read(rabbitsProvider.notifier).loadRabbits(refresh: true);
+      ref.read(rabbitsListProvider.notifier).loadRabbits();
     });
   }
 
@@ -78,7 +78,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rabbitsState = ref.watch(rabbitsProvider);
+    final rabbitsState = ref.watch(rabbitsListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -239,7 +239,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                   ...rabbitsState.rabbits.map((rabbit) {
                     return DropdownMenuItem(
                       value: rabbit.id,
-                      child: Text('${rabbit.name} (${rabbit.earTag ?? "без бирки"})'),
+                      child: Text('${rabbit.name} (${rabbit.tagId ?? "без бирки"})'),
                     );
                   }).toList(),
                 ],

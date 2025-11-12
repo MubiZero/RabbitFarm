@@ -1,5 +1,4 @@
 -- RabbitFarm Database Initialization Script
--- Run this if you're not using Docker
 
 -- Create database
 CREATE DATABASE IF NOT EXISTS rabbitfarm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

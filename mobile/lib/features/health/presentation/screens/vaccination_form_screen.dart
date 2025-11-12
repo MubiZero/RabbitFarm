@@ -10,7 +10,7 @@ import '../providers/vaccinations_provider.dart';
 /// Экран формы добавления/редактирования вакцинации
 class VaccinationFormScreen extends ConsumerStatefulWidget {
   final Vaccination? vaccination;
-  final Rabbit? rabbit; // Можно передать кролика для автозаполнения
+  final RabbitModel? rabbit; // Можно передать кролика для автозаполнения
 
   const VaccinationFormScreen({
     super.key,
