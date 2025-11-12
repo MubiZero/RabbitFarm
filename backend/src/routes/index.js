@@ -12,6 +12,8 @@ const medicalRecordRoutes = require('./medical-record.routes');
 const feedRoutes = require('./feed.routes');
 const feedingRecordRoutes = require('./feeding-record.routes');
 const transactionRoutes = require('./transaction.routes');
+const taskRoutes = require('./task.routes');
+const reportRoutes = require('./report.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -33,7 +35,8 @@ router.get('/', (req, res) => {
       medical_records: '/medical-records',
       feeds: '/feeds',
       feeding_records: '/feeding-records',
-      transactions: '/transactions'
+      transactions: '/transactions',
+      tasks: '/tasks'
     }
   });
 });
@@ -49,5 +52,7 @@ router.use('/medical-records', medicalRecordRoutes);
 router.use('/feeds', feedRoutes);
 router.use('/feeding-records', feedingRecordRoutes);
 router.use('/transactions', transactionRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/reports', reportRoutes);
 
 module.exports = router;
