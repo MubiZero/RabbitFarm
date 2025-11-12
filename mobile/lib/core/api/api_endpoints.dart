@@ -45,4 +45,11 @@ class ApiEndpoints {
   static const String medicalRecords = '/medical-records';
   static String rabbitMedicalRecords(int rabbitId) =>
       '/rabbits/$rabbitId/medical-records';
+
+  // Transactions endpoints
+  static const String transactions = '/transactions';
+  static const String transactionStatistics = '/transactions/statistics';
+  static const String monthlyReport = '/transactions/monthly-report';
+  static String rabbitTransactions(int rabbitId) =>
+      '/rabbits/$rabbitId/transactions';
 }
