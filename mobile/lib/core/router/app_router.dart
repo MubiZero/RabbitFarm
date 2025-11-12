@@ -34,6 +34,10 @@ import '../../features/feeding/data/models/feeding_record_model.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/data/models/transaction_model.dart';
+import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
+import '../../features/tasks/presentation/screens/task_form_screen.dart';
+import '../../features/tasks/data/models/task_model.dart';
+import '../../features/reports/presentation/screens/dashboard_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -250,6 +254,28 @@ final routerProvider = Provider<GoRouter>((ref) {
           final transaction = state.extra as Transaction?;
           return TransactionFormScreen(transaction: transaction);
         },
+      ),
+
+      // Tasks routes
+      GoRoute(
+        path: '/tasks',
+        name: 'tasks',
+        builder: (context, state) => const TasksListScreen(),
+      ),
+      GoRoute(
+        path: '/tasks/form',
+        name: 'task-form',
+        builder: (context, state) {
+          final task = state.extra as Task?;
+          return TaskFormScreen(task: task);
+        },
+      ),
+
+      // Reports / Dashboard routes
+      GoRoute(
+        path: '/dashboard',
+        name: 'dashboard',
+        builder: (context, state) => const DashboardScreen(),
       ),
     ],
   );

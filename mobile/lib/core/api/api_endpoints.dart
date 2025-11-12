@@ -52,4 +52,15 @@ class ApiEndpoints {
   static const String monthlyReport = '/transactions/monthly-report';
   static String rabbitTransactions(int rabbitId) =>
       '/rabbits/$rabbitId/transactions';
+
+  // Tasks endpoints
+  static const String tasks = '/tasks';
+  static const String taskStatistics = '/tasks/statistics';
+  static const String tasksUpcoming = '/tasks/upcoming';
+
+  // Reports endpoints
+  static const String reportDashboard = '/reports/dashboard';
+  static const String reportFarm = '/reports/farm';
+  static const String reportHealth = '/reports/health';
+  static const String reportFinancial = '/reports/financial';
 }
