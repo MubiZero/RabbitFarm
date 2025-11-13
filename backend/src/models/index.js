@@ -36,8 +36,8 @@ User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 
 User.hasMany(Rabbit, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-User.hasMany(Task, { as: 'assignedTasks', foreignKey: 'assigned_to', onDelete: 'SET NULL' });
-User.hasMany(Task, { as: 'createdTasks', foreignKey: 'created_by', onDelete: 'SET NULL' });
+User.hasMany(Task, { as: 'assignedTo', foreignKey: 'assigned_to', onDelete: 'SET NULL' });
+User.hasMany(Task, { as: 'creator', foreignKey: 'created_by', onDelete: 'SET NULL' });
 User.hasMany(Transaction, { foreignKey: 'created_by', onDelete: 'SET NULL' });
 User.hasMany(FeedingRecord, { foreignKey: 'fed_by', onDelete: 'SET NULL' });
 User.hasMany(Photo, { foreignKey: 'uploaded_by', onDelete: 'SET NULL' });
@@ -69,7 +69,7 @@ Rabbit.hasMany(Vaccination, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 Rabbit.hasMany(MedicalRecord, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 Rabbit.hasMany(FeedingRecord, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 Rabbit.hasMany(Transaction, { foreignKey: 'rabbit_id', onDelete: 'SET NULL' });
-Rabbit.hasMany(Task, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
+Rabbit.hasMany(Task, { as: 'tasks', foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 Rabbit.hasMany(Photo, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 Rabbit.hasMany(Note, { foreignKey: 'rabbit_id', onDelete: 'CASCADE' });
 
@@ -99,9 +99,9 @@ FeedingRecord.belongsTo(User, { foreignKey: 'fed_by' });
 Transaction.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
 Transaction.belongsTo(User, { foreignKey: 'created_by' });
 
-Task.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-Task.belongsTo(Cage, { foreignKey: 'cage_id' });
-Task.belongsTo(User, { as: 'assignedUser', foreignKey: 'assigned_to' });
+Task.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+Task.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
+Task.belongsTo(User, { as: 'assignedTo', foreignKey: 'assigned_to' });
 Task.belongsTo(User, { as: 'creator', foreignKey: 'created_by' });
 
 Photo.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
