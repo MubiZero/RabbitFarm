@@ -82,7 +82,7 @@ exports.create = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -92,19 +92,17 @@ exports.create = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
 
-    res.status(201).json(
-      ApiResponse.success('Задача успешно создана', createdTask)
-    );
+    return ApiResponse.success(res, createdTask, 'Задача успешно создана', 201);
   } catch (error) {
     next(error);
   }
@@ -123,7 +121,7 @@ exports.getById = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -133,12 +131,12 @@ exports.getById = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
@@ -149,7 +147,7 @@ exports.getById = async (req, res, next) => {
       );
     }
 
-    res.json(ApiResponse.success('Задача получена', task));
+    return ApiResponse.success(res, task, 'Задача получена');
   } catch (error) {
     next(error);
   }
@@ -251,7 +249,7 @@ exports.list = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -261,12 +259,12 @@ exports.list = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ],
       limit: parseInt(limit),
@@ -275,17 +273,15 @@ exports.list = async (req, res, next) => {
       distinct: true
     });
 
-    res.json(
-      ApiResponse.success('Список задач получен', {
-        tasks: rows,
-        pagination: {
-          total: count,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(count / limit)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      tasks: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(count / limit)
+      }
+    }, 'Список задач получен');
   } catch (error) {
     next(error);
   }
@@ -384,7 +380,7 @@ exports.update = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -394,19 +390,17 @@ exports.update = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
 
-    res.json(
-      ApiResponse.success('Задача успешно обновлена', updatedTask)
-    );
+    return ApiResponse.success(res, updatedTask, 'Задача успешно обновлена');
   } catch (error) {
     next(error);
   }
@@ -430,7 +424,7 @@ exports.delete = async (req, res, next) => {
 
     await task.destroy();
 
-    res.json(ApiResponse.success('Задача успешно удалена'));
+    return ApiResponse.success(res, null, 'Задача успешно удалена');
   } catch (error) {
     next(error);
   }
@@ -501,24 +495,22 @@ exports.getStatistics = async (req, res, next) => {
       group: ['priority']
     });
 
-    res.json(
-      ApiResponse.success('Статистика получена', {
-        total_pending: totalPending,
-        total_in_progress: totalInProgress,
-        total_completed: totalCompleted,
-        total_cancelled: totalCancelled,
-        overdue_count: overdueCount,
-        today_count: todayCount,
-        tasks_by_type: tasksByType.map(item => ({
-          type: item.type,
-          count: parseInt(item.dataValues.count)
-        })),
-        tasks_by_priority: tasksByPriority.map(item => ({
-          priority: item.priority,
-          count: parseInt(item.dataValues.count)
-        }))
-      })
-    );
+    return ApiResponse.success(res, {
+      total_pending: totalPending,
+      total_in_progress: totalInProgress,
+      total_completed: totalCompleted,
+      total_cancelled: totalCancelled,
+      overdue_count: overdueCount,
+      today_count: todayCount,
+      tasks_by_type: tasksByType.map(item => ({
+        type: item.type,
+        count: parseInt(item.dataValues.count)
+      })),
+      tasks_by_priority: tasksByPriority.map(item => ({
+        priority: item.priority,
+        count: parseInt(item.dataValues.count)
+      }))
+    }, 'Статистика получена');
   } catch (error) {
     next(error);
   }
@@ -551,7 +543,7 @@ exports.getUpcoming = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -561,15 +553,13 @@ exports.getUpcoming = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ],
       order: [['due_date', 'ASC'], ['priority', 'DESC']]
     });
 
-    res.json(
-      ApiResponse.success('Предстоящие задачи получены', tasks)
-    );
+    return ApiResponse.success(res, tasks, 'Предстоящие задачи получены');
   } catch (error) {
     next(error);
   }
@@ -601,7 +591,7 @@ exports.completeTask = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: Cage,
@@ -616,9 +606,7 @@ exports.completeTask = async (req, res, next) => {
       ]
     });
 
-    res.json(
-      ApiResponse.success('Задача выполнена', updatedTask)
-    );
+    return ApiResponse.success(res, updatedTask, 'Задача выполнена');
   } catch (error) {
     next(error);
   }
