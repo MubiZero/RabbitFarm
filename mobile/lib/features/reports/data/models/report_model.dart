@@ -78,10 +78,8 @@ class CageStats with _$CageStats {
 @freezed
 class HealthStats with _$HealthStats {
   const factory HealthStats({
-    @JsonKey(name: 'upcoming_vaccinations')
     @IntConverter()
     required int upcomingVaccinations,
-    @JsonKey(name: 'overdue_vaccinations')
     @IntConverter()
     required int overdueVaccinations,
   }) = _HealthStats;
@@ -93,9 +91,9 @@ class HealthStats with _$HealthStats {
 @freezed
 class FinanceStats with _$FinanceStats {
   const factory FinanceStats({
-    @JsonKey(name: 'income_30days') @DoubleConverter() required double income30days,
-    @JsonKey(name: 'expenses_30days') @DoubleConverter() required double expenses30days,
-    @JsonKey(name: 'profit_30days') @DoubleConverter() required double profit30days,
+    @DoubleConverter() required double income30days,
+    @DoubleConverter() required double expenses30days,
+    @DoubleConverter() required double profit30days,
   }) = _FinanceStats;
 
   factory FinanceStats.fromJson(Map<String, dynamic> json) =>
@@ -116,7 +114,7 @@ class TaskStats with _$TaskStats {
 @freezed
 class InventoryStats with _$InventoryStats {
   const factory InventoryStats({
-    @JsonKey(name: 'low_stock_feeds') @IntConverter() required int lowStockFeeds,
+    @IntConverter() required int lowStockFeeds,
   }) = _InventoryStats;
 
   factory InventoryStats.fromJson(Map<String, dynamic> json) =>
@@ -126,7 +124,7 @@ class InventoryStats with _$InventoryStats {
 @freezed
 class BreedingStats with _$BreedingStats {
   const factory BreedingStats({
-    @JsonKey(name: 'recent_births') @IntConverter() required int recentBirths,
+    @IntConverter() required int recentBirths,
   }) = _BreedingStats;
 
   factory BreedingStats.fromJson(Map<String, dynamic> json) =>
