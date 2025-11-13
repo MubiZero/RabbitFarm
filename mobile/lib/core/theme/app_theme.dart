@@ -1,19 +1,92 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Colors
-  static const Color primaryColor = Color(0xFF4CAF50); // Green
-  static const Color secondaryColor = Color(0xFF8D6E63); // Brown
-  static const Color accentColor = Color(0xFFFF9800); // Orange
-  static const Color backgroundColor = Color(0xFFF5F5F5);
+  // Modern Color Palette - Минималистичные и современные цвета
+  static const Color primaryColor = Color(0xFF10B981); // Emerald Green
+  static const Color primaryLight = Color(0xFF34D399);
+  static const Color primaryDark = Color(0xFF059669);
+
+  static const Color secondaryColor = Color(0xFF6366F1); // Indigo
+  static const Color secondaryLight = Color(0xFF818CF8);
+  static const Color secondaryDark = Color(0xFF4F46E5);
+
+  static const Color accentColor = Color(0xFFF59E0B); // Amber
+  static const Color accentLight = Color(0xFFFBBF24);
+
+  // Background colors - Градиентный фон
+  static const Color backgroundColor = Color(0xFFF8FAFC);
+  static const Color backgroundGradientStart = Color(0xFFF1F5F9);
+  static const Color backgroundGradientEnd = Color(0xFFE2E8F0);
+
   static const Color surfaceColor = Colors.white;
-  static const Color errorColor = Color(0xFFD32F2F);
-  static const Color successColor = Color(0xFF388E3C);
+  static const Color surfaceVariant = Color(0xFFF8FAFC);
+
+  // Semantic colors
+  static const Color errorColor = Color(0xFFEF4444);
+  static const Color successColor = Color(0xFF10B981);
+  static const Color warningColor = Color(0xFFF59E0B);
+  static const Color infoColor = Color(0xFF3B82F6);
 
   // Text colors
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textHint = Color(0xFF9E9E9E);
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textHint = Color(0xFF94A3B8);
+
+  // Chart colors
+  static const List<Color> chartColors = [
+    Color(0xFF10B981), // Green
+    Color(0xFF6366F1), // Indigo
+    Color(0xFFF59E0B), // Amber
+    Color(0xFFEC4899), // Pink
+    Color(0xFF8B5CF6), // Purple
+    Color(0xFF14B8A6), // Teal
+  ];
+
+  // Gradient definitions
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primaryLight, primaryColor],
+  );
+
+  static const LinearGradient secondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [secondaryLight, secondaryColor],
+  );
+
+  static const LinearGradient backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [backgroundGradientStart, backgroundGradientEnd],
+  );
+
+  // Shadow definitions
+  static List<BoxShadow> get cardShadow => [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.04),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: Colors.black.withOpacity(0.02),
+      blurRadius: 6,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
+  static List<BoxShadow> get cardShadowHover => [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.08),
+      blurRadius: 20,
+      offset: const Offset(0, 8),
+    ),
+    BoxShadow(
+      color: Colors.black.withOpacity(0.04),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+    ),
+  ];
 
   // Light Theme
   static ThemeData get lightTheme {
@@ -36,10 +109,11 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,
-        elevation: 2,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

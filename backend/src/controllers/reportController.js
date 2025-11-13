@@ -26,32 +26,38 @@ exports.getDashboard = async (req, res, next) => {
   try {
     // Rabbits statistics
     const totalRabbits = await Rabbit.count();
-    const maleRabbits = await Rabbit.count({ where: { gender: 'male' } });
-    const femaleRabbits = await Rabbit.count({ where: { gender: 'female' } });
+    const maleRabbits = await Rabbit.count({ where: { sex: 'male' } });
+    const femaleRabbits = await Rabbit.count({ where: { sex: 'female' } });
 
     // Cages statistics
     const totalCages = await Cage.count();
-    const occupiedCages = await Cage.count({
+    // Count cages that have rabbits assigned to them
+    const occupiedCages = await Rabbit.count({
       where: {
-        status: 'occupied'
-      }
+        cage_id: {
+          [Op.ne]: null
+        }
+      },
+      distinct: true,
+      col: 'cage_id'
     });
 
     // Health statistics
+    // Count upcoming vaccinations (next_vaccination_date within next 30 days)
     const upcomingVaccinations = await Vaccination.count({
       where: {
-        vaccination_date: {
-          [Op.between]: [new Date(), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
+        next_vaccination_date: {
+          [Op.between]: [new Date(), new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)]
         }
       }
     });
 
+    // Count overdue vaccinations (next_vaccination_date in the past)
     const overdueVaccinations = await Vaccination.count({
       where: {
-        vaccination_date: {
+        next_vaccination_date: {
           [Op.lt]: new Date()
-        },
-        completed: false
+        }
       }
     });
 
@@ -111,39 +117,37 @@ exports.getDashboard = async (req, res, next) => {
       }
     });
 
-    res.json(
-      ApiResponse.success('Сводка получена', {
-        rabbits: {
-          total: totalRabbits,
-          male: maleRabbits,
-          female: femaleRabbits
-        },
-        cages: {
-          total: totalCages,
-          occupied: occupiedCages,
-          available: totalCages - occupiedCages
-        },
-        health: {
-          upcoming_vaccinations: upcomingVaccinations,
-          overdue_vaccinations: overdueVaccinations
-        },
-        finance: {
-          income_30days: parseFloat(recentIncome).toFixed(2),
-          expenses_30days: parseFloat(recentExpenses).toFixed(2),
-          profit_30days: parseFloat(recentIncome - recentExpenses).toFixed(2)
-        },
-        tasks: {
-          pending: pendingTasks,
-          overdue: overdueTasks
-        },
-        inventory: {
-          low_stock_feeds: lowStockFeeds
-        },
-        breeding: {
-          recent_births: recentBirths
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      rabbits: {
+        total: totalRabbits,
+        male: maleRabbits,
+        female: femaleRabbits
+      },
+      cages: {
+        total: totalCages,
+        occupied: occupiedCages,
+        available: totalCages - occupiedCages
+      },
+      health: {
+        upcomingVaccinations: upcomingVaccinations,
+        overdueVaccinations: overdueVaccinations
+      },
+      finance: {
+        income30days: parseFloat(recentIncome).toFixed(2),
+        expenses30days: parseFloat(recentExpenses).toFixed(2),
+        profit30days: parseFloat(recentIncome - recentExpenses).toFixed(2)
+      },
+      tasks: {
+        pending: pendingTasks,
+        overdue: overdueTasks
+      },
+      inventory: {
+        lowStockFeeds: lowStockFeeds
+      },
+      breeding: {
+        recentBirths: recentBirths
+      }
+    }, 'Сводка получена');
   } catch (error) {
     next(error);
   }

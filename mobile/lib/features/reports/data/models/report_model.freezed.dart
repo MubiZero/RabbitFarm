@@ -835,10 +835,8 @@ HealthStats _$HealthStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$HealthStats {
-  @JsonKey(name: 'upcoming_vaccinations')
   @IntConverter()
   int get upcomingVaccinations => throw _privateConstructorUsedError;
-  @JsonKey(name: 'overdue_vaccinations')
   @IntConverter()
   int get overdueVaccinations => throw _privateConstructorUsedError;
 
@@ -860,12 +858,8 @@ abstract class $HealthStatsCopyWith<$Res> {
   ) = _$HealthStatsCopyWithImpl<$Res, HealthStats>;
   @useResult
   $Res call({
-    @JsonKey(name: 'upcoming_vaccinations')
-    @IntConverter()
-    int upcomingVaccinations,
-    @JsonKey(name: 'overdue_vaccinations')
-    @IntConverter()
-    int overdueVaccinations,
+    @IntConverter() int upcomingVaccinations,
+    @IntConverter() int overdueVaccinations,
   });
 }
 
@@ -913,12 +907,8 @@ abstract class _$$HealthStatsImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'upcoming_vaccinations')
-    @IntConverter()
-    int upcomingVaccinations,
-    @JsonKey(name: 'overdue_vaccinations')
-    @IntConverter()
-    int overdueVaccinations,
+    @IntConverter() int upcomingVaccinations,
+    @IntConverter() int overdueVaccinations,
   });
 }
 
@@ -958,23 +948,17 @@ class __$$HealthStatsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$HealthStatsImpl implements _HealthStats {
   const _$HealthStatsImpl({
-    @JsonKey(name: 'upcoming_vaccinations')
-    @IntConverter()
-    required this.upcomingVaccinations,
-    @JsonKey(name: 'overdue_vaccinations')
-    @IntConverter()
-    required this.overdueVaccinations,
+    @IntConverter() required this.upcomingVaccinations,
+    @IntConverter() required this.overdueVaccinations,
   });
 
   factory _$HealthStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$HealthStatsImplFromJson(json);
 
   @override
-  @JsonKey(name: 'upcoming_vaccinations')
   @IntConverter()
   final int upcomingVaccinations;
   @override
-  @JsonKey(name: 'overdue_vaccinations')
   @IntConverter()
   final int overdueVaccinations;
 
@@ -1015,23 +999,17 @@ class _$HealthStatsImpl implements _HealthStats {
 
 abstract class _HealthStats implements HealthStats {
   const factory _HealthStats({
-    @JsonKey(name: 'upcoming_vaccinations')
-    @IntConverter()
-    required final int upcomingVaccinations,
-    @JsonKey(name: 'overdue_vaccinations')
-    @IntConverter()
-    required final int overdueVaccinations,
+    @IntConverter() required final int upcomingVaccinations,
+    @IntConverter() required final int overdueVaccinations,
   }) = _$HealthStatsImpl;
 
   factory _HealthStats.fromJson(Map<String, dynamic> json) =
       _$HealthStatsImpl.fromJson;
 
   @override
-  @JsonKey(name: 'upcoming_vaccinations')
   @IntConverter()
   int get upcomingVaccinations;
   @override
-  @JsonKey(name: 'overdue_vaccinations')
   @IntConverter()
   int get overdueVaccinations;
 
@@ -1049,13 +1027,10 @@ FinanceStats _$FinanceStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$FinanceStats {
-  @JsonKey(name: 'income_30days')
   @DoubleConverter()
   double get income30days => throw _privateConstructorUsedError;
-  @JsonKey(name: 'expenses_30days')
   @DoubleConverter()
   double get expenses30days => throw _privateConstructorUsedError;
-  @JsonKey(name: 'profit_30days')
   @DoubleConverter()
   double get profit30days => throw _privateConstructorUsedError;
 
@@ -1077,9 +1052,9 @@ abstract class $FinanceStatsCopyWith<$Res> {
   ) = _$FinanceStatsCopyWithImpl<$Res, FinanceStats>;
   @useResult
   $Res call({
-    @JsonKey(name: 'income_30days') @DoubleConverter() double income30days,
-    @JsonKey(name: 'expenses_30days') @DoubleConverter() double expenses30days,
-    @JsonKey(name: 'profit_30days') @DoubleConverter() double profit30days,
+    @DoubleConverter() double income30days,
+    @DoubleConverter() double expenses30days,
+    @DoubleConverter() double profit30days,
   });
 }
 
@@ -1132,9 +1107,9 @@ abstract class _$$FinanceStatsImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'income_30days') @DoubleConverter() double income30days,
-    @JsonKey(name: 'expenses_30days') @DoubleConverter() double expenses30days,
-    @JsonKey(name: 'profit_30days') @DoubleConverter() double profit30days,
+    @DoubleConverter() double income30days,
+    @DoubleConverter() double expenses30days,
+    @DoubleConverter() double profit30days,
   });
 }
 
@@ -1179,30 +1154,21 @@ class __$$FinanceStatsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$FinanceStatsImpl implements _FinanceStats {
   const _$FinanceStatsImpl({
-    @JsonKey(name: 'income_30days')
-    @DoubleConverter()
-    required this.income30days,
-    @JsonKey(name: 'expenses_30days')
-    @DoubleConverter()
-    required this.expenses30days,
-    @JsonKey(name: 'profit_30days')
-    @DoubleConverter()
-    required this.profit30days,
+    @DoubleConverter() required this.income30days,
+    @DoubleConverter() required this.expenses30days,
+    @DoubleConverter() required this.profit30days,
   });
 
   factory _$FinanceStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$FinanceStatsImplFromJson(json);
 
   @override
-  @JsonKey(name: 'income_30days')
   @DoubleConverter()
   final double income30days;
   @override
-  @JsonKey(name: 'expenses_30days')
   @DoubleConverter()
   final double expenses30days;
   @override
-  @JsonKey(name: 'profit_30days')
   @DoubleConverter()
   final double profit30days;
 
@@ -1245,30 +1211,21 @@ class _$FinanceStatsImpl implements _FinanceStats {
 
 abstract class _FinanceStats implements FinanceStats {
   const factory _FinanceStats({
-    @JsonKey(name: 'income_30days')
-    @DoubleConverter()
-    required final double income30days,
-    @JsonKey(name: 'expenses_30days')
-    @DoubleConverter()
-    required final double expenses30days,
-    @JsonKey(name: 'profit_30days')
-    @DoubleConverter()
-    required final double profit30days,
+    @DoubleConverter() required final double income30days,
+    @DoubleConverter() required final double expenses30days,
+    @DoubleConverter() required final double profit30days,
   }) = _$FinanceStatsImpl;
 
   factory _FinanceStats.fromJson(Map<String, dynamic> json) =
       _$FinanceStatsImpl.fromJson;
 
   @override
-  @JsonKey(name: 'income_30days')
   @DoubleConverter()
   double get income30days;
   @override
-  @JsonKey(name: 'expenses_30days')
   @DoubleConverter()
   double get expenses30days;
   @override
-  @JsonKey(name: 'profit_30days')
   @DoubleConverter()
   double get profit30days;
 
@@ -1461,7 +1418,6 @@ InventoryStats _$InventoryStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$InventoryStats {
-  @JsonKey(name: 'low_stock_feeds')
   @IntConverter()
   int get lowStockFeeds => throw _privateConstructorUsedError;
 
@@ -1482,9 +1438,7 @@ abstract class $InventoryStatsCopyWith<$Res> {
     $Res Function(InventoryStats) then,
   ) = _$InventoryStatsCopyWithImpl<$Res, InventoryStats>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'low_stock_feeds') @IntConverter() int lowStockFeeds,
-  });
+  $Res call({@IntConverter() int lowStockFeeds});
 }
 
 /// @nodoc
@@ -1523,9 +1477,7 @@ abstract class _$$InventoryStatsImplCopyWith<$Res>
   ) = __$$InventoryStatsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'low_stock_feeds') @IntConverter() int lowStockFeeds,
-  });
+  $Res call({@IntConverter() int lowStockFeeds});
 }
 
 /// @nodoc
@@ -1556,17 +1508,12 @@ class __$$InventoryStatsImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$InventoryStatsImpl implements _InventoryStats {
-  const _$InventoryStatsImpl({
-    @JsonKey(name: 'low_stock_feeds')
-    @IntConverter()
-    required this.lowStockFeeds,
-  });
+  const _$InventoryStatsImpl({@IntConverter() required this.lowStockFeeds});
 
   factory _$InventoryStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryStatsImplFromJson(json);
 
   @override
-  @JsonKey(name: 'low_stock_feeds')
   @IntConverter()
   final int lowStockFeeds;
 
@@ -1607,16 +1554,13 @@ class _$InventoryStatsImpl implements _InventoryStats {
 
 abstract class _InventoryStats implements InventoryStats {
   const factory _InventoryStats({
-    @JsonKey(name: 'low_stock_feeds')
-    @IntConverter()
-    required final int lowStockFeeds,
+    @IntConverter() required final int lowStockFeeds,
   }) = _$InventoryStatsImpl;
 
   factory _InventoryStats.fromJson(Map<String, dynamic> json) =
       _$InventoryStatsImpl.fromJson;
 
   @override
-  @JsonKey(name: 'low_stock_feeds')
   @IntConverter()
   int get lowStockFeeds;
 
@@ -1634,7 +1578,6 @@ BreedingStats _$BreedingStatsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BreedingStats {
-  @JsonKey(name: 'recent_births')
   @IntConverter()
   int get recentBirths => throw _privateConstructorUsedError;
 
@@ -1655,7 +1598,7 @@ abstract class $BreedingStatsCopyWith<$Res> {
     $Res Function(BreedingStats) then,
   ) = _$BreedingStatsCopyWithImpl<$Res, BreedingStats>;
   @useResult
-  $Res call({@JsonKey(name: 'recent_births') @IntConverter() int recentBirths});
+  $Res call({@IntConverter() int recentBirths});
 }
 
 /// @nodoc
@@ -1694,7 +1637,7 @@ abstract class _$$BreedingStatsImplCopyWith<$Res>
   ) = __$$BreedingStatsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({@JsonKey(name: 'recent_births') @IntConverter() int recentBirths});
+  $Res call({@IntConverter() int recentBirths});
 }
 
 /// @nodoc
@@ -1725,15 +1668,12 @@ class __$$BreedingStatsImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$BreedingStatsImpl implements _BreedingStats {
-  const _$BreedingStatsImpl({
-    @JsonKey(name: 'recent_births') @IntConverter() required this.recentBirths,
-  });
+  const _$BreedingStatsImpl({@IntConverter() required this.recentBirths});
 
   factory _$BreedingStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$BreedingStatsImplFromJson(json);
 
   @override
-  @JsonKey(name: 'recent_births')
   @IntConverter()
   final int recentBirths;
 
@@ -1771,16 +1711,13 @@ class _$BreedingStatsImpl implements _BreedingStats {
 
 abstract class _BreedingStats implements BreedingStats {
   const factory _BreedingStats({
-    @JsonKey(name: 'recent_births')
-    @IntConverter()
-    required final int recentBirths,
+    @IntConverter() required final int recentBirths,
   }) = _$BreedingStatsImpl;
 
   factory _BreedingStats.fromJson(Map<String, dynamic> json) =
       _$BreedingStatsImpl.fromJson;
 
   @override
-  @JsonKey(name: 'recent_births')
   @IntConverter()
   int get recentBirths;
 

@@ -38,6 +38,7 @@ import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
 import '../../features/reports/presentation/screens/dashboard_screen.dart';
+import '../../features/reports/presentation/screens/modern_dashboard_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -79,10 +80,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const RabbitsListScreen(),
+        builder: (context, state) => const ModernDashboardScreen(),
       ),
 
       // Rabbits routes
+      GoRoute(
+        path: '/rabbits',
+        name: 'rabbits',
+        builder: (context, state) => const RabbitsListScreen(),
+      ),
       GoRoute(
         path: '/rabbits/new',
         name: 'rabbit-new',
@@ -275,6 +281,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard',
         name: 'dashboard',
+        builder: (context, state) => const ModernDashboardScreen(),
+      ),
+
+      // Old dashboard (for reference)
+      GoRoute(
+        path: '/dashboard/old',
+        name: 'dashboard-old',
         builder: (context, state) => const DashboardScreen(),
       ),
     ],
