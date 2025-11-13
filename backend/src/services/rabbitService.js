@@ -68,7 +68,7 @@ class RabbitService {
     try {
       const rabbit = await Rabbit.findByPk(rabbitId, {
         include: [
-          { model: Breed, attributes: ['id', 'name', 'purpose'] },
+          { model: Breed, as: 'breed', attributes: ['id', 'name', 'purpose'] },
           { model: Cage, attributes: ['id', 'number', 'type', 'location'] },
           { model: Rabbit, as: 'father', attributes: ['id', 'name', 'tag_id'] },
           { model: Rabbit, as: 'mother', attributes: ['id', 'name', 'tag_id'] }
@@ -134,7 +134,7 @@ class RabbitService {
       const rabbits = await Rabbit.findAll({
         where,
         include: [
-          { model: Breed, attributes: ['id', 'name', 'purpose'] },
+          { model: Breed, as: 'breed', attributes: ['id', 'name', 'purpose'] },
           { model: Cage, attributes: ['id', 'number', 'location'] }
         ],
         order: [[sort_by, sort_order.toUpperCase()]],
@@ -328,8 +328,8 @@ class RabbitService {
           'breed_id',
           [require('sequelize').fn('COUNT', '*'), 'count']
         ],
-        include: [{ model: Breed, attributes: ['name'] }],
-        group: ['breed_id', 'Breed.id', 'Breed.name'],
+        include: [{ model: Breed, as: 'breed', attributes: ['name'] }],
+        group: ['breed_id', 'breed.id', 'breed.name'],
         where: { status: { [Op.notIn]: ['sold', 'dead'] } },
         raw: false
       });
@@ -337,7 +337,7 @@ class RabbitService {
       // Format breed distribution to match mobile model
       const byBreed = breedDistribution.map(item => ({
         breed_id: item.breed_id,
-        breed_name: item.Breed?.name || null,
+        breed_name: item.breed?.name || null,
         count: parseInt(item.get('count'))
       }));
 
