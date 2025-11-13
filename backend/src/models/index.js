@@ -54,7 +54,7 @@ Cage.hasMany(Note, { foreignKey: 'cage_id', onDelete: 'CASCADE' });
 
 // Rabbit associations
 Rabbit.belongsTo(User, { foreignKey: 'user_id' });
-Rabbit.belongsTo(Breed, { foreignKey: 'breed_id' });
+Rabbit.belongsTo(Breed, { as: 'breed', foreignKey: 'breed_id' });
 Rabbit.belongsTo(Cage, { foreignKey: 'cage_id' });
 
 // Self-referential associations for parents
@@ -88,7 +88,7 @@ Rabbit.hasMany(Birth, { as: 'births', foreignKey: 'mother_id', onDelete: 'RESTRI
 // Other associations
 RabbitWeight.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
 Vaccination.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
-MedicalRecord.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
+MedicalRecord.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 
 Feed.hasMany(FeedingRecord, { foreignKey: 'feed_id', onDelete: 'RESTRICT' });
 FeedingRecord.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
