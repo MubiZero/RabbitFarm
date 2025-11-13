@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
@@ -39,6 +40,11 @@ import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
 import '../../features/reports/presentation/screens/dashboard_screen.dart';
 import '../../features/reports/presentation/screens/modern_dashboard_screen.dart';
+import '../../features/reports/presentation/screens/customizable_dashboard_screen.dart';
+import '../../features/reports/presentation/screens/dashboard_settings_screen.dart';
+import '../../features/home/presentation/screens/main_navigation_screen.dart';
+import '../../features/home/presentation/screens/today_screen.dart';
+import '../../features/home/presentation/screens/more_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -58,7 +64,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // If authenticated and on login/register page, redirect to home
       if (isAuthenticated && (isLoggingIn || isRegistering)) {
-        return '/';
+        return '/today';
       }
 
       return null; // No redirect
@@ -76,19 +82,59 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterScreen(),
       ),
 
-      // Main app routes
+      // Root redirect
       GoRoute(
         path: '/',
-        name: 'home',
-        builder: (context, state) => const ModernDashboardScreen(),
+        redirect: (context, state) => '/today',
       ),
 
-      // Rabbits routes
-      GoRoute(
-        path: '/rabbits',
-        name: 'rabbits',
-        builder: (context, state) => const RabbitsListScreen(),
+      // Main shell route with bottom navigation
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainNavigationScreen(
+            child: child,
+            currentPath: state.uri.path,
+          );
+        },
+        routes: [
+          // Today screen
+          GoRoute(
+            path: '/today',
+            name: 'today',
+            builder: (context, state) => const TodayScreen(),
+          ),
+
+          // Dashboard (Overview)
+          GoRoute(
+            path: '/dashboard',
+            name: 'dashboard',
+            builder: (context, state) => const CustomizableDashboardScreen(),
+          ),
+
+          // Rabbits
+          GoRoute(
+            path: '/rabbits',
+            name: 'rabbits',
+            builder: (context, state) => const RabbitsListScreen(),
+          ),
+
+          // Tasks
+          GoRoute(
+            path: '/tasks',
+            name: 'tasks',
+            builder: (context, state) => const TasksListScreen(),
+          ),
+
+          // More screen
+          GoRoute(
+            path: '/more',
+            name: 'more',
+            builder: (context, state) => const MoreScreen(),
+          ),
+        ],
       ),
+
+      // Rabbit detail and form routes (outside shell)
       GoRoute(
         path: '/rabbits/new',
         name: 'rabbit-new',
@@ -262,12 +308,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Tasks routes
-      GoRoute(
-        path: '/tasks',
-        name: 'tasks',
-        builder: (context, state) => const TasksListScreen(),
-      ),
+      // Task form route (outside shell)
       GoRoute(
         path: '/tasks/form',
         name: 'task-form',
@@ -277,10 +318,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Reports / Dashboard routes
+      // Dashboard settings
       GoRoute(
-        path: '/dashboard',
-        name: 'dashboard',
+        path: '/dashboard/settings',
+        name: 'dashboard-settings',
+        builder: (context, state) => const DashboardSettingsScreen(),
+      ),
+
+      // Reports route (alias for dashboard)
+      GoRoute(
+        path: '/reports',
+        name: 'reports',
+        builder: (context, state) => const CustomizableDashboardScreen(),
+      ),
+
+      // Modern dashboard (без кастомизации)
+      GoRoute(
+        path: '/dashboard/modern',
+        name: 'dashboard-modern',
         builder: (context, state) => const ModernDashboardScreen(),
       ),
 
@@ -289,6 +344,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/old',
         name: 'dashboard-old',
         builder: (context, state) => const DashboardScreen(),
+      ),
+
+      // Photos and Notes routes (placeholder screens)
+      GoRoute(
+        path: '/photos',
+        name: 'photos',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Фото - скоро будет доступно')),
+        ),
+      ),
+      GoRoute(
+        path: '/notes',
+        name: 'notes',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Заметки - скоро будет доступно')),
+        ),
+      ),
+
+      // Matings route (referenced in More screen)
+      GoRoute(
+        path: '/matings',
+        name: 'matings',
+        builder: (context, state) => const BreedingPlannerScreen(),
       ),
     ],
   );
