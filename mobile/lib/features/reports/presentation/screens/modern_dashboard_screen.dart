@@ -312,7 +312,7 @@ class ModernDashboardScreen extends ConsumerWidget {
                 title: 'Всего кроликов',
                 value: '${dashboard.rabbits.total}',
                 subtitle: '${dashboard.rabbits.male}М / ${dashboard.rabbits.female}Ж',
-                data: [20, 25, 22, 30, 35, 32, dashboard.rabbits.total.toDouble()],
+                data: _generateTrendData(dashboard.rabbits.total),
                 color: AppTheme.primaryColor,
                 onTap: () => context.push('/rabbits'),
               ),
@@ -323,7 +323,7 @@ class ModernDashboardScreen extends ConsumerWidget {
                 title: 'Рождений',
                 value: '${dashboard.breeding.recentBirths}',
                 subtitle: 'За 30 дней',
-                data: [3, 5, 2, 7, 4, 6, dashboard.breeding.recentBirths.toDouble()],
+                data: _generateTrendData(dashboard.breeding.recentBirths, isSmallValues: true),
                 color: AppTheme.accentColor,
                 onTap: () => context.push('/births'),
               ),
@@ -631,5 +631,13 @@ class ModernDashboardScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Generate flat line data - shows current value without fake trends
+  /// Until we have real historical data from backend
+  List<double> _generateTrendData(int currentValue, {bool isSmallValues = false}) {
+    // Just show a flat line at current value
+    // No fake waves or trends without real data
+    return List.generate(7, (_) => currentValue.toDouble());
   }
 }

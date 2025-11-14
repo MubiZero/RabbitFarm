@@ -66,6 +66,25 @@ class IntConverter implements JsonConverter<int, dynamic> {
   int toJson(int value) => value;
 }
 
+/// Custom converter for nullable int values
+class NullableIntConverter implements JsonConverter<int?, dynamic> {
+  const NullableIntConverter();
+
+  @override
+  int? fromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      if (value.isEmpty) return null;
+      return int.parse(value);
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(int? value) => value;
+}
+
 /// Custom converter for double values that might come as strings
 class DoubleConverter implements JsonConverter<double, dynamic> {
   const DoubleConverter();
@@ -91,10 +110,10 @@ class Transaction with _$Transaction {
     required TransactionCategory category,
     @DoubleConverter() required double amount,
     @JsonKey(name: 'transaction_date') required DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') @IntConverter() int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
-    @JsonKey(name: 'created_by') @IntConverter() int? createdBy,
+    @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     // Relationships (not included in JSON serialization by default)
@@ -113,7 +132,7 @@ class TransactionCreate with _$TransactionCreate {
     required TransactionCategory category,
     required double amount,
     @JsonKey(name: 'transaction_date') required DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   }) = _TransactionCreate;
@@ -130,7 +149,7 @@ class TransactionUpdate with _$TransactionUpdate {
     TransactionCategory? category,
     double? amount,
     @JsonKey(name: 'transaction_date') DateTime? transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   }) = _TransactionUpdate;

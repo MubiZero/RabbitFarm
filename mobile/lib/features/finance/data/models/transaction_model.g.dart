@@ -13,10 +13,10 @@ _$TransactionImpl _$$TransactionImplFromJson(Map<String, dynamic> json) =>
       category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
       amount: const DoubleConverter().fromJson(json['amount']),
       transactionDate: DateTime.parse(json['transaction_date'] as String),
-      rabbitId: const IntConverter().fromJson(json['rabbit_id']),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       description: json['description'] as String?,
       receiptUrl: json['receipt_url'] as String?,
-      createdBy: const IntConverter().fromJson(json['created_by']),
+      createdBy: const NullableIntConverter().fromJson(json['created_by']),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -32,16 +32,10 @@ Map<String, dynamic> _$$TransactionImplToJson(_$TransactionImpl instance) =>
       'category': _$TransactionCategoryEnumMap[instance.category]!,
       'amount': const DoubleConverter().toJson(instance.amount),
       'transaction_date': instance.transactionDate.toIso8601String(),
-      'rabbit_id': _$JsonConverterToJson<dynamic, int>(
-        instance.rabbitId,
-        const IntConverter().toJson,
-      ),
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
       'description': instance.description,
       'receipt_url': instance.receiptUrl,
-      'created_by': _$JsonConverterToJson<dynamic, int>(
-        instance.createdBy,
-        const IntConverter().toJson,
-      ),
+      'created_by': const NullableIntConverter().toJson(instance.createdBy),
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
@@ -63,11 +57,6 @@ const _$TransactionCategoryEnumMap = {
   TransactionCategory.other: 'other',
 };
 
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
-
 _$TransactionCreateImpl _$$TransactionCreateImplFromJson(
   Map<String, dynamic> json,
 ) => _$TransactionCreateImpl(
@@ -75,7 +64,7 @@ _$TransactionCreateImpl _$$TransactionCreateImplFromJson(
   category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
   amount: (json['amount'] as num).toDouble(),
   transactionDate: DateTime.parse(json['transaction_date'] as String),
-  rabbitId: (json['rabbit_id'] as num?)?.toInt(),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
   description: json['description'] as String?,
   receiptUrl: json['receipt_url'] as String?,
 );
@@ -87,7 +76,7 @@ Map<String, dynamic> _$$TransactionCreateImplToJson(
   'category': _$TransactionCategoryEnumMap[instance.category]!,
   'amount': instance.amount,
   'transaction_date': instance.transactionDate.toIso8601String(),
-  'rabbit_id': instance.rabbitId,
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
   'description': instance.description,
   'receipt_url': instance.receiptUrl,
 };
@@ -101,7 +90,7 @@ _$TransactionUpdateImpl _$$TransactionUpdateImplFromJson(
   transactionDate: json['transaction_date'] == null
       ? null
       : DateTime.parse(json['transaction_date'] as String),
-  rabbitId: (json['rabbit_id'] as num?)?.toInt(),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
   description: json['description'] as String?,
   receiptUrl: json['receipt_url'] as String?,
 );
@@ -113,7 +102,7 @@ Map<String, dynamic> _$$TransactionUpdateImplToJson(
   'category': _$TransactionCategoryEnumMap[instance.category],
   'amount': instance.amount,
   'transaction_date': instance.transactionDate?.toIso8601String(),
-  'rabbit_id': instance.rabbitId,
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
   'description': instance.description,
   'receipt_url': instance.receiptUrl,
 };

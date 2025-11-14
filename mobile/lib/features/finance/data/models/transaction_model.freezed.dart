@@ -30,13 +30,13 @@ mixin _$Transaction {
   @JsonKey(name: 'transaction_date')
   DateTime get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get rabbitId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   @JsonKey(name: 'receipt_url')
   String? get receiptUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_by')
-  @IntConverter()
+  @NullableIntConverter()
   int? get createdBy => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -68,10 +68,10 @@ abstract class $TransactionCopyWith<$Res> {
     TransactionCategory category,
     @DoubleConverter() double amount,
     @JsonKey(name: 'transaction_date') DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') @IntConverter() int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
-    @JsonKey(name: 'created_by') @IntConverter() int? createdBy,
+    @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
@@ -193,10 +193,10 @@ abstract class _$$TransactionImplCopyWith<$Res>
     TransactionCategory category,
     @DoubleConverter() double amount,
     @JsonKey(name: 'transaction_date') DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') @IntConverter() int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
-    @JsonKey(name: 'created_by') @IntConverter() int? createdBy,
+    @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
@@ -297,10 +297,10 @@ class _$TransactionImpl implements _Transaction {
     required this.category,
     @DoubleConverter() required this.amount,
     @JsonKey(name: 'transaction_date') required this.transactionDate,
-    @JsonKey(name: 'rabbit_id') @IntConverter() this.rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
-    @JsonKey(name: 'created_by') @IntConverter() this.createdBy,
+    @JsonKey(name: 'created_by') @NullableIntConverter() this.createdBy,
     @JsonKey(name: 'created_at') this.createdAt,
     @JsonKey(name: 'updated_at') this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
@@ -324,7 +324,7 @@ class _$TransactionImpl implements _Transaction {
   final DateTime transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
-  @IntConverter()
+  @NullableIntConverter()
   final int? rabbitId;
   @override
   final String? description;
@@ -333,7 +333,7 @@ class _$TransactionImpl implements _Transaction {
   final String? receiptUrl;
   @override
   @JsonKey(name: 'created_by')
-  @IntConverter()
+  @NullableIntConverter()
   final int? createdBy;
   @override
   @JsonKey(name: 'created_at')
@@ -417,10 +417,10 @@ abstract class _Transaction implements Transaction {
     required final TransactionCategory category,
     @DoubleConverter() required final double amount,
     @JsonKey(name: 'transaction_date') required final DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') @IntConverter() final int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
-    @JsonKey(name: 'created_by') @IntConverter() final int? createdBy,
+    @JsonKey(name: 'created_by') @NullableIntConverter() final int? createdBy,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
     @JsonKey(name: 'updated_at') final DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -445,7 +445,7 @@ abstract class _Transaction implements Transaction {
   DateTime get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get rabbitId;
   @override
   String? get description;
@@ -454,7 +454,7 @@ abstract class _Transaction implements Transaction {
   String? get receiptUrl;
   @override
   @JsonKey(name: 'created_by')
-  @IntConverter()
+  @NullableIntConverter()
   int? get createdBy;
   @override
   @JsonKey(name: 'created_at')
@@ -486,6 +486,7 @@ mixin _$TransactionCreate {
   @JsonKey(name: 'transaction_date')
   DateTime get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   int? get rabbitId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   @JsonKey(name: 'receipt_url')
@@ -513,7 +514,7 @@ abstract class $TransactionCreateCopyWith<$Res> {
     TransactionCategory category,
     double amount,
     @JsonKey(name: 'transaction_date') DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   });
@@ -592,7 +593,7 @@ abstract class _$$TransactionCreateImplCopyWith<$Res>
     TransactionCategory category,
     double amount,
     @JsonKey(name: 'transaction_date') DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   });
@@ -663,7 +664,7 @@ class _$TransactionCreateImpl implements _TransactionCreate {
     required this.category,
     required this.amount,
     @JsonKey(name: 'transaction_date') required this.transactionDate,
-    @JsonKey(name: 'rabbit_id') this.rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
   });
@@ -682,6 +683,7 @@ class _$TransactionCreateImpl implements _TransactionCreate {
   final DateTime transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   final int? rabbitId;
   @override
   final String? description;
@@ -749,7 +751,7 @@ abstract class _TransactionCreate implements TransactionCreate {
     required final TransactionCategory category,
     required final double amount,
     @JsonKey(name: 'transaction_date') required final DateTime transactionDate,
-    @JsonKey(name: 'rabbit_id') final int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
   }) = _$TransactionCreateImpl;
@@ -768,6 +770,7 @@ abstract class _TransactionCreate implements TransactionCreate {
   DateTime get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   int? get rabbitId;
   @override
   String? get description;
@@ -795,6 +798,7 @@ mixin _$TransactionUpdate {
   @JsonKey(name: 'transaction_date')
   DateTime? get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   int? get rabbitId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   @JsonKey(name: 'receipt_url')
@@ -822,7 +826,7 @@ abstract class $TransactionUpdateCopyWith<$Res> {
     TransactionCategory? category,
     double? amount,
     @JsonKey(name: 'transaction_date') DateTime? transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   });
@@ -901,7 +905,7 @@ abstract class _$$TransactionUpdateImplCopyWith<$Res>
     TransactionCategory? category,
     double? amount,
     @JsonKey(name: 'transaction_date') DateTime? transactionDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   });
@@ -972,7 +976,7 @@ class _$TransactionUpdateImpl implements _TransactionUpdate {
     this.category,
     this.amount,
     @JsonKey(name: 'transaction_date') this.transactionDate,
-    @JsonKey(name: 'rabbit_id') this.rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
   });
@@ -991,6 +995,7 @@ class _$TransactionUpdateImpl implements _TransactionUpdate {
   final DateTime? transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   final int? rabbitId;
   @override
   final String? description;
@@ -1058,7 +1063,7 @@ abstract class _TransactionUpdate implements TransactionUpdate {
     final TransactionCategory? category,
     final double? amount,
     @JsonKey(name: 'transaction_date') final DateTime? transactionDate,
-    @JsonKey(name: 'rabbit_id') final int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
   }) = _$TransactionUpdateImpl;
@@ -1077,6 +1082,7 @@ abstract class _TransactionUpdate implements TransactionUpdate {
   DateTime? get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
   int? get rabbitId;
   @override
   String? get description;
