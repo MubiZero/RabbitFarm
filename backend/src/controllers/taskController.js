@@ -581,7 +581,7 @@ exports.completeTask = async (req, res, next) => {
         {
           model: User,
           as: 'assignedTo',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
