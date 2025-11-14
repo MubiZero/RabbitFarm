@@ -1,5 +1,5 @@
 const { FeedingRecord, Feed, Rabbit, Cage, User } = require('../models');
-const { ApiResponse } = require('../utils/apiResponse');
+const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
 
 /**
@@ -18,20 +18,17 @@ exports.create = async (req, res, next) => {
     // Check if feed exists and has enough stock
     const feed = await Feed.findByPk(feed_id);
     if (!feed) {
-      return res.status(404).json(
-        ApiResponse.error('Корм не найден', 404)
-      );
+      return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
     const currentStock = parseFloat(feed.current_stock);
     const quantityNeeded = parseFloat(quantity);
 
     if (currentStock < quantityNeeded) {
-      return res.status(400).json(
-        ApiResponse.error(
-          `Недостаточно корма на складе. Доступно: ${currentStock} ${feed.unit}`,
-          400
-        )
+      return ApiResponse.error(
+        res,
+        `Недостаточно корма на складе. Доступно: ${currentStock} ${feed.unit}`,
+        400
       );
     }
 
@@ -52,13 +49,11 @@ exports.create = async (req, res, next) => {
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
         { model: Cage, as: 'cage' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
 
-    return res.status(201).json(
-      ApiResponse.success(feedingRecord, 'Запись о кормлении создана')
-    );
+    return ApiResponse.success(res, feedingRecord, 'Запись о кормлении создана', 201);
   } catch (error) {
     next(error);
   }
@@ -76,17 +71,15 @@ exports.getById = async (req, res, next) => {
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
         { model: Cage, as: 'cage' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
 
     if (!feedingRecord) {
-      return res.status(404).json(
-        ApiResponse.error('Запись о кормлении не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
     }
 
-    return res.json(ApiResponse.success(feedingRecord));
+    return ApiResponse.success(res, feedingRecord);
   } catch (error) {
     next(error);
   }
@@ -144,24 +137,22 @@ exports.list = async (req, res, next) => {
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
         { model: Cage, as: 'cage' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ],
       limit: parseInt(limit),
       offset,
       order: [[sort_by, sort_order.toUpperCase()]]
     });
 
-    return res.json(
-      ApiResponse.success({
-        rows,
-        pagination: {
-          total: count,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(count / limit)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(count / limit)
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -178,12 +169,12 @@ exports.getByRabbit = async (req, res, next) => {
       where: { rabbit_id: rabbitId },
       include: [
         { model: Feed, as: 'feed' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ],
       order: [['fed_at', 'DESC']]
     });
 
-    return res.json(ApiResponse.success(records));
+    return ApiResponse.success(res, records);
   } catch (error) {
     next(error);
   }
@@ -200,9 +191,7 @@ exports.update = async (req, res, next) => {
     const feedingRecord = await FeedingRecord.findByPk(id);
 
     if (!feedingRecord) {
-      return res.status(404).json(
-        ApiResponse.error('Запись о кормлении не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
     }
 
     const oldQuantity = parseFloat(feedingRecord.quantity);
@@ -226,18 +215,14 @@ exports.update = async (req, res, next) => {
       // Deduct from new/same feed
       const targetFeed = await Feed.findByPk(targetFeedId);
       if (!targetFeed) {
-        return res.status(404).json(
-          ApiResponse.error('Корм не найден', 404)
-        );
+        return ApiResponse.error(res, 'Корм не найден', 404);
       }
 
       const quantityDiff = targetQuantity - (targetFeedId === oldFeedId ? oldQuantity : 0);
       const newStock = parseFloat(targetFeed.current_stock) - quantityDiff;
 
       if (newStock < 0) {
-        return res.status(400).json(
-          ApiResponse.error('Недостаточно корма на складе', 400)
-        );
+        return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
       }
 
       await targetFeed.update({ current_stock: newStock });
@@ -250,13 +235,11 @@ exports.update = async (req, res, next) => {
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
         { model: Cage, as: 'cage' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
 
-    return res.json(
-      ApiResponse.success(feedingRecord, 'Запись о кормлении обновлена')
-    );
+    return ApiResponse.success(res, feedingRecord, 'Запись о кормлении обновлена');
   } catch (error) {
     next(error);
   }
@@ -272,9 +255,7 @@ exports.delete = async (req, res, next) => {
     const feedingRecord = await FeedingRecord.findByPk(id);
 
     if (!feedingRecord) {
-      return res.status(404).json(
-        ApiResponse.error('Запись о кормлении не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
     }
 
     // Return stock to feed
@@ -287,9 +268,7 @@ exports.delete = async (req, res, next) => {
 
     await feedingRecord.destroy();
 
-    return res.json(
-      ApiResponse.success(null, 'Запись о кормлении удалена')
-    );
+    return ApiResponse.success(res, null, 'Запись о кормлении удалена');
   } catch (error) {
     next(error);
   }
@@ -364,7 +343,7 @@ exports.getStatistics = async (req, res, next) => {
       }
     });
 
-    return res.json(ApiResponse.success(stats));
+    return ApiResponse.success(res, stats);
   } catch (error) {
     next(error);
   }
@@ -382,13 +361,13 @@ exports.getRecent = async (req, res, next) => {
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
         { model: Cage, as: 'cage' },
-        { model: User, as: 'fedBy', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ],
       limit: parseInt(limit),
       order: [['fed_at', 'DESC']]
     });
 
-    return res.json(ApiResponse.success(records));
+    return ApiResponse.success(res, records);
   } catch (error) {
     next(error);
   }

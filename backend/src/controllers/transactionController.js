@@ -19,9 +19,7 @@ exports.create = async (req, res, next) => {
     if (rabbit_id) {
       const rabbit = await Rabbit.findByPk(rabbit_id);
       if (!rabbit) {
-        return res.status(404).json(
-          ApiResponse.error('Кролик не найден', 404)
-        );
+        return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
 
@@ -42,19 +40,17 @@ exports.create = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
 
-    res.status(201).json(
-      ApiResponse.success('Транзакция успешно создана', createdTransaction)
-    );
+    return ApiResponse.success(res, createdTransaction, 'Транзакция успешно создана', 201);
   } catch (error) {
     next(error);
   }
@@ -73,23 +69,21 @@ exports.getById = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
 
     if (!transaction) {
-      return res.status(404).json(
-        ApiResponse.error('Транзакция не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Транзакция не найдена', 404);
     }
 
-    res.json(ApiResponse.success('Транзакция получена', transaction));
+    return ApiResponse.success(res, transaction, 'Транзакция получена');
   } catch (error) {
     next(error);
   }
@@ -157,12 +151,12 @@ exports.list = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ],
       limit: parseInt(limit),
@@ -171,17 +165,15 @@ exports.list = async (req, res, next) => {
       distinct: true
     });
 
-    res.json(
-      ApiResponse.success('Список транзакций получен', {
-        transactions: rows,
-        pagination: {
-          total: count,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(count / limit)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      transactions: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(count / limit)
+      }
+    }, 'Список транзакций получен');
   } catch (error) {
     next(error);
   }
@@ -199,18 +191,14 @@ exports.update = async (req, res, next) => {
     const transaction = await Transaction.findByPk(id);
 
     if (!transaction) {
-      return res.status(404).json(
-        ApiResponse.error('Транзакция не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Транзакция не найдена', 404);
     }
 
     // Validate rabbit_id if provided
     if (rabbit_id) {
       const rabbit = await Rabbit.findByPk(rabbit_id);
       if (!rabbit) {
-        return res.status(404).json(
-          ApiResponse.error('Кролик не найден', 404)
-        );
+        return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
 
@@ -230,19 +218,17 @@ exports.update = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         },
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ]
     });
 
-    res.json(
-      ApiResponse.success('Транзакция успешно обновлена', updatedTransaction)
-    );
+    return ApiResponse.success(res, updatedTransaction, 'Транзакция успешно обновлена');
   } catch (error) {
     next(error);
   }
@@ -259,14 +245,12 @@ exports.delete = async (req, res, next) => {
     const transaction = await Transaction.findByPk(id);
 
     if (!transaction) {
-      return res.status(404).json(
-        ApiResponse.error('Транзакция не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Транзакция не найдена', 404);
     }
 
     await transaction.destroy();
 
-    res.json(ApiResponse.success('Транзакция успешно удалена'));
+    return ApiResponse.success(res, null, 'Транзакция успешно удалена');
   } catch (error) {
     next(error);
   }
@@ -336,32 +320,30 @@ exports.getStatistics = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         }
       ],
       limit: 5,
       order: [['transaction_date', 'DESC'], ['created_at', 'DESC']]
     });
 
-    res.json(
-      ApiResponse.success('Статистика получена', {
-        total_income: parseFloat(totalIncome).toFixed(2),
-        total_expenses: parseFloat(totalExpenses).toFixed(2),
-        net_profit: parseFloat(netProfit).toFixed(2),
-        total_transactions: totalTransactions,
-        income_by_category: incomeByCategory.map(item => ({
-          category: item.category,
-          total: parseFloat(item.dataValues.total).toFixed(2),
-          count: parseInt(item.dataValues.count)
-        })),
-        expenses_by_category: expensesByCategory.map(item => ({
-          category: item.category,
-          total: parseFloat(item.dataValues.total).toFixed(2),
-          count: parseInt(item.dataValues.count)
-        })),
-        recent_transactions: recentTransactions
-      })
-    );
+    return ApiResponse.success(res, {
+      total_income: parseFloat(totalIncome).toFixed(2),
+      total_expenses: parseFloat(totalExpenses).toFixed(2),
+      net_profit: parseFloat(netProfit).toFixed(2),
+      total_transactions: totalTransactions,
+      income_by_category: incomeByCategory.map(item => ({
+        category: item.category,
+        total: parseFloat(item.dataValues.total).toFixed(2),
+        count: parseInt(item.dataValues.count)
+      })),
+      expenses_by_category: expensesByCategory.map(item => ({
+        category: item.category,
+        total: parseFloat(item.dataValues.total).toFixed(2),
+        count: parseInt(item.dataValues.count)
+      })),
+      recent_transactions: recentTransactions
+    }, 'Статистика получена');
   } catch (error) {
     next(error);
   }
@@ -378,9 +360,7 @@ exports.getRabbitTransactions = async (req, res, next) => {
     // Check if rabbit exists
     const rabbit = await Rabbit.findByPk(rabbitId);
     if (!rabbit) {
-      return res.status(404).json(
-        ApiResponse.error('Кролик не найден', 404)
-      );
+      return ApiResponse.error(res, 'Кролик не найден', 404);
     }
 
     const transactions = await Transaction.findAll({
@@ -389,7 +369,7 @@ exports.getRabbitTransactions = async (req, res, next) => {
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'username', 'email']
+          attributes: ['id', 'full_name', 'email']
         }
       ],
       order: [['transaction_date', 'DESC'], ['created_at', 'DESC']]
@@ -404,16 +384,14 @@ exports.getRabbitTransactions = async (req, res, next) => {
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-    res.json(
-      ApiResponse.success('Транзакции кролика получены', {
-        transactions,
-        summary: {
-          total_income: totalIncome.toFixed(2),
-          total_expenses: totalExpenses.toFixed(2),
-          net_profit: (totalIncome - totalExpenses).toFixed(2)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      transactions,
+      summary: {
+        total_income: totalIncome.toFixed(2),
+        total_expenses: totalExpenses.toFixed(2),
+        net_profit: (totalIncome - totalExpenses).toFixed(2)
+      }
+    }, 'Транзакции кролика получены');
   } catch (error) {
     next(error);
   }
@@ -428,9 +406,7 @@ exports.getMonthlyReport = async (req, res, next) => {
     const { year, month } = req.query;
 
     if (!year || !month) {
-      return res.status(400).json(
-        ApiResponse.error('Необходимо указать год и месяц', 400)
-      );
+      return ApiResponse.error(res, 'Необходимо указать год и месяц', 400);
     }
 
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
@@ -449,7 +425,7 @@ exports.getMonthlyReport = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
-          attributes: ['id', 'name', 'ear_tag']
+          attributes: ['id', 'name', 'tag_id']
         }
       ],
       order: [['transaction_date', 'ASC']]
@@ -463,23 +439,21 @@ exports.getMonthlyReport = async (req, res, next) => {
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-    res.json(
-      ApiResponse.success('Месячный отчет получен', {
-        period: {
-          year: parseInt(year),
-          month: parseInt(month),
-          start_date: startDate,
-          end_date: endDate
-        },
-        summary: {
-          total_income: totalIncome.toFixed(2),
-          total_expenses: totalExpenses.toFixed(2),
-          net_profit: (totalIncome - totalExpenses).toFixed(2),
-          transaction_count: transactions.length
-        },
-        transactions
-      })
-    );
+    return ApiResponse.success(res, {
+      period: {
+        year: parseInt(year),
+        month: parseInt(month),
+        start_date: startDate,
+        end_date: endDate
+      },
+      summary: {
+        total_income: totalIncome.toFixed(2),
+        total_expenses: totalExpenses.toFixed(2),
+        net_profit: (totalIncome - totalExpenses).toFixed(2),
+        transaction_count: transactions.length
+      },
+      transactions
+    }, 'Месячный отчет получен');
   } catch (error) {
     next(error);
   }

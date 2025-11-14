@@ -91,13 +91,13 @@ Vaccination.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 MedicalRecord.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 
 Feed.hasMany(FeedingRecord, { foreignKey: 'feed_id', onDelete: 'RESTRICT' });
-FeedingRecord.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-FeedingRecord.belongsTo(Feed, { foreignKey: 'feed_id' });
-FeedingRecord.belongsTo(Cage, { foreignKey: 'cage_id' });
-FeedingRecord.belongsTo(User, { foreignKey: 'fed_by' });
+FeedingRecord.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+FeedingRecord.belongsTo(Feed, { as: 'feed', foreignKey: 'feed_id' });
+FeedingRecord.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
+FeedingRecord.belongsTo(User, { as: 'fedBy', foreignKey: 'fed_by' });
 
-Transaction.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-Transaction.belongsTo(User, { foreignKey: 'created_by' });
+Transaction.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+Transaction.belongsTo(User, { as: 'creator', foreignKey: 'created_by' });
 
 Task.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 Task.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
