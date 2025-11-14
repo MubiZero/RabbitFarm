@@ -33,9 +33,7 @@ exports.create = async (req, res, next) => {
     if (rabbit_id) {
       const rabbit = await Rabbit.findByPk(rabbit_id);
       if (!rabbit) {
-        return res.status(404).json(
-          ApiResponse.error('Кролик не найден', 404)
-        );
+        return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
 
@@ -43,9 +41,7 @@ exports.create = async (req, res, next) => {
     if (cage_id) {
       const cage = await Cage.findByPk(cage_id);
       if (!cage) {
-        return res.status(404).json(
-          ApiResponse.error('Клетка не найдена', 404)
-        );
+        return ApiResponse.error(res, 'Клетка не найдена', 404);
       }
     }
 
@@ -53,9 +49,7 @@ exports.create = async (req, res, next) => {
     if (assigned_to) {
       const user = await User.findByPk(assigned_to);
       if (!user) {
-        return res.status(404).json(
-          ApiResponse.error('Пользователь не найден', 404)
-        );
+        return ApiResponse.error(res, 'Пользователь не найден', 404);
       }
     }
 
@@ -142,9 +136,7 @@ exports.getById = async (req, res, next) => {
     });
 
     if (!task) {
-      return res.status(404).json(
-        ApiResponse.error('Задача не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
     return ApiResponse.success(res, task, 'Задача получена');
@@ -314,36 +306,28 @@ exports.update = async (req, res, next) => {
     const task = await Task.findByPk(id);
 
     if (!task) {
-      return res.status(404).json(
-        ApiResponse.error('Задача не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
     // Validate references if provided
     if (rabbit_id) {
       const rabbit = await Rabbit.findByPk(rabbit_id);
       if (!rabbit) {
-        return res.status(404).json(
-          ApiResponse.error('Кролик не найден', 404)
-        );
+        return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
 
     if (cage_id) {
       const cage = await Cage.findByPk(cage_id);
       if (!cage) {
-        return res.status(404).json(
-          ApiResponse.error('Клетка не найдена', 404)
-        );
+        return ApiResponse.error(res, 'Клетка не найдена', 404);
       }
     }
 
     if (assigned_to) {
       const user = await User.findByPk(assigned_to);
       if (!user) {
-        return res.status(404).json(
-          ApiResponse.error('Пользователь не найден', 404)
-        );
+        return ApiResponse.error(res, 'Пользователь не найден', 404);
       }
     }
 
@@ -417,9 +401,7 @@ exports.delete = async (req, res, next) => {
     const task = await Task.findByPk(id);
 
     if (!task) {
-      return res.status(404).json(
-        ApiResponse.error('Задача не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
     await task.destroy();
@@ -576,9 +558,7 @@ exports.completeTask = async (req, res, next) => {
     const task = await Task.findByPk(id);
 
     if (!task) {
-      return res.status(404).json(
-        ApiResponse.error('Задача не найдена', 404)
-      );
+      return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
     await task.update({

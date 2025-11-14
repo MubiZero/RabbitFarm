@@ -1,5 +1,5 @@
 const { Feed, FeedingRecord } = require('../models');
-const { ApiResponse } = require('../utils/apiResponse');
+const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
 
 /**
@@ -14,9 +14,7 @@ exports.create = async (req, res, next) => {
   try {
     const feed = await Feed.create(req.body);
 
-    return res.status(201).json(
-      ApiResponse.success(feed, 'Корм успешно добавлен')
-    );
+    return ApiResponse.success(res, feed, 'Корм успешно добавлен', 201);
   } catch (error) {
     next(error);
   }
@@ -32,12 +30,10 @@ exports.getById = async (req, res, next) => {
     const feed = await Feed.findByPk(id);
 
     if (!feed) {
-      return res.status(404).json(
-        ApiResponse.error('Корм не найден', 404)
-      );
+      return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
-    return res.json(ApiResponse.success(feed));
+    return ApiResponse.success(res, feed);
   } catch (error) {
     next(error);
   }
@@ -88,17 +84,15 @@ exports.list = async (req, res, next) => {
       order: [[sort_by, sort_order.toUpperCase()]]
     });
 
-    return res.json(
-      ApiResponse.success({
-        rows,
-        pagination: {
-          total: count,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(count / limit)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(count / limit)
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -114,16 +108,12 @@ exports.update = async (req, res, next) => {
     const feed = await Feed.findByPk(id);
 
     if (!feed) {
-      return res.status(404).json(
-        ApiResponse.error('Корм не найден', 404)
-      );
+      return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
     await feed.update(req.body);
 
-    return res.json(
-      ApiResponse.success(feed, 'Корм успешно обновлен')
-    );
+    return ApiResponse.success(res, feed, 'Корм успешно обновлен');
   } catch (error) {
     next(error);
   }
@@ -139,9 +129,7 @@ exports.delete = async (req, res, next) => {
     const feed = await Feed.findByPk(id);
 
     if (!feed) {
-      return res.status(404).json(
-        ApiResponse.error('Корм не найден', 404)
-      );
+      return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
     // Check if feed is used in feeding records
@@ -150,19 +138,16 @@ exports.delete = async (req, res, next) => {
     });
 
     if (recordsCount > 0) {
-      return res.status(400).json(
-        ApiResponse.error(
-          `Нельзя удалить корм, так как он используется в ${recordsCount} записях кормления`,
-          400
-        )
+      return ApiResponse.error(
+        res,
+        `Нельзя удалить корм, так как он используется в ${recordsCount} записях кормления`,
+        400
       );
     }
 
     await feed.destroy();
 
-    return res.json(
-      ApiResponse.success(null, 'Корм успешно удален')
-    );
+    return ApiResponse.success(res, null, 'Корм успешно удален');
   } catch (error) {
     next(error);
   }
@@ -214,7 +199,7 @@ exports.getStatistics = async (req, res, next) => {
       }
     });
 
-    return res.json(ApiResponse.success(stats));
+    return ApiResponse.success(res, stats);
   } catch (error) {
     next(error);
   }
@@ -243,7 +228,7 @@ exports.getLowStock = async (req, res, next) => {
         : 0
     }));
 
-    return res.json(ApiResponse.success(lowStockFeeds));
+    return ApiResponse.success(res, lowStockFeeds);
   } catch (error) {
     next(error);
   }
@@ -260,9 +245,7 @@ exports.adjustStock = async (req, res, next) => {
     const feed = await Feed.findByPk(id);
 
     if (!feed) {
-      return res.status(404).json(
-        ApiResponse.error('Корм не найден', 404)
-      );
+      return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
     const currentStock = parseFloat(feed.current_stock);
@@ -274,21 +257,15 @@ exports.adjustStock = async (req, res, next) => {
     } else if (operation === 'subtract') {
       newStock = currentStock - adjustment;
       if (newStock < 0) {
-        return res.status(400).json(
-          ApiResponse.error('Недостаточно корма на складе', 400)
-        );
+        return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
       }
     } else {
-      return res.status(400).json(
-        ApiResponse.error('Некорректная операция. Используйте "add" или "subtract"', 400)
-      );
+      return ApiResponse.error(res, 'Некорректная операция. Используйте "add" или "subtract"', 400);
     }
 
     await feed.update({ current_stock: newStock });
 
-    return res.json(
-      ApiResponse.success(feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`)
-    );
+    return ApiResponse.success(res, feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`);
   } catch (error) {
     next(error);
   }

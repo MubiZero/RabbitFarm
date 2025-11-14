@@ -39,7 +39,7 @@ class FeedingRecordsRepository {
       }
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.feeds}/feeding-records',
+        ApiEndpoints.feedingRecords,
         queryParameters: queryParams,
       );
 
@@ -66,7 +66,7 @@ class FeedingRecordsRepository {
   Future<FeedingRecord> getFeedingRecordById(int id) async {
     try {
       final response = await _apiClient.get(
-        '${ApiEndpoints.feeds}/feeding-records/$id',
+        '${ApiEndpoints.feedingRecords}/$id',
       );
 
       if (response.data['success'] == true) {
@@ -104,7 +104,7 @@ class FeedingRecordsRepository {
       FeedingRecordCreate feedingRecord) async {
     try {
       final response = await _apiClient.post(
-        '${ApiEndpoints.feeds}/feeding-records',
+        ApiEndpoints.feedingRecords,
         data: feedingRecord.toJson(),
       );
 
@@ -124,7 +124,7 @@ class FeedingRecordsRepository {
       int id, FeedingRecordUpdate feedingRecord) async {
     try {
       final response = await _apiClient.put(
-        '${ApiEndpoints.feeds}/feeding-records/$id',
+        '${ApiEndpoints.feedingRecords}/$id',
         data: feedingRecord.toJson(),
       );
 
@@ -143,7 +143,7 @@ class FeedingRecordsRepository {
   Future<void> deleteFeedingRecord(int id) async {
     try {
       final response = await _apiClient.delete(
-        '${ApiEndpoints.feeds}/feeding-records/$id',
+        '${ApiEndpoints.feedingRecords}/$id',
       );
 
       if (response.data['success'] != true) {
@@ -171,7 +171,7 @@ class FeedingRecordsRepository {
       }
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.feeds}/feeding-records/statistics',
+        '${ApiEndpoints.feedingRecords}/statistics',
         queryParameters: queryParams,
       );
 
@@ -193,7 +193,7 @@ class FeedingRecordsRepository {
       if (limit != null) queryParams['limit'] = limit;
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.feeds}/feeding-records/recent',
+        '${ApiEndpoints.feedingRecords}/recent',
         queryParameters: queryParams,
       );
 

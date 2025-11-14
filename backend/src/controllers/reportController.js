@@ -226,41 +226,39 @@ exports.getFarmReport = async (req, res, next) => {
     const feedingRecordsCount = await FeedingRecord.count({ where });
     const totalFeedConsumption = await FeedingRecord.sum('quantity', { where }) || 0;
 
-    res.json(
-      ApiResponse.success('Отчет по ферме получен', {
-        period: {
-          from: from_date || 'начало',
-          to: to_date || 'текущая дата'
-        },
-        population: {
-          total_rabbits: await Rabbit.count(),
-          by_breed: rabbitsByBreed
-        },
-        financial: {
-          transactions: transactions,
-          summary: transactions.reduce((acc, t) => {
-            if (t.type === 'income') {
-              acc.total_income = parseFloat(t.total);
-            } else {
-              acc.total_expenses = parseFloat(t.total);
-            }
-            return acc;
-          }, { total_income: 0, total_expenses: 0 })
-        },
-        health: {
-          vaccinations: vaccinationsCount,
-          medical_records: medicalRecordsCount
-        },
-        breeding: {
-          breedings: breedingsCount,
-          births: birthsCount
-        },
-        feeding: {
-          total_feeding_records: feedingRecordsCount,
-          total_feed_consumption: parseFloat(totalFeedConsumption).toFixed(2)
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      period: {
+        from: from_date || 'начало',
+        to: to_date || 'текущая дата'
+      },
+      population: {
+        total_rabbits: await Rabbit.count(),
+        by_breed: rabbitsByBreed
+      },
+      financial: {
+        transactions: transactions,
+        summary: transactions.reduce((acc, t) => {
+          if (t.type === 'income') {
+            acc.total_income = parseFloat(t.total);
+          } else {
+            acc.total_expenses = parseFloat(t.total);
+          }
+          return acc;
+        }, { total_income: 0, total_expenses: 0 })
+      },
+      health: {
+        vaccinations: vaccinationsCount,
+        medical_records: medicalRecordsCount
+      },
+      breeding: {
+        breedings: breedingsCount,
+        births: birthsCount
+      },
+      feeding: {
+        total_feeding_records: feedingRecordsCount,
+        total_feed_consumption: parseFloat(totalFeedConsumption).toFixed(2)
+      }
+    }, 'Отчет по ферме получен');
   } catch (error) {
     next(error);
   }
@@ -316,23 +314,21 @@ exports.getHealthReport = async (req, res, next) => {
       include: [{
         model: Rabbit,
         as: 'rabbit',
-        attributes: ['id', 'name', 'ear_tag']
+        attributes: ['id', 'name', 'tag_id']
       }],
       limit: 10,
       order: [['vaccination_date', 'ASC']]
     });
 
-    res.json(
-      ApiResponse.success('Отчет по здоровью получен', {
-        vaccinations: {
-          by_type: vaccinationsByType,
-          upcoming: upcomingVaccinations
-        },
-        medical_records: {
-          by_type: medicalRecordsByType
-        }
-      })
-    );
+    return ApiResponse.success(res, {
+      vaccinations: {
+        by_type: vaccinationsByType,
+        upcoming: upcomingVaccinations
+      },
+      medical_records: {
+        by_type: medicalRecordsByType
+      }
+    }, 'Отчет по здоровью получен');
   } catch (error) {
     next(error);
   }
@@ -384,21 +380,19 @@ exports.getFinancialReport = async (req, res, next) => {
     const totalIncome = totalByType.find(t => t.type === 'income')?.total || 0;
     const totalExpenses = totalByType.find(t => t.type === 'expense')?.total || 0;
 
-    res.json(
-      ApiResponse.success('Финансовый отчет получен', {
-        summary: {
-          total_income: parseFloat(totalIncome).toFixed(2),
-          total_expenses: parseFloat(totalExpenses).toFixed(2),
-          net_profit: parseFloat(totalIncome - totalExpenses).toFixed(2)
-        },
-        by_category: byCategory.map(item => ({
-          type: item.type,
-          category: item.category,
-          total: parseFloat(item.total).toFixed(2),
-          count: parseInt(item.count)
-        }))
-      })
-    );
+    return ApiResponse.success(res, {
+      summary: {
+        total_income: parseFloat(totalIncome).toFixed(2),
+        total_expenses: parseFloat(totalExpenses).toFixed(2),
+        net_profit: parseFloat(totalIncome - totalExpenses).toFixed(2)
+      },
+      by_category: byCategory.map(item => ({
+        type: item.type,
+        category: item.category,
+        total: parseFloat(item.total).toFixed(2),
+        count: parseInt(item.count)
+      }))
+    }, 'Финансовый отчет получен');
   } catch (error) {
     next(error);
   }
