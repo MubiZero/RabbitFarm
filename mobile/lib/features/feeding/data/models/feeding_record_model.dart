@@ -11,12 +11,12 @@ part 'feeding_record_model.g.dart';
 class FeedingRecord with _$FeedingRecord {
   const factory FeedingRecord({
     @IntConverter() required int id,
-    @JsonKey(name: 'rabbit_id') @IntConverter() int? rabbitId,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'feed_id') @IntConverter() required int feedId,
-    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @DoubleConverter() required double quantity,
     @JsonKey(name: 'fed_at') required DateTime fedAt,
-    @JsonKey(name: 'fed_by') @IntConverter() int? fedBy,
+    @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
@@ -117,6 +117,25 @@ class IntConverter implements JsonConverter<int, dynamic> {
 
   @override
   dynamic toJson(int value) => value;
+}
+
+/// Custom converter for nullable int values
+class NullableIntConverter implements JsonConverter<int?, dynamic> {
+  const NullableIntConverter();
+
+  @override
+  int? fromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      if (value.isEmpty) return null;
+      return int.parse(value);
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(int? value) => value;
 }
 
 /// Custom converter for double values that might come as strings

@@ -9,12 +9,12 @@ part of 'feeding_record_model.dart';
 _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
     _$FeedingRecordImpl(
       id: const IntConverter().fromJson(json['id']),
-      rabbitId: const IntConverter().fromJson(json['rabbit_id']),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       feedId: const IntConverter().fromJson(json['feed_id']),
-      cageId: const IntConverter().fromJson(json['cage_id']),
+      cageId: const NullableIntConverter().fromJson(json['cage_id']),
       quantity: const DoubleConverter().fromJson(json['quantity']),
       fedAt: DateTime.parse(json['fed_at'] as String),
-      fedBy: const IntConverter().fromJson(json['fed_by']),
+      fedBy: const NullableIntConverter().fromJson(json['fed_by']),
       notes: json['notes'] as String?,
       createdAt: json['created_at'] == null
           ? null
@@ -24,29 +24,15 @@ _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$FeedingRecordImplToJson(_$FeedingRecordImpl instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
-      'rabbit_id': _$JsonConverterToJson<dynamic, int>(
-        instance.rabbitId,
-        const IntConverter().toJson,
-      ),
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
       'feed_id': const IntConverter().toJson(instance.feedId),
-      'cage_id': _$JsonConverterToJson<dynamic, int>(
-        instance.cageId,
-        const IntConverter().toJson,
-      ),
+      'cage_id': const NullableIntConverter().toJson(instance.cageId),
       'quantity': const DoubleConverter().toJson(instance.quantity),
       'fed_at': instance.fedAt.toIso8601String(),
-      'fed_by': _$JsonConverterToJson<dynamic, int>(
-        instance.fedBy,
-        const IntConverter().toJson,
-      ),
+      'fed_by': const NullableIntConverter().toJson(instance.fedBy),
       'notes': instance.notes,
       'created_at': instance.createdAt?.toIso8601String(),
     };
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
 
 _$FeedingRecordCreateImpl _$$FeedingRecordCreateImplFromJson(
   Map<String, dynamic> json,
