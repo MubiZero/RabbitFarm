@@ -60,6 +60,25 @@ class IntConverter implements JsonConverter<int, dynamic> {
   int toJson(int value) => value;
 }
 
+/// Custom converter for nullable int values
+class NullableIntConverter implements JsonConverter<int?, dynamic> {
+  const NullableIntConverter();
+
+  @override
+  int? fromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      if (value.isEmpty) return null;
+      return int.parse(value);
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(int? value) => value;
+}
+
 /// Task model
 @freezed
 class Task with _$Task {
@@ -72,13 +91,13 @@ class Task with _$Task {
     required TaskPriority priority,
     @JsonKey(name: 'due_date') required DateTime dueDate,
     @JsonKey(name: 'completed_at') DateTime? completedAt,
-    @JsonKey(name: 'rabbit_id') @IntConverter() int? rabbitId,
-    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
-    @JsonKey(name: 'assigned_to') @IntConverter() int? assignedTo,
-    @JsonKey(name: 'created_by') @IntConverter() int? createdBy,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
+    @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
+    @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') @IntConverter() int? reminderBefore,
+    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
@@ -100,12 +119,12 @@ class TaskCreate with _$TaskCreate {
     TaskStatus? status,
     TaskPriority? priority,
     @JsonKey(name: 'due_date') required DateTime dueDate,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
-    @JsonKey(name: 'cage_id') int? cageId,
-    @JsonKey(name: 'assigned_to') int? assignedTo,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
+    @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') int? reminderBefore,
+    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
     String? notes,
   }) = _TaskCreate;
 
@@ -124,12 +143,12 @@ class TaskUpdate with _$TaskUpdate {
     TaskPriority? priority,
     @JsonKey(name: 'due_date') DateTime? dueDate,
     @JsonKey(name: 'completed_at') DateTime? completedAt,
-    @JsonKey(name: 'rabbit_id') int? rabbitId,
-    @JsonKey(name: 'cage_id') int? cageId,
-    @JsonKey(name: 'assigned_to') int? assignedTo,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
+    @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') int? reminderBefore,
+    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
     String? notes,
   }) = _TaskUpdate;
 
