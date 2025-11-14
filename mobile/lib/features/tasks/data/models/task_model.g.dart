@@ -17,13 +17,15 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
   completedAt: json['completed_at'] == null
       ? null
       : DateTime.parse(json['completed_at'] as String),
-  rabbitId: const IntConverter().fromJson(json['rabbit_id']),
-  cageId: const IntConverter().fromJson(json['cage_id']),
-  assignedTo: const IntConverter().fromJson(json['assigned_to']),
-  createdBy: const IntConverter().fromJson(json['created_by']),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+  cageId: const NullableIntConverter().fromJson(json['cage_id']),
+  assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
+  createdBy: const NullableIntConverter().fromJson(json['created_by']),
   isRecurring: json['is_recurring'] as bool?,
   recurrenceRule: json['recurrence_rule'] as String?,
-  reminderBefore: const IntConverter().fromJson(json['reminder_before']),
+  reminderBefore: const NullableIntConverter().fromJson(
+    json['reminder_before'],
+  ),
   notes: json['notes'] as String?,
   createdAt: json['created_at'] == null
       ? null
@@ -43,27 +45,14 @@ Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
       'priority': _$TaskPriorityEnumMap[instance.priority]!,
       'due_date': instance.dueDate.toIso8601String(),
       'completed_at': instance.completedAt?.toIso8601String(),
-      'rabbit_id': _$JsonConverterToJson<dynamic, int>(
-        instance.rabbitId,
-        const IntConverter().toJson,
-      ),
-      'cage_id': _$JsonConverterToJson<dynamic, int>(
-        instance.cageId,
-        const IntConverter().toJson,
-      ),
-      'assigned_to': _$JsonConverterToJson<dynamic, int>(
-        instance.assignedTo,
-        const IntConverter().toJson,
-      ),
-      'created_by': _$JsonConverterToJson<dynamic, int>(
-        instance.createdBy,
-        const IntConverter().toJson,
-      ),
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'cage_id': const NullableIntConverter().toJson(instance.cageId),
+      'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
+      'created_by': const NullableIntConverter().toJson(instance.createdBy),
       'is_recurring': instance.isRecurring,
       'recurrence_rule': instance.recurrenceRule,
-      'reminder_before': _$JsonConverterToJson<dynamic, int>(
+      'reminder_before': const NullableIntConverter().toJson(
         instance.reminderBefore,
-        const IntConverter().toJson,
       ),
       'notes': instance.notes,
       'created_at': instance.createdAt?.toIso8601String(),
@@ -93,11 +82,6 @@ const _$TaskPriorityEnumMap = {
   TaskPriority.urgent: 'urgent',
 };
 
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
-
 _$TaskCreateImpl _$$TaskCreateImplFromJson(Map<String, dynamic> json) =>
     _$TaskCreateImpl(
       title: json['title'] as String,
@@ -106,12 +90,14 @@ _$TaskCreateImpl _$$TaskCreateImplFromJson(Map<String, dynamic> json) =>
       status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
       priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
       dueDate: DateTime.parse(json['due_date'] as String),
-      rabbitId: (json['rabbit_id'] as num?)?.toInt(),
-      cageId: (json['cage_id'] as num?)?.toInt(),
-      assignedTo: (json['assigned_to'] as num?)?.toInt(),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      cageId: const NullableIntConverter().fromJson(json['cage_id']),
+      assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
       isRecurring: json['is_recurring'] as bool?,
       recurrenceRule: json['recurrence_rule'] as String?,
-      reminderBefore: (json['reminder_before'] as num?)?.toInt(),
+      reminderBefore: const NullableIntConverter().fromJson(
+        json['reminder_before'],
+      ),
       notes: json['notes'] as String?,
     );
 
@@ -123,12 +109,14 @@ Map<String, dynamic> _$$TaskCreateImplToJson(_$TaskCreateImpl instance) =>
       'status': _$TaskStatusEnumMap[instance.status],
       'priority': _$TaskPriorityEnumMap[instance.priority],
       'due_date': instance.dueDate.toIso8601String(),
-      'rabbit_id': instance.rabbitId,
-      'cage_id': instance.cageId,
-      'assigned_to': instance.assignedTo,
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'cage_id': const NullableIntConverter().toJson(instance.cageId),
+      'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
       'is_recurring': instance.isRecurring,
       'recurrence_rule': instance.recurrenceRule,
-      'reminder_before': instance.reminderBefore,
+      'reminder_before': const NullableIntConverter().toJson(
+        instance.reminderBefore,
+      ),
       'notes': instance.notes,
     };
 
@@ -145,12 +133,14 @@ _$TaskUpdateImpl _$$TaskUpdateImplFromJson(Map<String, dynamic> json) =>
       completedAt: json['completed_at'] == null
           ? null
           : DateTime.parse(json['completed_at'] as String),
-      rabbitId: (json['rabbit_id'] as num?)?.toInt(),
-      cageId: (json['cage_id'] as num?)?.toInt(),
-      assignedTo: (json['assigned_to'] as num?)?.toInt(),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      cageId: const NullableIntConverter().fromJson(json['cage_id']),
+      assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
       isRecurring: json['is_recurring'] as bool?,
       recurrenceRule: json['recurrence_rule'] as String?,
-      reminderBefore: (json['reminder_before'] as num?)?.toInt(),
+      reminderBefore: const NullableIntConverter().fromJson(
+        json['reminder_before'],
+      ),
       notes: json['notes'] as String?,
     );
 
@@ -163,12 +153,14 @@ Map<String, dynamic> _$$TaskUpdateImplToJson(_$TaskUpdateImpl instance) =>
       'priority': _$TaskPriorityEnumMap[instance.priority],
       'due_date': instance.dueDate?.toIso8601String(),
       'completed_at': instance.completedAt?.toIso8601String(),
-      'rabbit_id': instance.rabbitId,
-      'cage_id': instance.cageId,
-      'assigned_to': instance.assignedTo,
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'cage_id': const NullableIntConverter().toJson(instance.cageId),
+      'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
       'is_recurring': instance.isRecurring,
       'recurrence_rule': instance.recurrenceRule,
-      'reminder_before': instance.reminderBefore,
+      'reminder_before': const NullableIntConverter().toJson(
+        instance.reminderBefore,
+      ),
       'notes': instance.notes,
     };
 
