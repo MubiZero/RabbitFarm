@@ -35,13 +35,13 @@ mixin _$RabbitModel {
   DateTime get birthDate => throw _privateConstructorUsedError;
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'cage_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get cageId => throw _privateConstructorUsedError;
   @JsonKey(name: 'father_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get fatherId => throw _privateConstructorUsedError;
   @JsonKey(name: 'mother_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get motherId => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   String get purpose => throw _privateConstructorUsedError;
@@ -102,9 +102,9 @@ abstract class $RabbitModelCopyWith<$Res> {
     String sex,
     @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
     String? color,
-    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
-    @JsonKey(name: 'father_id') @IntConverter() int? fatherId,
-    @JsonKey(name: 'mother_id') @IntConverter() int? motherId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
+    @JsonKey(name: 'father_id') @NullableIntConverter() int? fatherId,
+    @JsonKey(name: 'mother_id') @NullableIntConverter() int? motherId,
     String status,
     String purpose,
     @JsonKey(name: 'acquired_date')
@@ -360,9 +360,9 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     String sex,
     @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
     String? color,
-    @JsonKey(name: 'cage_id') @IntConverter() int? cageId,
-    @JsonKey(name: 'father_id') @IntConverter() int? fatherId,
-    @JsonKey(name: 'mother_id') @IntConverter() int? motherId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
+    @JsonKey(name: 'father_id') @NullableIntConverter() int? fatherId,
+    @JsonKey(name: 'mother_id') @NullableIntConverter() int? motherId,
     String status,
     String purpose,
     @JsonKey(name: 'acquired_date')
@@ -558,9 +558,9 @@ class _$RabbitModelImpl implements _RabbitModel {
     required this.sex,
     @JsonKey(name: 'birth_date') @DateTimeConverter() required this.birthDate,
     this.color,
-    @JsonKey(name: 'cage_id') @IntConverter() this.cageId,
-    @JsonKey(name: 'father_id') @IntConverter() this.fatherId,
-    @JsonKey(name: 'mother_id') @IntConverter() this.motherId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
+    @JsonKey(name: 'father_id') @NullableIntConverter() this.fatherId,
+    @JsonKey(name: 'mother_id') @NullableIntConverter() this.motherId,
     required this.status,
     required this.purpose,
     @JsonKey(name: 'acquired_date')
@@ -606,15 +606,15 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String? color;
   @override
   @JsonKey(name: 'cage_id')
-  @IntConverter()
+  @NullableIntConverter()
   final int? cageId;
   @override
   @JsonKey(name: 'father_id')
-  @IntConverter()
+  @NullableIntConverter()
   final int? fatherId;
   @override
   @JsonKey(name: 'mother_id')
-  @IntConverter()
+  @NullableIntConverter()
   final int? motherId;
   @override
   final String status;
@@ -774,9 +774,9 @@ abstract class _RabbitModel implements RabbitModel {
     @DateTimeConverter()
     required final DateTime birthDate,
     final String? color,
-    @JsonKey(name: 'cage_id') @IntConverter() final int? cageId,
-    @JsonKey(name: 'father_id') @IntConverter() final int? fatherId,
-    @JsonKey(name: 'mother_id') @IntConverter() final int? motherId,
+    @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
+    @JsonKey(name: 'father_id') @NullableIntConverter() final int? fatherId,
+    @JsonKey(name: 'mother_id') @NullableIntConverter() final int? motherId,
     required final String status,
     required final String purpose,
     @JsonKey(name: 'acquired_date')
@@ -830,15 +830,15 @@ abstract class _RabbitModel implements RabbitModel {
   String? get color;
   @override
   @JsonKey(name: 'cage_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get cageId;
   @override
   @JsonKey(name: 'father_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get fatherId;
   @override
   @JsonKey(name: 'mother_id')
-  @IntConverter()
+  @NullableIntConverter()
   int? get motherId;
   @override
   String get status;

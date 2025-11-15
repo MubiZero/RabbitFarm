@@ -16,18 +16,9 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
   sex: json['sex'] as String,
   birthDate: const DateTimeConverter().fromJson(json['birth_date'] as Object),
   color: json['color'] as String?,
-  cageId: _$JsonConverterFromJson<Object, int>(
-    json['cage_id'],
-    const IntConverter().fromJson,
-  ),
-  fatherId: _$JsonConverterFromJson<Object, int>(
-    json['father_id'],
-    const IntConverter().fromJson,
-  ),
-  motherId: _$JsonConverterFromJson<Object, int>(
-    json['mother_id'],
-    const IntConverter().fromJson,
-  ),
+  cageId: const NullableIntConverter().fromJson(json['cage_id']),
+  fatherId: const NullableIntConverter().fromJson(json['father_id']),
+  motherId: const NullableIntConverter().fromJson(json['mother_id']),
   status: json['status'] as String,
   purpose: json['purpose'] as String,
   acquiredDate: const NullableDateTimeConverter().fromJson(
@@ -66,18 +57,9 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'sex': instance.sex,
   'birth_date': const DateTimeConverter().toJson(instance.birthDate),
   'color': instance.color,
-  'cage_id': _$JsonConverterToJson<Object, int>(
-    instance.cageId,
-    const IntConverter().toJson,
-  ),
-  'father_id': _$JsonConverterToJson<Object, int>(
-    instance.fatherId,
-    const IntConverter().toJson,
-  ),
-  'mother_id': _$JsonConverterToJson<Object, int>(
-    instance.motherId,
-    const IntConverter().toJson,
-  ),
+  'cage_id': const NullableIntConverter().toJson(instance.cageId),
+  'father_id': const NullableIntConverter().toJson(instance.fatherId),
+  'mother_id': const NullableIntConverter().toJson(instance.motherId),
   'status': instance.status,
   'purpose': instance.purpose,
   'acquired_date': const NullableDateTimeConverter().toJson(
@@ -97,16 +79,6 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'father': instance.father,
   'mother': instance.mother,
 };
-
-Value? _$JsonConverterFromJson<Json, Value>(
-  Object? json,
-  Value? Function(Json json) fromJson,
-) => json == null ? null : fromJson(json as Json);
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
 
 _$CageInfoImpl _$$CageInfoImplFromJson(Map<String, dynamic> json) =>
     _$CageInfoImpl(
