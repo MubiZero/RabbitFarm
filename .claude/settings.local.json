@@ -14,7 +14,9 @@
       "Bash(dir:*)",
       "Bash(del \"C:\\projects\\RabbitFarm\\backend\\Dockerfile\")",
       "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose.yml\")",
-      "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose-simple.yml\")"
+      "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose-simple.yml\")",
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

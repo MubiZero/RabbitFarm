@@ -14,3 +14,22 @@ class IntConverter implements JsonConverter<int, Object> {
   @override
   Object toJson(int object) => object;
 }
+
+/// Конвертер для nullable целых чисел
+class NullableIntConverter implements JsonConverter<int?, Object?> {
+  const NullableIntConverter();
+
+  @override
+  int? fromJson(Object? json) {
+    if (json == null) return null;
+    if (json is num) return json.toInt();
+    if (json is String) {
+      if (json.isEmpty) return null;
+      return int.parse(json);
+    }
+    return null;
+  }
+
+  @override
+  Object? toJson(int? object) => object;
+}
