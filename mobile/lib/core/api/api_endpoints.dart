@@ -25,6 +25,10 @@ class ApiEndpoints {
 
   // Breeds endpoints
   static const String breeds = '/breeds';
+  
+  // Breeding endpoints
+  static const String breeding = '/breeding';
+  static const String breedingStatistics = '/breeding/statistics';
 
   // Cages endpoints
   static const String cages = '/cages';

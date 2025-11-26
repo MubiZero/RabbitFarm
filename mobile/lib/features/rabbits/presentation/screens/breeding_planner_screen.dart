@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/models/pedigree_model.dart';
 import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
@@ -406,13 +407,37 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
         // Кнопка "Запланировать случку"
         if (riskLevel != InbreedingRiskLevel.critical)
           ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Переход к созданию случки
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Функция планирования случки будет добавлена'),
-                ),
+            onPressed: () async {
+              if (_selectedMaleId == null || _selectedFemaleId == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Выберите самца и самку'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
+
+              // Переход к форме создания случки с предзаполненными данными
+              final result = await context.push(
+                '/breeding/new',
+                extra: {
+                  'male_id': _selectedMaleId,
+                  'female_id': _selectedFemaleId,
+                  'analysis': _analysis,
+                },
               );
+
+              if (result == true && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Случка успешно запланирована'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                // Можно вернуться назад или обновить данные
+                context.pop();
+              }
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),

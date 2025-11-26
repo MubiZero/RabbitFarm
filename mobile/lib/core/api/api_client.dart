@@ -226,4 +226,52 @@ class ApiClient {
   Future<Response> getBreeds() {
     return _dio.get(ApiEndpoints.breeds);
   }
+
+  // Breeding endpoints
+  Future<Response> getBreedings({
+    int page = 1,
+    int limit = 20,
+    String? status,
+    int? maleId,
+    int? femaleId,
+    String? fromDate,
+    String? toDate,
+    String sortBy = 'created_at',
+    String sortOrder = 'desc',
+  }) {
+    return _dio.get(
+      ApiEndpoints.breeding,
+      queryParameters: {
+        'page': page,
+        'limit': limit,
+        'sort_by': sortBy,
+        'sort_order': sortOrder,
+        if (status != null) 'status': status,
+        if (maleId != null) 'male_id': maleId,
+        if (femaleId != null) 'female_id': femaleId,
+        if (fromDate != null) 'from_date': fromDate,
+        if (toDate != null) 'to_date': toDate,
+      },
+    );
+  }
+
+  Future<Response> getBreedingById(int id) {
+    return _dio.get('${ApiEndpoints.breeding}/$id');
+  }
+
+  Future<Response> createBreeding(Map<String, dynamic> data) {
+    return _dio.post(ApiEndpoints.breeding, data: data);
+  }
+
+  Future<Response> updateBreeding(int id, Map<String, dynamic> data) {
+    return _dio.put('${ApiEndpoints.breeding}/$id', data: data);
+  }
+
+  Future<Response> deleteBreeding(int id) {
+    return _dio.delete('${ApiEndpoints.breeding}/$id');
+  }
+
+  Future<Response> getBreedingStatistics() {
+    return _dio.get(ApiEndpoints.breedingStatistics);
+  }
 }

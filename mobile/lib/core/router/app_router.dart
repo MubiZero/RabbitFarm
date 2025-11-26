@@ -11,6 +11,9 @@ import '../../features/rabbits/presentation/screens/pedigree_screen.dart';
 import '../../features/rabbits/presentation/screens/breeds_list_screen.dart';
 import '../../features/rabbits/presentation/screens/breed_form_screen.dart';
 import '../../features/rabbits/presentation/screens/breeding_planner_screen.dart';
+import '../../features/breeding/presentation/screens/breeding_list_screen.dart';
+import '../../features/breeding/presentation/screens/breeding_form_screen.dart';
+import '../../features/breeding/presentation/screens/breeding_detail_screen.dart';
 import '../../features/rabbits/presentation/screens/birth_form_screen.dart';
 import '../../features/rabbits/presentation/screens/births_list_screen.dart';
 import '../../features/rabbits/data/models/rabbit_model.dart';
@@ -193,6 +196,27 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/breeding/planner',
         name: 'breeding-planner',
         builder: (context, state) => const BreedingPlannerScreen(),
+      ),
+      GoRoute(
+        path: '/breeding',
+        name: 'breeding-list',
+        builder: (context, state) => const BreedingListScreen(),
+      ),
+      GoRoute(
+        path: '/breeding/new',
+        name: 'breeding-new',
+        builder: (context, state) {
+          final initialData = state.extra as Map<String, dynamic>?;
+          return BreedingFormScreen(initialData: initialData);
+        },
+      ),
+      GoRoute(
+        path: '/breeding/:id',
+        name: 'breeding-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return BreedingDetailScreen(breedingId: id);
+        },
       ),
 
       // Births routes
