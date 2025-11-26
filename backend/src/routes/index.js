@@ -14,6 +14,7 @@ const feedingRecordRoutes = require('./feeding-record.routes');
 const transactionRoutes = require('./transaction.routes');
 const taskRoutes = require('./task.routes');
 const reportRoutes = require('./report.routes');
+const breedingRoutes = require('./breeding.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -54,5 +55,6 @@ router.use('/feeding-records', feedingRecordRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/reports', reportRoutes);
+router.use('/breeding', breedingRoutes);
 
 module.exports = router;
