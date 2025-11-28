@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -37,9 +38,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       } catch (e) {
         if (mounted) {
+          String message = e.toString().replaceAll('Exception: ', '');
+          if (e is DioException) {
+            message = e.message ?? 'Произошла ошибка';
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.toString().replaceAll('Exception: ', '')),
+              content: Text(message),
               backgroundColor: Colors.red,
             ),
           );

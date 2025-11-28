@@ -112,7 +112,7 @@ class LoggingInterceptor extends Interceptor {
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    String errorMessage;
+    String errorMessage = '';
 
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
@@ -125,9 +125,38 @@ class ErrorInterceptor extends Interceptor {
         final statusCode = err.response?.statusCode;
         final data = err.response?.data;
 
-        if (data is Map && data.containsKey('message')) {
-          errorMessage = data['message'];
-        } else {
+        if (data is Map) {
+          // Handle standardized API error response
+          if (data['error'] is Map) {
+            final errorObj = data['error'];
+            errorMessage = errorObj['message'] ?? 'Произошла ошибка';
+            
+            // Handle validation details
+            if (errorObj['details'] is List) {
+              final details = errorObj['details'] as List;
+              if (details.isNotEmpty) {
+                final detailsMessages = details
+                    .map((d) => d['message']?.toString() ?? '')
+                    .where((m) => m.isNotEmpty)
+                    .join('\n');
+                if (detailsMessages.isNotEmpty) {
+                  errorMessage = '$errorMessage:\n$detailsMessages';
+                }
+              }
+            }
+
+            // Attach error code to the exception for handling in UI
+            err = err.copyWith(
+              error: {'code': errorObj['code'], 'message': errorMessage},
+            );
+          } else if (data.containsKey('message')) {
+            errorMessage = data['message'];
+          }
+        }
+
+        // If no error message found yet, use default messages based on status code
+        // ignore: unnecessary_null_comparison
+        if (errorMessage.isEmpty) {
           switch (statusCode) {
             case 400:
               errorMessage = 'Неверный запрос';
@@ -140,6 +169,9 @@ class ErrorInterceptor extends Interceptor {
               break;
             case 404:
               errorMessage = 'Не найдено';
+              break;
+            case 422:
+              errorMessage = 'Ошибка валидации';
               break;
             case 500:
               errorMessage = 'Ошибка сервера';
