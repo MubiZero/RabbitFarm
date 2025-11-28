@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -47,10 +48,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
+          String message = e.toString().replaceAll('Exception: ', '');
+          bool userExists = false;
+
+          if (e is DioException) {
+            message = e.message ?? 'Произошла ошибка';
+            if (e.error is Map) {
+              final errorMap = e.error as Map;
+              if (errorMap['code'] == 'USER_EXISTS') {
+                userExists = true;
+              }
+            }
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.toString().replaceAll('Exception: ', '')),
+              content: Text(message),
               backgroundColor: Colors.red,
+              duration: Duration(seconds: userExists ? 6 : 4),
+              action: userExists
+                  ? SnackBarAction(
+                      label: 'Войти',
+                      textColor: Colors.white,
+                      onPressed: () => context.go('/login'),
+                    )
+                  : null,
             ),
           );
         }
