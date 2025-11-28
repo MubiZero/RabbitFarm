@@ -10,10 +10,14 @@ module.exports = (sequelize) => {
     number: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      // unique: true, // Removed unique constraint as it should be unique per user, not globally
       validate: {
         notEmpty: { msg: 'Cage number is required' }
       }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     type: {
       type: DataTypes.ENUM('single', 'group', 'maternity'),
@@ -60,7 +64,8 @@ module.exports = (sequelize) => {
     indexes: [
       { fields: ['number'] },
       { fields: ['type'] },
-      { fields: ['condition'] }
+      { fields: ['condition'] },
+      { unique: true, fields: ['user_id', 'number'] }
     ]
   });
 

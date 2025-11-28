@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Экран "Еще" - доступ ко всем дополнительным функциям
 class MoreScreen extends ConsumerWidget {
@@ -490,26 +491,29 @@ class MoreScreen extends ConsumerWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выйти из аккаунта?'),
-        content: const Text('Вы действительно хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.pop();
-              // TODO: Implement logout
-              context.go('/login');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorColor,
+      builder: (context) => Consumer(
+        builder: (context, ref, _) => AlertDialog(
+          title: const Text('Выйти из аккаунта?'),
+          content: const Text('Вы действительно хотите выйти?'),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text('Отмена'),
             ),
-            child: const Text('Выйти'),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () async {
+                context.pop(); // Close dialog
+                // Call logout from auth provider
+                await ref.read(authProvider.notifier).logout();
+                // Navigate to login (router will handle redirect automatically)
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.errorColor,
+              ),
+              child: const Text('Выйти'),
+            ),
+          ],
+        ),
       ),
     );
   }

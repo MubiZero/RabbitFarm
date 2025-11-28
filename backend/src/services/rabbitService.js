@@ -49,7 +49,7 @@ class RabbitService {
       }
 
       // Fetch rabbit with associations
-      const createdRabbit = await this.getRabbitById(rabbit.id);
+      const createdRabbit = await this.getRabbitById(rabbit.id, rabbitData.user_id);
 
       logger.info('Rabbit created', { rabbitId: rabbit.id });
       return createdRabbit;
@@ -62,11 +62,16 @@ class RabbitService {
   /**
    * Get rabbit by ID
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    * @returns {Object} Rabbit with associations
    */
-  async getRabbitById(rabbitId) {
+  async getRabbitById(rabbitId, userId) {
     try {
-      const rabbit = await Rabbit.findByPk(rabbitId, {
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: userId
+        },
         include: [
           { model: Breed, as: 'breed', attributes: ['id', 'name', 'purpose'] },
           { model: Cage, attributes: ['id', 'number', 'type', 'location'] },
@@ -88,17 +93,20 @@ class RabbitService {
 
   /**
    * Get list of rabbits with filters and pagination
+   * @param {Number} userId - User ID for filtering
    * @param {Object} filters - Filter options
    * @param {Object} pagination - Pagination options
    * @returns {Object} Rabbits list with pagination info
    */
-  async listRabbits(filters = {}, pagination = {}) {
+  async listRabbits(userId, filters = {}, pagination = {}) {
     try {
       const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'desc' } = pagination;
       const offset = (page - 1) * limit;
 
       // Build where clause
-      const where = {};
+      const where = {
+        user_id: userId  // Filter by user
+      };
 
       if (filters.breed_id) {
         where.breed_id = filters.breed_id;
@@ -160,12 +168,18 @@ class RabbitService {
   /**
    * Update rabbit
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    * @param {Object} updateData - Data to update
    * @returns {Object} Updated rabbit
    */
-  async updateRabbit(rabbitId, updateData) {
+  async updateRabbit(rabbitId, userId, updateData) {
     try {
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: userId
+        }
+      });
 
       if (!rabbit) {
         throw new Error('RABBIT_NOT_FOUND');
@@ -208,7 +222,7 @@ class RabbitService {
       }
 
       // Fetch updated rabbit with associations
-      const updatedRabbit = await this.getRabbitById(rabbit.id);
+      const updatedRabbit = await this.getRabbitById(rabbit.id, userId);
 
       logger.info('Rabbit updated', { rabbitId });
       return updatedRabbit;
@@ -221,10 +235,16 @@ class RabbitService {
   /**
    * Delete rabbit
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    */
-  async deleteRabbit(rabbitId) {
+  async deleteRabbit(rabbitId, userId) {
     try {
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: userId
+        }
+      });
 
       if (!rabbit) {
         throw new Error('RABBIT_NOT_FOUND');
@@ -257,11 +277,18 @@ class RabbitService {
   /**
    * Get rabbit weight history
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    * @returns {Array} Weight records
    */
-  async getWeightHistory(rabbitId) {
+  async getWeightHistory(rabbitId, userId) {
     try {
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: userId
+        }
+      });
+
       if (!rabbit) {
         throw new Error('RABBIT_NOT_FOUND');
       }
@@ -281,12 +308,19 @@ class RabbitService {
   /**
    * Add weight record
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    * @param {Object} weightData - Weight data
    * @returns {Object} Weight record
    */
-  async addWeightRecord(rabbitId, weightData) {
+  async addWeightRecord(rabbitId, userId, weightData) {
     try {
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: userId
+        }
+      });
+
       if (!rabbit) {
         throw new Error('RABBIT_NOT_FOUND');
       }
@@ -309,18 +343,21 @@ class RabbitService {
 
   /**
    * Get rabbit statistics
+   * @param {Number} userId - User ID for filtering
    * @returns {Object} Statistics
    */
-  async getStatistics() {
+  async getStatistics(userId) {
     try {
-      const total = await Rabbit.count();
-      const deadCount = await Rabbit.count({ where: { status: 'dead' } });
+      const where = { user_id: userId };
+
+      const total = await Rabbit.count({ where });
+      const deadCount = await Rabbit.count({ where: { ...where, status: 'dead' } });
       const aliveCount = total - deadCount;
-      const maleCount = await Rabbit.count({ where: { sex: 'male', status: { [Op.ne]: 'dead' } } });
-      const femaleCount = await Rabbit.count({ where: { sex: 'female', status: { [Op.ne]: 'dead' } } });
-      const pregnantCount = await Rabbit.count({ where: { status: 'pregnant' } });
-      const sickCount = await Rabbit.count({ where: { status: 'sick' } });
-      const forSaleCount = await Rabbit.count({ where: { purpose: 'sale', status: { [Op.notIn]: ['sold', 'dead'] } } });
+      const maleCount = await Rabbit.count({ where: { ...where, sex: 'male', status: { [Op.ne]: 'dead' } } });
+      const femaleCount = await Rabbit.count({ where: { ...where, sex: 'female', status: { [Op.ne]: 'dead' } } });
+      const pregnantCount = await Rabbit.count({ where: { ...where, status: 'pregnant' } });
+      const sickCount = await Rabbit.count({ where: { ...where, status: 'sick' } });
+      const forSaleCount = await Rabbit.count({ where: { ...where, purpose: 'sale', status: { [Op.notIn]: ['sold', 'dead'] } } });
 
       // Get breed distribution
       const breedDistribution = await Rabbit.findAll({
@@ -330,7 +367,7 @@ class RabbitService {
         ],
         include: [{ model: Breed, as: 'breed', attributes: ['name'] }],
         group: ['breed_id', 'breed.id', 'breed.name'],
-        where: { status: { [Op.notIn]: ['sold', 'dead'] } },
+        where: { ...where, status: { [Op.notIn]: ['sold', 'dead'] } },
         raw: false
       });
 
@@ -361,12 +398,13 @@ class RabbitService {
   /**
    * Get rabbit pedigree (parents tree)
    * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} userId - User ID for ownership verification
    * @param {Number} generations - Number of generations (default: 3)
    * @returns {Object} Pedigree tree
    */
-  async getPedigree(rabbitId, generations = 3) {
+  async getPedigree(rabbitId, userId, generations = 3) {
     try {
-      const rabbit = await this.getRabbitById(rabbitId);
+      const rabbit = await this.getRabbitById(rabbitId, userId);
 
       const buildPedigree = async (currentRabbit, level) => {
         if (!currentRabbit || level >= generations) {
@@ -384,7 +422,7 @@ class RabbitService {
 
         if (currentRabbit.father_id) {
           try {
-            const father = await this.getRabbitById(currentRabbit.father_id);
+            const father = await this.getRabbitById(currentRabbit.father_id, userId);
             result.father = await buildPedigree(father, level + 1);
           } catch (error) {
             // Родитель не найден - пропускаем
@@ -397,7 +435,7 @@ class RabbitService {
 
         if (currentRabbit.mother_id) {
           try {
-            const mother = await this.getRabbitById(currentRabbit.mother_id);
+            const mother = await this.getRabbitById(currentRabbit.mother_id, userId);
             result.mother = await buildPedigree(mother, level + 1);
           } catch (error) {
             // Родитель не найден - пропускаем

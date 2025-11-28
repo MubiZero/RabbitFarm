@@ -44,7 +44,7 @@ class RabbitController {
    */
   async getById(req, res, next) {
     try {
-      const rabbit = await rabbitService.getRabbitById(req.params.id);
+      const rabbit = await rabbitService.getRabbitById(req.params.id, req.user.id);
 
       return ApiResponse.success(res, rabbit);
     } catch (error) {
@@ -64,6 +64,7 @@ class RabbitController {
       const { page, limit, sort_by, sort_order, ...filters } = req.query;
 
       const result = await rabbitService.listRabbits(
+        req.user.id,
         filters,
         { page, limit, sort_by, sort_order }
       );
@@ -92,7 +93,7 @@ class RabbitController {
         req.body.photo_url = `/uploads/rabbits/${req.file.filename}`;
       }
 
-      const rabbit = await rabbitService.updateRabbit(req.params.id, req.body);
+      const rabbit = await rabbitService.updateRabbit(req.params.id, req.user.id, req.body);
 
       return ApiResponse.success(res, rabbit, 'Кролик успешно обновлен');
     } catch (error) {
@@ -118,7 +119,7 @@ class RabbitController {
    */
   async delete(req, res, next) {
     try {
-      await rabbitService.deleteRabbit(req.params.id);
+      await rabbitService.deleteRabbit(req.params.id, req.user.id);
 
       return ApiResponse.success(res, null, 'Кролик успешно удален');
     } catch (error) {
@@ -138,7 +139,7 @@ class RabbitController {
    */
   async getWeightHistory(req, res, next) {
     try {
-      const weights = await rabbitService.getWeightHistory(req.params.id);
+      const weights = await rabbitService.getWeightHistory(req.params.id, req.user.id);
 
       return ApiResponse.success(res, weights, 'История взвешиваний получена успешно');
     } catch (error) {
@@ -155,7 +156,7 @@ class RabbitController {
    */
   async addWeight(req, res, next) {
     try {
-      const weight = await rabbitService.addWeightRecord(req.params.id, req.body);
+      const weight = await rabbitService.addWeightRecord(req.params.id, req.user.id, req.body);
 
       return ApiResponse.created(res, weight, 'Вес добавлен успешно');
     } catch (error) {
@@ -172,7 +173,7 @@ class RabbitController {
    */
   async getStatistics(req, res, next) {
     try {
-      const stats = await rabbitService.getStatistics();
+      const stats = await rabbitService.getStatistics(req.user.id);
 
       return ApiResponse.success(res, stats, 'Статистика получена успешно');
     } catch (error) {
@@ -187,7 +188,7 @@ class RabbitController {
   async getPedigree(req, res, next) {
     try {
       const generations = parseInt(req.query.generations) || 3;
-      const pedigree = await rabbitService.getPedigree(req.params.id, generations);
+      const pedigree = await rabbitService.getPedigree(req.params.id, req.user.id, generations);
 
       return ApiResponse.success(res, pedigree, 'Родословная получена успешно');
     } catch (error) {
@@ -211,7 +212,7 @@ class RabbitController {
       const photoUrl = `/uploads/rabbits/${req.file.filename}`;
 
       // Update rabbit with new photo
-      const rabbit = await rabbitService.updateRabbit(req.params.id, {
+      const rabbit = await rabbitService.updateRabbit(req.params.id, req.user.id, {
         photo_url: photoUrl
       });
 
@@ -231,7 +232,7 @@ class RabbitController {
   async deletePhoto(req, res, next) {
     try {
       // Update rabbit to remove photo
-      const rabbit = await rabbitService.updateRabbit(req.params.id, {
+      const rabbit = await rabbitService.updateRabbit(req.params.id, req.user.id, {
         photo_url: null
       });
 
