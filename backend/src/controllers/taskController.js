@@ -31,7 +31,12 @@ exports.create = async (req, res, next) => {
 
     // Validate rabbit_id if provided
     if (rabbit_id) {
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
@@ -110,7 +115,11 @@ exports.getById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findByPk(id, {
+    const task = await Task.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      },
       include: [
         {
           model: Rabbit,
@@ -170,7 +179,9 @@ exports.list = async (req, res, next) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    const where = {};
+    const where = {
+      created_by: req.user.id // Filter by user
+    };
 
     // Filters
     if (type) {
@@ -303,15 +314,25 @@ exports.update = async (req, res, next) => {
       notes
     } = req.body;
 
-    const task = await Task.findByPk(id);
+    const task = await Task.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!task) {
       return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
     // Validate references if provided
-    if (rabbit_id) {
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+    if (rabbit_id && rabbit_id !== task.rabbit_id) {
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
@@ -398,7 +419,12 @@ exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findByPk(id);
+    const task = await Task.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!task) {
       return ApiResponse.error(res, 'Задача не найдена', 404);
@@ -418,15 +444,18 @@ exports.delete = async (req, res, next) => {
  */
 exports.getStatistics = async (req, res, next) => {
   try {
+    const where = { created_by: req.user.id };
+
     // Total tasks by status
-    const totalPending = await Task.count({ where: { status: 'pending' } });
-    const totalInProgress = await Task.count({ where: { status: 'in_progress' } });
-    const totalCompleted = await Task.count({ where: { status: 'completed' } });
-    const totalCancelled = await Task.count({ where: { status: 'cancelled' } });
+    const totalPending = await Task.count({ where: { ...where, status: 'pending' } });
+    const totalInProgress = await Task.count({ where: { ...where, status: 'in_progress' } });
+    const totalCompleted = await Task.count({ where: { ...where, status: 'completed' } });
+    const totalCancelled = await Task.count({ where: { ...where, status: 'cancelled' } });
 
     // Overdue tasks
     const overdueCount = await Task.count({
       where: {
+        ...where,
         due_date: {
           [Op.lt]: new Date()
         },
@@ -444,6 +473,7 @@ exports.getStatistics = async (req, res, next) => {
 
     const todayCount = await Task.count({
       where: {
+        ...where,
         due_date: {
           [Op.gte]: today,
           [Op.lt]: tomorrow
@@ -460,6 +490,7 @@ exports.getStatistics = async (req, res, next) => {
         'type',
         [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
       ],
+      where,
       group: ['type']
     });
 
@@ -470,6 +501,7 @@ exports.getStatistics = async (req, res, next) => {
         [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
       ],
       where: {
+        ...where,
         status: {
           [Op.in]: ['pending', 'in_progress']
         }
@@ -513,6 +545,7 @@ exports.getUpcoming = async (req, res, next) => {
 
     const tasks = await Task.findAll({
       where: {
+        created_by: req.user.id, // Filter by user
         due_date: {
           [Op.gte]: today,
           [Op.lt]: futureDate
@@ -555,7 +588,12 @@ exports.completeTask = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findByPk(id);
+    const task = await Task.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!task) {
       return ApiResponse.error(res, 'Задача не найдена', 404);

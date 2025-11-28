@@ -17,7 +17,12 @@ exports.create = async (req, res, next) => {
 
     // Validate rabbit_id if provided
     if (rabbit_id) {
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
@@ -64,7 +69,11 @@ exports.getById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const transaction = await Transaction.findByPk(id, {
+    const transaction = await Transaction.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      },
       include: [
         {
           model: Rabbit,
@@ -110,7 +119,9 @@ exports.list = async (req, res, next) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    const where = {};
+    const where = {
+      created_by: req.user.id // Filter by user
+    };
 
     // Filters
     if (type) {
@@ -188,15 +199,25 @@ exports.update = async (req, res, next) => {
     const { id } = req.params;
     const { type, category, amount, transaction_date, rabbit_id, description, receipt_url } = req.body;
 
-    const transaction = await Transaction.findByPk(id);
+    const transaction = await Transaction.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!transaction) {
       return ApiResponse.error(res, 'Транзакция не найдена', 404);
     }
 
     // Validate rabbit_id if provided
-    if (rabbit_id) {
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+    if (rabbit_id && rabbit_id !== transaction.rabbit_id) {
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
@@ -242,7 +263,12 @@ exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const transaction = await Transaction.findByPk(id);
+    const transaction = await Transaction.findOne({
+      where: {
+        id,
+        created_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!transaction) {
       return ApiResponse.error(res, 'Транзакция не найдена', 404);
@@ -264,7 +290,9 @@ exports.getStatistics = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
-    const where = {};
+    const where = {
+      created_by: req.user.id // Filter by user
+    };
     if (from_date || to_date) {
       where.transaction_date = {};
       if (from_date) {
@@ -357,8 +385,13 @@ exports.getRabbitTransactions = async (req, res, next) => {
   try {
     const { rabbitId } = req.params;
 
-    // Check if rabbit exists
-    const rabbit = await Rabbit.findByPk(rabbitId);
+    // Check if rabbit exists and belongs to user
+    const rabbit = await Rabbit.findOne({
+      where: {
+        id: rabbitId,
+        user_id: req.user.id
+      }
+    });
     if (!rabbit) {
       return ApiResponse.error(res, 'Кролик не найден', 404);
     }
@@ -413,6 +446,7 @@ exports.getMonthlyReport = async (req, res, next) => {
     const endDate = new Date(year, month, 0).toISOString().split('T')[0];
 
     const where = {
+      created_by: req.user.id, // Filter by user
       transaction_date: {
         [Op.gte]: startDate,
         [Op.lte]: endDate

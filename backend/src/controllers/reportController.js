@@ -24,16 +24,19 @@ const ApiResponse = require('../utils/apiResponse');
  */
 exports.getDashboard = async (req, res, next) => {
   try {
+    const userId = req.user.id;
+
     // Rabbits statistics
-    const totalRabbits = await Rabbit.count();
-    const maleRabbits = await Rabbit.count({ where: { sex: 'male' } });
-    const femaleRabbits = await Rabbit.count({ where: { sex: 'female' } });
+    const totalRabbits = await Rabbit.count({ where: { user_id: userId } });
+    const maleRabbits = await Rabbit.count({ where: { sex: 'male', user_id: userId } });
+    const femaleRabbits = await Rabbit.count({ where: { sex: 'female', user_id: userId } });
 
     // Cages statistics
-    const totalCages = await Cage.count();
+    const totalCages = await Cage.count({ where: { user_id: userId } });
     // Count cages that have rabbits assigned to them
     const occupiedCages = await Rabbit.count({
       where: {
+        user_id: userId,
         cage_id: {
           [Op.ne]: null
         }
@@ -49,7 +52,13 @@ exports.getDashboard = async (req, res, next) => {
         next_vaccination_date: {
           [Op.between]: [new Date(), new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)]
         }
-      }
+      },
+      include: [{
+        model: Rabbit,
+        as: 'rabbit',
+        where: { user_id: userId },
+        attributes: []
+      }]
     });
 
     // Count overdue vaccinations (next_vaccination_date in the past)
@@ -58,7 +67,13 @@ exports.getDashboard = async (req, res, next) => {
         next_vaccination_date: {
           [Op.lt]: new Date()
         }
-      }
+      },
+      include: [{
+        model: Rabbit,
+        as: 'rabbit',
+        where: { user_id: userId },
+        attributes: []
+      }]
     });
 
     // Financial summary (last 30 days)
@@ -67,6 +82,7 @@ exports.getDashboard = async (req, res, next) => {
 
     const recentIncome = await Transaction.sum('amount', {
       where: {
+        created_by: userId,
         type: 'income',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
@@ -76,6 +92,7 @@ exports.getDashboard = async (req, res, next) => {
 
     const recentExpenses = await Transaction.sum('amount', {
       where: {
+        created_by: userId,
         type: 'expense',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
@@ -85,11 +102,15 @@ exports.getDashboard = async (req, res, next) => {
 
     // Tasks statistics
     const pendingTasks = await Task.count({
-      where: { status: 'pending' }
+      where: {
+        status: 'pending',
+        created_by: userId
+      }
     });
 
     const overdueTasks = await Task.count({
       where: {
+        created_by: userId,
         due_date: {
           [Op.lt]: new Date()
         },
@@ -102,6 +123,7 @@ exports.getDashboard = async (req, res, next) => {
     // Feed inventory
     const lowStockFeeds = await Feed.count({
       where: {
+        user_id: userId,
         current_stock: {
           [Op.lte]: require('sequelize').col('min_stock')
         }
@@ -114,7 +136,13 @@ exports.getDashboard = async (req, res, next) => {
         birth_date: {
           [Op.gte]: thirtyDaysAgo
         }
-      }
+      },
+      include: [{
+        model: Rabbit,
+        as: 'mother',
+        where: { user_id: userId },
+        attributes: []
+      }]
     });
 
     return ApiResponse.success(res, {

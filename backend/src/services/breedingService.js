@@ -55,11 +55,16 @@ class BreedingService {
     /**
      * Get breeding by ID
      * @param {Number} id - Breeding ID
+     * @param {Number} userId - User ID for ownership verification
      * @returns {Object} Breeding record with associations
      */
-    async getBreedingById(id) {
+    async getBreedingById(id, userId) {
         try {
-            const breeding = await Breeding.findByPk(id, {
+            const breeding = await Breeding.findOne({
+                where: {
+                    id,
+                    user_id: userId
+                },
                 include: [
                     { model: Rabbit, as: 'male', attributes: ['id', 'name', 'tag_id', 'breed_id'] },
                     { model: Rabbit, as: 'female', attributes: ['id', 'name', 'tag_id', 'breed_id'] }
@@ -79,15 +84,18 @@ class BreedingService {
 
     /**
      * List breedings with filters
+     * @param {Number} userId - User ID for filtering
      * @param {Object} filters - Filter options
      * @param {Object} pagination - Pagination options
      */
-    async listBreedings(filters = {}, pagination = {}) {
+    async listBreedings(userId, filters = {}, pagination = {}) {
         try {
             const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'desc' } = pagination;
             const offset = (page - 1) * limit;
 
-            const where = {};
+            const where = {
+                user_id: userId  // Filter by user
+            };
 
             if (filters.status) {
                 where.status = filters.status;
@@ -142,11 +150,18 @@ class BreedingService {
     /**
      * Update breeding record
      * @param {Number} id - Breeding ID
+     * @param {Number} userId - User ID for ownership verification
      * @param {Object} data - Update data
      */
-    async updateBreeding(id, data) {
+    async updateBreeding(id, userId, data) {
         try {
-            const breeding = await Breeding.findByPk(id);
+            const breeding = await Breeding.findOne({
+                where: {
+                    id,
+                    user_id: userId
+                }
+            });
+
             if (!breeding) {
                 throw new Error('BREEDING_NOT_FOUND');
             }
@@ -163,7 +178,7 @@ class BreedingService {
 
             await breeding.update(data);
 
-            const updated = await this.getBreedingById(id);
+            const updated = await this.getBreedingById(id, userId);
             logger.info('Breeding updated', { breedingId: id });
             return updated;
         } catch (error) {
@@ -175,10 +190,17 @@ class BreedingService {
     /**
      * Delete breeding record
      * @param {Number} id - Breeding ID
+     * @param {Number} userId - User ID for ownership verification
      */
-    async deleteBreeding(id) {
+    async deleteBreeding(id, userId) {
         try {
-            const breeding = await Breeding.findByPk(id);
+            const breeding = await Breeding.findOne({
+                where: {
+                    id,
+                    user_id: userId
+                }
+            });
+
             if (!breeding) {
                 throw new Error('BREEDING_NOT_FOUND');
             }
@@ -194,13 +216,16 @@ class BreedingService {
 
     /**
      * Get breeding statistics
+     * @param {Number} userId - User ID for filtering
      */
-    async getStatistics() {
+    async getStatistics(userId) {
         try {
-            const total = await Breeding.count();
-            const planned = await Breeding.count({ where: { status: 'planned' } });
-            const completed = await Breeding.count({ where: { status: 'completed' } });
-            const failed = await Breeding.count({ where: { status: 'failed' } });
+            const where = { user_id: userId };
+
+            const total = await Breeding.count({ where });
+            const planned = await Breeding.count({ where: { ...where, status: 'planned' } });
+            const completed = await Breeding.count({ where: { ...where, status: 'completed' } });
+            const failed = await Breeding.count({ where: { ...where, status: 'failed' } });
 
             // Success rate (completed / (completed + failed)) * 100
             const totalFinished = completed + failed;

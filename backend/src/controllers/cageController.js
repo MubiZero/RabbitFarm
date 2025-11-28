@@ -14,7 +14,10 @@ class CageController {
    */
   async create(req, res, next) {
     try {
-      const cage = await Cage.create(req.body);
+      const cage = await Cage.create({
+        ...req.body,
+        user_id: req.user.id
+      });
 
       return ApiResponse.created(res, cage, 'Клетка успешно создана');
     } catch (error) {
@@ -34,7 +37,11 @@ class CageController {
    */
   async getById(req, res, next) {
     try {
-      const cage = await Cage.findByPk(req.params.id, {
+      const cage = await Cage.findOne({
+        where: {
+          id: req.params.id,
+          user_id: req.user.id
+        },
         include: [
           {
             model: Rabbit,
@@ -79,7 +86,9 @@ class CageController {
       } = req.query;
 
       const offset = (parseInt(page) - 1) * parseInt(limit);
-      const where = {};
+      const where = {
+        user_id: req.user.id // Filter by user
+      };
 
       // Filters
       if (type) where.type = type;
@@ -143,7 +152,12 @@ class CageController {
    */
   async update(req, res, next) {
     try {
-      const cage = await Cage.findByPk(req.params.id);
+      const cage = await Cage.findOne({
+        where: {
+          id: req.params.id,
+          user_id: req.user.id
+        }
+      });
 
       if (!cage) {
         return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -169,7 +183,11 @@ class CageController {
    */
   async delete(req, res, next) {
     try {
-      const cage = await Cage.findByPk(req.params.id, {
+      const cage = await Cage.findOne({
+        where: {
+          id: req.params.id,
+          user_id: req.user.id
+        },
         include: [{ model: Rabbit, as: 'rabbits' }]
       });
 
@@ -200,6 +218,9 @@ class CageController {
   async getStatistics(req, res, next) {
     try {
       const cages = await Cage.findAll({
+        where: {
+          user_id: req.user.id
+        },
         include: [
           {
             model: Rabbit,
@@ -270,7 +291,12 @@ class CageController {
    */
   async markCleaned(req, res, next) {
     try {
-      const cage = await Cage.findByPk(req.params.id);
+      const cage = await Cage.findOne({
+        where: {
+          id: req.params.id,
+          user_id: req.user.id
+        }
+      });
 
       if (!cage) {
         return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -293,6 +319,9 @@ class CageController {
   async getLayout(req, res, next) {
     try {
       const cages = await Cage.findAll({
+        where: {
+          user_id: req.user.id
+        },
         include: [
           {
             model: Rabbit,

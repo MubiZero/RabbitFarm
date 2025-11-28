@@ -16,8 +16,13 @@ class VaccinationController {
     try {
       const { rabbit_id } = req.body;
 
-      // Check if rabbit exists
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+      // Check if rabbit exists and belongs to user
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
@@ -62,6 +67,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -135,6 +141,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -172,8 +179,13 @@ class VaccinationController {
     try {
       const { rabbitId } = req.params;
 
-      // Check if rabbit exists
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      // Check if rabbit exists and belongs to user
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
@@ -208,9 +220,14 @@ class VaccinationController {
         return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
       }
 
-      // If rabbit_id is being updated, check if new rabbit exists
+      // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== vaccination.rabbit_id) {
-        const rabbit = await Rabbit.findByPk(req.body.rabbit_id);
+        const rabbit = await Rabbit.findOne({
+          where: {
+            id: req.body.rabbit_id,
+            user_id: req.user.id
+          }
+        });
         if (!rabbit) {
           return ApiResponse.notFound(res, 'Кролик не найден');
         }
@@ -251,7 +268,14 @@ class VaccinationController {
    */
   async delete(req, res, next) {
     try {
-      const vaccination = await Vaccination.findByPk(req.params.id);
+      const vaccination = await Vaccination.findOne({
+        where: { id: req.params.id },
+        include: [{
+          model: Rabbit,
+          where: { user_id: req.user.id },
+          attributes: ['id']
+        }]
+      });
 
       if (!vaccination) {
         return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
@@ -276,6 +300,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'status']
           }
         ]
@@ -384,6 +409,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             include: [
               {
@@ -434,6 +460,7 @@ class VaccinationController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
+              user_id: req.user.id, // Filter by user
               status: {
                 [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
               }

@@ -15,6 +15,19 @@ exports.create = async (req, res, next) => {
     const { feed_id, quantity, rabbit_id, cage_id } = req.body;
     const fed_by = req.user.id;
 
+    // Validate rabbit_id if provided
+    if (rabbit_id) {
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
+      if (!rabbit) {
+        return ApiResponse.error(res, 'Кролик не найден', 404);
+      }
+    }
+
     // Check if feed exists and has enough stock
     const feed = await Feed.findByPk(feed_id);
     if (!feed) {
@@ -66,7 +79,11 @@ exports.getById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const feedingRecord = await FeedingRecord.findByPk(id, {
+    const feedingRecord = await FeedingRecord.findOne({
+      where: {
+        id,
+        fed_by: req.user.id // Verify ownership
+      },
       include: [
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
@@ -103,7 +120,9 @@ exports.list = async (req, res, next) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    const where = {};
+    const where = {
+      fed_by: req.user.id // Filter by user
+    };
 
     // Filter by rabbit
     if (rabbit_id) {
@@ -165,6 +184,17 @@ exports.getByRabbit = async (req, res, next) => {
   try {
     const { rabbitId } = req.params;
 
+    // Check if rabbit exists and belongs to user
+    const rabbit = await Rabbit.findOne({
+      where: {
+        id: rabbitId,
+        user_id: req.user.id
+      }
+    });
+    if (!rabbit) {
+      return ApiResponse.error(res, 'Кролик не найден', 404);
+    }
+
     const records = await FeedingRecord.findAll({
       where: { rabbit_id: rabbitId },
       include: [
@@ -188,7 +218,12 @@ exports.update = async (req, res, next) => {
     const { id } = req.params;
     const { quantity: newQuantity, feed_id: newFeedId } = req.body;
 
-    const feedingRecord = await FeedingRecord.findByPk(id);
+    const feedingRecord = await FeedingRecord.findOne({
+      where: {
+        id,
+        fed_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!feedingRecord) {
       return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
@@ -252,7 +287,12 @@ exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const feedingRecord = await FeedingRecord.findByPk(id);
+    const feedingRecord = await FeedingRecord.findOne({
+      where: {
+        id,
+        fed_by: req.user.id // Verify ownership
+      }
+    });
 
     if (!feedingRecord) {
       return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
@@ -281,7 +321,9 @@ exports.getStatistics = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
-    const where = {};
+    const where = {
+      fed_by: req.user.id // Filter by user
+    };
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
@@ -357,6 +399,9 @@ exports.getRecent = async (req, res, next) => {
     const { limit = 10 } = req.query;
 
     const records = await FeedingRecord.findAll({
+      where: {
+        fed_by: req.user.id // Filter by user
+      },
       include: [
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },

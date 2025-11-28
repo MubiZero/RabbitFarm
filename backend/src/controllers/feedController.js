@@ -12,7 +12,10 @@ const { Op } = require('sequelize');
  */
 exports.create = async (req, res, next) => {
   try {
-    const feed = await Feed.create(req.body);
+    const feed = await Feed.create({
+      ...req.body,
+      user_id: req.user.id
+    });
 
     return ApiResponse.success(res, feed, 'Корм успешно добавлен', 201);
   } catch (error) {
@@ -27,7 +30,12 @@ exports.getById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const feed = await Feed.findByPk(id);
+    const feed = await Feed.findOne({
+      where: {
+        id,
+        user_id: req.user.id
+      }
+    });
 
     if (!feed) {
       return ApiResponse.error(res, 'Корм не найден', 404);
@@ -55,7 +63,9 @@ exports.list = async (req, res, next) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    const where = {};
+    const where = {
+      user_id: req.user.id // Filter by user
+    };
 
     // Filter by type
     if (type) {
@@ -105,7 +115,12 @@ exports.update = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const feed = await Feed.findByPk(id);
+    const feed = await Feed.findOne({
+      where: {
+        id,
+        user_id: req.user.id
+      }
+    });
 
     if (!feed) {
       return ApiResponse.error(res, 'Корм не найден', 404);
@@ -126,7 +141,12 @@ exports.delete = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const feed = await Feed.findByPk(id);
+    const feed = await Feed.findOne({
+      where: {
+        id,
+        user_id: req.user.id
+      }
+    });
 
     if (!feed) {
       return ApiResponse.error(res, 'Корм не найден', 404);
@@ -158,7 +178,11 @@ exports.delete = async (req, res, next) => {
  */
 exports.getStatistics = async (req, res, next) => {
   try {
-    const feeds = await Feed.findAll();
+    const feeds = await Feed.findAll({
+      where: {
+        user_id: req.user.id
+      }
+    });
 
     const stats = {
       total_feeds: feeds.length,
@@ -212,6 +236,7 @@ exports.getLowStock = async (req, res, next) => {
   try {
     const feeds = await Feed.findAll({
       where: {
+        user_id: req.user.id, // Filter by user
         [Op.and]: [
           { current_stock: { [Op.lte]: require('sequelize').col('min_stock') } }
         ]
@@ -242,7 +267,12 @@ exports.adjustStock = async (req, res, next) => {
     const { id } = req.params;
     const { quantity, operation } = req.body; // operation: 'add' or 'subtract'
 
-    const feed = await Feed.findByPk(id);
+    const feed = await Feed.findOne({
+      where: {
+        id,
+        user_id: req.user.id
+      }
+    });
 
     if (!feed) {
       return ApiResponse.error(res, 'Корм не найден', 404);

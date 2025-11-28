@@ -16,8 +16,13 @@ class MedicalRecordController {
     try {
       const { rabbit_id } = req.body;
 
-      // Check if rabbit exists
-      const rabbit = await Rabbit.findByPk(rabbit_id);
+      // Check if rabbit exists and belongs to user
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbit_id,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
@@ -62,6 +67,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -130,6 +136,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -167,8 +174,13 @@ class MedicalRecordController {
     try {
       const { rabbitId } = req.params;
 
-      // Check if rabbit exists
-      const rabbit = await Rabbit.findByPk(rabbitId);
+      // Check if rabbit exists and belongs to user
+      const rabbit = await Rabbit.findOne({
+        where: {
+          id: rabbitId,
+          user_id: req.user.id
+        }
+      });
       if (!rabbit) {
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
@@ -203,9 +215,14 @@ class MedicalRecordController {
         return ApiResponse.notFound(res, 'Медицинская запись не найдена');
       }
 
-      // If rabbit_id is being updated, check if new rabbit exists
+      // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
-        const rabbit = await Rabbit.findByPk(req.body.rabbit_id);
+        const rabbit = await Rabbit.findOne({
+          where: {
+            id: req.body.rabbit_id,
+            user_id: req.user.id
+          }
+        });
         if (!rabbit) {
           return ApiResponse.notFound(res, 'Кролик не найден');
         }
@@ -246,7 +263,14 @@ class MedicalRecordController {
    */
   async delete(req, res, next) {
     try {
-      const medicalRecord = await MedicalRecord.findByPk(req.params.id);
+      const medicalRecord = await MedicalRecord.findOne({
+        where: { id: req.params.id },
+        include: [{
+          model: Rabbit,
+          where: { user_id: req.user.id },
+          attributes: ['id']
+        }]
+      });
 
       if (!medicalRecord) {
         return ApiResponse.notFound(res, 'Медицинская запись не найдена');
@@ -271,6 +295,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'status']
           }
         ]
@@ -360,6 +385,7 @@ class MedicalRecordController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
+              user_id: req.user.id, // Filter by user
               status: {
                 [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
               }
@@ -430,6 +456,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id }, // Filter by user
             attributes: ['id', 'name', 'tag_id']
           }
         ],
