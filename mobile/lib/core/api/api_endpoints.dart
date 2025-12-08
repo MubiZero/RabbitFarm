@@ -1,12 +1,22 @@
 class ApiEndpoints {
-  // Base URL - auto-detect platform
-  static const String baseUrl = 'http://localhost:3000/api/v1';
+  // Base URL Configuration
+  // To use different environments, set environment variable when building:
+  // flutter run --dart-define=API_URL=http://localhost:4567/api/v1
+  // flutter build apk --dart-define=API_URL=http://108.181.167.236:4567/api/v1
+  
+  static const String _defaultBaseUrl = 'http://108.181.167.236:4567/api/v1';
+  
+  // Get base URL from environment or use default
+  static const String baseUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: _defaultBaseUrl,
+  );
 
-  // For Android emulator, use:
-  // static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
-
-  // For physical device, use your PC's IP:
-  // static const String baseUrl = 'http://192.168.1.XXX:3000/api/v1';
+  // Alternative URLs for different environments (documented for reference)
+  // Production: http://108.181.167.236:4567/api/v1
+  // Local development: http://localhost:4567/api/v1
+  // Android emulator: http://10.0.2.2:4567/api/v1
+  // iOS simulator: http://localhost:4567/api/v1
 
   // Health check
   static const String health = '/health';
