@@ -19,11 +19,14 @@ app.set('trust proxy', 1);
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - Allow all origins for better mobile app compatibility
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'development' ? '*' : (process.env.CORS_ORIGIN || '').split(','),
+  origin: true, // Accept all origins (required for mobile apps)
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Total-Count']
 };
 app.use(cors(corsOptions));
 
@@ -37,6 +40,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // HTTP request logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
+
+  // CORS debugging middleware
+  app.use((req, res, next) => {
+    logger.info('CORS Request', {
+      origin: req.headers.origin || 'no-origin',
+      method: req.method,
+      path: req.path,
+      headers: {
+        authorization: req.headers.authorization ? 'Bearer ***' : 'none',
+        'content-type': req.headers['content-type'] || 'none'
+      }
+    });
+    next();
+  });
 } else {
   app.use(morgan('combined', {
     stream: {
@@ -52,13 +69,31 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/', generalLimiter);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Check database connection
+    await require('./models').sequelize.authenticate();
+    const dbStatus = 'connected';
+
+    res.status(200).json({
+      status: 'healthy',
+      database: dbStatus,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      version: process.env.API_VERSION || 'v1'
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      database: 'disconnected',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      version: process.env.API_VERSION || 'v1',
+      error: error.message
+    });
+  }
 });
 
 // API routes
