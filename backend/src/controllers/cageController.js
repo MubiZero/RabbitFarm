@@ -46,7 +46,7 @@ class CageController {
           {
             model: Rabbit,
             as: 'rabbits',
-            attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'breed_id']
+            attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'breed_id', 'birth_date', 'purpose', 'created_at', 'updated_at']
           }
         ]
       });
@@ -107,8 +107,7 @@ class CageController {
         include: [
           {
             model: Rabbit,
-            as: 'rabbits',
-            attributes: ['id', 'name', 'tag_id', 'sex', 'status']
+            as: 'rabbits'
           }
         ],
         limit: parseInt(limit),
@@ -325,8 +324,7 @@ class CageController {
         include: [
           {
             model: Rabbit,
-            as: 'rabbits',
-            attributes: ['id', 'name', 'tag_id', 'sex', 'status']
+            as: 'rabbits'
           }
         ],
         order: [['location', 'ASC'], ['number', 'ASC']]

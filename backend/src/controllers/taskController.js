@@ -80,13 +80,11 @@ exports.create = async (req, res, next) => {
       include: [
         {
           model: Rabbit,
-          as: 'rabbit',
-          attributes: ['id', 'name', 'tag_id']
+          as: 'rabbit'
         },
         {
           model: Cage,
-          as: 'cage',
-          attributes: ['id', 'number', 'location']
+          as: 'cage'
         },
         {
           model: User,

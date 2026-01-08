@@ -66,8 +66,8 @@ class BreedingService {
                     user_id: userId
                 },
                 include: [
-                    { model: Rabbit, as: 'male', attributes: ['id', 'name', 'tag_id', 'breed_id'] },
-                    { model: Rabbit, as: 'female', attributes: ['id', 'name', 'tag_id', 'breed_id'] }
+                    { model: Rabbit, as: 'male' },
+                    { model: Rabbit, as: 'female' }
                 ]
             });
 
@@ -124,8 +124,8 @@ class BreedingService {
             const items = await Breeding.findAll({
                 where,
                 include: [
-                    { model: Rabbit, as: 'male', attributes: ['id', 'name', 'tag_id'] },
-                    { model: Rabbit, as: 'female', attributes: ['id', 'name', 'tag_id'] }
+                    { model: Rabbit, as: 'male' },
+                    { model: Rabbit, as: 'female' }
                 ],
                 order: [[sort_by, sort_order.toUpperCase()]],
                 limit: parseInt(limit),

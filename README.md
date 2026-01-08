@@ -80,45 +80,31 @@ The easiest way to run the entire backend system (API + Database) is using Docke
 docker-compose up -d
 ```
 
-This will start:
-- **Backend API**: `http://localhost:4567`
-- **MySQL Database**: `localhost:3306`
+#### 🛡️ Port Configuration
+- **Backend API**: `http://localhost:4567` (External access)
+- **MySQL Database**: `localhost:33060` (Mapped to 3306 internally to avoid conflicts with local MySQL)
 - **Adminer (DB Web UI)**: `http://localhost:8080`
 
-### Backend Setup (Manual)
+**Note:** If you get an error that a port is already in use, you can change the host port in `docker-compose.yml`.
 
-If you prefer running without Docker:
+### 📱 Connecting the Mobile App
 
-1. **Install dependencies**
+To connect the Flutter app to your local Docker backend:
+
+1. **Android Emulator**: Use `http://10.0.2.2:4567/api/v1`
+2. **iOS Simulator**: Use `http://localhost:4567/api/v1`
+3. **Real Device**: Use your computer's local IP (e.g., `http://192.168.1.50:4567/api/v1`)
+
+You can run the app with the specific API URL using:
 ```bash
-cd backend
-npm install
+flutter run --dart-define=API_URL=http://YOUR_IP:4567/api/v1
 ```
 
-2. **Configure .env**
-```bash
-cp .env.example .env
-# Edit .env with your database credentials
-```
+### 🛠️ Troubleshooting
 
-3. **Run migrations and seed**
-```bash
-npm run migrate
-npm run seed
-```
-
-4. **Start development server**
-```bash
-npm run dev
-```
-
-### Mobile App Setup
-
-```bash
-cd mobile
-flutter pub get
-flutter run
-```
+- **DB Connection Issues**: If the API fails to connect to the DB, check `docker logs rabbitfarm-api`. The API automatically waits for the DB to be ready.
+- **Data Persistence**: Database data is stored in a Docker volume `rabbitfarm_mysql_data`.
+- **CORS Issues**: The backend is configured to accept all origins in development mode for easier mobile testing.
 
 ## 📚 Documentation
 
