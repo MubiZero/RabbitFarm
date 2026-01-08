@@ -40,7 +40,7 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     outcome: {
-      type: DataTypes.ENUM('recovered', 'ongoing', 'died', 'euthanized'),
+      type: DataTypes.ENUM('выздоровел', 'в процессе', 'падеж', 'убой'),
       allowNull: true
     },
     cost: {

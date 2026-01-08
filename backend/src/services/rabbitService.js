@@ -1,6 +1,21 @@
-const { Rabbit, Breed, Cage, RabbitWeight, Photo, sequelize } = require('../models');
+const {
+  Rabbit,
+  Breed,
+  Cage,
+  RabbitWeight,
+  Photo,
+  Breeding,
+  Birth,
+  Vaccination,
+  MedicalRecord,
+  FeedingRecord,
+  Transaction,
+  Task,
+  sequelize
+} = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
+const { deleteFile } = require('../utils/fileHelper');
 
 /**
  * Rabbit service
@@ -21,33 +36,50 @@ class RabbitService {
         throw new Error('BREED_NOT_FOUND');
       }
 
-      // Check if cage exists and belongs to the user
+      // Check if cage exists and has capacity
       if (rabbitData.cage_id) {
         const cage = await Cage.findOne({
-          where: { id: rabbitData.cage_id, user_id: rabbitData.user_id }
+          where: { id: rabbitData.cage_id, user_id: rabbitData.user_id },
+          transaction
         });
         if (!cage) {
           throw new Error('CAGE_NOT_FOUND');
         }
-      }
 
-      // Check if father exists and belongs to the user
-      if (rabbitData.father_id) {
-        const father = await Rabbit.findOne({
-          where: { id: rabbitData.father_id, user_id: rabbitData.user_id }
+        // Check capacity (skip for maternity types usually, but let's be strict or use capacity field)
+        const currentCount = await Rabbit.count({
+          where: { cage_id: rabbitData.cage_id, user_id: rabbitData.user_id },
+          transaction
         });
-        if (!father) {
-          throw new Error('FATHER_NOT_FOUND');
+        if (currentCount >= cage.capacity) {
+          throw new Error('CAGE_FULL');
+        }
+
+        // If dead or sold, shouldn't be in a cage
+        if (['мертв', 'продан'].includes(rabbitData.status)) {
+          rabbitData.cage_id = null;
         }
       }
 
-      // Check if mother exists and belongs to the user
+      // Check if father exists and is male and belongs to the user
+      if (rabbitData.father_id) {
+        const father = await Rabbit.findOne({
+          where: { id: rabbitData.father_id, user_id: rabbitData.user_id, sex: 'самец' },
+          transaction
+        });
+        if (!father) {
+          throw new Error('FATHER_NOT_FOUND_OR_INVALID_SEX');
+        }
+      }
+
+      // Check if mother exists and is female and belongs to the user
       if (rabbitData.mother_id) {
         const mother = await Rabbit.findOne({
-          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id }
+          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id, sex: 'самка' },
+          transaction
         });
         if (!mother) {
-          throw new Error('MOTHER_NOT_FOUND');
+          throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');
         }
       }
 
@@ -214,6 +246,23 @@ class RabbitService {
         throw new Error('RABBIT_NOT_FOUND');
       }
 
+      // Sex change protection: cannot change sex if has history
+      if (updateData.sex && updateData.sex !== rabbit.sex) {
+        const offspringCount = await Rabbit.count({
+          where: { [Op.or]: [{ mother_id: rabbitId }, { father_id: rabbitId }] },
+          transaction
+        });
+        const breedingCount = await Breeding.count({
+          where: { [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] },
+          transaction
+        });
+
+        if (offspringCount > 0 || breedingCount > 0) {
+          await transaction.rollback();
+          throw new Error('CANNOT_CHANGE_SEX_WITH_HISTORY');
+        }
+      }
+
       // Check if breed exists (if being updated)
       if (updateData.breed_id) {
         const breed = await Breed.findByPk(updateData.breed_id);
@@ -222,34 +271,47 @@ class RabbitService {
         }
       }
 
-      // Check if cage exists and belongs to the user (if being updated)
-      if (updateData.cage_id) {
+      // Check if cage exists and has capacity (if being updated)
+      if (updateData.cage_id && updateData.cage_id !== rabbit.cage_id) {
         const cage = await Cage.findOne({
-          where: { id: updateData.cage_id, user_id: userId }
+          where: { id: updateData.cage_id, user_id: userId },
+          transaction
         });
-        if (!cage) {
-          throw new Error('CAGE_NOT_FOUND');
+        if (!cage) throw new Error('CAGE_NOT_FOUND');
+
+        const currentCount = await Rabbit.count({
+          where: { cage_id: updateData.cage_id, user_id: userId },
+          transaction
+        });
+        if (currentCount >= cage.capacity) {
+          throw new Error('CAGE_FULL');
         }
       }
 
-      // Check if father exists and belongs to the user
+      // If status updated to dead/sold, remove cage
+      if (['мертв', 'продан'].includes(updateData.status || rabbit.status)) {
+        if (updateData.cage_id) updateData.cage_id = null;
+        else if (!updateData.cage_id && rabbit.cage_id) updateData.cage_id = null;
+      }
+
+      // Check if father exists and is male
       if (updateData.father_id) {
+        if (updateData.father_id === rabbitId) throw new Error('CANNOT_BE_OWN_FATHER');
         const father = await Rabbit.findOne({
-          where: { id: updateData.father_id, user_id: userId }
+          where: { id: updateData.father_id, user_id: userId, sex: 'самец' },
+          transaction
         });
-        if (!father) {
-          throw new Error('FATHER_NOT_FOUND');
-        }
+        if (!father) throw new Error('FATHER_NOT_FOUND_OR_INVALID_SEX');
       }
 
-      // Check if mother exists and belongs to the user
+      // Check if mother exists and is female
       if (updateData.mother_id) {
+        if (updateData.mother_id === rabbitId) throw new Error('CANNOT_BE_OWN_MOTHER');
         const mother = await Rabbit.findOne({
-          where: { id: updateData.mother_id, user_id: userId }
+          where: { id: updateData.mother_id, user_id: userId, sex: 'самка' },
+          transaction
         });
-        if (!mother) {
-          throw new Error('MOTHER_NOT_FOUND');
-        }
+        if (!mother) throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');
       }
 
       // Check if tag_id is unique for THIS user (if being updated)
@@ -263,6 +325,11 @@ class RabbitService {
       }
 
       // Update rabbit
+      // File Cleanup: if photo is changing, delete old file
+      if (updateData.photo_url && rabbit.photo_url && updateData.photo_url !== rabbit.photo_url) {
+        deleteFile(rabbit.photo_url);
+      }
+
       await rabbit.update(updateData, { transaction });
 
       // If weight is being updated, add weight record
@@ -296,32 +363,42 @@ class RabbitService {
   async deleteRabbit(rabbitId, userId) {
     try {
       const rabbit = await Rabbit.findOne({
-        where: {
-          id: rabbitId,
-          user_id: userId
-        }
+        where: { id: rabbitId, user_id: userId }
       });
 
-      if (!rabbit) {
-        throw new Error('RABBIT_NOT_FOUND');
-      }
+      if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
 
-      // Check if rabbit has offspring
+      // Check for offspring
       const offspring = await Rabbit.count({
-        where: {
-          [Op.or]: [
-            { father_id: rabbitId },
-            { mother_id: rabbitId }
-          ]
-        }
+        where: { [Op.or]: [{ father_id: rabbitId }, { mother_id: rabbitId }] }
       });
+      if (offspring > 0) throw new Error('RABBIT_HAS_OFFSPRING');
 
-      if (offspring > 0) {
-        throw new Error('RABBIT_HAS_OFFSPRING');
+      // Check for Breeding records
+      const breedings = await Breeding.count({
+        where: { [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] }
+      });
+      if (breedings > 0) throw new Error('RABBIT_HAS_BREEDING_HISTORY');
+
+      // Check for Birth records
+      const births = await Birth.count({ where: { mother_id: rabbitId } });
+      if (births > 0) throw new Error('RABBIT_HAS_BIRTH_HISTORY');
+
+      // Check for Medical/Health records
+      const medical = await MedicalRecord.count({ where: { rabbit_id: rabbitId } });
+      const vaccinations = await Vaccination.count({ where: { rabbit_id: rabbitId } });
+      if (medical > 0 || vaccinations > 0) throw new Error('RABBIT_HAS_HEALTH_HISTORY');
+
+      // Check for financial records
+      const transactions = await Transaction.count({ where: { rabbit_id: rabbitId } });
+      if (transactions > 0) throw new Error('RABBIT_HAS_FINANCIAL_HISTORY');
+
+      // File Cleanup
+      if (rabbit.photo_url) {
+        deleteFile(rabbit.photo_url);
       }
 
       await rabbit.destroy();
-
       logger.info('Rabbit deleted', { rabbitId });
       return { success: true };
     } catch (error) {
@@ -369,12 +446,11 @@ class RabbitService {
    * @returns {Object} Weight record
    */
   async addWeightRecord(rabbitId, userId, weightData) {
+    const transaction = await sequelize.transaction();
     try {
       const rabbit = await Rabbit.findOne({
-        where: {
-          id: rabbitId,
-          user_id: userId
-        }
+        where: { id: rabbitId, user_id: userId },
+        transaction
       });
 
       if (!rabbit) {
@@ -384,14 +460,16 @@ class RabbitService {
       const weightRecord = await RabbitWeight.create({
         rabbit_id: rabbitId,
         ...weightData
-      });
+      }, { transaction });
 
       // Update current_weight on rabbit
-      await rabbit.update({ current_weight: weightData.weight });
+      await rabbit.update({ current_weight: weightData.weight }, { transaction });
 
+      await transaction.commit();
       logger.info('Weight record added', { rabbitId, weight: weightData.weight });
       return weightRecord;
     } catch (error) {
+      await transaction.rollback();
       logger.error('Add weight record error', { error: error.message, rabbitId });
       throw error;
     }

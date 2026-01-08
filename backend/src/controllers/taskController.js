@@ -82,11 +82,15 @@ exports.create = async (req, res, next) => {
       include: [
         {
           model: Rabbit,
-          as: 'rabbit'
+          as: 'rabbit',
+          where: { user_id: req.user.id },
+          required: false
         },
         {
           model: Cage,
-          as: 'cage'
+          as: 'cage',
+          where: { user_id: req.user.id },
+          required: false
         },
         {
           model: User,
@@ -118,7 +122,10 @@ exports.getById = async (req, res, next) => {
     const task = await Task.findOne({
       where: {
         id,
-        created_by: req.user.id // Verify ownership
+        [Op.or]: [
+          { created_by: req.user.id },
+          { assigned_to: req.user.id }
+        ]
       },
       include: [
         {
@@ -180,7 +187,10 @@ exports.list = async (req, res, next) => {
 
     const offset = (page - 1) * limit;
     const where = {
-      created_by: req.user.id // Filter by user
+      [Op.or]: [
+        { created_by: req.user.id },
+        { assigned_to: req.user.id }
+      ]
     };
 
     // Filters
@@ -206,10 +216,6 @@ exports.list = async (req, res, next) => {
 
     if (assigned_to) {
       where.assigned_to = assigned_to;
-    }
-
-    if (created_by) {
-      where.created_by = created_by;
     }
 
     // Date filters
@@ -371,9 +377,9 @@ exports.update = async (req, res, next) => {
       notes
     };
 
-    if (status === 'completed' && !completed_at) {
+    if (status === 'завершено' && !completed_at) {
       updateData.completed_at = new Date();
-    } else if (status !== 'completed') {
+    } else if (status !== 'завершено') {
       updateData.completed_at = null;
     } else if (completed_at) {
       updateData.completed_at = completed_at;
@@ -446,7 +452,12 @@ exports.delete = async (req, res, next) => {
  */
 exports.getStatistics = async (req, res, next) => {
   try {
-    const where = { created_by: req.user.id };
+    const where = {
+      [Op.or]: [
+        { created_by: req.user.id },
+        { assigned_to: req.user.id }
+      ]
+    };
 
     // Total tasks by status
     const totalPending = await Task.count({ where: { ...where, status: 'pending' } });
@@ -547,13 +558,16 @@ exports.getUpcoming = async (req, res, next) => {
 
     const tasks = await Task.findAll({
       where: {
-        created_by: req.user.id, // Filter by user
+        [Op.or]: [
+          { created_by: req.user.id },
+          { assigned_to: req.user.id }
+        ],
         due_date: {
           [Op.gte]: today,
           [Op.lt]: futureDate
         },
         status: {
-          [Op.in]: ['pending', 'in_progress']
+          [Op.in]: ['в ожидании', 'в процессе']
         }
       },
       include: [
@@ -593,7 +607,10 @@ exports.completeTask = async (req, res, next) => {
     const task = await Task.findOne({
       where: {
         id,
-        created_by: req.user.id // Verify ownership
+        [Op.or]: [
+          { created_by: req.user.id },
+          { assigned_to: req.user.id }
+        ]
       }
     });
 
@@ -601,10 +618,67 @@ exports.completeTask = async (req, res, next) => {
       return ApiResponse.error(res, 'Задача не найдена', 404);
     }
 
-    await task.update({
-      status: 'completed',
-      completed_at: new Date()
-    });
+    const transaction = await require('../models').sequelize.transaction();
+    try {
+      await task.update({
+        status: 'завершено',
+        completed_at: new Date()
+      }, { transaction });
+
+      // Handle recurrence
+      if (task.is_recurring && task.recurrence_rule) {
+        const nextDueDate = new Date(task.due_date);
+
+        switch (task.recurrence_rule.toLowerCase()) {
+          case 'daily':
+            nextDueDate.setDate(nextDueDate.getDate() + 1);
+            break;
+          case 'weekly':
+            nextDueDate.setDate(nextDueDate.getDate() + 7);
+            break;
+          case 'biweekly':
+            nextDueDate.setDate(nextDueDate.getDate() + 14);
+            break;
+          case 'monthly':
+            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+            break;
+          case 'quarterly':
+            nextDueDate.setMonth(nextDueDate.getMonth() + 3);
+            break;
+          case 'yearly':
+            nextDueDate.setFullYear(nextDueDate.getFullYear() + 1);
+            break;
+          default:
+            // If unknown rule, don't create next task or default to weekly? 
+            // Better to log it.
+            break;
+        }
+
+        if (nextDueDate > new Date(task.due_date)) {
+          await Task.create({
+            title: task.title,
+            description: task.description,
+            type: task.type,
+            status: 'в ожидании',
+            priority: task.priority,
+            due_date: nextDueDate,
+            rabbit_id: task.rabbit_id,
+            cage_id: task.cage_id,
+            assigned_to: task.assigned_to,
+            created_by: task.created_by,
+            is_recurring: true,
+            recurrence_rule: task.recurrence_rule,
+            reminder_before: task.reminder_before,
+            notes: task.notes
+          }, { transaction });
+        }
+      }
+
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
 
     const updatedTask = await Task.findByPk(id, {
       include: [

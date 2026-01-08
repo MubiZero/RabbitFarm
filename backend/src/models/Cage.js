@@ -20,9 +20,9 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     type: {
-      type: DataTypes.ENUM('single', 'group', 'maternity'),
+      type: DataTypes.ENUM('одиночная', 'групповая', 'маточник'),
       allowNull: false,
-      defaultValue: 'single'
+      defaultValue: 'одиночная'
     },
     size: {
       type: DataTypes.STRING(50),
@@ -43,9 +43,9 @@ module.exports = (sequelize) => {
       comment: 'Location on farm'
     },
     condition: {
-      type: DataTypes.ENUM('good', 'needs_repair', 'broken'),
+      type: DataTypes.ENUM('хорошее', 'требует ремонта', 'сломана'),
       allowNull: false,
-      defaultValue: 'good'
+      defaultValue: 'хорошее'
     },
     last_cleaned_at: {
       type: DataTypes.DATE,

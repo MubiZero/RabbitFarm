@@ -1,4 +1,4 @@
-const { Breeding, Rabbit } = require('../models');
+const { Breeding, Rabbit, Task } = require('../models');
 const { Op } = require('sequelize');
 const logger = require('../utils/logger');
 
@@ -13,27 +13,40 @@ class BreedingService {
      * @returns {Object} Created breeding record
      */
     async createBreeding(data) {
+        const transaction = await Breeding.sequelize.transaction();
         try {
+            if (data.male_id === data.female_id) {
+                throw new Error('CANNOT_BREED_SAME_RABBIT');
+            }
+
             // Check if male exists and is male and belongs to user
             const male = await Rabbit.findOne({
-                where: { id: data.male_id, user_id: data.user_id }
+                where: { id: data.male_id, user_id: data.user_id },
+                transaction
             });
             if (!male) {
                 throw new Error('MALE_NOT_FOUND');
             }
-            if (male.sex !== 'male') {
+            if (male.sex !== 'самец') {
                 throw new Error('INVALID_MALE_SEX');
+            }
+            if (['мертв', 'продан'].includes(male.status)) {
+                throw new Error('MALE_NOT_AVAILABLE');
             }
 
             // Check if female exists and is female and belongs to user
             const female = await Rabbit.findOne({
-                where: { id: data.female_id, user_id: data.user_id }
+                where: { id: data.female_id, user_id: data.user_id },
+                transaction
             });
             if (!female) {
                 throw new Error('FEMALE_NOT_FOUND');
             }
-            if (female.sex !== 'female') {
+            if (female.sex !== 'самка') {
                 throw new Error('INVALID_FEMALE_SEX');
+            }
+            if (['мертв', 'продан'].includes(female.status)) {
+                throw new Error('FEMALE_NOT_AVAILABLE');
             }
 
             // Calculate expected birth date (31 days after breeding)
@@ -43,7 +56,63 @@ class BreedingService {
                 data.expected_birth_date = breedingDate.toISOString().split('T')[0];
             }
 
-            const breeding = await Breeding.create(data);
+            const breeding = await Breeding.create(data, { transaction });
+
+            // Automation: Create tasks for the breeding process
+            if (data.breeding_date) {
+                const breedingDate = new Date(data.breeding_date);
+
+                // 1. Palpation Task (+14 days)
+                const palpationDate = new Date(breedingDate);
+                palpationDate.setDate(palpationDate.getDate() + 14);
+
+                await Task.create({
+                    created_by: data.user_id,
+                    assigned_to: data.user_id,
+                    title: `Пальпация: ${female.name}`,
+                    description: `Проверить на беременность самку ${female.name} после случки с ${male.name}`,
+                    type: 'осмотр',
+                    priority: 'средний',
+                    due_date: palpationDate,
+                    rabbit_id: female.id,
+                    status: 'в ожидании'
+                }, { transaction });
+
+                // 2. Nest Box Box Task (+28 days)
+                const nestBoxDate = new Date(breedingDate);
+                nestBoxDate.setDate(nestBoxDate.getDate() + 28);
+
+                await Task.create({
+                    created_by: data.user_id,
+                    assigned_to: data.user_id,
+                    title: `Поставить маточник: ${female.name}`,
+                    description: `Подготовить клетку и поставить гнездовой ящик для ${female.name}`,
+                    type: 'разведение',
+                    priority: 'высокий',
+                    due_date: nestBoxDate,
+                    rabbit_id: female.id,
+                    cage_id: female.cage_id,
+                    status: 'в ожидании'
+                }, { transaction });
+
+                // 3. Expected Birth Task (+31 days)
+                const birthDate = new Date(breedingDate);
+                birthDate.setDate(birthDate.getDate() + 31);
+
+                await Task.create({
+                    created_by: data.user_id,
+                    assigned_to: data.user_id,
+                    title: `Ожидаемый окрол: ${female.name}`,
+                    description: `Ожидается окрол у самки ${female.name} (случка с ${male.name})`,
+                    type: 'разведение',
+                    priority: 'срочный',
+                    due_date: birthDate,
+                    rabbit_id: female.id,
+                    status: 'в ожидании'
+                }, { transaction });
+            }
+
+            await transaction.commit();
 
             // Fetch with associations
             const createdBreeding = await this.getBreedingById(breeding.id, data.user_id);
@@ -51,6 +120,7 @@ class BreedingService {
             logger.info('Breeding created', { breedingId: breeding.id });
             return createdBreeding;
         } catch (error) {
+            if (transaction) await transaction.rollback();
             logger.error('Create breeding error', { error: error.message });
             throw error;
         }
@@ -178,38 +248,70 @@ class BreedingService {
      * @param {Object} data - Update data
      */
     async updateBreeding(id, userId, data) {
+        const transaction = await Breeding.sequelize.transaction();
         try {
             const breeding = await Breeding.findOne({
-                where: {
-                    id,
-                    user_id: userId
-                }
+                where: { id, user_id: userId },
+                transaction
             });
 
             if (!breeding) {
+                await transaction.rollback();
                 throw new Error('BREEDING_NOT_FOUND');
             }
 
             // If updating male/female, check existence and ownership
             if (data.male_id) {
                 const male = await Rabbit.findOne({
-                    where: { id: data.male_id, user_id: userId, sex: 'male' }
+                    where: { id: data.male_id, user_id: userId, sex: 'самец' },
+                    transaction
                 });
-                if (!male) throw new Error('INVALID_MALE');
+                if (!male) {
+                    await transaction.rollback();
+                    throw new Error('INVALID_MALE');
+                }
             }
             if (data.female_id) {
+                if (data.female_id === (data.male_id || breeding.male_id)) {
+                    await transaction.rollback();
+                    throw new Error('CANNOT_BREED_SAME_RABBIT');
+                }
                 const female = await Rabbit.findOne({
-                    where: { id: data.female_id, user_id: userId, sex: 'female' }
+                    where: { id: data.female_id, user_id: userId, sex: 'самка' },
+                    transaction
                 });
-                if (!female) throw new Error('INVALID_FEMALE');
+                if (!female) {
+                    await transaction.rollback();
+                    throw new Error('INVALID_FEMALE');
+                }
+                if (['мертв', 'продан'].includes(female.status)) {
+                    await transaction.rollback();
+                    throw new Error('FEMALE_NOT_AVAILABLE');
+                }
             }
 
-            await breeding.update(data);
+            await breeding.update(data, { transaction });
+
+            // Automation: Update female status to 'сукрольность' if is_pregnant is true
+            if (data.is_pregnant === true) {
+                const female = await Rabbit.findByPk(data.female_id || breeding.female_id, { transaction });
+                if (female) {
+                    await female.update({ status: 'сукрольность' }, { transaction });
+                }
+            } else if (data.is_pregnant === false || data.status === 'failed') {
+                const female = await Rabbit.findByPk(breeding.female_id, { transaction });
+                if (female && female.status === 'сукрольность') {
+                    await female.update({ status: 'активен' }, { transaction });
+                }
+            }
+
+            await transaction.commit();
 
             const updated = await this.getBreedingById(id, userId);
             logger.info('Breeding updated', { breedingId: id });
             return updated;
         } catch (error) {
+            if (transaction) await transaction.rollback();
             logger.error('Update breeding error', { error: error.message, id });
             throw error;
         }
