@@ -1,5 +1,5 @@
-const { Rabbit, Breed, Cage, RabbitWeight, Photo } = require('../models');
-const { Op } = require('sequelize');
+const { Rabbit, Breed, Cage, RabbitWeight, Photo, sequelize } = require('../models');
+const { Op, Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
 
 /**
@@ -73,10 +73,10 @@ class RabbitService {
           user_id: userId
         },
         include: [
-          { model: Breed, as: 'breed', attributes: ['id', 'name', 'purpose'] },
-          { model: Cage, attributes: ['id', 'number', 'type', 'location'] },
-          { model: Rabbit, as: 'father', attributes: ['id', 'name', 'tag_id'] },
-          { model: Rabbit, as: 'mother', attributes: ['id', 'name', 'tag_id'] }
+          { model: Breed, as: 'breed' },
+          { model: Cage },
+          { model: Rabbit, as: 'father' },
+          { model: Rabbit, as: 'mother' }
         ]
       });
 
@@ -142,8 +142,8 @@ class RabbitService {
       const rabbits = await Rabbit.findAll({
         where,
         include: [
-          { model: Breed, as: 'breed', attributes: ['id', 'name', 'purpose'] },
-          { model: Cage, attributes: ['id', 'number', 'location'] }
+          { model: Breed, as: 'breed' },
+          { model: Cage }
         ],
         order: [[sort_by, sort_order.toUpperCase()]],
         limit: parseInt(limit),
@@ -363,7 +363,7 @@ class RabbitService {
       const breedDistribution = await Rabbit.findAll({
         attributes: [
           'breed_id',
-          [require('sequelize').fn('COUNT', '*'), 'count']
+          [Sequelize.fn('COUNT', '*'), 'count']
         ],
         include: [{ model: Breed, as: 'breed', attributes: ['name'] }],
         group: ['breed_id', 'breed.id', 'breed.name'],

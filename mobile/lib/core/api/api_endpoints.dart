@@ -2,9 +2,11 @@ class ApiEndpoints {
   // Base URL Configuration
   // To use different environments, set environment variable when building:
   // flutter run --dart-define=API_URL=http://localhost:4567/api/v1
-  // flutter build apk --dart-define=API_URL=http://108.181.167.236:4567/api/v1
+  // Production VPS: http://108.181.167.236:4567/api/v1
+  // Local Docker: http://localhost:4567/api/v1 (iOS/Web/Desktop)
+  // Android Emulator: http://10.0.2.2:4567/api/v1
   
-  static const String _defaultBaseUrl = 'http://108.181.167.236:4567/api/v1';
+  static const String _defaultBaseUrl = 'http://localhost:4567/api/v1';
   
   // Get base URL from environment or use default
   static const String baseUrl = String.fromEnvironment(

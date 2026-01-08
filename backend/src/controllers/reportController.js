@@ -8,9 +8,10 @@ const {
   Transaction,
   Task,
   Breeding,
-  Birth
+  Birth,
+  sequelize
 } = require('../models');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
@@ -124,9 +125,13 @@ exports.getDashboard = async (req, res, next) => {
     const lowStockFeeds = await Feed.count({
       where: {
         user_id: userId,
-        current_stock: {
-          [Op.lte]: require('sequelize').col('min_stock')
-        }
+        [Op.and]: [
+          Sequelize.where(
+            Sequelize.col('current_stock'),
+            '<=',
+            Sequelize.col('min_stock')
+          )
+        ]
       }
     });
 
@@ -177,6 +182,7 @@ exports.getDashboard = async (req, res, next) => {
       }
     }, 'Сводка получена');
   } catch (error) {
+    console.error('Dashboard Error:', error);
     next(error);
   }
 };
@@ -204,7 +210,7 @@ exports.getFarmReport = async (req, res, next) => {
     const rabbitsByBreed = await Rabbit.findAll({
       attributes: [
         'breed_id',
-        [require('sequelize').fn('COUNT', require('sequelize').col('Rabbit.id')), 'count']
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
       ],
       group: ['breed_id'],
       raw: true
@@ -220,8 +226,8 @@ exports.getFarmReport = async (req, res, next) => {
       },
       attributes: [
         'type',
-        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'total'],
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
       ],
       group: ['type'],
       raw: true
@@ -316,7 +322,7 @@ exports.getHealthReport = async (req, res, next) => {
       where: dateFilter,
       attributes: [
         'vaccine_name',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
       ],
       group: ['vaccine_name'],
       raw: true
@@ -326,7 +332,7 @@ exports.getHealthReport = async (req, res, next) => {
     const medicalRecordsByType = await MedicalRecord.findAll({
       attributes: [
         'record_type',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
       ],
       group: ['record_type'],
       raw: true
@@ -386,7 +392,7 @@ exports.getFinancialReport = async (req, res, next) => {
       where,
       attributes: [
         'type',
-        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'total']
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total']
       ],
       group: ['type'],
       raw: true
@@ -398,8 +404,8 @@ exports.getFinancialReport = async (req, res, next) => {
       attributes: [
         'type',
         'category',
-        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'total'],
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
       ],
       group: ['type', 'category'],
       raw: true

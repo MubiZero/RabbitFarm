@@ -21,7 +21,7 @@ class CageModel with _$CageModel {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     // Related data
     List<RabbitModel>? rabbits,
-    @JsonKey(name: 'current_occupancy') @IntConverter() int? currentOccupancy,
+    @JsonKey(name: 'current_occupancy') @NullableIntConverter() int? currentOccupancy,
     @JsonKey(name: 'is_full') bool? isFull,
     @JsonKey(name: 'is_available') bool? isAvailable,
   }) = _CageModel;
