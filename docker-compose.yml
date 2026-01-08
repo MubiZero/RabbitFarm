@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: rabbitfarm-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: rabbitfarm
+      MYSQL_USER: rabbitfarm_user
+      MYSQL_PASSWORD: RabbitFarm2024!
+      MYSQL_ROOT_PASSWORD: RabbitFarm2024!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rabbitfarm-api
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=rabbitfarm
+      - DB_USER=rabbitfarm_user
+      - DB_PASSWORD=RabbitFarm2024!
+      - PORT=4567
+      - JWT_SECRET=rabbitfarm_jwt_secret_key_2024_super_secure_change_in_production
+      - JWT_EXPIRE=15m
+      - JWT_REFRESH_SECRET=rabbitfarm_refresh_secret_key_2024_super_secure_change_in_production
+      - JWT_REFRESH_EXPIRE=7d
+      - CORS_ORIGIN=*
+    ports:
+      - "4567:4567"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+
+  adminer:
+    image: adminer
+    container_name: rabbitfarm-adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
