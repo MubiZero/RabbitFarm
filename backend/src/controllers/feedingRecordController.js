@@ -18,18 +18,27 @@ exports.create = async (req, res, next) => {
     // Validate rabbit_id if provided
     if (rabbit_id) {
       const rabbit = await Rabbit.findOne({
-        where: {
-          id: rabbit_id,
-          user_id: req.user.id
-        }
+        where: { id: rabbit_id, user_id: req.user.id }
       });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
 
-    // Check if feed exists and has enough stock
-    const feed = await Feed.findByPk(feed_id);
+    // Validate cage_id if provided
+    if (cage_id) {
+      const cage = await Cage.findOne({
+        where: { id: cage_id, user_id: req.user.id }
+      });
+      if (!cage) {
+        return ApiResponse.error(res, 'Клетка не найдена', 404);
+      }
+    }
+
+    // Check if feed exists and has enough stock and belongs to user
+    const feed = await Feed.findOne({
+      where: { id: feed_id, user_id: req.user.id }
+    });
     if (!feed) {
       return ApiResponse.error(res, 'Корм не найден', 404);
     }
@@ -56,12 +65,12 @@ exports.create = async (req, res, next) => {
       current_stock: currentStock - quantityNeeded
     });
 
-    // Load relationships
+    // Load relationships with safety filters
     await feedingRecord.reload({
       include: [
-        { model: Feed, as: 'feed' },
-        { model: Rabbit, as: 'rabbit' },
-        { model: Cage, as: 'cage' },
+        { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
+        { model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, required: false },
+        { model: Cage, as: 'cage', where: { user_id: req.user.id }, required: false },
         { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
@@ -198,7 +207,7 @@ exports.getByRabbit = async (req, res, next) => {
     const records = await FeedingRecord.findAll({
       where: { rabbit_id: rabbitId },
       include: [
-        { model: Feed, as: 'feed' },
+        { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
         { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ],
       order: [['fed_at', 'DESC']]
@@ -248,7 +257,9 @@ exports.update = async (req, res, next) => {
       }
 
       // Deduct from new/same feed
-      const targetFeed = await Feed.findByPk(targetFeedId);
+      const targetFeed = await Feed.findOne({
+        where: { id: targetFeedId, user_id: req.user.id }
+      });
       if (!targetFeed) {
         return ApiResponse.error(res, 'Корм не найден', 404);
       }
@@ -263,13 +274,23 @@ exports.update = async (req, res, next) => {
       await targetFeed.update({ current_stock: newStock });
     }
 
+    if (req.body.rabbit_id && req.body.rabbit_id !== feedingRecord.rabbit_id) {
+      const rabbit = await Rabbit.findOne({ where: { id: req.body.rabbit_id, user_id: req.user.id } });
+      if (!rabbit) return ApiResponse.error(res, 'Кролик не найден', 404);
+    }
+
+    if (req.body.cage_id && req.body.cage_id !== feedingRecord.cage_id) {
+      const cage = await Cage.findOne({ where: { id: req.body.cage_id, user_id: req.user.id } });
+      if (!cage) return ApiResponse.error(res, 'Клетка не найдена', 404);
+    }
+
     await feedingRecord.update(req.body);
 
     await feedingRecord.reload({
       include: [
-        { model: Feed, as: 'feed' },
-        { model: Rabbit, as: 'rabbit' },
-        { model: Cage, as: 'cage' },
+        { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
+        { model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, required: false },
+        { model: Cage, as: 'cage', where: { user_id: req.user.id }, required: false },
         { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
@@ -299,7 +320,9 @@ exports.delete = async (req, res, next) => {
     }
 
     // Return stock to feed
-    const feed = await Feed.findByPk(feedingRecord.feed_id);
+    const feed = await Feed.findOne({
+      where: { id: feedingRecord.feed_id, user_id: req.user.id }
+    });
     if (feed) {
       await feed.update({
         current_stock: parseFloat(feed.current_stock) + parseFloat(feedingRecord.quantity)

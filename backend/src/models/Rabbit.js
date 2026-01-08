@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 
 module.exports = (sequelize) => {
   const Rabbit = sequelize.define('Rabbit', {
@@ -13,7 +13,6 @@ module.exports = (sequelize) => {
     },
     tag_id: {
       type: DataTypes.STRING(50),
-      unique: true,
       allowNull: true,
       comment: 'Tag/chip ID'
     },
@@ -26,8 +25,9 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     sex: {
-      type: DataTypes.ENUM('male', 'female'),
-      allowNull: false
+      type: DataTypes.ENUM('male', 'female', 'unknown'),
+      allowNull: false,
+      defaultValue: 'unknown'
     },
     birth_date: {
       type: DataTypes.DATEONLY,
@@ -50,7 +50,7 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     status: {
-      type: DataTypes.ENUM('healthy', 'sick', 'quarantine', 'pregnant', 'sold', 'dead'),
+      type: DataTypes.ENUM('healthy', 'active', 'sick', 'quarantine', 'pregnant', 'sold', 'dead'),
       allowNull: false,
       defaultValue: 'healthy'
     },
@@ -106,7 +106,6 @@ module.exports = (sequelize) => {
     updatedAt: 'updated_at',
     indexes: [
       { fields: ['user_id'] },
-      { fields: ['tag_id'] },
       { fields: ['name'] },
       { fields: ['breed_id'] },
       { fields: ['sex'] },
@@ -115,16 +114,17 @@ module.exports = (sequelize) => {
       { fields: ['birth_date'] },
       { fields: ['cage_id'] },
       { fields: ['father_id'] },
-      { fields: ['mother_id'] }
+      { fields: ['mother_id'] },
+      { unique: true, fields: ['user_id', 'tag_id'], where: { tag_id: { [Op.ne]: null } } }
     ]
   });
 
   // Virtual field: age in months
-  Rabbit.prototype.getAgeInMonths = function() {
+  Rabbit.prototype.getAgeInMonths = function () {
     const today = new Date();
     const birthDate = new Date(this.birth_date);
     const months = (today.getFullYear() - birthDate.getFullYear()) * 12 +
-                   today.getMonth() - birthDate.getMonth();
+      today.getMonth() - birthDate.getMonth();
     return months;
   };
 

@@ -42,9 +42,11 @@ exports.create = async (req, res, next) => {
       }
     }
 
-    // Validate cage_id if provided
+    // Validate cage_id if provided and belongs to user
     if (cage_id) {
-      const cage = await Cage.findByPk(cage_id);
+      const cage = await Cage.findOne({
+        where: { id: cage_id, user_id: req.user.id }
+      });
       if (!cage) {
         return ApiResponse.error(res, 'Клетка не найдена', 404);
       }
@@ -54,7 +56,7 @@ exports.create = async (req, res, next) => {
     if (assigned_to) {
       const user = await User.findByPk(assigned_to);
       if (!user) {
-        return ApiResponse.error(res, 'Пользователь не найден', 404);
+        return ApiResponse.error(res, 'Исполнитель не найден', 404);
       }
     }
 
@@ -336,8 +338,10 @@ exports.update = async (req, res, next) => {
       }
     }
 
-    if (cage_id) {
-      const cage = await Cage.findByPk(cage_id);
+    if (cage_id && cage_id !== task.cage_id) {
+      const cage = await Cage.findOne({
+        where: { id: cage_id, user_id: req.user.id }
+      });
       if (!cage) {
         return ApiResponse.error(res, 'Клетка не найдена', 404);
       }

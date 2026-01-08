@@ -14,8 +14,10 @@ class BreedingService {
      */
     async createBreeding(data) {
         try {
-            // Check if male exists and is male
-            const male = await Rabbit.findByPk(data.male_id);
+            // Check if male exists and is male and belongs to user
+            const male = await Rabbit.findOne({
+                where: { id: data.male_id, user_id: data.user_id }
+            });
             if (!male) {
                 throw new Error('MALE_NOT_FOUND');
             }
@@ -23,8 +25,10 @@ class BreedingService {
                 throw new Error('INVALID_MALE_SEX');
             }
 
-            // Check if female exists and is female
-            const female = await Rabbit.findByPk(data.female_id);
+            // Check if female exists and is female and belongs to user
+            const female = await Rabbit.findOne({
+                where: { id: data.female_id, user_id: data.user_id }
+            });
             if (!female) {
                 throw new Error('FEMALE_NOT_FOUND');
             }
@@ -42,7 +46,7 @@ class BreedingService {
             const breeding = await Breeding.create(data);
 
             // Fetch with associations
-            const createdBreeding = await this.getBreedingById(breeding.id);
+            const createdBreeding = await this.getBreedingById(breeding.id, data.user_id);
 
             logger.info('Breeding created', { breedingId: breeding.id });
             return createdBreeding;
@@ -66,8 +70,18 @@ class BreedingService {
                     user_id: userId
                 },
                 include: [
-                    { model: Rabbit, as: 'male' },
-                    { model: Rabbit, as: 'female' }
+                    {
+                        model: Rabbit,
+                        as: 'male',
+                        where: { user_id: userId },
+                        required: false
+                    },
+                    {
+                        model: Rabbit,
+                        as: 'female',
+                        where: { user_id: userId },
+                        required: false
+                    }
                 ]
             });
 
@@ -124,8 +138,18 @@ class BreedingService {
             const items = await Breeding.findAll({
                 where,
                 include: [
-                    { model: Rabbit, as: 'male' },
-                    { model: Rabbit, as: 'female' }
+                    {
+                        model: Rabbit,
+                        as: 'male',
+                        where: { user_id: userId },
+                        required: false
+                    },
+                    {
+                        model: Rabbit,
+                        as: 'female',
+                        where: { user_id: userId },
+                        required: false
+                    }
                 ],
                 order: [[sort_by, sort_order.toUpperCase()]],
                 limit: parseInt(limit),
@@ -166,14 +190,18 @@ class BreedingService {
                 throw new Error('BREEDING_NOT_FOUND');
             }
 
-            // If updating male/female, check existence
+            // If updating male/female, check existence and ownership
             if (data.male_id) {
-                const male = await Rabbit.findByPk(data.male_id);
-                if (!male || male.sex !== 'male') throw new Error('INVALID_MALE');
+                const male = await Rabbit.findOne({
+                    where: { id: data.male_id, user_id: userId, sex: 'male' }
+                });
+                if (!male) throw new Error('INVALID_MALE');
             }
             if (data.female_id) {
-                const female = await Rabbit.findByPk(data.female_id);
-                if (!female || female.sex !== 'female') throw new Error('INVALID_FEMALE');
+                const female = await Rabbit.findOne({
+                    where: { id: data.female_id, user_id: userId, sex: 'female' }
+                });
+                if (!female) throw new Error('INVALID_FEMALE');
             }
 
             await breeding.update(data);
