@@ -59,40 +59,35 @@ Complete farm management solution with Flutter mobile app (Android) and REST API
 ```
 RabbitFarm/
 ├── backend/              # Backend API (Node.js/Express)
-│   ├── src/
-│   │   ├── config/      # Configuration files
-│   │   ├── controllers/ # Request handlers
-│   │   ├── middleware/  # Express middleware
-│   │   ├── models/      # Sequelize models
-│   │   ├── routes/      # API routes
-│   │   ├── services/    # Business logic
-│   │   ├── validators/  # Request validation
-│   │   └── utils/       # Helper functions
-│   ├── migrations/      # Database migrations
-│   ├── seeders/        # Seed data
-│   └── uploads/        # Uploaded files
-│
-├── mobile/             # Flutter mobile app (to be created)
-│   └── ...
-│
-├── docs/               # Documentation
-│   ├── ROADMAP.md      # Development roadmap
-│   ├── PROGRESS.md     # Current progress
-│   ├── ARCHITECTURE.md # System architecture
-│   └── DATABASE_SCHEMA.md # Database schema
-│
-└── README.md           # This file
+├── mobile/               # Flutter mobile app
+├── docs/                 # Documentation (Architecture, API, etc.)
+├── docker-compose.yml    # Docker orchestration
+└── README.md             # This file
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
-- **MySQL** 8.0
-- **Flutter** 3.16+ (for mobile app)
+- **Docker** and **Docker Compose**
+- **Flutter** (for mobile app development)
 
-### Backend Setup
+### Quick Start (Docker)
+
+The easiest way to run the entire backend system (API + Database) is using Docker:
+
+```bash
+docker-compose up -d
+```
+
+This will start:
+- **Backend API**: `http://localhost:4567`
+- **MySQL Database**: `localhost:3306`
+- **Adminer (DB Web UI)**: `http://localhost:8080`
+
+### Backend Setup (Manual)
+
+If you prefer running without Docker:
 
 1. **Install dependencies**
 ```bash
@@ -100,38 +95,24 @@ cd backend
 npm install
 ```
 
-2. **Setup MySQL database**
-```bash
-mysql -u root -p
-CREATE DATABASE rabbitfarm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'rabbitfarm_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON rabbitfarm.* TO 'rabbitfarm_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-3. **Create and configure .env**
+2. **Configure .env**
 ```bash
 cp .env.example .env
 # Edit .env with your database credentials
 ```
 
-4. **Run migrations**
+3. **Run migrations and seed**
 ```bash
 npm run migrate
-```
-
-5. **Seed database**
-```bash
 npm run seed
 ```
 
-6. **Start development server**
+4. **Start development server**
 ```bash
 npm run dev
 ```
 
-### Mobile App Setup (Coming Soon)
+### Mobile App Setup
 
 ```bash
 cd mobile
