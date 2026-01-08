@@ -17,7 +17,7 @@ class AuthController {
 
       return ApiResponse.created(res, result, 'Пользователь успешно зарегистрирован');
     } catch (error) {
-      if (error.message === 'USER_EXISTS') {
+      if (error.message === 'USER_EXISTS' || error.name === 'SequelizeUniqueConstraintError') {
         return ApiResponse.error(res, 'Пользователь с таким email уже существует', 400, 'USER_EXISTS');
       }
       next(error);

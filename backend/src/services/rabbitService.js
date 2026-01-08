@@ -13,31 +13,56 @@ class RabbitService {
    * @returns {Object} Created rabbit
    */
   async createRabbit(rabbitData) {
+    const transaction = await sequelize.transaction();
     try {
-      // Check if breed exists
+      // Check if breed exists (breeds are global in this app)
       const breed = await Breed.findByPk(rabbitData.breed_id);
       if (!breed) {
         throw new Error('BREED_NOT_FOUND');
       }
 
-      // Check if cage exists (if provided)
+      // Check if cage exists and belongs to the user
       if (rabbitData.cage_id) {
-        const cage = await Cage.findByPk(rabbitData.cage_id);
+        const cage = await Cage.findOne({
+          where: { id: rabbitData.cage_id, user_id: rabbitData.user_id }
+        });
         if (!cage) {
           throw new Error('CAGE_NOT_FOUND');
         }
       }
 
-      // Check if tag_id is unique (if provided)
+      // Check if father exists and belongs to the user
+      if (rabbitData.father_id) {
+        const father = await Rabbit.findOne({
+          where: { id: rabbitData.father_id, user_id: rabbitData.user_id }
+        });
+        if (!father) {
+          throw new Error('FATHER_NOT_FOUND');
+        }
+      }
+
+      // Check if mother exists and belongs to the user
+      if (rabbitData.mother_id) {
+        const mother = await Rabbit.findOne({
+          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id }
+        });
+        if (!mother) {
+          throw new Error('MOTHER_NOT_FOUND');
+        }
+      }
+
+      // Check if tag_id is unique for THIS user
       if (rabbitData.tag_id) {
-        const existing = await Rabbit.findOne({ where: { tag_id: rabbitData.tag_id } });
+        const existing = await Rabbit.findOne({
+          where: { tag_id: rabbitData.tag_id, user_id: rabbitData.user_id }
+        });
         if (existing) {
           throw new Error('TAG_ID_EXISTS');
         }
       }
 
       // Create rabbit
-      const rabbit = await Rabbit.create(rabbitData);
+      const rabbit = await Rabbit.create(rabbitData, { transaction });
 
       // Add initial weight if provided
       if (rabbitData.current_weight) {
@@ -45,8 +70,10 @@ class RabbitService {
           rabbit_id: rabbit.id,
           weight: rabbitData.current_weight,
           measured_at: new Date()
-        });
+        }, { transaction });
       }
+
+      await transaction.commit();
 
       // Fetch rabbit with associations
       const createdRabbit = await this.getRabbitById(rabbit.id, rabbitData.user_id);
@@ -54,6 +81,7 @@ class RabbitService {
       logger.info('Rabbit created', { rabbitId: rabbit.id });
       return createdRabbit;
     } catch (error) {
+      await transaction.rollback();
       logger.error('Create rabbit error', { error: error.message });
       throw error;
     }
@@ -173,6 +201,7 @@ class RabbitService {
    * @returns {Object} Updated rabbit
    */
   async updateRabbit(rabbitId, userId, updateData) {
+    const transaction = await sequelize.transaction();
     try {
       const rabbit = await Rabbit.findOne({
         where: {
@@ -193,24 +222,48 @@ class RabbitService {
         }
       }
 
-      // Check if cage exists (if being updated)
+      // Check if cage exists and belongs to the user (if being updated)
       if (updateData.cage_id) {
-        const cage = await Cage.findByPk(updateData.cage_id);
+        const cage = await Cage.findOne({
+          where: { id: updateData.cage_id, user_id: userId }
+        });
         if (!cage) {
           throw new Error('CAGE_NOT_FOUND');
         }
       }
 
-      // Check if tag_id is unique (if being updated)
+      // Check if father exists and belongs to the user
+      if (updateData.father_id) {
+        const father = await Rabbit.findOne({
+          where: { id: updateData.father_id, user_id: userId }
+        });
+        if (!father) {
+          throw new Error('FATHER_NOT_FOUND');
+        }
+      }
+
+      // Check if mother exists and belongs to the user
+      if (updateData.mother_id) {
+        const mother = await Rabbit.findOne({
+          where: { id: updateData.mother_id, user_id: userId }
+        });
+        if (!mother) {
+          throw new Error('MOTHER_NOT_FOUND');
+        }
+      }
+
+      // Check if tag_id is unique for THIS user (if being updated)
       if (updateData.tag_id && updateData.tag_id !== rabbit.tag_id) {
-        const existing = await Rabbit.findOne({ where: { tag_id: updateData.tag_id } });
+        const existing = await Rabbit.findOne({
+          where: { tag_id: updateData.tag_id, user_id: userId }
+        });
         if (existing) {
           throw new Error('TAG_ID_EXISTS');
         }
       }
 
       // Update rabbit
-      await rabbit.update(updateData);
+      await rabbit.update(updateData, { transaction });
 
       // If weight is being updated, add weight record
       if (updateData.current_weight && updateData.current_weight !== rabbit.current_weight) {
@@ -218,8 +271,10 @@ class RabbitService {
           rabbit_id: rabbit.id,
           weight: updateData.current_weight,
           measured_at: new Date()
-        });
+        }, { transaction });
       }
+
+      await transaction.commit();
 
       // Fetch updated rabbit with associations
       const updatedRabbit = await this.getRabbitById(rabbit.id, userId);
@@ -227,6 +282,7 @@ class RabbitService {
       logger.info('Rabbit updated', { rabbitId });
       return updatedRabbit;
     } catch (error) {
+      await transaction.rollback();
       logger.error('Update rabbit error', { error: error.message, rabbitId });
       throw error;
     }
