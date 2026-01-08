@@ -1,4 +1,4 @@
-const { FeedingRecord, Feed, Rabbit, Cage, User } = require('../models');
+const { FeedingRecord, Feed, Rabbit, Cage, User, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
 
@@ -35,38 +35,36 @@ exports.create = async (req, res, next) => {
       }
     }
 
-    // Check if feed exists and has enough stock and belongs to user
-    const feed = await Feed.findOne({
-      where: { id: feed_id, user_id: req.user.id }
-    });
-    if (!feed) {
-      return ApiResponse.error(res, 'Корм не найден', 404);
-    }
+    // Create feeding record and deduct from stock in a transaction
+    const result = await sequelize.transaction(async (t) => {
+      // Re-fetch feed with lock to ensure stock is accurate
+      const feedToUpdate = await Feed.findOne({
+        where: { id: feed_id, user_id: req.user.id },
+        lock: t.LOCK.UPDATE,
+        transaction: t
+      });
 
-    const currentStock = parseFloat(feed.current_stock);
-    const quantityNeeded = parseFloat(quantity);
+      if (!feedToUpdate) throw new Error('FEED_NOT_FOUND');
 
-    if (currentStock < quantityNeeded) {
-      return ApiResponse.error(
-        res,
-        `Недостаточно корма на складе. Доступно: ${currentStock} ${feed.unit}`,
-        400
-      );
-    }
+      const currentStock = parseFloat(feedToUpdate.current_stock);
+      if (currentStock < quantityNeeded) {
+        throw new Error('INSUFFICIENT_STOCK');
+      }
 
-    // Create feeding record
-    const feedingRecord = await FeedingRecord.create({
-      ...req.body,
-      fed_by
-    });
+      await feedToUpdate.update({
+        current_stock: currentStock - quantityNeeded
+      }, { transaction: t });
 
-    // Deduct from feed stock
-    await feed.update({
-      current_stock: currentStock - quantityNeeded
+      const record = await FeedingRecord.create({
+        ...req.body,
+        fed_by
+      }, { transaction: t });
+
+      return record;
     });
 
     // Load relationships with safety filters
-    await feedingRecord.reload({
+    await result.reload({
       include: [
         { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
         { model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, required: false },
@@ -75,8 +73,14 @@ exports.create = async (req, res, next) => {
       ]
     });
 
-    return ApiResponse.success(res, feedingRecord, 'Запись о кормлении создана', 201);
+    return ApiResponse.success(res, result, 'Запись о кормлении создана', 201);
   } catch (error) {
+    if (error.message === 'FEED_NOT_FOUND') {
+      return ApiResponse.error(res, 'Корм не найден', 404);
+    }
+    if (error.message === 'INSUFFICIENT_STOCK') {
+      return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+    }
     next(error);
   }
 };
@@ -284,18 +288,77 @@ exports.update = async (req, res, next) => {
       if (!cage) return ApiResponse.error(res, 'Клетка не найдена', 404);
     }
 
-    await feedingRecord.update(req.body);
+    const transaction = await sequelize.transaction();
+    try {
+      const oldQuantity = parseFloat(feedingRecord.quantity);
+      const newQuantity = parseFloat(req.body.quantity || oldQuantity);
+      const feedId = req.body.feed_id || feedingRecord.feed_id;
 
-    await feedingRecord.reload({
-      include: [
-        { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
-        { model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, required: false },
-        { model: Cage, as: 'cage', where: { user_id: req.user.id }, required: false },
-        { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
-      ]
-    });
+      // Only adjust stock if quantity or feed_id is actually changing
+      if (newQuantity !== oldQuantity || feedId !== feedingRecord.feed_id) {
+        // Find the feed that will be affected (the new one, or the old one if feedId didn't change)
+        const feed = await Feed.findOne({
+          where: { id: feedId, user_id: req.user.id },
+          lock: transaction.LOCK.UPDATE,
+          transaction
+        });
 
-    return ApiResponse.success(res, feedingRecord, 'Запись о кормлении обновлена');
+        if (!feed) {
+          await transaction.rollback();
+          return ApiResponse.error(res, 'Корм не найден', 404);
+        }
+
+        if (feedId === feedingRecord.feed_id) {
+          // Same feed, just adjust difference
+          const diff = newQuantity - oldQuantity;
+          const newStock = parseFloat(feed.current_stock) - diff;
+          if (newStock < 0) {
+            await transaction.rollback();
+            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+          }
+          await feed.update({ current_stock: newStock }, { transaction });
+        } else {
+          // Changed feed: return to old, subtract from new
+          const oldFeed = await Feed.findOne({
+            where: { id: feedingRecord.feed_id, user_id: req.user.id },
+            lock: transaction.LOCK.UPDATE,
+            transaction
+          });
+          if (oldFeed) {
+            await oldFeed.update({ current_stock: parseFloat(oldFeed.current_stock) + oldQuantity }, { transaction });
+          } else {
+            // This case should ideally not happen if oldFeedId was valid, but handle defensively
+            console.warn(`Old feed with ID ${feedingRecord.feed_id} not found for stock adjustment.`);
+          }
+
+          const newStock = parseFloat(feed.current_stock) - newQuantity;
+          if (newStock < 0) {
+            await transaction.rollback();
+            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+          }
+          await feed.update({ current_stock: newStock }, { transaction });
+        }
+      }
+
+      await feedingRecord.update(req.body, { transaction });
+      await transaction.commit();
+
+      await feedingRecord.reload({
+        include: [
+          { model: Feed, as: 'feed', where: { user_id: req.user.id }, required: false },
+          { model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, required: false },
+          { model: Cage, as: 'cage', where: { user_id: req.user.id }, required: false },
+          { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
+        ]
+      });
+
+      return ApiResponse.success(res, feedingRecord, 'Запись о кормлении обновлена');
+    } catch (error) {
+      await transaction.rollback();
+      // If it's an error we explicitly threw (like INSUFFICIENT_STOCK), it's already handled.
+      // Otherwise, re-throw for the outer catch block to handle.
+      throw error;
+    }
   } catch (error) {
     next(error);
   }
@@ -305,6 +368,7 @@ exports.update = async (req, res, next) => {
  * Delete feeding record
  */
 exports.delete = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const { id } = req.params;
 
@@ -312,27 +376,33 @@ exports.delete = async (req, res, next) => {
       where: {
         id,
         fed_by: req.user.id // Verify ownership
-      }
+      },
+      transaction
     });
 
     if (!feedingRecord) {
+      await transaction.rollback();
       return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
     }
 
     // Return stock to feed
     const feed = await Feed.findOne({
-      where: { id: feedingRecord.feed_id, user_id: req.user.id }
+      where: { id: feedingRecord.feed_id, user_id: req.user.id },
+      lock: transaction.LOCK.UPDATE,
+      transaction
     });
     if (feed) {
       await feed.update({
         current_stock: parseFloat(feed.current_stock) + parseFloat(feedingRecord.quantity)
-      });
+      }, { transaction });
     }
 
-    await feedingRecord.destroy();
+    await feedingRecord.destroy({ transaction });
+    await transaction.commit();
 
     return ApiResponse.success(res, null, 'Запись о кормлении удалена');
   } catch (error) {
+    if (transaction) await transaction.rollback();
     next(error);
   }
 };

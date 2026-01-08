@@ -29,8 +29,8 @@ exports.getDashboard = async (req, res, next) => {
 
     // Rabbits statistics
     const totalRabbits = await Rabbit.count({ where: { user_id: userId } });
-    const maleRabbits = await Rabbit.count({ where: { sex: 'male', user_id: userId } });
-    const femaleRabbits = await Rabbit.count({ where: { sex: 'female', user_id: userId } });
+    const maleRabbits = await Rabbit.count({ where: { sex: 'самец', user_id: userId } });
+    const femaleRabbits = await Rabbit.count({ where: { sex: 'самка', user_id: userId } });
 
     // Cages statistics
     const totalCages = await Cage.count({ where: { user_id: userId } });
@@ -84,7 +84,7 @@ exports.getDashboard = async (req, res, next) => {
     const recentIncome = await Transaction.sum('amount', {
       where: {
         created_by: userId,
-        type: 'income',
+        type: 'доход',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
         }
@@ -94,7 +94,7 @@ exports.getDashboard = async (req, res, next) => {
     const recentExpenses = await Transaction.sum('amount', {
       where: {
         created_by: userId,
-        type: 'expense',
+        type: 'расход',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
         }
@@ -104,7 +104,7 @@ exports.getDashboard = async (req, res, next) => {
     // Tasks statistics
     const pendingTasks = await Task.count({
       where: {
-        status: 'pending',
+        status: 'в ожидании',
         created_by: userId
       }
     });
@@ -116,7 +116,7 @@ exports.getDashboard = async (req, res, next) => {
           [Op.lt]: new Date()
         },
         status: {
-          [Op.in]: ['pending', 'in_progress']
+          [Op.in]: ['в ожидании', 'в процессе']
         }
       }
     });
@@ -208,6 +208,7 @@ exports.getFarmReport = async (req, res, next) => {
 
     // Rabbit population dynamics
     const rabbitsByBreed = await Rabbit.findAll({
+      where: { user_id: req.user.id },
       attributes: [
         'breed_id',
         [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
@@ -219,10 +220,11 @@ exports.getFarmReport = async (req, res, next) => {
     // Financial summary
     const transactions = await Transaction.findAll({
       where: {
+        created_by: req.user.id,
         transaction_date: from_date || to_date ? {
           [Op.gte]: from_date || new Date('2020-01-01'),
           [Op.lte]: to_date || new Date()
-        } : {}
+        } : { [Op.ne]: null }
       },
       attributes: [
         'type',
@@ -234,20 +236,28 @@ exports.getFarmReport = async (req, res, next) => {
     });
 
     // Health overview
-    const vaccinationsCount = await Vaccination.count({ where });
-    const medicalRecordsCount = await MedicalRecord.count({ where });
+    const vaccinationsCount = await Vaccination.count({
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }]
+    });
+    const medicalRecordsCount = await MedicalRecord.count({
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }]
+    });
 
     // Breeding overview
     const breedingsCount = await Breeding.count({
-      where: from_date || to_date ? {
-        breeding_date: {
-          [Op.gte]: from_date || new Date('2020-01-01'),
-          [Op.lte]: to_date || new Date()
-        }
-      } : {}
+      where: {
+        user_id: req.user.id,
+        ...(from_date || to_date ? {
+          breeding_date: {
+            [Op.gte]: from_date || new Date('2020-01-01'),
+            [Op.lte]: to_date || new Date()
+          }
+        } : {})
+      }
     });
 
     const birthsCount = await Birth.count({
+      include: [{ model: Rabbit, as: 'mother', where: { user_id: req.user.id }, attributes: [] }],
       where: from_date || to_date ? {
         birth_date: {
           [Op.gte]: from_date || new Date('2020-01-01'),
@@ -257,8 +267,8 @@ exports.getFarmReport = async (req, res, next) => {
     });
 
     // Feeding statistics
-    const feedingRecordsCount = await FeedingRecord.count({ where });
-    const totalFeedConsumption = await FeedingRecord.sum('quantity', { where }) || 0;
+    const feedingRecordsCount = await FeedingRecord.count({ where: { fed_by: req.user.id } });
+    const totalFeedConsumption = await FeedingRecord.sum('quantity', { where: { fed_by: req.user.id } }) || 0;
 
     return ApiResponse.success(res, {
       period: {
@@ -266,13 +276,13 @@ exports.getFarmReport = async (req, res, next) => {
         to: to_date || 'текущая дата'
       },
       population: {
-        total_rabbits: await Rabbit.count(),
+        total_rabbits: await Rabbit.count({ where: { user_id: req.user.id } }),
         by_breed: rabbitsByBreed
       },
       financial: {
         transactions: transactions,
         summary: transactions.reduce((acc, t) => {
-          if (t.type === 'income') {
+          if (t.type === 'доход') {
             acc.total_income = parseFloat(t.total);
           } else {
             acc.total_expenses = parseFloat(t.total);
@@ -319,22 +329,24 @@ exports.getHealthReport = async (req, res, next) => {
 
     // Vaccinations by type
     const vaccinationsByType = await Vaccination.findAll({
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }],
       where: dateFilter,
       attributes: [
         'vaccine_name',
-        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+        [Sequelize.fn('COUNT', Sequelize.col('Vaccination.id')), 'count']
       ],
       group: ['vaccine_name'],
       raw: true
     });
 
-    // Medical records by type
-    const medicalRecordsByType = await MedicalRecord.findAll({
+    // Medical records by outcome
+    const medicalRecordsByOutcome = await MedicalRecord.findAll({
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }],
       attributes: [
-        'record_type',
-        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+        'outcome',
+        [Sequelize.fn('COUNT', Sequelize.col('MedicalRecord.id')), 'count']
       ],
-      group: ['record_type'],
+      group: ['outcome'],
       raw: true
     });
 
@@ -348,6 +360,7 @@ exports.getHealthReport = async (req, res, next) => {
       include: [{
         model: Rabbit,
         as: 'rabbit',
+        where: { user_id: req.user.id },
         attributes: ['id', 'name', 'tag_id']
       }],
       limit: 10,
@@ -360,7 +373,7 @@ exports.getHealthReport = async (req, res, next) => {
         upcoming: upcomingVaccinations
       },
       medical_records: {
-        by_type: medicalRecordsByType
+        by_outcome: medicalRecordsByOutcome
       }
     }, 'Отчет по здоровью получен');
   } catch (error) {
@@ -389,7 +402,7 @@ exports.getFinancialReport = async (req, res, next) => {
 
     // Total by type
     const totalByType = await Transaction.findAll({
-      where,
+      where: { ...where, created_by: req.user.id },
       attributes: [
         'type',
         [Sequelize.fn('SUM', Sequelize.col('amount')), 'total']
@@ -400,7 +413,7 @@ exports.getFinancialReport = async (req, res, next) => {
 
     // By category
     const byCategory = await Transaction.findAll({
-      where,
+      where: { ...where, created_by: req.user.id },
       attributes: [
         'type',
         'category',
@@ -411,8 +424,8 @@ exports.getFinancialReport = async (req, res, next) => {
       raw: true
     });
 
-    const totalIncome = totalByType.find(t => t.type === 'income')?.total || 0;
-    const totalExpenses = totalByType.find(t => t.type === 'expense')?.total || 0;
+    const totalIncome = totalByType.find(t => t.type === 'доход')?.total || 0;
+    const totalExpenses = totalByType.find(t => t.type === 'расход')?.total || 0;
 
     return ApiResponse.success(res, {
       summary: {

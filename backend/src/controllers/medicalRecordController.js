@@ -1,4 +1,4 @@
-const { MedicalRecord, Rabbit, Breed } = require('../models');
+const { MedicalRecord, Rabbit, Breed, Transaction, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
 const { Op } = require('sequelize');
@@ -13,21 +13,49 @@ class MedicalRecordController {
    * POST /api/v1/medical-records
    */
   async create(req, res, next) {
+    const t = await sequelize.transaction();
     try {
-      const { rabbit_id } = req.body;
+      const { rabbit_id, outcome, cost, started_at, diagnosis } = req.body;
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: {
-          id: rabbit_id,
-          user_id: req.user.id
-        }
+        where: { id: rabbit_id, user_id: req.user.id },
+        transaction: t
       });
       if (!rabbit) {
+        await t.rollback();
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
 
-      const medicalRecord = await MedicalRecord.create(req.body);
+      // Check vitality
+      if (rabbit.status === 'мертв' || rabbit.status === 'продан') {
+        await t.rollback();
+        return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика');
+      }
+
+      const medicalRecord = await MedicalRecord.create(req.body, { transaction: t });
+
+      // Automation 1: Status Update
+      if (['падеж', 'убой'].includes(outcome)) {
+        await rabbit.update({ status: 'мертв', cage_id: null }, { transaction: t });
+      } else if (outcome === 'в процессе') {
+        await rabbit.update({ status: 'болен' }, { transaction: t });
+      }
+
+      // Automation 2: Financial Transaction
+      if (cost && parseFloat(cost) > 0) {
+        await Transaction.create({
+          type: 'расход',
+          category: 'ветеринария',
+          amount: cost,
+          transaction_date: started_at || new Date(),
+          rabbit_id: rabbit_id,
+          description: `Medical: ${diagnosis || 'Treatment'}`,
+          created_by: req.user.id
+        }, { transaction: t });
+      }
+
+      await t.commit();
 
       // Fetch created record with rabbit info
       const result = await MedicalRecord.findByPk(medicalRecord.id, {
@@ -36,19 +64,14 @@ class MedicalRecordController {
             model: Rabbit,
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date'],
-            include: [
-              {
-                model: Breed,
-                as: 'breed',
-                attributes: ['id', 'name']
-              }
-            ]
+            include: [{ model: Breed, as: 'breed', attributes: ['id', 'name'] }]
           }
         ]
       });
 
       return ApiResponse.created(res, result, 'Медицинская запись успешно создана');
     } catch (error) {
+      await t.rollback();
       if (error.name === 'SequelizeValidationError') {
         return ApiResponse.badRequest(res, error.errors[0].message);
       }
@@ -208,27 +231,41 @@ class MedicalRecordController {
    * PUT /api/v1/medical-records/:id
    */
   async update(req, res, next) {
+    const t = await sequelize.transaction();
     try {
-      const medicalRecord = await MedicalRecord.findByPk(req.params.id);
+      const medicalRecord = await MedicalRecord.findByPk(req.params.id, {
+        include: [{ model: Rabbit, as: 'rabbit' }],
+        transaction: t
+      });
 
-      if (!medicalRecord) {
+      if (!medicalRecord || medicalRecord.rabbit.user_id !== req.user.id) {
+        await t.rollback();
         return ApiResponse.notFound(res, 'Медицинская запись не найдена');
       }
 
+      const oldOutcome = medicalRecord.outcome;
+      const oldCost = medicalRecord.cost;
+
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
-        const rabbit = await Rabbit.findOne({
-          where: {
-            id: req.body.rabbit_id,
-            user_id: req.user.id
-          }
+        const newRabbit = await Rabbit.findOne({
+          where: { id: req.body.rabbit_id, user_id: req.user.id },
+          transaction: t
         });
-        if (!rabbit) {
+        if (!newRabbit) {
+          await t.rollback();
           return ApiResponse.notFound(res, 'Кролик не найден');
         }
       }
 
-      await medicalRecord.update(req.body);
+      await medicalRecord.update(req.body, { transaction: t });
+
+      // Automation: Status Update
+      if (['падеж', 'убой'].includes(req.body.outcome) && oldOutcome !== req.body.outcome) {
+        await medicalRecord.rabbit.update({ status: 'мертв', cage_id: null }, { transaction: t });
+      }
+
+      await t.commit();
 
       // Fetch updated record with rabbit info
       const result = await MedicalRecord.findByPk(medicalRecord.id, {
@@ -237,19 +274,14 @@ class MedicalRecordController {
             model: Rabbit,
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex'],
-            include: [
-              {
-                model: Breed,
-                as: 'breed',
-                attributes: ['id', 'name']
-              }
-            ]
+            include: [{ model: Breed, as: 'breed', attributes: ['id', 'name'] }]
           }
         ]
       });
 
       return ApiResponse.success(res, result, 'Медицинская запись успешно обновлена');
     } catch (error) {
+      await t.rollback();
       if (error.name === 'SequelizeValidationError') {
         return ApiResponse.badRequest(res, error.errors[0].message);
       }
@@ -308,10 +340,10 @@ class MedicalRecordController {
       const stats = {
         total_records: medicalRecords.length,
         by_outcome: {
-          recovered: 0,
-          ongoing: 0,
-          died: 0,
-          euthanized: 0
+          'выздоровел': 0,
+          'в процессе': 0,
+          'падеж': 0,
+          'убой': 0
         },
         ongoing_treatments: [],
         total_cost: 0,
@@ -326,7 +358,7 @@ class MedicalRecordController {
         }
 
         // Collect ongoing treatments
-        if (record.outcome === 'ongoing') {
+        if (record.outcome === 'в процессе') {
           const startDate = new Date(record.started_at);
           const daysOngoing = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
 
@@ -377,7 +409,7 @@ class MedicalRecordController {
     try {
       const medicalRecords = await MedicalRecord.findAll({
         where: {
-          outcome: 'ongoing'
+          outcome: 'в процессе'
         },
         include: [
           {
@@ -387,7 +419,7 @@ class MedicalRecordController {
             where: {
               user_id: req.user.id, // Filter by user
               status: {
-                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
+                [Op.in]: ['здоров', 'сукрольность', 'болен'] // Exclude dead/sold
               }
             },
             include: [

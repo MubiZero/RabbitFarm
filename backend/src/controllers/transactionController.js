@@ -12,18 +12,22 @@ const ApiResponse = require('../utils/apiResponse');
  * POST /api/v1/transactions
  */
 exports.create = async (req, res, next) => {
+  const t = await Transaction.sequelize.transaction();
   try {
     const { type, category, amount, transaction_date, rabbit_id, description, receipt_url } = req.body;
 
     // Validate rabbit_id if provided
+    let rabbit = null;
     if (rabbit_id) {
-      const rabbit = await Rabbit.findOne({
+      rabbit = await Rabbit.findOne({
         where: {
           id: rabbit_id,
           user_id: req.user.id
-        }
+        },
+        transaction: t
       });
       if (!rabbit) {
+        await t.rollback();
         return ApiResponse.error(res, 'Кролик не найден', 404);
       }
     }
@@ -37,7 +41,18 @@ exports.create = async (req, res, next) => {
       description,
       receipt_url,
       created_by: req.user.id
-    });
+    }, { transaction: t });
+
+    // Logical Automation: If selling a rabbit, mark him as sold
+    if (rabbit && type === 'доход' &&
+      (category?.toLowerCase() === 'sale' || category?.toLowerCase() === 'продажа' || category?.toLowerCase() === 'продажа кролика')) {
+      await rabbit.update({
+        status: 'продан',
+        cage_id: null
+      }, { transaction: t });
+    }
+
+    await t.commit();
 
     // Fetch created transaction with associations
     const createdTransaction = await Transaction.findByPk(transaction.id, {
@@ -45,6 +60,8 @@ exports.create = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'rabbit',
+          where: { user_id: req.user.id },
+          required: false,
           attributes: ['id', 'name', 'tag_id']
         },
         {
@@ -57,6 +74,7 @@ exports.create = async (req, res, next) => {
 
     return ApiResponse.success(res, createdTransaction, 'Транзакция успешно создана', 201);
   } catch (error) {
+    await t.rollback();
     next(error);
   }
 };

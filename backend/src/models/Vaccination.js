@@ -35,6 +35,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    cost: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true

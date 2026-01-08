@@ -14,9 +14,13 @@ class AuthService {
    * @returns {Object} User and tokens
    */
   async register(userData) {
+    const transaction = await User.sequelize.transaction();
     try {
       // Check if user already exists
-      const existingUser = await User.findOne({ where: { email: userData.email } });
+      const existingUser = await User.findOne({
+        where: { email: userData.email },
+        transaction
+      });
       if (existingUser) {
         throw new Error('USER_EXISTS');
       }
@@ -31,7 +35,7 @@ class AuthService {
         full_name: userData.full_name,
         phone: userData.phone || null,
         role: userData.role || 'worker'
-      });
+      }, { transaction });
 
       // Generate tokens
       const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role });
@@ -45,8 +49,9 @@ class AuthService {
         user_id: user.id,
         token: refreshToken,
         expires_at: expiresAt
-      });
+      }, { transaction });
 
+      await transaction.commit();
       logger.info('User registered successfully', { userId: user.id, email: user.email });
 
       // Remove password hash from response
@@ -58,6 +63,7 @@ class AuthService {
         refresh_token: refreshToken
       };
     } catch (error) {
+      if (transaction) await transaction.rollback();
       logger.error('Registration error', { error: error.message });
       throw error;
     }
@@ -258,16 +264,19 @@ class AuthService {
    * @param {String} newPassword - New password
    */
   async changePassword(userId, currentPassword, newPassword) {
+    const transaction = await User.sequelize.transaction();
     try {
-      const user = await User.findByPk(userId);
+      const user = await User.findByPk(userId, { transaction });
 
       if (!user) {
+        await transaction.rollback();
         throw new Error('USER_NOT_FOUND');
       }
 
       // Verify current password
       const isPasswordValid = await PasswordUtil.compare(currentPassword, user.password_hash);
       if (!isPasswordValid) {
+        await transaction.rollback();
         throw new Error('INVALID_CURRENT_PASSWORD');
       }
 
@@ -275,15 +284,20 @@ class AuthService {
       const newPasswordHash = await PasswordUtil.hash(newPassword);
 
       // Update password
-      await user.update({ password_hash: newPasswordHash });
+      await user.update({ password_hash: newPasswordHash }, { transaction });
 
       // Invalidate all refresh tokens (force re-login on all devices)
-      await RefreshToken.destroy({ where: { user_id: userId } });
+      await RefreshToken.destroy({
+        where: { user_id: userId },
+        transaction
+      });
 
+      await transaction.commit();
       logger.info('Password changed successfully', { userId });
 
       return { success: true };
     } catch (error) {
+      if (transaction) await transaction.rollback();
       logger.error('Change password error', { error: error.message, userId });
       throw error;
     }

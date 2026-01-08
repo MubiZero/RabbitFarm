@@ -109,6 +109,21 @@ class RabbitController {
       if (error.message === 'TAG_ID_EXISTS') {
         return ApiResponse.badRequest(res, 'Кролик с таким ID клейма уже существует');
       }
+      if (error.message === 'CANNOT_CHANGE_SEX_WITH_HISTORY') {
+        return ApiResponse.badRequest(res, 'Нельзя менять пол после того, как у кролика появилось потомство или история случек');
+      }
+      if (error.message === 'FATHER_NOT_FOUND_OR_INVALID_SEX') {
+        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом');
+      }
+      if (error.message === 'MOTHER_NOT_FOUND_OR_INVALID_SEX') {
+        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой');
+      }
+      if (error.message === 'CAGE_FULL') {
+        return ApiResponse.badRequest(res, 'Клетка уже заполнена');
+      }
+      if (error.message === 'CANNOT_BE_OWN_FATHER' || error.message === 'CANNOT_BE_OWN_MOTHER') {
+        return ApiResponse.badRequest(res, 'Кролик не может быть родителем самому себе');
+      }
       next(error);
     }
   }
@@ -128,6 +143,18 @@ class RabbitController {
       }
       if (error.message === 'RABBIT_HAS_OFFSPRING') {
         return ApiResponse.badRequest(res, 'Невозможно удалить кролика с потомством');
+      }
+      if (error.message === 'RABBIT_HAS_BREEDING_HISTORY') {
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть история случек');
+      }
+      if (error.message === 'RABBIT_HAS_BIRTH_HISTORY') {
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у самки есть история окролов');
+      }
+      if (error.message === 'RABBIT_HAS_HEALTH_HISTORY') {
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть медицинские записи или вакцинации');
+      }
+      if (error.message === 'RABBIT_HAS_FINANCIAL_HISTORY') {
+        return ApiResponse.badRequest(res, 'Невозможно удалить: с кроликом связаны финансовые операции');
       }
       next(error);
     }

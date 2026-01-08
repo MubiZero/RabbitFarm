@@ -1,4 +1,4 @@
-const { Vaccination, Rabbit, Breed } = require('../models');
+const { Vaccination, Rabbit, Breed, Transaction, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
 const { Op } = require('sequelize');
@@ -13,21 +13,42 @@ class VaccinationController {
    * POST /api/v1/vaccinations
    */
   async create(req, res, next) {
+    const t = await sequelize.transaction();
     try {
-      const { rabbit_id } = req.body;
+      const { rabbit_id, cost, vaccination_date, vaccine_name } = req.body;
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: {
-          id: rabbit_id,
-          user_id: req.user.id
-        }
+        where: { id: rabbit_id, user_id: req.user.id },
+        transaction: t
       });
       if (!rabbit) {
+        await t.rollback();
         return ApiResponse.notFound(res, 'Кролик не найден');
       }
 
-      const vaccination = await Vaccination.create(req.body);
+      // Vitality check
+      if (rabbit.status === 'мертв' || rabbit.status === 'продан') {
+        await t.rollback();
+        return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика');
+      }
+
+      const vaccination = await Vaccination.create(req.body, { transaction: t });
+
+      // Automation: Financial Transaction
+      if (cost && parseFloat(cost) > 0) {
+        await Transaction.create({
+          type: 'расход',
+          category: 'ветеринария', // or 'Vaccination'
+          amount: cost,
+          transaction_date: vaccination_date || new Date(),
+          rabbit_id: rabbit_id,
+          description: `Vaccination: ${vaccine_name}`,
+          created_by: req.user.id
+        }, { transaction: t });
+      }
+
+      await t.commit();
 
       // Fetch created vaccination with rabbit info
       const result = await Vaccination.findByPk(vaccination.id, {
@@ -36,19 +57,14 @@ class VaccinationController {
             model: Rabbit,
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date'],
-            include: [
-              {
-                model: Breed,
-                as: 'breed',
-                attributes: ['id', 'name']
-              }
-            ]
+            include: [{ model: Breed, as: 'breed', attributes: ['id', 'name'] }]
           }
         ]
       });
 
       return ApiResponse.created(res, result, 'Запись о вакцинации успешно создана');
     } catch (error) {
+      await t.rollback();
       if (error.name === 'SequelizeValidationError') {
         return ApiResponse.badRequest(res, error.errors[0].message);
       }

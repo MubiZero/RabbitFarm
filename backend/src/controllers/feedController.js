@@ -263,6 +263,7 @@ exports.getLowStock = async (req, res, next) => {
  * Adjust feed stock (add or subtract)
  */
 exports.adjustStock = async (req, res, next) => {
+  const transaction = await require('../models').sequelize.transaction();
   try {
     const { id } = req.params;
     const { quantity, operation } = req.body; // operation: 'add' or 'subtract'
@@ -271,10 +272,13 @@ exports.adjustStock = async (req, res, next) => {
       where: {
         id,
         user_id: req.user.id
-      }
+      },
+      lock: transaction.LOCK.UPDATE,
+      transaction
     });
 
     if (!feed) {
+      await transaction.rollback();
       return ApiResponse.error(res, 'Корм не найден', 404);
     }
 
@@ -287,16 +291,20 @@ exports.adjustStock = async (req, res, next) => {
     } else if (operation === 'subtract') {
       newStock = currentStock - adjustment;
       if (newStock < 0) {
+        await transaction.rollback();
         return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
       }
     } else {
+      await transaction.rollback();
       return ApiResponse.error(res, 'Некорректная операция. Используйте "add" или "subtract"', 400);
     }
 
-    await feed.update({ current_stock: newStock });
+    await feed.update({ current_stock: newStock }, { transaction });
+    await transaction.commit();
 
     return ApiResponse.success(res, feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`);
   } catch (error) {
+    await transaction.rollback();
     next(error);
   }
 };
