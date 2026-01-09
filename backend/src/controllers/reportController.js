@@ -29,8 +29,8 @@ exports.getDashboard = async (req, res, next) => {
 
     // Rabbits statistics
     const totalRabbits = await Rabbit.count({ where: { user_id: userId } });
-    const maleRabbits = await Rabbit.count({ where: { sex: 'самец', user_id: userId } });
-    const femaleRabbits = await Rabbit.count({ where: { sex: 'самка', user_id: userId } });
+    const maleRabbits = await Rabbit.count({ where: { sex: 'male', user_id: userId } });
+    const femaleRabbits = await Rabbit.count({ where: { sex: 'female', user_id: userId } });
 
     // Cages statistics
     const totalCages = await Cage.count({ where: { user_id: userId } });
@@ -84,7 +84,7 @@ exports.getDashboard = async (req, res, next) => {
     const recentIncome = await Transaction.sum('amount', {
       where: {
         created_by: userId,
-        type: 'доход',
+        type: 'income',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
         }
@@ -94,7 +94,7 @@ exports.getDashboard = async (req, res, next) => {
     const recentExpenses = await Transaction.sum('amount', {
       where: {
         created_by: userId,
-        type: 'расход',
+        type: 'expense',
         transaction_date: {
           [Op.gte]: thirtyDaysAgo
         }
@@ -104,7 +104,7 @@ exports.getDashboard = async (req, res, next) => {
     // Tasks statistics
     const pendingTasks = await Task.count({
       where: {
-        status: 'в ожидании',
+        status: 'pending',
         created_by: userId
       }
     });
@@ -116,7 +116,7 @@ exports.getDashboard = async (req, res, next) => {
           [Op.lt]: new Date()
         },
         status: {
-          [Op.in]: ['в ожидании', 'в процессе']
+          [Op.in]: ['pending', 'in_progress']
         }
       }
     });
@@ -282,7 +282,7 @@ exports.getFarmReport = async (req, res, next) => {
       financial: {
         transactions: transactions,
         summary: transactions.reduce((acc, t) => {
-          if (t.type === 'доход') {
+          if (t.type === 'income') {
             acc.total_income = parseFloat(t.total);
           } else {
             acc.total_expenses = parseFloat(t.total);
@@ -424,8 +424,8 @@ exports.getFinancialReport = async (req, res, next) => {
       raw: true
     });
 
-    const totalIncome = totalByType.find(t => t.type === 'доход')?.total || 0;
-    const totalExpenses = totalByType.find(t => t.type === 'расход')?.total || 0;
+    const totalIncome = totalByType.find(t => t.type === 'income')?.total || 0;
+    const totalExpenses = totalByType.find(t => t.type === 'expense')?.total || 0;
 
     return ApiResponse.success(res, {
       summary: {

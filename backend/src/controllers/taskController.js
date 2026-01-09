@@ -377,9 +377,9 @@ exports.update = async (req, res, next) => {
       notes
     };
 
-    if (status === 'завершено' && !completed_at) {
+    if (status === 'completed' && !completed_at) {
       updateData.completed_at = new Date();
-    } else if (status !== 'завершено') {
+    } else if (status !== 'completed') {
       updateData.completed_at = null;
     } else if (completed_at) {
       updateData.completed_at = completed_at;
@@ -567,7 +567,7 @@ exports.getUpcoming = async (req, res, next) => {
           [Op.lt]: futureDate
         },
         status: {
-          [Op.in]: ['в ожидании', 'в процессе']
+          [Op.in]: ['pending', 'in_progress']
         }
       },
       include: [
@@ -621,7 +621,7 @@ exports.completeTask = async (req, res, next) => {
     const transaction = await require('../models').sequelize.transaction();
     try {
       await task.update({
-        status: 'завершено',
+        status: 'completed',
         completed_at: new Date()
       }, { transaction });
 
@@ -659,7 +659,7 @@ exports.completeTask = async (req, res, next) => {
             title: task.title,
             description: task.description,
             type: task.type,
-            status: 'в ожидании',
+            status: 'pending',
             priority: task.priority,
             due_date: nextDueDate,
             rabbit_id: task.rabbit_id,

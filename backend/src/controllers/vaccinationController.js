@@ -28,7 +28,7 @@ class VaccinationController {
       }
 
       // Vitality check
-      if (rabbit.status === 'мертв' || rabbit.status === 'продан') {
+      if (rabbit.status === 'dead' || rabbit.status === 'sold') {
         await t.rollback();
         return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика');
       }
@@ -38,8 +38,8 @@ class VaccinationController {
       // Automation: Financial Transaction
       if (cost && parseFloat(cost) > 0) {
         await Transaction.create({
-          type: 'расход',
-          category: 'ветеринария', // or 'Vaccination'
+          type: 'expense',
+          category: 'Health', // or 'Vaccination'
           amount: cost,
           transaction_date: vaccination_date || new Date(),
           rabbit_id: rabbit_id,

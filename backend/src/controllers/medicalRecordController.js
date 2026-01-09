@@ -28,7 +28,7 @@ class MedicalRecordController {
       }
 
       // Check vitality
-      if (rabbit.status === 'мертв' || rabbit.status === 'продан') {
+      if (rabbit.status === 'dead' || rabbit.status === 'sold') {
         await t.rollback();
         return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика');
       }
@@ -36,17 +36,17 @@ class MedicalRecordController {
       const medicalRecord = await MedicalRecord.create(req.body, { transaction: t });
 
       // Automation 1: Status Update
-      if (['падеж', 'убой'].includes(outcome)) {
-        await rabbit.update({ status: 'мертв', cage_id: null }, { transaction: t });
-      } else if (outcome === 'в процессе') {
-        await rabbit.update({ status: 'болен' }, { transaction: t });
+      if (['died', 'euthanized'].includes(outcome)) {
+        await rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
+      } else if (outcome === 'ongoing') {
+        await rabbit.update({ status: 'sick' }, { transaction: t });
       }
 
       // Automation 2: Financial Transaction
       if (cost && parseFloat(cost) > 0) {
         await Transaction.create({
-          type: 'расход',
-          category: 'ветеринария',
+          type: 'expense',
+          category: 'Health',
           amount: cost,
           transaction_date: started_at || new Date(),
           rabbit_id: rabbit_id,
@@ -261,8 +261,8 @@ class MedicalRecordController {
       await medicalRecord.update(req.body, { transaction: t });
 
       // Automation: Status Update
-      if (['падеж', 'убой'].includes(req.body.outcome) && oldOutcome !== req.body.outcome) {
-        await medicalRecord.rabbit.update({ status: 'мертв', cage_id: null }, { transaction: t });
+      if (['died', 'euthanized'].includes(req.body.outcome) && oldOutcome !== req.body.outcome) {
+        await medicalRecord.rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
       }
 
       await t.commit();
@@ -340,10 +340,10 @@ class MedicalRecordController {
       const stats = {
         total_records: medicalRecords.length,
         by_outcome: {
-          'выздоровел': 0,
-          'в процессе': 0,
-          'падеж': 0,
-          'убой': 0
+          recovered: 0,
+          ongoing: 0,
+          died: 0,
+          euthanized: 0
         },
         ongoing_treatments: [],
         total_cost: 0,
@@ -358,7 +358,7 @@ class MedicalRecordController {
         }
 
         // Collect ongoing treatments
-        if (record.outcome === 'в процессе') {
+        if (record.outcome === 'ongoing') {
           const startDate = new Date(record.started_at);
           const daysOngoing = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
 
@@ -409,7 +409,7 @@ class MedicalRecordController {
     try {
       const medicalRecords = await MedicalRecord.findAll({
         where: {
-          outcome: 'в процессе'
+          outcome: 'ongoing'
         },
         include: [
           {
@@ -419,7 +419,7 @@ class MedicalRecordController {
             where: {
               user_id: req.user.id, // Filter by user
               status: {
-                [Op.in]: ['здоров', 'сукрольность', 'болен'] // Exclude dead/sold
+                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
               }
             },
             include: [

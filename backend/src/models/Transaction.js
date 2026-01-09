@@ -8,13 +8,13 @@ module.exports = (sequelize) => {
       autoIncrement: true
     },
     type: {
-      type: DataTypes.ENUM('доход', 'расход'),
+      type: DataTypes.ENUM('income', 'expense'),
       allowNull: false
     },
     category: {
       type: DataTypes.ENUM(
-        'продажа кролика', 'продажа мяса', 'продажа шкурок', 'плата за случку',
-        'корма', 'ветеринария', 'оборудование', 'коммунальные услуги', 'прочее'
+        'sale_rabbit', 'sale_meat', 'sale_fur', 'breeding_fee',
+        'feed', 'veterinary', 'equipment', 'utilities', 'other'
       ),
       allowNull: false
     },

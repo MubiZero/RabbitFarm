@@ -105,7 +105,7 @@ exports.createBirth = async (req, res) => {
       return ApiResponse.notFound(res, 'Мать не найдена');
     }
 
-    if (mother.status === 'мертв') {
+    if (mother.status === 'dead') {
       await transaction.rollback();
       return ApiResponse.error(res, 'Мертвый кролик не может принести потомство', 400);
     }
@@ -137,8 +137,8 @@ exports.createBirth = async (req, res) => {
     }, { transaction });
 
     // Обновляем статус матери (если была беременна)
-    if (mother.status === 'сукрольность' || mother.status === 'активен' || mother.status === 'здоров') {
-      await mother.update({ status: 'активен' }, { transaction });
+    if (mother.status === 'pregnant' || mother.status === 'active' || mother.status === 'healthy') {
+      await mother.update({ status: 'active' }, { transaction });
     }
 
     // Automation: Create tasks for the nursing period
@@ -152,11 +152,11 @@ exports.createBirth = async (req, res) => {
       assigned_to: userId,
       title: `Взвесить крольчат: ${mother.name}`,
       description: `Первое взвешивание крольчат от самки ${mother.name}`,
-      type: 'осмотр',
-      priority: 'средний',
+      type: 'checkup',
+      priority: 'medium',
       due_date: weightDate,
       rabbit_id: mother.id,
-      status: 'в ожидании'
+      status: 'pending'
     }, { transaction });
 
     // 2. Open eyes check (+10 days)
@@ -167,11 +167,11 @@ exports.createBirth = async (req, res) => {
       assigned_to: userId,
       title: `Проверить глаза: ${mother.name}`,
       description: `Проверить, открылись ли глаза у крольчат самки ${mother.name}`,
-      type: 'осмотр',
-      priority: 'средний',
+      type: 'checkup',
+      priority: 'medium',
       due_date: eyesDate,
       rabbit_id: mother.id,
-      status: 'в ожидании'
+      status: 'pending'
     }, { transaction });
 
     // 3. Weaning (+45 days)
@@ -182,11 +182,11 @@ exports.createBirth = async (req, res) => {
       assigned_to: userId,
       title: `Отсадка (отъем): ${mother.name}`,
       description: `Пора отсаживать крольчат от самки ${mother.name}`,
-      type: 'разведение',
-      priority: 'высокий',
+      type: 'breeding',
+      priority: 'high',
       due_date: weaningDate,
       rabbit_id: mother.id,
-      status: 'в ожидании'
+      status: 'pending'
     }, { transaction });
 
     await transaction.commit();
@@ -382,13 +382,13 @@ exports.createKitsFromBirth = async (req, res) => {
         tag_id: `${prefix}-${Date.now()}-${i}`,
         name: `${prefix}-${i}`,
         breed_id,
-        sex: 'неизвестно',
+        sex: 'unknown',
         birth_date: birth_date || birth.birth_date,
         mother_id: mother_id || birth.mother_id,
         father_id: father_id || null,
-        status: 'активен',
+        status: 'active',
         cage_id: cageId,
-        purpose: 'мясо', // По умолчанию молодняк на откорм? Или разведение?
+        purpose: 'meat', // По умолчанию молодняк на откорм? Или breeding?
       }, { transaction });
       kits.push(kit);
     }

@@ -27,10 +27,10 @@ class BreedingService {
             if (!male) {
                 throw new Error('MALE_NOT_FOUND');
             }
-            if (male.sex !== 'самец') {
+            if (male.sex !== 'male') {
                 throw new Error('INVALID_MALE_SEX');
             }
-            if (['мертв', 'продан'].includes(male.status)) {
+            if (['dead', 'sold'].includes(male.status)) {
                 throw new Error('MALE_NOT_AVAILABLE');
             }
 
@@ -42,10 +42,10 @@ class BreedingService {
             if (!female) {
                 throw new Error('FEMALE_NOT_FOUND');
             }
-            if (female.sex !== 'самка') {
+            if (female.sex !== 'female') {
                 throw new Error('INVALID_FEMALE_SEX');
             }
-            if (['мертв', 'продан'].includes(female.status)) {
+            if (['dead', 'sold'].includes(female.status)) {
                 throw new Error('FEMALE_NOT_AVAILABLE');
             }
 
@@ -71,11 +71,11 @@ class BreedingService {
                     assigned_to: data.user_id,
                     title: `Пальпация: ${female.name}`,
                     description: `Проверить на беременность самку ${female.name} после случки с ${male.name}`,
-                    type: 'осмотр',
-                    priority: 'средний',
+                    type: 'checkup',
+                    priority: 'medium',
                     due_date: palpationDate,
                     rabbit_id: female.id,
-                    status: 'в ожидании'
+                    status: 'pending'
                 }, { transaction });
 
                 // 2. Nest Box Box Task (+28 days)
@@ -87,12 +87,12 @@ class BreedingService {
                     assigned_to: data.user_id,
                     title: `Поставить маточник: ${female.name}`,
                     description: `Подготовить клетку и поставить гнездовой ящик для ${female.name}`,
-                    type: 'разведение',
-                    priority: 'высокий',
+                    type: 'breeding',
+                    priority: 'high',
                     due_date: nestBoxDate,
                     rabbit_id: female.id,
                     cage_id: female.cage_id,
-                    status: 'в ожидании'
+                    status: 'pending'
                 }, { transaction });
 
                 // 3. Expected Birth Task (+31 days)
@@ -104,11 +104,11 @@ class BreedingService {
                     assigned_to: data.user_id,
                     title: `Ожидаемый окрол: ${female.name}`,
                     description: `Ожидается окрол у самки ${female.name} (случка с ${male.name})`,
-                    type: 'разведение',
-                    priority: 'срочный',
+                    type: 'breeding',
+                    priority: 'urgent',
                     due_date: birthDate,
                     rabbit_id: female.id,
-                    status: 'в ожидании'
+                    status: 'pending'
                 }, { transaction });
             }
 
@@ -263,7 +263,7 @@ class BreedingService {
             // If updating male/female, check existence and ownership
             if (data.male_id) {
                 const male = await Rabbit.findOne({
-                    where: { id: data.male_id, user_id: userId, sex: 'самец' },
+                    where: { id: data.male_id, user_id: userId, sex: 'male' },
                     transaction
                 });
                 if (!male) {
@@ -277,14 +277,14 @@ class BreedingService {
                     throw new Error('CANNOT_BREED_SAME_RABBIT');
                 }
                 const female = await Rabbit.findOne({
-                    where: { id: data.female_id, user_id: userId, sex: 'самка' },
+                    where: { id: data.female_id, user_id: userId, sex: 'female' },
                     transaction
                 });
                 if (!female) {
                     await transaction.rollback();
                     throw new Error('INVALID_FEMALE');
                 }
-                if (['мертв', 'продан'].includes(female.status)) {
+                if (['dead', 'sold'].includes(female.status)) {
                     await transaction.rollback();
                     throw new Error('FEMALE_NOT_AVAILABLE');
                 }
@@ -292,16 +292,16 @@ class BreedingService {
 
             await breeding.update(data, { transaction });
 
-            // Automation: Update female status to 'сукрольность' if is_pregnant is true
+            // Automation: Update female status to 'pregnant' if is_pregnant is true
             if (data.is_pregnant === true) {
                 const female = await Rabbit.findByPk(data.female_id || breeding.female_id, { transaction });
                 if (female) {
-                    await female.update({ status: 'сукрольность' }, { transaction });
+                    await female.update({ status: 'pregnant' }, { transaction });
                 }
             } else if (data.is_pregnant === false || data.status === 'failed') {
                 const female = await Rabbit.findByPk(breeding.female_id, { transaction });
-                if (female && female.status === 'сукрольность') {
-                    await female.update({ status: 'активен' }, { transaction });
+                if (female && female.status === 'pregnant') {
+                    await female.update({ status: 'active' }, { transaction });
                 }
             }
 
