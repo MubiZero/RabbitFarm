@@ -57,6 +57,7 @@ class RabbitStats with _$RabbitStats {
     @IntConverter() required int total,
     @IntConverter() required int male,
     @IntConverter() required int female,
+    @Default([]) List<int> history,
   }) = _RabbitStats;
 
   factory RabbitStats.fromJson(Map<String, dynamic> json) =>
@@ -105,6 +106,7 @@ class TaskStats with _$TaskStats {
   const factory TaskStats({
     @IntConverter() required int pending,
     @IntConverter() required int overdue,
+    @IntConverter() required int urgent,
   }) = _TaskStats;
 
   factory TaskStats.fromJson(Map<String, dynamic> json) =>
@@ -125,6 +127,7 @@ class InventoryStats with _$InventoryStats {
 class BreedingStats with _$BreedingStats {
   const factory BreedingStats({
     @IntConverter() required int recentBirths,
+    @Default([]) List<int> history,
   }) = _BreedingStats;
 
   factory BreedingStats.fromJson(Map<String, dynamic> json) =>

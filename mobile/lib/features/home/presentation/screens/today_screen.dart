@@ -117,6 +117,18 @@ class TodayScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
+                      if (dashboard.tasks.urgent > 0)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: _buildAlertCard(
+                            context,
+                            'Срочные задачи',
+                            'Срочных задач: ${dashboard.tasks.urgent}',
+                            Icons.priority_high,
+                            const Color(0xFFEF4444),
+                            () => context.go('/tasks'),
+                          ),
+                        ),
                       if (dashboard.health.overdueVaccinations > 0)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -152,7 +164,8 @@ class TodayScreen extends ConsumerWidget {
                         ),
                       if (dashboard.health.overdueVaccinations == 0 &&
                           dashboard.breeding.recentBirths == 0 &&
-                          dashboard.inventory.lowStockFeeds == 0)
+                          dashboard.inventory.lowStockFeeds == 0 &&
+                          dashboard.tasks.urgent == 0)
                         const Center(
                           child: Padding(
                             padding: EdgeInsets.all(32.0),

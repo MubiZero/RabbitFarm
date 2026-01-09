@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/models/dashboard_config.dart';
+import '../../data/models/report_model.dart';
 import '../providers/dashboard_config_provider.dart';
 import '../providers/reports_provider.dart';
 import '../widgets/modern_stat_card.dart';
@@ -47,7 +48,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
   Widget _buildDashboard(
     BuildContext context,
     WidgetRef ref,
-    dynamic dashboard,
+    DashboardReport dashboard,
     DashboardConfig config,
   ) {
     return CustomScrollView(
@@ -146,7 +147,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAlerts(BuildContext context, dynamic dashboard) {
+  Widget _buildAlerts(BuildContext context, DashboardReport dashboard) {
     final alerts = <Widget>[];
 
     if (dashboard.health.overdueVaccinations > 0) {
@@ -251,7 +252,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
 
   List<Widget> _buildCustomizableWidgets(
     BuildContext context,
-    dynamic dashboard,
+    DashboardReport dashboard,
     DashboardConfig config,
   ) {
     final visibleWidgets = config.widgets
@@ -291,7 +292,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return widgets;
   }
 
-  Widget _buildOverviewSection(BuildContext context, dynamic dashboard) {
+  Widget _buildOverviewSection(BuildContext context, DashboardReport dashboard) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -314,7 +315,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
                 title: 'Всего кроликов',
                 value: '${dashboard.rabbits.total}',
                 subtitle: '${dashboard.rabbits.male}М / ${dashboard.rabbits.female}Ж',
-                data: [20, 25, 22, 30, 35, 32, dashboard.rabbits.total.toDouble()],
+                data: dashboard.rabbits.history.isEmpty
+                    ? [
+                        dashboard.rabbits.total.toDouble(),
+                        dashboard.rabbits.total.toDouble()
+                      ]
+                    : List<double>.from(dashboard.rabbits.history
+                        .map((e) => (e as num).toDouble())),
                 color: AppTheme.primaryColor,
                 onTap: () => context.push('/rabbits'),
               ),
@@ -325,7 +332,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
                 title: 'Рождений',
                 value: '${dashboard.breeding.recentBirths}',
                 subtitle: 'За 30 дней',
-                data: [3, 5, 2, 7, 4, 6, dashboard.breeding.recentBirths.toDouble()],
+                data: dashboard.breeding.history.isEmpty
+                    ? [
+                        dashboard.breeding.recentBirths.toDouble(),
+                        dashboard.breeding.recentBirths.toDouble()
+                      ]
+                    : List<double>.from(dashboard.breeding.history
+                        .map((e) => (e as num).toDouble())),
                 color: AppTheme.accentColor,
                 onTap: () => context.push('/births'),
               ),

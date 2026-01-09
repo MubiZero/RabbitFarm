@@ -35,6 +35,11 @@ _$RabbitStatsImpl _$$RabbitStatsImplFromJson(Map<String, dynamic> json) =>
       total: const IntConverter().fromJson(json['total']),
       male: const IntConverter().fromJson(json['male']),
       female: const IntConverter().fromJson(json['female']),
+      history:
+          (json['history'] as List<dynamic>?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$RabbitStatsImplToJson(_$RabbitStatsImpl instance) =>
@@ -42,6 +47,7 @@ Map<String, dynamic> _$$RabbitStatsImplToJson(_$RabbitStatsImpl instance) =>
       'total': const IntConverter().toJson(instance.total),
       'male': const IntConverter().toJson(instance.male),
       'female': const IntConverter().toJson(instance.female),
+      'history': instance.history,
     };
 
 _$CageStatsImpl _$$CageStatsImplFromJson(Map<String, dynamic> json) =>
@@ -96,12 +102,14 @@ _$TaskStatsImpl _$$TaskStatsImplFromJson(Map<String, dynamic> json) =>
     _$TaskStatsImpl(
       pending: const IntConverter().fromJson(json['pending']),
       overdue: const IntConverter().fromJson(json['overdue']),
+      urgent: const IntConverter().fromJson(json['urgent']),
     );
 
 Map<String, dynamic> _$$TaskStatsImplToJson(_$TaskStatsImpl instance) =>
     <String, dynamic>{
       'pending': const IntConverter().toJson(instance.pending),
       'overdue': const IntConverter().toJson(instance.overdue),
+      'urgent': const IntConverter().toJson(instance.urgent),
     };
 
 _$InventoryStatsImpl _$$InventoryStatsImplFromJson(Map<String, dynamic> json) =>
@@ -118,11 +126,17 @@ Map<String, dynamic> _$$InventoryStatsImplToJson(
 _$BreedingStatsImpl _$$BreedingStatsImplFromJson(Map<String, dynamic> json) =>
     _$BreedingStatsImpl(
       recentBirths: const IntConverter().fromJson(json['recentBirths']),
+      history:
+          (json['history'] as List<dynamic>?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$BreedingStatsImplToJson(_$BreedingStatsImpl instance) =>
     <String, dynamic>{
       'recentBirths': const IntConverter().toJson(instance.recentBirths),
+      'history': instance.history,
     };
 
 _$FarmReportImpl _$$FarmReportImplFromJson(Map<String, dynamic> json) =>
