@@ -16,18 +16,18 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     type: {
-      type: DataTypes.ENUM('кормление', 'уборка', 'вакцинация', 'осмотр', 'разведение', 'прочее'),
+      type: DataTypes.ENUM('feeding', 'cleaning', 'vaccination', 'checkup', 'breeding', 'other'),
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('в ожидании', 'в процессе', 'завершено', 'отменено'),
+      type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'cancelled'),
       allowNull: false,
-      defaultValue: 'в ожидании'
+      defaultValue: 'pending'
     },
     priority: {
-      type: DataTypes.ENUM('низкий', 'средний', 'высокий', 'срочный'),
+      type: DataTypes.ENUM('low', 'medium', 'high', 'urgent'),
       allowNull: false,
-      defaultValue: 'средний'
+      defaultValue: 'medium'
     },
     due_date: {
       type: DataTypes.DATE,

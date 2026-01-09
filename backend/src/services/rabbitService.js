@@ -56,7 +56,7 @@ class RabbitService {
         }
 
         // If dead or sold, shouldn't be in a cage
-        if (['мертв', 'продан'].includes(rabbitData.status)) {
+        if (['dead', 'sold'].includes(rabbitData.status)) {
           rabbitData.cage_id = null;
         }
       }
@@ -64,7 +64,7 @@ class RabbitService {
       // Check if father exists and is male and belongs to the user
       if (rabbitData.father_id) {
         const father = await Rabbit.findOne({
-          where: { id: rabbitData.father_id, user_id: rabbitData.user_id, sex: 'самец' },
+          where: { id: rabbitData.father_id, user_id: rabbitData.user_id, sex: 'male' },
           transaction
         });
         if (!father) {
@@ -75,7 +75,7 @@ class RabbitService {
       // Check if mother exists and is female and belongs to the user
       if (rabbitData.mother_id) {
         const mother = await Rabbit.findOne({
-          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id, sex: 'самка' },
+          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id, sex: 'female' },
           transaction
         });
         if (!mother) {
@@ -289,7 +289,7 @@ class RabbitService {
       }
 
       // If status updated to dead/sold, remove cage
-      if (['мертв', 'продан'].includes(updateData.status || rabbit.status)) {
+      if (['dead', 'sold'].includes(updateData.status || rabbit.status)) {
         if (updateData.cage_id) updateData.cage_id = null;
         else if (!updateData.cage_id && rabbit.cage_id) updateData.cage_id = null;
       }
@@ -298,7 +298,7 @@ class RabbitService {
       if (updateData.father_id) {
         if (updateData.father_id === rabbitId) throw new Error('CANNOT_BE_OWN_FATHER');
         const father = await Rabbit.findOne({
-          where: { id: updateData.father_id, user_id: userId, sex: 'самец' },
+          where: { id: updateData.father_id, user_id: userId, sex: 'male' },
           transaction
         });
         if (!father) throw new Error('FATHER_NOT_FOUND_OR_INVALID_SEX');
@@ -308,7 +308,7 @@ class RabbitService {
       if (updateData.mother_id) {
         if (updateData.mother_id === rabbitId) throw new Error('CANNOT_BE_OWN_MOTHER');
         const mother = await Rabbit.findOne({
-          where: { id: updateData.mother_id, user_id: userId, sex: 'самка' },
+          where: { id: updateData.mother_id, user_id: userId, sex: 'female' },
           transaction
         });
         if (!mother) throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');

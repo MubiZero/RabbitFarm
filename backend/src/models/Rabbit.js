@@ -25,9 +25,9 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     sex: {
-      type: DataTypes.ENUM('самец', 'самка', 'неизвестно'),
+      type: DataTypes.ENUM('male', 'female', 'unknown'),
       allowNull: false,
-      defaultValue: 'неизвестно'
+      defaultValue: 'unknown'
     },
     birth_date: {
       type: DataTypes.DATEONLY,
@@ -50,14 +50,14 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     status: {
-      type: DataTypes.ENUM('здоров', 'активен', 'болен', 'карантин', 'сукрольность', 'продан', 'мертв'),
+      type: DataTypes.ENUM('healthy', 'active', 'sick', 'quarantine', 'pregnant', 'sold', 'dead'),
       allowNull: false,
-      defaultValue: 'здоров'
+      defaultValue: 'healthy'
     },
     purpose: {
-      type: DataTypes.ENUM('разведение', 'мясо', 'продажа', 'выставка'),
+      type: DataTypes.ENUM('breeding', 'meat', 'sale', 'show'),
       allowNull: false,
-      defaultValue: 'разведение'
+      defaultValue: 'breeding'
     },
     acquired_date: {
       type: DataTypes.DATEONLY,

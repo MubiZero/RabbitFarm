@@ -44,10 +44,10 @@ exports.create = async (req, res, next) => {
     }, { transaction: t });
 
     // Logical Automation: If selling a rabbit, mark him as sold
-    if (rabbit && type === 'доход' &&
-      (category?.toLowerCase() === 'sale' || category?.toLowerCase() === 'продажа' || category?.toLowerCase() === 'продажа кролика')) {
+    if (rabbit && type === 'income' &&
+      (category?.toLowerCase() === 'sale' || category?.toLowerCase() === 'продажа')) {
       await rabbit.update({
-        status: 'продан',
+        status: 'sold',
         cage_id: null
       }, { transaction: t });
     }
