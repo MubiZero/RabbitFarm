@@ -417,6 +417,7 @@ mixin _$RabbitStats {
   int get male => throw _privateConstructorUsedError;
   @IntConverter()
   int get female => throw _privateConstructorUsedError;
+  List<int> get history => throw _privateConstructorUsedError;
 
   /// Serializes this RabbitStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -439,6 +440,7 @@ abstract class $RabbitStatsCopyWith<$Res> {
     @IntConverter() int total,
     @IntConverter() int male,
     @IntConverter() int female,
+    List<int> history,
   });
 }
 
@@ -460,6 +462,7 @@ class _$RabbitStatsCopyWithImpl<$Res, $Val extends RabbitStats>
     Object? total = null,
     Object? male = null,
     Object? female = null,
+    Object? history = null,
   }) {
     return _then(
       _value.copyWith(
@@ -475,6 +478,10 @@ class _$RabbitStatsCopyWithImpl<$Res, $Val extends RabbitStats>
                 ? _value.female
                 : female // ignore: cast_nullable_to_non_nullable
                       as int,
+            history: null == history
+                ? _value.history
+                : history // ignore: cast_nullable_to_non_nullable
+                      as List<int>,
           )
           as $Val,
     );
@@ -494,6 +501,7 @@ abstract class _$$RabbitStatsImplCopyWith<$Res>
     @IntConverter() int total,
     @IntConverter() int male,
     @IntConverter() int female,
+    List<int> history,
   });
 }
 
@@ -514,6 +522,7 @@ class __$$RabbitStatsImplCopyWithImpl<$Res>
     Object? total = null,
     Object? male = null,
     Object? female = null,
+    Object? history = null,
   }) {
     return _then(
       _$RabbitStatsImpl(
@@ -529,6 +538,10 @@ class __$$RabbitStatsImplCopyWithImpl<$Res>
             ? _value.female
             : female // ignore: cast_nullable_to_non_nullable
                   as int,
+        history: null == history
+            ? _value._history
+            : history // ignore: cast_nullable_to_non_nullable
+                  as List<int>,
       ),
     );
   }
@@ -541,7 +554,8 @@ class _$RabbitStatsImpl implements _RabbitStats {
     @IntConverter() required this.total,
     @IntConverter() required this.male,
     @IntConverter() required this.female,
-  });
+    final List<int> history = const [],
+  }) : _history = history;
 
   factory _$RabbitStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$RabbitStatsImplFromJson(json);
@@ -555,10 +569,18 @@ class _$RabbitStatsImpl implements _RabbitStats {
   @override
   @IntConverter()
   final int female;
+  final List<int> _history;
+  @override
+  @JsonKey()
+  List<int> get history {
+    if (_history is EqualUnmodifiableListView) return _history;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_history);
+  }
 
   @override
   String toString() {
-    return 'RabbitStats(total: $total, male: $male, female: $female)';
+    return 'RabbitStats(total: $total, male: $male, female: $female, history: $history)';
   }
 
   @override
@@ -568,12 +590,19 @@ class _$RabbitStatsImpl implements _RabbitStats {
             other is _$RabbitStatsImpl &&
             (identical(other.total, total) || other.total == total) &&
             (identical(other.male, male) || other.male == male) &&
-            (identical(other.female, female) || other.female == female));
+            (identical(other.female, female) || other.female == female) &&
+            const DeepCollectionEquality().equals(other._history, _history));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, total, male, female);
+  int get hashCode => Object.hash(
+    runtimeType,
+    total,
+    male,
+    female,
+    const DeepCollectionEquality().hash(_history),
+  );
 
   /// Create a copy of RabbitStats
   /// with the given fields replaced by the non-null parameter values.
@@ -594,6 +623,7 @@ abstract class _RabbitStats implements RabbitStats {
     @IntConverter() required final int total,
     @IntConverter() required final int male,
     @IntConverter() required final int female,
+    final List<int> history,
   }) = _$RabbitStatsImpl;
 
   factory _RabbitStats.fromJson(Map<String, dynamic> json) =
@@ -608,6 +638,8 @@ abstract class _RabbitStats implements RabbitStats {
   @override
   @IntConverter()
   int get female;
+  @override
+  List<int> get history;
 
   /// Create a copy of RabbitStats
   /// with the given fields replaced by the non-null parameter values.
@@ -1247,6 +1279,8 @@ mixin _$TaskStats {
   int get pending => throw _privateConstructorUsedError;
   @IntConverter()
   int get overdue => throw _privateConstructorUsedError;
+  @IntConverter()
+  int get urgent => throw _privateConstructorUsedError;
 
   /// Serializes this TaskStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1263,7 +1297,11 @@ abstract class $TaskStatsCopyWith<$Res> {
   factory $TaskStatsCopyWith(TaskStats value, $Res Function(TaskStats) then) =
       _$TaskStatsCopyWithImpl<$Res, TaskStats>;
   @useResult
-  $Res call({@IntConverter() int pending, @IntConverter() int overdue});
+  $Res call({
+    @IntConverter() int pending,
+    @IntConverter() int overdue,
+    @IntConverter() int urgent,
+  });
 }
 
 /// @nodoc
@@ -1280,7 +1318,11 @@ class _$TaskStatsCopyWithImpl<$Res, $Val extends TaskStats>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? pending = null, Object? overdue = null}) {
+  $Res call({
+    Object? pending = null,
+    Object? overdue = null,
+    Object? urgent = null,
+  }) {
     return _then(
       _value.copyWith(
             pending: null == pending
@@ -1290,6 +1332,10 @@ class _$TaskStatsCopyWithImpl<$Res, $Val extends TaskStats>
             overdue: null == overdue
                 ? _value.overdue
                 : overdue // ignore: cast_nullable_to_non_nullable
+                      as int,
+            urgent: null == urgent
+                ? _value.urgent
+                : urgent // ignore: cast_nullable_to_non_nullable
                       as int,
           )
           as $Val,
@@ -1306,7 +1352,11 @@ abstract class _$$TaskStatsImplCopyWith<$Res>
   ) = __$$TaskStatsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({@IntConverter() int pending, @IntConverter() int overdue});
+  $Res call({
+    @IntConverter() int pending,
+    @IntConverter() int overdue,
+    @IntConverter() int urgent,
+  });
 }
 
 /// @nodoc
@@ -1322,7 +1372,11 @@ class __$$TaskStatsImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? pending = null, Object? overdue = null}) {
+  $Res call({
+    Object? pending = null,
+    Object? overdue = null,
+    Object? urgent = null,
+  }) {
     return _then(
       _$TaskStatsImpl(
         pending: null == pending
@@ -1332,6 +1386,10 @@ class __$$TaskStatsImplCopyWithImpl<$Res>
         overdue: null == overdue
             ? _value.overdue
             : overdue // ignore: cast_nullable_to_non_nullable
+                  as int,
+        urgent: null == urgent
+            ? _value.urgent
+            : urgent // ignore: cast_nullable_to_non_nullable
                   as int,
       ),
     );
@@ -1344,6 +1402,7 @@ class _$TaskStatsImpl implements _TaskStats {
   const _$TaskStatsImpl({
     @IntConverter() required this.pending,
     @IntConverter() required this.overdue,
+    @IntConverter() required this.urgent,
   });
 
   factory _$TaskStatsImpl.fromJson(Map<String, dynamic> json) =>
@@ -1355,10 +1414,13 @@ class _$TaskStatsImpl implements _TaskStats {
   @override
   @IntConverter()
   final int overdue;
+  @override
+  @IntConverter()
+  final int urgent;
 
   @override
   String toString() {
-    return 'TaskStats(pending: $pending, overdue: $overdue)';
+    return 'TaskStats(pending: $pending, overdue: $overdue, urgent: $urgent)';
   }
 
   @override
@@ -1367,12 +1429,13 @@ class _$TaskStatsImpl implements _TaskStats {
         (other.runtimeType == runtimeType &&
             other is _$TaskStatsImpl &&
             (identical(other.pending, pending) || other.pending == pending) &&
-            (identical(other.overdue, overdue) || other.overdue == overdue));
+            (identical(other.overdue, overdue) || other.overdue == overdue) &&
+            (identical(other.urgent, urgent) || other.urgent == urgent));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, pending, overdue);
+  int get hashCode => Object.hash(runtimeType, pending, overdue, urgent);
 
   /// Create a copy of TaskStats
   /// with the given fields replaced by the non-null parameter values.
@@ -1392,6 +1455,7 @@ abstract class _TaskStats implements TaskStats {
   const factory _TaskStats({
     @IntConverter() required final int pending,
     @IntConverter() required final int overdue,
+    @IntConverter() required final int urgent,
   }) = _$TaskStatsImpl;
 
   factory _TaskStats.fromJson(Map<String, dynamic> json) =
@@ -1403,6 +1467,9 @@ abstract class _TaskStats implements TaskStats {
   @override
   @IntConverter()
   int get overdue;
+  @override
+  @IntConverter()
+  int get urgent;
 
   /// Create a copy of TaskStats
   /// with the given fields replaced by the non-null parameter values.
@@ -1580,6 +1647,7 @@ BreedingStats _$BreedingStatsFromJson(Map<String, dynamic> json) {
 mixin _$BreedingStats {
   @IntConverter()
   int get recentBirths => throw _privateConstructorUsedError;
+  List<int> get history => throw _privateConstructorUsedError;
 
   /// Serializes this BreedingStats to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1598,7 +1666,7 @@ abstract class $BreedingStatsCopyWith<$Res> {
     $Res Function(BreedingStats) then,
   ) = _$BreedingStatsCopyWithImpl<$Res, BreedingStats>;
   @useResult
-  $Res call({@IntConverter() int recentBirths});
+  $Res call({@IntConverter() int recentBirths, List<int> history});
 }
 
 /// @nodoc
@@ -1615,13 +1683,17 @@ class _$BreedingStatsCopyWithImpl<$Res, $Val extends BreedingStats>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? recentBirths = null}) {
+  $Res call({Object? recentBirths = null, Object? history = null}) {
     return _then(
       _value.copyWith(
             recentBirths: null == recentBirths
                 ? _value.recentBirths
                 : recentBirths // ignore: cast_nullable_to_non_nullable
                       as int,
+            history: null == history
+                ? _value.history
+                : history // ignore: cast_nullable_to_non_nullable
+                      as List<int>,
           )
           as $Val,
     );
@@ -1637,7 +1709,7 @@ abstract class _$$BreedingStatsImplCopyWith<$Res>
   ) = __$$BreedingStatsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({@IntConverter() int recentBirths});
+  $Res call({@IntConverter() int recentBirths, List<int> history});
 }
 
 /// @nodoc
@@ -1653,13 +1725,17 @@ class __$$BreedingStatsImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? recentBirths = null}) {
+  $Res call({Object? recentBirths = null, Object? history = null}) {
     return _then(
       _$BreedingStatsImpl(
         recentBirths: null == recentBirths
             ? _value.recentBirths
             : recentBirths // ignore: cast_nullable_to_non_nullable
                   as int,
+        history: null == history
+            ? _value._history
+            : history // ignore: cast_nullable_to_non_nullable
+                  as List<int>,
       ),
     );
   }
@@ -1668,7 +1744,10 @@ class __$$BreedingStatsImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$BreedingStatsImpl implements _BreedingStats {
-  const _$BreedingStatsImpl({@IntConverter() required this.recentBirths});
+  const _$BreedingStatsImpl({
+    @IntConverter() required this.recentBirths,
+    final List<int> history = const [],
+  }) : _history = history;
 
   factory _$BreedingStatsImpl.fromJson(Map<String, dynamic> json) =>
       _$$BreedingStatsImplFromJson(json);
@@ -1676,10 +1755,18 @@ class _$BreedingStatsImpl implements _BreedingStats {
   @override
   @IntConverter()
   final int recentBirths;
+  final List<int> _history;
+  @override
+  @JsonKey()
+  List<int> get history {
+    if (_history is EqualUnmodifiableListView) return _history;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_history);
+  }
 
   @override
   String toString() {
-    return 'BreedingStats(recentBirths: $recentBirths)';
+    return 'BreedingStats(recentBirths: $recentBirths, history: $history)';
   }
 
   @override
@@ -1688,12 +1775,17 @@ class _$BreedingStatsImpl implements _BreedingStats {
         (other.runtimeType == runtimeType &&
             other is _$BreedingStatsImpl &&
             (identical(other.recentBirths, recentBirths) ||
-                other.recentBirths == recentBirths));
+                other.recentBirths == recentBirths) &&
+            const DeepCollectionEquality().equals(other._history, _history));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, recentBirths);
+  int get hashCode => Object.hash(
+    runtimeType,
+    recentBirths,
+    const DeepCollectionEquality().hash(_history),
+  );
 
   /// Create a copy of BreedingStats
   /// with the given fields replaced by the non-null parameter values.
@@ -1712,6 +1804,7 @@ class _$BreedingStatsImpl implements _BreedingStats {
 abstract class _BreedingStats implements BreedingStats {
   const factory _BreedingStats({
     @IntConverter() required final int recentBirths,
+    final List<int> history,
   }) = _$BreedingStatsImpl;
 
   factory _BreedingStats.fromJson(Map<String, dynamic> json) =
@@ -1720,6 +1813,8 @@ abstract class _BreedingStats implements BreedingStats {
   @override
   @IntConverter()
   int get recentBirths;
+  @override
+  List<int> get history;
 
   /// Create a copy of BreedingStats
   /// with the given fields replaced by the non-null parameter values.

@@ -121,6 +121,18 @@ exports.getDashboard = async (req, res, next) => {
       }
     });
 
+    const urgentTasks = await Task.count({
+      where: {
+        created_by: userId,
+        priority: 'urgent',
+        status: {
+          [Op.in]: ['pending', 'in_progress']
+        }
+      }
+    });
+
+
+
     // Feed inventory
     const lowStockFeeds = await Feed.count({
       where: {
@@ -135,7 +147,7 @@ exports.getDashboard = async (req, res, next) => {
       }
     });
 
-    // Recent births (last 30 days)
+    // Recent births (last 30 days) - Existing logic
     const recentBirths = await Birth.count({
       where: {
         birth_date: {
@@ -150,11 +162,71 @@ exports.getDashboard = async (req, res, next) => {
       }]
     });
 
+    // --- History Calculations for Charts ---
+
+    // 1. Rabbits History (Last 7 days)
+    const allRabbits = await Rabbit.findAll({
+      where: { user_id: userId },
+      attributes: ['created_at', 'death_date', 'sold_date']
+    });
+
+    const rabbitsHistory = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const endOfDay = new Date(d.setHours(23, 59, 59, 999));
+
+      const count = allRabbits.filter(r => {
+        const created = new Date(r.created_at);
+        const dead = r.death_date ? new Date(r.death_date) : null;
+        const sold = r.sold_date ? new Date(r.sold_date) : null;
+
+        if (created > endOfDay) return false;
+        if (dead && dead <= endOfDay) return false;
+        if (sold && sold <= endOfDay) return false;
+        return true;
+      }).length;
+      rabbitsHistory.push(count);
+    }
+
+    // 2. Births History (Last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const recentBirthsList = await Birth.findAll({
+      where: {
+        birth_date: {
+          [Op.gte]: sevenDaysAgo
+        }
+      },
+      include: [{
+        model: Rabbit,
+        as: 'mother',
+        where: { user_id: userId },
+        attributes: []
+      }],
+      attributes: ['birth_date', 'kits_born_alive']
+    });
+
+    const birthsHistory = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateString = d.toISOString().split('T')[0];
+
+      const birthsOnDay = recentBirthsList.filter(b => b.birth_date === dateString);
+      const totalKits = birthsOnDay.reduce((sum, b) => sum + (b.kits_born_alive || 0), 0);
+      birthsHistory.push(totalKits);
+    }
+
+
     return ApiResponse.success(res, {
       rabbits: {
         total: totalRabbits,
         male: maleRabbits,
-        female: femaleRabbits
+        female: femaleRabbits,
+        history: rabbitsHistory
       },
       cages: {
         total: totalCages,
@@ -172,13 +244,15 @@ exports.getDashboard = async (req, res, next) => {
       },
       tasks: {
         pending: pendingTasks,
-        overdue: overdueTasks
+        overdue: overdueTasks,
+        urgent: urgentTasks
       },
       inventory: {
         lowStockFeeds: lowStockFeeds
       },
       breeding: {
-        recentBirths: recentBirths
+        recentBirths: recentBirths,
+        history: birthsHistory
       }
     }, 'Сводка получена');
   } catch (error) {
