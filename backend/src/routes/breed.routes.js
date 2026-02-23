@@ -4,8 +4,72 @@ const breedController = require('../controllers/breedController');
 const { authenticate, authorize } = require('../middleware/auth');
 
 /**
- * Breed routes
- * All routes require authentication
+ * @swagger
+ * tags:
+ *   name: Breeds
+ *   description: Управление породами кроликов
+ *
+ * /breeds:
+ *   get:
+ *     summary: Список пород
+ *     tags: [Breeds]
+ *     responses:
+ *       200:
+ *         description: Полный список пород
+ *   post:
+ *     summary: Создать породу
+ *     tags: [Breeds]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name: { type: string }
+ *               description: { type: string }
+ *               origin: { type: string }
+ *     responses:
+ *       201:
+ *         description: Порода создана
+ *
+ * /breeds/{id}:
+ *   get:
+ *     summary: Получить породу по ID
+ *     tags: [Breeds]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Данные породы
+ *       404:
+ *         description: Порода не найдена
+ *   put:
+ *     summary: Обновить породу
+ *     tags: [Breeds]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Порода обновлена
+ *   delete:
+ *     summary: Удалить породу
+ *     tags: [Breeds]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Порода удалена
  */
 
 // Apply authentication to all routes

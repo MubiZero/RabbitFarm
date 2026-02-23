@@ -16,6 +16,104 @@ const feedingRecordController = require('../controllers/feedingRecordController'
 const transactionController = require('../controllers/transactionController');
 
 /**
+ * @swagger
+ * tags:
+ *   name: Rabbits
+ *   description: Управление кроликами
+ */
+
+/**
+ * @swagger
+ * /rabbits:
+ *   get:
+ *     summary: Список кроликов с фильтрацией и пагинацией
+ *     tags: [Rabbits]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: sex
+ *         schema: { type: string, enum: [male, female] }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Список кроликов с пагинацией
+ *   post:
+ *     summary: Создать нового кролика
+ *     tags: [Rabbits]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, breed_id, sex]
+ *             properties:
+ *               name: { type: string }
+ *               breed_id: { type: integer }
+ *               sex: { type: string, enum: [male, female] }
+ *               birth_date: { type: string, format: date }
+ *               status: { type: string }
+ *               weight: { type: number }
+ *     responses:
+ *       201:
+ *         description: Кролик создан
+ *       404:
+ *         description: Порода не найдена
+ *
+ * /rabbits/{id}:
+ *   get:
+ *     summary: Получить кролика по ID
+ *     tags: [Rabbits]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Данные кролика
+ *       404:
+ *         description: Кролик не найден
+ *   put:
+ *     summary: Обновить кролика
+ *     tags: [Rabbits]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Кролик обновлён
+ *   delete:
+ *     summary: Удалить кролика (только Owner)
+ *     tags: [Rabbits]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Кролик удалён
+ *
+ * /rabbits/statistics:
+ *   get:
+ *     summary: Статистика по кроликам
+ *     tags: [Rabbits]
+ *     responses:
+ *       200:
+ *         description: Статистика
+ */
+
+/**
  * Rabbit routes
  * All routes require authentication
  */
