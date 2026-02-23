@@ -1,4 +1,4 @@
-const { User, RefreshToken } = require('../models');
+const { User, RefreshToken, TokenBlacklist } = require('../models');
 const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
@@ -195,11 +195,25 @@ class AuthService {
   /**
    * Logout user
    * @param {String} refreshToken - Refresh token to invalidate
+   * @param {String} accessToken - Access token to blacklist
    */
-  async logout(refreshToken) {
+  async logout(refreshToken, accessToken) {
     try {
       // Delete refresh token
       const deleted = await RefreshToken.destroy({ where: { token: refreshToken } });
+
+      // Blacklist the access token if provided
+      if (accessToken) {
+        try {
+          const decoded = JWTUtil.verifyAccessToken(accessToken);
+          if (decoded && decoded.jti) {
+            const expiresAt = new Date(decoded.exp * 1000);
+            await TokenBlacklist.create({ jti: decoded.jti, expires_at: expiresAt });
+          }
+        } catch (err) {
+          // Ignore invalid access tokens during logout
+        }
+      }
 
       if (deleted > 0) {
         logger.info('User logged out successfully');

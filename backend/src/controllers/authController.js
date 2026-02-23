@@ -76,7 +76,11 @@ class AuthController {
   async logout(req, res, next) {
     try {
       const { refresh_token } = req.body;
-      await authService.logout(refresh_token);
+      const authHeader = req.headers.authorization;
+      const accessToken = authHeader && authHeader.startsWith('Bearer ')
+        ? authHeader.substring(7)
+        : null;
+      await authService.logout(refresh_token, accessToken);
 
       return ApiResponse.success(res, null, 'Выход выполнен успешно');
     } catch (error) {
