@@ -2,6 +2,7 @@ require('dotenv').config();
 const app = require('./app');
 const logger = require('./utils/logger');
 const { sequelize } = require('./models');
+const { startTokenCleanupJob } = require('./jobs/tokenCleanup');
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -27,6 +28,11 @@ async function startServer() {
     if (!dbConnected) {
       logger.error('Failed to connect to database. Exiting...');
       process.exit(1);
+    }
+
+    // Start background jobs
+    if (process.env.NODE_ENV !== 'test') {
+      startTokenCleanupJob();
     }
 
     // Start listening
