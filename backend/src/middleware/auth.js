@@ -1,6 +1,6 @@
 const JWTUtil = require('../utils/jwt');
 const ApiResponse = require('../utils/apiResponse');
-const { User } = require('../models');
+const { User, TokenBlacklist } = require('../models');
 
 /**
  * Authentication middleware
@@ -19,6 +19,14 @@ const authenticate = async (req, res, next) => {
 
     // Verify token
     const decoded = JWTUtil.verifyAccessToken(token);
+
+    // Check if token is blacklisted
+    if (decoded.jti) {
+      const blacklisted = await TokenBlacklist.findOne({ where: { jti: decoded.jti } });
+      if (blacklisted) {
+        return ApiResponse.unauthorized(res, 'Token has been revoked');
+      }
+    }
 
     // Get user from database
     const user = await User.findByPk(decoded.id, {

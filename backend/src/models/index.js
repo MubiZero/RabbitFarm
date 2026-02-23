@@ -29,6 +29,7 @@ const Transaction = require('./Transaction')(sequelize);
 const Task = require('./Task')(sequelize);
 const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
+const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 
 // Define associations
 // User associations
@@ -117,6 +118,7 @@ module.exports = {
   Sequelize,
   User,
   RefreshToken,
+  TokenBlacklist,
   Breed,
   Cage,
   Rabbit,

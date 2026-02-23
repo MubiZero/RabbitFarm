@@ -12,10 +12,11 @@ class JWTUtil {
    * @returns {String} - JWT token
    */
   static generateAccessToken(payload) {
-    return jwt.sign(payload, jwtConfig.secret, {
-      expiresIn: jwtConfig.expiresIn,
-      algorithm: jwtConfig.algorithm
-    });
+    return jwt.sign(
+      { ...payload, jti: randomUUID() },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn, algorithm: jwtConfig.algorithm }
+    );
   }
 
   /**
