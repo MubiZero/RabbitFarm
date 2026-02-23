@@ -4,8 +4,66 @@ const reportController = require('../controllers/reportController');
 const { authenticate } = require('../middleware/auth');
 
 /**
- * Report Routes
- * All routes require authentication
+ * @swagger
+ * tags:
+ *   name: Reports
+ *   description: Отчёты и аналитика
+ *
+ * /reports/dashboard:
+ *   get:
+ *     summary: Обзор дашборда
+ *     tags: [Reports]
+ *     responses:
+ *       200:
+ *         description: Ключевые метрики фермы для дашборда
+ *
+ * /reports/farm:
+ *   get:
+ *     summary: Общий отчёт по ферме
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: from_date
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: to_date
+ *         schema: { type: string, format: date }
+ *     responses:
+ *       200:
+ *         description: Сводный отчёт по ферме
+ *
+ * /reports/health:
+ *   get:
+ *     summary: Отчёт по здоровью
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: from_date
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: to_date
+ *         schema: { type: string, format: date }
+ *     responses:
+ *       200:
+ *         description: Отчёт по вакцинациям и медзаписям
+ *
+ * /reports/financial:
+ *   get:
+ *     summary: Финансовый отчёт
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: from_date
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: to_date
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: groupBy
+ *         schema: { type: string, enum: [day, month, year] }
+ *     responses:
+ *       200:
+ *         description: Финансовый отчёт по периоду
  */
 
 // Apply authentication to all routes

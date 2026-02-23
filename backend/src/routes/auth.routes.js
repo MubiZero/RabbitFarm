@@ -13,13 +13,48 @@ const {
 } = require('../validators/authValidator');
 
 /**
- * Authentication routes
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Аутентификация и управление профилем
  */
 
 /**
- * @route   POST /api/v1/auth/register
- * @desc    Register new user
- * @access  Public
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Регистрация нового пользователя
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, full_name]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *               full_name:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [owner, manager, worker]
+ *                 default: worker
+ *     responses:
+ *       201:
+ *         description: Пользователь зарегистрирован
+ *       400:
+ *         description: Пользователь уже существует или невалидные данные
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post(
   '/register',
@@ -29,9 +64,30 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/auth/login
- * @desc    Login user
- * @access  Public
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Вход пользователя
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Успешный вход, возвращает токены
+ *       401:
+ *         description: Неверные учётные данные
  */
 router.post(
   '/login',
@@ -41,9 +97,27 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/auth/refresh
- * @desc    Refresh access token
- * @access  Public
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Обновить access token
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refresh_token]
+ *             properties:
+ *               refresh_token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Новые токены
+ *       401:
+ *         description: Недействительный refresh token
  */
 router.post(
   '/refresh',
@@ -52,9 +126,24 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/auth/logout
- * @desc    Logout user (invalidate refresh token)
- * @access  Public
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Выход (инвалидировать токены)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refresh_token]
+ *             properties:
+ *               refresh_token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Выход выполнен успешно
  */
 router.post(
   '/logout',
@@ -63,9 +152,16 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/auth/me
- * @desc    Get current user profile
- * @access  Private
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Получить профиль текущего пользователя
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Профиль пользователя
+ *       401:
+ *         description: Не авторизован
  */
 router.get(
   '/me',
@@ -74,9 +170,25 @@ router.get(
 );
 
 /**
- * @route   PUT /api/v1/auth/profile
- * @desc    Update user profile
- * @access  Private
+ * @swagger
+ * /auth/profile:
+ *   put:
+ *     summary: Обновить профиль пользователя
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               full_name:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Профиль обновлён
  */
 router.put(
   '/profile',
@@ -86,9 +198,28 @@ router.put(
 );
 
 /**
- * @route   POST /api/v1/auth/change-password
- * @desc    Change user password
- * @access  Private
+ * @swagger
+ * /auth/change-password:
+ *   post:
+ *     summary: Изменить пароль
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [current_password, new_password]
+ *             properties:
+ *               current_password:
+ *                 type: string
+ *               new_password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Пароль изменён
+ *       400:
+ *         description: Неверный текущий пароль
  */
 router.post(
   '/change-password',
@@ -98,9 +229,26 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/auth/forgot-password
- * @desc    Request password reset token
- * @access  Public
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Запросить сброс пароля
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Инструкции отправлены (если аккаунт существует)
  */
 router.post(
   '/forgot-password',
@@ -109,9 +257,29 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/auth/reset-password
- * @desc    Reset password using token
- * @access  Public
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Сбросить пароль по токену
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, new_password]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               new_password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Пароль сброшен успешно
+ *       400:
+ *         description: Недействительный или просроченный токен
  */
 router.post(
   '/reset-password',
