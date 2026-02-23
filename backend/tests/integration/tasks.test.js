@@ -48,7 +48,7 @@ describe('Tasks API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ type: 'feeding' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
   });
 

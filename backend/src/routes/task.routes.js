@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-const { validateCreate, validateUpdate } = require('../validators/taskValidator');
+const { createTaskSchema, updateTaskSchema } = require('../validators/taskValidator');
 const { authenticate } = require('../middleware/auth');
+const validate = require('../middleware/validation');
 
 /**
  * @swagger
@@ -122,10 +123,10 @@ router.get('/statistics', taskController.getStatistics);
 router.get('/upcoming', taskController.getUpcoming);
 
 // CRUD routes
-router.post('/', validateCreate, taskController.create);
+router.post('/', validate(createTaskSchema), taskController.create);
 router.get('/', taskController.list);
 router.get('/:id', taskController.getById);
-router.put('/:id', validateUpdate, taskController.update);
+router.put('/:id', validate(updateTaskSchema), taskController.update);
 router.delete('/:id', taskController.delete);
 
 // Complete task

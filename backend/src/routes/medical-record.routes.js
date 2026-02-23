@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const medicalRecordController = require('../controllers/medicalRecordController');
-const { validateCreate, validateUpdate } = require('../validators/medicalRecordValidator');
+const { createMedicalRecordSchema, updateMedicalRecordSchema } = require('../validators/medicalRecordValidator');
 const { authenticate } = require('../middleware/auth');
+const validate = require('../middleware/validation');
 
 /**
  * @swagger
@@ -118,10 +119,10 @@ router.get('/ongoing', medicalRecordController.getOngoing);
 router.get('/costs', medicalRecordController.getCosts);
 
 // CRUD routes
-router.post('/', validateCreate, medicalRecordController.create);
+router.post('/', validate(createMedicalRecordSchema), medicalRecordController.create);
 router.get('/', medicalRecordController.list);
 router.get('/:id', medicalRecordController.getById);
-router.put('/:id', validateUpdate, medicalRecordController.update);
+router.put('/:id', validate(updateMedicalRecordSchema), medicalRecordController.update);
 router.delete('/:id', medicalRecordController.delete);
 
 module.exports = router;

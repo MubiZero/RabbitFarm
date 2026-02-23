@@ -62,7 +62,7 @@ describe('Medical Records API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ rabbit_id: rabbitId });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
   });
 

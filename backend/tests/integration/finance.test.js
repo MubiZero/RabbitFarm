@@ -66,7 +66,7 @@ describe('Transactions API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ type: 'income' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
   });
 

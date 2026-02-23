@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const feedController = require('../controllers/feedController');
-const { validateCreate, validateUpdate, validateAdjustStock } = require('../validators/feedValidator');
+const { createFeedSchema, updateFeedSchema, adjustStockSchema } = require('../validators/feedValidator');
 const { authenticate } = require('../middleware/auth');
+const validate = require('../middleware/validation');
 
 /**
  * @swagger
@@ -130,13 +131,13 @@ router.get('/statistics', feedController.getStatistics);
 router.get('/low-stock', feedController.getLowStock);
 
 // CRUD routes
-router.post('/', validateCreate, feedController.create);
+router.post('/', validate(createFeedSchema), feedController.create);
 router.get('/', feedController.list);
 router.get('/:id', feedController.getById);
-router.put('/:id', validateUpdate, feedController.update);
+router.put('/:id', validate(updateFeedSchema), feedController.update);
 router.delete('/:id', feedController.delete);
 
 // Stock adjustment
-router.post('/:id/adjust-stock', validateAdjustStock, feedController.adjustStock);
+router.post('/:id/adjust-stock', validate(adjustStockSchema), feedController.adjustStock);
 
 module.exports = router;
