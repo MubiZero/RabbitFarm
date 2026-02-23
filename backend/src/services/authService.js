@@ -185,6 +185,9 @@ class AuthService {
       };
     } catch (error) {
       logger.error('Refresh token error', { error: error.message });
+      if (error.message === 'Invalid or expired refresh token') {
+        throw new Error('INVALID_REFRESH_TOKEN');
+      }
       throw error;
     }
   }
