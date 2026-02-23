@@ -1,4 +1,11 @@
 require('dotenv').config();
+const validateEnv = require('./config/validateEnv');
+
+// Validate environment variables before anything else
+if (process.env.NODE_ENV !== 'test') {
+  validateEnv();
+}
+
 const app = require('./app');
 const logger = require('./utils/logger');
 const { sequelize } = require('./models');
