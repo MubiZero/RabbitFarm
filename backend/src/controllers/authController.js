@@ -123,6 +123,46 @@ class AuthController {
   }
 
   /**
+   * Forgot password - request reset token
+   * POST /api/v1/auth/forgot-password
+   */
+  async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      const result = await authService.forgotPassword(email);
+
+      // Always return 200 to avoid email enumeration
+      return ApiResponse.success(res, null, 'Если аккаунт существует, инструкции отправлены на email');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Reset password using token
+   * POST /api/v1/auth/reset-password
+   */
+  async resetPassword(req, res, next) {
+    try {
+      const { token, new_password } = req.body;
+      await authService.resetPassword(token, new_password);
+
+      return ApiResponse.success(res, null, 'Пароль успешно изменен. Пожалуйста, войдите заново.');
+    } catch (error) {
+      if (error.message === 'INVALID_RESET_TOKEN') {
+        return ApiResponse.badRequest(res, 'Недействительный токен сброса пароля');
+      }
+      if (error.message === 'RESET_TOKEN_EXPIRED') {
+        return ApiResponse.badRequest(res, 'Срок действия токена истек');
+      }
+      if (error.message === 'USER_INACTIVE') {
+        return ApiResponse.forbidden(res, 'Аккаунт неактивен');
+      }
+      next(error);
+    }
+  }
+
+  /**
    * Change password
    * POST /api/v1/auth/change-password
    */
