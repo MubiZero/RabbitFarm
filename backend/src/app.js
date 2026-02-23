@@ -65,8 +65,10 @@ if (process.env.NODE_ENV === 'development') {
 // Static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Rate limiting
-app.use('/api/', generalLimiter);
+// Rate limiting (disabled in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.use('/api/', generalLimiter);
+}
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
