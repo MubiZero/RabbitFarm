@@ -9,6 +9,8 @@ const logger = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Create Express app
 const app = express();
@@ -97,6 +99,12 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: 'RabbitFarm API Docs'
+}));
+app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
 
 // API routes
 app.use(`/api/${process.env.API_VERSION || 'v1'}`, routes);
