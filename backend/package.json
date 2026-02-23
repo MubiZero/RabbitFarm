@@ -17,6 +17,8 @@
     "seed": "sequelize-cli db:seed:all",
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "test": "jest --coverage",
+    "test:unit": "jest tests/unit --coverage",
+    "test:integration": "jest tests/integration --coverage",
     "test:watch": "jest --watch",
     "test:api": "node test-api.js",
     "lint": "eslint src/**/*.js",
