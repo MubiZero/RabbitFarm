@@ -1,4 +1,5 @@
-const { User, RefreshToken, TokenBlacklist } = require('../models');
+const { User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../models');
+const crypto = require('crypto');
 const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
@@ -316,6 +317,99 @@ class AuthService {
     } catch (error) {
       if (transaction) await transaction.rollback();
       logger.error('Change password error', { error: error.message, userId });
+      throw error;
+    }
+  }
+
+  /**
+   * Request password reset
+   * @param {String} email - User email
+   * @returns {Object} { token } - plain text token for testing; in prod would be emailed
+   */
+  async forgotPassword(email) {
+    try {
+      const user = await User.findOne({ where: { email } });
+      // Always return success to avoid email enumeration
+      if (!user || !user.is_active) {
+        return { success: true };
+      }
+
+      // Delete any existing tokens for this user
+      await PasswordResetToken.destroy({ where: { user_id: user.id } });
+
+      // Generate a secure random token
+      const plainToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(plainToken).digest('hex');
+
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour
+
+      await PasswordResetToken.create({
+        user_id: user.id,
+        token_hash: tokenHash,
+        expires_at: expiresAt
+      });
+
+      logger.info('Password reset token created', { userId: user.id, email });
+
+      // In production, this token would be sent by email.
+      // We return it here for testability.
+      return { success: true, token: plainToken };
+    } catch (error) {
+      logger.error('Forgot password error', { error: error.message, email });
+      throw error;
+    }
+  }
+
+  /**
+   * Reset password using token
+   * @param {String} token - Plain text reset token
+   * @param {String} newPassword - New password
+   */
+  async resetPassword(token, newPassword) {
+    const transaction = await User.sequelize.transaction();
+    try {
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+      const resetRecord = await PasswordResetToken.findOne({
+        where: { token_hash: tokenHash },
+        include: [{ model: User, attributes: ['id', 'email', 'is_active'] }],
+        transaction
+      });
+
+      if (!resetRecord) {
+        throw new Error('INVALID_RESET_TOKEN');
+      }
+
+      if (new Date() > resetRecord.expires_at) {
+        await resetRecord.destroy({ transaction });
+        throw new Error('RESET_TOKEN_EXPIRED');
+      }
+
+      if (!resetRecord.User.is_active) {
+        throw new Error('USER_INACTIVE');
+      }
+
+      const newPasswordHash = await PasswordUtil.hash(newPassword);
+
+      await User.update(
+        { password_hash: newPasswordHash },
+        { where: { id: resetRecord.User.id }, transaction }
+      );
+
+      // Delete used token
+      await resetRecord.destroy({ transaction });
+
+      // Invalidate all refresh tokens (force re-login)
+      await RefreshToken.destroy({ where: { user_id: resetRecord.User.id }, transaction });
+
+      await transaction.commit();
+      logger.info('Password reset successfully', { userId: resetRecord.User.id });
+
+      return { success: true };
+    } catch (error) {
+      await transaction.rollback();
+      logger.error('Reset password error', { error: error.message });
       throw error;
     }
   }
