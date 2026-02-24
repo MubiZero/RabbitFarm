@@ -27,149 +27,192 @@ exports.getDashboard = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    // Rabbits statistics
-    const totalRabbits = await Rabbit.count({ where: { user_id: userId } });
-    const maleRabbits = await Rabbit.count({ where: { sex: 'male', user_id: userId } });
-    const femaleRabbits = await Rabbit.count({ where: { sex: 'female', user_id: userId } });
-
-    // Cages statistics
-    const totalCages = await Cage.count({ where: { user_id: userId } });
-    // Count cages that have rabbits assigned to them
-    const occupiedCages = await Rabbit.count({
-      where: {
-        user_id: userId,
-        cage_id: {
-          [Op.ne]: null
-        }
-      },
-      distinct: true,
-      col: 'cage_id'
-    });
-
-    // Health statistics
-    // Count upcoming vaccinations (next_vaccination_date within next 30 days)
-    const upcomingVaccinations = await Vaccination.count({
-      where: {
-        next_vaccination_date: {
-          [Op.between]: [new Date(), new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)]
-        }
-      },
-      include: [{
-        model: Rabbit,
-        as: 'rabbit',
-        where: { user_id: userId },
-        attributes: []
-      }]
-    });
-
-    // Count overdue vaccinations (next_vaccination_date in the past)
-    const overdueVaccinations = await Vaccination.count({
-      where: {
-        next_vaccination_date: {
-          [Op.lt]: new Date()
-        }
-      },
-      include: [{
-        model: Rabbit,
-        as: 'rabbit',
-        where: { user_id: userId },
-        attributes: []
-      }]
-    });
-
-    // Financial summary (last 30 days)
+    // Pre-compute date boundaries used by multiple queries
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentIncome = await Transaction.sum('amount', {
-      where: {
-        created_by: userId,
-        type: 'income',
-        transaction_date: {
-          [Op.gte]: thirtyDaysAgo
-        }
-      }
-    }) || 0;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
 
-    const recentExpenses = await Transaction.sum('amount', {
-      where: {
-        created_by: userId,
-        type: 'expense',
-        transaction_date: {
-          [Op.gte]: thirtyDaysAgo
-        }
-      }
-    }) || 0;
+    // Run all independent queries in parallel
+    const [
+      totalRabbits,
+      maleRabbits,
+      femaleRabbits,
+      totalCages,
+      occupiedCages,
+      upcomingVaccinations,
+      overdueVaccinations,
+      recentIncomeRaw,
+      recentExpensesRaw,
+      pendingTasks,
+      overdueTasks,
+      urgentTasks,
+      lowStockFeeds,
+      recentBirths,
+      allRabbits,
+      recentBirthsList
+    ] = await Promise.all([
+      // Rabbits statistics
+      Rabbit.count({ where: { user_id: userId } }),
+      Rabbit.count({ where: { sex: 'male', user_id: userId } }),
+      Rabbit.count({ where: { sex: 'female', user_id: userId } }),
 
-    // Tasks statistics
-    const pendingTasks = await Task.count({
-      where: {
-        status: 'pending',
-        created_by: userId
-      }
-    });
-
-    const overdueTasks = await Task.count({
-      where: {
-        created_by: userId,
-        due_date: {
-          [Op.lt]: new Date()
+      // Cages statistics
+      Cage.count({ where: { user_id: userId } }),
+      // Count cages that have rabbits assigned to them
+      Rabbit.count({
+        where: {
+          user_id: userId,
+          cage_id: {
+            [Op.ne]: null
+          }
         },
-        status: {
-          [Op.in]: ['pending', 'in_progress']
+        distinct: true,
+        col: 'cage_id'
+      }),
+
+      // Health statistics
+      // Count upcoming vaccinations (next_vaccination_date within next 30 days)
+      Vaccination.count({
+        where: {
+          next_vaccination_date: {
+            [Op.between]: [new Date(), new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)]
+          }
+        },
+        include: [{
+          model: Rabbit,
+          as: 'rabbit',
+          where: { user_id: userId },
+          attributes: []
+        }]
+      }),
+
+      // Count overdue vaccinations (next_vaccination_date in the past)
+      Vaccination.count({
+        where: {
+          next_vaccination_date: {
+            [Op.lt]: new Date()
+          }
+        },
+        include: [{
+          model: Rabbit,
+          as: 'rabbit',
+          where: { user_id: userId },
+          attributes: []
+        }]
+      }),
+
+      // Financial summary (last 30 days)
+      Transaction.sum('amount', {
+        where: {
+          created_by: userId,
+          type: 'income',
+          transaction_date: {
+            [Op.gte]: thirtyDaysAgo
+          }
         }
-      }
-    });
+      }),
 
-    const urgentTasks = await Task.count({
-      where: {
-        created_by: userId,
-        priority: 'urgent',
-        status: {
-          [Op.in]: ['pending', 'in_progress']
+      Transaction.sum('amount', {
+        where: {
+          created_by: userId,
+          type: 'expense',
+          transaction_date: {
+            [Op.gte]: thirtyDaysAgo
+          }
         }
-      }
-    });
+      }),
 
-
-
-    // Feed inventory
-    const lowStockFeeds = await Feed.count({
-      where: {
-        user_id: userId,
-        [Op.and]: [
-          Sequelize.where(
-            Sequelize.col('current_stock'),
-            '<=',
-            Sequelize.col('min_stock')
-          )
-        ]
-      }
-    });
-
-    // Recent births (last 30 days) - Existing logic
-    const recentBirths = await Birth.count({
-      where: {
-        birth_date: {
-          [Op.gte]: thirtyDaysAgo
+      // Tasks statistics
+      Task.count({
+        where: {
+          status: 'pending',
+          created_by: userId
         }
-      },
-      include: [{
-        model: Rabbit,
-        as: 'mother',
+      }),
+
+      Task.count({
+        where: {
+          created_by: userId,
+          due_date: {
+            [Op.lt]: new Date()
+          },
+          status: {
+            [Op.in]: ['pending', 'in_progress']
+          }
+        }
+      }),
+
+      Task.count({
+        where: {
+          created_by: userId,
+          priority: 'urgent',
+          status: {
+            [Op.in]: ['pending', 'in_progress']
+          }
+        }
+      }),
+
+      // Feed inventory
+      Feed.count({
+        where: {
+          user_id: userId,
+          [Op.and]: [
+            Sequelize.where(
+              Sequelize.col('current_stock'),
+              '<=',
+              Sequelize.col('min_stock')
+            )
+          ]
+        }
+      }),
+
+      // Recent births (last 30 days)
+      Birth.count({
+        where: {
+          birth_date: {
+            [Op.gte]: thirtyDaysAgo
+          }
+        },
+        include: [{
+          model: Rabbit,
+          as: 'mother',
+          where: { user_id: userId },
+          attributes: []
+        }]
+      }),
+
+      // Rabbits History data (Last 7 days)
+      Rabbit.findAll({
         where: { user_id: userId },
-        attributes: []
-      }]
-    });
+        attributes: ['created_at', 'death_date', 'sold_date']
+      }),
 
-    // --- History Calculations for Charts ---
+      // Births History data (Last 7 days)
+      Birth.findAll({
+        where: {
+          birth_date: {
+            [Op.gte]: sevenDaysAgo
+          }
+        },
+        include: [{
+          model: Rabbit,
+          as: 'mother',
+          where: { user_id: userId },
+          attributes: []
+        }],
+        attributes: ['birth_date', 'kits_born_alive']
+      })
+    ]);
+
+    const recentIncome = recentIncomeRaw || 0;
+    const recentExpenses = recentExpensesRaw || 0;
+
+    // --- History Calculations for Charts (in-memory, uses query results) ---
 
     // 1. Rabbits History (Last 7 days)
-    const allRabbits = await Rabbit.findAll({
-      where: { user_id: userId },
-      attributes: ['created_at', 'death_date', 'sold_date']
-    });
-
     const rabbitsHistory = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -190,25 +233,6 @@ exports.getDashboard = async (req, res, next) => {
     }
 
     // 2. Births History (Last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    const recentBirthsList = await Birth.findAll({
-      where: {
-        birth_date: {
-          [Op.gte]: sevenDaysAgo
-        }
-      },
-      include: [{
-        model: Rabbit,
-        as: 'mother',
-        where: { user_id: userId },
-        attributes: []
-      }],
-      attributes: ['birth_date', 'kits_born_alive']
-    });
-
     const birthsHistory = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
