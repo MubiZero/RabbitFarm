@@ -166,6 +166,13 @@ describe('CageService', () => {
       expect(page2.items[0].id).toBe(3);
     });
 
+    it('should return empty results when condition conflicts with only_available', async () => {
+      const result = await cageService.listCages(1, { condition: 'needs_repair', only_available: 'true' });
+
+      expect(result).toEqual({ items: [], total: 0, page: 1, limit: 50 });
+      expect(Cage.findAndCountAll).not.toHaveBeenCalled();
+    });
+
     it('should apply type and condition filters in where clause', async () => {
       Cage.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
 

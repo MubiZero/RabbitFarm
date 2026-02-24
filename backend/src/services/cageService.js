@@ -78,6 +78,11 @@ class CageService {
     // When only_available is requested, push condition filter to SQL and
     // handle occupancy check after fetch but before pagination so counts stay correct.
     if (only_available === 'true') {
+      // A cage can only be available if its condition is 'good'.
+      // If caller explicitly requests a non-good condition, no cages can be available.
+      if (condition && condition !== 'good') {
+        return { items: [], total: 0, page: parsedPage, limit: parsedLimit };
+      }
       where.condition = 'good';
 
       // Fetch ALL matching cages (no limit/offset) so we can filter by computed occupancy
