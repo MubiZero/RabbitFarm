@@ -120,6 +120,49 @@ describe('reportController', () => {
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
+    it('should default date_from to 30 days ago when no dates provided', async () => {
+      setAllMocksToEmpty();
+
+      // Fix Date to a known value
+      const fixedNow = new Date('2025-06-15T12:00:00Z');
+      jest.useFakeTimers();
+      jest.setSystemTime(fixedNow);
+
+      const req = mockReq({ query: {} });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      // Transaction.findAll should have been called with date range starting 30 days ago
+      const txCall = Transaction.findAll.mock.calls[0][0];
+      const { Op } = require('sequelize');
+      expect(txCall.where.transaction_date[Op.gte]).toBe('2025-05-16');
+      expect(txCall.where.transaction_date[Op.lte]).toBe('2025-06-15');
+
+      // period in response should reflect the defaults
+      const responseBody = res.json.mock.calls[0][0];
+      expect(responseBody.data.period.from).toBe('2025-05-16');
+      expect(responseBody.data.period.to).toBe('2025-06-15');
+
+      jest.useRealTimers();
+    });
+
+    it('should use explicit date_from when provided', async () => {
+      setAllMocksToEmpty();
+
+      const req = mockReq({ query: { from_date: '2024-01-01' } });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const txCall = Transaction.findAll.mock.calls[0][0];
+      const { Op } = require('sequelize');
+      expect(txCall.where.transaction_date[Op.gte]).toBe('2024-01-01');
+    });
+
     it('should call next on error', async () => {
       Rabbit.count.mockRejectedValue(new Error('DB error'));
 
