@@ -1,3 +1,4 @@
+const { randomUUID } = require('crypto');
 const { Rabbit, Birth, Breeding, Task } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -379,7 +380,7 @@ exports.createKitsFromBirth = async (req, res) => {
       // For simplicity, we use timestamp + index, but let's make it cleaner
       const kit = await Rabbit.create({
         user_id: userId,
-        tag_id: `${prefix}-${Date.now()}-${i}`,
+        tag_id: `kit-${randomUUID().slice(0, 8)}`,
         name: `${prefix}-${i}`,
         breed_id,
         sex: 'unknown',
