@@ -29,4 +29,42 @@ describe('PasswordUtil', () => {
       expect(result).toBe(false);
     });
   });
+
+  describe('validateStrength', () => {
+    it('should return valid=true for strong password', () => {
+      const result = PasswordUtil.validateStrength('StrongPass1');
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('should return error for password shorter than 8 chars', () => {
+      const result = PasswordUtil.validateStrength('Abc1');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Password must be at least 8 characters long');
+    });
+
+    it('should return error for missing lowercase letter', () => {
+      const result = PasswordUtil.validateStrength('UPPERCASE123');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Password must contain at least one lowercase letter');
+    });
+
+    it('should return error for missing uppercase letter', () => {
+      const result = PasswordUtil.validateStrength('lowercase123');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Password must contain at least one uppercase letter');
+    });
+
+    it('should return error for missing number', () => {
+      const result = PasswordUtil.validateStrength('NoNumbers!');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Password must contain at least one number');
+    });
+
+    it('should return multiple errors for very weak password', () => {
+      const result = PasswordUtil.validateStrength('abc');
+      expect(result.valid).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(1);
+    });
+  });
 });

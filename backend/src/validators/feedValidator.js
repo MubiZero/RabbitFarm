@@ -179,79 +179,7 @@ const adjustStockSchema = Joi.object({
     })
 });
 
-/**
- * Validation middleware for creating feed
- */
-const validateCreate = (req, res, next) => {
-  const { error } = createFeedSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }))
-    });
-  }
-
-  next();
-};
-
-/**
- * Validation middleware for updating feed
- */
-const validateUpdate = (req, res, next) => {
-  const { error } = updateFeedSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }))
-    });
-  }
-
-  next();
-};
-
-/**
- * Validation middleware for adjusting stock
- */
-const validateAdjustStock = (req, res, next) => {
-  const { error } = adjustStockSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }))
-    });
-  }
-
-  next();
-};
-
 module.exports = {
-  validateCreate,
-  validateUpdate,
-  validateAdjustStock,
   createFeedSchema,
   updateFeedSchema,
   adjustStockSchema
