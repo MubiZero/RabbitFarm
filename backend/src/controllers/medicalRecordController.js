@@ -38,6 +38,8 @@ class MedicalRecordController {
       // Automation 1: Status Update
       if (['died', 'euthanized'].includes(outcome)) {
         await rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
+      } else if (outcome === 'recovered') {
+        await rabbit.update({ status: 'alive' }, { transaction: t });
       } else if (outcome === 'ongoing') {
         await rabbit.update({ status: 'sick' }, { transaction: t });
       }
