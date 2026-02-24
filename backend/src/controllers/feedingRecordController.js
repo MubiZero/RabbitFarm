@@ -1,4 +1,5 @@
 const { FeedingRecord, Feed, Rabbit, Cage, User, sequelize } = require('../models');
+const logger = require('../utils/logger');
 const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
 
@@ -291,7 +292,7 @@ exports.update = async (req, res, next) => {
             await oldFeed.update({ current_stock: parseFloat(oldFeed.current_stock) + oldQuantity }, { transaction });
           } else {
             // This case should ideally not happen if oldFeedId was valid, but handle defensively
-            console.warn(`Old feed with ID ${feedingRecord.feed_id} not found for stock adjustment.`);
+            logger.warn(`Old feed with ID ${feedingRecord.feed_id} not found for stock adjustment.`);
           }
 
           const newStock = parseFloat(feed.current_stock) - newQuantity;
