@@ -229,7 +229,6 @@ exports.getByRabbit = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { quantity: newQuantity, feed_id: newFeedId } = req.body;
 
     const feedingRecord = await FeedingRecord.findOne({
       where: {
