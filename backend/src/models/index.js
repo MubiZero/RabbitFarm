@@ -29,11 +29,16 @@ const Transaction = require('./Transaction')(sequelize);
 const Task = require('./Task')(sequelize);
 const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
+const TokenBlacklist = require('./TokenBlacklist')(sequelize);
+const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 
 // Define associations
 // User associations
 User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
+
+User.hasMany(PasswordResetToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+PasswordResetToken.belongsTo(User, { foreignKey: 'user_id' });
 
 User.hasMany(Rabbit, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 User.hasMany(Task, { as: 'assignedTo', foreignKey: 'assigned_to', onDelete: 'SET NULL' });
@@ -117,6 +122,8 @@ module.exports = {
   Sequelize,
   User,
   RefreshToken,
+  TokenBlacklist,
+  PasswordResetToken,
   Breed,
   Cage,
   Rabbit,

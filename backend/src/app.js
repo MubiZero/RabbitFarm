@@ -9,6 +9,8 @@ const logger = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Create Express app
 const app = express();
@@ -65,8 +67,10 @@ if (process.env.NODE_ENV === 'development') {
 // Static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Rate limiting
-app.use('/api/', generalLimiter);
+// Rate limiting (disabled in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.use('/api/', generalLimiter);
+}
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -95,6 +99,12 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: 'RabbitFarm API Docs'
+}));
+app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
 
 // API routes
 app.use(`/api/${process.env.API_VERSION || 'v1'}`, routes);

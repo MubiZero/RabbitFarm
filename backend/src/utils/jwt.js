@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { randomUUID } = require('crypto');
 const jwtConfig = require('../config/jwt');
 
 /**
@@ -11,10 +12,11 @@ class JWTUtil {
    * @returns {String} - JWT token
    */
   static generateAccessToken(payload) {
-    return jwt.sign(payload, jwtConfig.secret, {
-      expiresIn: jwtConfig.expiresIn,
-      algorithm: jwtConfig.algorithm
-    });
+    return jwt.sign(
+      { ...payload, jti: randomUUID() },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn, algorithm: jwtConfig.algorithm }
+    );
   }
 
   /**
@@ -23,10 +25,11 @@ class JWTUtil {
    * @returns {String} - JWT refresh token
    */
   static generateRefreshToken(payload) {
-    return jwt.sign(payload, jwtConfig.refreshSecret, {
-      expiresIn: jwtConfig.refreshExpiresIn,
-      algorithm: jwtConfig.algorithm
-    });
+    return jwt.sign(
+      { ...payload, jti: randomUUID() },
+      jwtConfig.refreshSecret,
+      { expiresIn: jwtConfig.refreshExpiresIn, algorithm: jwtConfig.algorithm }
+    );
   }
 
   /**
