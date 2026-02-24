@@ -293,16 +293,20 @@ exports.getFarmReport = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
+    // Default date range: last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const defaultDateFrom = thirtyDaysAgo.toISOString().split('T')[0];
+    const defaultDateTo = new Date().toISOString().split('T')[0];
+
+    const effectiveFromDate = from_date || defaultDateFrom;
+    const effectiveToDate = to_date || defaultDateTo;
+
     const where = {};
-    if (from_date || to_date) {
-      where.created_at = {};
-      if (from_date) {
-        where.created_at[Op.gte] = from_date;
-      }
-      if (to_date) {
-        where.created_at[Op.lte] = to_date;
-      }
-    }
+    where.created_at = {
+      [Op.gte]: effectiveFromDate,
+      [Op.lte]: effectiveToDate
+    };
 
     // Rabbit population dynamics
     const rabbitsByBreed = await Rabbit.findAll({
@@ -319,10 +323,10 @@ exports.getFarmReport = async (req, res, next) => {
     const transactions = await Transaction.findAll({
       where: {
         created_by: req.user.id,
-        transaction_date: from_date || to_date ? {
-          [Op.gte]: from_date || new Date('2020-01-01'),
-          [Op.lte]: to_date || new Date()
-        } : { [Op.ne]: null }
+        transaction_date: {
+          [Op.gte]: effectiveFromDate,
+          [Op.lte]: effectiveToDate
+        }
       },
       attributes: [
         'type',
@@ -345,23 +349,21 @@ exports.getFarmReport = async (req, res, next) => {
     const breedingsCount = await Breeding.count({
       where: {
         user_id: req.user.id,
-        ...(from_date || to_date ? {
-          breeding_date: {
-            [Op.gte]: from_date || new Date('2020-01-01'),
-            [Op.lte]: to_date || new Date()
-          }
-        } : {})
+        breeding_date: {
+          [Op.gte]: effectiveFromDate,
+          [Op.lte]: effectiveToDate
+        }
       }
     });
 
     const birthsCount = await Birth.count({
       include: [{ model: Rabbit, as: 'mother', where: { user_id: req.user.id }, attributes: [] }],
-      where: from_date || to_date ? {
+      where: {
         birth_date: {
-          [Op.gte]: from_date || new Date('2020-01-01'),
-          [Op.lte]: to_date || new Date()
+          [Op.gte]: effectiveFromDate,
+          [Op.lte]: effectiveToDate
         }
-      } : {}
+      }
     });
 
     // Feeding statistics
@@ -370,8 +372,8 @@ exports.getFarmReport = async (req, res, next) => {
 
     return ApiResponse.success(res, {
       period: {
-        from: from_date || 'начало',
-        to: to_date || 'текущая дата'
+        from: effectiveFromDate,
+        to: effectiveToDate
       },
       population: {
         total_rabbits: await Rabbit.count({ where: { user_id: req.user.id } }),
