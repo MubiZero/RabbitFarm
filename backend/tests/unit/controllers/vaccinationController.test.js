@@ -2,7 +2,11 @@
  * Unit tests for vaccinationController
  */
 jest.mock('../../../src/models', () => {
-  const mockSequelize = { transaction: jest.fn() };
+  const mockSequelize = {
+    transaction: jest.fn(),
+    fn: jest.fn((fnName, col) => `${fnName}(${col})`),
+    col: jest.fn((name) => name)
+  };
   return {
     Vaccination: {
       findOne: jest.fn(), findAll: jest.fn(), findByPk: jest.fn(),
@@ -197,6 +201,17 @@ describe('vaccinationController', () => {
       expect(Vaccination.findAndCountAll).toHaveBeenCalled();
     });
 
+    it('should apply upcoming filter', async () => {
+      Vaccination.findAndCountAll.mockResolvedValue({ rows: [], count: 0 });
+
+      await ctrl.list(
+        mockReq({ query: { upcoming: 'true' } }),
+        mockRes(), mockNext
+      );
+
+      expect(Vaccination.findAndCountAll).toHaveBeenCalled();
+    });
+
     it('should call next on error', async () => {
       Vaccination.findAndCountAll.mockRejectedValue(new Error('DB error'));
 
@@ -226,6 +241,15 @@ describe('vaccinationController', () => {
       await ctrl.getByRabbit(mockReq({ params: { rabbitId: '999' } }), res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('should call next on DB error', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1 });
+      Vaccination.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getByRabbit(mockReq({ params: { rabbitId: '1' } }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -268,6 +292,37 @@ describe('vaccinationController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should return 400 on SequelizeValidationError', async () => {
+      const vaccination = {
+        id: 1, rabbit_id: 1,
+        rabbit: { user_id: 1 },
+        update: jest.fn().mockRejectedValue({
+          name: 'SequelizeValidationError',
+          errors: [{ message: 'Invalid date' }]
+        })
+      };
+      Vaccination.findByPk.mockResolvedValueOnce(vaccination);
+
+      const res = mockRes();
+      await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should call next on unexpected error in update', async () => {
+      const vaccination = {
+        id: 1, rabbit_id: 1,
+        rabbit: { user_id: 1 },
+        update: jest.fn().mockRejectedValue(new Error('DB error'))
+      };
+      Vaccination.findByPk.mockResolvedValueOnce(vaccination);
+
+      await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('delete', () => {
@@ -292,11 +347,33 @@ describe('vaccinationController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should call next on DB error in delete', async () => {
+      Vaccination.findOne.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.delete(mockReq({ params: { id: '1' } }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('getStatistics', () => {
+    const setupStatsMocks = (overrides = {}) => {
+      // Default mocks for all parallel queries in getStatistics
+      Vaccination.count
+        .mockResolvedValueOnce(overrides.total ?? 0)         // total
+        .mockResolvedValueOnce(overrides.thisYear ?? 0)       // this_year
+        .mockResolvedValueOnce(overrides.last30Days ?? 0)     // last_30_days
+        .mockResolvedValueOnce(overrides.upcomingTotal ?? 0)  // upcoming total
+        .mockResolvedValueOnce(overrides.upcomingNext30 ?? 0) // upcoming next 30 days
+        .mockResolvedValueOnce(overrides.overdue ?? 0);       // overdue
+      Vaccination.findAll
+        .mockResolvedValueOnce(overrides.byVaccineType ?? []) // GROUP BY vaccine_type
+        .mockResolvedValueOnce(overrides.upcomingList ?? []);  // upcoming list
+    };
+
     it('should return statistics', async () => {
-      Vaccination.findAll.mockResolvedValue([]);
+      setupStatsMocks();
 
       const req = mockReq({ query: {} });
       const res = mockRes();
@@ -304,6 +381,54 @@ describe('vaccinationController', () => {
       await ctrl.getStatistics(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should count this_year, last_30_days and upcoming', async () => {
+      const now = new Date();
+      const futureDate = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+      const nearFuture = new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000);
+
+      setupStatsMocks({
+        total: 2,
+        byVaccineType: [
+          { vaccine_type: 'vhd', count: '1' },
+          { vaccine_type: 'myxomatosis', count: '1' }
+        ],
+        thisYear: 2,
+        last30Days: 2,
+        upcomingTotal: 2,
+        upcomingNext30: 2,
+        overdue: 0,
+        upcomingList: [
+          {
+            id: 1, rabbit_id: 1, vaccine_name: 'VGBK', vaccine_type: 'vhd',
+            next_vaccination_date: futureDate.toISOString(),
+            rabbit: { name: 'Буся' }
+          },
+          {
+            id: 2, rabbit_id: 2, vaccine_name: 'Myxo', vaccine_type: 'myxomatosis',
+            next_vaccination_date: nearFuture.toISOString(),
+            rabbit: { name: 'Прыг' }
+          }
+        ]
+      });
+
+      const res = mockRes();
+      await ctrl.getStatistics(mockReq(), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const data = res.json.mock.calls[0][0].data;
+      expect(data.this_year).toBeGreaterThanOrEqual(2);
+      expect(data.last_30_days).toBeGreaterThanOrEqual(2);
+      expect(data.upcoming.total).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should call next on error', async () => {
+      Vaccination.count.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getStatistics(mockReq(), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -333,6 +458,14 @@ describe('vaccinationController', () => {
 
       expect(Vaccination.findAll).toHaveBeenCalled();
     });
+
+    it('should call next on error', async () => {
+      Vaccination.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getUpcoming(mockReq({ query: {} }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('getOverdue', () => {
@@ -351,6 +484,14 @@ describe('vaccinationController', () => {
       await ctrl.getOverdue(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should call next on error', async () => {
+      Vaccination.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getOverdue(mockReq(), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

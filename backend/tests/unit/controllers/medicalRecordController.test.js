@@ -2,14 +2,19 @@
  * Unit tests for medicalRecordController
  */
 jest.mock('../../../src/models', () => {
-  const mockSequelize = { transaction: jest.fn() };
+  const mockSequelize = {
+    transaction: jest.fn(),
+    fn: jest.fn((fnName, col) => `${fnName}(${col})`),
+    col: jest.fn((name) => name)
+  };
   return {
     MedicalRecord: {
       findAll: jest.fn(),
       findByPk: jest.fn(),
       findOne: jest.fn(),
       findAndCountAll: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      count: jest.fn()
     },
     Rabbit: { findOne: jest.fn() },
     Breed: {},
@@ -267,6 +272,15 @@ describe('medicalRecordController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should call next on DB error', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1 });
+      MedicalRecord.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getByRabbit(mockReq({ params: { rabbitId: '1' } }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('update', () => {
@@ -346,6 +360,37 @@ describe('medicalRecordController', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(mockTx.rollback).toHaveBeenCalled();
     });
+
+    it('should return 400 on SequelizeValidationError in update', async () => {
+      const medicalRecord = {
+        id: 1, outcome: 'ongoing', rabbit_id: 1,
+        rabbit: { user_id: 1, update: jest.fn() },
+        update: jest.fn().mockRejectedValue({
+          name: 'SequelizeValidationError',
+          errors: [{ message: 'Invalid value' }]
+        })
+      };
+      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+
+      const res = mockRes();
+      await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should call next on unexpected error in update', async () => {
+      const medicalRecord = {
+        id: 1, outcome: 'ongoing', rabbit_id: 1,
+        rabbit: { user_id: 1, update: jest.fn() },
+        update: jest.fn().mockRejectedValue(new Error('DB error'))
+      };
+      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+
+      await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('delete', () => {
@@ -370,11 +415,31 @@ describe('medicalRecordController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should call next on error in delete', async () => {
+      MedicalRecord.findOne.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.delete(mockReq({ params: { id: '1' } }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe('getStatistics', () => {
+    const setupStatsMocks = (overrides = {}) => {
+      // Default mocks for all parallel queries in getStatistics
+      MedicalRecord.count
+        .mockResolvedValueOnce(overrides.total ?? 0)       // total
+        .mockResolvedValueOnce(overrides.thisYear ?? 0)     // this_year
+        .mockResolvedValueOnce(overrides.lastMonth ?? 0);   // last_month
+      MedicalRecord.findAll
+        .mockResolvedValueOnce(overrides.byOutcome ?? [])          // GROUP BY outcome
+        .mockResolvedValueOnce(overrides.totalCost ?? [{ total_cost: null }]) // SUM cost
+        .mockResolvedValueOnce(overrides.ongoingList ?? []);       // ongoing treatments
+    };
+
     it('should return statistics with empty records', async () => {
-      MedicalRecord.findAll.mockResolvedValue([]);
+      setupStatsMocks();
 
       const req = mockReq();
       const res = mockRes();
@@ -386,21 +451,23 @@ describe('medicalRecordController', () => {
 
     it('should compute statistics for records with cost and ongoing', async () => {
       const now = new Date();
-      const pastDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      const records = [
-        {
-          id: 1, outcome: 'ongoing', cost: 100,
-          started_at: new Date().toISOString(),
-          rabbit_id: 1, rabbit: { name: 'Bunny' },
-          diagnosis: 'Cold', symptoms: 'Sneezing'
-        },
-        {
-          id: 2, outcome: 'recovered', cost: null,
-          started_at: new Date().toISOString(),
-          rabbit: { name: 'Hop' }
-        }
-      ];
-      MedicalRecord.findAll.mockResolvedValue(records);
+      setupStatsMocks({
+        total: 2,
+        byOutcome: [
+          { outcome: 'ongoing', count: '1' },
+          { outcome: 'recovered', count: '1' }
+        ],
+        totalCost: [{ total_cost: '100' }],
+        thisYear: 2,
+        lastMonth: 2,
+        ongoingList: [
+          {
+            id: 1, rabbit_id: 1,
+            diagnosis: 'Cold', started_at: now.toISOString(), symptoms: 'Sneezing',
+            rabbit: { name: 'Bunny' }
+          }
+        ]
+      });
 
       const res = mockRes();
       await ctrl.getStatistics(mockReq(), res, mockNext);
@@ -409,6 +476,14 @@ describe('medicalRecordController', () => {
       const jsonArg = res.json.mock.calls[0][0];
       expect(jsonArg.data.total_records).toBe(2);
       expect(jsonArg.data.by_outcome.ongoing).toBe(1);
+    });
+
+    it('should call next on error', async () => {
+      MedicalRecord.count.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getStatistics(mockReq(), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -430,6 +505,14 @@ describe('medicalRecordController', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       const json = res.json.mock.calls[0][0];
       expect(json.data[0].days_ongoing).toBeGreaterThanOrEqual(4);
+    });
+
+    it('should call next on error', async () => {
+      MedicalRecord.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getOngoing(mockReq(), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -468,6 +551,14 @@ describe('medicalRecordController', () => {
       );
 
       expect(MedicalRecord.findAll).toHaveBeenCalled();
+    });
+
+    it('should call next on error', async () => {
+      MedicalRecord.findAll.mockRejectedValue(new Error('DB error'));
+
+      await ctrl.getCosts(mockReq({ query: {} }), mockRes(), mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });
