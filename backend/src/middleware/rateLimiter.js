@@ -1,10 +1,14 @@
 const rateLimit = require('express-rate-limit');
 const ApiResponse = require('../utils/apiResponse');
 
+// In test environment, use a no-op middleware to avoid rate limit interference
+const noopMiddleware = (req, res, next) => next();
+const isTest = process.env.NODE_ENV === 'test';
+
 /**
  * General API rate limiter
  */
-const generalLimiter = rateLimit({
+const generalLimiter = isTest ? noopMiddleware : rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: 'Too many requests from this IP, please try again later',
@@ -18,7 +22,7 @@ const generalLimiter = rateLimit({
 /**
  * Strict rate limiter for auth endpoints
  */
-const authLimiter = rateLimit({
+const authLimiter = isTest ? noopMiddleware : rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // 5 requests per window
   message: 'Too many authentication attempts, please try again later',
@@ -32,7 +36,7 @@ const authLimiter = rateLimit({
 /**
  * Upload rate limiter
  */
-const uploadLimiter = rateLimit({
+const uploadLimiter = isTest ? noopMiddleware : rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   message: 'Too many upload requests, please try again later',

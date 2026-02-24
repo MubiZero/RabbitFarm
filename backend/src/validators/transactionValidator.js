@@ -148,55 +148,7 @@ const updateTransactionSchema = Joi.object({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
 });
 
-/**
- * Validation middleware for creating transaction
- */
-const validateCreate = (req, res, next) => {
-  const { error } = createTransactionSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }))
-    });
-  }
-
-  next();
-};
-
-/**
- * Validation middleware for updating transaction
- */
-const validateUpdate = (req, res, next) => {
-  const { error } = updateTransactionSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }))
-    });
-  }
-
-  next();
-};
-
 module.exports = {
-  validateCreate,
-  validateUpdate,
   createTransactionSchema,
   updateTransactionSchema,
   TRANSACTION_TYPES,
