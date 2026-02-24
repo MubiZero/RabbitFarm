@@ -485,9 +485,9 @@ exports.getHealthReport = async (req, res, next) => {
  */
 exports.getFinancialReport = async (req, res, next) => {
   try {
-    const { from_date, to_date, groupBy = 'month' } = req.query;
+    const { from_date, to_date, groupBy } = req.query;
 
-    const where = {};
+    const where = { created_by: req.user.id };
     if (from_date || to_date) {
       where.transaction_date = {};
       if (from_date) {
@@ -498,9 +498,9 @@ exports.getFinancialReport = async (req, res, next) => {
       }
     }
 
-    // Total by type
+    // Total by type (always computed for the overall summary)
     const totalByType = await Transaction.findAll({
-      where: { ...where, created_by: req.user.id },
+      where,
       attributes: [
         'type',
         [Sequelize.fn('SUM', Sequelize.col('amount')), 'total']
@@ -509,9 +509,85 @@ exports.getFinancialReport = async (req, res, next) => {
       raw: true
     });
 
-    // By category
+    const totalIncome = totalByType.find(t => t.type === 'income')?.total || 0;
+    const totalExpenses = totalByType.find(t => t.type === 'expense')?.total || 0;
+
+    const summary = {
+      total_income: parseFloat(totalIncome).toFixed(2),
+      total_expenses: parseFloat(totalExpenses).toFixed(2),
+      net_profit: parseFloat(totalIncome - totalExpenses).toFixed(2)
+    };
+
+    // Handle groupBy parameter
+    if (groupBy === 'by_category') {
+      const byCategory = await Transaction.findAll({
+        where,
+        attributes: [
+          'category',
+          [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'income' THEN amount ELSE 0 END")), 'total_income'],
+          [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'expense' THEN amount ELSE 0 END")), 'total_expense']
+        ],
+        group: ['category'],
+        raw: true
+      });
+
+      const grouped = byCategory.map(item => ({
+        category: item.category,
+        total_income: parseFloat(item.total_income || 0).toFixed(2),
+        total_expense: parseFloat(item.total_expense || 0).toFixed(2),
+        net: parseFloat((item.total_income || 0) - (item.total_expense || 0)).toFixed(2)
+      }));
+
+      return ApiResponse.success(res, { summary, grouped }, 'Финансовый отчет получен');
+    }
+
+    if (groupBy === 'by_month') {
+      const byMonth = await Transaction.findAll({
+        where,
+        attributes: [
+          [Sequelize.fn('DATE_FORMAT', Sequelize.col('transaction_date'), '%Y-%m'), 'month'],
+          [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'income' THEN amount ELSE 0 END")), 'total_income'],
+          [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'expense' THEN amount ELSE 0 END")), 'total_expense']
+        ],
+        group: [Sequelize.fn('DATE_FORMAT', Sequelize.col('transaction_date'), '%Y-%m')],
+        order: [[Sequelize.fn('DATE_FORMAT', Sequelize.col('transaction_date'), '%Y-%m'), 'ASC']],
+        raw: true
+      });
+
+      const grouped = byMonth.map(item => ({
+        month: item.month,
+        total_income: parseFloat(item.total_income || 0).toFixed(2),
+        total_expense: parseFloat(item.total_expense || 0).toFixed(2),
+        net: parseFloat((item.total_income || 0) - (item.total_expense || 0)).toFixed(2)
+      }));
+
+      return ApiResponse.success(res, { summary, grouped }, 'Финансовый отчет получен');
+    }
+
+    if (groupBy === 'by_type') {
+      const byType = await Transaction.findAll({
+        where,
+        attributes: [
+          'type',
+          [Sequelize.fn('SUM', Sequelize.col('amount')), 'total'],
+          [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+        ],
+        group: ['type'],
+        raw: true
+      });
+
+      const grouped = byType.map(item => ({
+        type: item.type,
+        total: parseFloat(item.total || 0).toFixed(2),
+        count: parseInt(item.count)
+      }));
+
+      return ApiResponse.success(res, { summary, grouped }, 'Финансовый отчет получен');
+    }
+
+    // Default: no groupBy or unknown value — return existing ungrouped summary with by_category breakdown
     const byCategory = await Transaction.findAll({
-      where: { ...where, created_by: req.user.id },
+      where,
       attributes: [
         'type',
         'category',
@@ -522,15 +598,8 @@ exports.getFinancialReport = async (req, res, next) => {
       raw: true
     });
 
-    const totalIncome = totalByType.find(t => t.type === 'income')?.total || 0;
-    const totalExpenses = totalByType.find(t => t.type === 'expense')?.total || 0;
-
     return ApiResponse.success(res, {
-      summary: {
-        total_income: parseFloat(totalIncome).toFixed(2),
-        total_expenses: parseFloat(totalExpenses).toFixed(2),
-        net_profit: parseFloat(totalIncome - totalExpenses).toFixed(2)
-      },
+      summary,
       by_category: byCategory.map(item => ({
         type: item.type,
         category: item.category,
