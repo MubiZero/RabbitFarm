@@ -11,3 +11,13 @@ jest.mock('../src/utils/logger', () => ({
   warn: jest.fn(),
   debug: jest.fn()
 }));
+
+// Заглушаем console.error/warn из production кода (error paths в контроллерах)
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
