@@ -41,6 +41,10 @@ class TaskService {
       if (!user) throw new Error('ASSIGNEE_NOT_FOUND');
     }
 
+    if (data.recurrence_rule && !RECURRENCE_OFFSETS[data.recurrence_rule.toLowerCase()]) {
+      throw new Error('INVALID_RECURRENCE_RULE');
+    }
+
     const task = await Task.create({
       title: data.title,
       description: data.description,

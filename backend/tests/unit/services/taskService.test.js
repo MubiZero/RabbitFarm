@@ -101,6 +101,44 @@ describe('TaskService', () => {
       expect(Task.create).not.toHaveBeenCalled();
     });
 
+    it('should throw INVALID_RECURRENCE_RULE when recurrence_rule is not a valid option', async () => {
+      await expect(
+        taskService.createTask({ title: 'Bad recurrence', recurrence_rule: 'every_full_moon', user_id: 1 })
+      ).rejects.toThrow('INVALID_RECURRENCE_RULE');
+
+      expect(Task.create).not.toHaveBeenCalled();
+    });
+
+    it('should create a task with a valid recurrence_rule', async () => {
+      const mockTask = createMockTask({ is_recurring: true, recurrence_rule: 'daily' });
+      Task.create.mockResolvedValue(mockTask);
+      Task.findByPk.mockResolvedValue(mockTask);
+
+      const result = await taskService.createTask({
+        title: 'Daily feeding',
+        recurrence_rule: 'daily',
+        is_recurring: true,
+        user_id: 1
+      });
+
+      expect(Task.create).toHaveBeenCalled();
+      expect(result).toBeDefined();
+    });
+
+    it('should create a task without recurrence_rule (non-recurring)', async () => {
+      const mockTask = createMockTask();
+      Task.create.mockResolvedValue(mockTask);
+      Task.findByPk.mockResolvedValue(mockTask);
+
+      const result = await taskService.createTask({
+        title: 'One-time task',
+        user_id: 1
+      });
+
+      expect(Task.create).toHaveBeenCalled();
+      expect(result).toBeDefined();
+    });
+
     it('should create a task with valid rabbit, cage, and assignee', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 2 });
