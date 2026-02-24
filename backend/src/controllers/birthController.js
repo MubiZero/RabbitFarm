@@ -392,9 +392,6 @@ exports.createKitsFromBirth = async (req, res) => {
       kits.push(kit);
     }
 
-    // Update birth record if needed
-    await birth.update({ kits_weaned: (birth.kits_weaned || 0) + kitCount }, { transaction });
-
     await transaction.commit();
     return ApiResponse.created(res, kits, 'Крольчата успешно созданы');
   } catch (error) {
