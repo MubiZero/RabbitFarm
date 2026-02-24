@@ -27,7 +27,7 @@ const errorHandler = (err, req, res, next) => {
   // Sequelize unique constraint error
   if (err.name === 'SequelizeUniqueConstraintError') {
     const field = err.errors[0]?.path;
-    return ApiResponse.badRequest(res, `${field} already exists`);
+    return ApiResponse.error(res, `Resource already exists: ${field}`, 409, 'CONFLICT');
   }
 
   // Sequelize foreign key constraint error

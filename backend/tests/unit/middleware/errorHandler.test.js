@@ -47,7 +47,7 @@ describe('errorHandler middleware', () => {
     expect(res.json).toHaveBeenCalled();
   });
 
-  it('should handle SequelizeUniqueConstraintError', () => {
+  it('should handle SequelizeUniqueConstraintError with 409 Conflict', () => {
     const err = {
       name: 'SequelizeUniqueConstraintError',
       message: 'Unique constraint error',
@@ -59,7 +59,10 @@ describe('errorHandler middleware', () => {
 
     errorHandler(err, req, res, mockNext);
 
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(409);
+    const jsonArg = res.json.mock.calls[0][0];
+    expect(jsonArg.error.code).toBe('CONFLICT');
+    expect(jsonArg.error.message).toContain('Resource already exists');
   });
 
   it('should handle SequelizeForeignKeyConstraintError', () => {
