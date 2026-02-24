@@ -100,6 +100,28 @@ describe('medicalRecordController', () => {
       expect(rabbit.update).toHaveBeenCalledWith({ status: 'sick' }, expect.any(Object));
     });
 
+    it('should update rabbit status to alive when outcome is recovered', async () => {
+      const rabbit = { id: 1, status: 'sick', update: jest.fn().mockResolvedValue(true) };
+      Rabbit.findOne.mockResolvedValue(rabbit);
+      MedicalRecord.create.mockResolvedValue({ id: 6 });
+      MedicalRecord.findByPk.mockResolvedValue({ id: 6 });
+
+      await ctrl.create(mockReq({ body: { ...baseBody, outcome: 'recovered' } }), mockRes(), mockNext);
+
+      expect(rabbit.update).toHaveBeenCalledWith({ status: 'alive' }, expect.any(Object));
+    });
+
+    it('should not update rabbit status when outcome does not trigger a change', async () => {
+      const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
+      Rabbit.findOne.mockResolvedValue(rabbit);
+      MedicalRecord.create.mockResolvedValue({ id: 7 });
+      MedicalRecord.findByPk.mockResolvedValue({ id: 7 });
+
+      await ctrl.create(mockReq({ body: baseBody }), mockRes(), mockNext);
+
+      expect(rabbit.update).not.toHaveBeenCalled();
+    });
+
     it('should create financial transaction when cost > 0', async () => {
       const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
