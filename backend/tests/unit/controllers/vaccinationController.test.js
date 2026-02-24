@@ -222,6 +222,27 @@ describe('vaccinationController', () => {
   });
 
   describe('getByRabbit', () => {
+    it('should include user_id filter on Rabbit include to prevent data leakage', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1 });
+      Vaccination.findAll.mockResolvedValue([{ id: 1 }]);
+
+      const req = mockReq({ params: { rabbitId: '1' }, user: { id: 42 } });
+      const res = mockRes();
+
+      await ctrl.getByRabbit(req, res, mockNext);
+
+      expect(Vaccination.findAll).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { rabbit_id: '1' },
+          include: expect.arrayContaining([
+            expect.objectContaining({
+              where: { user_id: 42 }
+            })
+          ])
+        })
+      );
+    });
+
     it('should return vaccinations for rabbit', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Vaccination.findAll.mockResolvedValue([{ id: 1 }]);

@@ -213,6 +213,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
+            where: { user_id: req.user.id },
             attributes: ['id', 'name', 'tag_id']
           }
         ]
