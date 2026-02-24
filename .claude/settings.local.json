@@ -16,9 +16,27 @@
       "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose.yml\")",
       "Bash(del \"C:\\projects\\RabbitFarm\\backend\\docker-compose-simple.yml\")",
       "Bash(cat:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Read(//mnt/d/projects/RabbitFarm/RabbitFarm/**)",
+      "Bash(git check-ignore:*)",
+      "Bash(tail:*)",
+      "Bash(npx jest:*)",
+      "Bash(node:*)",
+      "Bash(head:*)",
+      "Bash(mysql:*)",
+      "Bash(DB_TEST_NAME=rabbitfarm_test DB_HOST=127.0.0.1 DB_USER=rabbitfarm_user DB_PASSWORD=RabbitFarm2024! npx jest:*)",
+      "Bash(grep:*)",
+      "Bash(DB_TEST_NAME=rabbitfarm_test DB_HOST=127.0.0.1 DB_USER=rabbitfarm_user DB_PASSWORD=RabbitFarm2024! node:*)",
+      "Bash(grep Jest: :*)",
+      "Bash(git log:*)",
+      "Bash(git merge:*)",
+      "Bash(wait:*)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "context7"
+  ]
 }
