@@ -43,7 +43,7 @@ describe('CageController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: cage }));
     });
 
-    it('should handle SequelizeUniqueConstraintError with 400', async () => {
+    it('should delegate SequelizeUniqueConstraintError to next (global errorHandler)', async () => {
       const err = new Error('Unique constraint');
       err.name = 'SequelizeUniqueConstraintError';
       cageService.createCage.mockRejectedValue(err);
@@ -52,11 +52,10 @@ describe('CageController', () => {
 
       await cageController.create(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(err);
     });
 
-    it('should handle SequelizeValidationError with 400', async () => {
+    it('should delegate SequelizeValidationError to next (global errorHandler)', async () => {
       const err = new Error('Validation error');
       err.name = 'SequelizeValidationError';
       err.errors = [{ message: 'Number is required' }];
@@ -66,9 +65,7 @@ describe('CageController', () => {
 
       await cageController.create(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(err);
     });
 
     it('should call next for unexpected errors', async () => {
@@ -171,7 +168,7 @@ describe('CageController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 400 on SequelizeUniqueConstraintError', async () => {
+    it('should delegate SequelizeUniqueConstraintError to next (global errorHandler)', async () => {
       const err = new Error('Unique'); err.name = 'SequelizeUniqueConstraintError';
       cageService.updateCage.mockRejectedValue(err);
       const req = mockReq({ params: { id: '1' }, body: {} });
@@ -179,11 +176,10 @@ describe('CageController', () => {
 
       await cageController.update(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(err);
     });
 
-    it('should return 400 on SequelizeValidationError', async () => {
+    it('should delegate SequelizeValidationError to next (global errorHandler)', async () => {
       const err = new Error('Validation'); err.name = 'SequelizeValidationError';
       err.errors = [{ message: 'Field invalid' }];
       cageService.updateCage.mockRejectedValue(err);
@@ -192,8 +188,7 @@ describe('CageController', () => {
 
       await cageController.update(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(err);
     });
 
     it('should call next for unexpected errors', async () => {

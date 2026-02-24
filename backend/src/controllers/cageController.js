@@ -12,12 +12,6 @@ class CageController {
       const cage = await cageService.createCage({ ...req.body, user_id: req.user.id });
       return ApiResponse.created(res, cage, 'Клетка успешно создана');
     } catch (error) {
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        return ApiResponse.badRequest(res, 'Клетка с таким номером уже существует');
-      }
-      if (error.name === 'SequelizeValidationError') {
-        return ApiResponse.badRequest(res, error.errors[0].message);
-      }
       next(error);
     }
   }
@@ -54,12 +48,6 @@ class CageController {
       return ApiResponse.success(res, cage, 'Клетка успешно обновлена');
     } catch (error) {
       if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        return ApiResponse.badRequest(res, 'Клетка с таким номером уже существует');
-      }
-      if (error.name === 'SequelizeValidationError') {
-        return ApiResponse.badRequest(res, error.errors[0].message);
-      }
       next(error);
     }
   }
