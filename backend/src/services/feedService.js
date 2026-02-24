@@ -1,5 +1,5 @@
 const { Feed, FeedingRecord } = require('../models');
-const { Op } = require('sequelize');
+const { Op, col, literal } = require('sequelize');
 const logger = require('../utils/logger');
 
 /**
@@ -40,7 +40,7 @@ class FeedService {
 
     if (type) where.type = type;
     if (low_stock === 'true') {
-      where[Op.and] = [{ current_stock: { [Op.lte]: require('sequelize').col('min_stock') } }];
+      where[Op.and] = [{ current_stock: { [Op.lte]: col('min_stock') } }];
     }
     if (search) {
       where[Op.or] = [
@@ -124,9 +124,9 @@ class FeedService {
     const feeds = await Feed.findAll({
       where: {
         user_id: userId,
-        [Op.and]: [{ current_stock: { [Op.lte]: require('sequelize').col('min_stock') } }]
+        [Op.and]: [{ current_stock: { [Op.lte]: col('min_stock') } }]
       },
-      order: [[require('sequelize').literal('(current_stock / NULLIF(min_stock, 0))'), 'ASC']]
+      order: [[literal('(current_stock / NULLIF(min_stock, 0))'), 'ASC']]
     });
 
     return feeds.map(feed => ({
