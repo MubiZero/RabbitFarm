@@ -539,11 +539,15 @@ class RabbitService {
   async getPedigree(rabbitId, userId, generations = 3) {
     try {
       const rabbit = await this.getRabbitById(rabbitId, userId);
+      const visited = new Set();
 
       const buildPedigree = async (currentRabbit, level) => {
         if (!currentRabbit || level >= generations) {
           return currentRabbit;
         }
+
+        if (visited.has(currentRabbit.id)) return null;
+        visited.add(currentRabbit.id);
 
         const result = {
           id: currentRabbit.id,

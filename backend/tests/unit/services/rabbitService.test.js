@@ -74,4 +74,35 @@ describe('RabbitService', () => {
       expect(mockTransaction.commit).toHaveBeenCalled();
     });
   });
+
+  describe('getPedigree', () => {
+    it('should handle circular parent reference without stack overflow', async () => {
+      // Mock: Rabbit 1's father = Rabbit 2, Rabbit 2's father = Rabbit 1 (circular)
+      const mockRabbit1 = {
+        id: 1, name: 'Rabbit A', tag_id: 'A1', sex: 'male',
+        birth_date: '2024-01-01', father_id: 2, mother_id: null,
+        Breed: { name: 'TestBreed' }
+      };
+      const mockRabbit2 = {
+        id: 2, name: 'Rabbit B', tag_id: 'B1', sex: 'male',
+        birth_date: '2024-02-01', father_id: 1, mother_id: null,
+        Breed: { name: 'TestBreed' }
+      };
+
+      Rabbit.findOne.mockImplementation((opts) => {
+        const id = opts?.where?.id;
+        if (id === 1) return Promise.resolve(mockRabbit1);
+        if (id === 2) return Promise.resolve(mockRabbit2);
+        return Promise.resolve(null);
+      });
+
+      // Should complete without throwing/hanging — test will timeout if infinite recursion
+      const result = await rabbitService.getPedigree(1, 1, 3);
+      expect(result).not.toBeNull();
+      expect(result.id).toBe(1);
+      // Father should be present but its father (circular back to 1) should be null
+      expect(result.father).toBeDefined();
+      expect(result.father.id).toBe(2);
+    });
+  });
 });
