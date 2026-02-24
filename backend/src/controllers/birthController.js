@@ -376,8 +376,6 @@ exports.createKitsFromBirth = async (req, res) => {
     const prefix = name_prefix || 'Крольчонок';
 
     for (let i = 1; i <= kitCount; i++) {
-      // Find next available tag_id by checking existence
-      // For simplicity, we use timestamp + index, but let's make it cleaner
       const kit = await Rabbit.create({
         user_id: userId,
         tag_id: `kit-${randomUUID().slice(0, 8)}`,
