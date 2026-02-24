@@ -189,9 +189,14 @@ class RabbitService {
       }
 
       if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
         where[Op.or] = [
-          { name: { [Op.like]: `%${filters.search}%` } },
-          { tag_id: { [Op.like]: `%${filters.search}%` } }
+          Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), {
+            [Op.like]: `%${searchLower}%`
+          }),
+          Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('tag_id')), {
+            [Op.like]: `%${searchLower}%`
+          })
         ];
       }
 
