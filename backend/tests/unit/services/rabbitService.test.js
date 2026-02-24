@@ -1,7 +1,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
-    Rabbit: { findOne: jest.fn(), findByPk: jest.fn(), create: jest.fn(), count: jest.fn(), findAndCountAll: jest.fn() },
+    Rabbit: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn(), create: jest.fn(), count: jest.fn(), findAndCountAll: jest.fn() },
     Breed: { findByPk: jest.fn() },
     Cage: { findOne: jest.fn() },
     RabbitWeight: { create: jest.fn() },
@@ -72,6 +72,49 @@ describe('RabbitService', () => {
       expect(result).toBeDefined();
       expect(Rabbit.create).toHaveBeenCalled();
       expect(mockTransaction.commit).toHaveBeenCalled();
+    });
+  });
+
+  describe('listRabbits', () => {
+    it('should perform case-insensitive search on name and tag_id', async () => {
+      const mockRabbits = [
+        createMockRabbit({ id: 1, name: 'Rex', tag_id: 'TAG001' }),
+        createMockRabbit({ id: 2, name: 'REX Junior', tag_id: 'TAG002' })
+      ];
+
+      Rabbit.count.mockResolvedValue(2);
+      Rabbit.findAll.mockResolvedValue(mockRabbits);
+
+      const result = await rabbitService.listRabbits(1, { search: 'rex' });
+
+      expect(result.items).toHaveLength(2);
+      expect(result.pagination.total).toBe(2);
+
+      // Verify that findAll was called with a where clause containing Op.or
+      const findAllCall = Rabbit.findAll.mock.calls[0][0];
+      const whereClause = findAllCall.where;
+      const { Op } = require('sequelize');
+      expect(whereClause[Op.or]).toBeDefined();
+      // The Op.or array should contain Sequelize.where() calls (objects with 'attribute' property)
+      // indicating LOWER() function usage rather than plain column references
+      const orConditions = whereClause[Op.or];
+      expect(orConditions).toHaveLength(2);
+      // Each condition should be a Sequelize.where() result (has 'attribute' key for fn call)
+      orConditions.forEach(cond => {
+        expect(cond).toHaveProperty('attribute');
+      });
+    });
+
+    it('should list rabbits with pagination defaults', async () => {
+      Rabbit.count.mockResolvedValue(0);
+      Rabbit.findAll.mockResolvedValue([]);
+
+      const result = await rabbitService.listRabbits(1);
+
+      expect(result.items).toEqual([]);
+      expect(result.pagination.page).toBe(1);
+      expect(result.pagination.limit).toBe(20);
+      expect(result.pagination.total).toBe(0);
     });
   });
 
