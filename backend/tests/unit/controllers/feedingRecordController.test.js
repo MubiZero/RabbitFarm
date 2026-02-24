@@ -262,6 +262,77 @@ describe('feedingRecordController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should adjust stock delta when same feed but quantity changed', async () => {
+      const feedUpdate = jest.fn().mockResolvedValue(true);
+      const record = {
+        id: 1, feed_id: 1, cage_id: null, rabbit_id: null,
+        quantity: '2.0',
+        update: jest.fn().mockResolvedValue(true),
+        reload: jest.fn().mockResolvedValue(true)
+      };
+      FeedingRecord.findOne.mockResolvedValue(record);
+      // Feed with current_stock 10; new quantity 5 → diff = 3, new stock = 7
+      Feed.findOne.mockResolvedValue({ id: 1, current_stock: '10.0', update: feedUpdate });
+
+      const req = mockReq({ params: { id: '1' }, body: { quantity: 5 } });
+      const res = mockRes();
+
+      await ctrl.update(req, res, mockNext);
+
+      expect(feedUpdate).toHaveBeenCalledWith({ current_stock: 7 }, { transaction: mockTx });
+      expect(mockTx.commit).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should restore old feed stock and deduct new feed stock when feed_id changes', async () => {
+      const oldFeedUpdate = jest.fn().mockResolvedValue(true);
+      const newFeedUpdate = jest.fn().mockResolvedValue(true);
+      const record = {
+        id: 1, feed_id: 1, cage_id: null, rabbit_id: null,
+        quantity: '3.0',
+        update: jest.fn().mockResolvedValue(true),
+        reload: jest.fn().mockResolvedValue(true)
+      };
+      FeedingRecord.findOne.mockResolvedValue(record);
+      // First call: new feed (id 2); Second call: old feed (id 1)
+      Feed.findOne
+        .mockResolvedValueOnce({ id: 2, current_stock: '20.0', update: newFeedUpdate })
+        .mockResolvedValueOnce({ id: 1, current_stock: '5.0', update: oldFeedUpdate });
+
+      const req = mockReq({ params: { id: '1' }, body: { feed_id: 2, quantity: 4 } });
+      const res = mockRes();
+
+      await ctrl.update(req, res, mockNext);
+
+      // Old feed restored: 5 + 3 = 8
+      expect(oldFeedUpdate).toHaveBeenCalledWith({ current_stock: 8 }, { transaction: mockTx });
+      // New feed deducted: 20 - 4 = 16
+      expect(newFeedUpdate).toHaveBeenCalledWith({ current_stock: 16 }, { transaction: mockTx });
+      expect(mockTx.commit).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should return 400 with insufficient stock when quantity exceeds feed stock', async () => {
+      const record = {
+        id: 1, feed_id: 1, cage_id: null, rabbit_id: null,
+        quantity: '2.0',
+        update: jest.fn().mockResolvedValue(true),
+        reload: jest.fn().mockResolvedValue(true)
+      };
+      FeedingRecord.findOne.mockResolvedValue(record);
+      // current_stock 3, old quantity 2, new quantity 10 → diff 8, new stock = 3-8 = -5 < 0
+      Feed.findOne.mockResolvedValue({ id: 1, current_stock: '3.0', update: jest.fn() });
+
+      const req = mockReq({ params: { id: '1' }, body: { quantity: 10 } });
+      const res = mockRes();
+
+      await ctrl.update(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockTx.rollback).toHaveBeenCalled();
+      expect(mockTx.commit).not.toHaveBeenCalled();
+    });
   });
 
   describe('delete', () => {
