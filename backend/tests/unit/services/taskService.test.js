@@ -262,6 +262,21 @@ describe('TaskService', () => {
       User.findByPk.mockResolvedValue(null);
 
       await expect(taskService.updateTask(1, 1, { assigned_to: 99 })).rejects.toThrow('ASSIGNEE_NOT_FOUND');
+      expect(User.findByPk).toHaveBeenCalledWith(99);
+    });
+
+    it('should succeed when assigned_to points to an existing user', async () => {
+      const mockTask = createMockTask();
+      Task.findOne.mockResolvedValue(mockTask);
+      User.findByPk.mockResolvedValue({ id: 5, full_name: 'Jane Doe', email: 'jane@example.com' });
+      const updatedTask = createMockTask({ assigned_to: 5 });
+      Task.findByPk.mockResolvedValue(updatedTask);
+
+      const result = await taskService.updateTask(1, 1, { assigned_to: 5 });
+
+      expect(User.findByPk).toHaveBeenCalledWith(5);
+      expect(mockTask.update).toHaveBeenCalled();
+      expect(result).toBe(updatedTask);
     });
   });
 
@@ -403,6 +418,29 @@ describe('TaskService', () => {
 
       await expect(taskService.completeTask(1, 1)).rejects.toThrow('DB_ERROR');
       expect(mockTransaction.rollback).toHaveBeenCalled();
+    });
+
+    const recurrenceTypes = ['weekly', 'biweekly', 'monthly', 'quarterly', 'yearly'];
+
+    recurrenceTypes.forEach((rule) => {
+      it(`should create next task for ${rule} recurrence`, async () => {
+        const pastDue = new Date('2026-01-01');
+        const mockTask = createMockTask({
+          is_recurring: true,
+          recurrence_rule: rule,
+          due_date: pastDue
+        });
+        Task.findOne.mockResolvedValue(mockTask);
+        Task.create.mockResolvedValue({});
+        Task.findByPk.mockResolvedValue(mockTask);
+
+        await taskService.completeTask(1, 1);
+
+        expect(Task.create).toHaveBeenCalledWith(
+          expect.objectContaining({ is_recurring: true, recurrence_rule: rule }),
+          expect.any(Object)
+        );
+      });
     });
   });
 });
