@@ -222,25 +222,30 @@ describe('vaccinationController', () => {
   });
 
   describe('getByRabbit', () => {
-    it('should include user_id filter on Rabbit include to prevent data leakage', async () => {
+    it('should verify ownership pre-check calls Rabbit.findOne with id and user_id', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Vaccination.findAll.mockResolvedValue([{ id: 1 }]);
 
-      const req = mockReq({ params: { rabbitId: '1' }, user: { id: 42 } });
+      const req = mockReq({ params: { rabbitId: '5' }, user: { id: 42 } });
       const res = mockRes();
 
       await ctrl.getByRabbit(req, res, mockNext);
 
-      expect(Vaccination.findAll).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { rabbit_id: '1' },
-          include: expect.arrayContaining([
-            expect.objectContaining({
-              where: { user_id: 42 }
-            })
-          ])
-        })
-      );
+      expect(Rabbit.findOne).toHaveBeenCalledWith({
+        where: { id: '5', user_id: 42 }
+      });
+    });
+
+    it('should return 404 and skip findAll when rabbit does not belong to user', async () => {
+      Rabbit.findOne.mockResolvedValue(null);
+
+      const req = mockReq({ params: { rabbitId: '5' }, user: { id: 42 } });
+      const res = mockRes();
+
+      await ctrl.getByRabbit(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(Vaccination.findAll).not.toHaveBeenCalled();
     });
 
     it('should return vaccinations for rabbit', async () => {
