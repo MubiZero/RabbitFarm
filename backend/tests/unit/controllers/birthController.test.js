@@ -305,6 +305,24 @@ describe('birthController', () => {
       expect(mockTx.rollback).toHaveBeenCalled();
     });
 
+    it('should NOT update kits_weaned when creating kits (weaning is a separate event)', async () => {
+      const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0, update: jest.fn().mockResolvedValue(true) };
+      const mother = { id: 2, cage_id: null, getCage: jest.fn().mockResolvedValue(null) };
+      Birth.findOne.mockResolvedValue(birth);
+      Rabbit.findByPk.mockResolvedValue(mother);
+      Rabbit.create.mockResolvedValue({ id: 10 });
+
+      const req = mockReq({ params: { id: '1' }, body: kitBody });
+      const res = mockRes();
+
+      await ctrl.createKitsFromBirth(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(mockTx.commit).toHaveBeenCalled();
+      // birth.update should NOT be called — kits_weaned must remain unchanged at birth
+      expect(birth.update).not.toHaveBeenCalled();
+    });
+
     it('should use name_prefix when provided', async () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0, update: jest.fn().mockResolvedValue(true) };
       const mother = { id: 2, cage_id: null, getCage: jest.fn().mockResolvedValue(null) };
