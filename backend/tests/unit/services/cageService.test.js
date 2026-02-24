@@ -122,13 +122,48 @@ describe('CageService', () => {
 
     it('should filter by only_available', async () => {
       const available = createMockCage({ rabbits: [], condition: 'good', capacity: 2 });
-      const unavailable = createMockCage({ id: 2, rabbits: [{ id: 1 }, { id: 2 }], capacity: 2 });
+      const unavailable = createMockCage({ id: 2, rabbits: [{ id: 1 }, { id: 2 }], capacity: 2, condition: 'good' });
       Cage.findAndCountAll.mockResolvedValue({ count: 2, rows: [available, unavailable] });
 
       const result = await cageService.listCages(1, { only_available: 'true' });
 
-      // only_available filters in-memory
       expect(result.items.every(c => c.is_available)).toBe(true);
+    });
+
+    it('should pass condition=good in SQL WHERE when only_available is true', async () => {
+      Cage.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
+
+      await cageService.listCages(1, { only_available: 'true' });
+
+      const callArg = Cage.findAndCountAll.mock.calls[0][0];
+      expect(callArg.where.condition).toBe('good');
+    });
+
+    it('should paginate correctly when only_available is true', async () => {
+      // 3 cages with condition=good, but only 2 are actually available (not full)
+      const cages = [
+        createMockCage({ id: 1, rabbits: [], condition: 'good', capacity: 2 }),
+        createMockCage({ id: 2, rabbits: [{ id: 1 }, { id: 2 }], condition: 'good', capacity: 2 }), // full
+        createMockCage({ id: 3, rabbits: [], condition: 'good', capacity: 3 })
+      ];
+      Cage.findAndCountAll.mockResolvedValue({ count: 3, rows: cages });
+
+      // Request page 1 with limit 1
+      const result = await cageService.listCages(1, { only_available: 'true' }, { page: 1, limit: 1 });
+
+      // Total should be 2 (only available cages), not 3
+      expect(result.total).toBe(2);
+      // Should return only 1 item (limit=1)
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].id).toBe(1);
+
+      // Page 2 should return the second available cage
+      Cage.findAndCountAll.mockResolvedValue({ count: 3, rows: cages });
+      const page2 = await cageService.listCages(1, { only_available: 'true' }, { page: 2, limit: 1 });
+
+      expect(page2.total).toBe(2);
+      expect(page2.items).toHaveLength(1);
+      expect(page2.items[0].id).toBe(3);
     });
 
     it('should apply type and condition filters in where clause', async () => {

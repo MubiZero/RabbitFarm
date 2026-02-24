@@ -59,7 +59,9 @@ class CageService {
       only_available
     } = { ...filters, ...pagination };
 
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const offset = (parsedPage - 1) * parsedLimit;
     const where = { user_id: userId };
 
     if (type) where.type = type;
@@ -73,20 +75,38 @@ class CageService {
       ];
     }
 
+    // When only_available is requested, push condition filter to SQL and
+    // handle occupancy check after fetch but before pagination so counts stay correct.
+    if (only_available === 'true') {
+      where.condition = 'good';
+
+      // Fetch ALL matching cages (no limit/offset) so we can filter by computed occupancy
+      const allCages = await Cage.findAndCountAll({
+        where,
+        include: [{ ...RABBIT_INCLUDE, where: { user_id: userId } }],
+        order: [[sort_by, sort_order.toUpperCase()]],
+        distinct: true
+      });
+
+      const allItems = allCages.rows.map(addOccupancy).filter(c => c.is_available);
+      const total = allItems.length;
+      const items = allItems.slice(offset, offset + parsedLimit);
+
+      return { items, total, page: parsedPage, limit: parsedLimit };
+    }
+
     const cages = await Cage.findAndCountAll({
       where,
       include: [{ ...RABBIT_INCLUDE, where: { user_id: userId } }],
-      limit: parseInt(limit),
+      limit: parsedLimit,
       offset,
       order: [[sort_by, sort_order.toUpperCase()]],
       distinct: true
     });
 
-    let items = cages.rows.map(addOccupancy);
-    if (only_available === 'true') items = items.filter(c => c.is_available);
-    const total = only_available === 'true' ? items.length : cages.count;
+    const items = cages.rows.map(addOccupancy);
 
-    return { items, total, page: parseInt(page), limit: parseInt(limit) };
+    return { items, total: cages.count, page: parsedPage, limit: parsedLimit };
   }
 
   async updateCage(id, userId, data) {
