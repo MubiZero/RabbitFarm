@@ -312,93 +312,139 @@ class VaccinationController {
    */
   async getStatistics(req, res, next) {
     try {
-      const vaccinations = await Vaccination.findAll({
-        include: [
-          {
-            model: Rabbit,
-            as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
-            attributes: ['id', 'status']
-          }
-        ]
-      });
-
+      const user_id = req.user.id;
       const now = new Date();
       const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-
-      const stats = {
-        total_vaccinations: vaccinations.length,
-        by_vaccine_type: {
-          vhd: 0,
-          myxomatosis: 0,
-          pasteurellosis: 0,
-          other: 0
-        },
-        upcoming: {
-          total: 0,
-          next_30_days: 0,
-          overdue: 0,
-          list: []
-        },
-        this_year: 0,
-        last_30_days: 0
-      };
-
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       const yearStart = new Date(now.getFullYear(), 0, 1);
 
-      vaccinations.forEach(vaccination => {
-        // Count by type
-        stats.by_vaccine_type[vaccination.vaccine_type]++;
+      const rabbitInclude = {
+        model: Rabbit,
+        as: 'rabbit',
+        where: { user_id },
+        attributes: []
+      };
 
-        // Count this year
-        if (new Date(vaccination.vaccination_date) >= yearStart) {
-          stats.this_year++;
-        }
+      // Run all aggregate queries in parallel
+      const [
+        totalVaccinations,
+        byVaccineType,
+        thisYear,
+        last30Days,
+        upcomingTotal,
+        upcomingNext30Days,
+        overdueCount,
+        upcomingList
+      ] = await Promise.all([
+        // Total count
+        Vaccination.count({
+          include: [rabbitInclude]
+        }),
 
-        // Count last 30 days
-        if (new Date(vaccination.vaccination_date) >= thirtyDaysAgo) {
-          stats.last_30_days++;
-        }
+        // Count by vaccine_type
+        Vaccination.findAll({
+          attributes: [
+            'vaccine_type',
+            [sequelize.fn('COUNT', sequelize.col('Vaccination.id')), 'count']
+          ],
+          include: [rabbitInclude],
+          group: ['vaccine_type'],
+          raw: true
+        }),
 
-        // Check upcoming vaccinations
-        if (vaccination.next_vaccination_date) {
-          const nextDate = new Date(vaccination.next_vaccination_date);
+        // This year count
+        Vaccination.count({
+          where: { vaccination_date: { [Op.gte]: yearStart } },
+          include: [rabbitInclude]
+        }),
 
-          if (nextDate >= now) {
-            stats.upcoming.total++;
+        // Last 30 days count
+        Vaccination.count({
+          where: { vaccination_date: { [Op.gte]: thirtyDaysAgo } },
+          include: [rabbitInclude]
+        }),
 
-            if (nextDate <= thirtyDaysFromNow) {
-              stats.upcoming.next_30_days++;
-              stats.upcoming.list.push({
-                id: vaccination.id,
-                rabbit_id: vaccination.rabbit_id,
-                rabbit_name: vaccination.rabbit?.name,
-                vaccine_name: vaccination.vaccine_name,
-                vaccine_type: vaccination.vaccine_type,
-                next_vaccination_date: vaccination.next_vaccination_date,
-                days_until: Math.ceil((nextDate - now) / (1000 * 60 * 60 * 24))
-              });
-            }
-          } else {
-            // Overdue
-            stats.upcoming.overdue++;
-            stats.upcoming.list.push({
-              id: vaccination.id,
-              rabbit_id: vaccination.rabbit_id,
-              rabbit_name: vaccination.rabbit?.name,
-              vaccine_name: vaccination.vaccine_name,
-              vaccine_type: vaccination.vaccine_type,
-              next_vaccination_date: vaccination.next_vaccination_date,
-              days_until: Math.ceil((nextDate - now) / (1000 * 60 * 60 * 24)),
-              is_overdue: true
-            });
-          }
+        // Upcoming total (next_vaccination_date >= now)
+        Vaccination.count({
+          where: { next_vaccination_date: { [Op.gte]: now } },
+          include: [rabbitInclude]
+        }),
+
+        // Upcoming next 30 days
+        Vaccination.count({
+          where: {
+            next_vaccination_date: { [Op.gte]: now, [Op.lte]: thirtyDaysFromNow }
+          },
+          include: [rabbitInclude]
+        }),
+
+        // Overdue (next_vaccination_date < now)
+        Vaccination.count({
+          where: {
+            next_vaccination_date: { [Op.lt]: now, [Op.not]: null }
+          },
+          include: [rabbitInclude]
+        }),
+
+        // Upcoming + overdue list (only records with next_vaccination_date)
+        Vaccination.findAll({
+          where: {
+            next_vaccination_date: { [Op.not]: null }
+          },
+          include: [{
+            model: Rabbit,
+            as: 'rabbit',
+            where: { user_id },
+            attributes: ['id', 'name']
+          }],
+          attributes: ['id', 'rabbit_id', 'vaccine_name', 'vaccine_type', 'next_vaccination_date'],
+          order: [['next_vaccination_date', 'ASC']]
+        })
+      ]);
+
+      // Build by_vaccine_type map from SQL results
+      const byTypeMap = { vhd: 0, myxomatosis: 0, pasteurellosis: 0, other: 0 };
+      byVaccineType.forEach(row => {
+        const type = row.vaccine_type;
+        if (type in byTypeMap) {
+          byTypeMap[type] = parseInt(row.count, 10);
         }
       });
 
-      // Sort upcoming list by days_until
-      stats.upcoming.list.sort((a, b) => a.days_until - b.days_until);
+      // Build upcoming list from fetched records
+      const list = upcomingList.map(v => {
+        const nextDate = new Date(v.next_vaccination_date);
+        const daysUntil = Math.ceil((nextDate - now) / (1000 * 60 * 60 * 24));
+        const entry = {
+          id: v.id,
+          rabbit_id: v.rabbit_id,
+          rabbit_name: v.rabbit?.name,
+          vaccine_name: v.vaccine_name,
+          vaccine_type: v.vaccine_type,
+          next_vaccination_date: v.next_vaccination_date,
+          days_until: daysUntil
+        };
+        if (nextDate < now) {
+          entry.is_overdue = true;
+        }
+        return entry;
+      });
+
+      // Sort by days_until
+      list.sort((a, b) => a.days_until - b.days_until);
+
+      const stats = {
+        total_vaccinations: totalVaccinations,
+        by_vaccine_type: byTypeMap,
+        upcoming: {
+          total: upcomingTotal,
+          next_30_days: upcomingNext30Days,
+          overdue: overdueCount,
+          list
+        },
+        this_year: thisYear,
+        last_30_days: last30Days
+      };
 
       return ApiResponse.success(res, stats, 'Статистика вакцинаций получена успешно');
     } catch (error) {

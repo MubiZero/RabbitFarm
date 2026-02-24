@@ -322,78 +322,116 @@ class MedicalRecordController {
    */
   async getStatistics(req, res, next) {
     try {
-      const medicalRecords = await MedicalRecord.findAll({
-        include: [
-          {
-            model: Rabbit,
-            as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
-            attributes: ['id', 'status']
-          }
-        ]
-      });
-
+      const user_id = req.user.id;
       const now = new Date();
       const thisYear = new Date(now.getFullYear(), 0, 1);
       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
-      const stats = {
-        total_records: medicalRecords.length,
-        by_outcome: {
-          recovered: 0,
-          ongoing: 0,
-          died: 0,
-          euthanized: 0
-        },
-        ongoing_treatments: [],
-        total_cost: 0,
-        this_year: 0,
-        last_month: 0
+      const rabbitInclude = {
+        model: Rabbit,
+        as: 'rabbit',
+        where: { user_id },
+        attributes: []
       };
 
-      medicalRecords.forEach(record => {
+      // Run all aggregate queries in parallel
+      const [
+        totalRecords,
+        byOutcome,
+        totalCostResult,
+        thisYearCount,
+        lastMonthCount,
+        ongoingTreatments
+      ] = await Promise.all([
+        // Total count
+        MedicalRecord.count({
+          include: [rabbitInclude]
+        }),
+
         // Count by outcome
-        if (record.outcome) {
-          stats.by_outcome[record.outcome]++;
-        }
+        MedicalRecord.findAll({
+          attributes: [
+            'outcome',
+            [sequelize.fn('COUNT', sequelize.col('MedicalRecord.id')), 'count']
+          ],
+          include: [rabbitInclude],
+          group: ['outcome'],
+          raw: true
+        }),
 
-        // Collect ongoing treatments
-        if (record.outcome === 'ongoing') {
-          const startDate = new Date(record.started_at);
-          const daysOngoing = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+        // Total cost (SUM)
+        MedicalRecord.findAll({
+          attributes: [
+            [sequelize.fn('SUM', sequelize.col('cost')), 'total_cost']
+          ],
+          include: [rabbitInclude],
+          raw: true
+        }),
 
-          stats.ongoing_treatments.push({
-            id: record.id,
-            rabbit_id: record.rabbit_id,
-            rabbit_name: record.rabbit?.name,
-            diagnosis: record.diagnosis,
-            started_at: record.started_at,
-            days_ongoing: daysOngoing,
-            symptoms: record.symptoms
-          });
-        }
+        // This year count
+        MedicalRecord.count({
+          where: { started_at: { [Op.gte]: thisYear } },
+          include: [rabbitInclude]
+        }),
 
-        // Sum costs
-        if (record.cost) {
-          stats.total_cost += parseFloat(record.cost);
-        }
+        // Last month count
+        MedicalRecord.count({
+          where: { started_at: { [Op.gte]: lastMonth } },
+          include: [rabbitInclude]
+        }),
 
-        // Count this year
-        if (new Date(record.started_at) >= thisYear) {
-          stats.this_year++;
-        }
+        // Ongoing treatments (limited query, not all records)
+        MedicalRecord.findAll({
+          where: { outcome: 'ongoing' },
+          include: [{
+            model: Rabbit,
+            as: 'rabbit',
+            where: { user_id },
+            attributes: ['id', 'name']
+          }],
+          attributes: ['id', 'rabbit_id', 'diagnosis', 'started_at', 'symptoms'],
+          order: [['started_at', 'ASC']]
+        })
+      ]);
 
-        // Count last month
-        if (new Date(record.started_at) >= lastMonth) {
-          stats.last_month++;
+      // Build by_outcome map from SQL results
+      const byOutcomeMap = { recovered: 0, ongoing: 0, died: 0, euthanized: 0 };
+      byOutcome.forEach(row => {
+        if (row.outcome && row.outcome in byOutcomeMap) {
+          byOutcomeMap[row.outcome] = parseInt(row.count, 10);
         }
       });
 
-      // Sort ongoing treatments by days (longest first)
-      stats.ongoing_treatments.sort((a, b) => b.days_ongoing - a.days_ongoing);
+      // Build ongoing treatments list
+      const ongoingList = ongoingTreatments.map(record => {
+        const startDate = new Date(record.started_at);
+        const daysOngoing = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+        return {
+          id: record.id,
+          rabbit_id: record.rabbit_id,
+          rabbit_name: record.rabbit?.name,
+          diagnosis: record.diagnosis,
+          started_at: record.started_at,
+          days_ongoing: daysOngoing,
+          symptoms: record.symptoms
+        };
+      });
 
-      // Round total cost
-      stats.total_cost = Math.round(stats.total_cost * 100) / 100;
+      // Sort ongoing treatments by days (longest first)
+      ongoingList.sort((a, b) => b.days_ongoing - a.days_ongoing);
+
+      // Extract total cost
+      const rawCost = totalCostResult[0]?.total_cost;
+      const totalCost = Math.round((rawCost ? parseFloat(rawCost) : 0) * 100) / 100;
+
+      const stats = {
+        total_records: totalRecords,
+        by_outcome: byOutcomeMap,
+        ongoing_treatments: ongoingList,
+        total_cost: totalCost,
+        this_year: thisYearCount,
+        last_month: lastMonthCount
+      };
 
       return ApiResponse.success(res, stats, 'Статистика медицинских записей получена успешно');
     } catch (error) {
