@@ -47,12 +47,12 @@ exports.create = async (req, res, next) => {
       if (!feedToUpdate) throw new Error('FEED_NOT_FOUND');
 
       const currentStock = parseFloat(feedToUpdate.current_stock);
-      if (currentStock < quantityNeeded) {
+      if (currentStock < quantity) {
         throw new Error('INSUFFICIENT_STOCK');
       }
 
       await feedToUpdate.update({
-        current_stock: currentStock - quantityNeeded
+        current_stock: currentStock - quantity
       }, { transaction: t });
 
       const record = await FeedingRecord.create({

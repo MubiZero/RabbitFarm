@@ -288,6 +288,7 @@ class VaccinationController {
         where: { id: req.params.id },
         include: [{
           model: Rabbit,
+          as: 'rabbit',
           where: { user_id: req.user.id },
           attributes: ['id']
         }]
