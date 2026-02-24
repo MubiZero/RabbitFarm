@@ -263,8 +263,15 @@ class MedicalRecordController {
       await medicalRecord.update(req.body, { transaction: t });
 
       // Automation: Status Update
-      if (['died', 'euthanized'].includes(req.body.outcome) && oldOutcome !== req.body.outcome) {
-        await medicalRecord.rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
+      const newOutcome = req.body.outcome;
+      if (newOutcome && newOutcome !== oldOutcome) {
+        if (['died', 'euthanized'].includes(newOutcome)) {
+          await medicalRecord.rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
+        } else if (newOutcome === 'recovered') {
+          await medicalRecord.rabbit.update({ status: 'alive' }, { transaction: t });
+        } else if (newOutcome === 'ongoing') {
+          await medicalRecord.rabbit.update({ status: 'sick' }, { transaction: t });
+        }
       }
 
       await t.commit();

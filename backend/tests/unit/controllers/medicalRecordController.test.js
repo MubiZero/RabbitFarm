@@ -364,6 +364,44 @@ describe('medicalRecordController', () => {
       expect(rabbitMock.update).toHaveBeenCalledWith({ status: 'dead', cage_id: null }, expect.any(Object));
     });
 
+    it('should update rabbit to alive when outcome changes to recovered', async () => {
+      const rabbitMock = { user_id: 1, update: jest.fn().mockResolvedValue(true) };
+      const medicalRecord = {
+        id: 1, outcome: 'ongoing', rabbit_id: 1,
+        rabbit: rabbitMock,
+        update: jest.fn().mockResolvedValue(true)
+      };
+      MedicalRecord.findByPk
+        .mockResolvedValueOnce(medicalRecord)
+        .mockResolvedValueOnce({ id: 1 });
+
+      await ctrl.update(
+        mockReq({ params: { id: '1' }, body: { outcome: 'recovered' } }),
+        mockRes(), mockNext
+      );
+
+      expect(rabbitMock.update).toHaveBeenCalledWith({ status: 'alive' }, expect.any(Object));
+    });
+
+    it('should update rabbit to sick when outcome changes to ongoing', async () => {
+      const rabbitMock = { user_id: 1, update: jest.fn().mockResolvedValue(true) };
+      const medicalRecord = {
+        id: 1, outcome: 'recovered', rabbit_id: 1,
+        rabbit: rabbitMock,
+        update: jest.fn().mockResolvedValue(true)
+      };
+      MedicalRecord.findByPk
+        .mockResolvedValueOnce(medicalRecord)
+        .mockResolvedValueOnce({ id: 1 });
+
+      await ctrl.update(
+        mockReq({ params: { id: '1' }, body: { outcome: 'ongoing' } }),
+        mockRes(), mockNext
+      );
+
+      expect(rabbitMock.update).toHaveBeenCalledWith({ status: 'sick' }, expect.any(Object));
+    });
+
     it('should return 404 if new rabbit_id not found', async () => {
       const medicalRecord = {
         id: 1, outcome: null, rabbit_id: 1,
