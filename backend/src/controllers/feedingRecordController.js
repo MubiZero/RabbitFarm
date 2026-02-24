@@ -242,42 +242,6 @@ exports.update = async (req, res, next) => {
       return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
     }
 
-    const oldQuantity = parseFloat(feedingRecord.quantity);
-    const oldFeedId = feedingRecord.feed_id;
-
-    // If quantity or feed changed, adjust stock
-    if (newQuantity || newFeedId) {
-      const targetFeedId = newFeedId || oldFeedId;
-      const targetQuantity = newQuantity ? parseFloat(newQuantity) : oldQuantity;
-
-      // Return stock to old feed
-      if (newFeedId && newFeedId !== oldFeedId) {
-        const oldFeed = await Feed.findByPk(oldFeedId);
-        if (oldFeed) {
-          await oldFeed.update({
-            current_stock: parseFloat(oldFeed.current_stock) + oldQuantity
-          });
-        }
-      }
-
-      // Deduct from new/same feed
-      const targetFeed = await Feed.findOne({
-        where: { id: targetFeedId, user_id: req.user.id }
-      });
-      if (!targetFeed) {
-        return ApiResponse.error(res, 'Корм не найден', 404);
-      }
-
-      const quantityDiff = targetQuantity - (targetFeedId === oldFeedId ? oldQuantity : 0);
-      const newStock = parseFloat(targetFeed.current_stock) - quantityDiff;
-
-      if (newStock < 0) {
-        return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
-      }
-
-      await targetFeed.update({ current_stock: newStock });
-    }
-
     if (req.body.rabbit_id && req.body.rabbit_id !== feedingRecord.rabbit_id) {
       const rabbit = await Rabbit.findOne({ where: { id: req.body.rabbit_id, user_id: req.user.id } });
       if (!rabbit) return ApiResponse.error(res, 'Кролик не найден', 404);
