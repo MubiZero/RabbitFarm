@@ -130,6 +130,71 @@ describe('TransactionService', () => {
       );
     });
 
+    it('should NOT update rabbit status when rabbit is already sold', async () => {
+      const mockRabbit = { id: 1, status: 'sold', update: jest.fn().mockResolvedValue(true) };
+      Rabbit.findOne.mockResolvedValue(mockRabbit);
+
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      Transaction.create.mockResolvedValue(mockTx);
+      Transaction.findByPk.mockResolvedValue(mockTx);
+
+      const result = await transactionService.createTransaction({
+        type: 'income',
+        category: 'sale',
+        amount: 500,
+        rabbit_id: 1,
+        user_id: 1
+      });
+
+      expect(mockRabbit.update).not.toHaveBeenCalled();
+      expect(mockDbTransaction.commit).toHaveBeenCalled();
+      expect(result).toBe(mockTx);
+    });
+
+    it('should NOT update rabbit status when rabbit is died', async () => {
+      const mockRabbit = { id: 1, status: 'died', update: jest.fn().mockResolvedValue(true) };
+      Rabbit.findOne.mockResolvedValue(mockRabbit);
+
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      Transaction.create.mockResolvedValue(mockTx);
+      Transaction.findByPk.mockResolvedValue(mockTx);
+
+      const result = await transactionService.createTransaction({
+        type: 'income',
+        category: 'sale',
+        amount: 500,
+        rabbit_id: 1,
+        user_id: 1
+      });
+
+      expect(mockRabbit.update).not.toHaveBeenCalled();
+      expect(mockDbTransaction.commit).toHaveBeenCalled();
+      expect(result).toBe(mockTx);
+    });
+
+    it('should mark alive rabbit as sold on sale transaction', async () => {
+      const mockRabbit = { id: 1, status: 'alive', update: jest.fn().mockResolvedValue(true) };
+      Rabbit.findOne.mockResolvedValue(mockRabbit);
+
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      Transaction.create.mockResolvedValue(mockTx);
+      Transaction.findByPk.mockResolvedValue(mockTx);
+
+      await transactionService.createTransaction({
+        type: 'income',
+        category: 'sale',
+        amount: 500,
+        rabbit_id: 1,
+        user_id: 1
+      });
+
+      expect(mockRabbit.update).toHaveBeenCalledWith(
+        { status: 'sold', cage_id: null },
+        expect.objectContaining({ transaction: mockDbTransaction })
+      );
+      expect(mockDbTransaction.commit).toHaveBeenCalled();
+    });
+
     it('should NOT mark rabbit as sold on non-sale income', async () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
