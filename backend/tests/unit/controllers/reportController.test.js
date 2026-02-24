@@ -181,12 +181,211 @@ describe('reportController', () => {
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
+    it('should apply from_date and to_date filters', async () => {
+      Transaction.findAll.mockResolvedValue([
+        { type: 'income', total: '500', category: 'sale', count: '2' },
+        { type: 'expense', total: '200', category: 'feed', count: '1' }
+      ]);
+
+      const req = mockReq({ query: { from_date: '2024-01-01', to_date: '2024-12-31' } });
+      const res = mockRes();
+
+      await ctrl.getFinancialReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(Transaction.findAll).toHaveBeenCalled();
+    });
+
     it('should call next on error', async () => {
       Transaction.findAll.mockRejectedValue(new Error('DB error'));
 
       await ctrl.getFinancialReport(mockReq({ query: {} }), mockRes(), mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    it('should group by category when groupBy=by_category', async () => {
+      // First call: totalByType; Second call: byCategory grouped
+      Transaction.findAll
+        .mockResolvedValueOnce([
+          { type: 'income', total: '1000' },
+          { type: 'expense', total: '300' }
+        ])
+        .mockResolvedValueOnce([
+          { category: 'sale', total_income: '1000', total_expense: '0' },
+          { category: 'feed', total_income: '0', total_expense: '300' }
+        ]);
+
+      const req = mockReq({ query: { groupBy: 'by_category' } });
+      const res = mockRes();
+
+      await ctrl.getFinancialReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const body = res.json.mock.calls[0][0];
+      expect(body.data.summary).toBeDefined();
+      expect(body.data.grouped).toHaveLength(2);
+      expect(body.data.grouped[0]).toEqual({
+        category: 'sale',
+        total_income: '1000.00',
+        total_expense: '0.00',
+        net: '1000.00'
+      });
+      expect(body.data.grouped[1]).toEqual({
+        category: 'feed',
+        total_income: '0.00',
+        total_expense: '300.00',
+        net: '-300.00'
+      });
+      // Should not have by_category (the old flat key)
+      expect(body.data.by_category).toBeUndefined();
+    });
+
+    it('should group by month when groupBy=by_month', async () => {
+      Transaction.findAll
+        .mockResolvedValueOnce([
+          { type: 'income', total: '1500' }
+        ])
+        .mockResolvedValueOnce([
+          { month: '2024-01', total_income: '800', total_expense: '200' },
+          { month: '2024-02', total_income: '700', total_expense: '0' }
+        ]);
+
+      const req = mockReq({ query: { groupBy: 'by_month' } });
+      const res = mockRes();
+
+      await ctrl.getFinancialReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const body = res.json.mock.calls[0][0];
+      expect(body.data.grouped).toHaveLength(2);
+      expect(body.data.grouped[0]).toEqual({
+        month: '2024-01',
+        total_income: '800.00',
+        total_expense: '200.00',
+        net: '600.00'
+      });
+      expect(body.data.grouped[1]).toEqual({
+        month: '2024-02',
+        total_income: '700.00',
+        total_expense: '0.00',
+        net: '700.00'
+      });
+    });
+
+    it('should group by type when groupBy=by_type', async () => {
+      Transaction.findAll
+        .mockResolvedValueOnce([
+          { type: 'income', total: '500' },
+          { type: 'expense', total: '200' }
+        ])
+        .mockResolvedValueOnce([
+          { type: 'income', total: '500', count: '3' },
+          { type: 'expense', total: '200', count: '2' }
+        ]);
+
+      const req = mockReq({ query: { groupBy: 'by_type' } });
+      const res = mockRes();
+
+      await ctrl.getFinancialReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const body = res.json.mock.calls[0][0];
+      expect(body.data.grouped).toHaveLength(2);
+      expect(body.data.grouped[0]).toEqual({
+        type: 'income',
+        total: '500.00',
+        count: 3
+      });
+      expect(body.data.grouped[1]).toEqual({
+        type: 'expense',
+        total: '200.00',
+        count: 2
+      });
+    });
+
+    it('should return default ungrouped response for unknown groupBy value', async () => {
+      Transaction.findAll
+        .mockResolvedValueOnce([{ type: 'income', total: '100' }])
+        .mockResolvedValueOnce([{ type: 'income', category: 'sale', total: '100', count: '1' }]);
+
+      const req = mockReq({ query: { groupBy: 'by_unknown' } });
+      const res = mockRes();
+
+      await ctrl.getFinancialReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const body = res.json.mock.calls[0][0];
+      expect(body.data.by_category).toBeDefined();
+      expect(body.data.grouped).toBeUndefined();
+    });
+  });
+
+  describe('getFarmReport — date filters & income/expense branches', () => {
+    it('should apply from_date and to_date filters', async () => {
+      setAllMocksToEmpty();
+      Rabbit.count.mockResolvedValue(3);
+
+      const req = mockReq({ query: { from_date: '2024-01-01', to_date: '2024-12-31' } });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should apply only from_date filter', async () => {
+      setAllMocksToEmpty();
+      const req = mockReq({ query: { from_date: '2024-06-01' } });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should calculate income and expense totals from transactions', async () => {
+      setAllMocksToEmpty();
+      Transaction.findAll.mockResolvedValue([
+        { type: 'income', total: '1000', count: '5' },
+        { type: 'expense', total: '400', count: '3' }
+      ]);
+
+      const req = mockReq({ query: {} });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const responseBody = res.json.mock.calls[0][0];
+      expect(responseBody.data.financial.summary.total_income).toBe(1000);
+      expect(responseBody.data.financial.summary.total_expenses).toBe(400);
+    });
+  });
+
+  describe('getHealthReport — date filters', () => {
+    it('should apply from_date and to_date filters', async () => {
+      Vaccination.findAll.mockResolvedValue([]);
+      MedicalRecord.findAll.mockResolvedValue([]);
+
+      const req = mockReq({ query: { from_date: '2024-01-01', to_date: '2024-12-31' } });
+      const res = mockRes();
+
+      await ctrl.getHealthReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should apply only to_date filter', async () => {
+      Vaccination.findAll.mockResolvedValue([]);
+      MedicalRecord.findAll.mockResolvedValue([]);
+
+      const req = mockReq({ query: { to_date: '2024-06-30' } });
+      const res = mockRes();
+
+      await ctrl.getHealthReport(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
     });
   });
 });
