@@ -103,6 +103,7 @@ describe('RabbitService', () => {
       // Father should be present but its father (circular back to 1) should be null
       expect(result.father).toBeDefined();
       expect(result.father.id).toBe(2);
+      expect(result.father.father).toBeNull();
     });
   });
 });

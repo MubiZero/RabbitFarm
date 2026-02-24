@@ -539,15 +539,13 @@ class RabbitService {
   async getPedigree(rabbitId, userId, generations = 3) {
     try {
       const rabbit = await this.getRabbitById(rabbitId, userId);
-      const visited = new Set();
-
-      const buildPedigree = async (currentRabbit, level) => {
+      const buildPedigree = async (currentRabbit, level, pathVisited = new Set()) => {
         if (!currentRabbit || level >= generations) {
           return currentRabbit;
         }
 
-        if (visited.has(currentRabbit.id)) return null;
-        visited.add(currentRabbit.id);
+        if (pathVisited.has(currentRabbit.id)) return null;
+        pathVisited.add(currentRabbit.id);
 
         const result = {
           id: currentRabbit.id,
@@ -561,7 +559,7 @@ class RabbitService {
         if (currentRabbit.father_id) {
           try {
             const father = await this.getRabbitById(currentRabbit.father_id, userId);
-            result.father = await buildPedigree(father, level + 1);
+            result.father = await buildPedigree(father, level + 1, pathVisited);
           } catch (error) {
             // Родитель не найден - пропускаем
             logger.warn('Father not found for pedigree', {
@@ -574,7 +572,7 @@ class RabbitService {
         if (currentRabbit.mother_id) {
           try {
             const mother = await this.getRabbitById(currentRabbit.mother_id, userId);
-            result.mother = await buildPedigree(mother, level + 1);
+            result.mother = await buildPedigree(mother, level + 1, pathVisited);
           } catch (error) {
             // Родитель не найден - пропускаем
             logger.warn('Mother not found for pedigree', {
@@ -584,6 +582,7 @@ class RabbitService {
           }
         }
 
+        pathVisited.delete(currentRabbit.id);
         return result;
       };
 
