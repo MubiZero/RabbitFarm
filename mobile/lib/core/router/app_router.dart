@@ -50,6 +50,9 @@ import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/more_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_farm_name_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_farm_type_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_ready_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -88,6 +91,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingWelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/farm-name',
+        name: 'onboarding-farm-name',
+        builder: (context, state) => const OnboardingFarmNameScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/farm-type',
+        name: 'onboarding-farm-type',
+        builder: (context, state) => const OnboardingFarmTypeScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/ready',
+        name: 'onboarding-ready',
+        builder: (context, state) => const OnboardingReadyScreen(),
       ),
 
       // Auth routes
