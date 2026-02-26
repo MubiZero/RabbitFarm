@@ -48,31 +48,40 @@ import '../../features/reports/presentation/screens/dashboard_settings_screen.da
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/more_screen.dart';
+import '../../features/onboarding/presentation/screens/splash_screen.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     redirect: (context, state) {
       final isAuthenticated = authState.isAuthenticated;
-      final isLoggingIn = state.matchedLocation == '/login';
-      final isRegistering = state.matchedLocation == '/register';
+      final loc = state.matchedLocation;
+      final isPublic = loc == '/login' || loc == '/register' ||
+          loc == '/splash' || loc.startsWith('/onboarding');
 
-      // If not authenticated and not on login/register page, redirect to login
-      if (!isAuthenticated && !isLoggingIn && !isRegistering) {
-        return '/login';
+      // If not authenticated and not on a public page, redirect to splash
+      if (!isAuthenticated && !isPublic) {
+        return '/splash';
       }
 
-      // If authenticated and on login/register page, redirect to home
-      if (isAuthenticated && (isLoggingIn || isRegistering)) {
+      // If authenticated and on login/register/splash, redirect to home
+      if (isAuthenticated && (loc == '/login' || loc == '/register' || loc == '/splash')) {
         return '/today';
       }
 
       return null; // No redirect
     },
     routes: [
+      // Splash
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       // Auth routes
       GoRoute(
         path: '/login',
@@ -95,8 +104,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) {
           return MainNavigationScreen(
-            child: child,
             currentPath: state.uri.path,
+            child: child,
           );
         },
         routes: [
