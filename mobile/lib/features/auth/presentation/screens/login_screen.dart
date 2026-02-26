@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -13,10 +15,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'admin@rabbitfarm.com');
-  final _passwordController = TextEditingController(text: 'admin123');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -46,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(message),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -59,50 +60,103 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo/Icon
-                  Icon(
-                    Icons.pets,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.primary,
+                  // Logo
+                  Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.accentEmerald.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.pets,
+                        size: 36,
+                        color: AppColors.accentEmerald,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // Title
                   Text(
                     'RabbitFarm',
-                    style: Theme.of(context).textTheme.displayMedium,
+                    style: AppTypography.displayMd.copyWith(
+                      color: AppColors.darkTextPrimary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
 
                   // Subtitle
                   Text(
-                    'Управление кроликофермой',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                    'Войдите в свой аккаунт',
+                    style: AppTypography.bodyMd.copyWith(
+                      color: AppColors.darkTextSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
+
+                  // Google button (UI only)
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // TODO: implement Google Sign-In
+                    },
+                    icon: const Icon(Icons.g_mobiledata, size: 22),
+                    label: const Text('Войти через Google'),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Apple button (UI only)
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // TODO: implement Apple Sign-In
+                    },
+                    icon: const Icon(Icons.apple, size: 22),
+                    label: const Text('Войти через Apple'),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Divider
+                  Row(
+                    children: [
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'или',
+                          style: AppTypography.labelSm.copyWith(
+                            color: AppColors.darkTextHint,
+                          ),
+                        ),
+                      ),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
 
                   // Email field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    style: AppTypography.bodyMd.copyWith(
+                      color: AppColors.darkTextPrimary,
+                    ),
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       hintText: 'Введите email',
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: Icon(Icons.email_outlined),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -120,15 +174,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    style: AppTypography.bodyMd.copyWith(
+                      color: AppColors.darkTextPrimary,
+                    ),
                     decoration: InputDecoration(
                       labelText: 'Пароль',
                       hintText: 'Введите пароль',
-                      prefixIcon: const Icon(Icons.lock),
+                      prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
                         onPressed: () {
                           setState(() {
@@ -147,23 +204,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 8),
-
-                  // Remember me checkbox
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: (value) {
-                          setState(() {
-                            _rememberMe = value ?? false;
-                          });
-                        },
-                      ),
-                      const Text('Запомнить меня'),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
 
                   // Login button
                   ElevatedButton(
@@ -180,13 +221,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           )
                         : const Text('Войти'),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
                   // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Нет аккаунта? '),
+                      Text(
+                        'Нет аккаунта? ',
+                        style: AppTypography.bodyMd.copyWith(
+                          color: AppColors.darkTextSecondary,
+                        ),
+                      ),
                       TextButton(
                         onPressed: authState.isLoading
                             ? null
@@ -194,36 +240,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: const Text('Зарегистрироваться'),
                       ),
                     ],
-                  ),
-
-                  // Test credentials hint
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Тестовые данные:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[900],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Email: admin@rabbitfarm.com\nПароль: admin123',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue[700],
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
