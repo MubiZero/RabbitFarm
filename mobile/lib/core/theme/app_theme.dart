@@ -1,227 +1,178 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
+import 'app_typography.dart';
+import 'app_radius.dart';
 
 class AppTheme {
-  // Modern Color Palette - Минималистичные и современные цвета
-  static const Color primaryColor = Color(0xFF10B981); // Emerald Green
-  static const Color primaryLight = Color(0xFF34D399);
-  static const Color primaryDark = Color(0xFF059669);
+  /// Build a ThemeData for the given brightness and accent color.
+  static ThemeData build({
+    required Brightness brightness,
+    required Color accent,
+  }) {
+    final isDark = brightness == Brightness.dark;
 
-  static const Color secondaryColor = Color(0xFF6366F1); // Indigo
-  static const Color secondaryLight = Color(0xFF818CF8);
-  static const Color secondaryDark = Color(0xFF4F46E5);
+    final bg         = isDark ? AppColors.darkBackground     : AppColors.lightBackground;
+    final surface    = isDark ? AppColors.darkSurface        : AppColors.lightSurface;
+    final surfaceVar = isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant;
+    final border     = isDark ? AppColors.darkBorder         : AppColors.lightBorder;
+    final txtPri     = isDark ? AppColors.darkTextPrimary    : AppColors.lightTextPrimary;
+    final txtSec     = isDark ? AppColors.darkTextSecondary  : AppColors.lightTextSecondary;
+    final txtHint    = isDark ? AppColors.darkTextHint       : AppColors.lightTextHint;
 
-  static const Color accentColor = Color(0xFFF59E0B); // Amber
-  static const Color accentLight = Color(0xFFFBBF24);
+    final colorScheme = ColorScheme(
+      brightness: brightness,
+      primary: accent,
+      onPrimary: Colors.white,
+      primaryContainer: accent.withValues(alpha: 0.15),
+      onPrimaryContainer: accent,
+      secondary: accent,
+      onSecondary: Colors.white,
+      secondaryContainer: accent.withValues(alpha: 0.1),
+      onSecondaryContainer: accent,
+      error: AppColors.error,
+      onError: Colors.white,
+      surface: surface,
+      onSurface: txtPri,
+      onSurfaceVariant: txtSec,
+      outline: border,
+      outlineVariant: border.withValues(alpha: 0.5),
+      shadow: Colors.black,
+      scrim: Colors.black,
+    );
 
-  // Background colors - Градиентный фон
-  static const Color backgroundColor = Color(0xFFF8FAFC);
-  static const Color backgroundGradientStart = Color(0xFFF1F5F9);
-  static const Color backgroundGradientEnd = Color(0xFFE2E8F0);
-
-  static const Color surfaceColor = Colors.white;
-  static const Color surfaceVariant = Color(0xFFF8FAFC);
-
-  // Semantic colors
-  static const Color errorColor = Color(0xFFEF4444);
-  static const Color successColor = Color(0xFF10B981);
-  static const Color warningColor = Color(0xFFF59E0B);
-  static const Color infoColor = Color(0xFF3B82F6);
-
-  // Text colors
-  static const Color textPrimary = Color(0xFF0F172A);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color textHint = Color(0xFF94A3B8);
-
-  // Chart colors
-  static const List<Color> chartColors = [
-    Color(0xFF10B981), // Green
-    Color(0xFF6366F1), // Indigo
-    Color(0xFFF59E0B), // Amber
-    Color(0xFFEC4899), // Pink
-    Color(0xFF8B5CF6), // Purple
-    Color(0xFF14B8A6), // Teal
-  ];
-
-  // Gradient definitions
-  static const LinearGradient primaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primaryLight, primaryColor],
-  );
-
-  static const LinearGradient secondaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [secondaryLight, secondaryColor],
-  );
-
-  static const LinearGradient backgroundGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [backgroundGradientStart, backgroundGradientEnd],
-  );
-
-  // Shadow definitions
-  static List<BoxShadow> get cardShadow => [
-    BoxShadow(
-      color: Colors.black.withOpacity(0.04),
-      blurRadius: 12,
-      offset: const Offset(0, 4),
-    ),
-    BoxShadow(
-      color: Colors.black.withOpacity(0.02),
-      blurRadius: 6,
-      offset: const Offset(0, 2),
-    ),
-  ];
-
-  static List<BoxShadow> get cardShadowHover => [
-    BoxShadow(
-      color: Colors.black.withOpacity(0.08),
-      blurRadius: 20,
-      offset: const Offset(0, 8),
-    ),
-    BoxShadow(
-      color: Colors.black.withOpacity(0.04),
-      blurRadius: 12,
-      offset: const Offset(0, 4),
-    ),
-  ];
-
-  // Light Theme
-  static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryColor,
-        primary: primaryColor,
-        secondary: secondaryColor,
-        error: errorColor,
-        surface: surfaceColor,
-        background: backgroundColor,
-      ),
-      scaffoldBackgroundColor: backgroundColor,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: bg,
+      fontFamily: 'Inter',
+
+      appBarTheme: AppBarTheme(
+        backgroundColor: bg,
+        foregroundColor: txtPri,
         elevation: 0,
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: AppTypography.titleLg.copyWith(color: txtPri),
+        iconTheme: IconThemeData(color: txtPri),
       ),
+
       cardTheme: CardThemeData(
-        color: surfaceColor,
+        color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.lg_,
+          side: BorderSide(color: border, width: 1),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        margin: EdgeInsets.zero,
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceColor,
+        fillColor: surfaceVar,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+          borderRadius: AppRadius.md_,
+          borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+          borderRadius: AppRadius.md_,
+          borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
+          borderRadius: AppRadius.md_,
+          borderSide: BorderSide(color: accent, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: errorColor),
+          borderRadius: AppRadius.md_,
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: errorColor, width: 2),
+          borderRadius: AppRadius.md_,
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+        labelStyle: AppTypography.bodyMd.copyWith(color: txtSec),
+        hintStyle: AppTypography.bodyMd.copyWith(color: txtHint),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: accent,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 16,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
+          minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.md_),
+          elevation: 0,
+          textStyle: AppTypography.labelLg,
         ),
       ),
+
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: accent,
+          side: BorderSide(color: accent),
+          minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.md_),
+          textStyle: AppTypography.labelLg,
+        ),
+      ),
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: primaryColor,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
+          foregroundColor: accent,
+          textStyle: AppTypography.labelLg,
         ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: primaryColor,
+
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: accent,
         foregroundColor: Colors.white,
+        elevation: 0,
+        shape: const CircleBorder(),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surfaceColor,
-        selectedItemColor: primaryColor,
-        unselectedItemColor: textSecondary,
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: surface,
+        selectedItemColor: accent,
+        unselectedItemColor: txtSec,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
+        selectedLabelStyle: AppTypography.labelSm,
+        unselectedLabelStyle: AppTypography.labelSm,
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-        ),
-        displayMedium: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-        ),
-        displaySmall: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
-        titleLarge: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: textPrimary,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: textPrimary,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: textPrimary,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
+
+      dividerTheme: DividerThemeData(
+        color: border,
+        thickness: 1,
+        space: 1,
+      ),
+
+      textTheme: TextTheme(
+        displayLarge:   AppTypography.displayLg.copyWith(color: txtPri),
+        displayMedium:  AppTypography.displayMd.copyWith(color: txtPri),
+        displaySmall:   AppTypography.titleLg.copyWith(color: txtPri),
+        headlineMedium: AppTypography.titleLg.copyWith(color: txtPri),
+        titleLarge:     AppTypography.titleMd.copyWith(color: txtPri),
+        titleMedium:    AppTypography.titleMd.copyWith(color: txtPri),
+        bodyLarge:      AppTypography.bodyLg.copyWith(color: txtPri),
+        bodyMedium:     AppTypography.bodyMd.copyWith(color: txtPri),
+        labelLarge:     AppTypography.labelLg.copyWith(color: txtPri),
+        labelSmall:     AppTypography.labelSm.copyWith(color: txtSec),
       ),
     );
   }
+
+  // Convenience shortcuts for common color lookups via BuildContext.
+  static Color bg(BuildContext context) =>
+      Theme.of(context).scaffoldBackgroundColor;
+  static Color surface(BuildContext context) =>
+      Theme.of(context).colorScheme.surface;
+  static Color surfaceVar(BuildContext context) =>
+      Theme.of(context).colorScheme.secondaryContainer;
+  static Color border(BuildContext context) =>
+      Theme.of(context).colorScheme.outline;
+  static Color textPrimary(BuildContext context) =>
+      Theme.of(context).colorScheme.onSurface;
+  static Color textSecondary(BuildContext context) =>
+      Theme.of(context).colorScheme.onSurfaceVariant;
+  static Color accent(BuildContext context) =>
+      Theme.of(context).colorScheme.primary;
 }
