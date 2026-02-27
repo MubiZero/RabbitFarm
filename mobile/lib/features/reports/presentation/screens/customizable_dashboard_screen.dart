@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/dashboard_config.dart';
 import '../../data/models/report_model.dart';
 import '../providers/dashboard_config_provider.dart';
@@ -23,8 +23,8 @@ class CustomizableDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.backgroundGradient,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
         ),
         child: dashboardAsync.when(
           data: (dashboard) {
@@ -34,9 +34,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               error: (error, stack) => _buildError(context, ref, error),
             );
           },
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
           error: (error, stack) => _buildError(context, ref, error),
@@ -86,17 +88,17 @@ class CustomizableDashboardScreen extends ConsumerWidget {
           children: [
             Text(
               'RabbitFarm',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: AppColors.darkTextPrimary,
               ),
             ),
             Text(
               'Управление фермой',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppTheme.textSecondary,
+                color: AppColors.darkTextSecondary,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -110,11 +112,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.cardShadow,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.settings,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
               size: 22,
             ),
           ),
@@ -130,11 +132,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.cardShadow,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.refresh,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
               size: 22,
             ),
           ),
@@ -224,7 +226,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -303,7 +305,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -322,7 +324,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
                       ]
                     : List<double>.from(dashboard.rabbits.history
                         .map((e) => (e as num).toDouble())),
-                color: AppTheme.primaryColor,
+                color: AppColors.accentEmerald,
                 onTap: () => context.push('/rabbits'),
               ),
             ),
@@ -339,7 +341,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
                       ]
                     : List<double>.from(dashboard.breeding.history
                         .map((e) => (e as num).toDouble())),
-                color: AppTheme.accentColor,
+                color: AppColors.accentRose,
                 onTap: () => context.push('/births'),
               ),
             ),
@@ -349,7 +351,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
         ModernStatCard(
           title: 'Клетки',
           icon: Icons.grid_view,
-          gradient: AppTheme.secondaryGradient,
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF10B981), Color(0xFF059669)]),
           route: '/cages',
           stats: [
             StatItem(
@@ -360,13 +362,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Занято',
               value: '${dashboard.cages.occupied}',
-              valueColor: AppTheme.textPrimary,
+              valueColor: AppColors.darkTextPrimary,
               icon: Icons.check_box,
             ),
             StatItem(
               label: 'Свободно',
               value: '${dashboard.cages.available}',
-              valueColor: AppTheme.successColor,
+              valueColor: AppColors.success,
               icon: Icons.check_box_outline_blank,
             ),
           ],
@@ -390,7 +392,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -408,19 +410,19 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Доход',
               value: '${income.toStringAsFixed(0)} ₽',
-              valueColor: AppTheme.successColor,
+              valueColor: AppColors.success,
               icon: Icons.arrow_upward,
             ),
             StatItem(
               label: 'Расход',
               value: '${expenses.toStringAsFixed(0)} ₽',
-              valueColor: AppTheme.errorColor,
+              valueColor: AppColors.error,
               icon: Icons.arrow_downward,
             ),
             StatItem(
               label: 'Прибыль',
               value: '${profit.toStringAsFixed(0)} ₽',
-              valueColor: profit >= 0 ? AppTheme.successColor : AppTheme.errorColor,
+              valueColor: profit >= 0 ? AppColors.success : AppColors.error,
               icon: profit >= 0 ? Icons.trending_up : Icons.trending_down,
             ),
           ],
@@ -440,7 +442,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -458,15 +460,15 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Предстоящие',
               value: '${dashboard.health.upcomingVaccinations}',
-              valueColor: AppTheme.warningColor,
+              valueColor: AppColors.warning,
               icon: Icons.schedule,
             ),
             StatItem(
               label: 'Просрочены',
               value: '${dashboard.health.overdueVaccinations}',
               valueColor: dashboard.health.overdueVaccinations > 0
-                  ? AppTheme.errorColor
-                  : AppTheme.successColor,
+                  ? AppColors.error
+                  : AppColors.success,
               icon: dashboard.health.overdueVaccinations > 0
                   ? Icons.warning
                   : Icons.check_circle,
@@ -493,7 +495,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -535,8 +537,8 @@ class CustomizableDashboardScreen extends ConsumerWidget {
                     label: 'Просрочены',
                     value: '${dashboard.tasks.overdue}',
                     valueColor: dashboard.tasks.overdue > 0
-                        ? AppTheme.errorColor
-                        : AppTheme.successColor,
+                        ? AppColors.error
+                        : AppColors.success,
                     icon: Icons.warning_amber,
                   ),
                 ],
@@ -559,7 +561,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -578,8 +580,8 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               label: 'Корма с низким запасом',
               value: '${dashboard.inventory.lowStockFeeds}',
               valueColor: dashboard.inventory.lowStockFeeds > 0
-                  ? AppTheme.errorColor
-                  : AppTheme.successColor,
+                  ? AppColors.error
+                  : AppColors.success,
               icon: dashboard.inventory.lowStockFeeds > 0
                   ? Icons.warning
                   : Icons.check_circle,
@@ -616,7 +618,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
   LinearGradient _getGradientForAction(QuickActionType type) {
     switch (type) {
       case QuickActionType.addRabbit:
-        return AppTheme.primaryGradient;
+        return const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.accentEmerald, Color(0xFF059669)],
+        );
       case QuickActionType.addVaccination:
         return const LinearGradient(
           begin: Alignment.topLeft,
@@ -642,7 +648,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
           colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
         );
       case QuickActionType.addTransaction:
-        return AppTheme.secondaryGradient;
+        return const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
+        );
       case QuickActionType.addCage:
         return const LinearGradient(
           begin: Alignment.topLeft,
@@ -674,13 +684,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.error_outline,
                 size: 64,
-                color: AppTheme.errorColor,
+                color: AppColors.error,
               ),
             ),
             const SizedBox(height: 24),
@@ -689,7 +699,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: AppColors.darkTextPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -697,7 +707,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               '$error',
               style: const TextStyle(
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: AppColors.darkTextSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -710,7 +720,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               icon: const Icon(Icons.refresh),
               label: const Text('Повторить'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor,
+                backgroundColor: AppColors.accentEmerald,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Баннер с важными уведомлениями и алертами
 class AlertBanner extends StatelessWidget {
@@ -76,9 +76,9 @@ class AlertBanner extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         message,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppTheme.textSecondary,
+                          color: AppColors.darkTextSecondary,
                         ),
                       ),
                     ],
@@ -89,7 +89,7 @@ class AlertBanner extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: onDismiss,
-                    color: AppTheme.textSecondary,
+                    color: AppColors.darkTextSecondary,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -114,30 +114,30 @@ class AlertBanner extends StatelessWidget {
       case AlertType.error:
         return _AlertConfig(
           icon: Icons.error_outline,
-          color: AppTheme.errorColor,
-          backgroundColor: AppTheme.errorColor.withOpacity(0.05),
-          borderColor: AppTheme.errorColor.withOpacity(0.2),
+          color: AppColors.error,
+          backgroundColor: AppColors.error.withOpacity(0.05),
+          borderColor: AppColors.error.withOpacity(0.2),
         );
       case AlertType.warning:
         return _AlertConfig(
           icon: Icons.warning_amber_outlined,
-          color: AppTheme.warningColor,
-          backgroundColor: AppTheme.warningColor.withOpacity(0.05),
-          borderColor: AppTheme.warningColor.withOpacity(0.2),
+          color: AppColors.warning,
+          backgroundColor: AppColors.warning.withOpacity(0.05),
+          borderColor: AppColors.warning.withOpacity(0.2),
         );
       case AlertType.success:
         return _AlertConfig(
           icon: Icons.check_circle_outline,
-          color: AppTheme.successColor,
-          backgroundColor: AppTheme.successColor.withOpacity(0.05),
-          borderColor: AppTheme.successColor.withOpacity(0.2),
+          color: AppColors.success,
+          backgroundColor: AppColors.success.withOpacity(0.05),
+          borderColor: AppColors.success.withOpacity(0.2),
         );
       case AlertType.info:
         return _AlertConfig(
           icon: Icons.info_outline,
-          color: AppTheme.infoColor,
-          backgroundColor: AppTheme.infoColor.withOpacity(0.05),
-          borderColor: AppTheme.infoColor.withOpacity(0.2),
+          color: AppColors.info,
+          backgroundColor: AppColors.info.withOpacity(0.05),
+          borderColor: AppColors.info.withOpacity(0.2),
         );
     }
   }

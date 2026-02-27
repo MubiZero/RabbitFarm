@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../providers/reports_provider.dart';
 import '../widgets/modern_stat_card.dart';
 import '../widgets/quick_action_button.dart';
@@ -19,14 +19,14 @@ class ModernDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.backgroundGradient,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
         ),
         child: dashboardAsync.when(
           data: (dashboard) => _buildDashboard(context, ref, dashboard),
           loading: () => const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentEmerald),
             ),
           ),
           error: (error, stack) => _buildError(context, ref, error),
@@ -86,14 +86,14 @@ class ModernDashboardScreen extends ConsumerWidget {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: AppColors.darkTextPrimary,
               ),
             ),
             Text(
               'Управление фермой',
               style: const TextStyle(
                 fontSize: 13,
-                color: AppTheme.textSecondary,
+                color: AppColors.darkTextSecondary,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -107,11 +107,11 @@ class ModernDashboardScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.cardShadow,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
             ),
             child: const Icon(
               Icons.notifications_outlined,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
               size: 22,
             ),
           ),
@@ -126,11 +126,11 @@ class ModernDashboardScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.cardShadow,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
             ),
             child: const Icon(
               Icons.refresh,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
               size: 22,
             ),
           ),
@@ -215,7 +215,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -228,7 +228,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               QuickActionButton(
                 icon: Icons.add,
                 label: 'Добавить кролика',
-                gradient: AppTheme.primaryGradient,
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.accentEmerald, Color(0xFF059669)]),
                 onTap: () => context.push('/rabbits/new'),
               ),
               const SizedBox(width: 12),
@@ -279,7 +279,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               QuickActionButton(
                 icon: Icons.attach_money,
                 label: 'Добавить транзакцию',
-                gradient: AppTheme.secondaryGradient,
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF10B981), Color(0xFF059669)]),
                 onTap: () => context.push('/transactions/form'),
               ),
             ],
@@ -300,7 +300,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -313,7 +313,7 @@ class ModernDashboardScreen extends ConsumerWidget {
                 value: '${dashboard.rabbits.total}',
                 subtitle: '${dashboard.rabbits.male}М / ${dashboard.rabbits.female}Ж',
                 data: _generateTrendData(dashboard.rabbits.total),
-                color: AppTheme.primaryColor,
+                color: AppColors.accentEmerald,
                 onTap: () => context.push('/rabbits'),
               ),
             ),
@@ -324,7 +324,7 @@ class ModernDashboardScreen extends ConsumerWidget {
                 value: '${dashboard.breeding.recentBirths}',
                 subtitle: 'За 30 дней',
                 data: _generateTrendData(dashboard.breeding.recentBirths, isSmallValues: true),
-                color: AppTheme.accentColor,
+                color: AppColors.accentRose,
                 onTap: () => context.push('/births'),
               ),
             ),
@@ -334,7 +334,7 @@ class ModernDashboardScreen extends ConsumerWidget {
         ModernStatCard(
           title: 'Клетки',
           icon: Icons.grid_view,
-          gradient: AppTheme.secondaryGradient,
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF10B981), Color(0xFF059669)]),
           route: '/cages',
           stats: [
             StatItem(
@@ -345,13 +345,13 @@ class ModernDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Занято',
               value: '${dashboard.cages.occupied}',
-              valueColor: AppTheme.textPrimary,
+              valueColor: AppColors.darkTextPrimary,
               icon: Icons.check_box,
             ),
             StatItem(
               label: 'Свободно',
               value: '${dashboard.cages.available}',
-              valueColor: AppTheme.successColor,
+              valueColor: AppColors.success,
               icon: Icons.check_box_outline_blank,
             ),
           ],
@@ -375,7 +375,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -393,19 +393,19 @@ class ModernDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Доход',
               value: '${income.toStringAsFixed(0)} ₽',
-              valueColor: AppTheme.successColor,
+              valueColor: AppColors.success,
               icon: Icons.arrow_upward,
             ),
             StatItem(
               label: 'Расход',
               value: '${expenses.toStringAsFixed(0)} ₽',
-              valueColor: AppTheme.errorColor,
+              valueColor: AppColors.error,
               icon: Icons.arrow_downward,
             ),
             StatItem(
               label: 'Прибыль',
               value: '${profit.toStringAsFixed(0)} ₽',
-              valueColor: profit >= 0 ? AppTheme.successColor : AppTheme.errorColor,
+              valueColor: profit >= 0 ? AppColors.success : AppColors.error,
               icon: profit >= 0 ? Icons.trending_up : Icons.trending_down,
             ),
           ],
@@ -425,7 +425,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -443,15 +443,15 @@ class ModernDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Предстоящие',
               value: '${dashboard.health.upcomingVaccinations}',
-              valueColor: AppTheme.warningColor,
+              valueColor: AppColors.warning,
               icon: Icons.schedule,
             ),
             StatItem(
               label: 'Просрочены',
               value: '${dashboard.health.overdueVaccinations}',
               valueColor: dashboard.health.overdueVaccinations > 0
-                  ? AppTheme.errorColor
-                  : AppTheme.successColor,
+                  ? AppColors.error
+                  : AppColors.success,
               icon: dashboard.health.overdueVaccinations > 0
                   ? Icons.warning
                   : Icons.check_circle,
@@ -478,7 +478,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -520,8 +520,8 @@ class ModernDashboardScreen extends ConsumerWidget {
                     label: 'Просрочены',
                     value: '${dashboard.tasks.overdue}',
                     valueColor: dashboard.tasks.overdue > 0
-                        ? AppTheme.errorColor
-                        : AppTheme.successColor,
+                        ? AppColors.error
+                        : AppColors.success,
                     icon: Icons.warning_amber,
                   ),
                 ],
@@ -544,7 +544,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -563,8 +563,8 @@ class ModernDashboardScreen extends ConsumerWidget {
               label: 'Корма с низким запасом',
               value: '${dashboard.inventory.lowStockFeeds}',
               valueColor: dashboard.inventory.lowStockFeeds > 0
-                  ? AppTheme.errorColor
-                  : AppTheme.successColor,
+                  ? AppColors.error
+                  : AppColors.success,
               icon: dashboard.inventory.lowStockFeeds > 0
                   ? Icons.warning
                   : Icons.check_circle,
@@ -585,13 +585,13 @@ class ModernDashboardScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.error_outline,
                 size: 64,
-                color: AppTheme.errorColor,
+                color: AppColors.error,
               ),
             ),
             const SizedBox(height: 24),
@@ -600,7 +600,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: AppColors.darkTextPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -608,7 +608,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               '$error',
               style: const TextStyle(
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: AppColors.darkTextSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -620,7 +620,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               icon: const Icon(Icons.refresh),
               label: const Text('Повторить'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor,
+                backgroundColor: AppColors.accentEmerald,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,

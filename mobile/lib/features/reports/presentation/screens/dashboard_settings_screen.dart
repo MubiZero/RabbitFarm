@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/dashboard_config.dart';
 import '../providers/dashboard_config_provider.dart';
 
@@ -33,7 +33,7 @@ class DashboardSettingsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 16),
               Text('Ошибка: $error'),
             ],
@@ -49,11 +49,11 @@ class DashboardSettingsScreen extends ConsumerWidget {
       child: Column(
         children: [
           Container(
-            color: AppTheme.surfaceVariant,
+            color: AppColors.darkSurfaceVariant,
             child: const TabBar(
-              labelColor: AppTheme.primaryColor,
-              unselectedLabelColor: AppTheme.textSecondary,
-              indicatorColor: AppTheme.primaryColor,
+              labelColor: AppColors.accentEmerald,
+              unselectedLabelColor: AppColors.darkTextSecondary,
+              indicatorColor: AppColors.accentEmerald,
               tabs: [
                 Tab(text: 'Виджеты', icon: Icon(Icons.dashboard)),
                 Tab(text: 'Быстрые действия', icon: Icon(Icons.flash_on)),
@@ -109,14 +109,18 @@ class DashboardSettingsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.cardShadow,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.accentEmerald, Color(0xFF059669)],
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Icon(Icons.dashboard, color: Colors.white, size: 24),
@@ -126,14 +130,14 @@ class DashboardSettingsScreen extends ConsumerWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: AppColors.darkTextPrimary,
           ),
         ),
         subtitle: Text(
           widget.type.description,
           style: const TextStyle(
             fontSize: 13,
-            color: AppTheme.textSecondary,
+            color: AppColors.darkTextSecondary,
           ),
         ),
         trailing: Row(
@@ -146,10 +150,10 @@ class DashboardSettingsScreen extends ConsumerWidget {
                     .read(dashboardConfigProvider.notifier)
                     .toggleWidgetVisibility(widget.type);
               },
-              activeColor: AppTheme.primaryColor,
+              activeColor: AppColors.accentEmerald,
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.drag_handle, color: AppTheme.textHint),
+            const Icon(Icons.drag_handle, color: AppColors.darkTextHint),
           ],
         ),
       ),
@@ -201,7 +205,7 @@ class DashboardSettingsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.cardShadow,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -218,17 +222,17 @@ class DashboardSettingsScreen extends ConsumerWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: AppColors.darkTextPrimary,
           ),
         ),
         subtitle: action.isVisible
             ? const Text(
                 'Отображается в быстрых действиях',
-                style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                style: TextStyle(fontSize: 13, color: AppColors.darkTextSecondary),
               )
             : const Text(
                 'Скрыто',
-                style: TextStyle(fontSize: 13, color: AppTheme.textHint),
+                style: TextStyle(fontSize: 13, color: AppColors.darkTextHint),
               ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -240,10 +244,10 @@ class DashboardSettingsScreen extends ConsumerWidget {
                     .read(dashboardConfigProvider.notifier)
                     .toggleQuickActionVisibility(action.type);
               },
-              activeColor: AppTheme.primaryColor,
+              activeColor: AppColors.accentEmerald,
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.drag_handle, color: AppTheme.textHint),
+            const Icon(Icons.drag_handle, color: AppColors.darkTextHint),
           ],
         ),
       ),
@@ -253,7 +257,11 @@ class DashboardSettingsScreen extends ConsumerWidget {
   LinearGradient _getGradientForAction(QuickActionType type) {
     switch (type) {
       case QuickActionType.addRabbit:
-        return AppTheme.primaryGradient;
+        return const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.accentEmerald, Color(0xFF059669)],
+        );
       case QuickActionType.addVaccination:
         return const LinearGradient(
           begin: Alignment.topLeft,
@@ -279,7 +287,11 @@ class DashboardSettingsScreen extends ConsumerWidget {
           colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
         );
       case QuickActionType.addTransaction:
-        return AppTheme.secondaryGradient;
+        return const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
+        );
       case QuickActionType.addCage:
         return const LinearGradient(
           begin: Alignment.topLeft,
@@ -346,7 +358,7 @@ class DashboardSettingsScreen extends ConsumerWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorColor,
+              backgroundColor: AppColors.error,
             ),
             child: const Text('Сбросить'),
           ),
