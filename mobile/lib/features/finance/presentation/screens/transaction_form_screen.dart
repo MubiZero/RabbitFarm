@@ -6,6 +6,7 @@ import '../../data/models/transaction_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../providers/transactions_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран создания/редактирования транзакции
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -86,7 +87,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
             ? 'Новая транзакция'
             : 'Редактировать транзакцию'),
         centerTitle: true,
-        backgroundColor: Colors.blue[700],
+        backgroundColor: AppColors.accentOcean,
         actions: [
           if (widget.transaction != null)
             IconButton(
@@ -215,7 +216,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               leading: const Icon(Icons.calendar_today),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.grey[300]!),
+                side: BorderSide(color: AppColors.darkBorder),
               ),
               onTap: () => _selectDate(context),
             ),
@@ -267,7 +268,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _saveTransaction,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[700],
+                backgroundColor: AppColors.accentOcean,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isLoading

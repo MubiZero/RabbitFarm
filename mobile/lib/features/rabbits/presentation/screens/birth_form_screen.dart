@@ -6,6 +6,7 @@ import '../../data/models/birth_model.dart';
 import '../../data/models/breeding_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран формы регистрации окрола
 ///
@@ -78,7 +79,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Редактировать окрол' : 'Зарегистрировать окрол'),
         centerTitle: true,
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.success,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -89,19 +90,19 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
             children: [
               // Информационная карточка
               Card(
-                color: Colors.blue[50],
+                color: AppColors.accentOcean.withValues(alpha: 0.08),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.blue[700]),
+                      Icon(Icons.info_outline, color: AppColors.accentOcean),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'Зарегистрируйте окрол и автоматически создайте карточки для крольчат',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.blue[900],
+                            color: AppColors.accentOcean,
                           ),
                         ),
                       ),
@@ -160,7 +161,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                         : 'Выберите дату',
                     style: TextStyle(
                       fontSize: 16,
-                      color: _birthDate != null ? Colors.black : Colors.grey[600],
+                      color: _birthDate != null ? Colors.black : AppColors.darkTextSecondary,
                     ),
                   ),
                 ),
@@ -184,7 +185,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                 decoration: InputDecoration(
                   labelText: 'Родилось живыми *',
                   hintText: 'Количество',
-                  prefixIcon: Icon(Icons.child_care, color: Colors.green[700]),
+                  prefixIcon: Icon(Icons.child_care, color: AppColors.success),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -266,7 +267,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
               // Чекбокс автосоздания крольчат
               if (!isEditing)
                 Card(
-                  color: Colors.green[50],
+                  color: AppColors.success.withValues(alpha: 0.08),
                   child: CheckboxListTile(
                     title: const Text(
                       'Автоматически создать карточки крольчат',
@@ -274,7 +275,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                     ),
                     subtitle: Text(
                       'Будет создано ${_kitsBornAliveController.text.isNotEmpty ? _kitsBornAliveController.text : "0"} карточек',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(color: AppColors.darkTextSecondary),
                     ),
                     value: _createKits,
                     onChanged: (value) {
@@ -284,7 +285,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                     },
                     secondary: Icon(
                       Icons.auto_awesome,
-                      color: Colors.green[700],
+                      color: AppColors.success,
                     ),
                   ),
                 ),
@@ -315,7 +316,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                       onPressed: _isSubmitting ? null : _submitForm,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.green[700],
+                        backgroundColor: AppColors.success,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -484,7 +485,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
               'Крольчата будут названы: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: AppColors.darkTextSecondary,
               ),
             ),
           ],
@@ -497,7 +498,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
           ElevatedButton.icon(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[700],
+              backgroundColor: AppColors.success,
             ),
             icon: const Icon(Icons.auto_awesome),
             label: const Text('Создать'),

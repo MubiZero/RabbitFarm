@@ -6,6 +6,7 @@ import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_weight_model.dart';
 import '../providers/weights_provider.dart';
 import '../widgets/weight_chart.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class WeightHistoryScreen extends ConsumerWidget {
   final RabbitModel rabbit;
@@ -277,7 +278,7 @@ class WeightHistoryScreen extends ConsumerWidget {
               Text(
                 weight.notes!,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: AppColors.darkTextSecondary,
                   fontStyle: FontStyle.italic,
                 ),
               ),

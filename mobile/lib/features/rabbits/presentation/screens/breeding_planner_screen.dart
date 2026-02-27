@@ -5,6 +5,7 @@ import '../../data/models/pedigree_model.dart';
 import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран планирования случек с анализом инбридинга
 ///
@@ -36,7 +37,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       appBar: AppBar(
         title: const Text('Планирование случек'),
         centerTitle: true,
-        backgroundColor: Colors.purple[700],
+        backgroundColor: AppColors.accentViolet,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -45,19 +46,19 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
           children: [
             // Информационная карточка
             Card(
-              color: Colors.blue[50],
+              color: AppColors.accentOcean.withValues(alpha: 0.08),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: Colors.blue[700]),
+                    Icon(Icons.info_outline, color: AppColors.accentOcean),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Выберите самца и самку для автоматического анализа родословной и оценки рисков инбридинга',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.blue[900],
+                          color: AppColors.accentOcean,
                         ),
                       ),
                     ),
@@ -122,7 +123,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               )
             else if (_error != null)
               Card(
-                color: Colors.red[50],
+                color: AppColors.error.withValues(alpha: 0.08),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -248,7 +249,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
         // Карточка с коэффициентом инбридинга
         Card(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           elevation: 4,
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -264,7 +265,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   'Коэффициент инбридинга',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: AppColors.darkTextSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -297,7 +298,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   riskLevel.description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: AppColors.darkTextSecondary,
                   ),
                 ),
               ],
@@ -353,7 +354,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                             '${ancestor.closestGeneration} пок.',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.darkTextSecondary,
                             ),
                           ),
                         ],
@@ -441,7 +442,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),
-              backgroundColor: Colors.purple[700],
+              backgroundColor: AppColors.accentViolet,
             ),
             icon: const Icon(Icons.add),
             label: const Text(

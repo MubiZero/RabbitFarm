@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка клеток
 class CagesListScreen extends ConsumerStatefulWidget {
@@ -30,7 +31,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
       appBar: AppBar(
         title: const Text('Клетки'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -74,7 +75,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: AppColors.darkSurface,
               ),
               onChanged: (value) {
                 ref.read(cagesProvider.notifier).updateSearchQuery(value);
@@ -96,7 +97,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCageForm(context, null),
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить клетку'),
       ),
@@ -191,7 +192,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
             Icon(
               state.searchQuery.isNotEmpty ? Icons.search_off : Icons.home_work,
               size: 80,
-              color: Colors.grey[400],
+              color: AppColors.darkTextHint,
             ),
             const SizedBox(height: 16),
             Text(
@@ -199,7 +200,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                   ? 'Клетки не найдены'
                   : 'Нет клеток',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                   ),
             ),
             const SizedBox(height: 8),
@@ -208,7 +209,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                   ? 'Попробуйте изменить запрос'
                   : 'Добавьте первую клетку',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                   ),
             ),
           ],
@@ -263,7 +264,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -289,7 +290,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                             cage.location!,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: AppColors.darkTextSecondary,
                             ),
                           ),
                       ],
@@ -368,7 +369,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                   const SizedBox(height: 4),
                   LinearProgressIndicator(
                     value: occupancyRate,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: AppColors.darkSurfaceVariant,
                     valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                     minHeight: 6,
                     borderRadius: BorderRadius.circular(3),
