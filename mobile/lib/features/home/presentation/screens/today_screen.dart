@@ -6,246 +6,325 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/alert_card.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/coach_mark.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../onboarding/presentation/providers/onboarding_provider.dart';
+import '../../../onboarding/presentation/providers/tour_provider.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 
 /// Экран "Сегодня" — основной рабочий экран
-class TodayScreen extends ConsumerWidget {
+class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends ConsumerState<TodayScreen> {
+  // Tour target keys
+  final _summaryKey = GlobalKey();
+  final _alertsKey = GlobalKey();
+  final _quickActionsKey = GlobalKey();
+
+  late final List<CoachMarkStep> _tourSteps;
+
+  @override
+  void initState() {
+    super.initState();
+    _tourSteps = [
+      CoachMarkStep(
+        targetKey: _summaryKey,
+        title: 'Сводка дня',
+        description:
+            'Здесь вы видите количество ожидающих задач и состояние запасов корма.',
+      ),
+      CoachMarkStep(
+        targetKey: _alertsKey,
+        title: 'Важные уведомления',
+        description:
+            'Здесь отображаются срочные события: просроченные вакцинации, роды и нехватка корма.',
+      ),
+      CoachMarkStep(
+        targetKey: _quickActionsKey,
+        title: 'Быстрые действия',
+        description:
+            'Отсюда можно быстро перейти к задачам, кроликам и управлению кормами.',
+      ),
+    ];
+
+    // Start tour after first frame if not yet done
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartTour());
+  }
+
+  Future<void> _maybeStartTour() async {
+    final onboarding = await ref.read(onboardingProvider.future);
+    if (!onboarding.tourDone && mounted) {
+      ref.read(tourProvider.notifier).start();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final now = DateTime.now();
     final dateFormat = DateFormat('d MMMM, EEEE', 'ru');
     final dashboardAsync = ref.watch(dashboardReportProvider);
     final authState = ref.watch(authProvider);
+    final tourState = ref.watch(tourProvider);
     final greeting = _greeting(now, authState.user?.fullName);
 
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // Header — flat, no gradient
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      greeting,
-                      style: AppTypography.displayMd.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      dateFormat.format(now),
-                      style: AppTypography.bodyMd.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Summary cards row
-            SliverToBoxAdapter(
-              child: dashboardAsync.when(
-                data: (dashboard) => Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _SummaryCard(
-                          label: 'Задачи',
-                          value: '${dashboard.tasks.pending}',
-                          sublabel: 'ожидают',
-                          icon: Icons.check_circle_outline,
-                          color: AppColors.accentViolet,
-                          onTap: () => context.go('/tasks'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _SummaryCard(
-                          label: 'Низкий запас',
-                          value: '${dashboard.inventory.lowStockFeeds}',
-                          sublabel: 'видов корма',
-                          icon: Icons.inventory_2_outlined,
-                          color: AppColors.warning,
-                          onTap: () => context.push('/feeds'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (_, __) => const SizedBox(),
-              ),
-            ),
-
-            // Alerts section
-            SliverToBoxAdapter(
-              child: dashboardAsync.when(
-                data: (dashboard) {
-                  final alerts = <Widget>[];
-
-                  if (dashboard.tasks.urgent > 0) {
-                    alerts.add(AlertCard(
-                      title: 'Срочные задачи',
-                      description: 'Срочных задач: ${dashboard.tasks.urgent}',
-                      icon: Icons.priority_high,
-                      color: AppColors.error,
-                      onTap: () => context.go('/tasks'),
-                    ));
-                  }
-                  if (dashboard.health.overdueVaccinations > 0) {
-                    alerts.add(AlertCard(
-                      title: 'Вакцинация',
-                      description:
-                          'Просрочено: ${dashboard.health.overdueVaccinations}',
-                      icon: Icons.vaccines,
-                      color: AppColors.error,
-                      onTap: () => context.push('/vaccinations'),
-                    ));
-                  }
-                  if (dashboard.breeding.recentBirths > 0) {
-                    alerts.add(AlertCard(
-                      title: 'Роды',
-                      description:
-                          'Рождений за 30 дней: ${dashboard.breeding.recentBirths}',
-                      icon: Icons.child_care,
-                      color: AppColors.accentRose,
-                      onTap: () => context.push('/births'),
-                    ));
-                  }
-                  if (dashboard.inventory.lowStockFeeds > 0) {
-                    alerts.add(AlertCard(
-                      title: 'Запас корма',
-                      description:
-                          'Низкий запас: ${dashboard.inventory.lowStockFeeds} видов',
-                      icon: Icons.inventory_2_outlined,
-                      color: AppColors.warning,
-                      onTap: () => context.push('/feeds'),
-                    ));
-                  }
-
-                  if (alerts.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-                      child: AppCard(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.check_circle,
-                                color: AppColors.success, size: 28),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Всё под контролем — срочных задач нет',
-                                style: AppTypography.bodyMd.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      body: Stack(
+        children: [
+          // Main content
+          SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                // Header — flat, no gradient
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Требует внимания',
-                          style: AppTypography.titleLg.copyWith(
+                          greeting,
+                          style: AppTypography.displayMd.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        ...alerts.map((w) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: w,
-                            )),
+                        const SizedBox(height: 4),
+                        Text(
+                          dateFormat.format(now),
+                          style: AppTypography.bodyMd.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
+                          ),
+                        ),
                       ],
                     ),
-                  );
-                },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const SizedBox(),
-              ),
-            ),
+                  ),
+                ),
 
-            // Quick actions
-            SliverToBoxAdapter(
-              child: dashboardAsync.when(
-                data: (dashboard) => Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Summary cards row
+                SliverToBoxAdapter(
+                  child: dashboardAsync.when(
+                    data: (dashboard) => Padding(
+                      key: _summaryKey,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Row(
                         children: [
-                          Text(
-                            'Быстрые действия',
-                            style: AppTypography.titleLg.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
+                          Expanded(
+                            child: _SummaryCard(
+                              label: 'Задачи',
+                              value: '${dashboard.tasks.pending}',
+                              sublabel: 'ожидают',
+                              icon: Icons.check_circle_outline,
+                              color: AppColors.accentViolet,
+                              onTap: () => context.go('/tasks'),
                             ),
                           ),
-                          TextButton(
-                            onPressed: () => context.go('/tasks'),
-                            child: const Text('Все задачи'),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _SummaryCard(
+                              label: 'Низкий запас',
+                              value: '${dashboard.inventory.lowStockFeeds}',
+                              sublabel: 'видов корма',
+                              icon: Icons.inventory_2_outlined,
+                              color: AppColors.warning,
+                              onTap: () => context.push('/feeds'),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      _QuickActionRow(
-                        title: 'Задачи',
-                        description: 'Просмотреть и управлять задачами',
-                        badge: '${dashboard.tasks.pending} ожидают',
-                        icon: Icons.check_circle_outline,
-                        color: AppColors.accentViolet,
-                        onTap: () => context.go('/tasks'),
-                      ),
-                      const SizedBox(height: 8),
-                      _QuickActionRow(
-                        title: 'Кролики',
-                        description: 'Управление поголовьем',
-                        badge: 'Всего: ${dashboard.rabbits.total}',
-                        icon: Icons.pets_outlined,
-                        color: AppColors.accentEmerald,
-                        onTap: () => context.push('/rabbits'),
-                      ),
-                      const SizedBox(height: 8),
-                      _QuickActionRow(
-                        title: 'Корма',
-                        description: 'Управление запасами',
-                        badge: 'Низкий запас: ${dashboard.inventory.lowStockFeeds}',
-                        icon: Icons.inventory_2_outlined,
-                        color: AppColors.warning,
-                        onTap: () => context.push('/feeds'),
-                      ),
-                    ],
+                    ),
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (_, __) => const SizedBox(),
                   ),
                 ),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const SizedBox(),
+
+                // Alerts section
+                SliverToBoxAdapter(
+                  child: dashboardAsync.when(
+                    data: (dashboard) {
+                      final alerts = <Widget>[];
+
+                      if (dashboard.tasks.urgent > 0) {
+                        alerts.add(AlertCard(
+                          title: 'Срочные задачи',
+                          description:
+                              'Срочных задач: ${dashboard.tasks.urgent}',
+                          icon: Icons.priority_high,
+                          color: AppColors.error,
+                          onTap: () => context.go('/tasks'),
+                        ));
+                      }
+                      if (dashboard.health.overdueVaccinations > 0) {
+                        alerts.add(AlertCard(
+                          title: 'Вакцинация',
+                          description:
+                              'Просрочено: ${dashboard.health.overdueVaccinations}',
+                          icon: Icons.vaccines,
+                          color: AppColors.error,
+                          onTap: () => context.push('/vaccinations'),
+                        ));
+                      }
+                      if (dashboard.breeding.recentBirths > 0) {
+                        alerts.add(AlertCard(
+                          title: 'Роды',
+                          description:
+                              'Рождений за 30 дней: ${dashboard.breeding.recentBirths}',
+                          icon: Icons.child_care,
+                          color: AppColors.accentRose,
+                          onTap: () => context.push('/births'),
+                        ));
+                      }
+                      if (dashboard.inventory.lowStockFeeds > 0) {
+                        alerts.add(AlertCard(
+                          title: 'Запас корма',
+                          description:
+                              'Низкий запас: ${dashboard.inventory.lowStockFeeds} видов',
+                          icon: Icons.inventory_2_outlined,
+                          color: AppColors.warning,
+                          onTap: () => context.push('/feeds'),
+                        ));
+                      }
+
+                      if (alerts.isEmpty) {
+                        return Padding(
+                          key: _alertsKey,
+                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                          child: AppCard(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.check_circle,
+                                    color: AppColors.success, size: 28),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Всё под контролем — срочных задач нет',
+                                    style: AppTypography.bodyMd.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                        child: Column(
+                          key: _alertsKey,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Требует внимания',
+                              style: AppTypography.titleLg.copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ...alerts.map((w) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: w,
+                                )),
+                          ],
+                        ),
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => const SizedBox(),
+                  ),
+                ),
+
+                // Quick actions
+                SliverToBoxAdapter(
+                  child: dashboardAsync.when(
+                    data: (dashboard) => Padding(
+                      key: _quickActionsKey,
+                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Быстрые действия',
+                                style: AppTypography.titleLg.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context.go('/tasks'),
+                                child: const Text('Все задачи'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _QuickActionRow(
+                            title: 'Задачи',
+                            description: 'Просмотреть и управлять задачами',
+                            badge: '${dashboard.tasks.pending} ожидают',
+                            icon: Icons.check_circle_outline,
+                            color: AppColors.accentViolet,
+                            onTap: () => context.go('/tasks'),
+                          ),
+                          const SizedBox(height: 8),
+                          _QuickActionRow(
+                            title: 'Кролики',
+                            description: 'Управление поголовьем',
+                            badge: 'Всего: ${dashboard.rabbits.total}',
+                            icon: Icons.pets_outlined,
+                            color: AppColors.accentEmerald,
+                            onTap: () => context.push('/rabbits'),
+                          ),
+                          const SizedBox(height: 8),
+                          _QuickActionRow(
+                            title: 'Корма',
+                            description: 'Управление запасами',
+                            badge:
+                                'Низкий запас: ${dashboard.inventory.lowStockFeeds}',
+                            icon: Icons.inventory_2_outlined,
+                            color: AppColors.warning,
+                            onTap: () => context.push('/feeds'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => const SizedBox(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // CoachMark overlay (shown during product tour)
+          if (tourState.isActive && tourState.step < _tourSteps.length)
+            Positioned.fill(
+              child: CoachMarkOverlay(
+                steps: _tourSteps,
+                currentStep: tourState.step,
+                onNext: () =>
+                    ref.read(tourProvider.notifier).advance(_tourSteps.length),
+                onSkip: () => ref.read(tourProvider.notifier).skip(),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -269,6 +348,8 @@ class TodayScreen extends ConsumerWidget {
     return '$base!';
   }
 }
+
+// ─── Reusable card widgets ──────────────────────────────────────────────────
 
 class _SummaryCard extends StatelessWidget {
   final String label;
