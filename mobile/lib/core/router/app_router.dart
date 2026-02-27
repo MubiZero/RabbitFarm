@@ -48,6 +48,7 @@ import '../../features/reports/presentation/screens/dashboard_settings_screen.da
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/more_screen.dart';
+import '../../features/home/presentation/screens/menu_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_farm_name_screen.dart';
@@ -163,7 +164,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const TasksListScreen(),
           ),
 
-          // More screen
+          // Menu screen (4th tab)
+          GoRoute(
+            path: '/menu',
+            name: 'menu',
+            builder: (context, state) => const MenuScreen(),
+          ),
+
+          // More screen (kept for backward compat)
           GoRoute(
             path: '/more',
             name: 'more',
