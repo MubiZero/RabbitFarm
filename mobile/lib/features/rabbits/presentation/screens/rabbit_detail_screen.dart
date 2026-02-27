@@ -8,6 +8,8 @@ import '../providers/rabbits_provider.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import 'weight_history_screen.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/status_badge.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -49,9 +51,9 @@ class RabbitDetailScreen extends ConsumerWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: Colors.red),
+                      Icon(Icons.delete, color: AppColors.error),
                       SizedBox(width: 8),
-                      Text('Удалить', style: TextStyle(color: Colors.red)),
+                      Text('Удалить', style: TextStyle(color: AppColors.error)),
                     ],
                   ),
                 ),
@@ -68,7 +70,7 @@ class RabbitDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error, size: 64, color: Colors.red),
+              const Icon(Icons.error, size: 64, color: AppColors.error),
               const SizedBox(height: 16),
               Text('Ошибка: ${error.toString()}'),
               const SizedBox(height: 16),
@@ -120,7 +122,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                           child: const Icon(
                             Icons.broken_image,
                             size: 64,
-                            color: Colors.grey,
+                            color: AppColors.darkTextHint,
                           ),
                         ),
                       ),
@@ -236,16 +238,14 @@ class RabbitDetailScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // Quick Actions
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Быстрые действия',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Быстрые действия',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
@@ -282,7 +282,6 @@ class RabbitDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
-              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -292,7 +291,23 @@ class RabbitDetailScreen extends ConsumerWidget {
             context,
             title: 'Статус',
             children: [
-              _buildInfoRow(context, 'Состояние', _getStatusText(rabbit.status)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        'Состояние',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.darkTextSecondary,
+                            ),
+                      ),
+                    ),
+                    StatusBadge(status: RabbitStatusX.fromString(rabbit.status)),
+                  ],
+                ),
+              ),
               _buildInfoRow(context, 'Назначение', _getPurposeText(rabbit.purpose)),
             ],
           ),
@@ -313,37 +328,34 @@ class RabbitDetailScreen extends ConsumerWidget {
 
           // Parents
           if (rabbit.father != null || rabbit.mother != null)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Родители',
-                      style: Theme.of(context).textTheme.titleMedium,
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Родители',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  if (rabbit.father != null)
+                    _buildParentCard(
+                      context,
+                      rabbit.father!,
+                      'Отец',
+                      Icons.male,
+                      AppColors.accentOcean,
                     ),
-                    const SizedBox(height: 12),
-                    if (rabbit.father != null)
-                      _buildParentCard(
-                        context,
-                        rabbit.father!,
-                        'Отец',
-                        Icons.male,
-                        Colors.blue,
-                      ),
-                    if (rabbit.father != null && rabbit.mother != null)
-                      const SizedBox(height: 8),
-                    if (rabbit.mother != null)
-                      _buildParentCard(
-                        context,
-                        rabbit.mother!,
-                        'Мать',
-                        Icons.female,
-                        Colors.pink,
-                      ),
-                  ],
-                ),
+                  if (rabbit.father != null && rabbit.mother != null)
+                    const SizedBox(height: 8),
+                  if (rabbit.mother != null)
+                    _buildParentCard(
+                      context,
+                      rabbit.mother!,
+                      'Мать',
+                      Icons.female,
+                      AppColors.accentRose,
+                    ),
+                ],
               ),
             ),
           const SizedBox(height: 16),
@@ -389,20 +401,17 @@ class RabbitDetailScreen extends ConsumerWidget {
     required String title,
     required List<Widget> children,
   }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            ...children,
-          ],
-        ),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
       ),
     );
   }
@@ -531,24 +540,7 @@ class RabbitDetailScreen extends ConsumerWidget {
   }
 
   Color _getSexColor(String sex) {
-    return sex == 'male' ? Colors.blue : Colors.pink;
-  }
-
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'active':
-        return 'Активен';
-      case 'pregnant':
-        return 'Беременна';
-      case 'sick':
-        return 'Болен';
-      case 'sold':
-        return 'Продан';
-      case 'dead':
-        return 'Умер';
-      default:
-        return status;
-    }
+    return sex == 'male' ? AppColors.accentOcean : AppColors.accentRose;
   }
 
   String _getPurposeText(String purpose) {
@@ -633,7 +625,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Кролик удален'),
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppColors.success,
                     ),
                   );
                 }
@@ -642,13 +634,13 @@ class RabbitDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(e.toString().replaceAll('Exception: ', '')),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                     ),
                   );
                 }
               }
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Удалить'),
           ),
         ],
