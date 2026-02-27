@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Карточка с круговым прогресс-индикатором
 class ProgressRingCard extends StatelessWidget {
@@ -17,7 +17,11 @@ class ProgressRingCard extends StatelessWidget {
     required this.progress,
     required this.centerText,
     required this.bottomText,
-    this.gradient = AppTheme.primaryGradient,
+    this.gradient = const LinearGradient(
+      colors: [AppColors.accentEmerald, Color(0xFF059669)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
     this.onTap,
   });
 
@@ -27,7 +31,7 @@ class ProgressRingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: AppTheme.cardShadow,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Material(
         color: Colors.transparent,
@@ -40,10 +44,10 @@ class ProgressRingCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: AppColors.darkTextPrimary,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -51,9 +55,9 @@ class ProgressRingCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   bottomText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppTheme.textSecondary,
+                    color: AppColors.darkTextSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -96,9 +100,9 @@ class ProgressRingCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppTheme.textSecondary,
+                  color: AppColors.darkTextSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -126,7 +130,7 @@ class _ProgressRingPainter extends CustomPainter {
 
     // Background circle
     final bgPaint = Paint()
-      ..color = AppTheme.surfaceVariant
+      ..color = AppColors.darkSurfaceVariant
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;

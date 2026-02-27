@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Кнопка быстрого действия с иконкой и градиентом
 class QuickActionButton extends StatelessWidget {
@@ -20,7 +20,12 @@ class QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultGradient = gradient ?? AppTheme.primaryGradient;
+    final accent = Theme.of(context).colorScheme.primary;
+    final defaultGradient = gradient ?? LinearGradient(
+      colors: [accent, accent.withValues(alpha: 0.7)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
 
     return Material(
       color: Colors.transparent,
@@ -32,7 +37,7 @@ class QuickActionButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: AppTheme.cardShadow,
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -60,10 +65,10 @@ class QuickActionButton extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textPrimary,
+                  color: AppColors.darkTextPrimary,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

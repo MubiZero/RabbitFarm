@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Мини-карточка с простым графиком для дашборда
 class MiniChartCard extends StatelessWidget {
@@ -17,7 +17,7 @@ class MiniChartCard extends StatelessWidget {
     required this.value,
     required this.subtitle,
     required this.data,
-    this.color = AppTheme.primaryColor,
+    this.color = AppColors.accentEmerald,
     this.onTap,
   });
 
@@ -27,7 +27,7 @@ class MiniChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: AppTheme.cardShadow,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Material(
         color: Colors.transparent,
@@ -41,9 +41,9 @@ class MiniChartCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: AppTheme.textSecondary,
+                    color: AppColors.darkTextSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -59,9 +59,9 @@ class MiniChartCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppTheme.textHint,
+                    color: AppColors.darkTextHint,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -84,7 +84,7 @@ class MiniChartCard extends StatelessWidget {
           'Нет данных',
           style: TextStyle(
             fontSize: 12,
-            color: AppTheme.textHint,
+            color: AppColors.darkTextHint,
           ),
         ),
       );

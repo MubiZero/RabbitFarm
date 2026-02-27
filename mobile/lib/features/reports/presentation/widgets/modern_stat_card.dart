@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Современная минималистичная карточка статистики с градиентами
 class ModernStatCard extends StatefulWidget {
@@ -41,8 +41,8 @@ class _ModernStatCardState extends State<ModernStatCard>
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: _isHovered
-              ? AppTheme.cardShadowHover
-              : AppTheme.cardShadow,
+              ? [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: Offset(0, 8))]
+              : [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
         ),
         child: Material(
           color: Colors.transparent,
@@ -94,10 +94,10 @@ class _ModernStatCardState extends State<ModernStatCard>
         Expanded(
           child: Text(
             widget.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
+              color: AppColors.darkTextPrimary,
             ),
           ),
         ),
@@ -107,13 +107,13 @@ class _ModernStatCardState extends State<ModernStatCard>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceVariant,
+              color: AppColors.darkSurfaceVariant,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: AppTheme.textSecondary,
+              color: AppColors.darkTextSecondary,
             ),
           ),
       ],
@@ -132,7 +132,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 Icon(
                   stat.icon,
                   size: 18,
-                  color: AppTheme.textSecondary,
+                  color: AppColors.darkTextSecondary,
                 ),
                 const SizedBox(width: 8),
               ],
@@ -140,7 +140,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 stat.label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: AppTheme.textSecondary,
+                  color: AppColors.darkTextSecondary,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -157,7 +157,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: stat.valueColor ?? AppTheme.textPrimary,
+                  color: stat.valueColor ?? AppColors.darkTextPrimary,
                 ),
               ),
             ],
@@ -173,8 +173,8 @@ class _ModernStatCardState extends State<ModernStatCard>
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: isPositive
-            ? AppTheme.successColor.withOpacity(0.1)
-            : AppTheme.errorColor.withOpacity(0.1),
+            ? AppColors.success.withOpacity(0.1)
+            : AppColors.error.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -182,7 +182,7 @@ class _ModernStatCardState extends State<ModernStatCard>
           Icon(
             isPositive ? Icons.trending_up : Icons.trending_down,
             size: 12,
-            color: isPositive ? AppTheme.successColor : AppTheme.errorColor,
+            color: isPositive ? AppColors.success : AppColors.error,
           ),
           const SizedBox(width: 2),
           Text(
@@ -190,7 +190,7 @@ class _ModernStatCardState extends State<ModernStatCard>
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: isPositive ? AppTheme.successColor : AppTheme.errorColor,
+              color: isPositive ? AppColors.success : AppColors.error,
             ),
           ),
         ],
