@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/alert_card.dart';
+import '../../../../core/widgets/app_card.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 
-/// Экран "Сегодня" - основной рабочий экран для ежедневных задач
+/// Экран "Сегодня" — основной рабочий экран
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
@@ -14,40 +18,31 @@ class TodayScreen extends ConsumerWidget {
     final now = DateTime.now();
     final dateFormat = DateFormat('d MMMM, EEEE', 'ru');
     final dashboardAsync = ref.watch(dashboardReportProvider);
+    final authState = ref.watch(authProvider);
+    final greeting = _greeting(now, authState.user?.fullName);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Header
+            // Header — flat, no gradient
             SliverToBoxAdapter(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Сегодня',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Text(
+                      greeting,
+                      style: AppTypography.displayMd.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       dateFormat.format(now),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
+                      style: AppTypography.bodyMd.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -55,38 +50,32 @@ class TodayScreen extends ConsumerWidget {
               ),
             ),
 
-            // Daily Summary Cards
+            // Summary cards row
             SliverToBoxAdapter(
               child: dashboardAsync.when(
                 data: (dashboard) => Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Row(
                     children: [
                       Expanded(
-                        child: _buildSummaryCard(
-                          context,
-                          'Задачи',
-                          '${dashboard.tasks.pending}',
-                          'ожидают',
-                          Icons.check_circle,
-                          const LinearGradient(
-                            colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-                          ),
-                          () => context.go('/tasks'),
+                        child: _SummaryCard(
+                          label: 'Задачи',
+                          value: '${dashboard.tasks.pending}',
+                          sublabel: 'ожидают',
+                          icon: Icons.check_circle_outline,
+                          color: AppColors.accentViolet,
+                          onTap: () => context.go('/tasks'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildSummaryCard(
-                          context,
-                          'Низкий запас',
-                          '${dashboard.inventory.lowStockFeeds}',
-                          'корма',
-                          Icons.inventory,
-                          const LinearGradient(
-                            colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                          ),
-                          () => context.push('/feeds'),
+                        child: _SummaryCard(
+                          label: 'Низкий запас',
+                          value: '${dashboard.inventory.lowStockFeeds}',
+                          sublabel: 'видов корма',
+                          icon: Icons.inventory_2_outlined,
+                          color: AppColors.warning,
+                          onTap: () => context.push('/feeds'),
                         ),
                       ),
                     ],
@@ -100,112 +89,118 @@ class TodayScreen extends ConsumerWidget {
               ),
             ),
 
-            // Priority Alerts
+            // Alerts section
             SliverToBoxAdapter(
               child: dashboardAsync.when(
-                data: (dashboard) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Требует внимания',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (dashboard.tasks.urgent > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: _buildAlertCard(
-                            context,
-                            'Срочные задачи',
-                            'Срочных задач: ${dashboard.tasks.urgent}',
-                            Icons.priority_high,
-                            const Color(0xFFEF4444),
-                            () => context.go('/tasks'),
-                          ),
-                        ),
-                      if (dashboard.health.overdueVaccinations > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: _buildAlertCard(
-                            context,
-                            'Вакцинация',
-                            'Просрочено вакцинаций: ${dashboard.health.overdueVaccinations}',
-                            Icons.vaccines,
-                            const Color(0xFFEF4444),
-                            () => context.push('/vaccinations'),
-                          ),
-                        ),
-                      if (dashboard.breeding.recentBirths > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: _buildAlertCard(
-                            context,
-                            'Роды',
-                            'Рождений за последние 30 дней: ${dashboard.breeding.recentBirths}',
-                            Icons.child_care,
-                            const Color(0xFFEC4899),
-                            () => context.push('/births'),
-                          ),
-                        ),
-                      if (dashboard.inventory.lowStockFeeds > 0)
-                        _buildAlertCard(
-                          context,
-                          'Корм',
-                          'Низкий запас корма: ${dashboard.inventory.lowStockFeeds} видов',
-                          Icons.inventory,
-                          const Color(0xFFF59E0B),
-                          () => context.push('/feeds'),
-                        ),
-                      if (dashboard.health.overdueVaccinations == 0 &&
-                          dashboard.breeding.recentBirths == 0 &&
-                          dashboard.inventory.lowStockFeeds == 0 &&
-                          dashboard.tasks.urgent == 0)
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(32.0),
-                            child: Text(
-                              'Нет срочных задач\n✨ Всё под контролем!',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: AppTheme.textSecondary,
+                data: (dashboard) {
+                  final alerts = <Widget>[];
+
+                  if (dashboard.tasks.urgent > 0) {
+                    alerts.add(AlertCard(
+                      title: 'Срочные задачи',
+                      description: 'Срочных задач: ${dashboard.tasks.urgent}',
+                      icon: Icons.priority_high,
+                      color: AppColors.error,
+                      onTap: () => context.go('/tasks'),
+                    ));
+                  }
+                  if (dashboard.health.overdueVaccinations > 0) {
+                    alerts.add(AlertCard(
+                      title: 'Вакцинация',
+                      description:
+                          'Просрочено: ${dashboard.health.overdueVaccinations}',
+                      icon: Icons.vaccines,
+                      color: AppColors.error,
+                      onTap: () => context.push('/vaccinations'),
+                    ));
+                  }
+                  if (dashboard.breeding.recentBirths > 0) {
+                    alerts.add(AlertCard(
+                      title: 'Роды',
+                      description:
+                          'Рождений за 30 дней: ${dashboard.breeding.recentBirths}',
+                      icon: Icons.child_care,
+                      color: AppColors.accentRose,
+                      onTap: () => context.push('/births'),
+                    ));
+                  }
+                  if (dashboard.inventory.lowStockFeeds > 0) {
+                    alerts.add(AlertCard(
+                      title: 'Запас корма',
+                      description:
+                          'Низкий запас: ${dashboard.inventory.lowStockFeeds} видов',
+                      icon: Icons.inventory_2_outlined,
+                      color: AppColors.warning,
+                      onTap: () => context.push('/feeds'),
+                    ));
+                  }
+
+                  if (alerts.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                      child: AppCard(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle,
+                                color: AppColors.success, size: 28),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Всё под контролем — срочных задач нет',
+                                style: AppTypography.bodyMd.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Требует внимания',
+                          style: AppTypography.titleLg.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
+                        const SizedBox(height: 12),
+                        ...alerts.map((w) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: w,
+                            )),
+                      ],
+                    ),
+                  );
+                },
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
                 error: (_, __) => const SizedBox(),
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-
-            // Quick Actions
+            // Quick actions
             SliverToBoxAdapter(
               child: dashboardAsync.when(
                 data: (dashboard) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Быстрые действия',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
+                            style: AppTypography.titleLg.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextButton(
@@ -215,44 +210,37 @@ class TodayScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _buildQuickActionCard(
-                        context,
-                        'Задачи',
-                        'Просмотреть и управлять задачами',
-                        Icons.check_circle,
-                        '${dashboard.tasks.pending} ожидают',
-                        AppTheme.primaryGradient,
-                        () => context.go('/tasks'),
+                      _QuickActionRow(
+                        title: 'Задачи',
+                        description: 'Просмотреть и управлять задачами',
+                        badge: '${dashboard.tasks.pending} ожидают',
+                        icon: Icons.check_circle_outline,
+                        color: AppColors.accentViolet,
+                        onTap: () => context.go('/tasks'),
                       ),
                       const SizedBox(height: 8),
-                      _buildQuickActionCard(
-                        context,
-                        'Кролики',
-                        'Управление поголовьем',
-                        Icons.pets,
-                        'Всего: ${dashboard.rabbits.total}',
-                        const LinearGradient(
-                          colors: [Color(0xFF06B6D4), Color(0xFF0891B2)],
-                        ),
-                        () => context.push('/rabbits'),
+                      _QuickActionRow(
+                        title: 'Кролики',
+                        description: 'Управление поголовьем',
+                        badge: 'Всего: ${dashboard.rabbits.total}',
+                        icon: Icons.pets_outlined,
+                        color: AppColors.accentEmerald,
+                        onTap: () => context.push('/rabbits'),
                       ),
                       const SizedBox(height: 8),
-                      _buildQuickActionCard(
-                        context,
-                        'Корма',
-                        'Управление запасами',
-                        Icons.inventory,
-                        'Низкий запас: ${dashboard.inventory.lowStockFeeds}',
-                        const LinearGradient(
-                          colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                        ),
-                        () => context.push('/feeds'),
+                      _QuickActionRow(
+                        title: 'Корма',
+                        description: 'Управление запасами',
+                        badge: 'Низкий запас: ${dashboard.inventory.lowStockFeeds}',
+                        icon: Icons.inventory_2_outlined,
+                        color: AppColors.warning,
+                        onTap: () => context.push('/feeds'),
                       ),
-                      const SizedBox(height: 100), // Space for FAB
                     ],
                   ),
                 ),
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
                 error: (_, __) => const SizedBox(),
               ),
             ),
@@ -262,209 +250,155 @@ class TodayScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(
-    BuildContext context,
-    String title,
-    String value,
-    String subtitle,
-    IconData icon,
-    LinearGradient gradient,
-    VoidCallback onTap,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: AppTheme.cardShadow,
+  String _greeting(DateTime now, String? name) {
+    final hour = now.hour;
+    final String base;
+    if (hour >= 6 && hour < 12) {
+      base = 'Доброе утро';
+    } else if (hour >= 12 && hour < 18) {
+      base = 'Добрый день';
+    } else if (hour >= 18 && hour < 23) {
+      base = 'Добрый вечер';
+    } else {
+      base = 'Доброй ночи';
+    }
+    if (name != null && name.isNotEmpty) {
+      final firstName = name.trim().split(' ').first;
+      return '$base, $firstName!';
+    }
+    return '$base!';
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final String sublabel;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _SummaryCard({
+    required this.label,
+    required this.value,
+    required this.sublabel,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 22),
           ),
-          child: Column(
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: AppTypography.labelSm.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: gradient,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: Colors.white, size: 28),
-              ),
-              const SizedBox(height: 12),
               Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.textSecondary,
+                value,
+                style: AppTypography.displayMd.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Text(
+                  sublabel,
+                  style: AppTypography.labelSm.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 4),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildAlertCard(
-    BuildContext context,
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3), width: 1),
-            boxShadow: AppTheme.cardShadow,
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: color,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: color),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+class _QuickActionRow extends StatelessWidget {
+  final String title;
+  final String description;
+  final String badge;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
-  Widget _buildQuickActionCard(
-    BuildContext context,
-    String title,
-    String description,
-    IconData icon,
-    String badge,
-    LinearGradient gradient,
-    VoidCallback onTap,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: AppTheme.cardShadow,
+  const _QuickActionRow({
+    required this.title,
+    required this.description,
+    required this.badge,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
           ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: gradient,
-                  borderRadius: BorderRadius.circular(12),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.titleMd.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-                child: Icon(icon, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      badge,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ),
-                  ],
+                Text(
+                  description,
+                  style: AppTypography.bodyMd.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textHint),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  badge,
+                  style: AppTypography.labelSm.copyWith(color: color),
+                ),
+              ],
+            ),
           ),
-        ),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 14,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ],
       ),
     );
   }
