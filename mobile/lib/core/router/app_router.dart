@@ -49,6 +49,7 @@ import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/more_screen.dart';
 import '../../features/home/presentation/screens/menu_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_farm_name_screen.dart';
@@ -383,6 +384,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           final task = state.extra as Task?;
           return TaskFormScreen(task: task);
         },
+      ),
+
+      // Settings screen
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
 
       // Dashboard settings
