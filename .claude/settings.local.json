@@ -30,7 +30,17 @@
       "Bash(grep Jest: :*)",
       "Bash(git log:*)",
       "Bash(git merge:*)",
-      "Bash(wait:*)"
+      "Bash(wait:*)",
+      "Bash(docker compose:*)",
+      "Bash(npm run:*)",
+      "Bash(git worktree:*)",
+      "Bash(cd /mnt/d/projects/RabbitFarm/RabbitFarm/.worktrees/mobile-redesign/mobile && dart analyze lib/core/theme/app_colors.dart 2>&1)",
+      "Bash(cd /mnt/d/projects/RabbitFarm/RabbitFarm/.worktrees/mobile-redesign/mobile && dart analyze lib/core/theme/app_typography.dart 2>&1)",
+      "Bash(dart analyze:*)",
+      "Bash(python3:*)",
+      "Bash(git stash:*)",
+      "Bash(flutter test:*)",
+      "Bash(git:*)"
     ],
     "deny": [],
     "ask": []

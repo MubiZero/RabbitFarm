@@ -8,8 +8,8 @@ services:
       MYSQL_USER: rabbitfarm_user
       MYSQL_PASSWORD: RabbitFarm2024!
       MYSQL_ROOT_PASSWORD: RabbitFarm2024!
-    # ports:
-    #   - "33060:3306" # Commented out to avoid conflicts. Use Adminer (port 8080) to access DB.
+    ports:
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
