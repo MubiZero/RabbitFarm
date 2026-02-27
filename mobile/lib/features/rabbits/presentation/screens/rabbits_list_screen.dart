@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/status_badge.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class RabbitsListScreen extends ConsumerStatefulWidget {
   const RabbitsListScreen({super.key});
@@ -16,11 +17,10 @@ class RabbitsListScreen extends ConsumerStatefulWidget {
 class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  
-  // Local filter states
+
   String? _selectedSex;
   String? _selectedStatus;
-  
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +35,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= 
+    if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       ref.read(rabbitsListProvider.notifier).loadMore(
         search: _searchController.text.isNotEmpty ? _searchController.text : null,
@@ -46,7 +46,6 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   }
 
   void _onSearchChanged(String value) {
-    // Debounce can be added here if needed
     ref.read(rabbitsListProvider.notifier).loadRabbits(
       search: value,
       sex: _selectedSex,
@@ -65,21 +64,21 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(rabbitsListProvider);
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          _buildSliverAppBar(),
-          _buildFilters(),
+          _buildSliverAppBar(primary),
+          _buildFilters(primary),
           if (state.isLoading && state.rabbits.isEmpty)
             const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             )
           else if (state.error != null && state.rabbits.isEmpty)
             SliverFillRemaining(
-              child: Center(child: Text('Error: ${state.error}')),
+              child: Center(child: Text('Ошибка: ${state.error}')),
             )
           else if (state.rabbits.isEmpty)
             const SliverFillRemaining(
@@ -87,7 +86,6 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             )
           else
             _buildRabbitsList(state.rabbits),
-            
           if (state.isLoading && state.rabbits.isNotEmpty)
             const SliverToBoxAdapter(
               child: Padding(
@@ -99,77 +97,76 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/rabbits/new'),
-        backgroundColor: AppTheme.primaryColor,
         icon: const Icon(Icons.add),
         label: const Text('Добавить'),
       ),
     );
   }
 
-  Widget _buildSliverAppBar() {
+  Widget _buildSliverAppBar(Color primary) {
     return SliverAppBar(
       floating: true,
       pinned: true,
       snap: true,
-      backgroundColor: AppTheme.primaryColor,
+      backgroundColor: primary,
       expandedHeight: 120,
       title: const Text('Мои Кролики'),
       centerTitle: true,
       bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(60),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    decoration: InputDecoration(
-                      hintText: 'Поиск по имени или клейму...',
-                      hintStyle: TextStyle(color: AppColors.darkTextHint),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.grey),
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearchChanged('');
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
+        preferredSize: const Size.fromHeight(60),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Поиск по имени или клейму...',
+                hintStyle: const TextStyle(color: AppColors.darkTextHint),
+                prefixIcon: const Icon(Icons.search, color: AppColors.darkTextHint),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: AppColors.darkTextHint),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearchChanged('');
+                        },
+                      )
+                    : null,
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(Color primary) {
     return SliverToBoxAdapter(
-      child: Container(
+      child: SizedBox(
         height: 60,
-        padding: const EdgeInsets.symmetric(vertical: 10),
         child: ListView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           children: [
             _buildFilterChip(
               label: 'Все',
               isSelected: _selectedSex == null && _selectedStatus == null,
+              primary: primary,
               onTap: () {
                 setState(() {
                   _selectedSex = null;
@@ -182,6 +179,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             _buildFilterChip(
               label: 'Самцы',
               isSelected: _selectedSex == 'male',
+              primary: primary,
               onTap: () {
                 setState(() {
                   _selectedSex = _selectedSex == 'male' ? null : 'male';
@@ -193,6 +191,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             _buildFilterChip(
               label: 'Самки',
               isSelected: _selectedSex == 'female',
+              primary: primary,
               onTap: () {
                 setState(() {
                   _selectedSex = _selectedSex == 'female' ? null : 'female';
@@ -204,6 +203,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             _buildFilterChip(
               label: 'Активные',
               isSelected: _selectedStatus == 'active',
+              primary: primary,
               onTap: () {
                 setState(() {
                   _selectedStatus = _selectedStatus == 'active' ? null : 'active';
@@ -215,6 +215,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             _buildFilterChip(
               label: 'Проданы',
               isSelected: _selectedStatus == 'sold',
+              primary: primary,
               onTap: () {
                 setState(() {
                   _selectedStatus = _selectedStatus == 'sold' ? null : 'sold';
@@ -231,23 +232,24 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   Widget _buildFilterChip({
     required String label,
     required bool isSelected,
+    required Color primary,
     required VoidCallback onTap,
   }) {
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: Colors.white,
-      selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-      checkmarkColor: AppTheme.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      selectedColor: primary.withValues(alpha: 0.2),
+      checkmarkColor: primary,
       labelStyle: TextStyle(
-        color: isSelected ? AppTheme.primaryColor : Colors.black87,
+        color: isSelected ? primary : AppColors.darkTextSecondary,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isSelected ? AppTheme.primaryColor : AppColors.darkBorder,
+          color: isSelected ? primary : AppColors.darkBorder,
         ),
       ),
     );
@@ -258,10 +260,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
       padding: const EdgeInsets.all(16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final rabbit = rabbits[index];
-            return _buildRabbitCard(rabbit);
-          },
+          (context, index) => _buildRabbitCard(rabbits[index]),
           childCount: rabbits.length,
         ),
       ),
@@ -269,119 +268,102 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   }
 
   Widget _buildRabbitCard(RabbitModel rabbit) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      shadowColor: Colors.black.withValues(alpha: 0.1),
-      child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppCard(
         onTap: () => context.push('/rabbits/${rabbit.id}'),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // Photo
-              Hero(
-                tag: 'rabbit_photo_${rabbit.id}',
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.darkSurfaceVariant,
-                    image: rabbit.photoUrl != null
-                        ? DecorationImage(
-                            image: NetworkImage(rabbit.photoUrl!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: rabbit.photoUrl == null
-                      ? Icon(
-                          Icons.pets,
-                          size: 40,
-                          color: AppColors.darkTextHint,
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Photo
+            Hero(
+              tag: 'rabbit_photo_${rabbit.id}',
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.darkSurfaceVariant,
+                  image: rabbit.photoUrl != null
+                      ? DecorationImage(
+                          image: NetworkImage(rabbit.photoUrl!),
+                          fit: BoxFit.cover,
                         )
                       : null,
                 ),
+                child: rabbit.photoUrl == null
+                    ? const Icon(Icons.pets, size: 40, color: AppColors.darkTextHint)
+                    : null,
               ),
-              const SizedBox(width: 16),
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            rabbit.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                            ),
+            ),
+            const SizedBox(width: 16),
+            // Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          rabbit.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.darkTextPrimary,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(rabbit.status).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _getStatusText(rabbit.status),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: _getStatusColor(rabbit.status),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Клеймо: ${rabbit.tagId ?? "Нет"}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.textSecondary,
                       ),
+                      StatusBadge(status: RabbitStatusX.fromString(rabbit.status)),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Клеймо: ${rabbit.tagId.isEmpty ? "Нет" : rabbit.tagId}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.darkTextSecondary,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _buildInfoBadge(
-                          icon: rabbit.sex == 'male' ? Icons.male : Icons.female,
-                          label: rabbit.sex == 'male' ? 'Самец' : 'Самка',
-                          color: rabbit.sex == 'male' ? Colors.blue : Colors.pink,
-                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _buildInfoBadge(
+                        icon: rabbit.sex == 'male' ? Icons.male : Icons.female,
+                        label: rabbit.sex == 'male' ? 'Самец' : 'Самка',
+                        color: rabbit.sex == 'male'
+                            ? AppColors.accentOcean
+                            : AppColors.accentRose,
+                      ),
+                      if (rabbit.breed?.name != null) ...[
                         const SizedBox(width: 8),
-                        if (rabbit.breed?.name != null)
-                          _buildInfoBadge(
-                            icon: Icons.category,
-                            label: rabbit.breed!.name,
-                            color: Colors.purple,
-                          ),
+                        _buildInfoBadge(
+                          icon: Icons.category,
+                          label: rabbit.breed!.name,
+                          color: AppColors.accentViolet,
+                        ),
                       ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-            ],
-          ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.darkTextHint),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoBadge({required IconData icon, required String label, required Color color}) {
+  Widget _buildInfoBadge({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.05),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
@@ -401,38 +383,5 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
         ],
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'active':
-        return Colors.green;
-      case 'sold':
-        return Colors.blue;
-      case 'deceased':
-        return Colors.red;
-      case 'quarantine':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'active':
-      case 'healthy':
-        return 'Здоров';
-      case 'sold':
-        return 'Продан';
-      case 'deceased':
-        return 'Умер';
-      case 'quarantine':
-        return 'Карантин';
-      case 'sick':
-        return 'Болен';
-      default:
-        return status;
-    }
   }
 }

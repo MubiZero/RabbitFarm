@@ -47,7 +47,6 @@ import '../../features/reports/presentation/screens/customizable_dashboard_scree
 import '../../features/reports/presentation/screens/dashboard_settings_screen.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
-import '../../features/home/presentation/screens/more_screen.dart';
 import '../../features/home/presentation/screens/menu_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
@@ -172,11 +171,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const MenuScreen(),
           ),
 
-          // More screen (kept for backward compat)
+          // More route (alias for /menu for backward compat)
           GoRoute(
             path: '/more',
             name: 'more',
-            builder: (context, state) => const MoreScreen(),
+            builder: (context, state) => const MenuScreen(),
           ),
         ],
       ),
