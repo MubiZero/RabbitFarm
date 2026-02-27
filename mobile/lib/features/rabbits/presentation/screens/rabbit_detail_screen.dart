@@ -7,6 +7,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import 'weight_history_screen.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -108,14 +109,14 @@ class RabbitDetailScreen extends ConsumerWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           height: 250,
-                          color: Colors.grey[200],
+                          color: AppColors.darkSurfaceVariant,
                           child: const Center(
                             child: CircularProgressIndicator(),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           height: 250,
-                          color: Colors.grey[200],
+                          color: AppColors.darkSurfaceVariant,
                           child: const Icon(
                             Icons.broken_image,
                             size: 64,
@@ -130,12 +131,12 @@ class RabbitDetailScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.touch_app, size: 16, color: Colors.grey[600]),
+                        Icon(Icons.touch_app, size: 16, color: AppColors.darkTextSecondary),
                         const SizedBox(width: 4),
                         Text(
                           'Нажмите для увеличения',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
+                                color: AppColors.darkTextSecondary,
                               ),
                         ),
                       ],
@@ -156,7 +157,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: _getSexColor(rabbit.sex).withOpacity(0.1),
+                      color: _getSexColor(rabbit.sex).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: ClipRRect(
@@ -197,7 +198,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         Text(
                           'Бирка: ${rabbit.tagId}',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[600],
+                                color: AppColors.darkTextSecondary,
                               ),
                         ),
                       ],
@@ -417,7 +418,7 @@ class RabbitDetailScreen extends ConsumerWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                   ),
             ),
           ),
@@ -447,8 +448,8 @@ class RabbitDetailScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: color.withValues(alpha: 0.05),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -456,7 +457,7 @@ class RabbitDetailScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),
@@ -469,7 +470,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          color: AppColors.darkTextSecondary,
                         ),
                   ),
                   const SizedBox(height: 2),
@@ -482,13 +483,13 @@ class RabbitDetailScreen extends ConsumerWidget {
                   Text(
                     'Бирка: ${parent.tagId}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          color: AppColors.darkTextSecondary,
                         ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.darkTextHint),
           ],
         ),
       ),
@@ -600,7 +601,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                 icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.of(context).pop(),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.black.withOpacity(0.5),
+                  backgroundColor: Colors.black.withValues(alpha: 0.5),
                 ),
               ),
             ),

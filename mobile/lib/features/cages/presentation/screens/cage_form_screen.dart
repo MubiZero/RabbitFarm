@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран формы добавления/редактирования клетки
 class CageFormScreen extends ConsumerStatefulWidget {
@@ -78,7 +79,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Редактировать клетку' : 'Добавить клетку'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -265,7 +266,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                       onPressed: _isSubmitting ? null : _submitForm,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.orange[700],
+                        backgroundColor: AppColors.warning,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -293,7 +294,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
 
   Widget _buildInfoCard() {
     return Card(
-      color: Colors.blue[50],
+      color: AppColors.accentOcean.withValues(alpha: 0.08),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -301,13 +302,13 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.blue[700]),
+                Icon(Icons.info_outline, color: AppColors.accentOcean),
                 const SizedBox(width: 8),
                 Text(
                   'Подсказка',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[700],
+                    color: AppColors.accentOcean,
                   ),
                 ),
               ],
@@ -320,7 +321,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
               '• Клетки для окрола - для самок с крольчатами',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.blue[900],
+                color: AppColors.accentOcean,
               ),
             ),
           ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка пород кроликов
 class BreedsListScreen extends ConsumerStatefulWidget {
@@ -54,7 +55,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: AppColors.darkSurface,
               ),
               onChanged: (value) {
                 ref.read(breedsProvider.notifier).updateSearchQuery(value);
@@ -122,7 +123,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
             Icon(
               state.searchQuery.isNotEmpty ? Icons.search_off : Icons.pets,
               size: 80,
-              color: Colors.grey[400],
+              color: AppColors.darkTextHint,
             ),
             const SizedBox(height: 16),
             Text(
@@ -130,7 +131,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   ? 'Породы не найдены'
                   : 'Нет пород',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                   ),
             ),
             const SizedBox(height: 8),
@@ -139,7 +140,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   ? 'Попробуйте изменить запрос'
                   : 'Добавьте первую породу',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                   ),
             ),
           ],
@@ -207,7 +208,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                             _getPurposeText(breed.purpose!),
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: AppColors.darkTextSecondary,
                             ),
                           ),
                       ],
@@ -255,7 +256,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   breed.description!,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: AppColors.darkTextSecondary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

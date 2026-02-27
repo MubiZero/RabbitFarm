@@ -10,6 +10,7 @@ import '../providers/feeds_provider.dart';
 import '../providers/feeding_records_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../cages/presentation/providers/cages_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран создания/редактирования записи о кормлении
 class FeedingRecordFormScreen extends ConsumerStatefulWidget {
@@ -87,7 +88,7 @@ class _FeedingRecordFormScreenState
             ? 'Новая запись о кормлении'
             : 'Редактировать запись'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
       ),
       body: Form(
         key: _formKey,
@@ -190,7 +191,7 @@ class _FeedingRecordFormScreenState
                     leading: const Icon(Icons.calendar_today),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.grey[300]!),
+                      side: BorderSide(color: AppColors.darkBorder),
                     ),
                     onTap: () => _selectDate(context),
                   ),
@@ -203,7 +204,7 @@ class _FeedingRecordFormScreenState
                     leading: const Icon(Icons.access_time),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.grey[300]!),
+                      side: BorderSide(color: AppColors.darkBorder),
                     ),
                     onTap: () => _selectTime(context),
                   ),
@@ -228,7 +229,7 @@ class _FeedingRecordFormScreenState
             ElevatedButton(
               onPressed: _isLoading ? null : _saveRecord,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange[700],
+                backgroundColor: AppColors.warning,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isLoading

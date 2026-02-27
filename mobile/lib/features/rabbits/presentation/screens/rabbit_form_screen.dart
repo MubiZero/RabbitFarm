@@ -11,6 +11,7 @@ import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/parent_selector.dart';
 import '../../../../core/utils/image_url_helper.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId; // ID for edit mode
@@ -375,9 +376,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       width: 150,
                       height: 150,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: AppColors.darkSurfaceVariant,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[400]!, width: 2),
+                        border: Border.all(color: AppColors.darkTextHint!, width: 2),
                       ),
                       child: _selectedImage != null
                           ? ClipRRect(

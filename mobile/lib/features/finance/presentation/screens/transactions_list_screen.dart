@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка финансовых транзакций
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -38,7 +39,7 @@ class _TransactionsListScreenState
       appBar: AppBar(
         title: const Text('Финансы'),
         centerTitle: true,
-        backgroundColor: Colors.blue[700],
+        backgroundColor: AppColors.accentOcean,
         actions: [
           // Фильтры
           IconButton(
@@ -72,7 +73,7 @@ class _TransactionsListScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showTransactionForm(context, null),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: AppColors.accentOcean,
         icon: const Icon(Icons.add),
         label: const Text('Добавить транзакцию'),
       ),
@@ -131,8 +132,8 @@ class _TransactionsListScreenState
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: Colors.grey[200],
-      selectedColor: color?.withOpacity(0.3) ?? Colors.blue[200],
+      backgroundColor: AppColors.darkSurfaceVariant,
+      selectedColor: color?.withValues(alpha: 0.3) ?? AppColors.accentOcean.withValues(alpha: 0.4),
     );
   }
 
@@ -233,16 +234,16 @@ class _TransactionsListScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.account_balance_wallet_outlined,
-                size: 64, color: Colors.grey[400]),
+                size: 64, color: AppColors.darkTextHint),
             const SizedBox(height: 16),
             Text(
               'Транзакций не найдено',
-              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
             ),
             const SizedBox(height: 8),
             Text(
               'Добавьте первую транзакцию',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppColors.darkTextSecondary),
             ),
           ],
         ),
@@ -309,7 +310,7 @@ class _TransactionsListScreenState
                   transaction.description!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                     fontStyle: FontStyle.italic,
                   ),
                   maxLines: 2,

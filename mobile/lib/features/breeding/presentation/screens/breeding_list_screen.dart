@@ -5,6 +5,7 @@ import '../providers/breeding_provider.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class BreedingListScreen extends ConsumerStatefulWidget {
   const BreedingListScreen({super.key});
@@ -177,7 +178,7 @@ class _BreedingCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: statusColor),
                     ),
@@ -192,7 +193,7 @@ class _BreedingCard extends StatelessWidget {
                   ),
                   Text(
                     _formatDate(breeding.breedingDate),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 12),
                   ),
                 ],
               ),

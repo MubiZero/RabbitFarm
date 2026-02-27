@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class RabbitsListScreen extends ConsumerStatefulWidget {
   const RabbitsListScreen({super.key});
@@ -125,7 +126,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -136,7 +137,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                     onChanged: _onSearchChanged,
                     decoration: InputDecoration(
                       hintText: 'Поиск по имени или клейму...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: TextStyle(color: AppColors.darkTextHint),
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -237,7 +238,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
       selected: isSelected,
       onSelected: (_) => onTap(),
       backgroundColor: Colors.white,
-      selectedColor: AppTheme.primaryColor.withOpacity(0.2),
+      selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
       checkmarkColor: AppTheme.primaryColor,
       labelStyle: TextStyle(
         color: isSelected ? AppTheme.primaryColor : Colors.black87,
@@ -246,7 +247,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isSelected ? AppTheme.primaryColor : Colors.grey[300]!,
+          color: isSelected ? AppTheme.primaryColor : AppColors.darkBorder,
         ),
       ),
     );
@@ -272,7 +273,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       child: InkWell(
         onTap: () => context.push('/rabbits/${rabbit.id}'),
         borderRadius: BorderRadius.circular(16),
@@ -288,7 +289,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
+                    color: AppColors.darkSurfaceVariant,
                     image: rabbit.photoUrl != null
                         ? DecorationImage(
                             image: NetworkImage(rabbit.photoUrl!),
@@ -300,7 +301,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                       ? Icon(
                           Icons.pets,
                           size: 40,
-                          color: Colors.grey[400],
+                          color: AppColors.darkTextHint,
                         )
                       : null,
                 ),
@@ -326,7 +327,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(rabbit.status).withOpacity(0.1),
+                            color: _getStatusColor(rabbit.status).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -380,9 +381,9 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

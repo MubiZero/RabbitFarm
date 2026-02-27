@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../data/models/birth_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка окролов
 class BirthsListScreen extends ConsumerStatefulWidget {
@@ -67,19 +68,19 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.child_care, size: 64, color: Colors.grey[400]),
+                            Icon(Icons.child_care, size: 64, color: AppColors.darkTextHint),
                             const SizedBox(height: 16),
                             Text(
                               'Окролов пока нет',
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: Colors.grey[600],
+                                    color: AppColors.darkTextSecondary,
                                   ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Зарегистрируйте первый окрол',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.grey[600],
+                                    color: AppColors.darkTextSecondary,
                                   ),
                             ),
                           ],
@@ -236,7 +237,7 @@ class _BirthCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: AppColors.darkSurface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -269,12 +270,12 @@ class _BirthCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.check_circle, size: 16, color: Colors.green[700]),
+                    Icon(Icons.check_circle, size: 16, color: AppColors.success),
                     const SizedBox(width: 8),
                     Text(
                       'Отсажено: ${birth.kitsWeaned} крольчат',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.green[700],
+                            color: AppColors.success,
                           ),
                     ),
                   ],
@@ -287,13 +288,13 @@ class _BirthCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.orange[50],
+                    color: AppColors.warning.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.orange[300]!),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber, size: 16, color: Colors.orange[700]),
+                      Icon(Icons.warning_amber, size: 16, color: AppColors.warning),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -314,7 +315,7 @@ class _BirthCard extends StatelessWidget {
                 Text(
                   birth.notes!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[700],
+                        color: AppColors.darkTextSecondary,
                       ),
                 ),
               ],
@@ -356,7 +357,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
+                color: AppColors.darkTextSecondary,
               ),
         ),
       ],

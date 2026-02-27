@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class BreedingDetailScreen extends ConsumerWidget {
   final int breedingId;
@@ -16,7 +17,7 @@ class BreedingDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Детали случки'),
-        backgroundColor: Colors.purple[700],
+        backgroundColor: AppColors.accentViolet,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -36,7 +37,7 @@ class BreedingDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error, size: 64, color: Colors.red[300]),
+              Icon(Icons.error, size: 64, color: AppColors.error.withValues(alpha: 0.6)),
               const SizedBox(height: 16),
               Text('Ошибка загрузки: $error'),
               const SizedBox(height: 16),
@@ -88,7 +89,7 @@ class BreedingDetailScreen extends ConsumerWidget {
       children: [
         // Статус
         Card(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -153,7 +154,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           if (breeding.male?.tagId != null)
                             Text(
                               'Бирка: ${breeding.male!.tagId}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
                             ),
                         ],
                       ),
@@ -185,7 +186,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           if (breeding.female?.tagId != null)
                             Text(
                               'Бирка: ${breeding.female!.tagId}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
                             ),
                         ],
                       ),
@@ -252,7 +253,7 @@ class BreedingDetailScreen extends ConsumerWidget {
         // Беременность
         if (breeding.isPregnant != null)
           Card(
-            color: breeding.isPregnant! ? Colors.green[50] : Colors.orange[50],
+            color: breeding.isPregnant! ? AppColors.success.withValues(alpha: 0.08) : AppColors.warning.withValues(alpha: 0.08),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -321,7 +322,7 @@ class BreedingDetailScreen extends ConsumerWidget {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),
-              backgroundColor: Colors.green[700],
+              backgroundColor: AppColors.success,
             ),
             icon: const Icon(Icons.child_care),
             label: const Text(

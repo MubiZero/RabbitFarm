@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран создания/редактирования корма
 class FeedFormScreen extends ConsumerStatefulWidget {
@@ -60,7 +61,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
       appBar: AppBar(
         title: Text(widget.feed == null ? 'Новый корм' : 'Редактировать корм'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         actions: [
           if (widget.feed != null)
             IconButton(
@@ -212,7 +213,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _saveFeed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange[700],
+                backgroundColor: AppColors.warning,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isLoading

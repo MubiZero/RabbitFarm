@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeding_records_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка записей о кормлении
 class FeedingRecordsListScreen extends ConsumerStatefulWidget {
@@ -39,7 +40,7 @@ class _FeedingRecordsListScreenState
       appBar: AppBar(
         title: const Text('История кормления'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -66,7 +67,7 @@ class _FeedingRecordsListScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showFeedingForm(context, null),
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить кормление'),
       ),
@@ -151,16 +152,16 @@ class _FeedingRecordsListScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.restaurant_outlined,
-                size: 64, color: Colors.grey[400]),
+                size: 64, color: AppColors.darkTextHint),
             const SizedBox(height: 16),
             Text(
               'Записей не найдено',
-              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
             ),
             const SizedBox(height: 8),
             Text(
               'Добавьте первую запись о кормлении',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppColors.darkTextSecondary),
             ),
           ],
         ),
@@ -199,7 +200,7 @@ class _FeedingRecordsListScreenState
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Colors.orange[700],
+          backgroundColor: AppColors.warning,
           child: const Icon(Icons.restaurant, color: Colors.white),
         ),
         title: Text(
@@ -251,7 +252,7 @@ class _FeedingRecordsListScreenState
                   record.notes!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: AppColors.darkTextSecondary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),

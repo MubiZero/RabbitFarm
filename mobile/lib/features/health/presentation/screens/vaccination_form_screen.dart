@@ -6,6 +6,7 @@ import '../../data/models/vaccination_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../providers/vaccinations_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран формы добавления/редактирования вакцинации
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -103,7 +104,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Редактировать вакцинацию' : 'Добавить вакцинацию'),
         centerTitle: true,
-        backgroundColor: Colors.green[700],
+        backgroundColor: AppColors.success,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -115,19 +116,19 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
               // Информационная карточка
               if (!isEditing)
                 Card(
-                  color: Colors.blue[50],
+                  color: AppColors.accentOcean.withValues(alpha: 0.08),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue[700]),
+                        Icon(Icons.info_outline, color: AppColors.accentOcean),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Зарегистрируйте вакцинацию для отслеживания графика прививок',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.blue[900],
+                              color: AppColors.accentOcean,
                             ),
                           ),
                         ),
@@ -294,7 +295,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
                       fontSize: 16,
                       color: _nextVaccinationDate != null
                           ? Colors.black
-                          : Colors.grey[600],
+                          : AppColors.darkTextSecondary,
                     ),
                   ),
                 ),
@@ -394,7 +395,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: AppColors.success,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

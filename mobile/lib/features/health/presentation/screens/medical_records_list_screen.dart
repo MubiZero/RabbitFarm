@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class MedicalRecordsListScreen extends ConsumerStatefulWidget {
   const MedicalRecordsListScreen({super.key});
@@ -76,14 +77,14 @@ class _MedicalRecordsListScreenState
                           Icon(
                             Icons.medical_information_outlined,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: AppColors.darkTextHint,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Нет медицинских записей',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey[600],
+                              color: AppColors.darkTextSecondary,
                             ),
                           ),
                         ],
@@ -188,7 +189,7 @@ class _MedicalRecordsListScreenState
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: outcomeColor.withOpacity(0.1),
+                      color: outcomeColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: outcomeColor),
                     ),
@@ -205,7 +206,7 @@ class _MedicalRecordsListScreenState
                   Text(
                     dateFormat.format(record.startedAt),
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: AppColors.darkTextSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -234,7 +235,7 @@ class _MedicalRecordsListScreenState
               Text(
                 'Симптомы: ${record.symptoms}',
                 style: TextStyle(
-                  color: Colors.grey[700],
+                  color: AppColors.darkTextSecondary,
                   fontSize: 13,
                 ),
                 maxLines: 2,
@@ -245,7 +246,7 @@ class _MedicalRecordsListScreenState
                 Text(
                   'Лечение: ${record.treatment}',
                   style: TextStyle(
-                    color: Colors.grey[700],
+                    color: AppColors.darkTextSecondary,
                     fontSize: 13,
                   ),
                   maxLines: 1,
@@ -259,13 +260,13 @@ class _MedicalRecordsListScreenState
                     Icon(
                       Icons.attach_money,
                       size: 16,
-                      color: Colors.grey[600],
+                      color: AppColors.darkTextSecondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${record.cost!.toStringAsFixed(2)} руб.',
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: AppColors.darkTextSecondary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -281,13 +282,13 @@ class _MedicalRecordsListScreenState
                     Icon(
                       Icons.person_outline,
                       size: 16,
-                      color: Colors.grey[600],
+                      color: AppColors.darkTextSecondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       record.veterinarian!,
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: AppColors.darkTextSecondary,
                         fontSize: 13,
                       ),
                     ),

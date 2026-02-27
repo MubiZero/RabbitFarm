@@ -7,6 +7,7 @@ import '../../data/models/cage_statistics.dart';
 import '../providers/cages_provider.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class CageDetailScreen extends ConsumerStatefulWidget {
   final int cageId;
@@ -201,7 +202,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Клетка ${cage.number}'),
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -224,7 +225,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (cage.isFull ?? false) ? null : () => _addRabbit(cage.id),
-        backgroundColor: (cage.isFull ?? false) ? Colors.grey : Colors.orange[700],
+        backgroundColor: (cage.isFull ?? false) ? Colors.grey : AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Посадить кролика'),
       ),
@@ -288,7 +289,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       children: [
         CircularProgressIndicator(
           value: percent,
-          backgroundColor: Colors.grey[200],
+          backgroundColor: AppColors.darkSurfaceVariant,
           color: percent >= 1 ? Colors.red : Colors.green,
           strokeWidth: 8,
         ),

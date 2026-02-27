@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class BreedingFormScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -96,7 +97,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Новая случка'),
-        backgroundColor: Colors.purple[700],
+        backgroundColor: AppColors.accentViolet,
       ),
       body: Form(
         key: _formKey,
@@ -106,12 +107,12 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
             // Информационная карточка
             if (widget.initialData?['analysis'] != null)
               Card(
-                color: Colors.blue[50],
+                color: AppColors.accentOcean.withValues(alpha: 0.08),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.blue[700]),
+                      Icon(Icons.info_outline, color: AppColors.accentOcean),
                       const SizedBox(width: 12),
                       const Expanded(
                         child: Text(
@@ -323,7 +324,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
               onPressed: _isSubmitting ? null : _submitForm,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(16),
-                backgroundColor: Colors.purple[700],
+                backgroundColor: AppColors.accentViolet,
               ),
               child: _isSubmitting
                   ? const SizedBox(

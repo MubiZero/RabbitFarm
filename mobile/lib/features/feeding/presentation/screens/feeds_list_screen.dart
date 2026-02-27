@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка кормов (склад)
 class FeedsListScreen extends ConsumerStatefulWidget {
@@ -33,7 +34,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       appBar: AppBar(
         title: const Text('Склад кормов'),
         centerTitle: true,
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -64,7 +65,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showFeedForm(context, null),
-        backgroundColor: Colors.orange[700],
+        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить корм'),
       ),
@@ -122,8 +123,8 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: Colors.grey[200],
-      selectedColor: Colors.orange[200],
+      backgroundColor: AppColors.darkSurfaceVariant,
+      selectedColor: AppColors.warning,
     );
   }
 
@@ -209,16 +210,16 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.inventory_2_outlined,
-                size: 64, color: Colors.grey[400]),
+                size: 64, color: AppColors.darkTextHint),
             const SizedBox(height: 16),
             Text(
               'Корма не найдены',
-              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
             ),
             const SizedBox(height: 8),
             Text(
               'Добавьте первый корм',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppColors.darkTextSecondary),
             ),
           ],
         ),
