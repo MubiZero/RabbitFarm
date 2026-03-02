@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/onboarding_progress.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class OnboardingFarmTypeScreen extends ConsumerStatefulWidget {
@@ -20,8 +19,8 @@ class _OnboardingFarmTypeScreenState
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -34,7 +33,7 @@ class _OnboardingFarmTypeScreenState
               Text(
                 'Как вы управляете\nфермой?',
                 style: AppTypography.displayMd.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: cs.onSurface,
                 ),
               ),
               const SizedBox(height: 32),
@@ -64,7 +63,7 @@ class _OnboardingFarmTypeScreenState
                 child: Text(
                   'Пропустить',
                   style: AppTypography.labelLg.copyWith(
-                    color: AppColors.darkTextSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -118,12 +117,12 @@ class _TypeCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (selected ? accent : AppColors.darkTextSecondary)
+                color: (selected ? accent : Theme.of(context).colorScheme.onSurfaceVariant)
                     .withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon,
-                  color: selected ? accent : AppColors.darkTextSecondary),
+                  color: selected ? accent : Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -134,11 +133,11 @@ class _TypeCard extends StatelessWidget {
                       style: AppTypography.titleMd.copyWith(
                         color: selected
                             ? accent
-                            : AppColors.darkTextPrimary,
+                            : Theme.of(context).colorScheme.onSurface,
                       )),
                   Text(subtitle,
                       style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.darkTextSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       )),
                 ],
               ),

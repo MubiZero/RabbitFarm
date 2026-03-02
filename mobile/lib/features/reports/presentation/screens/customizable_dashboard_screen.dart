@@ -213,14 +213,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Быстрые действия',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -292,14 +290,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Обзор фермы',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -356,7 +352,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Занято',
               value: '${dashboard.cages.occupied}',
-              valueColor: AppColors.darkTextPrimary,
+              valueColor: Theme.of(context).colorScheme.onSurface,
               icon: Icons.check_box,
             ),
             StatItem(
@@ -379,14 +375,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Финансы',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -429,14 +423,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Здоровье',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -482,14 +474,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Операции',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -548,14 +538,12 @@ class CustomizableDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Ресурсы',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+            style: AppTypography.titleLg.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -688,20 +676,17 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Ошибка загрузки',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.darkTextPrimary,
+              style: AppTypography.titleLg.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               '$error',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.darkTextSecondary,
+              style: AppTypography.bodyMd.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -714,7 +699,7 @@ class CustomizableDashboardScreen extends ConsumerWidget {
               icon: const Icon(Icons.refresh),
               label: const Text('Повторить'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentEmerald,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,

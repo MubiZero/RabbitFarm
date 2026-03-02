@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class OnboardingReadyScreen extends ConsumerWidget {
@@ -10,13 +9,13 @@ class OnboardingReadyScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     final onboarding = ref.watch(onboardingProvider).valueOrNull;
     final farmName = onboarding?.farmName.isNotEmpty == true
         ? onboarding!.farmName
         : 'ваша ферма';
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -29,13 +28,13 @@ class OnboardingReadyScreen extends ConsumerWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.accentEmerald.withValues(alpha: 0.12),
+                    color: cs.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check_circle_outline,
                     size: 56,
-                    color: AppColors.accentEmerald,
+                    color: cs.primary,
                   ),
                 ),
               ),
@@ -43,7 +42,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
               Text(
                 '"$farmName"\nготова к работе!',
                 style: AppTypography.displayMd.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: cs.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -51,7 +50,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
               Text(
                 'Настроим остальное вместе — \nмы покажем как пользоваться приложением',
                 style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.darkTextSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -72,7 +71,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
                 child: Text(
                   'Уже есть аккаунт? Войти',
                   style: AppTypography.labelLg.copyWith(
-                    color: AppColors.darkTextSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ),

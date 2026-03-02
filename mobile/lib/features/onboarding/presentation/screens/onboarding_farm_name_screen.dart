@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/onboarding_progress.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class OnboardingFarmNameScreen extends ConsumerStatefulWidget {
@@ -26,8 +25,8 @@ class _OnboardingFarmNameScreenState
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -40,7 +39,7 @@ class _OnboardingFarmNameScreenState
               Text(
                 'Как называется\nваша ферма?',
                 style: AppTypography.displayMd.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: cs.onSurface,
                 ),
               ),
               const SizedBox(height: 32),
@@ -48,7 +47,7 @@ class _OnboardingFarmNameScreenState
                 controller: _ctrl,
                 autofocus: true,
                 style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: cs.onSurface,
                 ),
                 decoration: const InputDecoration(
                   hintText: 'Например: Ферма "Берёзки"',
@@ -66,7 +65,7 @@ class _OnboardingFarmNameScreenState
                 child: Text(
                   'Пропустить',
                   style: AppTypography.labelLg.copyWith(
-                    color: AppColors.darkTextSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ),

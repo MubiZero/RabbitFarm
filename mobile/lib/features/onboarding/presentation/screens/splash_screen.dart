@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -64,8 +63,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: Center(
         child: FadeTransition(
           opacity: _fade,
@@ -76,27 +75,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.accentEmerald.withValues(alpha: 0.15),
+                  color: cs.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.pets,
                   size: 40,
-                  color: AppColors.accentEmerald,
+                  color: cs.primary,
                 ),
               ),
               const SizedBox(height: 20),
               Text(
                 'RabbitFarm',
                 style: AppTypography.displayMd.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: cs.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Управление фермой',
                 style: AppTypography.bodyMd.copyWith(
-                  color: AppColors.darkTextSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
               ),
             ],
