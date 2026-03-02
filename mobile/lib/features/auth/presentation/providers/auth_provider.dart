@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/user_model.dart';
@@ -47,6 +48,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _checkAuthStatus();
   }
 
+  bool _isNetworkError(DioException e) {
+    return e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.connectionError ||
+        (e.type == DioExceptionType.unknown &&
+            e.error.toString().contains('SocketException'));
+  }
+
   // Check if user is already logged in
   Future<void> _checkAuthStatus() async {
     state = state.copyWith(isLoading: true);
@@ -55,20 +65,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final isLoggedIn = await _authRepository.isLoggedIn();
 
       if (isLoggedIn) {
-        final user = await _authRepository.getProfile();
-        state = state.copyWith(
-          user: user,
-          isAuthenticated: true,
-          isLoading: false,
-        );
+        try {
+          final user = await _authRepository.getProfile();
+          state = state.copyWith(
+            user: user,
+            isAuthenticated: true,
+            isLoading: false,
+          );
+        } on DioException catch (e) {
+          if (_isNetworkError(e)) {
+            // No network, but token exists — keep user authenticated
+            // user == null, app continues to work
+            state = state.copyWith(
+              isAuthenticated: true,
+              isLoading: false,
+            );
+          } else {
+            // 401/403 — token is invalid, log user out
+            await _authRepository.logout();
+            state = state.copyWith(isLoading: false);
+          }
+        } catch (e) {
+          // Unknown error during profile fetch — log user out
+          state = state.copyWith(isLoading: false);
+        }
       } else {
         state = state.copyWith(isLoading: false);
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false);
     }
   }
 
