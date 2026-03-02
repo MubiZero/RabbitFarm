@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class OnboardingWelcomeScreen extends StatelessWidget {
@@ -9,7 +8,6 @@ class OnboardingWelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -23,13 +21,13 @@ class OnboardingWelcomeScreen extends StatelessWidget {
                   width: 160,
                   height: 160,
                   decoration: BoxDecoration(
-                    color: AppColors.accentEmerald.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.agriculture,
                     size: 80,
-                    color: AppColors.accentEmerald,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -37,7 +35,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
               Text(
                 'Управляйте фермой умно',
                 style: AppTypography.displayLg.copyWith(
-                  color: AppColors.darkTextPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -45,7 +43,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
               Text(
                 'Кролики, кормление, здоровье\nи финансы — всё в одном месте',
                 style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -59,9 +57,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
                 onPressed: () => context.go('/login'),
                 child: Text(
                   'Уже есть аккаунт? Войти',
-                  style: AppTypography.labelLg.copyWith(
-                    color: AppColors.darkTextSecondary,
-                  ),
+                  style: AppTypography.labelLg,
                 ),
               ),
               const SizedBox(height: 24),
