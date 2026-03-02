@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/providers/api_providers.dart';
 import '../models/cage_model.dart';
 
 /// Репозиторий для работы с клетками

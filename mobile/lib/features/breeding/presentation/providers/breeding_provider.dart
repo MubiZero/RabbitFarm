@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/providers/api_providers.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../../data/repositories/breeding_repository.dart';
 
