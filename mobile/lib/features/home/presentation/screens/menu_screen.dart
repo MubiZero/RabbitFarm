@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/string_utils.dart';
+import '../../../../shared/widgets/logout_dialog.dart';
 
 class MenuScreen extends ConsumerWidget {
   const MenuScreen({super.key});
@@ -53,7 +55,7 @@ class MenuScreen extends ConsumerWidget {
                             ),
                             child: Center(
                               child: Text(
-                                _initials(user?.fullName),
+                                initials(user?.fullName),
                                 style: AppTypography.titleLg.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -199,7 +201,7 @@ class MenuScreen extends ConsumerWidget {
                   color: AppColors.error.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
-                    onTap: () => _showLogoutDialog(context, ref),
+                    onTap: () => showLogoutDialog(context, ref),
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -224,15 +226,6 @@ class MenuScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _initials(String? name) {
-    if (name == null || name.isEmpty) return '?';
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return name[0].toUpperCase();
   }
 
   void _showAboutDialog(BuildContext context) {
@@ -261,29 +254,6 @@ class MenuScreen extends ConsumerWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выйти из аккаунта?'),
-        content: const Text('Вы действительно хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              context.pop();
-              await ref.read(authProvider.notifier).logout();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Выйти'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _SectionHeader extends StatelessWidget {
