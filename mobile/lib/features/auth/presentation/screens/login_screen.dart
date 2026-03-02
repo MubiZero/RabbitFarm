@@ -60,7 +60,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -76,13 +75,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: AppColors.accentEmerald.withValues(alpha: 0.15),
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.pets,
                         size: 36,
-                        color: AppColors.accentEmerald,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -92,7 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     'RabbitFarm',
                     style: AppTypography.displayMd.copyWith(
-                      color: AppColors.darkTextPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -102,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     'Войдите в свой аккаунт',
                     style: AppTypography.bodyMd.copyWith(
-                      color: AppColors.darkTextSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -137,7 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: Text(
                           'или',
                           style: AppTypography.labelSm.copyWith(
-                            color: AppColors.darkTextHint,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -150,9 +149,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: AppTypography.bodyMd.copyWith(
-                      color: AppColors.darkTextPrimary,
-                    ),
+                    style: AppTypography.bodyMd,
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       hintText: 'Введите email',
@@ -174,9 +171,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: AppTypography.bodyMd.copyWith(
-                      color: AppColors.darkTextPrimary,
-                    ),
+                    style: AppTypography.bodyMd,
                     decoration: InputDecoration(
                       labelText: 'Пароль',
                       hintText: 'Введите пароль',
@@ -230,7 +225,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         'Нет аккаунта? ',
                         style: AppTypography.bodyMd.copyWith(
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       TextButton(
