@@ -1,19 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../../core/api/api_client.dart';
+import '../../../../core/providers/api_providers.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
-
-// Storage provider
-final storageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
-});
-
-// API Client provider
-final apiClientProvider = Provider<ApiClient>((ref) {
-  final storage = ref.watch(storageProvider);
-  return ApiClient(storage: storage);
-});
 
 // Auth Repository provider
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
