@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 
 /// Экран списка клеток
 class CagesListScreen extends ConsumerStatefulWidget {
@@ -30,8 +32,6 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Клетки'),
-        centerTitle: true,
-        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -71,11 +71,6 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: AppColors.darkSurface,
               ),
               onChanged: (value) {
                 ref.read(cagesProvider.notifier).updateSearchQuery(value);
@@ -97,7 +92,6 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCageForm(context, null),
-        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить клетку'),
       ),
@@ -155,65 +149,21 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     }
 
     if (state.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка загрузки клеток',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.error!,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => ref.read(cagesProvider.notifier).loadCages(),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: state.error!,
+        onRetry: () => ref.read(cagesProvider.notifier).loadCages(),
       );
     }
 
     final cages = state.filteredCages;
 
     if (cages.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              state.searchQuery.isNotEmpty ? Icons.search_off : Icons.home_work,
-              size: 80,
-              color: AppColors.darkTextHint,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              state.searchQuery.isNotEmpty
-                  ? 'Клетки не найдены'
-                  : 'Нет клеток',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.darkTextSecondary,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.searchQuery.isNotEmpty
-                  ? 'Попробуйте изменить запрос'
-                  : 'Добавьте первую клетку',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.darkTextSecondary,
-                  ),
-            ),
-          ],
-        ),
+      return AppEmptyState(
+        icon: state.searchQuery.isNotEmpty ? Icons.search_off : Icons.home_work,
+        title: state.searchQuery.isNotEmpty ? 'Клетки не найдены' : 'Нет клеток',
+        subtitle: state.searchQuery.isNotEmpty
+            ? 'Попробуйте изменить запрос'
+            : 'Добавьте первую клетку',
       );
     }
 
@@ -244,172 +194,166 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
       statusColor = Colors.blue;
     }
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppCard(
         onTap: () => _showCageDetails(context, cage),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Заголовок
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _getCageIcon(cage.type),
-                      color: statusColor,
-                      size: 28,
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Заголовок
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Клетка ${cage.number}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (cage.location != null)
-                          Text(
-                            cage.location!,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.darkTextSecondary,
-                            ),
-                          ),
-                      ],
-                    ),
+                  child: Icon(
+                    _getCageIcon(cage.type),
+                    color: statusColor,
+                    size: 28,
                   ),
-                  // Действия
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        _showCageForm(context, cage);
-                      } else if (value == 'clean') {
-                        _markCleaned(context, cage);
-                      } else if (value == 'delete') {
-                        _confirmDelete(context, cage);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 20),
-                            SizedBox(width: 8),
-                            Text('Редактировать'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'clean',
-                        child: Row(
-                          children: [
-                            Icon(Icons.cleaning_services, size: 20),
-                            SizedBox(width: 8),
-                            Text('Отметить уборку'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 20, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Удалить', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Прогресс заполненности
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Заполненность: ${cage.currentOccupancy ?? 0}/${cage.capacity}',
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        '${(occupancyRate * 100).toInt()}%',
-                        style: TextStyle(
-                          fontSize: 13,
+                        'Клетка ${cage.number}',
+                        style: const TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: statusColor,
                         ),
                       ),
+                      if (cage.location != null)
+                        Text(
+                          cage.location!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  LinearProgressIndicator(
-                    value: occupancyRate,
-                    backgroundColor: AppColors.darkSurfaceVariant,
-                    valueColor: AlwaysStoppedAnimation<Color>(statusColor),
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Характеристики
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildInfoChip(
-                    Icons.category,
-                    _getTypeText(cage.type),
-                    Colors.blue,
-                  ),
-                  _buildInfoChip(
-                    Icons.build,
-                    _getConditionText(cage.condition),
-                    _getConditionColor(cage.condition),
-                  ),
-                  if (cage.size != null)
-                    _buildInfoChip(
-                      Icons.straighten,
-                      cage.size!,
-                      Colors.purple,
+                ),
+                // Действия
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _showCageForm(context, cage);
+                    } else if (value == 'clean') {
+                      _markCleaned(context, cage);
+                    } else if (value == 'delete') {
+                      _confirmDelete(context, cage);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit, size: 20),
+                          SizedBox(width: 8),
+                          Text('Редактировать'),
+                        ],
+                      ),
                     ),
-                  if (cage.lastCleanedAt != null)
-                    _buildInfoChip(
-                      Icons.cleaning_services,
-                      'Уборка: ${DateFormat('dd.MM').format(cage.lastCleanedAt!)}',
-                      Colors.teal,
+                    const PopupMenuItem(
+                      value: 'clean',
+                      child: Row(
+                        children: [
+                          Icon(Icons.cleaning_services, size: 20),
+                          SizedBox(width: 8),
+                          Text('Отметить уборку'),
+                        ],
+                      ),
                     ),
-                ],
-              ),
-            ],
-          ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, size: 20, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Удалить', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Прогресс заполненности
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Заполненность: ${cage.currentOccupancy ?? 0}/${cage.capacity}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    Text(
+                      '${(occupancyRate * 100).toInt()}%',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                LinearProgressIndicator(
+                  value: occupancyRate,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                  minHeight: 6,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Характеристики
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _buildInfoChip(
+                  Icons.category,
+                  _getTypeText(cage.type),
+                  Colors.blue,
+                ),
+                _buildInfoChip(
+                  Icons.build,
+                  _getConditionText(cage.condition),
+                  _getConditionColor(cage.condition),
+                ),
+                if (cage.size != null)
+                  _buildInfoChip(
+                    Icons.straighten,
+                    cage.size!,
+                    Colors.purple,
+                  ),
+                if (cage.lastCleanedAt != null)
+                  _buildInfoChip(
+                    Icons.cleaning_services,
+                    'Уборка: ${DateFormat('dd.MM').format(cage.lastCleanedAt!)}',
+                    Colors.teal,
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );
