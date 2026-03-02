@@ -5,6 +5,9 @@ class AppFilterChipData {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  /// Optional chip accent color. MUST be a semantic token from AppColors
+  /// (e.g. AppColors.success, AppColors.error, AppColors.accentOcean).
+  /// Never pass a hardcoded hex Color.
   final Color? color;
 
   const AppFilterChipData({
