@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
-/// Главный экран с bottom navigation (4 tabs: Сегодня, Кролики, Аналитика, Меню)
+/// Главный экран с bottom navigation (4 tabs: Сегодня, Кролики, Задачи, Меню)
 class MainNavigationScreen extends ConsumerWidget {
   final Widget child;
   final String currentPath;
@@ -46,9 +46,9 @@ class MainNavigationScreen extends ConsumerWidget {
               label: 'Кролики',
             ),
             NavigationDestination(
-              icon: Icon(Icons.bar_chart_outlined),
-              selectedIcon: Icon(Icons.bar_chart),
-              label: 'Аналитика',
+              icon: Icon(Icons.check_box_outline_blank),
+              selectedIcon: Icon(Icons.check_box),
+              label: 'Задачи',
             ),
             NavigationDestination(
               icon: Icon(Icons.menu),
@@ -66,7 +66,7 @@ class MainNavigationScreen extends ConsumerWidget {
   int _calculateSelectedIndex(String path) {
     if (path.startsWith('/today')) return 0;
     if (path.startsWith('/rabbits')) return 1;
-    if (path.startsWith('/dashboard') || path == '/') return 2;
+    if (path.startsWith('/tasks')) return 2;
     if (path.startsWith('/menu') || path.startsWith('/more')) return 3;
     return 0;
   }
@@ -78,22 +78,32 @@ class MainNavigationScreen extends ConsumerWidget {
       case 1:
         context.go('/rabbits');
       case 2:
-        context.go('/dashboard');
+        context.go('/tasks');
       case 3:
         context.go('/menu');
     }
   }
 
   Widget? _buildFab(BuildContext context, int currentIndex) {
-    if (currentIndex != 0 && currentIndex != 1) return null;
-
     final accent = Theme.of(context).colorScheme.primary;
 
-    return FloatingActionButton(
-      onPressed: () => _showQuickActions(context, currentIndex),
-      backgroundColor: accent,
-      child: const Icon(Icons.add, size: 28, color: Colors.white),
-    );
+    switch (currentIndex) {
+      case 0:
+      case 1:
+        return FloatingActionButton(
+          onPressed: () => _showQuickActions(context, currentIndex),
+          backgroundColor: accent,
+          child: const Icon(Icons.add, size: 28, color: Colors.white),
+        );
+      case 2:
+        return FloatingActionButton(
+          onPressed: () => context.push('/tasks/form'),
+          backgroundColor: accent,
+          child: const Icon(Icons.add, size: 28, color: Colors.white),
+        );
+      default:
+        return null;
+    }
   }
 
   void _showQuickActions(BuildContext context, int currentIndex) {
