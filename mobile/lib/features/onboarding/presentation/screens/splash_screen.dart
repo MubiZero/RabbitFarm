@@ -34,7 +34,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
 
-    final authState  = ref.read(authProvider);
+    // Ждём окончания инициализации аутентификации (максимум 5 секунд)
+    int waitedMs = 0;
+    while (ref.read(authProvider).isLoading && waitedMs < 5000) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      waitedMs += 50;
+      if (!mounted) return;
+    }
+
+    final authState = ref.read(authProvider);
     final onboarding = await ref.read(onboardingProvider.future);
 
     if (!mounted) return;
