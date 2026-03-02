@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../data/models/dashboard_config.dart';
 import '../../data/models/report_model.dart';
 import '../providers/dashboard_config_provider.dart';
@@ -74,12 +75,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildAppBar(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     return SliverAppBar(
       expandedHeight: 120,
       floating: false,
       pinned: true,
       elevation: 0,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
         title: Column(
@@ -88,19 +90,11 @@ class CustomizableDashboardScreen extends ConsumerWidget {
           children: [
             Text(
               'RabbitFarm',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.darkTextPrimary,
-              ),
+              style: AppTypography.displayMd.copyWith(color: cs.onSurface),
             ),
             Text(
               'Управление фермой',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.darkTextSecondary,
-                fontWeight: FontWeight.w400,
-              ),
+              style: AppTypography.bodyMd.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ),
@@ -110,13 +104,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 4))],
             ),
             child: Icon(
               Icons.settings,
-              color: AppColors.darkTextPrimary,
+              color: cs.onSurface,
               size: 22,
             ),
           ),
@@ -130,13 +124,13 @@ class CustomizableDashboardScreen extends ConsumerWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: Offset(0, 4))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 4))],
             ),
             child: Icon(
               Icons.refresh,
-              color: AppColors.darkTextPrimary,
+              color: cs.onSurface,
               size: 22,
             ),
           ),
