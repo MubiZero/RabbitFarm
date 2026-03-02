@@ -161,12 +161,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     try {
       await _authRepository.logout();
-      state = AuthState(); // Reset to initial state
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+    } catch (_) {
+      // Ignore network errors — tokens are already cleared in repository (finally)
+    } finally {
+      // Always reset auth state
+      state = AuthState();
     }
   }
 
