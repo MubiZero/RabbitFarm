@@ -5,6 +5,8 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/string_utils.dart';
+import '../../../../shared/widgets/logout_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -93,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: OutlinedButton.icon(
-              onPressed: () => _showLogoutDialog(context, ref),
+              onPressed: () => showLogoutDialog(context, ref),
               icon: const Icon(Icons.logout, color: AppColors.error),
               label: Text(
                 'Выйти из аккаунта',
@@ -111,29 +113,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выйти из аккаунта?'),
-        content: const Text('Вы действительно хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              context.pop();
-              await ref.read(authProvider.notifier).logout();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Выйти'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -200,7 +179,7 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
     final displayName = name ?? 'Пользователь';
-    final initials = _initials(displayName);
+    final userInitials = initials(displayName);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -215,7 +194,7 @@ class _ProfileCard extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                initials,
+                userInitials,
                 style: AppTypography.titleLg.copyWith(color: accent),
               ),
             ),
@@ -246,13 +225,6 @@ class _ProfileCard extends StatelessWidget {
     );
   }
 
-  String _initials(String n) {
-    final parts = n.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return n.isNotEmpty ? n[0].toUpperCase() : '?';
-  }
 }
 
 class _SettingsTile extends StatelessWidget {
