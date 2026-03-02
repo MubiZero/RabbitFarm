@@ -55,30 +55,51 @@ import '../../features/onboarding/presentation/screens/onboarding_farm_name_scre
 import '../../features/onboarding/presentation/screens/onboarding_farm_type_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_ready_screen.dart';
 
+/// Notifies GoRouter when auth state changes.
+/// Correct pattern: GoRouter is created once, redirect is re-evaluated on notification.
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen<AuthState>(authProvider, (_, __) => notifyListeners());
+  }
+
+  String? redirect(BuildContext context, GoRouterState state) {
+    final authState = _ref.read(authProvider);
+
+    // Don't redirect while initializing
+    if (authState.isLoading) return null;
+
+    final isAuthenticated = authState.isAuthenticated;
+    final loc = state.matchedLocation;
+    final isPublic = loc == '/login' ||
+        loc == '/register' ||
+        loc == '/splash' ||
+        loc.startsWith('/onboarding');
+
+    // Not authenticated on a protected page -> splash
+    if (!isAuthenticated && !isPublic) {
+      return '/splash';
+    }
+
+    // Authenticated on a public page -> home
+    if (isAuthenticated &&
+        (loc == '/login' || loc == '/register' || loc == '/splash')) {
+      return '/today';
+    }
+
+    return null;
+  }
+}
+
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final notifier = RouterNotifier(ref);
 
   return GoRouter(
     initialLocation: '/splash',
-    redirect: (context, state) {
-      final isAuthenticated = authState.isAuthenticated;
-      final loc = state.matchedLocation;
-      final isPublic = loc == '/login' || loc == '/register' ||
-          loc == '/splash' || loc.startsWith('/onboarding');
-
-      // If not authenticated and not on a public page, redirect to splash
-      if (!isAuthenticated && !isPublic) {
-        return '/splash';
-      }
-
-      // If authenticated and on login/register/splash, redirect to home
-      if (isAuthenticated && (loc == '/login' || loc == '/register' || loc == '/splash')) {
-        return '/today';
-      }
-
-      return null; // No redirect
-    },
+    refreshListenable: notifier,
+    redirect: notifier.redirect,
     routes: [
       // Splash
       GoRoute(
