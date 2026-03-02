@@ -95,6 +95,7 @@ class RouterNotifier extends ChangeNotifier {
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = RouterNotifier(ref);
+  ref.onDispose(notifier.dispose);
 
   return GoRouter(
     initialLocation: '/splash',
