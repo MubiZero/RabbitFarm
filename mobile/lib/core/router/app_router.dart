@@ -41,8 +41,6 @@ import '../../features/finance/data/models/transaction_model.dart';
 import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
-import '../../features/reports/presentation/screens/dashboard_screen.dart';
-import '../../features/reports/presentation/screens/modern_dashboard_screen.dart';
 import '../../features/reports/presentation/screens/customizable_dashboard_screen.dart';
 import '../../features/reports/presentation/screens/dashboard_settings_screen.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
@@ -425,22 +423,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/reports',
         name: 'reports',
-        builder: (context, state) => const CustomizableDashboardScreen(),
+        redirect: (_, __) => '/dashboard',
       ),
 
-      // Modern dashboard (без кастомизации)
-      GoRoute(
-        path: '/dashboard/modern',
-        name: 'dashboard-modern',
-        builder: (context, state) => const ModernDashboardScreen(),
-      ),
-
-      // Old dashboard (for reference)
-      GoRoute(
-        path: '/dashboard/old',
-        name: 'dashboard-old',
-        builder: (context, state) => const DashboardScreen(),
-      ),
 
       // Photos and Notes routes (placeholder screens)
       GoRoute(
@@ -458,12 +443,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // Matings route (referenced in More screen)
-      GoRoute(
-        path: '/matings',
-        name: 'matings',
-        builder: (context, state) => const BreedingPlannerScreen(),
-      ),
     ],
   );
 });
