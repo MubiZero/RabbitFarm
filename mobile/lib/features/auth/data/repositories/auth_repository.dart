@@ -94,22 +94,19 @@ class AuthRepository {
 
   // Get current user profile
   Future<UserModel> getProfile() async {
-    try {
-      final response = await _apiClient.getProfile();
+    // DioException пробрасывается напрямую для корректной обработки в AuthNotifier
+    final response = await _apiClient.getProfile();
 
-      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-        response.data,
-        (json) => json as Map<String, dynamic>,
-      );
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
 
-      if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
-      }
-
-      return UserModel.fromJson(apiResponse.data!);
-    } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки профиля');
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw Exception(apiResponse.message);
     }
+
+    return UserModel.fromJson(apiResponse.data!);
   }
 
   // Logout
