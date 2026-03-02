@@ -44,10 +44,6 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilters,
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => context.push('/tasks/form'),
-          ),
         ],
       ),
       body: Column(
