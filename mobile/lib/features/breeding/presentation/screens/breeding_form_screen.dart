@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_form_section.dart';
 
 class BreedingFormScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -16,7 +18,7 @@ class BreedingFormScreen extends ConsumerStatefulWidget {
 
 class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   int? _selectedMaleId;
   int? _selectedFemaleId;
   DateTime _breedingDate = DateTime.now();
@@ -27,8 +29,6 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   @override
   void initState() {
     super.initState();
-    
-    // Предзаполнение данными из планировщика
     if (widget.initialData != null) {
       _selectedMaleId = widget.initialData!['male_id'] as int?;
       _selectedFemaleId = widget.initialData!['female_id'] as int?;
@@ -36,19 +36,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    if (_selectedMaleId == null || _selectedFemaleId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Выберите самца и самку'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
@@ -56,7 +44,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
 
     try {
       final repository = ref.read(breedingRepositoryProvider);
-      
+
       await repository.createBreeding({
         'male_id': _selectedMaleId,
         'female_id': _selectedFemaleId,
@@ -66,25 +54,21 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
       });
 
       if (mounted) {
-        // Обновить список случек
         ref.invalidate(breedingListProvider);
-        
-        // Вернуться назад с результатом успеха
         context.pop(true);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ошибка: ${e.toString().replaceAll('Exception: ', '')}'),
-            backgroundColor: Colors.red,
+            content: Text(
+                'Ошибка: ${e.toString().replaceAll('Exception: ', '')}'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -92,19 +76,18 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   Widget build(BuildContext context) {
     final rabbitsState = ref.watch(rabbitsListProvider);
     final males = rabbitsState.rabbits.where((r) => r.sex == 'male').toList();
-    final females = rabbitsState.rabbits.where((r) => r.sex == 'female').toList();
+    final females =
+        rabbitsState.rabbits.where((r) => r.sex == 'female').toList();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Новая случка'),
-        backgroundColor: AppColors.accentViolet,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            // Информационная карточка
             if (widget.initialData?['analysis'] != null)
               Card(
                 color: AppColors.accentOcean.withValues(alpha: 0.08),
@@ -124,223 +107,117 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
                   ),
                 ),
               ),
-            
-            const SizedBox(height: 16),
+            if (widget.initialData?['analysis'] != null)
+              const SizedBox(height: 8),
 
-            // Выбор самца
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.male, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text(
-                          'Самец',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      value: _selectedMaleId,
-                      decoration: const InputDecoration(
-                        hintText: 'Выберите самца',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: males.map((rabbit) {
-                        return DropdownMenuItem(
-                          value: rabbit.id,
-                          child: Text('${rabbit.name} (${rabbit.tagId})'),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() => _selectedMaleId = value);
-                      },
-                      validator: (value) {
-                        if (value == null) return 'Выберите самца';
-                        return null;
-                      },
-                    ),
+            AppFormSection(
+              title: 'Пара',
+              children: [
+                DropdownButtonFormField<int>(
+                  value: _selectedMaleId,
+                  decoration: const InputDecoration(
+                    labelText: 'Самец *',
+                    prefixIcon: Icon(Icons.male, color: AppColors.accentOcean),
+                  ),
+                  items: males.map((rabbit) {
+                    return DropdownMenuItem(
+                      value: rabbit.id,
+                      child: Text('${rabbit.name} (${rabbit.tagId})'),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _selectedMaleId = value),
+                  validator: (value) =>
+                      value == null ? 'Выберите самца' : null,
+                ),
+                DropdownButtonFormField<int>(
+                  value: _selectedFemaleId,
+                  decoration: const InputDecoration(
+                    labelText: 'Самка *',
+                    prefixIcon: Icon(Icons.female, color: AppColors.accentRose),
+                  ),
+                  items: females.map((rabbit) {
+                    return DropdownMenuItem(
+                      value: rabbit.id,
+                      child: Text('${rabbit.name} (${rabbit.tagId})'),
+                    );
+                  }).toList(),
+                  onChanged: (value) =>
+                      setState(() => _selectedFemaleId = value),
+                  validator: (value) =>
+                      value == null ? 'Выберите самку' : null,
+                ),
+              ],
+            ),
+
+            AppFormSection(
+              title: 'Детали',
+              children: [
+                AppDateField(
+                  label: 'Дата случки *',
+                  value: _breedingDate,
+                  onChanged: (date) => setState(() => _breedingDate = date),
+                  prefixIcon: Icons.calendar_today,
+                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                ),
+                DropdownButtonFormField<String>(
+                  value: _status,
+                  decoration: const InputDecoration(
+                    labelText: 'Статус *',
+                    prefixIcon: Icon(Icons.flag_outlined),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                        value: 'planned', child: Text('Запланирована')),
+                    DropdownMenuItem(
+                        value: 'completed', child: Text('Завершена')),
+                    DropdownMenuItem(
+                        value: 'failed', child: Text('Неудачная')),
+                    DropdownMenuItem(
+                        value: 'cancelled', child: Text('Отменена')),
                   ],
+                  onChanged: (value) {
+                    if (value != null) setState(() => _status = value);
+                  },
                 ),
-              ),
+              ],
             ),
 
-            const SizedBox(height: 16),
-
-            // Выбор самки
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.female, color: Colors.pink),
-                        SizedBox(width: 8),
-                        Text(
-                          'Самка',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      value: _selectedFemaleId,
-                      decoration: const InputDecoration(
-                        hintText: 'Выберите самку',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: females.map((rabbit) {
-                        return DropdownMenuItem(
-                          value: rabbit.id,
-                          child: Text('${rabbit.name} (${rabbit.tagId})'),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() => _selectedFemaleId = value);
-                      },
-                      validator: (value) {
-                        if (value == null) return 'Выберите самку';
-                        return null;
-                      },
-                    ),
-                  ],
+            AppFormSection(
+              title: 'Заметки',
+              children: [
+                TextFormField(
+                  initialValue: _notes,
+                  decoration: const InputDecoration(
+                    labelText: 'Заметки',
+                    hintText: 'Дополнительная информация...',
+                    prefixIcon: Icon(Icons.notes),
+                  ),
+                  maxLines: 3,
+                  onSaved: (value) => _notes = value ?? '',
                 ),
-              ),
+              ],
             ),
-
-            const SizedBox(height: 16),
-
-            // Дата случки
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.calendar_today),
-                title: const Text('Дата случки'),
-                subtitle: Text(
-                  '${_breedingDate.day}.${_breedingDate.month}.${_breedingDate.year}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                trailing: const Icon(Icons.edit),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _breedingDate,
-                    firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (date != null) {
-                    setState(() => _breedingDate = date);
-                  }
-                },
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Статус
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Статус',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: _status,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                      items: const [
-                        DropdownMenuItem(value: 'planned', child: Text('Запланирована')),
-                        DropdownMenuItem(value: 'completed', child: Text('Завершена')),
-                        DropdownMenuItem(value: 'failed', child: Text('Неудачная')),
-                        DropdownMenuItem(value: 'cancelled', child: Text('Отменена')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _status = value);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Заметки
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Заметки',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      initialValue: _notes,
-                      decoration: const InputDecoration(
-                        hintText: 'Дополнительная информация...',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                      onSaved: (value) => _notes = value ?? '',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Кнопка сохранения
-            ElevatedButton(
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitForm,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-                backgroundColor: AppColors.accentViolet,
-              ),
               child: _isSubmitting
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text(
-                      'Сохранить',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                  : const Text('Сохранить'),
             ),
-          ],
+          ),
         ),
       ),
     );
