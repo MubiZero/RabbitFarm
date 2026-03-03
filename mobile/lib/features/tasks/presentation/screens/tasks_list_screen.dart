@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 class TasksListScreen extends ConsumerStatefulWidget {
   const TasksListScreen({super.key});
@@ -56,8 +58,10 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
                 final pagination = data['pagination'] as Map<String, dynamic>;
 
                 if (tasks.isEmpty) {
-                  return const Center(
-                    child: Text('Задачи не найдены'),
+                  return const AppEmptyState(
+                    icon: Icons.task_outlined,
+                    title: 'Задачи не найдены',
+                    subtitle: 'Попробуйте изменить фильтры',
                   );
                 }
 
@@ -92,19 +96,9 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Ошибка: $error'),
-                    ElevatedButton(
-                      onPressed: () {
-                        ref.invalidate(tasksProvider(_queryParams));
-                      },
-                      child: const Text('Повторить'),
-                    ),
-                  ],
-                ),
+              error: (error, stack) => AppErrorState(
+                message: error.toString(),
+                onRetry: () => ref.invalidate(tasksProvider(_queryParams)),
               ),
             ),
           ),
