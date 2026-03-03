@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import '../../data/models/medical_record_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../providers/medical_records_provider.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_form_section.dart';
 
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
   final MedicalRecord? medicalRecord;
@@ -85,243 +88,219 @@ class _MedicalRecordFormScreenState
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            // Rabbit selection
-            rabbitsState.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : rabbitsState.error != null
-                    ? Text('Ошибка загрузки кроликов: ${rabbitsState.error}')
-                    : DropdownButtonFormField<int>(
-                        value: _selectedRabbitId,
-                        decoration: const InputDecoration(
-                          labelText: 'Кролик *',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: rabbitsState.rabbits.map((rabbit) {
-                          return DropdownMenuItem(
-                            value: rabbit.id,
-                            child: Text('${rabbit.name} (${rabbit.tagId ?? ''})'),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedRabbitId = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Выберите кролика';
-                          }
-                          return null;
-                        },
-                      ),
-            const SizedBox(height: 16),
-
-            // Symptoms
-            TextFormField(
-              controller: _symptomsController,
-              decoration: const InputDecoration(
-                labelText: 'Симптомы *',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите симптомы';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Diagnosis
-            TextFormField(
-              controller: _diagnosisController,
-              decoration: const InputDecoration(
-                labelText: 'Диагноз',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Treatment
-            TextFormField(
-              controller: _treatmentController,
-              decoration: const InputDecoration(
-                labelText: 'Лечение',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-
-            // Medication
-            TextFormField(
-              controller: _medicationController,
-              decoration: const InputDecoration(
-                labelText: 'Препараты',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Dosage
-            TextFormField(
-              controller: _dosageController,
-              decoration: const InputDecoration(
-                labelText: 'Дозировка',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Started date
-            ListTile(
-              title: const Text('Дата начала *'),
-              subtitle: Text(DateFormat('dd.MM.yyyy').format(_startedAt)),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _startedAt,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _startedAt = date;
-                  });
-                }
-              },
-            ),
-
-            // Ended date
-            ListTile(
-              title: const Text('Дата окончания'),
-              subtitle: Text(_endedAt != null
-                  ? DateFormat('dd.MM.yyyy').format(_endedAt!)
-                  : 'Не указана'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_endedAt != null)
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        setState(() {
-                          _endedAt = null;
-                        });
-                      },
+            AppFormSection(
+              title: 'Основное',
+              children: [
+                if (rabbitsState.isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (rabbitsState.error != null)
+                  Text('Ошибка загрузки кроликов: ${rabbitsState.error}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error))
+                else
+                  DropdownButtonFormField<int>(
+                    value: _selectedRabbitId,
+                    decoration: const InputDecoration(
+                      labelText: 'Кролик *',
+                      prefixIcon: Icon(Icons.pets),
                     ),
-                  const Icon(Icons.calendar_today),
-                ],
-              ),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _endedAt ?? DateTime.now(),
-                  firstDate: _startedAt,
+                    items: rabbitsState.rabbits.map((rabbit) {
+                      return DropdownMenuItem(
+                        value: rabbit.id,
+                        child: Text('${rabbit.name} (${rabbit.tagId})'),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => _selectedRabbitId = value),
+                    validator: (value) =>
+                        value == null ? 'Выберите кролика' : null,
+                  ),
+                TextFormField(
+                  controller: _symptomsController,
+                  decoration: const InputDecoration(
+                    labelText: 'Симптомы *',
+                    prefixIcon: Icon(Icons.sick_outlined),
+                  ),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите симптомы';
+                    }
+                    return null;
+                  },
+                ),
+                AppDateField(
+                  label: 'Дата начала *',
+                  value: _startedAt,
+                  onChanged: (date) => setState(() => _startedAt = date),
+                  prefixIcon: Icons.calendar_today,
                   lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _endedAt = date;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Outcome
-            DropdownButtonFormField<String>(
-              value: _outcome,
-              decoration: const InputDecoration(
-                labelText: 'Исход',
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(
-                  value: 'ongoing',
-                  child: Text('Лечение продолжается'),
-                ),
-                DropdownMenuItem(
-                  value: 'recovered',
-                  child: Text('Выздоровел'),
-                ),
-                DropdownMenuItem(
-                  value: 'died',
-                  child: Text('Умер'),
-                ),
-                DropdownMenuItem(
-                  value: 'euthanized',
-                  child: Text('Эвтаназия'),
                 ),
               ],
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _outcome = value;
-                  });
-                }
-              },
             ),
-            const SizedBox(height: 16),
-
-            // Cost
-            TextFormField(
-              controller: _costController,
-              decoration: const InputDecoration(
-                labelText: 'Стоимость (руб.)',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  if (double.tryParse(value) == null) {
-                    return 'Введите корректное число';
-                  }
-                }
-                return null;
-              },
+            AppFormSection(
+              title: 'Диагностика и лечение',
+              children: [
+                TextFormField(
+                  controller: _diagnosisController,
+                  decoration: const InputDecoration(
+                    labelText: 'Диагноз',
+                    prefixIcon: Icon(Icons.medical_information_outlined),
+                  ),
+                ),
+                TextFormField(
+                  controller: _treatmentController,
+                  decoration: const InputDecoration(
+                    labelText: 'Лечение',
+                    prefixIcon: Icon(Icons.healing_outlined),
+                  ),
+                  maxLines: 3,
+                ),
+                TextFormField(
+                  controller: _medicationController,
+                  decoration: const InputDecoration(
+                    labelText: 'Препараты',
+                    prefixIcon: Icon(Icons.medication_outlined),
+                  ),
+                ),
+                TextFormField(
+                  controller: _dosageController,
+                  decoration: const InputDecoration(
+                    labelText: 'Дозировка',
+                    prefixIcon: Icon(Icons.straighten),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Veterinarian
-            TextFormField(
-              controller: _veterinarianController,
-              decoration: const InputDecoration(
-                labelText: 'Ветеринар',
-                border: OutlineInputBorder(),
-              ),
+            AppFormSection(
+              title: 'Дополнительно',
+              children: [
+                _buildEndedDateField(context),
+                DropdownButtonFormField<String>(
+                  value: _outcome,
+                  decoration: const InputDecoration(
+                    labelText: 'Исход',
+                    prefixIcon: Icon(Icons.flag_outlined),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'ongoing',
+                      child: Text('Лечение продолжается'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'recovered',
+                      child: Text('Выздоровел'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'died',
+                      child: Text('Умер'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'euthanized',
+                      child: Text('Эвтаназия'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) setState(() => _outcome = value);
+                  },
+                ),
+                TextFormField(
+                  controller: _costController,
+                  decoration: const InputDecoration(
+                    labelText: 'Стоимость (руб.)',
+                    prefixIcon: Icon(Icons.payments_outlined),
+                  ),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      if (double.tryParse(value) == null) {
+                        return 'Введите корректное число';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _veterinarianController,
+                  decoration: const InputDecoration(
+                    labelText: 'Ветеринар',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Notes
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Примечания',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 4,
-            ),
-            const SizedBox(height: 24),
-
-            // Submit button
-            ElevatedButton(
-              onPressed: _isLoading ? null : _submitForm,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-              ),
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : Text(widget.medicalRecord == null
-                      ? 'Создать'
-                      : 'Сохранить'),
+            AppFormSection(
+              title: 'Заметки',
+              children: [
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Примечания',
+                    prefixIcon: Icon(Icons.note_outlined),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _submitForm,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(widget.medicalRecord == null ? 'Создать' : 'Сохранить'),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEndedDateField(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final dateText = _endedAt != null
+        ? DateFormat('dd.MM.yyyy').format(_endedAt!)
+        : 'Не указана';
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: _endedAt ?? DateTime.now(),
+          firstDate: _startedAt,
+          lastDate: DateTime.now(),
+        );
+        if (date != null && mounted) {
+          setState(() => _endedAt = date);
+        }
+      },
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Дата окончания',
+          prefixIcon: const Icon(Icons.calendar_month_outlined),
+          suffixIcon: _endedAt != null
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () => setState(() => _endedAt = null),
+                )
+              : null,
+        ),
+        child: Text(
+          dateText,
+          style: TextStyle(color: cs.onSurface),
         ),
       ),
     );
@@ -332,13 +311,10 @@ class _MedicalRecordFormScreenState
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       if (widget.medicalRecord == null) {
-        // Create new record
         final record = MedicalRecordCreate(
           rabbitId: _selectedRabbitId!,
           symptoms: _symptomsController.text,
@@ -369,7 +345,6 @@ class _MedicalRecordFormScreenState
 
         await ref.read(medicalRecordsProvider.notifier).addMedicalRecord(record);
       } else {
-        // Update existing record
         final update = MedicalRecordUpdate(
           rabbitId: _selectedRabbitId,
           symptoms: _symptomsController.text,
@@ -409,7 +384,6 @@ class _MedicalRecordFormScreenState
             content: Text(widget.medicalRecord == null
                 ? 'Медицинская карта создана'
                 : 'Медицинская карта обновлена'),
-            backgroundColor: Colors.green,
           ),
         );
         context.pop();
@@ -419,15 +393,13 @@ class _MedicalRecordFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Ошибка: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
