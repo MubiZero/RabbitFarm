@@ -276,14 +276,14 @@ class _VaccinationsListScreenState
                     Icon(
                       Icons.event,
                       size: 18,
-                      color: isOverdue ? Colors.red : Colors.green,
+                      color: isOverdue ? AppColors.error : AppColors.success,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'След.: ${dateFormat.format(vaccination.nextVaccinationDate!)}',
                         style: TextStyle(
-                          color: isOverdue ? Colors.red : AppColors.success,
+                          color: isOverdue ? AppColors.error : AppColors.success,
                           fontWeight:
                               isOverdue ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -296,13 +296,13 @@ class _VaccinationsListScreenState
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red[100],
+                          color: AppColors.error.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Просрочено',
                           style: TextStyle(
-                            color: Colors.red[900],
+                            color: AppColors.error,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -315,13 +315,13 @@ class _VaccinationsListScreenState
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.green[100],
+                          color: AppColors.success.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           'Через ${vaccination.daysUntil} дн.',
-                          style: TextStyle(
-                            color: Colors.green[900],
+                          style: const TextStyle(
+                            color: AppColors.success,
                             fontSize: 12,
                           ),
                         ),
@@ -389,13 +389,13 @@ class _VaccinationsListScreenState
     Color chipColor;
     switch (type) {
       case VaccineType.vhd:
-        chipColor = Colors.red[100]!;
+        chipColor = AppColors.error.withValues(alpha: 0.15);
         break;
       case VaccineType.myxomatosis:
-        chipColor = Colors.blue[100]!;
+        chipColor = AppColors.info.withValues(alpha: 0.15);
         break;
       case VaccineType.pasteurellosis:
-        chipColor = Colors.orange[100]!;
+        chipColor = AppColors.warning.withValues(alpha: 0.15);
         break;
       case VaccineType.other:
         chipColor = Theme.of(context).colorScheme.outlineVariant;
@@ -621,19 +621,19 @@ class _StatisticsSheet extends ConsumerWidget {
               icon: Icons.vaccines,
               title: 'Всего вакцинаций',
               value: '${stats.totalVaccinations}',
-              color: Colors.blue,
+              color: AppColors.info,
             ),
             _StatTile(
               icon: Icons.calendar_today,
               title: 'За этот год',
               value: '${stats.thisYear}',
-              color: Colors.green,
+              color: AppColors.success,
             ),
             _StatTile(
               icon: Icons.history,
               title: 'За последние 30 дней',
               value: '${stats.last30Days}',
-              color: Colors.orange,
+              color: AppColors.warning,
             ),
 
             const Divider(height: 32),
@@ -648,13 +648,13 @@ class _StatisticsSheet extends ConsumerWidget {
               icon: Icons.event_available,
               title: 'Следующие 30 дней',
               value: '${stats.upcoming.next30Days}',
-              color: Colors.green,
+              color: AppColors.success,
             ),
             _StatTile(
               icon: Icons.warning,
               title: 'Просрочено',
               value: '${stats.upcoming.overdue}',
-              color: Colors.red,
+              color: AppColors.error,
             ),
           ],
         ),

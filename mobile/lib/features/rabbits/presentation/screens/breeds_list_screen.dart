@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
 
@@ -134,12 +135,12 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.brown[100],
+                      color: Theme.of(context).colorScheme.secondaryContainer,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.pets,
-                      color: Colors.brown[700],
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                       size: 28,
                     ),
                   ),
@@ -190,9 +191,9 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, size: 20, color: Colors.red),
+                            Icon(Icons.delete, size: 20, color: AppColors.error),
                             SizedBox(width: 8),
-                            Text('Удалить', style: TextStyle(color: Colors.red)),
+                            Text('Удалить', style: TextStyle(color: AppColors.error)),
                           ],
                         ),
                       ),
@@ -225,13 +226,13 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                     _buildInfoChip(
                       Icons.monitor_weight,
                       '${breed.averageWeight} кг',
-                      Colors.blue,
+                      AppColors.accentOcean,
                     ),
                   if (breed.averageLitterSize != null)
                     _buildInfoChip(
                       Icons.family_restroom,
                       '${breed.averageLitterSize} крольчат',
-                      Colors.green,
+                      AppColors.accentEmerald,
                     ),
                 ],
               ),
@@ -289,7 +290,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Удалить'),
           ),
         ],
@@ -304,7 +305,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Порода "${breed.name}" удалена'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
         } else {
@@ -313,7 +314,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
               content: Text(
                 ref.read(breedsProvider).error ?? 'Ошибка удаления породы',
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }

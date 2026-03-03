@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
 
@@ -246,13 +247,13 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                 Icon(
                   hasLowStock ? Icons.warning : Icons.inventory,
                   size: 16,
-                  color: hasLowStock ? Colors.red : Colors.green,
+                  color: hasLowStock ? AppColors.error : AppColors.success,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'На складе: ${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
                   style: TextStyle(
-                    color: hasLowStock ? Colors.red : Colors.black87,
+                    color: hasLowStock ? AppColors.error : null,
                     fontWeight: hasLowStock ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -261,7 +262,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             if (hasLowStock)
               Text(
                 'Минимум: ${feed.minStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
-                style: const TextStyle(color: Colors.red, fontSize: 12),
+                style: const TextStyle(color: AppColors.error, fontSize: 12),
               ),
           ],
         ),
@@ -269,12 +270,12 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+              icon: const Icon(Icons.add_circle_outline, color: AppColors.success),
               onPressed: () => _showStockAdjustment(context, feed, true),
               tooltip: 'Пополнить склад',
             ),
             IconButton(
-              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+              icon: const Icon(Icons.remove_circle_outline, color: AppColors.error),
               onPressed: () => _showStockAdjustment(context, feed, false),
               tooltip: 'Списать со склада',
             ),
@@ -315,7 +316,6 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
               decoration: InputDecoration(
                 labelText: 'Количество',
                 suffixText: _getFeedUnitName(feed.unit),
-                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -402,17 +402,17 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
   Color _getFeedTypeColor(FeedType type) {
     switch (type) {
       case FeedType.pellets:
-        return Colors.brown;
+        return AppColors.accentSunset;
       case FeedType.hay:
-        return Colors.amber;
+        return AppColors.warning;
       case FeedType.vegetables:
-        return Colors.green;
+        return AppColors.accentEmerald;
       case FeedType.grain:
-        return Colors.orange;
+        return AppColors.accentOcean;
       case FeedType.supplements:
-        return Colors.purple;
+        return AppColors.accentViolet;
       case FeedType.other:
-        return Colors.grey;
+        return AppColors.info;
     }
   }
 
