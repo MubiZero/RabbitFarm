@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 class MedicalRecordsListScreen extends ConsumerStatefulWidget {
   const MedicalRecordsListScreen({super.key});
@@ -70,25 +72,10 @@ class _MedicalRecordsListScreenState
               child: medicalRecordsState.when(
                 data: (records) {
                   if (records.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.medical_information_outlined,
-                            size: 64,
-                            color: AppColors.darkTextHint,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Нет медицинских записей',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.darkTextSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const AppEmptyState(
+                      icon: Icons.medical_information_outlined,
+                      title: 'Нет медицинских записей',
+                      subtitle: 'Добавьте первую медицинскую запись',
                     );
                   }
 
@@ -101,20 +88,9 @@ class _MedicalRecordsListScreenState
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text('Ошибка: ${error.toString()}'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadRecords,
-                        child: const Text('Повторить'),
-                      ),
-                    ],
-                  ),
+                error: (error, stack) => AppErrorState(
+                  message: error.toString(),
+                  onRetry: _loadRecords,
                 ),
               ),
             ),
@@ -206,7 +182,7 @@ class _MedicalRecordsListScreenState
                   Text(
                     dateFormat.format(record.startedAt),
                     style: TextStyle(
-                      color: AppColors.darkTextSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   ),
@@ -235,7 +211,7 @@ class _MedicalRecordsListScreenState
               Text(
                 'Симптомы: ${record.symptoms}',
                 style: TextStyle(
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 13,
                 ),
                 maxLines: 2,
@@ -246,7 +222,7 @@ class _MedicalRecordsListScreenState
                 Text(
                   'Лечение: ${record.treatment}',
                   style: TextStyle(
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 13,
                   ),
                   maxLines: 1,
@@ -260,13 +236,13 @@ class _MedicalRecordsListScreenState
                     Icon(
                       Icons.attach_money,
                       size: 16,
-                      color: AppColors.darkTextSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${record.cost!.toStringAsFixed(2)} руб.',
                       style: TextStyle(
-                        color: AppColors.darkTextSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -282,13 +258,13 @@ class _MedicalRecordsListScreenState
                     Icon(
                       Icons.person_outline,
                       size: 16,
-                      color: AppColors.darkTextSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       record.veterinarian!,
                       style: TextStyle(
-                        color: AppColors.darkTextSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
@@ -305,13 +281,13 @@ class _MedicalRecordsListScreenState
   Color _getOutcomeColor(MedicalOutcome outcome) {
     switch (outcome) {
       case MedicalOutcome.recovered:
-        return Colors.green;
+        return AppColors.success;
       case MedicalOutcome.ongoing:
-        return Colors.orange;
+        return AppColors.warning;
       case MedicalOutcome.died:
-        return Colors.red;
+        return AppColors.error;
       case MedicalOutcome.euthanized:
-        return Colors.purple;
+        return AppColors.accentViolet;
     }
   }
 
@@ -417,18 +393,18 @@ class _MedicalRecordsListScreenState
               const Divider(),
               _buildStatRow(
                   'Выздоровело', stats.byOutcome.recovered.toString(),
-                  color: Colors.green),
+                  color: AppColors.success),
               _buildStatRow('Лечение', stats.byOutcome.ongoing.toString(),
-                  color: Colors.orange),
+                  color: AppColors.warning),
               _buildStatRow('Умерло', stats.byOutcome.died.toString(),
-                  color: Colors.red),
+                  color: AppColors.error),
               _buildStatRow(
                   'Эвтаназия', stats.byOutcome.euthanized.toString(),
-                  color: Colors.purple),
+                  color: AppColors.accentViolet),
               const Divider(),
               _buildStatRow('Затраты',
                   '${stats.totalCost.toStringAsFixed(2)} руб.',
-                  color: Colors.blue),
+                  color: AppColors.info),
               _buildStatRow('За этот год', stats.thisYear.toString()),
               _buildStatRow('За последний месяц', stats.lastMonth.toString()),
               if (stats.ongoingTreatments.isNotEmpty) ...[
