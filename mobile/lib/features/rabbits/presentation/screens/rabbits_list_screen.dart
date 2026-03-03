@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/widgets/app_filter_bar.dart';
 import '../../../../core/widgets/status_badge.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
@@ -87,11 +90,18 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
             )
           else if (state.error != null && state.rabbits.isEmpty)
             SliverFillRemaining(
-              child: Center(child: Text('Ошибка: ${state.error}')),
+              child: AppErrorState(
+                message: state.error!,
+                onRetry: () => ref.read(rabbitsListProvider.notifier).loadRabbits(),
+              ),
             )
           else if (state.rabbits.isEmpty)
             const SliverFillRemaining(
-              child: Center(child: Text('Кролики не найдены')),
+              child: AppEmptyState(
+                icon: Icons.pets,
+                title: 'Кролики не найдены',
+                subtitle: 'Попробуйте изменить фильтры или добавьте кролика',
+              ),
             )
           else
             _buildRabbitsList(state.rabbits),
@@ -141,95 +151,63 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
 
   Widget _buildFilters() {
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 60,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          children: [
-            _buildFilterChip(
-              label: 'Все',
-              isSelected: _selectedSex == null && _selectedStatus == null,
-              onTap: () {
-                setState(() {
-                  _selectedSex = null;
-                  _selectedStatus = null;
-                });
-                _applyFilters();
-              },
-            ),
-            const SizedBox(width: 8),
-            _buildFilterChip(
-              label: 'Самцы',
-              isSelected: _selectedSex == 'male',
-              onTap: () {
-                setState(() {
-                  _selectedSex = _selectedSex == 'male' ? null : 'male';
-                });
-                _applyFilters();
-              },
-            ),
-            const SizedBox(width: 8),
-            _buildFilterChip(
-              label: 'Самки',
-              isSelected: _selectedSex == 'female',
-              onTap: () {
-                setState(() {
-                  _selectedSex = _selectedSex == 'female' ? null : 'female';
-                });
-                _applyFilters();
-              },
-            ),
-            const VerticalDivider(width: 20, indent: 8, endIndent: 8),
-            _buildFilterChip(
-              label: 'Активные',
-              isSelected: _selectedStatus == 'active',
-              onTap: () {
-                setState(() {
-                  _selectedStatus = _selectedStatus == 'active' ? null : 'active';
-                });
-                _applyFilters();
-              },
-            ),
-            const SizedBox(width: 8),
-            _buildFilterChip(
-              label: 'Проданы',
-              isSelected: _selectedStatus == 'sold',
-              onTap: () {
-                setState(() {
-                  _selectedStatus = _selectedStatus == 'sold' ? null : 'sold';
-                });
-                _applyFilters();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final primary = Theme.of(context).colorScheme.primary;
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      selectedColor: primary.withValues(alpha: 0.2),
-      checkmarkColor: primary,
-      labelStyle: AppTypography.labelSm.copyWith(
-        color: isSelected ? primary : Theme.of(context).colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected ? primary : Theme.of(context).colorScheme.outline,
-        ),
+      child: AppFilterBar(
+        chips: [
+          AppFilterChipData(
+            label: 'Все',
+            isSelected: _selectedSex == null && _selectedStatus == null,
+            onTap: () {
+              setState(() {
+                _selectedSex = null;
+                _selectedStatus = null;
+              });
+              _applyFilters();
+            },
+          ),
+          AppFilterChipData(
+            label: 'Самцы',
+            isSelected: _selectedSex == 'male',
+            onTap: () {
+              setState(() {
+                _selectedSex = _selectedSex == 'male' ? null : 'male';
+              });
+              _applyFilters();
+            },
+            color: AppColors.accentOcean,
+          ),
+          AppFilterChipData(
+            label: 'Самки',
+            isSelected: _selectedSex == 'female',
+            onTap: () {
+              setState(() {
+                _selectedSex = _selectedSex == 'female' ? null : 'female';
+              });
+              _applyFilters();
+            },
+            color: AppColors.accentRose,
+          ),
+          AppFilterChipData(
+            label: 'Активные',
+            isSelected: _selectedStatus == 'active',
+            onTap: () {
+              setState(() {
+                _selectedStatus = _selectedStatus == 'active' ? null : 'active';
+              });
+              _applyFilters();
+            },
+            color: AppColors.success,
+          ),
+          AppFilterChipData(
+            label: 'Проданы',
+            isSelected: _selectedStatus == 'sold',
+            onTap: () {
+              setState(() {
+                _selectedStatus = _selectedStatus == 'sold' ? null : 'sold';
+              });
+              _applyFilters();
+            },
+          ),
+        ],
       ),
     );
   }
