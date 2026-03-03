@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_form_section.dart';
 
 /// Экран формы добавления/редактирования клетки
 class CageFormScreen extends ConsumerStatefulWidget {
@@ -33,9 +34,9 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
   bool _isSubmitting = false;
 
   final List<Map<String, String>> _types = [
-    {'value': 'single', 'label': 'Одиночная', 'icon': 'home'},
-    {'value': 'group', 'label': 'Групповая', 'icon': 'home_work'},
-    {'value': 'maternity', 'label': 'Для окрола', 'icon': 'child_care'},
+    {'value': 'single', 'label': 'Одиночная'},
+    {'value': 'group', 'label': 'Групповая'},
+    {'value': 'maternity', 'label': 'Для окрола'},
   ];
 
   final List<Map<String, String>> _conditions = [
@@ -78,253 +79,136 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditing ? 'Редактировать клетку' : 'Добавить клетку'),
-        centerTitle: true,
-        backgroundColor: AppColors.warning,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Номер клетки
-              TextFormField(
-                controller: _numberController,
-                decoration: InputDecoration(
-                  labelText: 'Номер клетки *',
-                  hintText: 'Например: A-1',
-                  prefixIcon: const Icon(Icons.tag),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Введите номер клетки';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Тип клетки
-              DropdownButtonFormField<String>(
-                value: _selectedType,
-                decoration: InputDecoration(
-                  labelText: 'Тип клетки *',
-                  prefixIcon: const Icon(Icons.category),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                items: _types.map((type) {
-                  return DropdownMenuItem(
-                    value: type['value'],
-                    child: Text(type['label']!),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedType = value!;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Вместимость
-              TextFormField(
-                controller: _capacityController,
-                decoration: InputDecoration(
-                  labelText: 'Вместимость *',
-                  hintText: 'Количество кроликов',
-                  prefixIcon: const Icon(Icons.people),
-                  suffixText: 'кроликов',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите вместимость';
-                  }
-                  final capacity = int.tryParse(value);
-                  if (capacity == null || capacity < 1) {
-                    return 'Вместимость должна быть минимум 1';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Размер
-              TextFormField(
-                controller: _sizeController,
-                decoration: InputDecoration(
-                  labelText: 'Размер',
-                  hintText: 'Например: 60x80x45',
-                  prefixIcon: const Icon(Icons.straighten),
-                  suffixText: 'см',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Локация
-              TextFormField(
-                controller: _locationController,
-                decoration: InputDecoration(
-                  labelText: 'Расположение',
-                  hintText: 'Например: Сарай 1, Ряд A',
-                  prefixIcon: const Icon(Icons.location_on),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Состояние
-              DropdownButtonFormField<String>(
-                value: _selectedCondition,
-                decoration: InputDecoration(
-                  labelText: 'Состояние *',
-                  prefixIcon: const Icon(Icons.build),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                items: _conditions.map((condition) {
-                  return DropdownMenuItem(
-                    value: condition['value'],
-                    child: Text(condition['label']!),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCondition = value!;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Заметки
-              TextFormField(
-                controller: _notesController,
-                decoration: InputDecoration(
-                  labelText: 'Заметки',
-                  hintText: 'Дополнительная информация',
-                  prefixIcon: const Icon(Icons.notes),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  alignLabelWithHint: true,
-                ),
-                maxLines: 4,
-              ),
-
-              const SizedBox(height: 24),
-
-              // Информационная карточка
-              _buildInfoCard(),
-
-              const SizedBox(height: 32),
-
-              // Кнопки действий
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('Отмена'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: AppColors.warning,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _isSubmitting
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(isEditing ? 'Сохранить' : 'Добавить'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard() {
-    return Card(
-      color: AppColors.accentOcean.withValues(alpha: 0.08),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            Row(
+            AppFormSection(
+              title: 'Основное',
               children: [
-                Icon(Icons.info_outline, color: AppColors.accentOcean),
-                const SizedBox(width: 8),
-                Text(
-                  'Подсказка',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.accentOcean,
+                TextFormField(
+                  controller: _numberController,
+                  decoration: const InputDecoration(
+                    labelText: 'Номер клетки *',
+                    hintText: 'Например: A-1',
+                    prefixIcon: Icon(Icons.tag),
                   ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Введите номер клетки';
+                    }
+                    return null;
+                  },
+                ),
+                DropdownButtonFormField<String>(
+                  value: _selectedType,
+                  decoration: const InputDecoration(
+                    labelText: 'Тип клетки *',
+                    prefixIcon: Icon(Icons.category),
+                  ),
+                  items: _types.map((type) {
+                    return DropdownMenuItem(
+                      value: type['value'],
+                      child: Text(type['label']!),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _selectedType = value!),
+                ),
+                TextFormField(
+                  controller: _capacityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Вместимость *',
+                    hintText: 'Количество кроликов',
+                    prefixIcon: Icon(Icons.people),
+                    suffixText: 'кроликов',
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите вместимость';
+                    }
+                    final capacity = int.tryParse(value);
+                    if (capacity == null || capacity < 1) {
+                      return 'Вместимость должна быть минимум 1';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              '• Номер клетки должен быть уникальным\n'
-              '• Одиночные клетки обычно имеют вместимость 1-2\n'
-              '• Групповые клетки - для молодняка (3-10)\n'
-              '• Клетки для окрола - для самок с крольчатами',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.accentOcean,
-              ),
+            AppFormSection(
+              title: 'Дополнительно',
+              children: [
+                TextFormField(
+                  controller: _sizeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Размер',
+                    hintText: 'Например: 60x80x45',
+                    prefixIcon: Icon(Icons.straighten),
+                    suffixText: 'см',
+                  ),
+                ),
+                TextFormField(
+                  controller: _locationController,
+                  decoration: const InputDecoration(
+                    labelText: 'Расположение',
+                    hintText: 'Например: Сарай 1, Ряд A',
+                    prefixIcon: Icon(Icons.location_on),
+                  ),
+                ),
+                DropdownButtonFormField<String>(
+                  value: _selectedCondition,
+                  decoration: const InputDecoration(
+                    labelText: 'Состояние *',
+                    prefixIcon: Icon(Icons.build),
+                  ),
+                  items: _conditions.map((condition) {
+                    return DropdownMenuItem(
+                      value: condition['value'],
+                      child: Text(condition['label']!),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _selectedCondition = value!),
+                ),
+              ],
+            ),
+            AppFormSection(
+              title: 'Заметки',
+              children: [
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Заметки',
+                    hintText: 'Дополнительная информация',
+                    prefixIcon: Icon(Icons.notes),
+                  ),
+                  maxLines: 4,
+                ),
+              ],
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isSubmitting ? null : _submitForm,
+              child: _isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(isEditing ? 'Сохранить' : 'Добавить'),
+            ),
+          ),
         ),
       ),
     );
@@ -335,9 +219,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
+    setState(() => _isSubmitting = true);
 
     final cageData = {
       'number': _numberController.text.trim(),
@@ -352,8 +234,8 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
         'notes': _notesController.text.trim(),
     };
 
-    bool success;
     final isEditing = widget.cage != null;
+    bool success;
 
     if (isEditing) {
       success = await ref
@@ -363,9 +245,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
       success = await ref.read(cagesProvider.notifier).createCage(cageData);
     }
 
-    setState(() {
-      _isSubmitting = false;
-    });
+    setState(() => _isSubmitting = false);
 
     if (mounted) {
       if (success) {
@@ -376,7 +256,6 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                   ? 'Клетка "${_numberController.text}" обновлена'
                   : 'Клетка "${_numberController.text}" добавлена',
             ),
-            backgroundColor: Colors.green,
           ),
         );
         context.pop();
@@ -385,7 +264,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error ?? 'Ошибка сохранения клетки'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
