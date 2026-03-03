@@ -193,7 +193,7 @@ class _BreedingCard extends StatelessWidget {
                   ),
                   Text(
                     _formatDate(breeding.breedingDate),
-                    style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
                   ),
                 ],
               ),
