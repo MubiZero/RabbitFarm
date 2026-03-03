@@ -74,7 +74,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               label: 'Самец',
               sex: 'male',
               icon: Icons.male,
-              color: Colors.blue,
+              color: AppColors.accentOcean,
               selectedId: _selectedMaleId,
               rabbits: rabbitsState.rabbits.where((r) => r.sex == 'male').toList(),
               onChanged: (id) {
@@ -96,7 +96,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               label: 'Самка',
               sex: 'female',
               icon: Icons.female,
-              color: Colors.pink,
+              color: AppColors.accentRose,
               selectedId: _selectedFemaleId,
               rabbits: rabbitsState.rabbits.where((r) => r.sex == 'female').toList(),
               onChanged: (id) {
@@ -128,21 +128,21 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      Icon(Icons.error_outline, size: 48, color: Colors.red[700]),
+                      Icon(Icons.error_outline, size: 48, color: AppColors.error),
                       const SizedBox(height: 16),
                       Text(
                         'Ошибка анализа',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.red[900],
+                          color: AppColors.error,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         _error!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.red[800]),
+                        style: TextStyle(color: AppColors.error),
                       ),
                     ],
                   ),
@@ -192,7 +192,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               value: selectedId,
               decoration: const InputDecoration(
                 hintText: 'Выберите кролика',
-                border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               items: rabbits.map<DropdownMenuItem<int>>((rabbit) {
@@ -265,7 +264,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   'Коэффициент инбридинга',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -298,7 +297,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   riskLevel.description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -354,7 +353,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                             '${ancestor.closestGeneration} пок.',
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.darkTextSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -413,7 +412,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Выберите самца и самку'),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: AppColors.warning,
                   ),
                 );
                 return;
@@ -433,7 +432,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Случка успешно запланирована'),
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppColors.success,
                   ),
                 );
                 // Можно вернуться назад или обновить данные

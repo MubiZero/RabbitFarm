@@ -64,7 +64,7 @@ class PedigreeScreen extends ConsumerWidget {
               error.toString(),
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -227,7 +227,7 @@ class PedigreeScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkTextSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -256,15 +256,15 @@ class PedigreeScreen extends ConsumerWidget {
 
     if (rabbit.sex == 'male') {
       cardColor = AppColors.accentOcean.withValues(alpha: 0.08);
-      borderColor = Colors.blue[300];
+      borderColor = AppColors.accentOcean.withValues(alpha: 0.5);
       sexIcon = Icons.male;
     } else if (rabbit.sex == 'female') {
-      cardColor = Colors.pink[50];
-      borderColor = Colors.pink[300];
+      cardColor = AppColors.accentRose.withValues(alpha: 0.08);
+      borderColor = AppColors.accentRose.withValues(alpha: 0.5);
       sexIcon = Icons.female;
     } else {
-      cardColor = Colors.grey[50];
-      borderColor = AppColors.darkBorder;
+      cardColor = Theme.of(context).colorScheme.surfaceContainerLow;
+      borderColor = Theme.of(context).colorScheme.outlineVariant;
       sexIcon = Icons.help_outline;
     }
 
@@ -277,7 +277,7 @@ class PedigreeScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: cardColor,
           border: Border.all(
-            color: isPrimary ? Colors.green : borderColor!,
+            color: isPrimary ? AppColors.success : borderColor!,
             width: isPrimary ? 3 : 2,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -290,10 +290,10 @@ class PedigreeScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: rabbit.sex == 'male'
-                    ? Colors.blue[100]
+                    ? AppColors.accentOcean.withValues(alpha: 0.15)
                     : rabbit.sex == 'female'
-                        ? Colors.pink[100]
-                        : AppColors.darkSurface,
+                        ? AppColors.accentRose.withValues(alpha: 0.15)
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -302,8 +302,8 @@ class PedigreeScreen extends ConsumerWidget {
                 color: rabbit.sex == 'male'
                     ? AppColors.accentOcean
                     : rabbit.sex == 'female'
-                        ? Colors.pink[700]
-                        : AppColors.darkTextSecondary,
+                        ? AppColors.accentRose
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
 
@@ -322,7 +322,7 @@ class PedigreeScreen extends ConsumerWidget {
                         label,
                         style: TextStyle(
                           fontSize: isSmall ? 11 : 12,
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -346,14 +346,14 @@ class PedigreeScreen extends ConsumerWidget {
                         Icon(
                           Icons.tag,
                           size: isSmall ? 14 : 16,
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           rabbit.tagId!,
                           style: TextStyle(
                             fontSize: isSmall ? 12 : 14,
-                            color: AppColors.darkTextSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -368,7 +368,7 @@ class PedigreeScreen extends ConsumerWidget {
                           Icon(
                             Icons.pets,
                             size: isSmall ? 14 : 16,
-                            color: AppColors.darkTextSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
@@ -376,7 +376,7 @@ class PedigreeScreen extends ConsumerWidget {
                               rabbit.breed!,
                               style: TextStyle(
                                 fontSize: isSmall ? 12 : 14,
-                                color: AppColors.darkTextSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -395,14 +395,14 @@ class PedigreeScreen extends ConsumerWidget {
                           Icon(
                             Icons.cake,
                             size: isSmall ? 14 : 16,
-                            color: AppColors.darkTextSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             _formatDate(rabbit.birthDate!),
                             style: TextStyle(
                               fontSize: isSmall ? 11 : 13,
-                              color: AppColors.darkTextSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -415,7 +415,7 @@ class PedigreeScreen extends ConsumerWidget {
             // Стрелка для перехода
             Icon(
               Icons.chevron_right,
-              color: AppColors.darkTextHint,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: isSmall ? 20 : 24,
             ),
           ],

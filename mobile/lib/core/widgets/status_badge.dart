@@ -23,13 +23,14 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     final (label, color) = switch (status) {
       RabbitStatus.active     => ('Активен',   AppColors.success),
-      RabbitStatus.inactive   => ('Неактивен', AppColors.darkTextSecondary),
+      RabbitStatus.inactive   => ('Неактивен', muted),
       RabbitStatus.sick       => ('Болен',     AppColors.error),
       RabbitStatus.pregnant   => ('Беременна', AppColors.accentRose),
       RabbitStatus.sold       => ('Продан',    AppColors.warning),
-      RabbitStatus.deceased   => ('Умер',      AppColors.darkTextSecondary),
+      RabbitStatus.deceased   => ('Умер',      muted),
       RabbitStatus.quarantine => ('Карантин',  AppColors.warning),
     };
 

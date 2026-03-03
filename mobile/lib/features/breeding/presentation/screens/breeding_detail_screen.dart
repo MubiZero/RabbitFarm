@@ -17,7 +17,6 @@ class BreedingDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Детали случки'),
-        backgroundColor: AppColors.accentViolet,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -57,29 +56,30 @@ class BreedingDetailScreen extends ConsumerWidget {
     String statusText;
     IconData statusIcon;
 
+    final cs = Theme.of(context).colorScheme;
     switch (breeding.status) {
       case 'planned':
-        statusColor = Colors.blue;
+        statusColor = AppColors.accentOcean;
         statusText = 'Запланирована';
         statusIcon = Icons.schedule;
         break;
       case 'completed':
-        statusColor = Colors.green;
+        statusColor = AppColors.success;
         statusText = 'Завершена';
         statusIcon = Icons.check_circle;
         break;
       case 'failed':
-        statusColor = Colors.red;
+        statusColor = AppColors.error;
         statusText = 'Неудачная';
         statusIcon = Icons.cancel;
         break;
       case 'cancelled':
-        statusColor = Colors.grey;
+        statusColor = cs.onSurfaceVariant;
         statusText = 'Отменена';
         statusIcon = Icons.block;
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = cs.onSurfaceVariant;
         statusText = breeding.status;
         statusIcon = Icons.help;
     }
@@ -100,9 +100,9 @@ class BreedingDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Статус',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -139,13 +139,13 @@ class BreedingDetailScreen extends ConsumerWidget {
                 // Самец
                 Row(
                   children: [
-                    const Icon(Icons.male, color: Colors.blue),
+                    const Icon(Icons.male, color: AppColors.accentOcean),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Самец', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text('Самец', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
                             breeding.male?.name ?? 'ID: ${breeding.maleId}',
@@ -154,7 +154,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           if (breeding.male?.tagId != null)
                             Text(
                               'Бирка: ${breeding.male!.tagId}',
-                              style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
+                              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -171,13 +171,13 @@ class BreedingDetailScreen extends ConsumerWidget {
                 // Самка
                 Row(
                   children: [
-                    const Icon(Icons.female, color: Colors.pink),
+                    const Icon(Icons.female, color: AppColors.accentRose),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Самка', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text('Самка', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
                             breeding.female?.name ?? 'ID: ${breeding.femaleId}',
@@ -186,7 +186,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           if (breeding.female?.tagId != null)
                             Text(
                               'Бирка: ${breeding.female!.tagId}',
-                              style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
+                              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -218,29 +218,32 @@ class BreedingDetailScreen extends ConsumerWidget {
                 const Divider(height: 24),
                 
                 _buildDateRow(
+                  context: context,
                   icon: Icons.favorite,
                   label: 'Дата случки',
                   date: breeding.breedingDate,
-                  color: Colors.purple,
+                  color: AppColors.accentViolet,
                 ),
-                
+
                 if (breeding.expectedBirthDate != null) ...[
                   const SizedBox(height: 12),
                   _buildDateRow(
+                    context: context,
                     icon: Icons.calendar_today,
                     label: 'Ожидаемый окрол',
                     date: breeding.expectedBirthDate!,
-                    color: Colors.green,
+                    color: AppColors.success,
                   ),
                 ],
 
                 if (breeding.palpationDate != null) ...[
                   const SizedBox(height: 12),
                   _buildDateRow(
+                    context: context,
                     icon: Icons.touch_app,
                     label: 'Дата пальпации',
                     date: breeding.palpationDate!,
-                    color: Colors.orange,
+                    color: AppColors.warning,
                   ),
                 ],
               ],
@@ -260,7 +263,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                 children: [
                   Icon(
                     breeding.isPregnant! ? Icons.check_circle : Icons.help_outline,
-                    color: breeding.isPregnant! ? Colors.green : Colors.orange,
+                    color: breeding.isPregnant! ? AppColors.success : AppColors.warning,
                     size: 32,
                   ),
                   const SizedBox(width: 16),
@@ -268,9 +271,9 @@ class BreedingDetailScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Беременность',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -348,7 +351,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.error),
                     child: const Text('Удалить'),
                   ),
                 ],
@@ -364,7 +367,6 @@ class BreedingDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Случка удалена'),
-                      backgroundColor: Colors.green,
                     ),
                   );
                 }
@@ -373,7 +375,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Ошибка: ${e.toString().replaceAll('Exception: ', '')}'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                     ),
                   );
                 }
@@ -382,8 +384,8 @@ class BreedingDetailScreen extends ConsumerWidget {
           },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.all(16),
-            foregroundColor: Colors.red,
-            side: const BorderSide(color: Colors.red),
+            foregroundColor: AppColors.error,
+            side: const BorderSide(color: AppColors.error),
           ),
           icon: const Icon(Icons.delete),
           label: const Text('Удалить случку'),
@@ -393,6 +395,7 @@ class BreedingDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildDateRow({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String date,
@@ -408,7 +411,7 @@ class BreedingDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 2),
               Text(

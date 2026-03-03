@@ -278,7 +278,7 @@ class WeightHistoryScreen extends ConsumerWidget {
               Text(
                 weight.notes!,
                 style: TextStyle(
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
