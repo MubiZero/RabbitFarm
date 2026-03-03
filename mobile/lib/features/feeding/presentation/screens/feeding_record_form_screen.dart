@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../data/models/feed_model.dart';
 import '../../data/models/feeding_record_model.dart';
-import '../../../rabbits/data/models/rabbit_model.dart';
-import '../../../cages/data/models/cage_model.dart';
 import '../providers/feeds_provider.dart';
 import '../providers/feeding_records_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../cages/presentation/providers/cages_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_form_section.dart';
 
 /// Экран создания/редактирования записи о кормлении
 class FeedingRecordFormScreen extends ConsumerStatefulWidget {
@@ -32,11 +31,9 @@ class _FeedingRecordFormScreenState
   int? _selectedFeedId;
   int? _selectedRabbitId;
   int? _selectedCageId;
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  DateTime _fedAt = DateTime.now();
   bool _isLoading = false;
 
-  // Режим выбора: 'rabbit' или 'cage'
   String _feedingMode = 'rabbit';
 
   @override
@@ -51,8 +48,7 @@ class _FeedingRecordFormScreenState
       _selectedFeedId = widget.record!.feedId;
       _selectedRabbitId = widget.record!.rabbitId;
       _selectedCageId = widget.record!.cageId;
-      _selectedDate = widget.record!.fedAt;
-      _selectedTime = TimeOfDay.fromDateTime(widget.record!.fedAt);
+      _fedAt = widget.record!.fedAt;
 
       if (_selectedRabbitId != null) {
         _feedingMode = 'rabbit';
@@ -61,7 +57,6 @@ class _FeedingRecordFormScreenState
       }
     }
 
-    // Загружаем списки
     Future.microtask(() {
       ref.read(feedsProvider.notifier).loadFeeds(refresh: true);
       ref.read(rabbitsListProvider.notifier).loadRabbits();
@@ -87,159 +82,118 @@ class _FeedingRecordFormScreenState
         title: Text(widget.record == null
             ? 'Новая запись о кормлении'
             : 'Редактировать запись'),
-        centerTitle: true,
-        backgroundColor: AppColors.warning,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            // Режим кормления: индивидуальное или групповое
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            AppFormSection(
+              title: 'Кормление',
+              children: [
+                Row(
                   children: [
-                    const Text(
-                      'Режим кормления',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: const Text('Индивидуально'),
+                        subtitle: const Text('Конкретный кролик'),
+                        value: 'rabbit',
+                        groupValue: _feedingMode,
+                        onChanged: (value) {
+                          setState(() {
+                            _feedingMode = value!;
+                            _selectedCageId = null;
+                          });
+                        },
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: const Text('Индивидуально'),
-                            subtitle: const Text('Конкретный кролик'),
-                            value: 'rabbit',
-                            groupValue: _feedingMode,
-                            onChanged: (value) {
-                              setState(() {
-                                _feedingMode = value!;
-                                _selectedCageId = null;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: const Text('Групповое'),
-                            subtitle: const Text('Вся клетка'),
-                            value: 'cage',
-                            groupValue: _feedingMode,
-                            onChanged: (value) {
-                              setState(() {
-                                _feedingMode = value!;
-                                _selectedRabbitId = null;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: const Text('Групповое'),
+                        subtitle: const Text('Вся клетка'),
+                        value: 'cage',
+                        groupValue: _feedingMode,
+                        onChanged: (value) {
+                          setState(() {
+                            _feedingMode = value!;
+                            _selectedRabbitId = null;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
-              ),
+                if (_feedingMode == 'rabbit')
+                  _buildRabbitSelector(rabbitsState)
+                else
+                  _buildCageSelector(cagesState),
+                _buildFeedSelector(context, feedsState),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Выбор кролика или клетки
-            if (_feedingMode == 'rabbit')
-              _buildRabbitSelector(rabbitsState)
-            else
-              _buildCageSelector(cagesState),
-            const SizedBox(height: 16),
-
-            // Выбор корма
-            _buildFeedSelector(feedsState),
-            const SizedBox(height: 16),
-
-            // Количество
-            TextFormField(
-              controller: _quantityController,
-              decoration: const InputDecoration(
-                labelText: 'Количество *',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.scale),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите количество';
-                }
-                final number = double.tryParse(value);
-                if (number == null || number <= 0) {
-                  return 'Введите корректное число';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Дата и время
-            Row(
+            AppFormSection(
+              title: 'Детали',
               children: [
-                Expanded(
-                  child: ListTile(
-                    title: const Text('Дата'),
-                    subtitle: Text(DateFormat('dd.MM.yyyy').format(_selectedDate)),
-                    leading: const Icon(Icons.calendar_today),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: AppColors.darkBorder),
-                    ),
-                    onTap: () => _selectDate(context),
+                TextFormField(
+                  controller: _quantityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Количество *',
+                    prefixIcon: Icon(Icons.scale),
                   ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите количество';
+                    }
+                    final number = double.tryParse(value);
+                    if (number == null || number <= 0) {
+                      return 'Введите корректное число';
+                    }
+                    return null;
+                  },
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ListTile(
-                    title: const Text('Время'),
-                    subtitle: Text(_selectedTime.format(context)),
-                    leading: const Icon(Icons.access_time),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: AppColors.darkBorder),
-                    ),
-                    onTap: () => _selectTime(context),
-                  ),
+                AppDateField(
+                  label: 'Дата и время *',
+                  value: _fedAt,
+                  onChanged: (date) => setState(() => _fedAt = date),
+                  prefixIcon: Icons.calendar_today,
+                  lastDate: DateTime.now(),
+                  showTime: true,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-
-            // Примечания
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Примечания',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.note),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 24),
-
-            // Кнопка сохранения
-            ElevatedButton(
-              onPressed: _isLoading ? null : _saveRecord,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.warning,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(
-                      widget.record == null ? 'Создать' : 'Сохранить',
-                      style: const TextStyle(fontSize: 16),
-                    ),
+            AppFormSection(
+              title: 'Заметки',
+              children: [
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Примечания',
+                    prefixIcon: Icon(Icons.note_outlined),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _saveRecord,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(widget.record == null ? 'Создать' : 'Сохранить'),
+            ),
+          ),
         ),
       ),
     );
@@ -254,20 +208,16 @@ class _FeedingRecordFormScreenState
       value: _selectedRabbitId,
       decoration: const InputDecoration(
         labelText: 'Кролик *',
-        border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.pets),
       ),
       items: rabbitsState.rabbits.map((rabbit) {
         return DropdownMenuItem(
           value: rabbit.id,
-          child: Text('${rabbit.name} (${rabbit.tagId ?? "без бирки"})'),
+          child: Text(
+              '${rabbit.name} (${rabbit.tagId.isEmpty ? "без бирки" : rabbit.tagId})'),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedRabbitId = value;
-        });
-      },
+      onChanged: (value) => setState(() => _selectedRabbitId = value),
       validator: (value) {
         if (_feedingMode == 'rabbit' && value == null) {
           return 'Выберите кролика';
@@ -286,7 +236,6 @@ class _FeedingRecordFormScreenState
       value: _selectedCageId,
       decoration: const InputDecoration(
         labelText: 'Клетка *',
-        border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.home),
       ),
       items: cagesState.cages.map((cage) {
@@ -295,11 +244,7 @@ class _FeedingRecordFormScreenState
           child: Text('Клетка ${cage.number}'),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedCageId = value;
-        });
-      },
+      onChanged: (value) => setState(() => _selectedCageId = value),
       validator: (value) {
         if (_feedingMode == 'cage' && value == null) {
           return 'Выберите клетку';
@@ -309,16 +254,16 @@ class _FeedingRecordFormScreenState
     );
   }
 
-  Widget _buildFeedSelector(FeedsState feedsState) {
+  Widget _buildFeedSelector(BuildContext context, FeedsState feedsState) {
     if (feedsState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final cs = Theme.of(context).colorScheme;
     return DropdownButtonFormField<int>(
       value: _selectedFeedId,
       decoration: const InputDecoration(
         labelText: 'Корм *',
-        border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.inventory),
       ),
       items: feedsState.feeds.map((feed) {
@@ -333,18 +278,14 @@ class _FeedingRecordFormScreenState
                 '(${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)})',
                 style: TextStyle(
                   fontSize: 12,
-                  color: hasLowStock ? Colors.red : Colors.grey,
+                  color: hasLowStock ? AppColors.error : cs.onSurfaceVariant,
                 ),
               ),
             ],
           ),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedFeedId = value;
-        });
-      },
+      onChanged: (value) => setState(() => _selectedFeedId = value),
       validator: (value) {
         if (value == null) {
           return 'Выберите корм';
@@ -354,63 +295,23 @@ class _FeedingRecordFormScreenState
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-    );
-
-    if (date != null) {
-      setState(() {
-        _selectedDate = date;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-    );
-
-    if (time != null) {
-      setState(() {
-        _selectedTime = time;
-      });
-    }
-  }
-
   Future<void> _saveRecord() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final quantity = double.parse(_quantityController.text);
 
-      // Комбинируем дату и время
-      final fedAt = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        _selectedTime.hour,
-        _selectedTime.minute,
-      );
-
       if (widget.record == null) {
-        // Создание новой записи
         final recordCreate = FeedingRecordCreate(
           rabbitId: _feedingMode == 'rabbit' ? _selectedRabbitId : null,
           cageId: _feedingMode == 'cage' ? _selectedCageId : null,
           feedId: _selectedFeedId!,
           quantity: quantity,
-          fedAt: fedAt,
+          fedAt: _fedAt,
           notes: _notesController.text.isNotEmpty ? _notesController.text : null,
         );
 
@@ -423,13 +324,12 @@ class _FeedingRecordFormScreenState
           context.pop();
         }
       } else {
-        // Обновление существующей записи
         final recordUpdate = FeedingRecordUpdate(
           rabbitId: _feedingMode == 'rabbit' ? _selectedRabbitId : null,
           cageId: _feedingMode == 'cage' ? _selectedCageId : null,
           feedId: _selectedFeedId!,
           quantity: quantity,
-          fedAt: fedAt,
+          fedAt: _fedAt,
           notes: _notesController.text.isNotEmpty ? _notesController.text : null,
         );
 
@@ -451,15 +351,13 @@ class _FeedingRecordFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Ошибка: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
