@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 /// Экран списка вакцинаций
 class VaccinationsListScreen extends ConsumerStatefulWidget {
@@ -33,8 +35,6 @@ class _VaccinationsListScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Вакцинации'),
-        centerTitle: true,
-        backgroundColor: AppColors.success,
         actions: [
           // Фильтры
           IconButton(
@@ -67,7 +67,6 @@ class _VaccinationsListScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showVaccinationForm(context, null),
-        backgroundColor: AppColors.success,
         icon: const Icon(Icons.add),
         label: const Text('Добавить вакцинацию'),
       ),
@@ -175,48 +174,17 @@ class _VaccinationsListScreenState
     }
 
     if (state.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.error.withValues(alpha: 0.6)),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка: ${state.error}',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.darkTextSecondary),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                ref.read(vaccinationsProvider.notifier).loadVaccinations();
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: state.error!,
+        onRetry: () => ref.read(vaccinationsProvider.notifier).loadVaccinations(),
       );
     }
 
     if (state.vaccinations.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.vaccines_outlined, size: 64, color: AppColors.darkTextHint),
-            const SizedBox(height: 16),
-            Text(
-              'Нет записей о вакцинациях',
-              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Добавьте первую вакцинацию',
-              style: TextStyle(color: AppColors.darkTextHint),
-            ),
-          ],
-        ),
+      return AppEmptyState(
+        icon: Icons.vaccines_outlined,
+        title: 'Нет записей о вакцинациях',
+        subtitle: 'Добавьте первую вакцинацию',
       );
     }
 
@@ -280,7 +248,7 @@ class _VaccinationsListScreenState
                         vaccination.rabbit!.name,
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -295,7 +263,7 @@ class _VaccinationsListScreenState
                   const SizedBox(width: 8),
                   Text(
                     'Дата: ${dateFormat.format(vaccination.vaccinationDate)}',
-                    style: TextStyle(color: AppColors.darkTextSecondary),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -373,7 +341,7 @@ class _VaccinationsListScreenState
                     const SizedBox(width: 8),
                     Text(
                       vaccination.veterinarian!,
-                      style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                     ),
                   ],
                 ),
@@ -389,7 +357,7 @@ class _VaccinationsListScreenState
                     const SizedBox(width: 8),
                     Text(
                       'Партия: ${vaccination.batchNumber}',
-                      style: TextStyle(color: AppColors.darkTextSecondary, fontSize: 12),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
                     ),
                   ],
                 ),
@@ -402,7 +370,7 @@ class _VaccinationsListScreenState
                 Text(
                   vaccination.notes!,
                   style: TextStyle(
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
                   ),
@@ -430,7 +398,7 @@ class _VaccinationsListScreenState
         chipColor = Colors.orange[100]!;
         break;
       case VaccineType.other:
-        chipColor = AppColors.darkBorder;
+        chipColor = Theme.of(context).colorScheme.outlineVariant;
         break;
     }
 
@@ -885,7 +853,7 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.darkTextSecondary),
+          Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -895,7 +863,7 @@ class _DetailRow extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 4),

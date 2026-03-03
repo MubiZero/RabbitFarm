@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 /// Экран списка пород кроликов
 class BreedsListScreen extends ConsumerStatefulWidget {
@@ -29,8 +30,6 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Породы'),
-        centerTitle: true,
-        backgroundColor: Colors.brown[700],
       ),
       body: Column(
         children: [
@@ -51,11 +50,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 filled: true,
-                fillColor: AppColors.darkSurface,
               ),
               onChanged: (value) {
                 ref.read(breedsProvider.notifier).updateSearchQuery(value);
@@ -71,7 +66,6 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showBreedForm(context, null),
-        backgroundColor: Colors.brown[700],
         icon: const Icon(Icons.add),
         label: const Text('Добавить породу'),
       ),
@@ -86,65 +80,23 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     }
 
     if (state.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка загрузки пород',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.error!,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => ref.read(breedsProvider.notifier).loadBreeds(),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: state.error!,
+        onRetry: () => ref.read(breedsProvider.notifier).loadBreeds(),
       );
     }
 
     final breeds = state.filteredBreeds;
 
     if (breeds.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              state.searchQuery.isNotEmpty ? Icons.search_off : Icons.pets,
-              size: 80,
-              color: AppColors.darkTextHint,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              state.searchQuery.isNotEmpty
-                  ? 'Породы не найдены'
-                  : 'Нет пород',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.darkTextSecondary,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.searchQuery.isNotEmpty
-                  ? 'Попробуйте изменить запрос'
-                  : 'Добавьте первую породу',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.darkTextSecondary,
-                  ),
-            ),
-          ],
-        ),
+      return AppEmptyState(
+        icon: state.searchQuery.isNotEmpty ? Icons.search_off : Icons.pets,
+        title: state.searchQuery.isNotEmpty
+            ? 'Породы не найдены'
+            : 'Нет пород',
+        subtitle: state.searchQuery.isNotEmpty
+            ? 'Попробуйте изменить запрос'
+            : 'Добавьте первую породу',
       );
     }
 
@@ -208,7 +160,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                             _getPurposeText(breed.purpose!),
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.darkTextSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                       ],
@@ -256,7 +208,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   breed.description!,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
