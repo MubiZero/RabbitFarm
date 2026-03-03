@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_form_section.dart';
 
 class TaskFormScreen extends ConsumerStatefulWidget {
   final Task? task;
@@ -69,6 +71,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           if (widget.task != null)
             IconButton(
               icon: const Icon(Icons.delete),
+              color: AppColors.error,
               onPressed: _deleteTask,
             ),
         ],
@@ -76,121 +79,123 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Название *',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите название';
-                }
-                return null;
-              },
+            AppFormSection(
+              title: 'Основное',
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Название *',
+                    prefixIcon: Icon(Icons.title),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите название';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Описание',
+                    prefixIcon: Icon(Icons.notes),
+                  ),
+                  maxLines: 3,
+                ),
+                AppDateField(
+                  label: 'Срок выполнения *',
+                  value: _dueDate,
+                  onChanged: (date) => setState(() => _dueDate = date),
+                  prefixIcon: Icons.calendar_today,
+                  firstDate: DateTime.now(),
+                  showTime: true,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Описание',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
+            AppFormSection(
+              title: 'Параметры',
+              children: [
+                DropdownButtonFormField<TaskType>(
+                  value: _type,
+                  decoration: const InputDecoration(
+                    labelText: 'Тип *',
+                    prefixIcon: Icon(Icons.category),
+                  ),
+                  items: TaskType.values
+                      .map((type) => DropdownMenuItem(
+                            value: type,
+                            child: Text(_taskTypeToString(type)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) setState(() => _type = value);
+                  },
+                ),
+                DropdownButtonFormField<TaskStatus>(
+                  value: _status,
+                  decoration: const InputDecoration(
+                    labelText: 'Статус *',
+                    prefixIcon: Icon(Icons.flag_outlined),
+                  ),
+                  items: TaskStatus.values
+                      .map((status) => DropdownMenuItem(
+                            value: status,
+                            child: Text(_taskStatusToString(status)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) setState(() => _status = value);
+                  },
+                ),
+                DropdownButtonFormField<TaskPriority>(
+                  value: _priority,
+                  decoration: const InputDecoration(
+                    labelText: 'Приоритет *',
+                    prefixIcon: Icon(Icons.priority_high),
+                  ),
+                  items: TaskPriority.values
+                      .map((priority) => DropdownMenuItem(
+                            value: priority,
+                            child: Text(_taskPriorityToString(priority)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) setState(() => _priority = value);
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('Повторяющаяся задача'),
+                  value: _isRecurring,
+                  onChanged: (value) => setState(() => _isRecurring = value),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            DropdownButtonFormField<TaskType>(
-              value: _type,
-              decoration: const InputDecoration(
-                labelText: 'Тип *',
-                border: OutlineInputBorder(),
-              ),
-              items: TaskType.values
-                  .map((type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(_taskTypeToString(type)),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _type = value);
-              },
+            AppFormSection(
+              title: 'Заметки',
+              children: [
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Примечания',
+                    prefixIcon: Icon(Icons.note_outlined),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            DropdownButtonFormField<TaskStatus>(
-              value: _status,
-              decoration: const InputDecoration(
-                labelText: 'Статус *',
-                border: OutlineInputBorder(),
-              ),
-              items: TaskStatus.values
-                  .map((status) => DropdownMenuItem(
-                        value: status,
-                        child: Text(_taskStatusToString(status)),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _status = value);
-              },
-            ),
-            const SizedBox(height: 16),
-
-            DropdownButtonFormField<TaskPriority>(
-              value: _priority,
-              decoration: const InputDecoration(
-                labelText: 'Приоритет *',
-                border: OutlineInputBorder(),
-              ),
-              items: TaskPriority.values
-                  .map((priority) => DropdownMenuItem(
-                        value: priority,
-                        child: Text(_taskPriorityToString(priority)),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _priority = value);
-              },
-            ),
-            const SizedBox(height: 16),
-
-            ListTile(
-              title: const Text('Срок выполнения *'),
-              subtitle: Text(DateFormat('dd.MM.yyyy HH:mm').format(_dueDate)),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: _selectDueDate,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-                side: BorderSide(color: Colors.grey.shade400),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            SwitchListTile(
-              title: const Text('Повторяющаяся задача'),
-              value: _isRecurring,
-              onChanged: (value) => setState(() => _isRecurring = value),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-                side: BorderSide(color: Colors.grey.shade400),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Примечания',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 24),
-
-            ElevatedButton(
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
               onPressed: _isLoading ? null : _saveTask,
               child: _isLoading
                   ? const SizedBox(
@@ -200,38 +205,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                     )
                   : Text(widget.task == null ? 'Создать' : 'Сохранить'),
             ),
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  Future<void> _selectDueDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _dueDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-
-    if (date != null && mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_dueDate),
-      );
-
-      if (time != null && mounted) {
-        setState(() {
-          _dueDate = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-        });
-      }
-    }
   }
 
   Future<void> _saveTask() async {
@@ -243,7 +220,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       final taskActions = ref.read(taskActionsProvider);
 
       if (widget.task == null) {
-        // Create
         final taskCreate = TaskCreate(
           title: _titleController.text,
           description: _descriptionController.text.isEmpty
@@ -263,7 +239,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
         await taskActions.createTask(taskCreate);
       } else {
-        // Update
         final taskUpdate = TaskUpdate(
           title: _titleController.text,
           description: _descriptionController.text.isEmpty
@@ -287,9 +262,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.task == null
-                ? 'Задача создана'
-                : 'Задача обновлена'),
+            content: Text(widget.task == null ? 'Задача создана' : 'Задача обновлена'),
           ),
         );
         context.pop();
@@ -299,7 +272,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Ошибка: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -323,6 +296,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Удалить'),
           ),
         ],
@@ -343,7 +317,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Ошибка: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
