@@ -111,18 +111,18 @@ class RabbitDetailScreen extends ConsumerWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           height: 250,
-                          color: AppColors.darkSurfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           child: const Center(
                             child: CircularProgressIndicator(),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           height: 250,
-                          color: AppColors.darkSurfaceVariant,
-                          child: const Icon(
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          child: Icon(
                             Icons.broken_image,
                             size: 64,
-                            color: AppColors.darkTextHint,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -133,12 +133,12 @@ class RabbitDetailScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.touch_app, size: 16, color: AppColors.darkTextSecondary),
+                        Icon(Icons.touch_app, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
                           'Нажмите для увеличения',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.darkTextSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                         ),
                       ],
@@ -200,7 +200,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         Text(
                           'Бирка: ${rabbit.tagId}',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.darkTextSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                         ),
                       ],
@@ -300,7 +300,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                       child: Text(
                         'Состояние',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.darkTextSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                       ),
                     ),
@@ -427,7 +427,7 @@ class RabbitDetailScreen extends ConsumerWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ),
@@ -479,7 +479,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                   const SizedBox(height: 2),
@@ -492,13 +492,13 @@ class RabbitDetailScreen extends ConsumerWidget {
                   Text(
                     'Бирка: ${parent.tagId}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.darkTextHint),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -625,7 +625,6 @@ class RabbitDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Кролик удален'),
-                      backgroundColor: AppColors.success,
                     ),
                   );
                 }
