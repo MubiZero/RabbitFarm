@@ -6,6 +6,9 @@ import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/widgets/app_filter_bar.dart';
 
 /// Экран списка финансовых транзакций
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -34,12 +37,10 @@ class _TransactionsListScreenState
   @override
   Widget build(BuildContext context) {
     final transactionsState = ref.watch(transactionsProvider);
-    final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Финансы'),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -58,7 +59,7 @@ class _TransactionsListScreenState
             _buildSummaryBanner(context, transactionsState.transactions),
 
           // Quick filters
-          _buildQuickFilters(primary),
+          _buildQuickFilters(),
 
           // Active filters
           if (_selectedType != null ||
@@ -105,7 +106,7 @@ class _TransactionsListScreenState
               color: AppColors.success,
               icon: Icons.arrow_upward,
             ),
-            Container(width: 1, height: 40, color: AppColors.darkBorder),
+            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.outlineVariant),
             _buildSummaryItem(
               context,
               label: 'Расходы',
@@ -113,7 +114,7 @@ class _TransactionsListScreenState
               color: AppColors.error,
               icon: Icons.arrow_downward,
             ),
-            Container(width: 1, height: 40, color: AppColors.darkBorder),
+            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.outlineVariant),
             _buildSummaryItem(
               context,
               label: 'Баланс',
@@ -149,9 +150,9 @@ class _TransactionsListScreenState
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: AppColors.darkTextSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -159,76 +160,44 @@ class _TransactionsListScreenState
     );
   }
 
-  Widget _buildQuickFilters(Color primary) {
-    return SizedBox(
-      height: 50,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        children: [
-          _buildFilterChip(
-            'Все',
-            _selectedType == null,
-            primary: primary,
-            onTap: () {
-              setState(() => _selectedType = null);
-              _applyFilters();
-            },
-          ),
-          const SizedBox(width: 8),
-          _buildFilterChip(
-            'Доходы',
-            _selectedType == TransactionType.income,
-            primary: AppColors.success,
-            onTap: () {
-              setState(() {
-                _selectedType = _selectedType == TransactionType.income
-                    ? null
-                    : TransactionType.income;
-              });
-              _applyFilters();
-            },
-          ),
-          const SizedBox(width: 8),
-          _buildFilterChip(
-            'Расходы',
-            _selectedType == TransactionType.expense,
-            primary: AppColors.error,
-            onTap: () {
-              setState(() {
-                _selectedType = _selectedType == TransactionType.expense
-                    ? null
-                    : TransactionType.expense;
-              });
-              _applyFilters();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(
-    String label,
-    bool isSelected, {
-    required Color primary,
-    required VoidCallback onTap,
-  }) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      selectedColor: primary.withValues(alpha: 0.2),
-      checkmarkColor: primary,
-      labelStyle: TextStyle(
-        color: isSelected ? primary : AppColors.darkTextSecondary,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: isSelected ? primary : AppColors.darkBorder),
-      ),
+  Widget _buildQuickFilters() {
+    return AppFilterBar(
+      chips: [
+        AppFilterChipData(
+          label: 'Все',
+          isSelected: _selectedType == null,
+          onTap: () {
+            setState(() => _selectedType = null);
+            _applyFilters();
+          },
+        ),
+        AppFilterChipData(
+          label: 'Доходы',
+          isSelected: _selectedType == TransactionType.income,
+          onTap: () {
+            setState(() {
+              _selectedType = _selectedType == TransactionType.income
+                  ? null
+                  : TransactionType.income;
+            });
+            _applyFilters();
+          },
+          color: AppColors.success,
+        ),
+        AppFilterChipData(
+          label: 'Расходы',
+          isSelected: _selectedType == TransactionType.expense,
+          onTap: () {
+            setState(() {
+              _selectedType = _selectedType == TransactionType.expense
+                  ? null
+                  : TransactionType.expense;
+            });
+            _applyFilters();
+          },
+          color: AppColors.error,
+        ),
+      ],
     );
   }
 
@@ -293,46 +262,17 @@ class _TransactionsListScreenState
 
     if (transactionsState.error != null &&
         transactionsState.transactions.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка: ${transactionsState.error}',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.read(transactionsProvider.notifier).refresh(),
-              child: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: transactionsState.error!,
+        onRetry: () => ref.read(transactionsProvider.notifier).refresh(),
       );
     }
 
     if (transactionsState.transactions.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.account_balance_wallet_outlined,
-                size: 64, color: AppColors.darkTextHint),
-            const SizedBox(height: 16),
-            const Text(
-              'Транзакций не найдено',
-              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Добавьте первую транзакцию',
-              style: TextStyle(color: AppColors.darkTextSecondary),
-            ),
-          ],
-        ),
+      return const AppEmptyState(
+        icon: Icons.account_balance_wallet_outlined,
+        title: 'Транзакций не найдено',
+        subtitle: 'Добавьте первую транзакцию',
       );
     }
 
@@ -395,19 +335,19 @@ class _TransactionsListScreenState
                 children: [
                   Text(
                     _getCategoryName(transaction.category),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      color: AppColors.darkTextPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     DateFormat('dd MMM yyyy', 'ru_RU')
                         .format(transaction.transactionDate),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.darkTextSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   if (transaction.description != null &&
@@ -416,9 +356,9 @@ class _TransactionsListScreenState
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         transaction.description!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.darkTextHint,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontStyle: FontStyle.italic,
                         ),
                         maxLines: 1,
@@ -460,7 +400,6 @@ class _TransactionsListScreenState
                 value: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'Категория',
-                  border: OutlineInputBorder(),
                 ),
                 items: TransactionCategory.values.map((category) {
                   return DropdownMenuItem(
