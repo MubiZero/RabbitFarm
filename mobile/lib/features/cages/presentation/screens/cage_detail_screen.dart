@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../data/models/cage_model.dart';
-import '../../data/models/cage_statistics.dart';
 import '../providers/cages_provider.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
@@ -68,7 +66,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
           );
         }
       } finally {
@@ -136,7 +134,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
           );
         }
       } finally {
@@ -173,7 +171,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
           } catch (e) {
              if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Ошибка: $e'), backgroundColor: Colors.red),
+                SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
               );
             }
           } finally {
@@ -202,7 +200,6 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Клетка ${cage.number}'),
-        backgroundColor: AppColors.warning,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -225,7 +222,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (cage.isFull ?? false) ? null : () => _addRabbit(cage.id),
-        backgroundColor: (cage.isFull ?? false) ? Colors.grey : AppColors.warning,
+        backgroundColor: (cage.isFull ?? false) ? null : AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Посадить кролика'),
       ),
@@ -266,7 +263,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
             const Divider(height: 24),
             Row(
               children: [
-                const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                Icon(Icons.location_on, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   cage.location ?? 'Нет локации',
@@ -289,8 +286,8 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       children: [
         CircularProgressIndicator(
           value: percent,
-          backgroundColor: AppColors.darkSurfaceVariant,
-          color: percent >= 1 ? Colors.red : Colors.green,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          color: percent >= 1 ? AppColors.error : AppColors.success,
           strokeWidth: 8,
         ),
         Text(
@@ -313,10 +310,10 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
         ),
         const SizedBox(height: 12),
         if (rabbits.isEmpty)
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: Text('В этой клетке пока никого нет', style: TextStyle(color: Colors.grey)),
+              padding: const EdgeInsets.all(32.0),
+              child: Text('В этой клетке пока никого нет', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ),
           )
         else
@@ -334,7 +331,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
                     child: rabbit.photoUrl == null ? const Icon(Icons.pets, size: 20) : null,
                   ),
                   title: Text(rabbit.name),
-                  subtitle: Text(rabbit.tagId ?? ''),
+                  subtitle: Text(rabbit.tagId),
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value == 'move') _moveRabbit(rabbit);
@@ -350,9 +347,9 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
                         value: 'move',
                         child: Row(children: [Icon(Icons.low_priority), SizedBox(width: 8), Text('Переместить')]),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                          value: 'remove',
-                         child: Row(children: [Icon(Icons.output, color: Colors.red), SizedBox(width: 8), Text('Убрать', style: TextStyle(color: Colors.red))]),
+                         child: Row(children: [Icon(Icons.output, color: AppColors.error), SizedBox(width: 8), Text('Убрать', style: TextStyle(color: AppColors.error))]),
                       ),
                     ],
                   ),
@@ -393,13 +390,13 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
   Color _getConditionColor(String condition) {
     switch (condition) {
       case 'good':
-        return Colors.green;
+        return AppColors.success;
       case 'needs_repair':
-        return Colors.orange;
+        return AppColors.warning;
       case 'broken':
-        return Colors.red;
+        return AppColors.error;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 }
@@ -447,7 +444,7 @@ class _AddRabbitDialogState extends ConsumerState<_AddRabbitDialog> {
     setState(() {
       _filteredRabbits = _allRabbits.where((r) => 
         r.name.toLowerCase().contains(query.toLowerCase()) || 
-        (r.tagId?.toLowerCase().contains(query.toLowerCase()) ?? false)
+        r.tagId.toLowerCase().contains(query.toLowerCase())
       ).toList();
     });
   }
