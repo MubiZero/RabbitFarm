@@ -90,7 +90,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Удалить'),
           ),
         ],
@@ -106,7 +106,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
             content: Text(
               success ? 'Окрол удален' : 'Ошибка удаления окрола',
             ),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? AppColors.success : AppColors.error,
           ),
         );
       }
@@ -170,7 +170,7 @@ class _BirthCard extends StatelessWidget {
                   IconButton(
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline),
-                    color: Colors.red,
+                    color: AppColors.error,
                     tooltip: 'Удалить окрол',
                   ),
                 ],
@@ -206,19 +206,19 @@ class _BirthCard extends StatelessWidget {
                       icon: Icons.child_care,
                       label: 'Живых',
                       value: birth.kitsBornAlive.toString(),
-                      color: Colors.green,
+                      color: AppColors.success,
                     ),
                     _StatItem(
                       icon: Icons.close,
                       label: 'Мёртвых',
                       value: birth.kitsBornDead.toString(),
-                      color: Colors.red,
+                      color: AppColors.error,
                     ),
                     _StatItem(
                       icon: Icons.percent,
                       label: 'Выживаемость',
                       value: '$survivalRate%',
-                      color: Colors.blue,
+                      color: AppColors.info,
                     ),
                   ],
                 ),
@@ -249,7 +249,7 @@ class _BirthCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.warning.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange[300]!),
+                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
                   ),
                   child: Row(
                     children: [
@@ -259,7 +259,7 @@ class _BirthCard extends StatelessWidget {
                         child: Text(
                           birth.complications!,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.orange[900],
+                                color: AppColors.warning,
                               ),
                         ),
                       ),
