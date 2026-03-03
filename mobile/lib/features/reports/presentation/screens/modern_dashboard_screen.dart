@@ -86,14 +86,14 @@ class ModernDashboardScreen extends ConsumerWidget {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkTextPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
               'Управление фермой',
               style: const TextStyle(
                 fontSize: 13,
-                color: AppColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -111,7 +111,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             ),
             child: const Icon(
               Icons.notifications_outlined,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 22,
             ),
           ),
@@ -130,7 +130,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             ),
             child: const Icon(
               Icons.refresh,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 22,
             ),
           ),
@@ -215,7 +215,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -300,7 +300,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -345,7 +345,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             StatItem(
               label: 'Занято',
               value: '${dashboard.cages.occupied}',
-              valueColor: AppColors.darkTextPrimary,
+              valueColor: Theme.of(context).colorScheme.onSurface,
               icon: Icons.check_box,
             ),
             StatItem(
@@ -375,7 +375,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -425,7 +425,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -478,7 +478,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -544,7 +544,7 @@ class ModernDashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -600,7 +600,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkTextPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -608,7 +608,7 @@ class ModernDashboardScreen extends ConsumerWidget {
               '$error',
               style: const TextStyle(
                 fontSize: 14,
-                color: AppColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),

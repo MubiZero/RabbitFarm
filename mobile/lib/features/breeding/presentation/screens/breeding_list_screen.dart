@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../../shared/widgets/error_view.dart';
-import '../../../../shared/widgets/loading_view.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class BreedingListScreen extends ConsumerStatefulWidget {
   const BreedingListScreen({super.key});

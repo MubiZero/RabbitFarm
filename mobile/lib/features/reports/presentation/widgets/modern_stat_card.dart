@@ -97,7 +97,7 @@ class _ModernStatCardState extends State<ModernStatCard>
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkTextPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -107,13 +107,13 @@ class _ModernStatCardState extends State<ModernStatCard>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.darkSurfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: AppColors.darkTextSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
       ],
@@ -132,7 +132,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 Icon(
                   stat.icon,
                   size: 18,
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 8),
               ],
@@ -140,7 +140,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 stat.label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -157,7 +157,7 @@ class _ModernStatCardState extends State<ModernStatCard>
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: stat.valueColor ?? AppColors.darkTextPrimary,
+                  color: stat.valueColor ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],

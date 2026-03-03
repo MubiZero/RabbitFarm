@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-
 /// Кнопка быстрого действия с иконкой и градиентом
 class QuickActionButton extends StatelessWidget {
   final IconData icon;
@@ -68,7 +66,7 @@ class QuickActionButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.darkTextPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
