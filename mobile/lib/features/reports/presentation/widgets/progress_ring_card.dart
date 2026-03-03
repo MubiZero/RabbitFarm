@@ -47,17 +47,17 @@ class ProgressRingCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.darkTextPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildProgressRing(),
+                _buildProgressRing(context),
                 const SizedBox(height: 16),
                 Text(
                   bottomText,
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -69,7 +69,8 @@ class ProgressRingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressRing() {
+  Widget _buildProgressRing(BuildContext context) {
+    final ringBg = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       width: 140,
       height: 140,
@@ -81,6 +82,7 @@ class ProgressRingCard extends StatelessWidget {
             painter: _ProgressRingPainter(
               progress: progress,
               gradient: gradient,
+              backgroundColor: ringBg,
             ),
           ),
           Column(
@@ -90,7 +92,7 @@ class ProgressRingCard extends StatelessWidget {
                 shaderCallback: (bounds) => gradient.createShader(bounds),
                 child: Text(
                   centerText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -102,7 +104,7 @@ class ProgressRingCard extends StatelessWidget {
                 '${(progress * 100).toInt()}%',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.darkTextSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -117,10 +119,12 @@ class ProgressRingCard extends StatelessWidget {
 class _ProgressRingPainter extends CustomPainter {
   final double progress;
   final LinearGradient gradient;
+  final Color backgroundColor;
 
   _ProgressRingPainter({
     required this.progress,
     required this.gradient,
+    required this.backgroundColor,
   });
 
   @override
@@ -130,7 +134,7 @@ class _ProgressRingPainter extends CustomPainter {
 
     // Background circle
     final bgPaint = Paint()
-      ..color = AppColors.darkSurfaceVariant
+      ..color = backgroundColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
@@ -160,6 +164,6 @@ class _ProgressRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ProgressRingPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress || oldDelegate.backgroundColor != backgroundColor;
   }
 }

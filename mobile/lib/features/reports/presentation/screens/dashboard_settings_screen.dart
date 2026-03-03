@@ -49,10 +49,10 @@ class DashboardSettingsScreen extends ConsumerWidget {
       child: Column(
         children: [
           Container(
-            color: AppColors.darkSurfaceVariant,
-            child: const TabBar(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: TabBar(
               labelColor: AppColors.accentEmerald,
-              unselectedLabelColor: AppColors.darkTextSecondary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
               indicatorColor: AppColors.accentEmerald,
               tabs: [
                 Tab(text: 'Виджеты', icon: Icon(Icons.dashboard)),
@@ -127,17 +127,17 @@ class DashboardSettingsScreen extends ConsumerWidget {
         ),
         title: Text(
           widget.type.title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkTextPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         subtitle: Text(
           widget.type.description,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
-            color: AppColors.darkTextSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         trailing: Row(
@@ -153,7 +153,7 @@ class DashboardSettingsScreen extends ConsumerWidget {
               activeColor: AppColors.accentEmerald,
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.drag_handle, color: AppColors.darkTextHint),
+            Icon(Icons.drag_handle, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -219,20 +219,20 @@ class DashboardSettingsScreen extends ConsumerWidget {
         ),
         title: Text(
           action.type.title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkTextPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         subtitle: action.isVisible
-            ? const Text(
+            ? Text(
                 'Отображается в быстрых действиях',
-                style: TextStyle(fontSize: 13, color: AppColors.darkTextSecondary),
+                style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
               )
-            : const Text(
+            : Text(
                 'Скрыто',
-                style: TextStyle(fontSize: 13, color: AppColors.darkTextHint),
+                style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -247,7 +247,7 @@ class DashboardSettingsScreen extends ConsumerWidget {
               activeColor: AppColors.accentEmerald,
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.drag_handle, color: AppColors.darkTextHint),
+            Icon(Icons.drag_handle, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),

@@ -78,7 +78,7 @@ class AlertBanner extends StatelessWidget {
                         message,
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.darkTextSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -89,7 +89,7 @@ class AlertBanner extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: onDismiss,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),

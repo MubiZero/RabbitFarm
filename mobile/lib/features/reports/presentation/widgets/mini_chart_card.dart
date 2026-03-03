@@ -43,7 +43,7 @@ class MiniChartCard extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -61,13 +61,13 @@ class MiniChartCard extends StatelessWidget {
                   subtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.darkTextHint,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
                   height: 60,
-                  child: _buildMiniChart(),
+                  child: _buildMiniChart(context),
                 ),
               ],
             ),
@@ -77,14 +77,14 @@ class MiniChartCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMiniChart() {
+  Widget _buildMiniChart(BuildContext context) {
     if (data.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Нет данных',
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.darkTextHint,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       );
