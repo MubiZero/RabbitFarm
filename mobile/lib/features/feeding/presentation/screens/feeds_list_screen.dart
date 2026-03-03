@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 /// Экран списка кормов (склад)
 class FeedsListScreen extends ConsumerStatefulWidget {
@@ -33,8 +34,6 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Склад кормов'),
-        centerTitle: true,
-        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -65,7 +64,6 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showFeedForm(context, null),
-        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить корм'),
       ),
@@ -123,8 +121,8 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: AppColors.darkSurfaceVariant,
-      selectedColor: AppColors.warning,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      selectedColor: Theme.of(context).colorScheme.primaryContainer,
     );
   }
 
@@ -184,45 +182,17 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
     }
 
     if (feedsState.error != null && feedsState.feeds.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка: ${feedsState.error}',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => ref.read(feedsProvider.notifier).refresh(),
-              child: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: feedsState.error!,
+        onRetry: () => ref.read(feedsProvider.notifier).refresh(),
       );
     }
 
     if (feedsState.feeds.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inventory_2_outlined,
-                size: 64, color: AppColors.darkTextHint),
-            const SizedBox(height: 16),
-            Text(
-              'Корма не найдены',
-              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Добавьте первый корм',
-              style: TextStyle(color: AppColors.darkTextSecondary),
-            ),
-          ],
-        ),
+      return AppEmptyState(
+        icon: Icons.inventory_2_outlined,
+        title: 'Корма не найдены',
+        subtitle: 'Добавьте первый корм',
       );
     }
 

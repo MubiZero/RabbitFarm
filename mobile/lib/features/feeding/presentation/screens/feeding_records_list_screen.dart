@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeding_records_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 /// Экран списка записей о кормлении
 class FeedingRecordsListScreen extends ConsumerStatefulWidget {
@@ -39,8 +40,6 @@ class _FeedingRecordsListScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('История кормления'),
-        centerTitle: true,
-        backgroundColor: AppColors.warning,
         actions: [
           // Фильтры
           IconButton(
@@ -67,7 +66,6 @@ class _FeedingRecordsListScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showFeedingForm(context, null),
-        backgroundColor: AppColors.warning,
         icon: const Icon(Icons.add),
         label: const Text('Добавить кормление'),
       ),
@@ -125,46 +123,17 @@ class _FeedingRecordsListScreenState
     }
 
     if (recordsState.error != null && recordsState.records.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Ошибка: ${recordsState.error}',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.read(feedingRecordsProvider.notifier).refresh(),
-              child: const Text('Повторить'),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: recordsState.error!,
+        onRetry: () => ref.read(feedingRecordsProvider.notifier).refresh(),
       );
     }
 
     if (recordsState.records.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.restaurant_outlined,
-                size: 64, color: AppColors.darkTextHint),
-            const SizedBox(height: 16),
-            Text(
-              'Записей не найдено',
-              style: TextStyle(fontSize: 18, color: AppColors.darkTextSecondary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Добавьте первую запись о кормлении',
-              style: TextStyle(color: AppColors.darkTextSecondary),
-            ),
-          ],
-        ),
+      return AppEmptyState(
+        icon: Icons.restaurant_outlined,
+        title: 'Записей не найдено',
+        subtitle: 'Добавьте первую запись о кормлении',
       );
     }
 
@@ -200,8 +169,8 @@ class _FeedingRecordsListScreenState
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.warning,
-          child: const Icon(Icons.restaurant, color: Colors.white),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          child: Icon(Icons.restaurant, color: Theme.of(context).colorScheme.onPrimaryContainer),
         ),
         title: Text(
           record.feed?.name ?? 'Корм #${record.feedId}',
@@ -252,7 +221,7 @@ class _FeedingRecordsListScreenState
                   record.notes!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.darkTextSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
                   ),
                 ),

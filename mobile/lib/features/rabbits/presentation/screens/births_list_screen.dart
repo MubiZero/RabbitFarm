@@ -6,6 +6,8 @@ import '../../data/models/birth_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_state.dart';
 
 /// Экран списка окролов
 class BirthsListScreen extends ConsumerStatefulWidget {
@@ -26,8 +28,6 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Окролы'),
-        centerTitle: true,
-        backgroundColor: Colors.pink[700],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -36,55 +36,15 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
         child: birthsState.isLoading
             ? const Center(child: CircularProgressIndicator())
             : birthsState.error != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Ошибка загрузки окролов',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          birthsState.error!,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            ref.read(birthsProvider.notifier).loadBirths();
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Повторить'),
-                        ),
-                      ],
-                    ),
+                ? AppErrorState(
+                    message: birthsState.error!,
+                    onRetry: () => ref.read(birthsProvider.notifier).loadBirths(),
                   )
                 : birthsState.births.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.child_care, size: 64, color: AppColors.darkTextHint),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Окролов пока нет',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: AppColors.darkTextSecondary,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Зарегистрируйте первый окрол',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.darkTextSecondary,
-                                  ),
-                            ),
-                          ],
-                        ),
+                    ? AppEmptyState(
+                        icon: Icons.child_care,
+                        title: 'Окролов пока нет',
+                        subtitle: 'Зарегистрируйте первый окрол',
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
@@ -111,7 +71,6 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
         },
         icon: const Icon(Icons.add),
         label: const Text('Добавить окрол'),
-        backgroundColor: Colors.pink[700],
       ),
     );
   }
@@ -198,7 +157,7 @@ class _BirthCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 16, color: Colors.pink[700]),
+                      Icon(Icons.calendar_today, size: 16, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
                         dateFormat.format(DateTime.parse(birth.birthDate)),
@@ -222,7 +181,7 @@ class _BirthCard extends StatelessWidget {
               // Mother info
               Row(
                 children: [
-                  Icon(Icons.female, size: 16, color: Colors.pink[300]),
+                  Icon(Icons.female, size: 16, color: Theme.of(context).colorScheme.tertiary),
                   const SizedBox(width: 8),
                   Text(
                     'Мать: $motherName',
@@ -237,7 +196,7 @@ class _BirthCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.darkSurface,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -315,7 +274,7 @@ class _BirthCard extends StatelessWidget {
                 Text(
                   birth.notes!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.darkTextSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                 ),
               ],
@@ -357,7 +316,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
       ],
