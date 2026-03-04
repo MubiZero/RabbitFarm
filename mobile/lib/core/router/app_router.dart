@@ -19,6 +19,7 @@ import '../../features/rabbits/presentation/screens/births_list_screen.dart';
 import '../../features/rabbits/data/models/rabbit_model.dart';
 import '../../features/rabbits/data/models/breed_model.dart';
 import '../../features/rabbits/data/models/breeding_model.dart';
+import '../../features/rabbits/data/models/birth_model.dart';
 import '../../features/cages/presentation/screens/cages_list_screen.dart';
 import '../../features/cages/presentation/screens/cage_form_screen.dart';
 import '../../features/cages/presentation/screens/cage_detail_screen.dart';
@@ -281,6 +282,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           return BreedingDetailScreen(breedingId: id);
         },
       ),
+      GoRoute(
+        path: '/breeding/:id/edit',
+        name: 'breeding-edit',
+        builder: (context, state) {
+          final breeding = state.extra as BreedingModel?;
+          assert(breeding != null, 'breeding-edit route requires BreedingModel as extra');
+          if (breeding == null) {
+            return BreedingDetailScreen(breedingId: int.parse(state.pathParameters['id']!));
+          }
+          return BreedingFormScreen(breeding: breeding);
+        },
+      ),
 
       // Births routes
       GoRoute(
@@ -292,7 +305,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/births/new',
         name: 'birth-new',
         builder: (context, state) {
-          final breeding = state.extra as BreedingModel?;
+          final extra = state.extra;
+          if (extra is BirthModel) {
+            return BirthFormScreen(birth: extra);
+          }
+          final breeding = extra is BreedingModel ? extra : null;
           return BirthFormScreen(breeding: breeding);
         },
       ),
