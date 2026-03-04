@@ -149,9 +149,7 @@ class _MedicalRecordsListScreenState
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        onTap: () {
-          context.push('/medical-records/${record.id}');
-        },
+        onTap: () => _showRecordDetail(record),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -276,6 +274,151 @@ class _MedicalRecordsListScreenState
         ),
       ),
     );
+  }
+
+  void _showRecordDetail(MedicalRecord record) {
+    final dateFormat = DateFormat('dd.MM.yyyy');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    record.rabbit?.name ?? 'Кролик',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    context.push('/medical-records/form', extra: record);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline, color: AppColors.error),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _deleteMedicalRecord(record);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (record.diagnosis != null && record.diagnosis!.isNotEmpty)
+              _detailRow(Icons.medical_information_outlined, 'Диагноз', record.diagnosis!),
+            _detailRow(Icons.sick_outlined, 'Симптомы', record.symptoms),
+            if (record.treatment != null && record.treatment!.isNotEmpty)
+              _detailRow(Icons.healing_outlined, 'Лечение', record.treatment!),
+            if (record.medication != null && record.medication!.isNotEmpty)
+              _detailRow(Icons.medication_outlined, 'Препараты', record.medication!),
+            _detailRow(Icons.calendar_today, 'Начало', dateFormat.format(record.startedAt)),
+            if (record.endedAt != null)
+              _detailRow(Icons.event_available, 'Окончание', dateFormat.format(record.endedAt!)),
+            if (record.cost != null)
+              _detailRow(Icons.attach_money, 'Стоимость', '${record.cost!.toStringAsFixed(2)} руб.'),
+            if (record.veterinarian != null && record.veterinarian!.isNotEmpty)
+              _detailRow(Icons.person_outline, 'Ветеринар', record.veterinarian!),
+            if (record.notes != null && record.notes!.isNotEmpty)
+              _detailRow(Icons.notes, 'Заметки', record.notes!),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(value, style: const TextStyle(fontSize: 15)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteMedicalRecord(MedicalRecord record) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить запись?'),
+        content: const Text('Медицинская запись будет удалена безвозвратно.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await ref
+            .read(medicalRecordsProvider.notifier)
+            .deleteMedicalRecord(record.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Запись удалена')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка удаления: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Color _getOutcomeColor(MedicalOutcome outcome) {

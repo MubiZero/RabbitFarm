@@ -218,7 +218,91 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
   }
 
   Future<void> _createKitsForBirth(BirthModel birth, RabbitModel? mother) async {
-    // TODO: implemented in task 7
+    if (mother == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Мать не найдена в списке')),
+      );
+      return;
+    }
+
+    final namePrefixController = TextEditingController(text: '${mother.name}-');
+
+    final shouldCreate = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Создать карточки крольчат?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Будет создано ${birth.kitsBornAlive} карточек кроликов',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: namePrefixController,
+              decoration: const InputDecoration(
+                labelText: 'Префикс имени',
+                hintText: 'Например: Белка-',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Крольчата: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
+            icon: const Icon(Icons.auto_awesome),
+            label: const Text('Создать'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldCreate == true && mounted) {
+      final kits = await ref.read(birthsProvider.notifier).createKitsFromBirth(
+            birthId: birth.id,
+            motherId: birth.motherId,
+            fatherId: null,
+            breedId: mother.breedId,
+            birthDate: birth.birthDate,
+            count: birth.kitsBornAlive,
+            namePrefix: namePrefixController.text,
+          );
+
+      if (mounted) {
+        if (kits != null) {
+          await ref.read(rabbitsListProvider.notifier).refresh();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Создано ${kits.length} крольчат'),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+        }
+      }
+    }
   }
 }
 
