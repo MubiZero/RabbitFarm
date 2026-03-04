@@ -3,14 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../rabbits/data/models/breeding_model.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
 
 class BreedingFormScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
+  final BreedingModel? breeding;
 
-  const BreedingFormScreen({super.key, this.initialData});
+  const BreedingFormScreen({super.key, this.initialData, this.breeding});
 
   @override
   ConsumerState<BreedingFormScreen> createState() => _BreedingFormScreenState();
@@ -26,10 +28,25 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   String _notes = '';
   bool _isSubmitting = false;
 
+  bool get _isEditing => widget.breeding != null;
+
   @override
   void initState() {
     super.initState();
-    if (widget.initialData != null) {
+    if (widget.breeding != null) {
+      _selectedMaleId = widget.breeding!.maleId;
+      _selectedFemaleId = widget.breeding!.femaleId;
+      assert(
+        widget.breeding!.breedingDate.isNotEmpty,
+        'breeding.breedingDate is empty — date will default to today',
+      );
+      final parsedDate = widget.breeding!.breedingDate.isNotEmpty
+          ? DateTime.tryParse(widget.breeding!.breedingDate)
+          : null;
+      _breedingDate = parsedDate ?? DateTime.now();
+      _status = widget.breeding!.status;
+      _notes = widget.breeding!.notes ?? '';
+    } else if (widget.initialData != null) {
       _selectedMaleId = widget.initialData!['male_id'] as int?;
       _selectedFemaleId = widget.initialData!['female_id'] as int?;
     }
@@ -45,17 +62,27 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
     try {
       final repository = ref.read(breedingRepositoryProvider);
 
-      await repository.createBreeding({
+      final data = {
         'male_id': _selectedMaleId,
         'female_id': _selectedFemaleId,
         'breeding_date': _breedingDate.toIso8601String().split('T')[0],
         'status': _status,
         'notes': _notes.isNotEmpty ? _notes : null,
-      });
+      };
 
-      if (mounted) {
-        ref.invalidate(breedingListProvider);
-        context.pop(true);
+      if (_isEditing) {
+        await repository.updateBreeding(widget.breeding!.id, data);
+        if (mounted) {
+          ref.invalidate(breedingDetailProvider(widget.breeding!.id));
+          ref.invalidate(breedingListProvider);
+          context.pop(true);
+        }
+      } else {
+        await repository.createBreeding(data);
+        if (mounted) {
+          ref.invalidate(breedingListProvider);
+          context.pop(true);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -81,7 +108,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Новая случка'),
+        title: Text(_isEditing ? 'Редактирование случки' : 'Новая случка'),
       ),
       body: Form(
         key: _formKey,

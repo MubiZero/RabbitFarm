@@ -13,6 +13,7 @@ class BreedingDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final breedingAsync = ref.watch(breedingDetailProvider(breedingId));
+    final breeding = breedingAsync.valueOrNull;
 
     return Scaffold(
       appBar: AppBar(
@@ -20,12 +21,12 @@ class BreedingDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              // TODO: Переход к редактированию
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Редактирование в разработке')),
-              );
-            },
+            onPressed: breeding == null
+                ? null
+                : () => context.push(
+                      '/breeding/$breedingId/edit',
+                      extra: breeding,
+                    ),
           ),
         ],
       ),
@@ -362,6 +363,7 @@ class BreedingDetailScreen extends ConsumerWidget {
               try {
                 await ref.read(breedingRepositoryProvider).deleteBreeding(breedingId);
                 ref.invalidate(breedingListProvider);
+                ref.invalidate(breedingDetailProvider(breedingId));
                 if (context.mounted) {
                   context.pop();
                   ScaffoldMessenger.of(context).showSnackBar(
