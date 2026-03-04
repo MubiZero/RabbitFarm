@@ -242,6 +242,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         await ref.read(createFeedProvider(feedCreate).future);
 
         if (mounted) {
+          ref.read(feedsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Корм успешно создан')),
           );
@@ -263,6 +264,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         );
 
         if (mounted) {
+          ref.read(feedsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Корм успешно обновлен')),
           );
@@ -314,6 +316,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         await ref.read(deleteFeedProvider(widget.feed!.id).future);
 
         if (mounted) {
+          ref.read(feedsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Корм успешно удален')),
           );

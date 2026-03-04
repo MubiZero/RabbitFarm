@@ -158,9 +158,6 @@ final createFeedProvider =
   final repository = ref.watch(feedsRepositoryProvider);
   final feed = await repository.createFeed(feedCreate);
 
-  // Add to feeds list
-  ref.read(feedsProvider.notifier).addFeed(feed);
-
   return feed;
 });
 
@@ -170,9 +167,6 @@ final updateFeedProvider = FutureProvider.autoDispose
   final repository = ref.watch(feedsRepositoryProvider);
   final feed = await repository.updateFeed(params.id, params.update);
 
-  // Update in feeds list
-  ref.read(feedsProvider.notifier).updateFeed(feed);
-
   return feed;
 });
 
@@ -181,9 +175,6 @@ final deleteFeedProvider =
     FutureProvider.autoDispose.family<void, int>((ref, id) async {
   final repository = ref.watch(feedsRepositoryProvider);
   await repository.deleteFeed(id);
-
-  // Remove from feeds list
-  ref.read(feedsProvider.notifier).removeFeed(id);
 });
 
 /// Provider for feed statistics

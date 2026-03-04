@@ -172,9 +172,6 @@ final createFeedingRecordProvider = FutureProvider.autoDispose
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   final record = await repository.createFeedingRecord(recordCreate);
 
-  // Add to feeding records list
-  ref.read(feedingRecordsProvider.notifier).addRecord(record);
-
   return record;
 });
 
@@ -184,9 +181,6 @@ final updateFeedingRecordProvider = FutureProvider.autoDispose
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   final record = await repository.updateFeedingRecord(params.id, params.update);
 
-  // Update in feeding records list
-  ref.read(feedingRecordsProvider.notifier).updateRecord(record);
-
   return record;
 });
 
@@ -195,9 +189,6 @@ final deleteFeedingRecordProvider =
     FutureProvider.autoDispose.family<void, int>((ref, id) async {
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   await repository.deleteFeedingRecord(id);
-
-  // Remove from feeding records list
-  ref.read(feedingRecordsProvider.notifier).removeRecord(id);
 });
 
 /// Provider for feeding statistics

@@ -51,14 +51,13 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
                         itemCount: birthsState.births.length,
                         itemBuilder: (context, index) {
                           final birth = birthsState.births[index];
-                          final mother = rabbitsState.rabbits.firstWhere(
+                          final mother = rabbitsState.rabbits.where(
                             (r) => r.id == birth.motherId,
-                            orElse: () => throw Exception('Mother not found'),
-                          );
+                          ).firstOrNull;
 
                           return _BirthCard(
                             birth: birth,
-                            motherName: mother.name,
+                            motherName: mother?.name ?? 'Мать не найдена',
                             dateFormat: _dateFormat,
                             onDelete: () => _deleteBirth(birth),
                           );
