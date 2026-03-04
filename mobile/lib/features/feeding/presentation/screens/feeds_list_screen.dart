@@ -281,9 +281,153 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             ),
           ],
         ),
-        onTap: () => _showFeedForm(context, feed),
+        onTap: () => _showFeedDetail(context, feed),
       ),
     );
+  }
+
+  void _showFeedDetail(BuildContext context, Feed feed) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: _getFeedTypeColor(feed.type),
+                  child: Icon(_getFeedTypeIcon(feed.type), color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    feed.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showFeedForm(context, feed);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline, color: AppColors.error),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _deleteFeed(context, feed);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _getFeedTypeName(feed.type),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _feedStat(
+                    'На складе',
+                    '${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                    feed.currentStock <= feed.minStock
+                        ? AppColors.error
+                        : AppColors.success,
+                  ),
+                ),
+                Expanded(
+                  child: _feedStat(
+                    'Минимум',
+                    '${feed.minStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                    Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _feedStat(String label, String value, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+      ],
+    );
+  }
+
+  Future<void> _deleteFeed(BuildContext context, Feed feed) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить корм?'),
+        content: Text('Корм "${feed.name}" будет удален безвозвратно.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await ref.read(deleteFeedProvider(feed.id).future);
+        if (mounted) {
+          ref.read(feedsProvider.notifier).refresh();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Корм удален')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка удаления: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _showFeedForm(BuildContext context, Feed? feed) {
@@ -361,9 +505,65 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
   }
 
   void _showFilters(BuildContext context) {
-    // TODO: Implement advanced filters dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Дополнительные фильтры')),
+    FeedType? tempType = _selectedType;
+    bool tempLowStock = _showLowStockOnly;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: const Text('Фильтры'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<FeedType?>(
+                value: tempType,
+                decoration: const InputDecoration(labelText: 'Тип корма'),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('Все типы')),
+                  ...FeedType.values.map((type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(_getFeedTypeName(type)),
+                      )),
+                ],
+                onChanged: (value) => setDialogState(() => tempType = value),
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Только низкий остаток'),
+                value: tempLowStock,
+                onChanged: (value) =>
+                    setDialogState(() => tempLowStock = value),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = null;
+                  _showLowStockOnly = false;
+                });
+                _applyFilters();
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Сбросить'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = tempType;
+                  _showLowStockOnly = tempLowStock;
+                });
+                _applyFilters();
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Применить'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

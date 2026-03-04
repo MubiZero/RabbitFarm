@@ -393,6 +393,7 @@ class _VaccinationFormScreenState
               .createVaccination(request);
 
       if (success && mounted) {
+        ref.read(vaccinationsProvider.notifier).loadVaccinations();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.vaccination != null

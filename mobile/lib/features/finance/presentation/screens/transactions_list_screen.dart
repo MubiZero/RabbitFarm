@@ -309,7 +309,7 @@ class _TransactionsListScreenState
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: AppCard(
-        onTap: () => _showTransactionForm(context, transaction),
+        onTap: () => _showTransactionDetail(context, transaction),
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
@@ -381,6 +381,160 @@ class _TransactionsListScreenState
         ),
       ),
     );
+  }
+
+  void _showTransactionDetail(BuildContext context, Transaction transaction) {
+    final isIncome = transaction.type == TransactionType.income;
+    final color = isIncome ? AppColors.success : AppColors.error;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isIncome ? Icons.arrow_upward : Icons.arrow_downward,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '${isIncome ? '+' : '−'}${transaction.amount.toStringAsFixed(2)} ₽',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showTransactionForm(context, transaction);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline, color: AppColors.error),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _deleteTransaction(context, transaction);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _txDetailRow(Icons.category_outlined, 'Категория', _getCategoryName(transaction.category)),
+            _txDetailRow(Icons.swap_horiz, 'Тип', isIncome ? 'Доход' : 'Расход'),
+            _txDetailRow(
+              Icons.calendar_today,
+              'Дата',
+              DateFormat('dd MMM yyyy', 'ru_RU').format(transaction.transactionDate),
+            ),
+            if (transaction.description != null && transaction.description!.isNotEmpty)
+              _txDetailRow(Icons.notes, 'Описание', transaction.description!),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _txDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          const SizedBox(width: 12),
+          Text(
+            '$label: ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteTransaction(
+      BuildContext context, Transaction transaction) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить транзакцию?'),
+        content: const Text('Транзакция будет удалена безвозвратно.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await ref.read(deleteTransactionProvider(transaction.id).future);
+        if (mounted) {
+          ref.read(transactionsProvider.notifier).removeTransaction(transaction.id);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Транзакция удалена')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка удаления: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _showTransactionForm(BuildContext context, Transaction? transaction) {

@@ -295,6 +295,7 @@ class _FeedingRecordsListScreenState
         await ref.read(deleteFeedingRecordProvider(record.id).future);
 
         if (mounted) {
+          ref.read(feedingRecordsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Запись успешно удалена')),
           );
