@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/birth_model.dart';
+import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -60,6 +61,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
                             motherName: mother?.name ?? 'Мать не найдена',
                             dateFormat: _dateFormat,
                             onDelete: () => _deleteBirth(birth),
+                            onTap: () => _showBirthDetail(birth, mother),
                           );
                         },
                       ),
@@ -111,6 +113,113 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
       }
     }
   }
+
+  void _showBirthDetail(BirthModel birth, RabbitModel? mother) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('Окрол ${_dateFormat.format(DateTime.parse(birth.birthDate))}',
+                style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Text('Мать: ${mother?.name ?? "Не найдена"}',
+                style: Theme.of(context).textTheme.bodyLarge),
+            if (birth.breedingId != null)
+              Text('Случка #${birth.breedingId}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 16),
+            // Stats row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _DetailStat(label: 'Живых', value: birth.kitsBornAlive.toString(), color: AppColors.success),
+                _DetailStat(label: 'Мёртвых', value: birth.kitsBornDead.toString(), color: AppColors.error),
+                if (birth.kitsWeaned != null)
+                  _DetailStat(label: 'Отсажено', value: birth.kitsWeaned!.toString(), color: AppColors.info),
+              ],
+            ),
+            if (birth.complications != null && birth.complications!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text('Осложнения: ${birth.complications}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.warning)),
+            ],
+            if (birth.notes != null && birth.notes!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(birth.notes!, style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            ],
+            const SizedBox(height: 24),
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      context.push('/births/new', extra: birth);
+                    },
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('Редактировать'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _deleteBirth(birth);
+                    },
+                    icon: Icon(Icons.delete_outline, color: AppColors.error),
+                    label: Text('Удалить', style: TextStyle(color: AppColors.error)),
+                  ),
+                ),
+              ],
+            ),
+            if (birth.kitsBornAlive > 0) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _createKitsForBirth(birth, mother);
+                  },
+                  icon: const Icon(Icons.auto_awesome),
+                  label: const Text('Создать крольчат'),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
+                ),
+              ),
+            ],
+            SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createKitsForBirth(BirthModel birth, RabbitModel? mother) async {
+    // TODO: implemented in task 7
+  }
 }
 
 /// Карточка окрола
@@ -119,12 +228,14 @@ class _BirthCard extends StatelessWidget {
   final String motherName;
   final DateFormat dateFormat;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const _BirthCard({
     required this.birth,
     required this.motherName,
     required this.dateFormat,
     required this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -142,9 +253,7 @@ class _BirthCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // TODO: Navigate to birth detail screen
-        },
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -318,6 +427,26 @@ class _StatItem extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
+      ],
+    );
+  }
+}
+
+/// Статистика для bottom sheet деталей окрола
+class _DetailStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  const _DetailStat({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold, color: color)),
+        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant)),
       ],
     );
   }

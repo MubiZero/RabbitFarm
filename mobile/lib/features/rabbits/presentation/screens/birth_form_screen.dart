@@ -265,6 +265,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
     final birthData = {
       'mother_id': _selectedMotherId,
       if (widget.breeding != null) 'breeding_id': widget.breeding!.id,
+      if (widget.birth?.breedingId != null) 'breeding_id': widget.birth!.breedingId,
       'birth_date': _birthDate.toIso8601String().split('T')[0],
       'kits_born_alive': int.parse(_kitsBornAliveController.text),
       'kits_born_dead': _kitsBornDeadController.text.isNotEmpty
@@ -285,6 +286,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
 
       if (mounted) {
         if (success) {
+          ref.read(birthsProvider.notifier).loadBirths();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Окрол обновлен')),
           );
@@ -306,7 +308,19 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
       if (mounted) {
         if (birth != null) {
           if (_createKits && int.parse(_kitsBornAliveController.text) > 0) {
-            await _createKitsDialog(context, birth);
+            try {
+              await _createKitsDialog(context, birth);
+            } catch (e) {
+              if (mounted) {
+                setState(() => _isSubmitting = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Ошибка: ${e.toString()}'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Окрол зарегистрирован')),
@@ -390,7 +404,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
             birthId: birth.id,
             motherId: birth.motherId,
             fatherId: widget.breeding?.maleId,
-            breedId: mother.breed!.id,
+            breedId: mother.breedId,
             birthDate: birth.birthDate,
             count: birth.kitsBornAlive,
             namePrefix: namePrefixController.text,

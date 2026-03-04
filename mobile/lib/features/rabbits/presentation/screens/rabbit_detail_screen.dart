@@ -536,11 +536,15 @@ class RabbitDetailScreen extends ConsumerWidget {
   }
 
   IconData _getSexIcon(String sex) {
-    return sex == 'male' ? Icons.male : Icons.female;
+    if (sex == 'male') return Icons.male;
+    if (sex == 'female') return Icons.female;
+    return Icons.question_mark;
   }
 
   Color _getSexColor(String sex) {
-    return sex == 'male' ? AppColors.accentOcean : AppColors.accentRose;
+    if (sex == 'male') return AppColors.accentOcean;
+    if (sex == 'female') return AppColors.accentRose;
+    return AppColors.textSecondary;
   }
 
   String _getPurposeText(String purpose) {
