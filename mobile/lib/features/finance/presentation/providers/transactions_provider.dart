@@ -173,9 +173,6 @@ final createTransactionProvider = FutureProvider.autoDispose
   final repository = ref.watch(transactionsRepositoryProvider);
   final transaction = await repository.createTransaction(transactionCreate);
 
-  // Add to transactions list
-  ref.read(transactionsProvider.notifier).addTransaction(transaction);
-
   return transaction;
 });
 
@@ -185,9 +182,6 @@ final updateTransactionProvider = FutureProvider.autoDispose
   final repository = ref.watch(transactionsRepositoryProvider);
   final transaction = await repository.updateTransaction(params.id, params.update);
 
-  // Update in transactions list
-  ref.read(transactionsProvider.notifier).updateTransaction(transaction);
-
   return transaction;
 });
 
@@ -196,9 +190,6 @@ final deleteTransactionProvider =
     FutureProvider.autoDispose.family<void, int>((ref, id) async {
   final repository = ref.watch(transactionsRepositoryProvider);
   await repository.deleteTransaction(id);
-
-  // Remove from transactions list
-  ref.read(transactionsProvider.notifier).removeTransaction(id);
 });
 
 /// Provider for financial statistics

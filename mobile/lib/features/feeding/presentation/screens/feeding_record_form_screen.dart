@@ -318,6 +318,7 @@ class _FeedingRecordFormScreenState
         await ref.read(createFeedingRecordProvider(recordCreate).future);
 
         if (mounted) {
+          ref.read(feedingRecordsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Запись успешно создана')),
           );
@@ -340,6 +341,7 @@ class _FeedingRecordFormScreenState
         );
 
         if (mounted) {
+          ref.read(feedingRecordsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Запись успешно обновлена')),
           );

@@ -273,6 +273,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         await ref.read(createTransactionProvider(transactionCreate).future);
 
         if (mounted) {
+          ref.read(transactionsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Транзакция успешно создана')),
           );
@@ -297,6 +298,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         );
 
         if (mounted) {
+          ref.read(transactionsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Транзакция успешно обновлена')),
           );
@@ -344,6 +346,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
             .read(deleteTransactionProvider(widget.transaction!.id).future);
 
         if (mounted) {
+          ref.read(transactionsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Транзакция успешно удалена')),
           );
