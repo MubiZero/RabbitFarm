@@ -278,11 +278,11 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                   Row(
                     children: [
                       _buildInfoBadge(
-                        icon: rabbit.sex == 'male' ? Icons.male : Icons.female,
-                        label: rabbit.sex == 'male' ? 'Самец' : 'Самка',
+                        icon: rabbit.sex == 'male' ? Icons.male : rabbit.sex == 'female' ? Icons.female : Icons.question_mark,
+                        label: rabbit.sex == 'male' ? 'Самец' : rabbit.sex == 'female' ? 'Самка' : 'Неизвестно',
                         color: rabbit.sex == 'male'
                             ? AppColors.accentOcean
-                            : AppColors.accentRose,
+                            : rabbit.sex == 'female' ? AppColors.accentRose : AppColors.textSecondary,
                       ),
                       if (rabbit.breed?.name != null) ...[
                         const SizedBox(width: 8),

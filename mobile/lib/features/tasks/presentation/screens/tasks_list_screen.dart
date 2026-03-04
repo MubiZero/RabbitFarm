@@ -15,28 +15,37 @@ class TasksListScreen extends ConsumerStatefulWidget {
 }
 
 class _TasksListScreenState extends ConsumerState<TasksListScreen> {
+  final _scrollController = ScrollController();
+
+  // Local filter state for the modal bottom sheet
   TaskType? _selectedType;
   TaskStatus? _selectedStatus;
   TaskPriority? _selectedPriority;
   bool _overdueOnly = false;
   bool _todayOnly = false;
-  int _currentPage = 1;
 
-  TasksQueryParams get _queryParams => TasksQueryParams(
-        page: _currentPage,
-        limit: 20,
-        type: _selectedType,
-        status: _selectedStatus,
-        priority: _selectedPriority,
-        overdueOnly: _overdueOnly ? true : null,
-        todayOnly: _todayOnly ? true : null,
-        sortBy: 'due_date',
-        sortOrder: 'ASC',
-      );
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(tasksListProvider.notifier).loadMore();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final tasksAsync = ref.watch(tasksProvider(_queryParams));
+    final tasksState = ref.watch(tasksListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,139 +57,138 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (_hasActiveFilters()) _buildActiveFiltersChips(),
-          Expanded(
-            child: tasksAsync.when(
-              data: (data) {
-                final tasks = data['tasks'] as List<Task>;
-                final pagination = data['pagination'] as Map<String, dynamic>;
-
-                if (tasks.isEmpty) {
-                  return const AppEmptyState(
-                    icon: Icons.task_outlined,
-                    title: 'Задачи не найдены',
-                    subtitle: 'Попробуйте изменить фильтры',
-                  );
-                }
-
-                return Column(
-                  children: [
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          ref.invalidate(tasksProvider(_queryParams));
-                        },
-                        child: ListView.builder(
-                          itemCount: tasks.length,
-                          itemBuilder: (context, index) {
-                            return _TaskCard(
-                              task: tasks[index],
-                              onTap: () {
-                                // Navigate to task details or edit
-                                context.push('/tasks/form', extra: tasks[index]);
-                              },
-                              onComplete: () async {
-                                await ref
-                                    .read(taskActionsProvider)
-                                    .completeTask(tasks[index].id);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    _buildPagination(pagination),
-                  ],
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => AppErrorState(
-                message: error.toString(),
-                onRetry: () => ref.invalidate(tasksProvider(_queryParams)),
-              ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(tasksListProvider.notifier).refresh();
+        },
+        child: Column(
+          children: [
+            if (_hasActiveFilters()) _buildActiveFiltersChips(),
+            Expanded(
+              child: _buildBody(tasksState),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
+  Widget _buildBody(TasksListState tasksState) {
+    if (tasksState.isLoading && tasksState.tasks.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (tasksState.error != null && tasksState.tasks.isEmpty) {
+      return AppErrorState(
+        message: tasksState.error!,
+        onRetry: () => ref.read(tasksListProvider.notifier).refresh(),
+      );
+    }
+
+    if (!tasksState.isLoading && tasksState.tasks.isEmpty) {
+      return const AppEmptyState(
+        icon: Icons.task_outlined,
+        title: 'Задачи не найдены',
+        subtitle: 'Попробуйте изменить фильтры',
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: tasksState.tasks.length + (tasksState.isLoading ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= tasksState.tasks.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final task = tasksState.tasks[index];
+        return _TaskCard(
+          task: task,
+          onTap: () {
+            context.push('/tasks/form', extra: task);
+          },
+          onComplete: () async {
+            await ref.read(taskActionsProvider).completeTask(task.id);
+            ref.read(tasksListProvider.notifier).refresh();
+          },
+        );
+      },
+    );
+  }
+
   bool _hasActiveFilters() {
-    return _selectedType != null ||
-        _selectedStatus != null ||
-        _selectedPriority != null ||
-        _overdueOnly ||
-        _todayOnly;
+    final state = ref.read(tasksListProvider);
+    return state.typeFilter != null ||
+        state.statusFilter != null ||
+        state.priorityFilter != null ||
+        state.overdueOnly ||
+        state.todayOnly;
   }
 
   Widget _buildActiveFiltersChips() {
+    final state = ref.watch(tasksListProvider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Wrap(
         spacing: 8,
         children: [
-          if (_selectedType != null)
+          if (state.typeFilter != null)
             Chip(
-              label: Text(_taskTypeToString(_selectedType!)),
-              onDeleted: () => setState(() => _selectedType = null),
+              label: Text(_taskTypeToString(state.typeFilter!)),
+              onDeleted: () {
+                ref.read(tasksListProvider.notifier).setFilters(clearType: true);
+                _selectedType = null;
+              },
             ),
-          if (_selectedStatus != null)
+          if (state.statusFilter != null)
             Chip(
-              label: Text(_taskStatusToString(_selectedStatus!)),
-              onDeleted: () => setState(() => _selectedStatus = null),
+              label: Text(_taskStatusToString(state.statusFilter!)),
+              onDeleted: () {
+                ref.read(tasksListProvider.notifier).setFilters(clearStatus: true);
+                _selectedStatus = null;
+              },
             ),
-          if (_selectedPriority != null)
+          if (state.priorityFilter != null)
             Chip(
-              label: Text(_taskPriorityToString(_selectedPriority!)),
-              onDeleted: () => setState(() => _selectedPriority = null),
+              label: Text(_taskPriorityToString(state.priorityFilter!)),
+              onDeleted: () {
+                ref.read(tasksListProvider.notifier).setFilters(clearPriority: true);
+                _selectedPriority = null;
+              },
             ),
-          if (_overdueOnly)
+          if (state.overdueOnly)
             Chip(
               label: const Text('Просроченные'),
-              onDeleted: () => setState(() => _overdueOnly = false),
+              onDeleted: () {
+                ref.read(tasksListProvider.notifier).setFilters(overdueOnly: false);
+                _overdueOnly = false;
+              },
             ),
-          if (_todayOnly)
+          if (state.todayOnly)
             Chip(
               label: const Text('Сегодня'),
-              onDeleted: () => setState(() => _todayOnly = false),
+              onDeleted: () {
+                ref.read(tasksListProvider.notifier).setFilters(todayOnly: false);
+                _todayOnly = false;
+              },
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPagination(Map<String, dynamic> pagination) {
-    final currentPage = pagination['page'] as int;
-    final totalPages = pagination['pages'] as int;
-
-    if (totalPages <= 1) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: currentPage > 1
-                ? () => setState(() => _currentPage = currentPage - 1)
-                : null,
-          ),
-          Text('$currentPage / $totalPages'),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: currentPage < totalPages
-                ? () => setState(() => _currentPage = currentPage + 1)
-                : null,
-          ),
         ],
       ),
     );
   }
 
   void _showFilters() {
+    // Sync local filter state from provider
+    final currentState = ref.read(tasksListProvider);
+    _selectedType = currentState.typeFilter;
+    _selectedStatus = currentState.statusFilter;
+    _selectedPriority = currentState.priorityFilter;
+    _overdueOnly = currentState.overdueOnly;
+    _todayOnly = currentState.todayOnly;
+
     showModalBottomSheet(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -256,20 +264,24 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
                         _overdueOnly = false;
                         _todayOnly = false;
                       });
-                      setState(() {
-                        _selectedType = null;
-                        _selectedStatus = null;
-                        _selectedPriority = null;
-                        _overdueOnly = false;
-                        _todayOnly = false;
-                      });
+                      ref.read(tasksListProvider.notifier).clearFilters();
+                      Navigator.pop(context);
                     },
                     child: const Text('Сбросить'),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {});
+                      ref.read(tasksListProvider.notifier).setFilters(
+                        type: _selectedType,
+                        clearType: _selectedType == null,
+                        status: _selectedStatus,
+                        clearStatus: _selectedStatus == null,
+                        priority: _selectedPriority,
+                        clearPriority: _selectedPriority == null,
+                        overdueOnly: _overdueOnly,
+                        todayOnly: _todayOnly,
+                      );
                       Navigator.pop(context);
                     },
                     child: const Text('Применить'),
