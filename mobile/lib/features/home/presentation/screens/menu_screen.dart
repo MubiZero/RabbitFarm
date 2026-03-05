@@ -162,23 +162,11 @@ class MenuScreen extends ConsumerWidget {
                 color: AppColors.accentEmerald,
                 onTap: () => context.push('/transactions'),
               ),
-              _MenuItem(
-                icon: Icons.bar_chart_outlined,
-                label: 'Отчеты',
-                color: AppColors.accentOcean,
-                onTap: () => context.push('/reports'),
-              ),
             ]),
 
             // Настройки
             _SectionHeader(title: 'Настройки'),
             _SectionList(items: [
-              _MenuItem(
-                icon: Icons.dashboard_customize_outlined,
-                label: 'Настройка дашборда',
-                color: AppColors.accentViolet,
-                onTap: () => context.push('/dashboard/settings'),
-              ),
               _MenuItem(
                 icon: Icons.settings_outlined,
                 label: 'Настройки приложения',

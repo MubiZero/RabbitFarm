@@ -58,20 +58,6 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Dashboard
-          _SectionLabel('Дашборд'),
-          _GroupCard(
-            context: context,
-            children: [
-              _SettingsTile(
-                icon: Icons.dashboard_customize_outlined,
-                label: 'Настройка виджетов',
-                onTap: () => context.push('/dashboard/settings'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
           // About
           _SectionLabel('О приложении'),
           _GroupCard(
