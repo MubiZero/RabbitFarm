@@ -65,10 +65,9 @@ class _VaccinationsListScreenState
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showVaccinationForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить вакцинацию'),
+        child: const Icon(Icons.add, size: 28),
       ),
     );
   }
