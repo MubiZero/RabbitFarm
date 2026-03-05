@@ -97,6 +97,8 @@ const { authenticate } = require('../middleware/auth');
 
 // Все маршруты требуют аутентификации
 router.use(authenticate);
+const idempotency = require('../middleware/idempotency');
+router.use(idempotency);
 
 // CRUD операции для окролов
 router.get('/', birthController.getBirths);

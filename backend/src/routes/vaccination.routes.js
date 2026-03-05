@@ -117,6 +117,8 @@ const {
 
 // Apply authentication to all routes
 router.use(authenticate);
+const idempotency = require('../middleware/idempotency');
+router.use(idempotency);
 
 // Statistics (before :id to avoid conflict)
 router.get('/statistics', vaccinationController.getStatistics);

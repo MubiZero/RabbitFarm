@@ -31,7 +31,7 @@ const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
 const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 const PasswordResetToken = require('./PasswordResetToken')(sequelize);
-
+const IdempotencyKey = require('./IdempotencyKey')(sequelize);
 // Define associations
 // User associations
 User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
@@ -137,5 +137,6 @@ module.exports = {
   Transaction,
   Task,
   Photo,
-  Note
+  Note,
+  IdempotencyKey
 };

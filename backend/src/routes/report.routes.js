@@ -68,6 +68,8 @@ const { authenticate } = require('../middleware/auth');
 
 // Apply authentication to all routes
 router.use(authenticate);
+const idempotency = require('../middleware/idempotency');
+router.use(idempotency);
 
 /**
  * @route   GET /api/v1/reports/dashboard

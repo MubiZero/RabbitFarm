@@ -74,10 +74,10 @@ class _TransactionsListScreenState
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showTransactionForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

@@ -48,9 +48,9 @@ exports.create = async (req, res, next) => {
       if (!feedToUpdate) throw new Error('FEED_NOT_FOUND');
 
       const currentStock = parseFloat(feedToUpdate.current_stock);
-      if (currentStock < quantity) {
-        throw new Error('INSUFFICIENT_STOCK');
-      }
+
+      // Removed INSUFFICIENT_STOCK throw to allow negative stock
+
 
       await feedToUpdate.update({
         current_stock: currentStock - quantity
@@ -78,9 +78,6 @@ exports.create = async (req, res, next) => {
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') {
       return ApiResponse.error(res, 'Корм не найден', 404);
-    }
-    if (error.message === 'INSUFFICIENT_STOCK') {
-      return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
     }
     next(error);
   }
@@ -276,10 +273,7 @@ exports.update = async (req, res, next) => {
           // Same feed, just adjust difference
           const diff = newQuantity - oldQuantity;
           const newStock = parseFloat(feed.current_stock) - diff;
-          if (newStock < 0) {
-            await transaction.rollback();
-            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
-          }
+          // Removed negative stock check
           await feed.update({ current_stock: newStock }, { transaction });
         } else {
           // Changed feed: return to old, subtract from new
@@ -296,10 +290,7 @@ exports.update = async (req, res, next) => {
           }
 
           const newStock = parseFloat(feed.current_stock) - newQuantity;
-          if (newStock < 0) {
-            await transaction.rollback();
-            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
-          }
+          // Removed negative stock check
           await feed.update({ current_stock: newStock }, { transaction });
         }
       }

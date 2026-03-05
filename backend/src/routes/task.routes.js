@@ -117,6 +117,8 @@ const validate = require('../middleware/validation');
 
 // Apply authentication to all routes
 router.use(authenticate);
+const idempotency = require('../middleware/idempotency');
+router.use(idempotency);
 
 // Statistics and special queries (before :id routes)
 router.get('/statistics', taskController.getStatistics);

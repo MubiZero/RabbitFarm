@@ -80,9 +80,11 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.transaction == null
-            ? 'Новая транзакция'
-            : 'Редактировать транзакцию'),
+        title: Text(
+          widget.transaction == null
+              ? 'Новая транзакция'
+              : 'Редактировать транзакцию',
+        ),
         actions: [
           if (widget.transaction != null)
             IconButton(
@@ -147,17 +149,20 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                     labelText: 'Категория *',
                     prefixIcon: Icon(Icons.category),
                   ),
-                  items: (_selectedType == TransactionType.income
-                          ? _incomeCategories
-                          : _expenseCategories)
-                      .map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(_getCategoryName(category)),
-                    );
-                  }).toList(),
+                  items:
+                      (_selectedType == TransactionType.income
+                              ? _incomeCategories
+                              : _expenseCategories)
+                          .map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(_getCategoryName(category)),
+                            );
+                          })
+                          .toList(),
                   onChanged: (value) {
-                    if (value != null) setState(() => _selectedCategory = value);
+                    if (value != null)
+                      setState(() => _selectedCategory = value);
                   },
                 ),
                 TextFormField(
@@ -203,7 +208,8 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                         return DropdownMenuItem(
                           value: rabbit.id,
                           child: Text(
-                              '${rabbit.name} (${rabbit.tagId.isEmpty ? "без бирки" : rabbit.tagId})'),
+                            '${rabbit.name} (${rabbit.tagId.isEmpty ? "без бирки" : rabbit.tagId})',
+                          ),
                         );
                       }),
                     ],
@@ -292,9 +298,10 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         );
 
         await ref.read(
-          updateTransactionProvider(
-            (id: widget.transaction!.id, update: transactionUpdate),
-          ).future,
+          updateTransactionProvider((
+            id: widget.transaction!.id,
+            update: transactionUpdate,
+          )).future,
         );
 
         if (mounted) {
@@ -324,8 +331,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Удалить транзакцию?'),
-        content:
-            const Text('Вы уверены, что хотите удалить эту транзакцию?'),
+        content: const Text('Вы уверены, что хотите удалить эту транзакцию?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -342,8 +348,9 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
 
     if (confirmed == true && mounted) {
       try {
-        await ref
-            .read(deleteTransactionProvider(widget.transaction!.id).future);
+        await ref.read(
+          deleteTransactionProvider(widget.transaction!.id).future,
+        );
 
         if (mounted) {
           ref.read(transactionsProvider.notifier).refresh();

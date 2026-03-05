@@ -102,8 +102,10 @@ module.exports = (sequelize) => {
     tableName: 'rabbits',
     underscored: true,
     timestamps: true,
+    paranoid: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
     indexes: [
       { fields: ['user_id'] },
       { fields: ['name'] },

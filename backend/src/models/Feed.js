@@ -50,8 +50,10 @@ module.exports = (sequelize) => {
     tableName: 'feeds',
     underscored: true,
     timestamps: true,
+    paranoid: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
     indexes: [
       { fields: ['name'] },
       { fields: ['type'] },
