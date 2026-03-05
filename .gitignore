@@ -1,5 +1,7 @@
-
+.gitignore
 .worktrees/
 .claude/
 .idea/
 .vscode/
+.mcp.json
+cages_resp.json

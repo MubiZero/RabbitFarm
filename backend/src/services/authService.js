@@ -29,13 +29,13 @@ class AuthService {
       // Hash password
       const passwordHash = await PasswordUtil.hash(userData.password);
 
-      // Create user
+      // Create user — self-registered users are always owners of their farm
       const user = await User.create({
         email: userData.email,
         password_hash: passwordHash,
         full_name: userData.full_name,
         phone: userData.phone || null,
-        role: userData.role || 'worker'
+        role: 'owner'
       }, { transaction });
 
       // Generate tokens

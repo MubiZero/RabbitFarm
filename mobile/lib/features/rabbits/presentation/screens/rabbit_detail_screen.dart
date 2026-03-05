@@ -544,7 +544,7 @@ class RabbitDetailScreen extends ConsumerWidget {
   Color _getSexColor(String sex) {
     if (sex == 'male') return AppColors.accentOcean;
     if (sex == 'female') return AppColors.accentRose;
-    return AppColors.textSecondary;
+    return AppColors.info;
   }
 
   String _getPurposeText(String purpose) {

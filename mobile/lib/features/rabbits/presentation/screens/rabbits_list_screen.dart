@@ -282,7 +282,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                         label: rabbit.sex == 'male' ? 'Самец' : rabbit.sex == 'female' ? 'Самка' : 'Неизвестно',
                         color: rabbit.sex == 'male'
                             ? AppColors.accentOcean
-                            : rabbit.sex == 'female' ? AppColors.accentRose : AppColors.textSecondary,
+                            : rabbit.sex == 'female' ? AppColors.accentRose : AppColors.info,
                       ),
                       if (rabbit.breed?.name != null) ...[
                         const SizedBox(width: 8),

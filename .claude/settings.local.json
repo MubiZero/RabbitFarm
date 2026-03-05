@@ -1,4 +1,5 @@
 {
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(test:*)",
@@ -40,7 +41,10 @@
       "Bash(python3:*)",
       "Bash(git stash:*)",
       "Bash(flutter test:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(sudo docker:*)",
+      "Bash(sudo:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []
