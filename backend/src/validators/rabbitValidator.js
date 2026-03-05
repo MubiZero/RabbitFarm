@@ -33,10 +33,10 @@ const createRabbitSchema = Joi.object({
     }),
 
   sex: Joi.string()
-    .valid('male', 'female')
+    .valid('male', 'female', 'unknown')
     .required()
     .messages({
-      'any.only': 'Пол должен быть: male или female',
+      'any.only': 'Пол должен быть: male, female или unknown',
       'any.required': 'Пол обязателен'
     }),
 
@@ -88,10 +88,10 @@ const createRabbitSchema = Joi.object({
     }),
 
   status: Joi.string()
-    .valid('healthy', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
+    .valid('healthy', 'active', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
     .default('healthy')
     .messages({
-      'any.only': 'Статус должен быть: healthy, sick, quarantine, pregnant, sold или dead'
+      'any.only': 'Статус должен быть: healthy, active, sick, quarantine, pregnant, sold или dead'
     }),
 
   purpose: Joi.string()
@@ -152,7 +152,7 @@ const updateRabbitSchema = Joi.object({
     .optional(),
 
   sex: Joi.string()
-    .valid('male', 'female')
+    .valid('male', 'female', 'unknown')
     .optional(),
 
   birth_date: Joi.date()
@@ -183,7 +183,7 @@ const updateRabbitSchema = Joi.object({
     .allow(null),
 
   status: Joi.string()
-    .valid('healthy', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
+    .valid('healthy', 'active', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
     .optional(),
 
   purpose: Joi.string()
@@ -257,14 +257,14 @@ const listRabbitsQuerySchema = Joi.object({
     }),
 
   sex: Joi.string()
-    .valid('male', 'female')
+    .valid('male', 'female', 'unknown')
     .optional()
     .messages({
-      'any.only': 'Пол должен быть: male или female'
+      'any.only': 'Пол должен быть: male, female или unknown'
     }),
 
   status: Joi.string()
-    .valid('healthy', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
+    .valid('healthy', 'active', 'sick', 'quarantine', 'pregnant', 'sold', 'dead')
     .optional()
     .messages({
       'any.only': 'Неверный статус'
