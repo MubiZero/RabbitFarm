@@ -79,6 +79,8 @@ const {
  */
 
 router.use(authenticate);
+const idempotency = require('../middleware/idempotency');
+router.use(idempotency);
 
 /**
  * @route   GET /api/v1/breeding/statistics

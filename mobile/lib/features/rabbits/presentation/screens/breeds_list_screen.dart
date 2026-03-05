@@ -65,10 +65,10 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showBreedForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить породу'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

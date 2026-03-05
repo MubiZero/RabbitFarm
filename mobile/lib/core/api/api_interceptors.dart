@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
 
 // Auth interceptor - adds JWT token to requests
 class AuthInterceptor extends Interceptor {
@@ -31,9 +32,7 @@ class AuthInterceptor extends Interceptor {
       if (refreshToken != null) {
         try {
           // Try to refresh token
-          final dio = Dio(BaseOptions(
-            baseUrl: err.requestOptions.baseUrl,
-          ));
+          final dio = Dio(BaseOptions(baseUrl: err.requestOptions.baseUrl));
 
           final response = await dio.post(
             '/auth/refresh',
@@ -130,7 +129,7 @@ class ErrorInterceptor extends Interceptor {
           if (data['error'] is Map) {
             final errorObj = data['error'];
             errorMessage = errorObj['message'] ?? 'Произошла ошибка';
-            
+
             // Handle validation details
             if (errorObj['details'] is List) {
               final details = errorObj['details'] as List;
@@ -199,10 +198,29 @@ class ErrorInterceptor extends Interceptor {
     }
 
     // Add custom error message to the error
-    err = err.copyWith(
-      message: errorMessage,
-    );
+    err = err.copyWith(message: errorMessage);
 
     handler.next(err);
+  }
+}
+
+// Idempotency interceptor - adds Idempotency-Key to specific requests
+class IdempotencyInterceptor extends Interceptor {
+  final _uuid = const Uuid();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final isMutatorMethod = [
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+    ].contains(options.method.toUpperCase());
+
+    if (isMutatorMethod && !options.headers.containsKey('Idempotency-Key')) {
+      options.headers['Idempotency-Key'] = _uuid.v4();
+    }
+
+    handler.next(options);
   }
 }

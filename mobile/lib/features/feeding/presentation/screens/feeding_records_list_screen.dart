@@ -64,10 +64,10 @@ class _FeedingRecordsListScreenState
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showFeedingForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить кормление'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

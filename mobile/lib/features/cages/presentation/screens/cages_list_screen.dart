@@ -90,10 +90,10 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showCageForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить клетку'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

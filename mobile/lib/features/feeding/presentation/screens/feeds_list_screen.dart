@@ -63,10 +63,10 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showFeedForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить корм'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

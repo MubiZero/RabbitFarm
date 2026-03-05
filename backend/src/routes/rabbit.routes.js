@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const rabbitController = require('../controllers/rabbitController');
 const { authenticate, authorize } = require('../middleware/auth');
+const idempotency = require('../middleware/idempotency');
 const validate = require('../middleware/validation');
 const upload = require('../config/multer');
 const {
@@ -120,6 +121,7 @@ const transactionController = require('../controllers/transactionController');
 
 // Apply authentication to all routes
 router.use(authenticate);
+router.use(idempotency);
 
 /**
  * @route   GET /api/v1/rabbits/statistics

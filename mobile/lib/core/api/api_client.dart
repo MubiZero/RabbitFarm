@@ -9,10 +9,8 @@ class ApiClient {
   late final Dio _dio;
   final FlutterSecureStorage _storage;
 
-  ApiClient({
-    required FlutterSecureStorage storage,
-    String? baseUrl,
-  }) : _storage = storage {
+  ApiClient({required FlutterSecureStorage storage, String? baseUrl})
+    : _storage = storage {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl ?? ApiEndpoints.baseUrl,
@@ -28,6 +26,7 @@ class ApiClient {
     // Add interceptors
     _dio.interceptors.add(AuthInterceptor(storage: _storage));
     _dio.interceptors.add(LoggingInterceptor());
+    _dio.interceptors.add(IdempotencyInterceptor());
     _dio.interceptors.add(ErrorInterceptor());
   }
 
@@ -194,28 +193,24 @@ class ApiClient {
     return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/weights');
   }
 
-  Future<Response> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+  Future<Response> uploadPhoto(
+    int rabbitId,
+    String filePath, {
+    Uint8List? bytes,
+  }) async {
     final MultipartFile file;
 
     if (kIsWeb && bytes != null) {
       // For web, use bytes
-      file = MultipartFile.fromBytes(
-        bytes,
-        filename: 'photo.jpg',
-      );
+      file = MultipartFile.fromBytes(bytes, filename: 'photo.jpg');
     } else {
       // For mobile/desktop, use file path
       file = await MultipartFile.fromFile(filePath);
     }
 
-    final formData = FormData.fromMap({
-      'photo': file,
-    });
+    final formData = FormData.fromMap({'photo': file});
 
-    return _dio.post(
-      '${ApiEndpoints.rabbits}/$rabbitId/photo',
-      data: formData,
-    );
+    return _dio.post('${ApiEndpoints.rabbits}/$rabbitId/photo', data: formData);
   }
 
   Future<Response> deletePhoto(int rabbitId) {
