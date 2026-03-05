@@ -42,8 +42,6 @@ import '../../features/finance/data/models/transaction_model.dart';
 import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
-import '../../features/reports/presentation/screens/customizable_dashboard_screen.dart';
-import '../../features/reports/presentation/screens/dashboard_settings_screen.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/menu_screen.dart';
@@ -162,13 +160,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/today',
             name: 'today',
             builder: (context, state) => const TodayScreen(),
-          ),
-
-          // Dashboard (Overview)
-          GoRoute(
-            path: '/dashboard',
-            name: 'dashboard',
-            builder: (context, state) => const CustomizableDashboardScreen(),
           ),
 
           // Rabbits
@@ -428,21 +419,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
       ),
-
-      // Dashboard settings
-      GoRoute(
-        path: '/dashboard/settings',
-        name: 'dashboard-settings',
-        builder: (context, state) => const DashboardSettingsScreen(),
-      ),
-
-      // Reports route (alias for dashboard)
-      GoRoute(
-        path: '/reports',
-        name: 'reports',
-        redirect: (_, __) => '/dashboard',
-      ),
-
 
       // Photos and Notes routes (placeholder screens)
       GoRoute(
