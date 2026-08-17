@@ -32,12 +32,15 @@ import '../../features/health/presentation/screens/medical_record_form_screen.da
 import '../../features/health/data/models/medical_record_model.dart';
 import '../../features/feeding/presentation/screens/feeds_list_screen.dart';
 import '../../features/feeding/presentation/screens/feed_form_screen.dart';
+import '../../features/feeding/presentation/screens/feed_statistics_screen.dart';
 import '../../features/feeding/presentation/screens/feeding_records_list_screen.dart';
 import '../../features/feeding/presentation/screens/feeding_record_form_screen.dart';
+import '../../features/feeding/presentation/screens/feeding_statistics_screen.dart';
 import '../../features/feeding/data/models/feed_model.dart';
 import '../../features/feeding/data/models/feeding_record_model.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
+import '../../features/finance/presentation/screens/transaction_statistics_screen.dart';
 import '../../features/finance/data/models/transaction_model.dart';
 import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
@@ -372,6 +375,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           return FeedFormScreen(feed: feed);
         },
       ),
+      GoRoute(
+        path: '/feeds/statistics',
+        name: 'feed-statistics',
+        builder: (context, state) => const FeedStatisticsScreen(),
+      ),
 
       // Feeding Records routes
       GoRoute(
@@ -387,6 +395,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           return FeedingRecordFormScreen(record: record);
         },
       ),
+      GoRoute(
+        path: '/feeding-records/statistics',
+        name: 'feeding-record-statistics',
+        builder: (context, state) => const FeedingStatisticsScreen(),
+      ),
 
       // Transactions routes
       GoRoute(
@@ -401,6 +414,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           final transaction = state.extra as Transaction?;
           return TransactionFormScreen(transaction: transaction);
         },
+      ),
+      GoRoute(
+        path: '/transactions/statistics',
+        name: 'transaction-statistics',
+        builder: (context, state) => const TransactionStatisticsScreen(),
       ),
 
       // Task form route (outside shell)
