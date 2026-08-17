@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'rabbit_model.dart';
 import 'breeding_model.dart';
@@ -61,8 +62,8 @@ class BirthModel with _$BirthModel {
             : null,
       );
     } catch (e) {
-      print('Error parsing BirthModel from JSON: $e');
-      print('JSON data: $json');
+      debugPrint('Error parsing BirthModel from JSON: $e');
+      debugPrint('JSON data: $json');
       rethrow;
     }
   }

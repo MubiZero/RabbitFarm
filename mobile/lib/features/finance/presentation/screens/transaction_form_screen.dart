@@ -100,41 +100,35 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
             AppFormSection(
               title: 'Тип транзакции',
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<TransactionType>(
-                        title: const Text('Доход'),
-                        subtitle: const Text('Продажа, услуги'),
-                        value: TransactionType.income,
-                        groupValue: _selectedType,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedType = value!;
-                            _selectedCategory = value == TransactionType.income
-                                ? _incomeCategories.first
-                                : _expenseCategories.first;
-                          });
-                        },
+                RadioGroup<TransactionType>(
+                  groupValue: _selectedType,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _selectedType = value;
+                      _selectedCategory = value == TransactionType.income
+                          ? _incomeCategories.first
+                          : _expenseCategories.first;
+                    });
+                  },
+                  child: const Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<TransactionType>(
+                          title: Text('Доход'),
+                          subtitle: Text('Продажа, услуги'),
+                          value: TransactionType.income,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<TransactionType>(
-                        title: const Text('Расход'),
-                        subtitle: const Text('Покупки, услуги'),
-                        value: TransactionType.expense,
-                        groupValue: _selectedType,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedType = value!;
-                            _selectedCategory = value == TransactionType.income
-                                ? _incomeCategories.first
-                                : _expenseCategories.first;
-                          });
-                        },
+                      Expanded(
+                        child: RadioListTile<TransactionType>(
+                          title: Text('Расход'),
+                          subtitle: Text('Покупки, услуги'),
+                          value: TransactionType.expense,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -142,7 +136,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               title: 'Детали',
               children: [
                 DropdownButtonFormField<TransactionCategory>(
-                  value: _selectedCategory,
+                  initialValue: _selectedCategory,
                   decoration: const InputDecoration(
                     labelText: 'Категория *',
                     prefixIcon: Icon(Icons.category),
@@ -188,7 +182,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                 ),
                 if (rabbitsState.rabbits.isNotEmpty)
                   DropdownButtonFormField<int>(
-                    value: _selectedRabbitId,
+                    initialValue: _selectedRabbitId,
                     decoration: const InputDecoration(
                       labelText: 'Кролик (опционально)',
                       prefixIcon: Icon(Icons.pets),

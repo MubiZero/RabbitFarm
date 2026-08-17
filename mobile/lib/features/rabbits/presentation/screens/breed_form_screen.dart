@@ -93,7 +93,7 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<String>(
-                  value: _selectedPurpose,
+                  initialValue: _selectedPurpose,
                   decoration: const InputDecoration(
                     labelText: 'Назначение',
                     prefixIcon: Icon(Icons.category),

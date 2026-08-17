@@ -204,7 +204,7 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<TaskType>(
-                value: _selectedType,
+                initialValue: _selectedType,
                 decoration: const InputDecoration(labelText: 'Тип'),
                 items: TaskType.values
                     .map((type) => DropdownMenuItem(
@@ -216,7 +216,7 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<TaskStatus>(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 decoration: const InputDecoration(labelText: 'Статус'),
                 items: TaskStatus.values
                     .map((status) => DropdownMenuItem(
@@ -229,7 +229,7 @@ class _TasksListScreenState extends ConsumerState<TasksListScreen> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<TaskPriority>(
-                value: _selectedPriority,
+                initialValue: _selectedPriority,
                 decoration: const InputDecoration(labelText: 'Приоритет'),
                 items: TaskPriority.values
                     .map((priority) => DropdownMenuItem(

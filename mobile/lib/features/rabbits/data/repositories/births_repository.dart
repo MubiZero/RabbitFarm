@@ -33,7 +33,7 @@ class BirthsRepository {
         throw Exception('Данные окролов отсутствуют или имеют неверный формат');
       }
 
-      return (data as List)
+      return data
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
@@ -86,7 +86,7 @@ class BirthsRepository {
         throw Exception('Данные окролов отсутствуют или имеют неверный формат');
       }
 
-      return (data as List)
+      return data
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
@@ -207,7 +207,7 @@ class BirthsRepository {
         throw Exception('Данные крольчат отсутствуют или имеют неверный формат');
       }
 
-      return (data as List)
+      return data
           .map((item) => RabbitModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {

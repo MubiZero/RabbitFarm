@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../../../core/utils/image_url_helper.dart';
+import '../../../../core/utils/age_utils.dart';
 
 class RabbitCard extends StatelessWidget {
   final RabbitModel rabbit;
@@ -18,7 +18,7 @@ class RabbitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final age = _calculateAge(rabbit.birthDate);
+    final age = formatAge(rabbit.birthDate);
     final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
     return Card(
@@ -35,7 +35,7 @@ class RabbitCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: _getSexColor().withOpacity(0.1),
+                  color: _getSexColor().withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: ClipRRect(
@@ -148,36 +148,6 @@ class RabbitCard extends StatelessWidget {
     );
   }
 
-  String _calculateAge(DateTime birthDate) {
-    final now = DateTime.now();
-    final difference = now.difference(birthDate);
-    final months = (difference.inDays / 30).floor();
-    final years = (months / 12).floor();
-
-    if (years > 0) {
-      final remainingMonths = months % 12;
-      if (remainingMonths > 0) {
-        return '$years г $remainingMonths мес';
-      }
-      return '$years ${_pluralYears(years)}';
-    }
-    return '$months ${_pluralMonths(months)}';
-  }
-
-  String _pluralYears(int years) {
-    if (years % 10 == 1 && years % 100 != 11) return 'год';
-    if ([2, 3, 4].contains(years % 10) &&
-        ![12, 13, 14].contains(years % 100)) return 'года';
-    return 'лет';
-  }
-
-  String _pluralMonths(int months) {
-    if (months % 10 == 1 && months % 100 != 11) return 'месяц';
-    if ([2, 3, 4].contains(months % 10) &&
-        ![12, 13, 14].contains(months % 100)) return 'месяца';
-    return 'месяцев';
-  }
-
   IconData _getSexIcon() {
     return rabbit.sex == 'male' ? Icons.male : Icons.female;
   }
@@ -252,7 +222,7 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -260,7 +230,7 @@ class _StatusChip extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: color.withOpacity(0.9),
+          color: color.withValues(alpha: 0.9),
         ),
       ),
     );

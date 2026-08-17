@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/api/api_client.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/feed_model.dart';
 import '../../data/repositories/feeds_repository.dart';

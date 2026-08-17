@@ -426,7 +426,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                   )
                 else
                   DropdownButtonFormField<int>(
-                    value: _selectedBreedId,
+                    initialValue: _selectedBreedId,
                     decoration: const InputDecoration(
                       labelText: 'Порода *',
                       prefixIcon: Icon(Icons.category),
@@ -443,7 +443,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                         value == null ? 'Выберите породу' : null,
                   ),
                 DropdownButtonFormField<String>(
-                  value: _selectedSex,
+                  initialValue: _selectedSex,
                   decoration: const InputDecoration(
                     labelText: 'Пол *',
                     prefixIcon: Icon(Icons.wc),
@@ -491,7 +491,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
               title: 'Дополнительно',
               children: [
                 DropdownButtonFormField<String>(
-                  value: _selectedStatus,
+                  initialValue: _selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Статус *',
                     prefixIcon: Icon(Icons.info_outline),
@@ -510,7 +510,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       setState(() => _selectedStatus = value!),
                 ),
                 DropdownButtonFormField<String>(
-                  value: _selectedPurpose,
+                  initialValue: _selectedPurpose,
                   decoration: const InputDecoration(
                     labelText: 'Назначение *',
                     prefixIcon: Icon(Icons.flag_outlined),

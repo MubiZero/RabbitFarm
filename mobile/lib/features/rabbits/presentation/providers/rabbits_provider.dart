@@ -3,7 +3,6 @@ import '../../../../core/providers/api_providers.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_statistics.dart';
 import '../../data/repositories/rabbits_repository.dart';
-import '../../../../shared/models/api_response.dart';
 
 // Rabbits Repository provider
 final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {

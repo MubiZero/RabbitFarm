@@ -100,7 +100,7 @@ class _MedicalRecordFormScreenState
                       style: TextStyle(color: Theme.of(context).colorScheme.error))
                 else
                   DropdownButtonFormField<int>(
-                    value: _selectedRabbitId,
+                    initialValue: _selectedRabbitId,
                     decoration: const InputDecoration(
                       labelText: 'Кролик *',
                       prefixIcon: Icon(Icons.pets),
@@ -177,7 +177,7 @@ class _MedicalRecordFormScreenState
               children: [
                 _buildEndedDateField(context),
                 DropdownButtonFormField<String>(
-                  value: _outcome,
+                  initialValue: _outcome,
                   decoration: const InputDecoration(
                     labelText: 'Исход',
                     prefixIcon: Icon(Icons.flag_outlined),

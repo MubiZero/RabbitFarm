@@ -129,7 +129,7 @@ class _VaccinationFormScreenState
               title: 'Основное',
               children: [
                 DropdownButtonFormField<int>(
-                  value: _selectedRabbitId,
+                  initialValue: _selectedRabbitId,
                   decoration: const InputDecoration(
                     labelText: 'Кролик *',
                     prefixIcon: Icon(Icons.pets),
@@ -147,7 +147,7 @@ class _VaccinationFormScreenState
                       value == null ? 'Выберите кролика' : null,
                 ),
                 DropdownButtonFormField<VaccineType>(
-                  value: _selectedVaccineType,
+                  initialValue: _selectedVaccineType,
                   decoration: const InputDecoration(
                     labelText: 'Тип вакцины *',
                     prefixIcon: Icon(Icons.category),

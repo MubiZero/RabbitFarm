@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
@@ -31,16 +32,13 @@ class PedigreeRepository {
         throw Exception(apiResponse.message);
       }
 
-      // Добавим логирование для отладки
-      print('Pedigree data: ${apiResponse.data}');
-
       return PedigreeModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      print('DioException in getPedigree: ${e.message}');
+      debugPrint('DioException in getPedigree: ${e.message}');
       throw Exception(e.message ?? 'Ошибка получения родословной');
     } catch (e, stackTrace) {
-      print('Error in getPedigree: $e');
-      print('StackTrace: $stackTrace');
+      debugPrint('Error in getPedigree: $e');
+      debugPrint('StackTrace: $stackTrace');
       throw Exception('Ошибка десериализации: $e');
     }
   }

@@ -183,9 +183,9 @@ class PedigreeScreen extends ConsumerWidget {
 
   Widget _buildGenerationHeader(String title, int generation) {
     final colors = [
-      AppColors.success!,
-      AppColors.accentOcean!,
-      AppColors.accentViolet!,
+      AppColors.success,
+      AppColors.accentOcean,
+      AppColors.accentViolet,
     ];
 
     return Row(
@@ -277,7 +277,7 @@ class PedigreeScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: cardColor,
           border: Border.all(
-            color: isPrimary ? AppColors.success : borderColor!,
+            color: isPrimary ? AppColors.success : borderColor,
             width: isPrimary ? 3 : 2,
           ),
           borderRadius: BorderRadius.circular(12),

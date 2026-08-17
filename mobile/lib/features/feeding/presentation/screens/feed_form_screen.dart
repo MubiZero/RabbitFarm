@@ -92,7 +92,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<FeedType>(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Тип корма *',
                     prefixIcon: Icon(Icons.category),
@@ -108,7 +108,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<FeedUnit>(
-                  value: _selectedUnit,
+                  initialValue: _selectedUnit,
                   decoration: const InputDecoration(
                     labelText: 'Единица измерения *',
                     prefixIcon: Icon(Icons.straighten),

@@ -119,7 +119,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               title: 'Параметры',
               children: [
                 DropdownButtonFormField<TaskType>(
-                  value: _type,
+                  initialValue: _type,
                   decoration: const InputDecoration(
                     labelText: 'Тип *',
                     prefixIcon: Icon(Icons.category),
@@ -135,7 +135,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<TaskStatus>(
-                  value: _status,
+                  initialValue: _status,
                   decoration: const InputDecoration(
                     labelText: 'Статус *',
                     prefixIcon: Icon(Icons.flag_outlined),
@@ -151,7 +151,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<TaskPriority>(
-                  value: _priority,
+                  initialValue: _priority,
                   decoration: const InputDecoration(
                     labelText: 'Приоритет *',
                     prefixIcon: Icon(Icons.priority_high),

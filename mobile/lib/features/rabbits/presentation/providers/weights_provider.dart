@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/rabbit_weight_model.dart';
-import '../../data/repositories/rabbits_repository.dart';
 import 'rabbits_provider.dart';
 
 /// Provider for weight history of a specific rabbit

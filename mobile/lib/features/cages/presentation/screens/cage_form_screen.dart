@@ -103,7 +103,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                   },
                 ),
                 DropdownButtonFormField<String>(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Тип клетки *',
                     prefixIcon: Icon(Icons.category),
@@ -160,7 +160,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                   ),
                 ),
                 DropdownButtonFormField<String>(
-                  value: _selectedCondition,
+                  initialValue: _selectedCondition,
                   decoration: const InputDecoration(
                     labelText: 'Состояние *',
                     prefixIcon: Icon(Icons.build),

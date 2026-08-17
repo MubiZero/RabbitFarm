@@ -45,7 +45,7 @@ class BreedingRepository {
       final pagination = (paginatedData['pagination'] ?? const <String, dynamic>{})
           as Map<String, dynamic>;
 
-      int _toInt(dynamic v) {
+      int toInt(dynamic v) {
         if (v is int) return v;
         if (v is double) return v.toInt();
         if (v is String) return int.tryParse(v) ?? 0;
@@ -53,17 +53,17 @@ class BreedingRepository {
       }
 
       final total = pagination.containsKey('total')
-          ? _toInt(pagination['total'])
-          : _toInt(paginatedData['total']);
+          ? toInt(pagination['total'])
+          : toInt(paginatedData['total']);
       final currentPage = pagination.containsKey('page')
-          ? _toInt(pagination['page'])
-          : _toInt(paginatedData['page']);
+          ? toInt(pagination['page'])
+          : toInt(paginatedData['page']);
       final currentLimit = pagination.containsKey('limit')
-          ? _toInt(pagination['limit'])
-          : _toInt(paginatedData['limit']);
+          ? toInt(pagination['limit'])
+          : toInt(paginatedData['limit']);
       final totalPages = pagination.containsKey('totalPages')
-          ? _toInt(pagination['totalPages'])
-          : _toInt(paginatedData['total_pages']);
+          ? toInt(pagination['totalPages'])
+          : toInt(paginatedData['total_pages']);
 
       return PaginatedResponse<BreedingModel>(
         items: items,

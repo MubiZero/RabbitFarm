@@ -6,7 +6,6 @@ import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_weight_model.dart';
 import '../providers/weights_provider.dart';
 import '../widgets/weight_chart.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class WeightHistoryScreen extends ConsumerWidget {
   final RabbitModel rabbit;

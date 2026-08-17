@@ -91,37 +91,38 @@ class _FeedingRecordFormScreenState
             AppFormSection(
               title: 'Кормление',
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<String>(
-                        title: const Text('Индивидуально'),
-                        subtitle: const Text('Конкретный кролик'),
-                        value: 'rabbit',
-                        groupValue: _feedingMode,
-                        onChanged: (value) {
-                          setState(() {
-                            _feedingMode = value!;
-                            _selectedCageId = null;
-                          });
-                        },
+                RadioGroup<String>(
+                  groupValue: _feedingMode,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _feedingMode = value;
+                      // Режимы взаимоисключающие: сбрасываем выбор другого режима.
+                      if (value == 'rabbit') {
+                        _selectedCageId = null;
+                      } else {
+                        _selectedRabbitId = null;
+                      }
+                    });
+                  },
+                  child: const Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: Text('Индивидуально'),
+                          subtitle: Text('Конкретный кролик'),
+                          value: 'rabbit',
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<String>(
-                        title: const Text('Групповое'),
-                        subtitle: const Text('Вся клетка'),
-                        value: 'cage',
-                        groupValue: _feedingMode,
-                        onChanged: (value) {
-                          setState(() {
-                            _feedingMode = value!;
-                            _selectedRabbitId = null;
-                          });
-                        },
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: Text('Групповое'),
+                          subtitle: Text('Вся клетка'),
+                          value: 'cage',
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 if (_feedingMode == 'rabbit')
                   _buildRabbitSelector(rabbitsState)
@@ -205,7 +206,7 @@ class _FeedingRecordFormScreenState
     }
 
     return DropdownButtonFormField<int>(
-      value: _selectedRabbitId,
+      initialValue: _selectedRabbitId,
       decoration: const InputDecoration(
         labelText: 'Кролик *',
         prefixIcon: Icon(Icons.pets),
@@ -233,7 +234,7 @@ class _FeedingRecordFormScreenState
     }
 
     return DropdownButtonFormField<int>(
-      value: _selectedCageId,
+      initialValue: _selectedCageId,
       decoration: const InputDecoration(
         labelText: 'Клетка *',
         prefixIcon: Icon(Icons.home),
@@ -261,7 +262,7 @@ class _FeedingRecordFormScreenState
 
     final cs = Theme.of(context).colorScheme;
     return DropdownButtonFormField<int>(
-      value: _selectedFeedId,
+      initialValue: _selectedFeedId,
       decoration: const InputDecoration(
         labelText: 'Корм *',
         prefixIcon: Icon(Icons.inventory),

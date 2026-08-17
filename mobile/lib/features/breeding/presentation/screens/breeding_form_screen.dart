@@ -141,7 +141,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
               title: 'Пара',
               children: [
                 DropdownButtonFormField<int>(
-                  value: _selectedMaleId,
+                  initialValue: _selectedMaleId,
                   decoration: const InputDecoration(
                     labelText: 'Самец *',
                     prefixIcon: Icon(Icons.male, color: AppColors.accentOcean),
@@ -157,7 +157,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
                       value == null ? 'Выберите самца' : null,
                 ),
                 DropdownButtonFormField<int>(
-                  value: _selectedFemaleId,
+                  initialValue: _selectedFemaleId,
                   decoration: const InputDecoration(
                     labelText: 'Самка *',
                     prefixIcon: Icon(Icons.female, color: AppColors.accentRose),
@@ -188,7 +188,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
                   lastDate: DateTime.now().add(const Duration(days: 365)),
                 ),
                 DropdownButtonFormField<String>(
-                  value: _status,
+                  initialValue: _status,
                   decoration: const InputDecoration(
                     labelText: 'Статус *',
                     prefixIcon: Icon(Icons.flag_outlined),
