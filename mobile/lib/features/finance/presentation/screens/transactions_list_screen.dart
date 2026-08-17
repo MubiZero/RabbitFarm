@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_filter_bar.dart';
+import '../utils/transaction_labels.dart';
 
 /// Экран списка финансовых транзакций
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -219,7 +220,7 @@ class _TransactionsListScreenState
         children: [
           if (_selectedType != null)
             Chip(
-              label: Text(_getTypeName(_selectedType!)),
+              label: Text(_selectedType!.label),
               onDeleted: () {
                 setState(() => _selectedType = null);
                 _applyFilters();
@@ -227,7 +228,7 @@ class _TransactionsListScreenState
             ),
           if (_selectedCategory != null)
             Chip(
-              label: Text(_getCategoryName(_selectedCategory!)),
+              label: Text(_selectedCategory!.label),
               onDeleted: () {
                 setState(() => _selectedCategory = null);
                 _applyFilters();
@@ -334,7 +335,7 @@ class _TransactionsListScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getCategoryName(transaction.category),
+                    transaction.category.label,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -453,7 +454,7 @@ class _TransactionsListScreenState
               ],
             ),
             const SizedBox(height: 16),
-            _txDetailRow(Icons.category_outlined, 'Категория', _getCategoryName(transaction.category)),
+            _txDetailRow(Icons.category_outlined, 'Категория', transaction.category.label),
             _txDetailRow(Icons.swap_horiz, 'Тип', isIncome ? 'Доход' : 'Расход'),
             _txDetailRow(
               Icons.calendar_today,
@@ -557,7 +558,7 @@ class _TransactionsListScreenState
                 items: TransactionCategory.values.map((category) {
                   return DropdownMenuItem(
                     value: category,
-                    child: Text(_getCategoryName(category)),
+                    child: Text(category.label),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -628,21 +629,4 @@ class _TransactionsListScreenState
       ),
     );
   }
-
-  String _getTypeName(TransactionType type) => switch (type) {
-        TransactionType.income  => 'Доход',
-        TransactionType.expense => 'Расход',
-      };
-
-  String _getCategoryName(TransactionCategory category) => switch (category) {
-        TransactionCategory.saleRabbit   => 'Продажа кролика',
-        TransactionCategory.saleMeat     => 'Продажа мяса',
-        TransactionCategory.saleFur      => 'Продажа меха',
-        TransactionCategory.breedingFee  => 'Плата за случку',
-        TransactionCategory.feed         => 'Корм',
-        TransactionCategory.veterinary   => 'Ветеринария',
-        TransactionCategory.equipment    => 'Оборудование',
-        TransactionCategory.utilities    => 'Коммунальные услуги',
-        TransactionCategory.other        => 'Другое',
-      };
 }

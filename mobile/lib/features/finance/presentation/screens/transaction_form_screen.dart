@@ -7,6 +7,7 @@ import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../utils/transaction_labels.dart';
 
 /// Экран создания/редактирования транзакции
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -147,7 +148,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                       .map((category) {
                     return DropdownMenuItem(
                       value: category,
-                      child: Text(_getCategoryName(category)),
+                      child: Text(category.label),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -356,29 +357,6 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
           );
         }
       }
-    }
-  }
-
-  String _getCategoryName(TransactionCategory category) {
-    switch (category) {
-      case TransactionCategory.saleRabbit:
-        return 'Продажа кролика';
-      case TransactionCategory.saleMeat:
-        return 'Продажа мяса';
-      case TransactionCategory.saleFur:
-        return 'Продажа меха';
-      case TransactionCategory.breedingFee:
-        return 'Плата за случку';
-      case TransactionCategory.feed:
-        return 'Корм';
-      case TransactionCategory.veterinary:
-        return 'Ветеринария';
-      case TransactionCategory.equipment:
-        return 'Оборудование';
-      case TransactionCategory.utilities:
-        return 'Коммунальные услуги';
-      case TransactionCategory.other:
-        return 'Другое';
     }
   }
 }

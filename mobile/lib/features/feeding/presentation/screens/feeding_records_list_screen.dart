@@ -202,7 +202,7 @@ class _FeedingRecordsListScreenState
                 const Icon(Icons.scale, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  'Количество: ${record.quantity.toStringAsFixed(1)} ${_getFeedUnitName(record.feed?.unit)}',
+                  'Количество: ${record.quantity.toStringAsFixed(1)} ${record.feed?.unit.displayName ?? ''}',
                 ),
               ],
             ),
@@ -392,10 +392,5 @@ class _FeedingRecordsListScreenState
 
   void _showStatistics(BuildContext context) {
     context.push('/feeding-records/statistics');
-  }
-
-  String _getFeedUnitName(FeedUnit? unit) {
-    if (unit == null) return '';
-    return unit.displayName;
   }
 }

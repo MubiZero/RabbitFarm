@@ -6,6 +6,7 @@ import '../providers/feeds_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../utils/feed_labels.dart';
 
 /// Экран списка кормов (склад)
 class FeedsListScreen extends ConsumerStatefulWidget {
@@ -164,7 +165,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             ),
           if (_selectedType != null)
             Chip(
-              label: Text(_getFeedTypeName(_selectedType!)),
+              label: Text(_selectedType!.displayName),
               onDeleted: () {
                 setState(() {
                   _selectedType = null;
@@ -230,8 +231,8 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: _getFeedTypeColor(feed.type),
-          child: Icon(_getFeedTypeIcon(feed.type), color: Colors.white),
+          backgroundColor: feed.type.color,
+          child: Icon(feed.type.icon, color: Colors.white),
         ),
         title: Text(
           feed.name,
@@ -240,7 +241,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_getFeedTypeName(feed.type)),
+            Text(feed.type.displayName),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -251,7 +252,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'На складе: ${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                  'На складе: ${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
                   style: TextStyle(
                     color: hasLowStock ? AppColors.error : null,
                     fontWeight: hasLowStock ? FontWeight.bold : FontWeight.normal,
@@ -261,7 +262,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             ),
             if (hasLowStock)
               Text(
-                'Минимум: ${feed.minStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                'Минимум: ${feed.minStock.toStringAsFixed(1)} ${feed.unit.displayName}',
                 style: const TextStyle(color: AppColors.error, fontSize: 12),
               ),
           ],
@@ -314,8 +315,8 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _getFeedTypeColor(feed.type),
-                  child: Icon(_getFeedTypeIcon(feed.type), color: Colors.white),
+                  backgroundColor: feed.type.color,
+                  child: Icon(feed.type.icon, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -342,7 +343,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _getFeedTypeName(feed.type),
+              feed.type.displayName,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
@@ -351,7 +352,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                 Expanded(
                   child: _feedStat(
                     'На складе',
-                    '${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                    '${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
                     feed.currentStock <= feed.minStock
                         ? AppColors.error
                         : AppColors.success,
@@ -360,7 +361,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                 Expanded(
                   child: _feedStat(
                     'Минимум',
-                    '${feed.minStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+                    '${feed.minStock.toStringAsFixed(1)} ${feed.unit.displayName}',
                     Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -450,7 +451,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Текущий остаток: ${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)}',
+              'Текущий остаток: ${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
             ),
             const SizedBox(height: 16),
             TextField(
@@ -458,7 +459,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Количество',
-                suffixText: _getFeedUnitName(feed.unit),
+                suffixText: feed.unit.displayName,
               ),
             ),
           ],
@@ -522,7 +523,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                   const DropdownMenuItem(value: null, child: Text('Все типы')),
                   ...FeedType.values.map((type) => DropdownMenuItem(
                         value: type,
-                        child: Text(_getFeedTypeName(type)),
+                        child: Text(type.displayName),
                       )),
                 ],
                 onChanged: (value) => setDialogState(() => tempType = value),
@@ -568,67 +569,5 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
 
   void _showStatistics(BuildContext context) {
     context.push('/feeds/statistics');
-  }
-
-  String _getFeedTypeName(FeedType type) {
-    switch (type) {
-      case FeedType.pellets:
-        return 'Гранулы';
-      case FeedType.hay:
-        return 'Сено';
-      case FeedType.vegetables:
-        return 'Овощи';
-      case FeedType.grain:
-        return 'Зерно';
-      case FeedType.supplements:
-        return 'Добавки';
-      case FeedType.other:
-        return 'Другое';
-    }
-  }
-
-  String _getFeedUnitName(FeedUnit unit) {
-    switch (unit) {
-      case FeedUnit.kg:
-        return 'кг';
-      case FeedUnit.liter:
-        return 'л';
-      case FeedUnit.piece:
-        return 'шт';
-    }
-  }
-
-  Color _getFeedTypeColor(FeedType type) {
-    switch (type) {
-      case FeedType.pellets:
-        return AppColors.accentSunset;
-      case FeedType.hay:
-        return AppColors.warning;
-      case FeedType.vegetables:
-        return AppColors.accentEmerald;
-      case FeedType.grain:
-        return AppColors.accentOcean;
-      case FeedType.supplements:
-        return AppColors.accentViolet;
-      case FeedType.other:
-        return AppColors.info;
-    }
-  }
-
-  IconData _getFeedTypeIcon(FeedType type) {
-    switch (type) {
-      case FeedType.pellets:
-        return Icons.grain;
-      case FeedType.hay:
-        return Icons.grass;
-      case FeedType.vegetables:
-        return Icons.eco;
-      case FeedType.grain:
-        return Icons.agriculture;
-      case FeedType.supplements:
-        return Icons.medication;
-      case FeedType.other:
-        return Icons.inventory_2;
-    }
   }
 }

@@ -276,7 +276,7 @@ class _FeedingRecordFormScreenState
               Text(feed.name),
               const SizedBox(width: 8),
               Text(
-                '(${feed.currentStock.toStringAsFixed(1)} ${_getFeedUnitName(feed.unit)})',
+                '(${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName})',
                 style: TextStyle(
                   fontSize: 12,
                   color: hasLowStock ? AppColors.error : cs.onSurfaceVariant,
@@ -362,17 +362,6 @@ class _FeedingRecordFormScreenState
       if (mounted) {
         setState(() => _isLoading = false);
       }
-    }
-  }
-
-  String _getFeedUnitName(FeedUnit unit) {
-    switch (unit) {
-      case FeedUnit.kg:
-        return 'кг';
-      case FeedUnit.liter:
-        return 'л';
-      case FeedUnit.piece:
-        return 'шт';
     }
   }
 }

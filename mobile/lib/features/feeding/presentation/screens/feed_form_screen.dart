@@ -100,7 +100,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   items: FeedType.values.map((type) {
                     return DropdownMenuItem(
                       value: type,
-                      child: Text(_getFeedTypeName(type)),
+                      child: Text(type.displayName),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -116,7 +116,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   items: FeedUnit.values.map((unit) {
                     return DropdownMenuItem(
                       value: unit,
-                      child: Text(_getFeedUnitName(unit)),
+                      child: Text(unit.displayName),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -133,7 +133,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   decoration: InputDecoration(
                     labelText: 'Текущий остаток *',
                     prefixIcon: const Icon(Icons.inventory),
-                    suffixText: _getFeedUnitName(_selectedUnit),
+                    suffixText: _selectedUnit.displayName,
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -152,7 +152,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   decoration: InputDecoration(
                     labelText: 'Минимальный остаток *',
                     prefixIcon: const Icon(Icons.warning_amber_outlined),
-                    suffixText: _getFeedUnitName(_selectedUnit),
+                    suffixText: _selectedUnit.displayName,
                     helperText: 'Порог для предупреждения о низком запасе',
                   ),
                   keyboardType: TextInputType.number,
@@ -172,7 +172,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   decoration: InputDecoration(
                     labelText: 'Стоимость за единицу',
                     prefixIcon: const Icon(Icons.payments_outlined),
-                    suffixText: 'руб/${_getFeedUnitName(_selectedUnit)}',
+                    suffixText: 'руб/${_selectedUnit.displayName}',
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -332,34 +332,6 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
           );
         }
       }
-    }
-  }
-
-  String _getFeedTypeName(FeedType type) {
-    switch (type) {
-      case FeedType.pellets:
-        return 'Гранулы';
-      case FeedType.hay:
-        return 'Сено';
-      case FeedType.vegetables:
-        return 'Овощи';
-      case FeedType.grain:
-        return 'Зерно';
-      case FeedType.supplements:
-        return 'Добавки';
-      case FeedType.other:
-        return 'Другое';
-    }
-  }
-
-  String _getFeedUnitName(FeedUnit unit) {
-    switch (unit) {
-      case FeedUnit.kg:
-        return 'кг';
-      case FeedUnit.liter:
-        return 'л';
-      case FeedUnit.piece:
-        return 'шт';
     }
   }
 }
