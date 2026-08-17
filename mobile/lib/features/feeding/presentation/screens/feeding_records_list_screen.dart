@@ -271,6 +271,7 @@ class _FeedingRecordsListScreenState
   }
 
   Future<void> _confirmDelete(BuildContext context, FeedingRecord record) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -296,19 +297,17 @@ class _FeedingRecordsListScreenState
 
         if (mounted) {
           ref.read(feedingRecordsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Запись успешно удалена')),
-          );
         }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Запись успешно удалена')),
+        );
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка при удалении: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Ошибка при удалении: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }

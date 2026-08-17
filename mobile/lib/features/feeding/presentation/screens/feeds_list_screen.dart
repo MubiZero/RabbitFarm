@@ -389,6 +389,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
   }
 
   Future<void> _deleteFeed(BuildContext context, Feed feed) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -413,19 +414,17 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
         await ref.read(deleteFeedProvider(feed.id).future);
         if (mounted) {
           ref.read(feedsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Корм удален')),
-          );
         }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Корм удален')),
+        );
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка удаления: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Ошибка удаления: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
   }
@@ -517,7 +516,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<FeedType?>(
-                value: tempType,
+                initialValue: tempType,
                 decoration: const InputDecoration(labelText: 'Тип корма'),
                 items: [
                   const DropdownMenuItem(value: null, child: Text('Все типы')),

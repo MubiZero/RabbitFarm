@@ -57,7 +57,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
           rabbit.id,
           {'cage_id': null},
         );
-        ref.refresh(cagesProvider); // Refresh cages to update occupancy
+        ref.invalidate(cagesProvider); // Refresh cages to update occupancy
         if (mounted) {
            ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Кролик убран из клетки')),
@@ -125,7 +125,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
           rabbit.id,
           {'cage_id': targetCage.id},
         );
-        ref.refresh(cagesProvider);
+        ref.invalidate(cagesProvider);
         if (mounted) {
            ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Кролик перемещен в клетку ${targetCage.number}')),
@@ -151,29 +151,26 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     // or just show search.
     
     // We will use a search dialog
+    final messenger = ScaffoldMessenger.of(context);
     await showDialog(
-      context: context, 
-      builder: (context) => _AddRabbitDialog(
+      context: context,
+      builder: (dialogContext) => _AddRabbitDialog(
         onSelect: (rabbit) async {
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
           setState(() => _isLoading = true);
           try {
              await ref.read(rabbitsRepositoryProvider).updateRabbit(
               rabbit.id,
               {'cage_id': cageId},
             );
-            ref.refresh(cagesProvider);
-             if (mounted) {
-               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Кролик добавлен в клетку')),
-              );
-            }
+            ref.invalidate(cagesProvider);
+            messenger.showSnackBar(
+              const SnackBar(content: Text('Кролик добавлен в клетку')),
+            );
           } catch (e) {
-             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
-              );
-            }
+            messenger.showSnackBar(
+              SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
+            );
           } finally {
             if (mounted) setState(() => _isLoading = false);
           }

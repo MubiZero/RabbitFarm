@@ -496,6 +496,7 @@ class _TransactionsListScreenState
 
   Future<void> _deleteTransaction(
       BuildContext context, Transaction transaction) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -520,19 +521,17 @@ class _TransactionsListScreenState
         await ref.read(deleteTransactionProvider(transaction.id).future);
         if (mounted) {
           ref.read(transactionsProvider.notifier).removeTransaction(transaction.id);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Транзакция удалена')),
-          );
         }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Транзакция удалена')),
+        );
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка удаления: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Ошибка удаления: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
   }
@@ -551,7 +550,7 @@ class _TransactionsListScreenState
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<TransactionCategory>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'Категория',
                 ),

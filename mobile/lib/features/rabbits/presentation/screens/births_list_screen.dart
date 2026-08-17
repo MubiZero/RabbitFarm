@@ -225,6 +225,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
       return;
     }
 
+    final messenger = ScaffoldMessenger.of(context);
     final namePrefixController = TextEditingController(text: '${mother.name}-');
 
     final shouldCreate = await showDialog<bool>(
@@ -283,24 +284,22 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
             namePrefix: namePrefixController.text,
           );
 
-      if (mounted) {
-        if (kits != null) {
-          await ref.read(rabbitsListProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Создано ${kits.length} крольчат'),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
-              backgroundColor: AppColors.warning,
-            ),
-          );
-        }
+      if (kits != null) {
+        await ref.read(rabbitsListProvider.notifier).refresh();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Создано ${kits.length} крольчат'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
       }
     }
   }

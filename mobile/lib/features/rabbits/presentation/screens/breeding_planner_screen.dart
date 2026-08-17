@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/models/pedigree_model.dart';
 import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
 import '../providers/rabbits_provider.dart';
@@ -22,8 +21,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
   int? _selectedMaleId;
   int? _selectedFemaleId;
 
-  PedigreeModel? _malePedigree;
-  PedigreeModel? _femalePedigree;
   InbreedingAnalysis? _analysis;
 
   bool _isLoadingPedigrees = false;
@@ -80,7 +77,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               onChanged: (id) {
                 setState(() {
                   _selectedMaleId = id;
-                  _malePedigree = null;
                   _analysis = null;
                 });
                 if (id != null && _selectedFemaleId != null) {
@@ -102,7 +98,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               onChanged: (id) {
                 setState(() {
                   _selectedFemaleId = id;
-                  _femalePedigree = null;
                   _analysis = null;
                 });
                 if (id != null && _selectedMaleId != null) {
@@ -189,7 +184,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
-              value: selectedId,
+              initialValue: selectedId,
               decoration: const InputDecoration(
                 hintText: 'Выберите кролика',
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -359,7 +354,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),
@@ -396,7 +391,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                       style: const TextStyle(fontSize: 14, height: 1.5),
                     ),
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -408,8 +403,11 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
         if (riskLevel != InbreedingRiskLevel.critical)
           ElevatedButton.icon(
             onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final router = GoRouter.of(context);
+
               if (_selectedMaleId == null || _selectedFemaleId == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                messenger.showSnackBar(
                   const SnackBar(
                     content: Text('Выберите самца и самку'),
                     backgroundColor: AppColors.warning,
@@ -419,7 +417,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               }
 
               // Переход к форме создания случки с предзаполненными данными
-              final result = await context.push(
+              final result = await router.push(
                 '/breeding/new',
                 extra: {
                   'male_id': _selectedMaleId,
@@ -428,15 +426,15 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 },
               );
 
-              if (result == true && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (result == true) {
+                messenger.showSnackBar(
                   const SnackBar(
                     content: Text('Случка успешно запланирована'),
                     backgroundColor: AppColors.success,
                   ),
                 );
                 // Можно вернуться назад или обновить данные
-                context.pop();
+                router.pop();
               }
             },
             style: ElevatedButton.styleFrom(
@@ -487,8 +485,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       final analysis = InbreedingAnalyzer.analyze(malePedigree, femalePedigree);
 
       setState(() {
-        _malePedigree = malePedigree;
-        _femalePedigree = femalePedigree;
         _analysis = analysis;
         _isLoadingPedigrees = false;
       });

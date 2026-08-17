@@ -114,7 +114,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
               title: 'Основное',
               children: [
                 DropdownButtonFormField<int>(
-                  value: _selectedMotherId,
+                  initialValue: _selectedMotherId,
                   decoration: const InputDecoration(
                     labelText: 'Самка (мать) *',
                     prefixIcon: Icon(Icons.female),
@@ -344,6 +344,8 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
   Future<void> _createKitsDialog(
       BuildContext context, BirthModel birth) async {
     final cs = Theme.of(context).colorScheme;
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
     final mother = ref.read(rabbitsListProvider).rabbits.firstWhere(
           (r) => r.id == birth.motherId,
         );
@@ -410,34 +412,32 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
             namePrefix: namePrefixController.text,
           );
 
-      if (mounted) {
-        if (kits != null) {
-          await ref.read(rabbitsListProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Окрол зарегистрирован! Создано ${kits.length} крольчат'),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-          context.pop();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
-              backgroundColor: AppColors.warning,
-            ),
-          );
-        }
+      if (kits != null) {
+        await ref.read(rabbitsListProvider.notifier).refresh();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+                'Окрол зарегистрирован! Создано ${kits.length} крольчат'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+        router.pop();
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+                ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
       }
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+    } else {
+      messenger.showSnackBar(
         const SnackBar(content: Text('Окрол зарегистрирован')),
       );
-      context.pop();
+      router.pop();
     }
 
-    setState(() => _isSubmitting = false);
+    if (mounted) setState(() => _isSubmitting = false);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +19,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
 
+  // Таймер держим полем, чтобы отменить его при уходе с экрана: иначе
+  // отложенный переход срабатывает уже после того, как экран закрыли.
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
@@ -26,11 +32,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
-    _navigate();
+    _navigationTimer = Timer(const Duration(milliseconds: 1500), _navigate);
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
 
     // Ждём окончания инициализации аутентификации (максимум 5 секунд)
@@ -57,6 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _ctrl.dispose();
     super.dispose();
   }
