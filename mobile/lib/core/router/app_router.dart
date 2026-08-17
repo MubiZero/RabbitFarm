@@ -420,22 +420,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SettingsScreen(),
       ),
 
-      // Photos and Notes routes (placeholder screens)
-      GoRoute(
-        path: '/photos',
-        name: 'photos',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Фото - скоро будет доступно')),
-        ),
-      ),
-      GoRoute(
-        path: '/notes',
-        name: 'notes',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Заметки - скоро будет доступно')),
-        ),
-      ),
-
     ],
   );
 });
