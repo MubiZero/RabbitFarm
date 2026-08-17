@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_endpoints.dart';
 import 'api_interceptors.dart';
@@ -27,7 +27,7 @@ class ApiClient {
 
     // Add interceptors
     _dio.interceptors.add(AuthInterceptor(storage: _storage));
-    _dio.interceptors.add(LoggingInterceptor());
+    if (kDebugMode) _dio.interceptors.add(LoggingInterceptor());
     _dio.interceptors.add(ErrorInterceptor());
   }
 

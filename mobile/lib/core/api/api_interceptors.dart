@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Auth interceptor - adds JWT token to requests
@@ -80,30 +81,62 @@ class AuthInterceptor extends Interceptor {
 
 // Logging interceptor - logs requests and responses (dev mode only)
 class LoggingInterceptor extends Interceptor {
+  // Токены и пароли не должны попадать в системный лог даже в отладке:
+  // логи устройства читают сторонние приложения и краш-репортеры.
+  static const _redactedKeys = {
+    'authorization',
+    'password',
+    'current_password',
+    'new_password',
+    'password_confirmation',
+    'access_token',
+    'refresh_token',
+    'token',
+  };
+
+  static Object? _redact(Object? value) {
+    if (value is Map) {
+      return {
+        for (final entry in value.entries)
+          entry.key: _redactedKeys.contains(entry.key.toString().toLowerCase())
+              ? '***'
+              : _redact(entry.value),
+      };
+    }
+    if (value is List) return value.map(_redact).toList();
+    return value;
+  }
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
-    print('📤 Data: ${options.data}');
-    print('🔑 Headers: ${options.headers}');
+    if (kDebugMode) {
+      debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
+      debugPrint('📤 Data: ${_redact(options.data)}');
+      debugPrint('🔑 Headers: ${_redact(options.headers)}');
+    }
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
-      '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-    );
-    print('📥 Data: ${response.data}');
+    if (kDebugMode) {
+      debugPrint(
+        '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
+      );
+      debugPrint('📥 Data: ${_redact(response.data)}');
+    }
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print(
-      '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-    );
-    print('🚨 Message: ${err.message}');
-    print('📛 Response: ${err.response?.data}');
+    if (kDebugMode) {
+      debugPrint(
+        '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
+      );
+      debugPrint('🚨 Message: ${err.message}');
+      debugPrint('📛 Response: ${_redact(err.response?.data)}');
+    }
     handler.next(err);
   }
 }
