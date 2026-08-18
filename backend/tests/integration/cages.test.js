@@ -43,7 +43,10 @@ describe('Cages API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ number: 'A-001', type: 'single', capacity: 1 });
 
-      expect(res.status).toBe(400);
+      // 409 Conflict: обработка уникальных индексов живёт в общем errorHandler
+      // (37376eb). Этот тест остался с прежним 400 и с тех пор был красным.
+      expect(res.status).toBe(409);
+      expect(res.body.success).toBe(false);
     });
   });
 
