@@ -49,7 +49,7 @@ class BreedController {
       return ApiResponse.created(res, breed, 'Порода успешно создана');
     } catch (error) {
       if (error.message === 'BREED_NAME_EXISTS') {
-        return ApiResponse.badRequest(res, 'Порода с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Порода с таким названием уже существует');
       }
       next(error);
     }
@@ -69,7 +69,7 @@ class BreedController {
         return ApiResponse.notFound(res, 'Порода не найдена');
       }
       if (error.message === 'BREED_NAME_EXISTS') {
-        return ApiResponse.badRequest(res, 'Порода с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Порода с таким названием уже существует');
       }
       next(error);
     }

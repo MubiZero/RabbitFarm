@@ -89,14 +89,14 @@ describe('RabbitController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when TAG_ID_EXISTS', async () => {
+    it('should return 409 when TAG_ID_EXISTS', async () => {
       rabbitService.createRabbit.mockRejectedValue(new Error('TAG_ID_EXISTS'));
       const req = mockReq({ body: { tag_id: 'DUP' } });
       const res = mockRes();
 
       await rabbitController.create(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
       expect(mockNext).not.toHaveBeenCalled();
     });
 
@@ -270,14 +270,14 @@ describe('RabbitController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when TAG_ID_EXISTS', async () => {
+    it('should return 409 when TAG_ID_EXISTS', async () => {
       rabbitService.updateRabbit.mockRejectedValue(new Error('TAG_ID_EXISTS'));
       const req = mockReq({ params: { id: '1' }, body: { tag_id: 'DUP' } });
       const res = mockRes();
 
       await rabbitController.update(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
       expect(mockNext).not.toHaveBeenCalled();
     });
 

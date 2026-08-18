@@ -34,8 +34,10 @@ describe('Auth API', () => {
         .post('/api/v1/auth/register')
         .send({ email: 'dup@example.com', password: 'Password123!', full_name: 'User 2' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(409);
       expect(res.body.success).toBe(false);
+      // Экран регистрации по этому коду предлагает перейти ко входу.
+      expect(res.body.error.code).toBe('USER_EXISTS');
     });
 
     it('должен отклонять невалидный email', async () => {

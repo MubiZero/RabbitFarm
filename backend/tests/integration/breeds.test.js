@@ -41,7 +41,7 @@ describe('Breeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ name: 'Новозеландский белый' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(409);
     });
 
     it('должен отклонять создание без авторизации', async () => {
@@ -124,7 +124,7 @@ describe('Breeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ name: 'Калифорнийский' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(409);
     });
   });
 

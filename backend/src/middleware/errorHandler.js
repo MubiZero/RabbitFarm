@@ -26,8 +26,15 @@ const errorHandler = (err, req, res, next) => {
 
   // Sequelize unique constraint error
   if (err.name === 'SequelizeUniqueConstraintError') {
-    const field = err.errors[0]?.path;
-    return ApiResponse.error(res, `Resource already exists: ${field}`, 409, 'CONFLICT');
+    const field = err.errors?.[0]?.path;
+    // Имя колонки пользователю ни о чём не говорит — отдаём его в details,
+    // а сообщение держим на языке остальных ответов API.
+    return ApiResponse.conflict(
+      res,
+      'Такая запись уже существует',
+      'CONFLICT',
+      field ? [{ field, message: 'Значение должно быть уникальным' }] : null
+    );
   }
 
   // Sequelize foreign key constraint error

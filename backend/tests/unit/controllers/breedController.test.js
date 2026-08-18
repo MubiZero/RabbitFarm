@@ -84,11 +84,11 @@ describe('BreedController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: breed }));
     });
 
-    it('should return 400 on BREED_NAME_EXISTS', async () => {
+    it('should return 409 on BREED_NAME_EXISTS', async () => {
       breedService.createBreed.mockRejectedValue(new Error('BREED_NAME_EXISTS'));
       const res = mockRes();
       await breedController.create(mockReq({ body: { name: 'Дубликат' } }), res, mockNext);
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
       expect(mockNext).not.toHaveBeenCalled();
     });
 
@@ -120,11 +120,11 @@ describe('BreedController', () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
 
-    it('should return 400 on BREED_NAME_EXISTS', async () => {
+    it('should return 409 on BREED_NAME_EXISTS', async () => {
       breedService.updateBreed.mockRejectedValue(new Error('BREED_NAME_EXISTS'));
       const res = mockRes();
       await breedController.update(mockReq({ params: { id: '1' } }), res, mockNext);
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
     });
 
     it('should call next on unexpected error', async () => {

@@ -32,7 +32,7 @@ class RabbitController {
         return ApiResponse.notFound(res, 'Клетка не найдена');
       }
       if (error.message === 'TAG_ID_EXISTS') {
-        return ApiResponse.badRequest(res, 'Кролик с таким ID клейма уже существует');
+        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует');
       }
       next(error);
     }
@@ -107,7 +107,7 @@ class RabbitController {
         return ApiResponse.notFound(res, 'Клетка не найдена');
       }
       if (error.message === 'TAG_ID_EXISTS') {
-        return ApiResponse.badRequest(res, 'Кролик с таким ID клейма уже существует');
+        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует');
       }
       if (error.message === 'CANNOT_CHANGE_SEX_WITH_HISTORY') {
         return ApiResponse.badRequest(res, 'Нельзя менять пол после того, как у кролика появилось потомство или история случек');

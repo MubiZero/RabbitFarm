@@ -62,7 +62,11 @@ describe('errorHandler middleware', () => {
     expect(res.status).toHaveBeenCalledWith(409);
     const jsonArg = res.json.mock.calls[0][0];
     expect(jsonArg.error.code).toBe('CONFLICT');
-    expect(jsonArg.error.message).toContain('Resource already exists');
+    expect(jsonArg.error.message).toBe('Такая запись уже существует');
+    // Имя поля остаётся машиночитаемым, но не попадает в текст для человека.
+    expect(jsonArg.error.details).toEqual([
+      { field: 'email', message: 'Значение должно быть уникальным' }
+    ]);
   });
 
   it('should handle SequelizeForeignKeyConstraintError', () => {

@@ -50,7 +50,13 @@ const {
  *       201:
  *         description: Пользователь зарегистрирован
  *       400:
- *         description: Пользователь уже существует или невалидные данные
+ *         description: Невалидные данные
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Пользователь с таким email уже существует (code USER_EXISTS)
  *         content:
  *           application/json:
  *             schema:

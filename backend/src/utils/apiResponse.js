@@ -113,6 +113,14 @@ class ApiResponse {
   }
 
   /**
+   * Conflict response (409) — нарушение уникальности: сущность уже существует.
+   * @param {String} code - уточняющий код, когда клиенту важно отличить случай
+   */
+  static conflict(res, message = 'Такая запись уже существует', code = 'CONFLICT', details = null) {
+    return this.error(res, message, 409, code, details);
+  }
+
+  /**
    * Validation error response (422)
    */
   static validationError(res, details, message = 'Validation failed') {

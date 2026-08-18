@@ -46,18 +46,19 @@ describe('AuthController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
     });
 
-    it('should return 400 when USER_EXISTS error thrown', async () => {
+    it('should return 409 when USER_EXISTS error thrown', async () => {
       authService.register.mockRejectedValue(new Error('USER_EXISTS'));
       const req = mockReq({ body: { email: 'a@b.com' } });
       const res = mockRes();
 
       await authController.register(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json.mock.calls[0][0].error.code).toBe('USER_EXISTS');
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when SequelizeUniqueConstraintError thrown', async () => {
+    it('should return 409 when SequelizeUniqueConstraintError thrown', async () => {
       const err = new Error('Unique');
       err.name = 'SequelizeUniqueConstraintError';
       authService.register.mockRejectedValue(err);
@@ -66,7 +67,8 @@ describe('AuthController', () => {
 
       await authController.register(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json.mock.calls[0][0].error.code).toBe('USER_EXISTS');
       expect(mockNext).not.toHaveBeenCalled();
     });
 
