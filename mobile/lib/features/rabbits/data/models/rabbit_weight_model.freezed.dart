@@ -26,7 +26,7 @@ mixin _$RabbitWeight {
   @JsonKey(name: 'rabbit_id')
   @IntConverter()
   int get rabbitId => throw _privateConstructorUsedError;
-  @WeightConverter()
+  @DoubleConverter()
   double get weight => throw _privateConstructorUsedError;
   @JsonKey(name: 'measured_at')
   DateTime get measuredAt => throw _privateConstructorUsedError;
@@ -54,7 +54,7 @@ abstract class $RabbitWeightCopyWith<$Res> {
   $Res call({
     @IntConverter() int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
-    @WeightConverter() double weight,
+    @DoubleConverter() double weight,
     @JsonKey(name: 'measured_at') DateTime measuredAt,
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -127,7 +127,7 @@ abstract class _$$RabbitWeightImplCopyWith<$Res>
   $Res call({
     @IntConverter() int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
-    @WeightConverter() double weight,
+    @DoubleConverter() double weight,
     @JsonKey(name: 'measured_at') DateTime measuredAt,
     String? notes,
     @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -192,7 +192,7 @@ class _$RabbitWeightImpl implements _RabbitWeight {
   const _$RabbitWeightImpl({
     @IntConverter() required this.id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required this.rabbitId,
-    @WeightConverter() required this.weight,
+    @DoubleConverter() required this.weight,
     @JsonKey(name: 'measured_at') required this.measuredAt,
     this.notes,
     @JsonKey(name: 'created_at') this.createdAt,
@@ -209,7 +209,7 @@ class _$RabbitWeightImpl implements _RabbitWeight {
   @IntConverter()
   final int rabbitId;
   @override
-  @WeightConverter()
+  @DoubleConverter()
   final double weight;
   @override
   @JsonKey(name: 'measured_at')
@@ -271,7 +271,7 @@ abstract class _RabbitWeight implements RabbitWeight {
   const factory _RabbitWeight({
     @IntConverter() required final int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required final int rabbitId,
-    @WeightConverter() required final double weight,
+    @DoubleConverter() required final double weight,
     @JsonKey(name: 'measured_at') required final DateTime measuredAt,
     final String? notes,
     @JsonKey(name: 'created_at') final DateTime? createdAt,
@@ -288,7 +288,7 @@ abstract class _RabbitWeight implements RabbitWeight {
   @IntConverter()
   int get rabbitId;
   @override
-  @WeightConverter()
+  @DoubleConverter()
   double get weight;
   @override
   @JsonKey(name: 'measured_at')

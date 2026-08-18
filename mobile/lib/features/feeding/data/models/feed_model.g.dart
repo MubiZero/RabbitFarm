@@ -7,14 +7,19 @@ part of 'feed_model.dart';
 // **************************************************************************
 
 _$FeedImpl _$$FeedImplFromJson(Map<String, dynamic> json) => _$FeedImpl(
-  id: const IntConverter().fromJson(json['id']),
+  id: const IntConverter().fromJson(json['id'] as Object),
   name: json['name'] as String,
   type: $enumDecode(_$FeedTypeEnumMap, json['type']),
   brand: json['brand'] as String?,
   unit: $enumDecodeNullable(_$FeedUnitEnumMap, json['unit']) ?? FeedUnit.kg,
-  currentStock: const DoubleConverter().fromJson(json['current_stock']),
-  minStock: const DoubleConverter().fromJson(json['min_stock']),
-  costPerUnit: const DoubleConverter().fromJson(json['cost_per_unit']),
+  currentStock: const DoubleConverter().fromJson(
+    json['current_stock'] as Object,
+  ),
+  minStock: const DoubleConverter().fromJson(json['min_stock'] as Object),
+  costPerUnit: _$JsonConverterFromJson<Object, double>(
+    json['cost_per_unit'],
+    const DoubleConverter().fromJson,
+  ),
   notes: json['notes'] as String?,
   createdAt: json['created_at'] == null
       ? null
@@ -33,7 +38,7 @@ Map<String, dynamic> _$$FeedImplToJson(_$FeedImpl instance) =>
       'unit': _$FeedUnitEnumMap[instance.unit]!,
       'current_stock': const DoubleConverter().toJson(instance.currentStock),
       'min_stock': const DoubleConverter().toJson(instance.minStock),
-      'cost_per_unit': _$JsonConverterToJson<dynamic, double>(
+      'cost_per_unit': _$JsonConverterToJson<Object, double>(
         instance.costPerUnit,
         const DoubleConverter().toJson,
       ),
@@ -56,6 +61,11 @@ const _$FeedUnitEnumMap = {
   FeedUnit.liter: 'liter',
   FeedUnit.piece: 'piece',
 };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
 
 Json? _$JsonConverterToJson<Json, Value>(
   Value? value,
@@ -167,10 +177,12 @@ Map<String, dynamic> _$$FeedTypeStatsImplToJson(_$FeedTypeStatsImpl instance) =>
 
 _$LowStockItemImpl _$$LowStockItemImplFromJson(Map<String, dynamic> json) =>
     _$LowStockItemImpl(
-      id: const IntConverter().fromJson(json['id']),
+      id: const IntConverter().fromJson(json['id'] as Object),
       name: json['name'] as String,
-      currentStock: const DoubleConverter().fromJson(json['current_stock']),
-      minStock: const DoubleConverter().fromJson(json['min_stock']),
+      currentStock: const DoubleConverter().fromJson(
+        json['current_stock'] as Object,
+      ),
+      minStock: const DoubleConverter().fromJson(json['min_stock'] as Object),
       unit: json['unit'] as String,
     );
 

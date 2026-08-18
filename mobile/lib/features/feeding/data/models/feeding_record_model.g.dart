@@ -8,11 +8,11 @@ part of 'feeding_record_model.dart';
 
 _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
     _$FeedingRecordImpl(
-      id: const IntConverter().fromJson(json['id']),
+      id: const IntConverter().fromJson(json['id'] as Object),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-      feedId: const IntConverter().fromJson(json['feed_id']),
+      feedId: const IntConverter().fromJson(json['feed_id'] as Object),
       cageId: const NullableIntConverter().fromJson(json['cage_id']),
-      quantity: const DoubleConverter().fromJson(json['quantity']),
+      quantity: const DoubleConverter().fromJson(json['quantity'] as Object),
       fedAt: DateTime.parse(json['fed_at'] as String),
       fedBy: const NullableIntConverter().fromJson(json['fed_by']),
       notes: json['notes'] as String?,

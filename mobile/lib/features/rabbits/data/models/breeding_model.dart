@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'rabbit_model.dart';
+import '../../../../core/json/int_converter.dart';
 
 part 'breeding_model.freezed.dart';
 
@@ -31,9 +32,9 @@ class BreedingModel with _$BreedingModel {
 
   factory BreedingModel.fromJson(Map<String, dynamic> json) {
     return BreedingModel(
-      id: _parseInt(json['id']),
-      maleId: _parseInt(json['male_id']),
-      femaleId: _parseInt(json['female_id']),
+      id: intFromJson(json['id']),
+      maleId: intFromJson(json['male_id']),
+      femaleId: intFromJson(json['female_id']),
       breedingDate: json['breeding_date']?.toString() ?? '',
       status: json['status']?.toString() ?? 'planned',
       palpationDate: json['palpation_date']?.toString(),
@@ -57,13 +58,6 @@ class BreedingModel with _$BreedingModel {
           ? List<String>.from(json['common_ancestors'] as List)
           : null,
     );
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value is int) return value;
-    if (value is String) return int.parse(value);
-    if (value is double) return value.toInt();
-    throw FormatException('Cannot parse int from $value');
   }
 
   /// Проверяет что вложенный объект кролика содержит полный набор

@@ -32,9 +32,9 @@ Map<String, dynamic> _$$DashboardReportImplToJson(
 
 _$RabbitStatsImpl _$$RabbitStatsImplFromJson(Map<String, dynamic> json) =>
     _$RabbitStatsImpl(
-      total: const IntConverter().fromJson(json['total']),
-      male: const IntConverter().fromJson(json['male']),
-      female: const IntConverter().fromJson(json['female']),
+      total: const IntConverter().fromJson(json['total'] as Object),
+      male: const IntConverter().fromJson(json['male'] as Object),
+      female: const IntConverter().fromJson(json['female'] as Object),
       history:
           (json['history'] as List<dynamic>?)
               ?.map((e) => (e as num).toInt())
@@ -52,9 +52,9 @@ Map<String, dynamic> _$$RabbitStatsImplToJson(_$RabbitStatsImpl instance) =>
 
 _$CageStatsImpl _$$CageStatsImplFromJson(Map<String, dynamic> json) =>
     _$CageStatsImpl(
-      total: const IntConverter().fromJson(json['total']),
-      occupied: const IntConverter().fromJson(json['occupied']),
-      available: const IntConverter().fromJson(json['available']),
+      total: const IntConverter().fromJson(json['total'] as Object),
+      occupied: const IntConverter().fromJson(json['occupied'] as Object),
+      available: const IntConverter().fromJson(json['available'] as Object),
     );
 
 Map<String, dynamic> _$$CageStatsImplToJson(_$CageStatsImpl instance) =>
@@ -67,10 +67,10 @@ Map<String, dynamic> _$$CageStatsImplToJson(_$CageStatsImpl instance) =>
 _$HealthStatsImpl _$$HealthStatsImplFromJson(Map<String, dynamic> json) =>
     _$HealthStatsImpl(
       upcomingVaccinations: const IntConverter().fromJson(
-        json['upcomingVaccinations'],
+        json['upcomingVaccinations'] as Object,
       ),
       overdueVaccinations: const IntConverter().fromJson(
-        json['overdueVaccinations'],
+        json['overdueVaccinations'] as Object,
       ),
     );
 
@@ -86,9 +86,15 @@ Map<String, dynamic> _$$HealthStatsImplToJson(_$HealthStatsImpl instance) =>
 
 _$FinanceStatsImpl _$$FinanceStatsImplFromJson(Map<String, dynamic> json) =>
     _$FinanceStatsImpl(
-      income30days: const DoubleConverter().fromJson(json['income30days']),
-      expenses30days: const DoubleConverter().fromJson(json['expenses30days']),
-      profit30days: const DoubleConverter().fromJson(json['profit30days']),
+      income30days: const DoubleConverter().fromJson(
+        json['income30days'] as Object,
+      ),
+      expenses30days: const DoubleConverter().fromJson(
+        json['expenses30days'] as Object,
+      ),
+      profit30days: const DoubleConverter().fromJson(
+        json['profit30days'] as Object,
+      ),
     );
 
 Map<String, dynamic> _$$FinanceStatsImplToJson(_$FinanceStatsImpl instance) =>
@@ -100,9 +106,9 @@ Map<String, dynamic> _$$FinanceStatsImplToJson(_$FinanceStatsImpl instance) =>
 
 _$TaskStatsImpl _$$TaskStatsImplFromJson(Map<String, dynamic> json) =>
     _$TaskStatsImpl(
-      pending: const IntConverter().fromJson(json['pending']),
-      overdue: const IntConverter().fromJson(json['overdue']),
-      urgent: const IntConverter().fromJson(json['urgent']),
+      pending: const IntConverter().fromJson(json['pending'] as Object),
+      overdue: const IntConverter().fromJson(json['overdue'] as Object),
+      urgent: const IntConverter().fromJson(json['urgent'] as Object),
     );
 
 Map<String, dynamic> _$$TaskStatsImplToJson(_$TaskStatsImpl instance) =>
@@ -114,7 +120,9 @@ Map<String, dynamic> _$$TaskStatsImplToJson(_$TaskStatsImpl instance) =>
 
 _$InventoryStatsImpl _$$InventoryStatsImplFromJson(Map<String, dynamic> json) =>
     _$InventoryStatsImpl(
-      lowStockFeeds: const IntConverter().fromJson(json['lowStockFeeds']),
+      lowStockFeeds: const IntConverter().fromJson(
+        json['lowStockFeeds'] as Object,
+      ),
     );
 
 Map<String, dynamic> _$$InventoryStatsImplToJson(
@@ -125,7 +133,9 @@ Map<String, dynamic> _$$InventoryStatsImplToJson(
 
 _$BreedingStatsImpl _$$BreedingStatsImplFromJson(Map<String, dynamic> json) =>
     _$BreedingStatsImpl(
-      recentBirths: const IntConverter().fromJson(json['recentBirths']),
+      recentBirths: const IntConverter().fromJson(
+        json['recentBirths'] as Object,
+      ),
       history:
           (json['history'] as List<dynamic>?)
               ?.map((e) => (e as num).toInt())
@@ -171,7 +181,9 @@ Map<String, dynamic> _$$ReportPeriodImplToJson(_$ReportPeriodImpl instance) =>
 
 _$PopulationDataImpl _$$PopulationDataImplFromJson(Map<String, dynamic> json) =>
     _$PopulationDataImpl(
-      totalRabbits: const IntConverter().fromJson(json['total_rabbits']),
+      totalRabbits: const IntConverter().fromJson(
+        json['total_rabbits'] as Object,
+      ),
       byBreed: (json['by_breed'] as List<dynamic>)
           .map((e) => BreedCount.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -186,8 +198,8 @@ Map<String, dynamic> _$$PopulationDataImplToJson(
 
 _$BreedCountImpl _$$BreedCountImplFromJson(Map<String, dynamic> json) =>
     _$BreedCountImpl(
-      breedId: const IntConverter().fromJson(json['breed_id']),
-      count: const IntConverter().fromJson(json['count']),
+      breedId: const IntConverter().fromJson(json['breed_id'] as Object),
+      count: const IntConverter().fromJson(json['count'] as Object),
     );
 
 Map<String, dynamic> _$$BreedCountImplToJson(_$BreedCountImpl instance) =>
@@ -213,8 +225,10 @@ Map<String, dynamic> _$$FinancialDataImplToJson(_$FinancialDataImpl instance) =>
 _$FinancialSummaryImpl _$$FinancialSummaryImplFromJson(
   Map<String, dynamic> json,
 ) => _$FinancialSummaryImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income']),
-  totalExpenses: const DoubleConverter().fromJson(json['total_expenses']),
+  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
+  totalExpenses: const DoubleConverter().fromJson(
+    json['total_expenses'] as Object,
+  ),
 );
 
 Map<String, dynamic> _$$FinancialSummaryImplToJson(
@@ -226,8 +240,12 @@ Map<String, dynamic> _$$FinancialSummaryImplToJson(
 
 _$HealthDataImpl _$$HealthDataImplFromJson(Map<String, dynamic> json) =>
     _$HealthDataImpl(
-      vaccinations: const IntConverter().fromJson(json['vaccinations']),
-      medicalRecords: const IntConverter().fromJson(json['medical_records']),
+      vaccinations: const IntConverter().fromJson(
+        json['vaccinations'] as Object,
+      ),
+      medicalRecords: const IntConverter().fromJson(
+        json['medical_records'] as Object,
+      ),
     );
 
 Map<String, dynamic> _$$HealthDataImplToJson(_$HealthDataImpl instance) =>
@@ -238,8 +256,8 @@ Map<String, dynamic> _$$HealthDataImplToJson(_$HealthDataImpl instance) =>
 
 _$BreedingDataImpl _$$BreedingDataImplFromJson(Map<String, dynamic> json) =>
     _$BreedingDataImpl(
-      breedings: const IntConverter().fromJson(json['breedings']),
-      births: const IntConverter().fromJson(json['births']),
+      breedings: const IntConverter().fromJson(json['breedings'] as Object),
+      births: const IntConverter().fromJson(json['births'] as Object),
     );
 
 Map<String, dynamic> _$$BreedingDataImplToJson(_$BreedingDataImpl instance) =>
@@ -251,10 +269,10 @@ Map<String, dynamic> _$$BreedingDataImplToJson(_$BreedingDataImpl instance) =>
 _$FeedingDataImpl _$$FeedingDataImplFromJson(Map<String, dynamic> json) =>
     _$FeedingDataImpl(
       totalFeedingRecords: const IntConverter().fromJson(
-        json['total_feeding_records'],
+        json['total_feeding_records'] as Object,
       ),
       totalFeedConsumption: const DoubleConverter().fromJson(
-        json['total_feed_consumption'],
+        json['total_feed_consumption'] as Object,
       ),
     );
 
@@ -304,7 +322,7 @@ _$VaccineTypeCountImpl _$$VaccineTypeCountImplFromJson(
   Map<String, dynamic> json,
 ) => _$VaccineTypeCountImpl(
   vaccineName: json['vaccine_name'] as String,
-  count: const IntConverter().fromJson(json['count']),
+  count: const IntConverter().fromJson(json['count'] as Object),
 );
 
 Map<String, dynamic> _$$VaccineTypeCountImplToJson(
@@ -330,7 +348,7 @@ _$RecordTypeCountImpl _$$RecordTypeCountImplFromJson(
   Map<String, dynamic> json,
 ) => _$RecordTypeCountImpl(
   recordType: json['record_type'] as String,
-  count: const IntConverter().fromJson(json['count']),
+  count: const IntConverter().fromJson(json['count'] as Object),
 );
 
 Map<String, dynamic> _$$RecordTypeCountImplToJson(
@@ -361,9 +379,11 @@ Map<String, dynamic> _$$FinancialReportImplToJson(
 _$FinancialReportSummaryImpl _$$FinancialReportSummaryImplFromJson(
   Map<String, dynamic> json,
 ) => _$FinancialReportSummaryImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income']),
-  totalExpenses: const DoubleConverter().fromJson(json['total_expenses']),
-  netProfit: const DoubleConverter().fromJson(json['net_profit']),
+  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
+  totalExpenses: const DoubleConverter().fromJson(
+    json['total_expenses'] as Object,
+  ),
+  netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
 );
 
 Map<String, dynamic> _$$FinancialReportSummaryImplToJson(
@@ -378,8 +398,8 @@ _$CategoryDataImpl _$$CategoryDataImplFromJson(Map<String, dynamic> json) =>
     _$CategoryDataImpl(
       type: json['type'] as String,
       category: json['category'] as String,
-      total: const DoubleConverter().fromJson(json['total']),
-      count: const IntConverter().fromJson(json['count']),
+      total: const DoubleConverter().fromJson(json['total'] as Object),
+      count: const IntConverter().fromJson(json['count'] as Object),
     );
 
 Map<String, dynamic> _$$CategoryDataImplToJson(_$CategoryDataImpl instance) =>

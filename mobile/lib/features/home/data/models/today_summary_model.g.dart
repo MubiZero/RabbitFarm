@@ -28,9 +28,13 @@ Map<String, dynamic> _$$TodaySummaryImplToJson(_$TodaySummaryImpl instance) =>
 
 _$TasksSummaryImpl _$$TasksSummaryImplFromJson(Map<String, dynamic> json) =>
     _$TasksSummaryImpl(
-      totalToday: const IntConverter().fromJson(json['total_today']),
-      completedToday: const IntConverter().fromJson(json['completed_today']),
-      pendingToday: const IntConverter().fromJson(json['pending_today']),
+      totalToday: const IntConverter().fromJson(json['total_today'] as Object),
+      completedToday: const IntConverter().fromJson(
+        json['completed_today'] as Object,
+      ),
+      pendingToday: const IntConverter().fromJson(
+        json['pending_today'] as Object,
+      ),
     );
 
 Map<String, dynamic> _$$TasksSummaryImplToJson(_$TasksSummaryImpl instance) =>
@@ -42,7 +46,7 @@ Map<String, dynamic> _$$TasksSummaryImplToJson(_$TasksSummaryImpl instance) =>
 
 _$FeedingSummaryImpl _$$FeedingSummaryImplFromJson(Map<String, dynamic> json) =>
     _$FeedingSummaryImpl(
-      countToday: const IntConverter().fromJson(json['count_today']),
+      countToday: const IntConverter().fromJson(json['count_today'] as Object),
     );
 
 Map<String, dynamic> _$$FeedingSummaryImplToJson(

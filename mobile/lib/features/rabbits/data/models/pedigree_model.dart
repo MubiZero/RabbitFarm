@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/int_converter.dart';
 
 part 'pedigree_model.freezed.dart';
 
@@ -22,7 +23,7 @@ class PedigreeModel with _$PedigreeModel {
   /// Кастомная десериализация с явной обработкой null значений
   factory PedigreeModel.fromJson(Map<String, dynamic> json) {
     return PedigreeModel(
-      id: _parseInt(json['id']),
+      id: intFromJson(json['id']),
       name: json['name']?.toString() ?? 'Без имени',
       tagId: json['tag_id']?.toString(),
       sex: json['sex']?.toString() ?? 'unknown',
@@ -38,10 +39,4 @@ class PedigreeModel with _$PedigreeModel {
   }
 
   /// Вспомогательная функция для парсинга ID
-  static int _parseInt(dynamic value) {
-    if (value is int) return value;
-    if (value is String) return int.parse(value);
-    if (value is double) return value.toInt();
-    throw FormatException('Cannot parse int from $value');
-  }
 }

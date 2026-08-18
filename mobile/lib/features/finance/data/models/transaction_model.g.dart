@@ -8,10 +8,10 @@ part of 'transaction_model.dart';
 
 _$TransactionImpl _$$TransactionImplFromJson(Map<String, dynamic> json) =>
     _$TransactionImpl(
-      id: const IntConverter().fromJson(json['id']),
+      id: const IntConverter().fromJson(json['id'] as Object),
       type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
       category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
-      amount: const DoubleConverter().fromJson(json['amount']),
+      amount: const DoubleConverter().fromJson(json['amount'] as Object),
       transactionDate: DateTime.parse(json['transaction_date'] as String),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       description: json['description'] as String?,
@@ -110,10 +110,14 @@ Map<String, dynamic> _$$TransactionUpdateImplToJson(
 _$FinancialStatisticsImpl _$$FinancialStatisticsImplFromJson(
   Map<String, dynamic> json,
 ) => _$FinancialStatisticsImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income']),
-  totalExpenses: const DoubleConverter().fromJson(json['total_expenses']),
-  netProfit: const DoubleConverter().fromJson(json['net_profit']),
-  totalTransactions: const IntConverter().fromJson(json['total_transactions']),
+  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
+  totalExpenses: const DoubleConverter().fromJson(
+    json['total_expenses'] as Object,
+  ),
+  netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
+  totalTransactions: const IntConverter().fromJson(
+    json['total_transactions'] as Object,
+  ),
   incomeByCategory: (json['income_by_category'] as List<dynamic>)
       .map((e) => CategoryStatistics.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -141,8 +145,8 @@ _$CategoryStatisticsImpl _$$CategoryStatisticsImplFromJson(
   Map<String, dynamic> json,
 ) => _$CategoryStatisticsImpl(
   category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
-  total: const DoubleConverter().fromJson(json['total']),
-  count: const IntConverter().fromJson(json['count']),
+  total: const DoubleConverter().fromJson(json['total'] as Object),
+  count: const IntConverter().fromJson(json['count'] as Object),
 );
 
 Map<String, dynamic> _$$CategoryStatisticsImplToJson(
@@ -171,8 +175,8 @@ Map<String, dynamic> _$$MonthlyReportImplToJson(_$MonthlyReportImpl instance) =>
 
 _$ReportPeriodImpl _$$ReportPeriodImplFromJson(Map<String, dynamic> json) =>
     _$ReportPeriodImpl(
-      year: const IntConverter().fromJson(json['year']),
-      month: const IntConverter().fromJson(json['month']),
+      year: const IntConverter().fromJson(json['year'] as Object),
+      month: const IntConverter().fromJson(json['month'] as Object),
       startDate: DateTime.parse(json['start_date'] as String),
       endDate: DateTime.parse(json['end_date'] as String),
     );
@@ -187,11 +191,15 @@ Map<String, dynamic> _$$ReportPeriodImplToJson(_$ReportPeriodImpl instance) =>
 
 _$ReportSummaryImpl _$$ReportSummaryImplFromJson(Map<String, dynamic> json) =>
     _$ReportSummaryImpl(
-      totalIncome: const DoubleConverter().fromJson(json['total_income']),
-      totalExpenses: const DoubleConverter().fromJson(json['total_expenses']),
-      netProfit: const DoubleConverter().fromJson(json['net_profit']),
+      totalIncome: const DoubleConverter().fromJson(
+        json['total_income'] as Object,
+      ),
+      totalExpenses: const DoubleConverter().fromJson(
+        json['total_expenses'] as Object,
+      ),
+      netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
       transactionCount: const IntConverter().fromJson(
-        json['transaction_count'],
+        json['transaction_count'] as Object,
       ),
     );
 
@@ -223,9 +231,11 @@ Map<String, dynamic> _$$RabbitTransactionsSummaryImplToJson(
 _$TransactionSummaryImpl _$$TransactionSummaryImplFromJson(
   Map<String, dynamic> json,
 ) => _$TransactionSummaryImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income']),
-  totalExpenses: const DoubleConverter().fromJson(json['total_expenses']),
-  netProfit: const DoubleConverter().fromJson(json['net_profit']),
+  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
+  totalExpenses: const DoubleConverter().fromJson(
+    json['total_expenses'] as Object,
+  ),
+  netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
 );
 
 Map<String, dynamic> _$$TransactionSummaryImplToJson(

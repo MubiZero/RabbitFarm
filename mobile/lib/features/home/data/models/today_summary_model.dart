@@ -1,23 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../tasks/data/models/task_model.dart';
+import '../../../../core/json/int_converter.dart';
 
 part 'today_summary_model.freezed.dart';
 part 'today_summary_model.g.dart';
-
-/// Custom converter for int values
-class IntConverter implements JsonConverter<int, dynamic> {
-  const IntConverter();
-
-  @override
-  int fromJson(dynamic value) {
-    if (value is int) return value;
-    if (value is String) return int.parse(value);
-    throw ArgumentError('Cannot convert $value to int');
-  }
-
-  @override
-  int toJson(int value) => value;
-}
 
 /// Today Summary Model - summary of today's activities
 @freezed

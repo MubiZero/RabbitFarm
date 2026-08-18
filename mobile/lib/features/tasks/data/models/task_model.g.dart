@@ -7,7 +7,7 @@ part of 'task_model.dart';
 // **************************************************************************
 
 _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
-  id: const IntConverter().fromJson(json['id']),
+  id: const IntConverter().fromJson(json['id'] as Object),
   title: json['title'] as String,
   description: json['description'] as String?,
   type: $enumDecode(_$TaskTypeEnumMap, json['type']),
@@ -164,21 +164,28 @@ Map<String, dynamic> _$$TaskUpdateImplToJson(_$TaskUpdateImpl instance) =>
       'notes': instance.notes,
     };
 
-_$TaskStatisticsImpl _$$TaskStatisticsImplFromJson(Map<String, dynamic> json) =>
-    _$TaskStatisticsImpl(
-      totalPending: const IntConverter().fromJson(json['total_pending']),
-      totalInProgress: const IntConverter().fromJson(json['total_in_progress']),
-      totalCompleted: const IntConverter().fromJson(json['total_completed']),
-      totalCancelled: const IntConverter().fromJson(json['total_cancelled']),
-      overdueCount: const IntConverter().fromJson(json['overdue_count']),
-      todayCount: const IntConverter().fromJson(json['today_count']),
-      tasksByType: (json['tasks_by_type'] as List<dynamic>)
-          .map((e) => TaskTypeCount.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      tasksByPriority: (json['tasks_by_priority'] as List<dynamic>)
-          .map((e) => TaskPriorityCount.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+_$TaskStatisticsImpl _$$TaskStatisticsImplFromJson(
+  Map<String, dynamic> json,
+) => _$TaskStatisticsImpl(
+  totalPending: const IntConverter().fromJson(json['total_pending'] as Object),
+  totalInProgress: const IntConverter().fromJson(
+    json['total_in_progress'] as Object,
+  ),
+  totalCompleted: const IntConverter().fromJson(
+    json['total_completed'] as Object,
+  ),
+  totalCancelled: const IntConverter().fromJson(
+    json['total_cancelled'] as Object,
+  ),
+  overdueCount: const IntConverter().fromJson(json['overdue_count'] as Object),
+  todayCount: const IntConverter().fromJson(json['today_count'] as Object),
+  tasksByType: (json['tasks_by_type'] as List<dynamic>)
+      .map((e) => TaskTypeCount.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  tasksByPriority: (json['tasks_by_priority'] as List<dynamic>)
+      .map((e) => TaskPriorityCount.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$$TaskStatisticsImplToJson(
   _$TaskStatisticsImpl instance,
@@ -196,7 +203,7 @@ Map<String, dynamic> _$$TaskStatisticsImplToJson(
 _$TaskTypeCountImpl _$$TaskTypeCountImplFromJson(Map<String, dynamic> json) =>
     _$TaskTypeCountImpl(
       type: $enumDecode(_$TaskTypeEnumMap, json['type']),
-      count: const IntConverter().fromJson(json['count']),
+      count: const IntConverter().fromJson(json['count'] as Object),
     );
 
 Map<String, dynamic> _$$TaskTypeCountImplToJson(_$TaskTypeCountImpl instance) =>
@@ -209,7 +216,7 @@ _$TaskPriorityCountImpl _$$TaskPriorityCountImplFromJson(
   Map<String, dynamic> json,
 ) => _$TaskPriorityCountImpl(
   priority: $enumDecode(_$TaskPriorityEnumMap, json['priority']),
-  count: const IntConverter().fromJson(json['count']),
+  count: const IntConverter().fromJson(json['count'] as Object),
 );
 
 Map<String, dynamic> _$$TaskPriorityCountImplToJson(

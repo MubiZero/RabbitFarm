@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'rabbit_model.dart';
 import 'breeding_model.dart';
+import '../../../../core/json/int_converter.dart';
 
 part 'birth_model.freezed.dart';
 
@@ -34,13 +35,13 @@ class BirthModel with _$BirthModel {
   factory BirthModel.fromJson(Map<String, dynamic> json) {
     try {
       return BirthModel(
-        id: _parseInt(json['id']),
-        breedingId: json['breeding_id'] != null ? _parseInt(json['breeding_id']) : null,
-        motherId: _parseInt(json['mother_id']),
+        id: intFromJson(json['id']),
+        breedingId: json['breeding_id'] != null ? intFromJson(json['breeding_id']) : null,
+        motherId: intFromJson(json['mother_id']),
         birthDate: json['birth_date']?.toString() ?? '',
-        kitsBornAlive: _parseInt(json['kits_born_alive'] ?? 0),
-        kitsBornDead: _parseInt(json['kits_born_dead'] ?? 0),
-        kitsWeaned: json['kits_weaned'] != null ? _parseInt(json['kits_weaned']) : null,
+        kitsBornAlive: intFromJson(json['kits_born_alive'] ?? 0),
+        kitsBornDead: intFromJson(json['kits_born_dead'] ?? 0),
+        kitsWeaned: json['kits_weaned'] != null ? intFromJson(json['kits_weaned']) : null,
         weaningDate: json['weaning_date']?.toString(),
         complications: json['complications']?.toString(),
         notes: json['notes']?.toString(),
@@ -66,13 +67,6 @@ class BirthModel with _$BirthModel {
       debugPrint('JSON data: $json');
       rethrow;
     }
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value is int) return value;
-    if (value is String) return int.parse(value);
-    if (value is double) return value.toInt();
-    throw FormatException('Cannot parse int from $value');
   }
 
   /// Проверяет, что вложенный объект кролика содержит полный набор

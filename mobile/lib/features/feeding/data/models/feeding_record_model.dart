@@ -2,6 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'feed_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../cages/data/models/cage_model.dart';
+import '../../../../core/json/int_converter.dart';
+import '../../../../core/json/double_converter.dart';
 
 part 'feeding_record_model.freezed.dart';
 part 'feeding_record_model.g.dart';
@@ -92,52 +94,3 @@ class FeedingByFeed with _$FeedingByFeed {
       _$FeedingByFeedFromJson(json);
 }
 
-/// Custom converter for int values that might come as strings
-class IntConverter implements JsonConverter<int, dynamic> {
-  const IntConverter();
-
-  @override
-  int fromJson(dynamic value) {
-    if (value is int) return value;
-    if (value is String) return int.parse(value);
-    throw ArgumentError('Cannot convert $value to int');
-  }
-
-  @override
-  dynamic toJson(int value) => value;
-}
-
-/// Custom converter for nullable int values
-class NullableIntConverter implements JsonConverter<int?, dynamic> {
-  const NullableIntConverter();
-
-  @override
-  int? fromJson(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return value;
-    if (value is String) {
-      if (value.isEmpty) return null;
-      return int.parse(value);
-    }
-    return null;
-  }
-
-  @override
-  dynamic toJson(int? value) => value;
-}
-
-/// Custom converter for double values that might come as strings
-class DoubleConverter implements JsonConverter<double, dynamic> {
-  const DoubleConverter();
-
-  @override
-  double fromJson(dynamic value) {
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.parse(value);
-    throw ArgumentError('Cannot convert $value to double');
-  }
-
-  @override
-  dynamic toJson(double value) => value;
-}
