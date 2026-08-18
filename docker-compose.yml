@@ -1,3 +1,5 @@
+# Значения секретов берутся из .env рядом с этим файлом (в git не хранится,
+# шаблон — backend/.env.example). Без них compose откажется стартовать.
 services:
   db:
     image: mysql:8.0
@@ -6,8 +8,8 @@ services:
     environment:
       MYSQL_DATABASE: rabbitfarm
       MYSQL_USER: rabbitfarm_user
-      MYSQL_PASSWORD: ***REMOVED***
-      MYSQL_ROOT_PASSWORD: ***REMOVED***
+      MYSQL_PASSWORD: ${DB_PASSWORD:?задайте DB_PASSWORD в .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?задайте DB_ROOT_PASSWORD в .env}
     ports:
       - "3307:3306"
     volumes:
@@ -30,11 +32,11 @@ services:
       - DB_PORT=3306
       - DB_NAME=rabbitfarm
       - DB_USER=rabbitfarm_user
-      - DB_PASSWORD=***REMOVED***
+      - DB_PASSWORD=${DB_PASSWORD:?задайте DB_PASSWORD в .env}
       - PORT=4567
-      - JWT_SECRET=***REMOVED***
+      - JWT_SECRET=${JWT_SECRET:?задайте JWT_SECRET в .env}
       - JWT_EXPIRE=15m
-      - JWT_REFRESH_SECRET=***REMOVED***
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?задайте JWT_REFRESH_SECRET в .env}
       - JWT_REFRESH_EXPIRE=7d
       - CORS_ORIGIN=*
       # - RUN_SEEDS=true # Uncomment this to run seeders on first start
