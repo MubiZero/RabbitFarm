@@ -12,7 +12,7 @@ const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return ApiResponse.unauthorized(res, 'No token provided');
+      return ApiResponse.unauthorized(res, 'Токен не передан');
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
@@ -24,7 +24,7 @@ const authenticate = async (req, res, next) => {
     if (decoded.jti) {
       const blacklisted = await TokenBlacklist.findOne({ where: { jti: decoded.jti } });
       if (blacklisted) {
-        return ApiResponse.unauthorized(res, 'Token has been revoked');
+        return ApiResponse.unauthorized(res, 'Токен отозван');
       }
     }
 
@@ -34,11 +34,11 @@ const authenticate = async (req, res, next) => {
     });
 
     if (!user) {
-      return ApiResponse.unauthorized(res, 'User not found');
+      return ApiResponse.unauthorized(res, 'Пользователь не найден');
     }
 
     if (!user.is_active) {
-      return ApiResponse.forbidden(res, 'Account is inactive');
+      return ApiResponse.forbidden(res, 'Аккаунт отключён');
     }
 
     // Attach user to request
@@ -60,7 +60,7 @@ const authenticate = async (req, res, next) => {
 const authorize = (allowedRoles = []) => {
   return (req, res, next) => {
     if (!req.user) {
-      return ApiResponse.unauthorized(res, 'Authentication required');
+      return ApiResponse.unauthorized(res, 'Требуется авторизация');
     }
 
     // Owner has access to everything
@@ -70,7 +70,7 @@ const authorize = (allowedRoles = []) => {
 
     // Check if user's role is in allowed roles
     if (!allowedRoles.includes(req.user.role)) {
-      return ApiResponse.forbidden(res, 'Insufficient permissions');
+      return ApiResponse.forbidden(res, 'Недостаточно прав');
     }
 
     next();

@@ -58,8 +58,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get feeding records: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить записи кормлений');
     }
   }
 
@@ -74,10 +73,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get feeding record');
+      throw Exception('Не удалось загрузить запись кормления');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get feeding record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить запись кормления');
     }
   }
 
@@ -95,8 +93,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get rabbit feeding records: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить кормления кролика');
     }
   }
 
@@ -113,10 +110,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to create feeding record');
+      throw Exception('Не удалось сохранить кормление');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to create feeding record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось сохранить кормление');
     }
   }
 
@@ -133,10 +129,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to update feeding record');
+      throw Exception('Не удалось обновить кормление');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to update feeding record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось обновить кормление');
     }
   }
 
@@ -148,11 +143,10 @@ class FeedingRecordsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Failed to delete feeding record');
+        throw Exception('Не удалось удалить кормление');
       }
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to delete feeding record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось удалить кормление');
     }
   }
 
@@ -180,10 +174,9 @@ class FeedingRecordsRepository {
         return FeedingStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get statistics');
+      throw Exception('Не удалось загрузить статистику кормлений');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику кормлений');
     }
   }
 
@@ -205,8 +198,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get recent feeding records: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить последние кормления');
     }
   }
 }

@@ -15,7 +15,7 @@ const generalLimiter = isTest ? noopMiddleware : rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    ApiResponse.error(res, 'Too many requests, please try again later', 429, 'RATE_LIMIT_EXCEEDED');
+    ApiResponse.error(res, 'Слишком много запросов, попробуйте позже', 429, 'RATE_LIMIT_EXCEEDED');
   }
 });
 
@@ -25,11 +25,11 @@ const generalLimiter = isTest ? noopMiddleware : rateLimit({
 const authLimiter = isTest ? noopMiddleware : rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // 5 requests per window
-  message: 'Too many authentication attempts, please try again later',
+  message: 'Слишком много попыток входа, попробуйте позже',
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    ApiResponse.error(res, 'Too many authentication attempts, please try again later', 429, 'AUTH_RATE_LIMIT_EXCEEDED');
+    ApiResponse.error(res, 'Слишком много попыток входа, попробуйте позже', 429, 'AUTH_RATE_LIMIT_EXCEEDED');
   }
 });
 
@@ -39,11 +39,11 @@ const authLimiter = isTest ? noopMiddleware : rateLimit({
 const uploadLimiter = isTest ? noopMiddleware : rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: 'Too many upload requests, please try again later',
+  message: 'Слишком много загрузок, попробуйте позже',
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    ApiResponse.error(res, 'Too many upload requests, please try again later', 429, 'UPLOAD_RATE_LIMIT_EXCEEDED');
+    ApiResponse.error(res, 'Слишком много загрузок, попробуйте позже', 429, 'UPLOAD_RATE_LIMIT_EXCEEDED');
   }
 });
 

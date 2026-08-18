@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       unique: true,
       validate: {
-        isEmail: { msg: 'Must be a valid email address' }
+        isEmail: { msg: 'Введите корректный email' }
       }
     },
     password_hash: {
@@ -23,10 +23,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: false,
       validate: {
-        notEmpty: { msg: 'Full name is required' },
+        notEmpty: { msg: 'Имя обязательно' },
         len: {
           args: [2, 255],
-          msg: 'Full name must be between 2 and 255 characters'
+          msg: 'Имя должно быть от 2 до 255 символов'
         }
       }
     },
@@ -41,7 +41,7 @@ module.exports = (sequelize) => {
       validate: {
         is: {
           args: /^[+]?[(]?[0-9]{1,3}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/,
-          msg: 'Invalid phone number format'
+          msg: 'Неверный формат телефона'
         }
       }
     },

@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       unique: true,
       validate: {
-        notEmpty: { msg: 'Breed name is required' }
+        notEmpty: { msg: 'Название породы обязательно' }
       }
     },
     description: {

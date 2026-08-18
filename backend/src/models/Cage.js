@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       // unique: true, // Removed unique constraint as it should be unique per user, not globally
       validate: {
-        notEmpty: { msg: 'Cage number is required' }
+        notEmpty: { msg: 'Номер клетки обязателен' }
       }
     },
     user_id: {
@@ -34,7 +34,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: 1,
       validate: {
-        min: { args: [1], msg: 'Capacity must be at least 1' }
+        min: { args: [1], msg: 'Вместимость должна быть не меньше 1' }
       }
     },
     location: {

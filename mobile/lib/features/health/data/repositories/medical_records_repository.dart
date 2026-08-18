@@ -58,8 +58,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get medical records: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарты');
     }
   }
 
@@ -74,10 +73,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get medical record');
+      throw Exception('Не удалось загрузить медкарту');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get medical record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарту');
     }
   }
 
@@ -95,8 +93,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get rabbit medical records: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарты кролика');
     }
   }
 
@@ -113,10 +110,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to create medical record');
+      throw Exception('Не удалось создать медзапись');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to create medical record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось создать медзапись');
     }
   }
 
@@ -133,10 +129,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to update medical record');
+      throw Exception('Не удалось обновить медзапись');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to update medical record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось обновить медзапись');
     }
   }
 
@@ -148,11 +143,10 @@ class MedicalRecordsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Failed to delete medical record');
+        throw Exception('Не удалось удалить медзапись');
       }
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to delete medical record: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось удалить медзапись');
     }
   }
 
@@ -167,10 +161,9 @@ class MedicalRecordsRepository {
         return MedicalStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get statistics');
+      throw Exception('Не удалось загрузить статистику лечения');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику лечения');
     }
   }
 
@@ -190,8 +183,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get ongoing treatments: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить текущие лечения');
     }
   }
 
@@ -219,10 +211,9 @@ class MedicalRecordsRepository {
         return CostReport.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get cost report');
+      throw Exception('Не удалось загрузить отчёт по расходам на лечение');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get cost report: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить отчёт по расходам на лечение');
     }
   }
 }

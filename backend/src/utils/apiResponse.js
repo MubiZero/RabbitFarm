@@ -10,7 +10,7 @@ class ApiResponse {
    * @param {String} message - Success message
    * @param {Number} statusCode - HTTP status code
    */
-  static success(res, data = null, message = 'Success', statusCode = 200) {
+  static success(res, data = null, message = 'Успешно', statusCode = 200) {
     return res.status(statusCode).json({
       success: true,
       data,
@@ -27,7 +27,7 @@ class ApiResponse {
    * @param {String} code - Error code
    * @param {Array} details - Error details
    */
-  static error(res, message = 'Error', statusCode = 500, code = 'SERVER_ERROR', details = null) {
+  static error(res, message = 'Ошибка', statusCode = 500, code = 'SERVER_ERROR', details = null) {
     const response = {
       success: false,
       error: {
@@ -53,7 +53,7 @@ class ApiResponse {
    * @param {Number} total - Total items count
    * @param {String} message - Success message
    */
-  static paginated(res, items, page, limit, total, message = 'Success') {
+  static paginated(res, items, page, limit, total, message = 'Успешно') {
     return res.status(200).json({
       success: true,
       data: {
@@ -73,7 +73,7 @@ class ApiResponse {
   /**
    * Created response (201)
    */
-  static created(res, data = null, message = 'Resource created successfully') {
+  static created(res, data = null, message = 'Запись создана') {
     return this.success(res, data, message, 201);
   }
 
@@ -87,28 +87,28 @@ class ApiResponse {
   /**
    * Bad request response (400)
    */
-  static badRequest(res, message = 'Bad request', details = null) {
+  static badRequest(res, message = 'Неверный запрос', details = null) {
     return this.error(res, message, 400, 'BAD_REQUEST', details);
   }
 
   /**
    * Unauthorized response (401)
    */
-  static unauthorized(res, message = 'Unauthorized') {
+  static unauthorized(res, message = 'Не авторизован') {
     return this.error(res, message, 401, 'UNAUTHORIZED');
   }
 
   /**
    * Forbidden response (403)
    */
-  static forbidden(res, message = 'Forbidden') {
+  static forbidden(res, message = 'Доступ запрещён') {
     return this.error(res, message, 403, 'FORBIDDEN');
   }
 
   /**
    * Not found response (404)
    */
-  static notFound(res, message = 'Resource not found') {
+  static notFound(res, message = 'Запись не найдена') {
     return this.error(res, message, 404, 'NOT_FOUND');
   }
 
@@ -123,14 +123,14 @@ class ApiResponse {
   /**
    * Validation error response (422)
    */
-  static validationError(res, details, message = 'Validation failed') {
+  static validationError(res, details, message = 'Проверка данных не пройдена') {
     return this.error(res, message, 422, 'VALIDATION_ERROR', details);
   }
 
   /**
    * Internal server error response (500)
    */
-  static serverError(res, message = 'Internal server error') {
+  static serverError(res, message = 'Внутренняя ошибка сервера') {
     return this.error(res, message, 500, 'SERVER_ERROR');
   }
 }

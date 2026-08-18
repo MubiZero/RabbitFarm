@@ -39,24 +39,25 @@ const errorHandler = (err, req, res, next) => {
 
   // Sequelize foreign key constraint error
   if (err.name === 'SequelizeForeignKeyConstraintError') {
-    return ApiResponse.badRequest(res, 'Invalid reference to related resource');
+    return ApiResponse.badRequest(res, 'Ссылка на связанную запись недействительна');
   }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
-    return ApiResponse.unauthorized(res, 'Invalid token');
+    return ApiResponse.unauthorized(res, 'Недействительный токен');
   }
 
   if (err.name === 'TokenExpiredError') {
-    return ApiResponse.unauthorized(res, 'Token expired');
+    return ApiResponse.unauthorized(res, 'Срок действия токена истёк');
   }
 
   // Multer errors (file upload)
   if (err.name === 'MulterError') {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return ApiResponse.badRequest(res, 'File too large');
+      return ApiResponse.badRequest(res, 'Файл слишком большой');
     }
-    return ApiResponse.badRequest(res, err.message);
+    // Текст multer-ошибки английский и технический; подробности уже в логе.
+    return ApiResponse.badRequest(res, 'Не удалось загрузить файл');
   }
 
   // Custom application errors
@@ -66,7 +67,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Default server error
   return ApiResponse.serverError(res,
-    process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    process.env.NODE_ENV === 'development' ? err.message : 'Внутренняя ошибка сервера'
   );
 };
 
@@ -74,7 +75,7 @@ const errorHandler = (err, req, res, next) => {
  * 404 Not Found handler
  */
 const notFoundHandler = (req, res, next) => {
-  ApiResponse.notFound(res, `Route ${req.originalUrl} not found`);
+  ApiResponse.notFound(res, `Маршрут ${req.originalUrl} не найден`);
 };
 
 module.exports = {

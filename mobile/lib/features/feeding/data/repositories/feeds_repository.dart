@@ -50,8 +50,7 @@ class FeedsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get feeds: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить корма');
     }
   }
 
@@ -66,10 +65,9 @@ class FeedsRepository {
         return Feed.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get feed');
+      throw Exception('Не удалось загрузить корм');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get feed: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить корм');
     }
   }
 
@@ -85,10 +83,9 @@ class FeedsRepository {
         return Feed.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to create feed');
+      throw Exception('Не удалось создать корм');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to create feed: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось создать корм');
     }
   }
 
@@ -104,10 +101,9 @@ class FeedsRepository {
         return Feed.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to update feed');
+      throw Exception('Не удалось обновить корм');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to update feed: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось обновить корм');
     }
   }
 
@@ -119,11 +115,10 @@ class FeedsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Failed to delete feed');
+        throw Exception('Не удалось удалить корм');
       }
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to delete feed: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось удалить корм');
     }
   }
 
@@ -138,10 +133,9 @@ class FeedsRepository {
         return FeedStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get statistics');
+      throw Exception('Не удалось загрузить статистику склада');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику склада');
     }
   }
 
@@ -159,8 +153,7 @@ class FeedsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get low stock feeds: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить список заканчивающихся кормов');
     }
   }
 
@@ -176,10 +169,9 @@ class FeedsRepository {
         return Feed.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to adjust stock');
+      throw Exception('Не удалось изменить остаток');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to adjust stock: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось изменить остаток');
     }
   }
 }

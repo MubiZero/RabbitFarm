@@ -60,7 +60,7 @@ class AuthController {
         return ApiResponse.unauthorized(res, 'Неверный refresh token');
       }
       if (error.message === 'REFRESH_TOKEN_EXPIRED') {
-        return ApiResponse.unauthorized(res, 'Refresh token истек');
+        return ApiResponse.unauthorized(res, 'Срок действия refresh-токена истёк');
       }
       if (error.message === 'USER_INACTIVE') {
         return ApiResponse.forbidden(res, 'Аккаунт неактивен');

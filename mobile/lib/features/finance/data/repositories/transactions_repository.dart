@@ -64,8 +64,7 @@ class TransactionsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get transactions: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакции');
     }
   }
 
@@ -80,10 +79,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get transaction');
+      throw Exception('Не удалось загрузить транзакцию');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get transaction: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакцию');
     }
   }
 
@@ -98,10 +96,9 @@ class TransactionsRepository {
         return RabbitTransactionsSummary.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get rabbit transactions');
+      throw Exception('Не удалось загрузить транзакции кролика');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get rabbit transactions: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакции кролика');
     }
   }
 
@@ -117,10 +114,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to create transaction');
+      throw Exception('Не удалось создать транзакцию');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to create transaction: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось создать транзакцию');
     }
   }
 
@@ -137,10 +133,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to update transaction');
+      throw Exception('Не удалось обновить транзакцию');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to update transaction: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось обновить транзакцию');
     }
   }
 
@@ -152,11 +147,10 @@ class TransactionsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Failed to delete transaction');
+        throw Exception('Не удалось удалить транзакцию');
       }
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to delete transaction: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось удалить транзакцию');
     }
   }
 
@@ -184,10 +178,9 @@ class TransactionsRepository {
         return FinancialStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get statistics');
+      throw Exception('Не удалось загрузить статистику финансов');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику финансов');
     }
   }
 
@@ -211,10 +204,9 @@ class TransactionsRepository {
         return MonthlyReport.fromJson(response.data['data']);
       }
 
-      throw Exception('Failed to get monthly report');
+      throw Exception('Не удалось загрузить отчёт за месяц');
     } on DioException catch (e) {
-      throw Exception(
-          'Failed to get monthly report: ${serverMessage(e) ?? e.message}');
+      throw Exception(serverMessage(e) ?? 'Не удалось загрузить отчёт за месяц');
     }
   }
 
