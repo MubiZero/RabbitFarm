@@ -396,49 +396,36 @@ exports.getStatistics = async (req, res, next) => {
       include: [{ model: Feed, as: 'feed' }]
     });
 
+    // Количество группируется по единице измерения: складывать килограммы,
+    // литры и штуки в одно число нельзя — сумма не значит ничего.
     const stats = {
       total_feedings: records.length,
-      total_quantity: 0,
-      by_feed_type: {
-        pellets: 0,
-        hay: 0,
-        vegetables: 0,
-        grain: 0,
-        supplements: 0,
-        other: 0
-      },
+      quantity_by_unit: {},
+      by_feed_type: {},
       by_feed: {},
       total_cost: 0
     };
 
     records.forEach(record => {
       const quantity = parseFloat(record.quantity);
-      stats.total_quantity += quantity;
+      if (!record.feed) return;
 
-      if (record.feed) {
-        // Count by feed type
-        const type = record.feed.type;
-        if (stats.by_feed_type.hasOwnProperty(type)) {
-          stats.by_feed_type[type] += quantity;
-        }
+      const { name: feedName, type, unit } = record.feed;
 
-        // Count by specific feed
-        const feedName = record.feed.name;
-        if (!stats.by_feed[feedName]) {
-          stats.by_feed[feedName] = {
-            quantity: 0,
-            unit: record.feed.unit,
-            cost: 0
-          };
-        }
-        stats.by_feed[feedName].quantity += quantity;
+      stats.quantity_by_unit[unit] = (stats.quantity_by_unit[unit] || 0) + quantity;
 
-        // Calculate cost
-        if (record.feed.cost_per_unit) {
-          const cost = quantity * parseFloat(record.feed.cost_per_unit);
-          stats.by_feed[feedName].cost += cost;
-          stats.total_cost += cost;
-        }
+      if (!stats.by_feed_type[unit]) stats.by_feed_type[unit] = {};
+      stats.by_feed_type[unit][type] = (stats.by_feed_type[unit][type] || 0) + quantity;
+
+      if (!stats.by_feed[feedName]) {
+        stats.by_feed[feedName] = { quantity: 0, unit, cost: 0 };
+      }
+      stats.by_feed[feedName].quantity += quantity;
+
+      if (record.feed.cost_per_unit) {
+        const cost = quantity * parseFloat(record.feed.cost_per_unit);
+        stats.by_feed[feedName].cost += cost;
+        stats.total_cost += cost;
       }
     });
 

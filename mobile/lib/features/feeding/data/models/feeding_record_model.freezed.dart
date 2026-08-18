@@ -1099,10 +1099,11 @@ FeedingStatistics _$FeedingStatisticsFromJson(Map<String, dynamic> json) {
 mixin _$FeedingStatistics {
   @JsonKey(name: 'total_feedings')
   int get totalFeedings => throw _privateConstructorUsedError;
-  @JsonKey(name: 'total_quantity')
-  double get totalQuantity => throw _privateConstructorUsedError;
+  @JsonKey(name: 'quantity_by_unit')
+  Map<String, double> get quantityByUnit => throw _privateConstructorUsedError;
   @JsonKey(name: 'by_feed_type')
-  FeedingByType get byFeedType => throw _privateConstructorUsedError;
+  Map<String, Map<String, double>> get byFeedType =>
+      throw _privateConstructorUsedError;
   @JsonKey(name: 'by_feed')
   Map<String, FeedingByFeed> get byFeed => throw _privateConstructorUsedError;
   @JsonKey(name: 'total_cost')
@@ -1127,13 +1128,11 @@ abstract class $FeedingStatisticsCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: 'total_feedings') int totalFeedings,
-    @JsonKey(name: 'total_quantity') double totalQuantity,
-    @JsonKey(name: 'by_feed_type') FeedingByType byFeedType,
+    @JsonKey(name: 'quantity_by_unit') Map<String, double> quantityByUnit,
+    @JsonKey(name: 'by_feed_type') Map<String, Map<String, double>> byFeedType,
     @JsonKey(name: 'by_feed') Map<String, FeedingByFeed> byFeed,
     @JsonKey(name: 'total_cost') double totalCost,
   });
-
-  $FeedingByTypeCopyWith<$Res> get byFeedType;
 }
 
 /// @nodoc
@@ -1152,7 +1151,7 @@ class _$FeedingStatisticsCopyWithImpl<$Res, $Val extends FeedingStatistics>
   @override
   $Res call({
     Object? totalFeedings = null,
-    Object? totalQuantity = null,
+    Object? quantityByUnit = null,
     Object? byFeedType = null,
     Object? byFeed = null,
     Object? totalCost = null,
@@ -1163,14 +1162,14 @@ class _$FeedingStatisticsCopyWithImpl<$Res, $Val extends FeedingStatistics>
                 ? _value.totalFeedings
                 : totalFeedings // ignore: cast_nullable_to_non_nullable
                       as int,
-            totalQuantity: null == totalQuantity
-                ? _value.totalQuantity
-                : totalQuantity // ignore: cast_nullable_to_non_nullable
-                      as double,
+            quantityByUnit: null == quantityByUnit
+                ? _value.quantityByUnit
+                : quantityByUnit // ignore: cast_nullable_to_non_nullable
+                      as Map<String, double>,
             byFeedType: null == byFeedType
                 ? _value.byFeedType
                 : byFeedType // ignore: cast_nullable_to_non_nullable
-                      as FeedingByType,
+                      as Map<String, Map<String, double>>,
             byFeed: null == byFeed
                 ? _value.byFeed
                 : byFeed // ignore: cast_nullable_to_non_nullable
@@ -1182,16 +1181,6 @@ class _$FeedingStatisticsCopyWithImpl<$Res, $Val extends FeedingStatistics>
           )
           as $Val,
     );
-  }
-
-  /// Create a copy of FeedingStatistics
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $FeedingByTypeCopyWith<$Res> get byFeedType {
-    return $FeedingByTypeCopyWith<$Res>(_value.byFeedType, (value) {
-      return _then(_value.copyWith(byFeedType: value) as $Val);
-    });
   }
 }
 
@@ -1206,14 +1195,11 @@ abstract class _$$FeedingStatisticsImplCopyWith<$Res>
   @useResult
   $Res call({
     @JsonKey(name: 'total_feedings') int totalFeedings,
-    @JsonKey(name: 'total_quantity') double totalQuantity,
-    @JsonKey(name: 'by_feed_type') FeedingByType byFeedType,
+    @JsonKey(name: 'quantity_by_unit') Map<String, double> quantityByUnit,
+    @JsonKey(name: 'by_feed_type') Map<String, Map<String, double>> byFeedType,
     @JsonKey(name: 'by_feed') Map<String, FeedingByFeed> byFeed,
     @JsonKey(name: 'total_cost') double totalCost,
   });
-
-  @override
-  $FeedingByTypeCopyWith<$Res> get byFeedType;
 }
 
 /// @nodoc
@@ -1231,7 +1217,7 @@ class __$$FeedingStatisticsImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? totalFeedings = null,
-    Object? totalQuantity = null,
+    Object? quantityByUnit = null,
     Object? byFeedType = null,
     Object? byFeed = null,
     Object? totalCost = null,
@@ -1242,14 +1228,14 @@ class __$$FeedingStatisticsImplCopyWithImpl<$Res>
             ? _value.totalFeedings
             : totalFeedings // ignore: cast_nullable_to_non_nullable
                   as int,
-        totalQuantity: null == totalQuantity
-            ? _value.totalQuantity
-            : totalQuantity // ignore: cast_nullable_to_non_nullable
-                  as double,
+        quantityByUnit: null == quantityByUnit
+            ? _value._quantityByUnit
+            : quantityByUnit // ignore: cast_nullable_to_non_nullable
+                  as Map<String, double>,
         byFeedType: null == byFeedType
-            ? _value.byFeedType
+            ? _value._byFeedType
             : byFeedType // ignore: cast_nullable_to_non_nullable
-                  as FeedingByType,
+                  as Map<String, Map<String, double>>,
         byFeed: null == byFeed
             ? _value._byFeed
             : byFeed // ignore: cast_nullable_to_non_nullable
@@ -1268,11 +1254,16 @@ class __$$FeedingStatisticsImplCopyWithImpl<$Res>
 class _$FeedingStatisticsImpl implements _FeedingStatistics {
   const _$FeedingStatisticsImpl({
     @JsonKey(name: 'total_feedings') required this.totalFeedings,
-    @JsonKey(name: 'total_quantity') required this.totalQuantity,
-    @JsonKey(name: 'by_feed_type') required this.byFeedType,
-    @JsonKey(name: 'by_feed') required final Map<String, FeedingByFeed> byFeed,
+    @JsonKey(name: 'quantity_by_unit')
+    final Map<String, double> quantityByUnit = const {},
+    @JsonKey(name: 'by_feed_type')
+    final Map<String, Map<String, double>> byFeedType = const {},
+    @JsonKey(name: 'by_feed')
+    final Map<String, FeedingByFeed> byFeed = const {},
     @JsonKey(name: 'total_cost') required this.totalCost,
-  }) : _byFeed = byFeed;
+  }) : _quantityByUnit = quantityByUnit,
+       _byFeedType = byFeedType,
+       _byFeed = byFeed;
 
   factory _$FeedingStatisticsImpl.fromJson(Map<String, dynamic> json) =>
       _$$FeedingStatisticsImplFromJson(json);
@@ -1280,12 +1271,24 @@ class _$FeedingStatisticsImpl implements _FeedingStatistics {
   @override
   @JsonKey(name: 'total_feedings')
   final int totalFeedings;
+  final Map<String, double> _quantityByUnit;
   @override
-  @JsonKey(name: 'total_quantity')
-  final double totalQuantity;
+  @JsonKey(name: 'quantity_by_unit')
+  Map<String, double> get quantityByUnit {
+    if (_quantityByUnit is EqualUnmodifiableMapView) return _quantityByUnit;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_quantityByUnit);
+  }
+
+  final Map<String, Map<String, double>> _byFeedType;
   @override
   @JsonKey(name: 'by_feed_type')
-  final FeedingByType byFeedType;
+  Map<String, Map<String, double>> get byFeedType {
+    if (_byFeedType is EqualUnmodifiableMapView) return _byFeedType;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_byFeedType);
+  }
+
   final Map<String, FeedingByFeed> _byFeed;
   @override
   @JsonKey(name: 'by_feed')
@@ -1301,7 +1304,7 @@ class _$FeedingStatisticsImpl implements _FeedingStatistics {
 
   @override
   String toString() {
-    return 'FeedingStatistics(totalFeedings: $totalFeedings, totalQuantity: $totalQuantity, byFeedType: $byFeedType, byFeed: $byFeed, totalCost: $totalCost)';
+    return 'FeedingStatistics(totalFeedings: $totalFeedings, quantityByUnit: $quantityByUnit, byFeedType: $byFeedType, byFeed: $byFeed, totalCost: $totalCost)';
   }
 
   @override
@@ -1311,10 +1314,14 @@ class _$FeedingStatisticsImpl implements _FeedingStatistics {
             other is _$FeedingStatisticsImpl &&
             (identical(other.totalFeedings, totalFeedings) ||
                 other.totalFeedings == totalFeedings) &&
-            (identical(other.totalQuantity, totalQuantity) ||
-                other.totalQuantity == totalQuantity) &&
-            (identical(other.byFeedType, byFeedType) ||
-                other.byFeedType == byFeedType) &&
+            const DeepCollectionEquality().equals(
+              other._quantityByUnit,
+              _quantityByUnit,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._byFeedType,
+              _byFeedType,
+            ) &&
             const DeepCollectionEquality().equals(other._byFeed, _byFeed) &&
             (identical(other.totalCost, totalCost) ||
                 other.totalCost == totalCost));
@@ -1325,8 +1332,8 @@ class _$FeedingStatisticsImpl implements _FeedingStatistics {
   int get hashCode => Object.hash(
     runtimeType,
     totalFeedings,
-    totalQuantity,
-    byFeedType,
+    const DeepCollectionEquality().hash(_quantityByUnit),
+    const DeepCollectionEquality().hash(_byFeedType),
     const DeepCollectionEquality().hash(_byFeed),
     totalCost,
   );
@@ -1351,9 +1358,10 @@ class _$FeedingStatisticsImpl implements _FeedingStatistics {
 abstract class _FeedingStatistics implements FeedingStatistics {
   const factory _FeedingStatistics({
     @JsonKey(name: 'total_feedings') required final int totalFeedings,
-    @JsonKey(name: 'total_quantity') required final double totalQuantity,
-    @JsonKey(name: 'by_feed_type') required final FeedingByType byFeedType,
-    @JsonKey(name: 'by_feed') required final Map<String, FeedingByFeed> byFeed,
+    @JsonKey(name: 'quantity_by_unit') final Map<String, double> quantityByUnit,
+    @JsonKey(name: 'by_feed_type')
+    final Map<String, Map<String, double>> byFeedType,
+    @JsonKey(name: 'by_feed') final Map<String, FeedingByFeed> byFeed,
     @JsonKey(name: 'total_cost') required final double totalCost,
   }) = _$FeedingStatisticsImpl;
 
@@ -1364,11 +1372,11 @@ abstract class _FeedingStatistics implements FeedingStatistics {
   @JsonKey(name: 'total_feedings')
   int get totalFeedings;
   @override
-  @JsonKey(name: 'total_quantity')
-  double get totalQuantity;
+  @JsonKey(name: 'quantity_by_unit')
+  Map<String, double> get quantityByUnit;
   @override
   @JsonKey(name: 'by_feed_type')
-  FeedingByType get byFeedType;
+  Map<String, Map<String, double>> get byFeedType;
   @override
   @JsonKey(name: 'by_feed')
   Map<String, FeedingByFeed> get byFeed;
@@ -1381,297 +1389,6 @@ abstract class _FeedingStatistics implements FeedingStatistics {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$FeedingStatisticsImplCopyWith<_$FeedingStatisticsImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-FeedingByType _$FeedingByTypeFromJson(Map<String, dynamic> json) {
-  return _FeedingByType.fromJson(json);
-}
-
-/// @nodoc
-mixin _$FeedingByType {
-  @JsonKey(defaultValue: 0.0)
-  double get pellets => throw _privateConstructorUsedError;
-  @JsonKey(defaultValue: 0.0)
-  double get hay => throw _privateConstructorUsedError;
-  @JsonKey(defaultValue: 0.0)
-  double get vegetables => throw _privateConstructorUsedError;
-  @JsonKey(defaultValue: 0.0)
-  double get grain => throw _privateConstructorUsedError;
-  @JsonKey(defaultValue: 0.0)
-  double get supplements => throw _privateConstructorUsedError;
-  @JsonKey(defaultValue: 0.0)
-  double get other => throw _privateConstructorUsedError;
-
-  /// Serializes this FeedingByType to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of FeedingByType
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $FeedingByTypeCopyWith<FeedingByType> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $FeedingByTypeCopyWith<$Res> {
-  factory $FeedingByTypeCopyWith(
-    FeedingByType value,
-    $Res Function(FeedingByType) then,
-  ) = _$FeedingByTypeCopyWithImpl<$Res, FeedingByType>;
-  @useResult
-  $Res call({
-    @JsonKey(defaultValue: 0.0) double pellets,
-    @JsonKey(defaultValue: 0.0) double hay,
-    @JsonKey(defaultValue: 0.0) double vegetables,
-    @JsonKey(defaultValue: 0.0) double grain,
-    @JsonKey(defaultValue: 0.0) double supplements,
-    @JsonKey(defaultValue: 0.0) double other,
-  });
-}
-
-/// @nodoc
-class _$FeedingByTypeCopyWithImpl<$Res, $Val extends FeedingByType>
-    implements $FeedingByTypeCopyWith<$Res> {
-  _$FeedingByTypeCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of FeedingByType
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? pellets = null,
-    Object? hay = null,
-    Object? vegetables = null,
-    Object? grain = null,
-    Object? supplements = null,
-    Object? other = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            pellets: null == pellets
-                ? _value.pellets
-                : pellets // ignore: cast_nullable_to_non_nullable
-                      as double,
-            hay: null == hay
-                ? _value.hay
-                : hay // ignore: cast_nullable_to_non_nullable
-                      as double,
-            vegetables: null == vegetables
-                ? _value.vegetables
-                : vegetables // ignore: cast_nullable_to_non_nullable
-                      as double,
-            grain: null == grain
-                ? _value.grain
-                : grain // ignore: cast_nullable_to_non_nullable
-                      as double,
-            supplements: null == supplements
-                ? _value.supplements
-                : supplements // ignore: cast_nullable_to_non_nullable
-                      as double,
-            other: null == other
-                ? _value.other
-                : other // ignore: cast_nullable_to_non_nullable
-                      as double,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$FeedingByTypeImplCopyWith<$Res>
-    implements $FeedingByTypeCopyWith<$Res> {
-  factory _$$FeedingByTypeImplCopyWith(
-    _$FeedingByTypeImpl value,
-    $Res Function(_$FeedingByTypeImpl) then,
-  ) = __$$FeedingByTypeImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    @JsonKey(defaultValue: 0.0) double pellets,
-    @JsonKey(defaultValue: 0.0) double hay,
-    @JsonKey(defaultValue: 0.0) double vegetables,
-    @JsonKey(defaultValue: 0.0) double grain,
-    @JsonKey(defaultValue: 0.0) double supplements,
-    @JsonKey(defaultValue: 0.0) double other,
-  });
-}
-
-/// @nodoc
-class __$$FeedingByTypeImplCopyWithImpl<$Res>
-    extends _$FeedingByTypeCopyWithImpl<$Res, _$FeedingByTypeImpl>
-    implements _$$FeedingByTypeImplCopyWith<$Res> {
-  __$$FeedingByTypeImplCopyWithImpl(
-    _$FeedingByTypeImpl _value,
-    $Res Function(_$FeedingByTypeImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of FeedingByType
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? pellets = null,
-    Object? hay = null,
-    Object? vegetables = null,
-    Object? grain = null,
-    Object? supplements = null,
-    Object? other = null,
-  }) {
-    return _then(
-      _$FeedingByTypeImpl(
-        pellets: null == pellets
-            ? _value.pellets
-            : pellets // ignore: cast_nullable_to_non_nullable
-                  as double,
-        hay: null == hay
-            ? _value.hay
-            : hay // ignore: cast_nullable_to_non_nullable
-                  as double,
-        vegetables: null == vegetables
-            ? _value.vegetables
-            : vegetables // ignore: cast_nullable_to_non_nullable
-                  as double,
-        grain: null == grain
-            ? _value.grain
-            : grain // ignore: cast_nullable_to_non_nullable
-                  as double,
-        supplements: null == supplements
-            ? _value.supplements
-            : supplements // ignore: cast_nullable_to_non_nullable
-                  as double,
-        other: null == other
-            ? _value.other
-            : other // ignore: cast_nullable_to_non_nullable
-                  as double,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$FeedingByTypeImpl implements _FeedingByType {
-  const _$FeedingByTypeImpl({
-    @JsonKey(defaultValue: 0.0) required this.pellets,
-    @JsonKey(defaultValue: 0.0) required this.hay,
-    @JsonKey(defaultValue: 0.0) required this.vegetables,
-    @JsonKey(defaultValue: 0.0) required this.grain,
-    @JsonKey(defaultValue: 0.0) required this.supplements,
-    @JsonKey(defaultValue: 0.0) required this.other,
-  });
-
-  factory _$FeedingByTypeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$FeedingByTypeImplFromJson(json);
-
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double pellets;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double hay;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double vegetables;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double grain;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double supplements;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  final double other;
-
-  @override
-  String toString() {
-    return 'FeedingByType(pellets: $pellets, hay: $hay, vegetables: $vegetables, grain: $grain, supplements: $supplements, other: $other)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$FeedingByTypeImpl &&
-            (identical(other.pellets, pellets) || other.pellets == pellets) &&
-            (identical(other.hay, hay) || other.hay == hay) &&
-            (identical(other.vegetables, vegetables) ||
-                other.vegetables == vegetables) &&
-            (identical(other.grain, grain) || other.grain == grain) &&
-            (identical(other.supplements, supplements) ||
-                other.supplements == supplements) &&
-            (identical(other.other, this.other) || other.other == this.other));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    pellets,
-    hay,
-    vegetables,
-    grain,
-    supplements,
-    other,
-  );
-
-  /// Create a copy of FeedingByType
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$FeedingByTypeImplCopyWith<_$FeedingByTypeImpl> get copyWith =>
-      __$$FeedingByTypeImplCopyWithImpl<_$FeedingByTypeImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$FeedingByTypeImplToJson(this);
-  }
-}
-
-abstract class _FeedingByType implements FeedingByType {
-  const factory _FeedingByType({
-    @JsonKey(defaultValue: 0.0) required final double pellets,
-    @JsonKey(defaultValue: 0.0) required final double hay,
-    @JsonKey(defaultValue: 0.0) required final double vegetables,
-    @JsonKey(defaultValue: 0.0) required final double grain,
-    @JsonKey(defaultValue: 0.0) required final double supplements,
-    @JsonKey(defaultValue: 0.0) required final double other,
-  }) = _$FeedingByTypeImpl;
-
-  factory _FeedingByType.fromJson(Map<String, dynamic> json) =
-      _$FeedingByTypeImpl.fromJson;
-
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get pellets;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get hay;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get vegetables;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get grain;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get supplements;
-  @override
-  @JsonKey(defaultValue: 0.0)
-  double get other;
-
-  /// Create a copy of FeedingByType
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$FeedingByTypeImplCopyWith<_$FeedingByTypeImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

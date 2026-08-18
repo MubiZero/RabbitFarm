@@ -61,34 +61,22 @@ class FeedingRecordUpdate with _$FeedingRecordUpdate {
 }
 
 /// Feeding Statistics
+///
+/// Количество всегда сгруппировано по единице измерения: килограммы, литры и
+/// штуки — разные величины, общая сумма по ним ничего не значит. Ключи карт —
+/// коды с сервера (`kg`, `piece`, `pellets`), подписи подбираются в UI.
 @freezed
 class FeedingStatistics with _$FeedingStatistics {
   const factory FeedingStatistics({
     @JsonKey(name: 'total_feedings') required int totalFeedings,
-    @JsonKey(name: 'total_quantity') required double totalQuantity,
-    @JsonKey(name: 'by_feed_type') required FeedingByType byFeedType,
-    @JsonKey(name: 'by_feed') required Map<String, FeedingByFeed> byFeed,
+    @JsonKey(name: 'quantity_by_unit') @Default({}) Map<String, double> quantityByUnit,
+    @JsonKey(name: 'by_feed_type') @Default({}) Map<String, Map<String, double>> byFeedType,
+    @JsonKey(name: 'by_feed') @Default({}) Map<String, FeedingByFeed> byFeed,
     @JsonKey(name: 'total_cost') required double totalCost,
   }) = _FeedingStatistics;
 
   factory FeedingStatistics.fromJson(Map<String, dynamic> json) =>
       _$FeedingStatisticsFromJson(json);
-}
-
-/// Feeding by type statistics
-@freezed
-class FeedingByType with _$FeedingByType {
-  const factory FeedingByType({
-    @JsonKey(defaultValue: 0.0) required double pellets,
-    @JsonKey(defaultValue: 0.0) required double hay,
-    @JsonKey(defaultValue: 0.0) required double vegetables,
-    @JsonKey(defaultValue: 0.0) required double grain,
-    @JsonKey(defaultValue: 0.0) required double supplements,
-    @JsonKey(defaultValue: 0.0) required double other,
-  }) = _FeedingByType;
-
-  factory FeedingByType.fromJson(Map<String, dynamic> json) =>
-      _$FeedingByTypeFromJson(json);
 }
 
 /// Feeding by specific feed

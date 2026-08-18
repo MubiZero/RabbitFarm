@@ -102,20 +102,30 @@ const _feedStats = FeedStatistics(
 
 const _feedingStats = FeedingStatistics(
   totalFeedings: 214,
-  totalQuantity: 486.5,
-  byFeedType: FeedingByType(
-    pellets: 240.5,
-    hay: 180,
-    vegetables: 46,
-    grain: 20,
-    supplements: 0,
-    other: 0,
-  ),
+  quantityByUnit: {'kg': 486.5},
+  byFeedType: {
+    'kg': {'pellets': 240.5, 'hay': 180, 'vegetables': 46, 'grain': 20},
+  },
   byFeed: {
-    'Гранулы «Премиум»': FeedingByFeed(quantity: 240.5, unit: 'кг', cost: 31265),
-    'Люцерновое сено': FeedingByFeed(quantity: 180, unit: 'кг', cost: 9000),
+    'Гранулы «Премиум»': FeedingByFeed(quantity: 240.5, unit: 'kg', cost: 31265),
+    'Люцерновое сено': FeedingByFeed(quantity: 180, unit: 'kg', cost: 9000),
   },
   totalCost: 40265,
+);
+
+/// Овощи выдают и на вес, и поштучно — единицы не должны смешиваться.
+const _mixedUnitFeedingStats = FeedingStatistics(
+  totalFeedings: 40,
+  quantityByUnit: {'kg': 46, 'piece': 120},
+  byFeedType: {
+    'kg': {'vegetables': 46},
+    'piece': {'vegetables': 120},
+  },
+  byFeed: {
+    'Морковь': FeedingByFeed(quantity: 46, unit: 'kg', cost: 1840),
+    'Кочаны капусты': FeedingByFeed(quantity: 120, unit: 'piece', cost: 3600),
+  },
+  totalCost: 5440,
 );
 
 /// Скелетон загрузки пульсирует бесконечно, поэтому `pumpAndSettle` на этих
@@ -273,9 +283,31 @@ void main() {
       expect(find.text('Аналитика кормлений'), findsOneWidget);
       expect(find.text('214'), findsOneWidget);
       expect(find.text('40\u00A0265 ₽'), findsOneWidget);
+      expect(find.text('Выдано'), findsOneWidget);
+      expect(find.text('486,5 кг'), findsOneWidget);
+      // Единица одна, поэтому в заголовке её не дублируем.
       expect(find.text('РАСХОД ПО ТИПАМ КОРМА'), findsOneWidget);
       expect(find.text('ПО КОРМАМ'), findsOneWidget);
-      expect(find.text('240,5 кг'), findsOneWidget);
+      // Код единицы с сервера приходит как `kg` — на экране должно быть «кг».
+      expect(find.text('240,5 кг'), findsWidgets);
+      expect(find.textContaining('kg'), findsNothing);
+    });
+
+    testWidgets('не смешивает килограммы и штуки', (tester) async {
+      await tester.pumpWidget(_wrap(
+        const FeedingStatisticsScreen(),
+        [
+          feedingStatisticsProvider
+              .overrideWith((ref, params) async => _mixedUnitFeedingStats),
+        ],
+      ));
+      await _settle(tester);
+
+      // Общего «166» быть не может: 46 кг и 120 шт складывать нельзя.
+      expect(find.text('46 кг'), findsWidgets);
+      expect(find.text('120 шт'), findsWidgets);
+      expect(find.text('РАСХОД ПО ТИПАМ КОРМА, КГ'), findsOneWidget);
+      expect(find.text('РАСХОД ПО ТИПАМ КОРМА, ШТ'), findsOneWidget);
     });
 
     testWidgets('на пустом периоде предлагает записать кормление',
@@ -286,8 +318,9 @@ void main() {
           feedingStatisticsProvider.overrideWith((ref, params) async =>
               _feedingStats.copyWith(
                 totalFeedings: 0,
-                totalQuantity: 0,
                 totalCost: 0,
+                quantityByUnit: const {},
+                byFeedType: const {},
                 byFeed: const {},
               )),
         ],

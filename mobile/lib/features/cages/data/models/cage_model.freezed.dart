@@ -41,7 +41,7 @@ mixin _$CageModel {
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Related data
   List<RabbitModel>? get rabbits => throw _privateConstructorUsedError;
   @JsonKey(name: 'current_occupancy')
-  @IntConverter()
+  @NullableIntConverter()
   int? get currentOccupancy => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_full')
   bool? get isFull => throw _privateConstructorUsedError;
@@ -76,7 +76,9 @@ abstract class $CageModelCopyWith<$Res> {
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     List<RabbitModel>? rabbits,
-    @JsonKey(name: 'current_occupancy') @IntConverter() int? currentOccupancy,
+    @JsonKey(name: 'current_occupancy')
+    @NullableIntConverter()
+    int? currentOccupancy,
     @JsonKey(name: 'is_full') bool? isFull,
     @JsonKey(name: 'is_available') bool? isAvailable,
   });
@@ -203,7 +205,9 @@ abstract class _$$CageModelImplCopyWith<$Res>
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     List<RabbitModel>? rabbits,
-    @JsonKey(name: 'current_occupancy') @IntConverter() int? currentOccupancy,
+    @JsonKey(name: 'current_occupancy')
+    @NullableIntConverter()
+    int? currentOccupancy,
     @JsonKey(name: 'is_full') bool? isFull,
     @JsonKey(name: 'is_available') bool? isAvailable,
   });
@@ -322,7 +326,9 @@ class _$CageModelImpl implements _CageModel {
     @JsonKey(name: 'created_at') this.createdAt,
     @JsonKey(name: 'updated_at') this.updatedAt,
     final List<RabbitModel>? rabbits,
-    @JsonKey(name: 'current_occupancy') @IntConverter() this.currentOccupancy,
+    @JsonKey(name: 'current_occupancy')
+    @NullableIntConverter()
+    this.currentOccupancy,
     @JsonKey(name: 'is_full') this.isFull,
     @JsonKey(name: 'is_available') this.isAvailable,
   }) : _rabbits = rabbits;
@@ -373,7 +379,7 @@ class _$CageModelImpl implements _CageModel {
 
   @override
   @JsonKey(name: 'current_occupancy')
-  @IntConverter()
+  @NullableIntConverter()
   final int? currentOccupancy;
   @override
   @JsonKey(name: 'is_full')
@@ -467,7 +473,7 @@ abstract class _CageModel implements CageModel {
     @JsonKey(name: 'updated_at') final DateTime? updatedAt,
     final List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy')
-    @IntConverter()
+    @NullableIntConverter()
     final int? currentOccupancy,
     @JsonKey(name: 'is_full') final bool? isFull,
     @JsonKey(name: 'is_available') final bool? isAvailable,
@@ -507,7 +513,7 @@ abstract class _CageModel implements CageModel {
   List<RabbitModel>? get rabbits;
   @override
   @JsonKey(name: 'current_occupancy')
-  @IntConverter()
+  @NullableIntConverter()
   int? get currentOccupancy;
   @override
   @JsonKey(name: 'is_full')

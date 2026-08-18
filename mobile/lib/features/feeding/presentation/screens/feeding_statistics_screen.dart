@@ -73,17 +73,11 @@ class _FeedingStatisticsScreenState
       );
     }
 
-    final byType = <FeedType, double>{
-      FeedType.pellets: stats.byFeedType.pellets,
-      FeedType.hay: stats.byFeedType.hay,
-      FeedType.vegetables: stats.byFeedType.vegetables,
-      FeedType.grain: stats.byFeedType.grain,
-      FeedType.supplements: stats.byFeedType.supplements,
-      FeedType.other: stats.byFeedType.other,
-    };
-    final presentTypes = byType.entries.where((e) => e.value > 0).toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final maxByType = presentTypes.isEmpty ? 0.0 : presentTypes.first.value;
+    // Каждая единица измерения — своя шкала: килограммы и штуки нельзя
+    // складывать и нельзя сравнивать одной полосой.
+    final units = stats.byFeedType.keys.toList()
+      ..sort((a, b) => (stats.quantityByUnit[b] ?? 0)
+          .compareTo(stats.quantityByUnit[a] ?? 0));
 
     final byFeed = stats.byFeed.entries.toList()
       ..sort((a, b) => b.value.quantity.compareTo(a.value.quantity));
@@ -114,23 +108,47 @@ class _FeedingStatisticsScreenState
               ),
             ],
           ),
-          if (presentTypes.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            _SectionTitle('Расход по типам корма'),
+          if (stats.quantityByUnit.isNotEmpty) ...[
             const SizedBox(height: 12),
             AppCard(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final entry in presentTypes)
-                    MetricBar(
-                      icon: entry.key.icon,
-                      label: entry.key.displayName,
-                      value: formatQuantity(entry.value),
-                      fraction: maxByType == 0 ? 0 : entry.value / maxByType,
-                      color: entry.key.color,
+                  Text(
+                    'Выдано',
+                    style: AppTypography.labelSm.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 8,
+                    children: [
+                      for (final unit in units)
+                        Text(
+                          formatQuantity(
+                            stats.quantityByUnit[unit] ?? 0,
+                            unitLabel(unit),
+                          ),
+                          style: AppTypography.titleLg.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
+            ),
+          ],
+          for (final unit in units) ...[
+            const SizedBox(height: 24),
+            _TypeBreakdown(
+              unit: unit,
+              // Заголовок называет единицу, только когда их несколько:
+              // при одной он был бы шумом.
+              showUnitInTitle: units.length > 1,
+              quantities: stats.byFeedType[unit] ?? const {},
             ),
           ],
           if (byFeed.isNotEmpty) ...[
@@ -170,6 +188,54 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+/// Разбивка расхода по типам корма внутри одной единицы измерения.
+class _TypeBreakdown extends StatelessWidget {
+  final String unit;
+  final bool showUnitInTitle;
+  final Map<String, double> quantities;
+
+  const _TypeBreakdown({
+    required this.unit,
+    required this.showUnitInTitle,
+    required this.quantities,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = quantities.entries.where((e) => e.value > 0).toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    if (entries.isEmpty) return const SizedBox.shrink();
+
+    final max = entries.first.value;
+    final title = showUnitInTitle
+        ? 'Расход по типам корма, ${unitLabel(unit)}'
+        : 'Расход по типам корма';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(title),
+        const SizedBox(height: 12),
+        AppCard(
+          child: Column(
+            children: [
+              for (final entry in entries)
+                MetricBar(
+                  icon: feedTypeFromCode(entry.key)?.icon,
+                  label: feedTypeFromCode(entry.key)?.displayName ?? entry.key,
+                  value: formatQuantity(entry.value, unitLabel(unit)),
+                  fraction: max == 0 ? 0 : entry.value / max,
+                  color: feedTypeFromCode(entry.key)?.color ??
+                      Theme.of(context).colorScheme.primary,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _FeedUsageRow extends StatelessWidget {
   final String name;
   final FeedingByFeed usage;
@@ -197,7 +263,7 @@ class _FeedUsageRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatQuantity(usage.quantity, usage.unit),
+                formatQuantity(usage.quantity, unitLabel(usage.unit)),
                 style: AppTypography.labelLg.copyWith(color: cs.onSurface),
               ),
               if (usage.cost > 0)

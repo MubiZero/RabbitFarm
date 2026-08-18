@@ -28,9 +28,8 @@ _$CageModelImpl _$$CageModelImplFromJson(Map<String, dynamic> json) =>
       rabbits: (json['rabbits'] as List<dynamic>?)
           ?.map((e) => RabbitModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      currentOccupancy: _$JsonConverterFromJson<Object, int>(
+      currentOccupancy: const NullableIntConverter().fromJson(
         json['current_occupancy'],
-        const IntConverter().fromJson,
       ),
       isFull: json['is_full'] as bool?,
       isAvailable: json['is_available'] as bool?,
@@ -50,23 +49,12 @@ Map<String, dynamic> _$$CageModelImplToJson(_$CageModelImpl instance) =>
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'rabbits': instance.rabbits,
-      'current_occupancy': _$JsonConverterToJson<Object, int>(
+      'current_occupancy': const NullableIntConverter().toJson(
         instance.currentOccupancy,
-        const IntConverter().toJson,
       ),
       'is_full': instance.isFull,
       'is_available': instance.isAvailable,
     };
-
-Value? _$JsonConverterFromJson<Json, Value>(
-  Object? json,
-  Value? Function(Json json) fromJson,
-) => json == null ? null : fromJson(json as Json);
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) => value == null ? null : toJson(value);
 
 _$CageStatisticsImpl _$$CageStatisticsImplFromJson(Map<String, dynamic> json) =>
     _$CageStatisticsImpl(

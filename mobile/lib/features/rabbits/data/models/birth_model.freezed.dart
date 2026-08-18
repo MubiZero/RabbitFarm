@@ -338,7 +338,7 @@ class __$$BirthModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$BirthModelImpl implements _BirthModel {
+class _$BirthModelImpl with DiagnosticableTreeMixin implements _BirthModel {
   const _$BirthModelImpl({
     required this.id,
     @JsonKey(name: 'breeding_id') this.breedingId,
@@ -408,8 +408,30 @@ class _$BirthModelImpl implements _BirthModel {
   }
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'BirthModel(id: $id, breedingId: $breedingId, motherId: $motherId, birthDate: $birthDate, kitsBornAlive: $kitsBornAlive, kitsBornDead: $kitsBornDead, kitsWeaned: $kitsWeaned, weaningDate: $weaningDate, complications: $complications, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, mother: $mother, breeding: $breeding, kits: $kits)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'BirthModel'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('breedingId', breedingId))
+      ..add(DiagnosticsProperty('motherId', motherId))
+      ..add(DiagnosticsProperty('birthDate', birthDate))
+      ..add(DiagnosticsProperty('kitsBornAlive', kitsBornAlive))
+      ..add(DiagnosticsProperty('kitsBornDead', kitsBornDead))
+      ..add(DiagnosticsProperty('kitsWeaned', kitsWeaned))
+      ..add(DiagnosticsProperty('weaningDate', weaningDate))
+      ..add(DiagnosticsProperty('complications', complications))
+      ..add(DiagnosticsProperty('notes', notes))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('mother', mother))
+      ..add(DiagnosticsProperty('breeding', breeding))
+      ..add(DiagnosticsProperty('kits', kits));
   }
 
   @override

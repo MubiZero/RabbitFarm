@@ -23,3 +23,26 @@ extension FeedTypeVisuals on FeedType {
         FeedType.other => Icons.inventory_2,
       };
 }
+
+/// Коды с сервера (`kg`, `pellets`) — там, где значение приходит ключом карты
+/// и его не разбирает json_serializable. Неизвестный код не роняет экран:
+/// вернём `null`, а подписью станет сам код.
+FeedType? feedTypeFromCode(String code) => switch (code) {
+      'pellets' => FeedType.pellets,
+      'hay' => FeedType.hay,
+      'vegetables' => FeedType.vegetables,
+      'grain' => FeedType.grain,
+      'supplements' => FeedType.supplements,
+      'other' => FeedType.other,
+      _ => null,
+    };
+
+FeedUnit? feedUnitFromCode(String code) => switch (code) {
+      'kg' => FeedUnit.kg,
+      'liter' => FeedUnit.liter,
+      'piece' => FeedUnit.piece,
+      _ => null,
+    };
+
+/// «kg» → «кг». Незнакомую единицу показываем как есть.
+String unitLabel(String code) => feedUnitFromCode(code)?.displayName ?? code;

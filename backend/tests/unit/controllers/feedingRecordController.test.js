@@ -406,7 +406,43 @@ describe('feedingRecordController', () => {
 
       const json = res.json.mock.calls[0][0];
       expect(json.data.total_feedings).toBe(1);
-      expect(json.data.by_feed_type.pellets).toBe(2);
+      expect(json.data.quantity_by_unit).toEqual({ kg: 2 });
+      expect(json.data.by_feed_type.kg.pellets).toBe(2);
+      expect(json.data.total_cost).toBe(10);
+    });
+
+    it('should keep quantities of different units apart', async () => {
+      FeedingRecord.findAll.mockResolvedValue([
+        {
+          quantity: '3.0',
+          feed: { name: 'Carrots', type: 'vegetables', unit: 'kg', cost_per_unit: '2.0' }
+        },
+        {
+          quantity: '5.0',
+          feed: { name: 'Cabbage heads', type: 'vegetables', unit: 'piece', cost_per_unit: null }
+        }
+      ]);
+
+      const res = mockRes();
+      await ctrl.getStatistics(mockReq({ query: {} }), res, mockNext);
+
+      const { data } = res.json.mock.calls[0][0];
+      expect(data.quantity_by_unit).toEqual({ kg: 3, piece: 5 });
+      expect(data.by_feed_type.kg.vegetables).toBe(3);
+      expect(data.by_feed_type.piece.vegetables).toBe(5);
+      expect(data.total_cost).toBe(6);
+    });
+
+    it('should ignore records whose feed is missing', async () => {
+      FeedingRecord.findAll.mockResolvedValue([{ quantity: '4.0', feed: null }]);
+
+      const res = mockRes();
+      await ctrl.getStatistics(mockReq({ query: {} }), res, mockNext);
+
+      const { data } = res.json.mock.calls[0][0];
+      expect(data.total_feedings).toBe(1);
+      expect(data.quantity_by_unit).toEqual({});
+      expect(data.by_feed_type).toEqual({});
     });
 
     it('should apply date filters', async () => {

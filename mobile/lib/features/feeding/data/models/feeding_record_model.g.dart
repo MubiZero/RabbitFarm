@@ -84,13 +84,27 @@ _$FeedingStatisticsImpl _$$FeedingStatisticsImplFromJson(
   Map<String, dynamic> json,
 ) => _$FeedingStatisticsImpl(
   totalFeedings: (json['total_feedings'] as num).toInt(),
-  totalQuantity: (json['total_quantity'] as num).toDouble(),
-  byFeedType: FeedingByType.fromJson(
-    json['by_feed_type'] as Map<String, dynamic>,
-  ),
-  byFeed: (json['by_feed'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(k, FeedingByFeed.fromJson(e as Map<String, dynamic>)),
-  ),
+  quantityByUnit:
+      (json['quantity_by_unit'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, (e as num).toDouble()),
+      ) ??
+      const {},
+  byFeedType:
+      (json['by_feed_type'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(
+          k,
+          (e as Map<String, dynamic>).map(
+            (k, e) => MapEntry(k, (e as num).toDouble()),
+          ),
+        ),
+      ) ??
+      const {},
+  byFeed:
+      (json['by_feed'] as Map<String, dynamic>?)?.map(
+        (k, e) =>
+            MapEntry(k, FeedingByFeed.fromJson(e as Map<String, dynamic>)),
+      ) ??
+      const {},
   totalCost: (json['total_cost'] as num).toDouble(),
 );
 
@@ -98,31 +112,11 @@ Map<String, dynamic> _$$FeedingStatisticsImplToJson(
   _$FeedingStatisticsImpl instance,
 ) => <String, dynamic>{
   'total_feedings': instance.totalFeedings,
-  'total_quantity': instance.totalQuantity,
+  'quantity_by_unit': instance.quantityByUnit,
   'by_feed_type': instance.byFeedType,
   'by_feed': instance.byFeed,
   'total_cost': instance.totalCost,
 };
-
-_$FeedingByTypeImpl _$$FeedingByTypeImplFromJson(Map<String, dynamic> json) =>
-    _$FeedingByTypeImpl(
-      pellets: (json['pellets'] as num?)?.toDouble() ?? 0.0,
-      hay: (json['hay'] as num?)?.toDouble() ?? 0.0,
-      vegetables: (json['vegetables'] as num?)?.toDouble() ?? 0.0,
-      grain: (json['grain'] as num?)?.toDouble() ?? 0.0,
-      supplements: (json['supplements'] as num?)?.toDouble() ?? 0.0,
-      other: (json['other'] as num?)?.toDouble() ?? 0.0,
-    );
-
-Map<String, dynamic> _$$FeedingByTypeImplToJson(_$FeedingByTypeImpl instance) =>
-    <String, dynamic>{
-      'pellets': instance.pellets,
-      'hay': instance.hay,
-      'vegetables': instance.vegetables,
-      'grain': instance.grain,
-      'supplements': instance.supplements,
-      'other': instance.other,
-    };
 
 _$FeedingByFeedImpl _$$FeedingByFeedImplFromJson(Map<String, dynamic> json) =>
     _$FeedingByFeedImpl(
