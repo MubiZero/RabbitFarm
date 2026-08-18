@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/vaccination_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Репозиторий для работы с вакцинациями
 class VaccinationsRepository {
@@ -137,7 +138,7 @@ class VaccinationsRepository {
       return Vaccination.fromJson(apiResponse.data!);
     } on DioException catch (e) {
       throw Exception(
-          e.response?.data['message'] ?? 'Ошибка создания записи о вакцинации');
+          serverMessage(e) ?? 'Ошибка создания записи о вакцинации');
     } catch (e) {
       throw Exception('Ошибка создания записи о вакцинации: $e');
     }
@@ -163,7 +164,7 @@ class VaccinationsRepository {
 
       return Vaccination.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ??
+      throw Exception(serverMessage(e) ??
           'Ошибка обновления записи о вакцинации');
     } catch (e) {
       throw Exception('Ошибка обновления записи о вакцинации: $e');
@@ -184,7 +185,7 @@ class VaccinationsRepository {
         throw Exception(apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ??
+      throw Exception(serverMessage(e) ??
           'Ошибка удаления записи о вакцинации');
     } catch (e) {
       throw Exception('Ошибка удаления записи о вакцинации: $e');

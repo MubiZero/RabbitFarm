@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/medical_record_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Repository for medical records operations
 class MedicalRecordsRepository {
@@ -58,7 +59,7 @@ class MedicalRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get medical records: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get medical records: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -76,7 +77,7 @@ class MedicalRecordsRepository {
       throw Exception('Failed to get medical record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get medical record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get medical record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -95,7 +96,7 @@ class MedicalRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get rabbit medical records: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get rabbit medical records: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -115,7 +116,7 @@ class MedicalRecordsRepository {
       throw Exception('Failed to create medical record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to create medical record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to create medical record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -135,7 +136,7 @@ class MedicalRecordsRepository {
       throw Exception('Failed to update medical record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to update medical record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to update medical record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -151,7 +152,7 @@ class MedicalRecordsRepository {
       }
     } on DioException catch (e) {
       throw Exception(
-          'Failed to delete medical record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to delete medical record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -169,7 +170,7 @@ class MedicalRecordsRepository {
       throw Exception('Failed to get statistics');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get statistics: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -190,7 +191,7 @@ class MedicalRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get ongoing treatments: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get ongoing treatments: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -221,7 +222,7 @@ class MedicalRecordsRepository {
       throw Exception('Failed to get cost report');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get cost report: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get cost report: ${serverMessage(e) ?? e.message}');
     }
   }
 }

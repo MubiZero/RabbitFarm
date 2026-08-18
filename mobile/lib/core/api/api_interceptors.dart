@@ -203,6 +203,9 @@ class ErrorInterceptor extends Interceptor {
             case 404:
               errorMessage = 'Не найдено';
               break;
+            case 409:
+              errorMessage = 'Такая запись уже существует';
+              break;
             case 422:
               errorMessage = 'Ошибка валидации';
               break;

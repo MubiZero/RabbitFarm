@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
+import '../../../../core/api/api_error.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -52,13 +53,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           bool userExists = false;
 
           if (e is DioException) {
-            message = e.message ?? 'Произошла ошибка';
-            if (e.error is Map) {
-              final errorMap = e.error as Map;
-              if (errorMap['code'] == 'USER_EXISTS') {
-                userExists = true;
-              }
-            }
+            message = serverMessage(e) ?? e.message ?? 'Произошла ошибка';
+            userExists = serverErrorCode(e) == 'USER_EXISTS';
           }
 
           ScaffoldMessenger.of(context).showSnackBar(

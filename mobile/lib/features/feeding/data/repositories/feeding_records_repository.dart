@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/feeding_record_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Repository for feeding records operations
 class FeedingRecordsRepository {
@@ -58,7 +59,7 @@ class FeedingRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get feeding records: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get feeding records: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -76,7 +77,7 @@ class FeedingRecordsRepository {
       throw Exception('Failed to get feeding record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get feeding record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get feeding record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -95,7 +96,7 @@ class FeedingRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get rabbit feeding records: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get rabbit feeding records: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -115,7 +116,7 @@ class FeedingRecordsRepository {
       throw Exception('Failed to create feeding record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to create feeding record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to create feeding record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -135,7 +136,7 @@ class FeedingRecordsRepository {
       throw Exception('Failed to update feeding record');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to update feeding record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to update feeding record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -151,7 +152,7 @@ class FeedingRecordsRepository {
       }
     } on DioException catch (e) {
       throw Exception(
-          'Failed to delete feeding record: ${e.response?.data['message'] ?? e.message}');
+          'Failed to delete feeding record: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -182,7 +183,7 @@ class FeedingRecordsRepository {
       throw Exception('Failed to get statistics');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get statistics: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -205,7 +206,7 @@ class FeedingRecordsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get recent feeding records: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get recent feeding records: ${serverMessage(e) ?? e.message}');
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/feed_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Repository for feeds operations
 class FeedsRepository {
@@ -50,7 +51,7 @@ class FeedsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get feeds: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get feeds: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -68,7 +69,7 @@ class FeedsRepository {
       throw Exception('Failed to get feed');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get feed: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get feed: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -87,7 +88,7 @@ class FeedsRepository {
       throw Exception('Failed to create feed');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to create feed: ${e.response?.data['message'] ?? e.message}');
+          'Failed to create feed: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -106,7 +107,7 @@ class FeedsRepository {
       throw Exception('Failed to update feed');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to update feed: ${e.response?.data['message'] ?? e.message}');
+          'Failed to update feed: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -122,7 +123,7 @@ class FeedsRepository {
       }
     } on DioException catch (e) {
       throw Exception(
-          'Failed to delete feed: ${e.response?.data['message'] ?? e.message}');
+          'Failed to delete feed: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -140,7 +141,7 @@ class FeedsRepository {
       throw Exception('Failed to get statistics');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get statistics: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -159,7 +160,7 @@ class FeedsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get low stock feeds: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get low stock feeds: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -178,7 +179,7 @@ class FeedsRepository {
       throw Exception('Failed to adjust stock');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to adjust stock: ${e.response?.data['message'] ?? e.message}');
+          'Failed to adjust stock: ${serverMessage(e) ?? e.message}');
     }
   }
 }

@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/breed_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Репозиторий для работы с породами кроликов
 class BreedsRepository {
@@ -76,7 +77,7 @@ class BreedsRepository {
 
       return BreedModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка создания породы');
+      throw Exception(serverMessage(e) ?? 'Ошибка создания породы');
     } catch (e) {
       throw Exception('Ошибка создания породы: $e');
     }
@@ -101,7 +102,7 @@ class BreedsRepository {
 
       return BreedModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка обновления породы');
+      throw Exception(serverMessage(e) ?? 'Ошибка обновления породы');
     } catch (e) {
       throw Exception('Ошибка обновления породы: $e');
     }
@@ -121,7 +122,7 @@ class BreedsRepository {
         throw Exception(apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка удаления породы');
+      throw Exception(serverMessage(e) ?? 'Ошибка удаления породы');
     } catch (e) {
       throw Exception('Ошибка удаления породы: $e');
     }

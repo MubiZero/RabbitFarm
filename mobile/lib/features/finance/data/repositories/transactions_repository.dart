@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/transaction_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Repository for financial transactions operations
 class TransactionsRepository {
@@ -64,7 +65,7 @@ class TransactionsRepository {
       return [];
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get transactions: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get transactions: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -82,7 +83,7 @@ class TransactionsRepository {
       throw Exception('Failed to get transaction');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get transaction: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get transaction: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -100,7 +101,7 @@ class TransactionsRepository {
       throw Exception('Failed to get rabbit transactions');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get rabbit transactions: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get rabbit transactions: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -119,7 +120,7 @@ class TransactionsRepository {
       throw Exception('Failed to create transaction');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to create transaction: ${e.response?.data['message'] ?? e.message}');
+          'Failed to create transaction: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -139,7 +140,7 @@ class TransactionsRepository {
       throw Exception('Failed to update transaction');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to update transaction: ${e.response?.data['message'] ?? e.message}');
+          'Failed to update transaction: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -155,7 +156,7 @@ class TransactionsRepository {
       }
     } on DioException catch (e) {
       throw Exception(
-          'Failed to delete transaction: ${e.response?.data['message'] ?? e.message}');
+          'Failed to delete transaction: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -186,7 +187,7 @@ class TransactionsRepository {
       throw Exception('Failed to get statistics');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get statistics: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get statistics: ${serverMessage(e) ?? e.message}');
     }
   }
 
@@ -213,7 +214,7 @@ class TransactionsRepository {
       throw Exception('Failed to get monthly report');
     } on DioException catch (e) {
       throw Exception(
-          'Failed to get monthly report: ${e.response?.data['message'] ?? e.message}');
+          'Failed to get monthly report: ${serverMessage(e) ?? e.message}');
     }
   }
 

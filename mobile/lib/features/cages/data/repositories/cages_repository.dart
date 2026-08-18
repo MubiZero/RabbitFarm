@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/cage_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Репозиторий для работы с клетками
 class CagesRepository {
@@ -104,7 +105,7 @@ class CagesRepository {
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка создания клетки');
+      throw Exception(serverMessage(e) ?? 'Ошибка создания клетки');
     } catch (e) {
       throw Exception('Ошибка создания клетки: $e');
     }
@@ -129,7 +130,7 @@ class CagesRepository {
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка обновления клетки');
+      throw Exception(serverMessage(e) ?? 'Ошибка обновления клетки');
     } catch (e) {
       throw Exception('Ошибка обновления клетки: $e');
     }
@@ -149,7 +150,7 @@ class CagesRepository {
         throw Exception(apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка удаления клетки');
+      throw Exception(serverMessage(e) ?? 'Ошибка удаления клетки');
     } catch (e) {
       throw Exception('Ошибка удаления клетки: $e');
     }
@@ -225,7 +226,7 @@ class CagesRepository {
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка отметки об уборке');
+      throw Exception(serverMessage(e) ?? 'Ошибка отметки об уборке');
     } catch (e) {
       throw Exception('Ошибка отметки об уборке: $e');
     }

@@ -5,6 +5,7 @@ import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/birth_model.dart';
 import '../models/rabbit_model.dart';
+import '../../../../core/api/api_error.dart';
 
 /// Репозиторий для работы с окролами
 class BirthsRepository {
@@ -115,7 +116,7 @@ class BirthsRepository {
 
       return BirthModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка создания окрола');
+      throw Exception(serverMessage(e) ?? 'Ошибка создания окрола');
     } catch (e) {
       throw Exception('Ошибка создания окрола: $e');
     }
@@ -140,7 +141,7 @@ class BirthsRepository {
 
       return BirthModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка обновления окрола');
+      throw Exception(serverMessage(e) ?? 'Ошибка обновления окрола');
     } catch (e) {
       throw Exception('Ошибка обновления окрола: $e');
     }
@@ -160,7 +161,7 @@ class BirthsRepository {
         throw Exception(apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Ошибка удаления окрола');
+      throw Exception(serverMessage(e) ?? 'Ошибка удаления окрола');
     } catch (e) {
       throw Exception('Ошибка удаления окрола: $e');
     }
@@ -212,7 +213,7 @@ class BirthsRepository {
           .toList();
     } on DioException catch (e) {
       throw Exception(
-        e.response?.data['message'] ?? 'Ошибка создания крольчат',
+        serverMessage(e) ?? 'Ошибка создания крольчат',
       );
     } catch (e) {
       throw Exception('Ошибка создания крольчат: $e');
