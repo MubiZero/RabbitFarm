@@ -134,6 +134,38 @@ describe('Feeding Records API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
+      expect(res.body.data.total_feedings).toBeGreaterThan(0);
+      expect(Object.keys(res.body.data.quantity_by_unit)).toContain('kg');
+      expect(res.body.data.by_feed_type.kg.pellets).toBeGreaterThan(0);
+    });
+
+    it('не должен смешивать количества в разных единицах измерения', async () => {
+      const pieceFeed = await request(app)
+        .post('/api/v1/feeds')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Кочаны капусты', type: 'vegetables', unit: 'piece', current_stock: 50 });
+
+      await request(app)
+        .post('/api/v1/feeding-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          feed_id: pieceFeed.body.data.id,
+          cage_id: cageId,
+          quantity: 7,
+          fed_at: '2024-05-02T08:00:00Z'
+        });
+
+      const res = await request(app)
+        .get('/api/v1/feeding-records/statistics')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      const { quantity_by_unit: byUnit, by_feed_type: byType } = res.body.data;
+
+      // Штуки живут отдельно от килограммов, а не в общей сумме.
+      expect(byUnit.piece).toBe(7);
+      expect(byUnit.kg).toBeGreaterThan(0);
+      expect(byType.piece).toEqual({ vegetables: 7 });
+      expect(byType.kg.vegetables).toBeUndefined();
     });
   });
 
