@@ -10,3 +10,6 @@ uploads
 tests
 *.zip
 *.log
+coverage
+.github
+*.test.js

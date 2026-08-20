@@ -1,0 +1,85 @@
+# Прод-стек для Coolify. Локальная разработка — в docker-compose.yml.
+#
+# Секреты не хранятся ни здесь, ни в репозитории: Coolify генерирует их сам
+# по «магическим» переменным SERVICE_* при первом деплое и держит у себя.
+# Порты наружу не публикуются — трафик идёт через прокси Coolify, который
+# сам выпускает и продлевает сертификаты.
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rabbitfarm}
+      MYSQL_USER: ${MYSQL_USER:-rabbitfarm}
+      # Пароли генерирует Coolify: одинаковый идентификатор DB означает
+      # одно и то же значение здесь и в сервисе api.
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_DB}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_DBROOT}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      # Проверяем не порт, а готовность отвечать на запросы: MySQL слушает
+      # раньше, чем заканчивает инициализацию.
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      # Домен и проксирование на порт 4567 настраивает Coolify по этой строке.
+      - SERVICE_FQDN_API_4567
+      - NODE_ENV=production
+      - PORT=4567
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${MYSQL_DATABASE:-rabbitfarm}
+      - DB_USER=${MYSQL_USER:-rabbitfarm}
+      - DB_PASSWORD=${SERVICE_PASSWORD_DB}
+      # Секреты подписи токенов: 64 случайных hex-символа на каждый.
+      - JWT_SECRET=${SERVICE_HEX_64_JWT}
+      - JWT_EXPIRE=${JWT_EXPIRE:-15m}
+      - JWT_REFRESH_SECRET=${SERVICE_HEX_64_JWTREFRESH}
+      - JWT_REFRESH_EXPIRE=${JWT_REFRESH_EXPIRE:-7d}
+      # Браузерное приложение ходит с другого домена — разрешаем именно его,
+      # а не «*»: со звёздочкой куки и авторизация работают небезопасно.
+      - CORS_ORIGIN=${SERVICE_URL_WEB}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-5242880}
+      - ALLOWED_FILE_TYPES=${ALLOWED_FILE_TYPES:-image/jpeg,image/png,image/jpg,image/webp}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      # Справочники наливаются только по явному указанию.
+      - RUN_SEEDS=${RUN_SEEDS:-false}
+    volumes:
+      # Фотографии кроликов и чеки лежат на диске: без тома они исчезнут
+      # при первом же передеплое.
+      - api-uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+      args:
+        # У Flutter web нет рантайм-конфигурации: адрес API попадает в бандл
+        # при сборке, поэтому смена домена API требует пересборки web.
+        API_URL: ${SERVICE_URL_API}/api/v1
+    restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_WEB_80
+    # Зависимости от api намеренно нет: статика должна подниматься и когда
+    # бэкенд лежит — приложение в этом случае показывает состояние ошибки
+    # с кнопкой «Повторить», а не белый экран от недоступного контейнера.
+
+volumes:
+  db-data:
+  api-uploads:
