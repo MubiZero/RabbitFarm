@@ -10,12 +10,12 @@ services:
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-rabbitfarm}
-      MYSQL_USER: ${MYSQL_USER:-rabbitfarm}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-rabbitfarm}
+      - MYSQL_USER=${MYSQL_USER:-rabbitfarm}
       # Пароли генерирует Coolify: одинаковый идентификатор DB означает
       # одно и то же значение здесь и в сервисе api.
-      MYSQL_PASSWORD: ${SERVICE_PASSWORD_DB}
-      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_DBROOT}
+      - MYSQL_PASSWORD=${SERVICE_PASSWORD_DB}
+      - MYSQL_ROOT_PASSWORD=${SERVICE_PASSWORD_DBROOT}
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     environment:
       # Домен и проксирование на порт 4567 настраивает Coolify по этой строке.
-      - SERVICE_FQDN_API_4567
+      - SERVICE_FQDN_API_4567=/
       - NODE_ENV=production
       - PORT=4567
       - DB_HOST=db
@@ -75,7 +75,7 @@ services:
         API_URL: ${SERVICE_URL_API}/api/v1
     restart: unless-stopped
     environment:
-      - SERVICE_FQDN_WEB_80
+      - SERVICE_FQDN_WEB_80=/
     # Зависимости от api намеренно нет: статика должна подниматься и когда
     # бэкенд лежит — приложение в этом случае показывает состояние ошибки
     # с кнопкой «Повторить», а не белый экран от недоступного контейнера.
