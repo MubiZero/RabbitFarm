@@ -99,6 +99,7 @@ class StaffScreen extends ConsumerWidget {
                   member,
                   isActive: !member.isActive,
                 ),
+                onResetPassword: () => _resetPassword(context, ref, member),
               ),
           const SizedBox(height: 24),
           invitationsAsync.when(
@@ -152,6 +153,59 @@ class StaffScreen extends ConsumerWidget {
                 : 'Изменения сохранены',
           ),
         ),
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  /// Сброс пароля работнику: почты у сервиса нет, поэтому владелец
+  /// получает временный пароль и передаёт его сам.
+  Future<void> _resetPassword(
+    BuildContext context,
+    WidgetRef ref,
+    FarmMember member,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Сбросить пароль?'),
+        content: Text(
+          '${member.fullName} выйдет из приложения, а вы получите временный '
+          'пароль, который нужно ему передать.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Отмена'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Сбросить'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      final password =
+          await ref.read(staffRepositoryProvider).resetMemberPassword(member.id);
+      if (!context.mounted) return;
+      await _showSecretDialog(
+        context,
+        title: 'Временный пароль',
+        explanation:
+            'Передайте пароль ${member.fullName}. Второй раз он не покажется — '
+            'при необходимости сбросьте ещё раз.',
+        secret: password,
       );
     } catch (e) {
       messenger.showSnackBar(
@@ -324,36 +378,57 @@ class StaffScreen extends ConsumerWidget {
     BuildContext context,
     CreatedInvitation invitation,
   ) async {
+    await _showSecretDialog(
+      context,
+      title: 'Код приглашения',
+      explanation:
+          'Передайте этот код ${invitation.email} любым удобным способом. '
+          'Второй раз он не покажется: сервер хранит только его отпечаток.',
+      secret: invitation.code,
+      footnote:
+          'Действует до ${DateFormat('d MMMM', 'ru_RU').format(invitation.expiresAt)}',
+    );
+  }
+
+  /// Одноразовый секрет: показать, дать скопировать и не обещать повтора.
+  Future<void> _showSecretDialog(
+    BuildContext context, {
+    required String title,
+    required String explanation,
+    required String secret,
+    String? footnote,
+  }) async {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Код приглашения'),
+        title: Text(title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Передайте этот код ${invitation.email} любым удобным способом. '
-              'Второй раз он не покажется: сервер хранит только его отпечаток.',
+              explanation,
               style: AppTypography.bodyMd.copyWith(
                 color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
             SelectableText(
-              invitation.code,
+              secret,
               style: AppTypography.titleMd.copyWith(
                 fontFamily: 'monospace',
                 color: Theme.of(dialogContext).colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Действует до ${DateFormat('d MMMM', 'ru_RU').format(invitation.expiresAt)}',
-              style: AppTypography.labelSm.copyWith(
-                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+            if (footnote != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                footnote,
+                style: AppTypography.labelSm.copyWith(
+                  color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
           ],
         ),
         actions: [
@@ -364,10 +439,10 @@ class StaffScreen extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(dialogContext);
-              await Clipboard.setData(ClipboardData(text: invitation.code));
+              await Clipboard.setData(ClipboardData(text: secret));
               await HapticFeedback.lightImpact();
               messenger.showSnackBar(
-                const SnackBar(content: Text('Код скопирован')),
+                const SnackBar(content: Text('Скопировано')),
               );
             },
             icon: const Icon(Icons.copy_all_outlined),
@@ -400,11 +475,13 @@ class _MemberCard extends StatelessWidget {
   final FarmMember member;
   final ValueChanged<FarmRole>? onChangeRole;
   final VoidCallback? onToggleAccess;
+  final VoidCallback? onResetPassword;
 
   const _MemberCard({
     required this.member,
     this.onChangeRole,
     this.onToggleAccess,
+    this.onResetPassword,
   });
 
   @override
@@ -469,6 +546,8 @@ class _MemberCard extends StatelessWidget {
                       onChangeRole?.call(FarmRole.manager);
                     case 'access':
                       onToggleAccess?.call();
+                    case 'password':
+                      onResetPassword?.call();
                   }
                 },
                 itemBuilder: (context) => [
@@ -482,6 +561,10 @@ class _MemberCard extends StatelessWidget {
                       value: 'worker',
                       child: Text('Сделать работником'),
                     ),
+                  const PopupMenuItem(
+                    value: 'password',
+                    child: Text('Сбросить пароль'),
+                  ),
                   PopupMenuItem(
                     value: 'access',
                     child: Text(inactive ? 'Открыть доступ' : 'Закрыть доступ'),

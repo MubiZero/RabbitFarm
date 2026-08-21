@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
-const { User, Invitation } = require('../models');
+const { User, Invitation, RefreshToken } = require('../models');
 const PasswordUtil = require('../utils/password');
 const logger = require('../utils/logger');
 
@@ -122,6 +122,32 @@ class StaffService {
 
     logger.info('Invitation accepted', { invitationId: invitation.id, userId: user.id });
     return user;
+  }
+
+  /**
+   * Сбросить пароль работнику.
+   *
+   * Почтового сервера нет, поэтому самостоятельное восстановление невозможно:
+   * временный пароль задаёт владелец и передаёт человеку сам. Возвращается
+   * он один раз — в базе, как обычно, лежит только хеш.
+   */
+  async resetMemberPassword(farmId, memberId) {
+    const member = await User.findOne({
+      where: { id: memberId, owner_id: farmId }
+    });
+    if (!member) {
+      throw new Error('MEMBER_NOT_FOUND');
+    }
+
+    const temporaryPassword = crypto.randomBytes(9).toString('base64url');
+    await member.update({ password_hash: await PasswordUtil.hash(temporaryPassword) });
+
+    // Старые сессии работника перестают действовать: иначе смена пароля
+    // не отбирает доступ у того, кто уже вошёл.
+    await RefreshToken.destroy({ where: { user_id: member.id } });
+
+    logger.info('Staff password reset', { memberId, farmId });
+    return { member, temporaryPassword };
   }
 
   /**

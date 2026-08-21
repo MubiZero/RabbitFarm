@@ -49,6 +49,15 @@ router.delete('/invitations/:id', authorize(['owner']), staffController.revokeIn
  *     summary: Изменить роль работника или отключить доступ
  *     tags: [Staff]
  */
+/**
+ * @swagger
+ * /staff/{id}/reset-password:
+ *   post:
+ *     summary: Задать работнику временный пароль (показывается один раз)
+ *     tags: [Staff]
+ */
+router.post('/:id/reset-password', authorize(['owner']), staffController.resetMemberPassword);
+
 router.patch(
   '/:id',
   authorize(['owner']),

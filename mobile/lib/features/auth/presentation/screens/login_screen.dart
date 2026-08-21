@@ -219,6 +219,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Вступление по приглашению — основной путь для сотрудников:
+                  // регистрация на ферме закрыта, аккаунт выдаёт владелец.
+                  TextButton(
+                    onPressed: authState.isLoading
+                        ? null
+                        : () => context.go('/join'),
+                    child: const Text('У меня есть код приглашения'),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Забыли пароль? Его сбрасывает владелец фермы — '
+                    'письма сервис не отправляет.',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.labelSm.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
                   // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

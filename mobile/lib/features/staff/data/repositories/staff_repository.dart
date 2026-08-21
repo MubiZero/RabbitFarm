@@ -76,6 +76,16 @@ class StaffRepository {
     }
   }
 
+  /// Задать работнику временный пароль. Возвращается один раз.
+  Future<String> resetMemberPassword(int id) async {
+    try {
+      final response = await _apiClient.post('/staff/$id/reset-password');
+      return response.data['data']['temporary_password'] as String;
+    } on DioException catch (e) {
+      throw Exception(serverMessage(e) ?? 'Не удалось сбросить пароль');
+    }
+  }
+
   /// Присоединиться к ферме по коду. Вызывается до авторизации.
   Future<Map<String, dynamic>> acceptInvitation({
     required String code,

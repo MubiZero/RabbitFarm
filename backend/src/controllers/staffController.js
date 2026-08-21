@@ -30,6 +30,27 @@ class StaffController {
     }
   }
 
+  /** POST /staff/:id/reset-password — задать работнику временный пароль */
+  async resetMemberPassword(req, res, next) {
+    try {
+      const { member, temporaryPassword } = await staffService.resetMemberPassword(
+        req.farmId,
+        req.params.id
+      );
+
+      return ApiResponse.success(
+        res,
+        { id: member.id, email: member.email, temporary_password: temporaryPassword },
+        'Временный пароль создан. Передайте его — второй раз он не покажется.'
+      );
+    } catch (error) {
+      if (error.message === 'MEMBER_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Работник не найден');
+      }
+      next(error);
+    }
+  }
+
   /** POST /staff/invitations — выписать приглашение */
   async createInvitation(req, res, next) {
     try {

@@ -165,6 +165,50 @@ describe('Приглашения в ферму', () => {
     expect(login.status).toBe(403);
   });
 
+  it('владелец задаёт работнику временный пароль, и старый перестаёт работать', async () => {
+    const invite = await request(app)
+      .post('/api/v1/staff/invitations')
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({ email: 'forgot@example.com', role: 'worker' });
+    const joined = await request(app)
+      .post('/api/v1/auth/accept-invitation')
+      .send({ code: invite.body.data.code, password: 'Password123!', full_name: 'Забывчивый' });
+
+    const reset = await request(app)
+      .post(`/api/v1/staff/${joined.body.data.user.id}/reset-password`)
+      .set('Authorization', `Bearer ${ownerToken}`);
+
+    expect(reset.status).toBe(200);
+    const temporary = reset.body.data.temporary_password;
+    expect(temporary).toEqual(expect.any(String));
+
+    const withOld = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'forgot@example.com', password: 'Password123!' });
+    expect(withOld.status).toBe(401);
+
+    const withNew = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'forgot@example.com', password: temporary });
+    expect(withNew.status).toBe(200);
+  });
+
+  it('работник не может сбросить пароль другому', async () => {
+    const invite = await request(app)
+      .post('/api/v1/staff/invitations')
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({ email: 'notallowed@example.com', role: 'worker' });
+    const joined = await request(app)
+      .post('/api/v1/auth/accept-invitation')
+      .send({ code: invite.body.data.code, password: 'Password123!', full_name: 'Работник' });
+
+    const res = await request(app)
+      .post(`/api/v1/staff/${joined.body.data.user.id}/reset-password`)
+      .set('Authorization', `Bearer ${joined.body.data.access_token}`);
+
+    expect(res.status).toBe(403);
+  });
+
   it('работник не может приглашать', async () => {
     const invite = await request(app)
       .post('/api/v1/staff/invitations')
