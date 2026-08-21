@@ -31,7 +31,7 @@ const { MedicalRecord, Rabbit, Transaction, sequelize } = require('../../../src/
 const ctrl = require('../../../src/controllers/medicalRecordController');
 
 const mockReq = (overrides = {}) => ({
-  body: {}, params: {}, query: {}, user: { id: 1 }, ...overrides
+  body: {}, params: {}, query: {}, user: { id: 1 }, farmId: 1, ...overrides
 });
 const mockRes = () => {
   const res = {};

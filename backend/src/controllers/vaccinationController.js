@@ -19,7 +19,7 @@ class VaccinationController {
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbit_id, user_id: req.user.id },
+        where: { id: rabbit_id, user_id: req.farmId },
         transaction: t
       });
       if (!rabbit) {
@@ -83,7 +83,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -157,7 +157,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -199,7 +199,7 @@ class VaccinationController {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: req.user.id
+          user_id: req.farmId
         }
       });
       if (!rabbit) {
@@ -241,7 +241,7 @@ class VaccinationController {
         const rabbit = await Rabbit.findOne({
           where: {
             id: req.body.rabbit_id,
-            user_id: req.user.id
+            user_id: req.farmId
           }
         });
         if (!rabbit) {
@@ -289,7 +289,7 @@ class VaccinationController {
         include: [{
           model: Rabbit,
           as: 'rabbit',
-          where: { user_id: req.user.id },
+          where: { user_id: req.farmId },
           attributes: ['id']
         }]
       });
@@ -312,7 +312,7 @@ class VaccinationController {
    */
   async getStatistics(req, res, next) {
     try {
-      const user_id = req.user.id;
+      const user_id = req.farmId;
       const now = new Date();
       const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -472,7 +472,7 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             include: [
               {
@@ -523,7 +523,7 @@ class VaccinationController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
-              user_id: req.user.id, // Filter by user
+              user_id: req.farmId, // Filter by user
               status: {
                 [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
               }

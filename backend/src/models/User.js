@@ -30,6 +30,12 @@ module.exports = (sequelize) => {
         }
       }
     },
+    // NULL — пользователь сам себе ферма (владелец).
+    // Заполнено — это работник фермы указанного владельца.
+    owner_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
     role: {
       type: DataTypes.ENUM('owner', 'manager', 'worker'),
       allowNull: false,

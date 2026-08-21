@@ -7,7 +7,7 @@ const breedingService = require('../../../src/services/breedingService');
 const breedingController = require('../../../src/controllers/breedingController');
 
 const mockReq = (overrides = {}) => ({
-  user: { id: 1 }, params: {}, body: {}, query: {}, ...overrides
+  user: { id: 1 }, farmId: 1, params: {}, body: {}, query: {}, ...overrides
 });
 const mockRes = () => {
   const res = {};

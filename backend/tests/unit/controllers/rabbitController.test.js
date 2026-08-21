@@ -10,6 +10,7 @@ const rabbitController = require('../../../src/controllers/rabbitController');
 
 const mockReq = (overrides = {}) => ({
   user: { id: 1 },
+  farmId: 1,
   params: {},
   body: {},
   query: {},

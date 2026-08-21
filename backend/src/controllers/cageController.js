@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
 class CageController {
   async create(req, res, next) {
     try {
-      const cage = await cageService.createCage({ ...req.body, user_id: req.user.id });
+      const cage = await cageService.createCage({ ...req.body, user_id: req.farmId });
       return ApiResponse.created(res, cage, 'Клетка успешно создана');
     } catch (error) {
       next(error);
@@ -18,7 +18,7 @@ class CageController {
 
   async getById(req, res, next) {
     try {
-      const cage = await cageService.getCageById(req.params.id, req.user.id);
+      const cage = await cageService.getCageById(req.params.id, req.farmId);
       return ApiResponse.success(res, cage);
     } catch (error) {
       if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -28,7 +28,7 @@ class CageController {
 
   async list(req, res, next) {
     try {
-      const result = await cageService.listCages(req.user.id, req.query);
+      const result = await cageService.listCages(req.farmId, req.query);
       return ApiResponse.paginated(
         res,
         result.items,
@@ -44,7 +44,7 @@ class CageController {
 
   async update(req, res, next) {
     try {
-      const cage = await cageService.updateCage(req.params.id, req.user.id, req.body);
+      const cage = await cageService.updateCage(req.params.id, req.farmId, req.body);
       return ApiResponse.success(res, cage, 'Клетка успешно обновлена');
     } catch (error) {
       if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -54,7 +54,7 @@ class CageController {
 
   async delete(req, res, next) {
     try {
-      await cageService.deleteCage(req.params.id, req.user.id);
+      await cageService.deleteCage(req.params.id, req.farmId);
       return ApiResponse.success(res, null, 'Клетка успешно удалена');
     } catch (error) {
       if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -67,7 +67,7 @@ class CageController {
 
   async getStatistics(req, res, next) {
     try {
-      const stats = await cageService.getStatistics(req.user.id);
+      const stats = await cageService.getStatistics(req.farmId);
       return ApiResponse.success(res, stats, 'Статистика клеток получена успешно');
     } catch (error) {
       next(error);
@@ -76,7 +76,7 @@ class CageController {
 
   async markCleaned(req, res, next) {
     try {
-      const cage = await cageService.markCleaned(req.params.id, req.user.id);
+      const cage = await cageService.markCleaned(req.params.id, req.farmId);
       return ApiResponse.success(res, cage, 'Отметка об уборке сохранена');
     } catch (error) {
       if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
@@ -86,7 +86,7 @@ class CageController {
 
   async getLayout(req, res, next) {
     try {
-      const layout = await cageService.getLayout(req.user.id);
+      const layout = await cageService.getLayout(req.farmId);
       return ApiResponse.success(res, layout, 'Схема размещения получена успешно');
     } catch (error) {
       next(error);

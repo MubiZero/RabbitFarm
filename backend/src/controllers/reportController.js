@@ -13,6 +13,7 @@ const {
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
+const { farmMemberIds } = require('../utils/farm');
 
 /**
  * Report Controller
@@ -25,7 +26,7 @@ const ApiResponse = require('../utils/apiResponse');
  */
 exports.getDashboard = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.farmId;
 
     // Pre-compute date boundaries used by multiple queries
     const thirtyDaysAgo = new Date();
@@ -310,7 +311,7 @@ exports.getFarmReport = async (req, res, next) => {
 
     // Rabbit population dynamics
     const rabbitsByBreed = await Rabbit.findAll({
-      where: { user_id: req.user.id },
+      where: { user_id: req.farmId },
       attributes: [
         'breed_id',
         [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
@@ -322,7 +323,7 @@ exports.getFarmReport = async (req, res, next) => {
     // Financial summary
     const transactions = await Transaction.findAll({
       where: {
-        created_by: req.user.id,
+        created_by: { [Op.in]: await farmMemberIds(req.farmId) },
         transaction_date: {
           [Op.gte]: effectiveFromDate,
           [Op.lte]: effectiveToDate
@@ -339,16 +340,16 @@ exports.getFarmReport = async (req, res, next) => {
 
     // Health overview
     const vaccinationsCount = await Vaccination.count({
-      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }]
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }]
     });
     const medicalRecordsCount = await MedicalRecord.count({
-      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }]
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }]
     });
 
     // Breeding overview
     const breedingsCount = await Breeding.count({
       where: {
-        user_id: req.user.id,
+        user_id: req.farmId,
         breeding_date: {
           [Op.gte]: effectiveFromDate,
           [Op.lte]: effectiveToDate
@@ -357,7 +358,7 @@ exports.getFarmReport = async (req, res, next) => {
     });
 
     const birthsCount = await Birth.count({
-      include: [{ model: Rabbit, as: 'mother', where: { user_id: req.user.id }, attributes: [] }],
+      include: [{ model: Rabbit, as: 'mother', where: { user_id: req.farmId }, attributes: [] }],
       where: {
         birth_date: {
           [Op.gte]: effectiveFromDate,
@@ -367,8 +368,8 @@ exports.getFarmReport = async (req, res, next) => {
     });
 
     // Feeding statistics
-    const feedingRecordsCount = await FeedingRecord.count({ where: { fed_by: req.user.id } });
-    const totalFeedConsumption = await FeedingRecord.sum('quantity', { where: { fed_by: req.user.id } }) || 0;
+    const feedingRecordsCount = await FeedingRecord.count({ where: { fed_by: { [Op.in]: await farmMemberIds(req.farmId) } } });
+    const totalFeedConsumption = await FeedingRecord.sum('quantity', { where: { fed_by: { [Op.in]: await farmMemberIds(req.farmId) } } }) || 0;
 
     return ApiResponse.success(res, {
       period: {
@@ -376,7 +377,7 @@ exports.getFarmReport = async (req, res, next) => {
         to: effectiveToDate
       },
       population: {
-        total_rabbits: await Rabbit.count({ where: { user_id: req.user.id } }),
+        total_rabbits: await Rabbit.count({ where: { user_id: req.farmId } }),
         by_breed: rabbitsByBreed
       },
       financial: {
@@ -429,7 +430,7 @@ exports.getHealthReport = async (req, res, next) => {
 
     // Vaccinations by type
     const vaccinationsByType = await Vaccination.findAll({
-      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }],
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }],
       where: dateFilter,
       attributes: [
         'vaccine_name',
@@ -441,7 +442,7 @@ exports.getHealthReport = async (req, res, next) => {
 
     // Medical records by outcome
     const medicalRecordsByOutcome = await MedicalRecord.findAll({
-      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.user.id }, attributes: [] }],
+      include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }],
       attributes: [
         'outcome',
         [Sequelize.fn('COUNT', Sequelize.col('MedicalRecord.id')), 'count']
@@ -460,7 +461,7 @@ exports.getHealthReport = async (req, res, next) => {
       include: [{
         model: Rabbit,
         as: 'rabbit',
-        where: { user_id: req.user.id },
+        where: { user_id: req.farmId },
         attributes: ['id', 'name', 'tag_id']
       }],
       limit: 10,
@@ -489,7 +490,7 @@ exports.getFinancialReport = async (req, res, next) => {
   try {
     const { from_date, to_date, groupBy } = req.query;
 
-    const where = { created_by: req.user.id };
+    const where = { created_by: { [Op.in]: await farmMemberIds(req.farmId) } };
     if (from_date || to_date) {
       where.transaction_date = {};
       if (from_date) {

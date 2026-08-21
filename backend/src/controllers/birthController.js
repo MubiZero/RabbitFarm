@@ -7,7 +7,7 @@ const ApiResponse = require('../utils/apiResponse');
  */
 exports.getBirths = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.farmId;
 
     const births = await Birth.findAll({
       include: [
@@ -40,7 +40,7 @@ exports.getBirths = async (req, res) => {
 exports.getBirthById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.farmId;
 
     const birth = await Birth.findOne({
       where: { id },
@@ -84,7 +84,7 @@ exports.getBirthById = async (req, res) => {
 exports.createBirth = async (req, res) => {
   const transaction = await Rabbit.sequelize.transaction();
   try {
-    const userId = req.user.id;
+    const userId = req.farmId;
     const {
       breeding_id,
       mother_id,
@@ -223,7 +223,7 @@ exports.createBirth = async (req, res) => {
 exports.updateBirth = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.farmId;
     const {
       birth_date,
       kits_born_alive,
@@ -289,7 +289,7 @@ exports.updateBirth = async (req, res) => {
 exports.deleteBirth = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.farmId;
 
     const birth = await Birth.findOne({
       where: { id },
@@ -322,7 +322,7 @@ exports.createKitsFromBirth = async (req, res) => {
   const transaction = await Birth.sequelize.transaction();
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.farmId;
     const {
       mother_id,
       father_id,

@@ -10,6 +10,7 @@ const feedController = require('../../../src/controllers/feedController');
 
 const mockReq = (overrides = {}) => ({
   user: { id: 1 },
+  farmId: 1,
   params: {},
   body: {},
   query: {},

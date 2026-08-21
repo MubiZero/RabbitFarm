@@ -8,7 +8,7 @@ const ApiResponse = require('../utils/apiResponse');
 
 exports.create = async (req, res, next) => {
   try {
-    const feed = await feedService.createFeed({ ...req.body, user_id: req.user.id });
+    const feed = await feedService.createFeed({ ...req.body, user_id: req.farmId });
     return ApiResponse.success(res, feed, 'Корм успешно добавлен', 201);
   } catch (error) {
     next(error);
@@ -17,7 +17,7 @@ exports.create = async (req, res, next) => {
 
 exports.getById = async (req, res, next) => {
   try {
-    const feed = await feedService.getFeedById(req.params.id, req.user.id);
+    const feed = await feedService.getFeedById(req.params.id, req.farmId);
     return ApiResponse.success(res, feed);
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
@@ -27,7 +27,7 @@ exports.getById = async (req, res, next) => {
 
 exports.list = async (req, res, next) => {
   try {
-    const result = await feedService.listFeeds(req.user.id, req.query);
+    const result = await feedService.listFeeds(req.farmId, req.query);
     return ApiResponse.success(res, result);
   } catch (error) {
     next(error);
@@ -36,7 +36,7 @@ exports.list = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const feed = await feedService.updateFeed(req.params.id, req.user.id, req.body);
+    const feed = await feedService.updateFeed(req.params.id, req.farmId, req.body);
     return ApiResponse.success(res, feed, 'Корм успешно обновлен');
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
@@ -46,7 +46,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    const result = await feedService.deleteFeed(req.params.id, req.user.id);
+    const result = await feedService.deleteFeed(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Корм успешно удален');
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
@@ -59,7 +59,7 @@ exports.delete = async (req, res, next) => {
 
 exports.getStatistics = async (req, res, next) => {
   try {
-    const stats = await feedService.getStatistics(req.user.id);
+    const stats = await feedService.getStatistics(req.farmId);
     return ApiResponse.success(res, stats);
   } catch (error) {
     next(error);
@@ -68,7 +68,7 @@ exports.getStatistics = async (req, res, next) => {
 
 exports.getLowStock = async (req, res, next) => {
   try {
-    const feeds = await feedService.getLowStock(req.user.id);
+    const feeds = await feedService.getLowStock(req.farmId);
     return ApiResponse.success(res, feeds);
   } catch (error) {
     next(error);
@@ -78,7 +78,7 @@ exports.getLowStock = async (req, res, next) => {
 exports.adjustStock = async (req, res, next) => {
   try {
     const { quantity, operation } = req.body;
-    const feed = await feedService.adjustStock(req.params.id, req.user.id, quantity, operation);
+    const feed = await feedService.adjustStock(req.params.id, req.farmId, quantity, operation);
     return ApiResponse.success(res, feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`);
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);

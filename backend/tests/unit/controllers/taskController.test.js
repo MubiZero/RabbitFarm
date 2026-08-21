@@ -10,6 +10,7 @@ const taskController = require('../../../src/controllers/taskController');
 
 const mockReq = (overrides = {}) => ({
   user: { id: 1 },
+  farmId: 1,
   params: {},
   body: {},
   query: {},

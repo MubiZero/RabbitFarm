@@ -1,3 +1,9 @@
+jest.mock('../../../src/utils/farm', () => ({
+  // Контроллер не должен знать, как определяется состав фермы —
+  // здесь важно лишь то, что фильтр строится по всем её участникам.
+  farmMemberIds: jest.fn().mockResolvedValue([1, 2])
+}));
+
 /**
  * Unit tests for reportController
  */
@@ -22,7 +28,7 @@ const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transacti
 const ctrl = require('../../../src/controllers/reportController');
 
 const mockReq = (overrides = {}) => ({
-  body: {}, params: {}, query: {}, user: { id: 1 }, ...overrides
+  body: {}, params: {}, query: {}, user: { id: 1 }, farmId: 1, ...overrides
 });
 const mockRes = () => {
   const res = {};

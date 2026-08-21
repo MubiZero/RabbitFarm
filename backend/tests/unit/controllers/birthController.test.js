@@ -29,7 +29,7 @@ const { Rabbit, Birth, Breeding, Task } = require('../../../src/models');
 const ctrl = require('../../../src/controllers/birthController');
 
 const mockReq = (overrides = {}) => ({
-  body: {}, params: {}, query: {}, user: { id: 1 }, ...overrides
+  body: {}, params: {}, query: {}, user: { id: 1 }, farmId: 1, ...overrides
 });
 const mockRes = () => {
   const res = {};

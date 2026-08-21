@@ -13,7 +13,7 @@ class BreedingController {
     async create(req, res, next) {
         try {
             // Add user_id from authenticated user
-            req.body.user_id = req.user.id;
+            req.body.user_id = req.farmId;
 
             const breeding = await breedingService.createBreeding(req.body);
             return ApiResponse.created(res, breeding, 'Случка успешно зарегистрирована');
@@ -40,7 +40,7 @@ class BreedingController {
      */
     async getById(req, res, next) {
         try {
-            const breeding = await breedingService.getBreedingById(req.params.id, req.user.id);
+            const breeding = await breedingService.getBreedingById(req.params.id, req.farmId);
             return ApiResponse.success(res, breeding);
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
@@ -57,7 +57,7 @@ class BreedingController {
     async list(req, res, next) {
         try {
             const { page, limit, sort_by, sort_order, ...filters } = req.query;
-            const result = await breedingService.listBreedings(req.user.id, filters, { page, limit, sort_by, sort_order });
+            const result = await breedingService.listBreedings(req.farmId, filters, { page, limit, sort_by, sort_order });
 
             return ApiResponse.paginated(
                 res,
@@ -78,7 +78,7 @@ class BreedingController {
      */
     async update(req, res, next) {
         try {
-            const breeding = await breedingService.updateBreeding(req.params.id, req.user.id, req.body);
+            const breeding = await breedingService.updateBreeding(req.params.id, req.farmId, req.body);
             return ApiResponse.success(res, breeding, 'Запись обновлена успешно');
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
@@ -97,7 +97,7 @@ class BreedingController {
      */
     async delete(req, res, next) {
         try {
-            await breedingService.deleteBreeding(req.params.id, req.user.id);
+            await breedingService.deleteBreeding(req.params.id, req.farmId);
             return ApiResponse.success(res, null, 'Запись удалена успешно');
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
@@ -113,7 +113,7 @@ class BreedingController {
      */
     async getStatistics(req, res, next) {
         try {
-            const stats = await breedingService.getStatistics(req.user.id);
+            const stats = await breedingService.getStatistics(req.farmId);
             return ApiResponse.success(res, stats, 'Статистика получена успешно');
         } catch (error) {
             next(error);

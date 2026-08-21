@@ -35,6 +35,10 @@ const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 // Define associations
 // User associations
 User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+// Работник принадлежит ферме владельца.
+User.belongsTo(User, { as: 'owner', foreignKey: 'owner_id' });
+User.hasMany(User, { as: 'staff', foreignKey: 'owner_id' });
+
 RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 
 User.hasMany(PasswordResetToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });

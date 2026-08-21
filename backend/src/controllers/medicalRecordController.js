@@ -19,7 +19,7 @@ class MedicalRecordController {
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbit_id, user_id: req.user.id },
+        where: { id: rabbit_id, user_id: req.farmId },
         transaction: t
       });
       if (!rabbit) {
@@ -92,7 +92,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -161,7 +161,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -203,7 +203,7 @@ class MedicalRecordController {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: req.user.id
+          user_id: req.farmId
         }
       });
       if (!rabbit) {
@@ -240,7 +240,7 @@ class MedicalRecordController {
         transaction: t
       });
 
-      if (!medicalRecord || medicalRecord.rabbit.user_id !== req.user.id) {
+      if (!medicalRecord || medicalRecord.rabbit.user_id !== req.farmId) {
         await t.rollback();
         return ApiResponse.notFound(res, 'Медицинская запись не найдена');
       }
@@ -251,7 +251,7 @@ class MedicalRecordController {
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
         const newRabbit = await Rabbit.findOne({
-          where: { id: req.body.rabbit_id, user_id: req.user.id },
+          where: { id: req.body.rabbit_id, user_id: req.farmId },
           transaction: t
         });
         if (!newRabbit) {
@@ -308,7 +308,7 @@ class MedicalRecordController {
         where: { id: req.params.id },
         include: [{
           model: Rabbit,
-          where: { user_id: req.user.id },
+          where: { user_id: req.farmId },
           attributes: ['id']
         }]
       });
@@ -331,7 +331,7 @@ class MedicalRecordController {
    */
   async getStatistics(req, res, next) {
     try {
-      const user_id = req.user.id;
+      const user_id = req.farmId;
       const now = new Date();
       const thisYear = new Date(now.getFullYear(), 0, 1);
       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
@@ -464,7 +464,7 @@ class MedicalRecordController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
-              user_id: req.user.id, // Filter by user
+              user_id: req.farmId, // Filter by user
               status: {
                 [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
               }
@@ -535,7 +535,7 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.user.id }, // Filter by user
+            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id']
           }
         ],

@@ -27,7 +27,7 @@ const { Vaccination, Rabbit, Transaction, sequelize } = require('../../../src/mo
 const ctrl = require('../../../src/controllers/vaccinationController');
 
 const mockReq = (overrides = {}) => ({
-  body: {}, params: {}, query: {}, user: { id: 1 }, ...overrides
+  body: {}, params: {}, query: {}, user: { id: 1 }, farmId: 1, ...overrides
 });
 const mockRes = () => {
   const res = {};
@@ -222,11 +222,12 @@ describe('vaccinationController', () => {
   });
 
   describe('getByRabbit', () => {
-    it('should verify ownership pre-check calls Rabbit.findOne with id and user_id', async () => {
+    it('проверка принадлежности идёт по ферме, а не по конкретному пользователю', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Vaccination.findAll.mockResolvedValue([{ id: 1 }]);
 
-      const req = mockReq({ params: { rabbitId: '5' }, user: { id: 42 } });
+      // Работник фермы 42 — записи кролика он видит как участник этой фермы.
+      const req = mockReq({ params: { rabbitId: '5' }, user: { id: 77 }, farmId: 42 });
       const res = mockRes();
 
       await ctrl.getByRabbit(req, res, mockNext);

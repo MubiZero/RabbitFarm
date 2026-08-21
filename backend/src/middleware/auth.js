@@ -43,6 +43,10 @@ const authenticate = async (req, res, next) => {
 
     // Attach user to request
     req.user = user;
+    // Ферма запроса: у работника это ферма его владельца, у владельца — он сам.
+    // Данные разделены по этому идентификатору, поэтому работник видит
+    // хозяйство владельца, а не собственное пустое.
+    req.farmId = user.owner_id || user.id;
     next();
   } catch (error) {
     if (error.message.includes('token')) {
