@@ -155,6 +155,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Присоединиться к ферме по коду приглашения.
+  Future<void> acceptInvitation({
+    required String code,
+    required String password,
+    required String fullName,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final authResponse = await _authRepository.acceptInvitation(
+        code: code,
+        password: password,
+        fullName: fullName,
+      );
+
+      state = state.copyWith(
+        user: authResponse.user,
+        isAuthenticated: true,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceAll('Exception: ', ''),
+      );
+      rethrow;
+    }
+  }
+
   // Logout
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);

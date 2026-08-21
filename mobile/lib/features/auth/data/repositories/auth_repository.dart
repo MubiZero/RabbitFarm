@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
+import '../../../../core/api/api_error.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;
@@ -89,6 +90,46 @@ class AuthRepository {
       return authResponse;
     } on DioException catch (e) {
       throw Exception(e.message ?? 'Ошибка регистрации');
+    }
+  }
+
+  /// Присоединиться к ферме по коду приглашения.
+  /// Токены сохраняются так же, как при регистрации: человек сразу внутри.
+  Future<AuthResponse> acceptInvitation({
+    required String code,
+    required String password,
+    required String fullName,
+  }) async {
+    try {
+      final response = await _apiClient.post('/auth/accept-invitation', data: {
+        'code': code,
+        'password': password,
+        'full_name': fullName,
+      });
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw Exception(apiResponse.message);
+      }
+
+      final authResponse = AuthResponse.fromJson(apiResponse.data!);
+
+      await _storage.write(
+        key: 'access_token',
+        value: authResponse.accessToken,
+      );
+      await _storage.write(
+        key: 'refresh_token',
+        value: authResponse.refreshToken,
+      );
+
+      return authResponse;
+    } on DioException catch (e) {
+      throw Exception(serverMessage(e) ?? 'Не удалось присоединиться к ферме');
     }
   }
 

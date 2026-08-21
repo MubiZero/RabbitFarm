@@ -49,6 +49,8 @@ import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/menu_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/staff/presentation/screens/staff_screen.dart';
+import '../../features/staff/presentation/screens/join_farm_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_farm_name_screen.dart';
@@ -74,6 +76,7 @@ class RouterNotifier extends ChangeNotifier {
     final loc = state.matchedLocation;
     final isPublic = loc == '/login' ||
         loc == '/register' ||
+        loc == '/join' ||
         loc == '/splash' ||
         loc.startsWith('/onboarding');
 
@@ -84,7 +87,10 @@ class RouterNotifier extends ChangeNotifier {
 
     // Authenticated on a public page -> home
     if (isAuthenticated &&
-        (loc == '/login' || loc == '/register' || loc == '/splash')) {
+        (loc == '/login' ||
+            loc == '/register' ||
+            loc == '/join' ||
+            loc == '/splash')) {
       return '/today';
     }
 
@@ -141,6 +147,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/join',
+        name: 'join-farm',
+        builder: (context, state) => const JoinFarmScreen(),
       ),
 
       // Root redirect
@@ -436,6 +447,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/staff',
+        name: 'staff',
+        builder: (context, state) => const StaffScreen(),
       ),
 
     ],

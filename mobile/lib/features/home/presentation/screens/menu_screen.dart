@@ -165,6 +165,16 @@ class MenuScreen extends ConsumerWidget {
             ]),
 
             // Настройки
+            _SectionHeader(title: 'Ферма'),
+            _SectionList(items: [
+              _MenuItem(
+                icon: Icons.groups_outlined,
+                label: 'Работники',
+                color: AppColors.accentOcean,
+                onTap: () => context.push('/staff'),
+              ),
+            ]),
+
             _SectionHeader(title: 'Настройки'),
             _SectionList(items: [
               _MenuItem(
