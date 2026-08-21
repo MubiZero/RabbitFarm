@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const staffController = require('../controllers/staffController');
 const { authenticate } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const { authLimiter } = require('../middleware/rateLimiter');
@@ -11,6 +12,7 @@ const {
   updateProfileSchema,
   changePasswordSchema
 } = require('../validators/authValidator');
+const { acceptInvitationSchema } = require('../validators/staffValidator');
 
 /**
  * @swagger
@@ -62,6 +64,25 @@ const {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+/**
+ * @swagger
+ * /auth/accept-invitation:
+ *   post:
+ *     summary: Присоединиться к ферме по коду приглашения
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       201:
+ *         description: Учётная запись создана, выданы токены
+ *       400:
+ *         description: Приглашение недействительно или истекло
+ */
+router.post(
+  '/accept-invitation',
+  validate(acceptInvitationSchema),
+  staffController.acceptInvitation
+);
+
 router.post(
   '/register',
   authLimiter,

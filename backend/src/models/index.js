@@ -16,6 +16,7 @@ const sequelize = new Sequelize(
 const User = require('./User')(sequelize);
 const RefreshToken = require('./RefreshToken')(sequelize);
 const Breed = require('./Breed')(sequelize);
+const Invitation = require('./Invitation')(sequelize);
 const Cage = require('./Cage')(sequelize);
 const Rabbit = require('./Rabbit')(sequelize);
 const RabbitWeight = require('./RabbitWeight')(sequelize);
@@ -35,6 +36,10 @@ const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 // Define associations
 // User associations
 User.hasMany(RefreshToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+// Приглашения принадлежат ферме и знают, кто их выписал.
+Invitation.belongsTo(User, { as: 'farm', foreignKey: 'farm_id' });
+Invitation.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
+
 // Работник принадлежит ферме владельца.
 User.belongsTo(User, { as: 'owner', foreignKey: 'owner_id' });
 User.hasMany(User, { as: 'staff', foreignKey: 'owner_id' });
@@ -123,6 +128,7 @@ Note.belongsTo(User, { foreignKey: 'created_by' });
 
 // Export models and sequelize instance
 module.exports = {
+  Invitation,
   sequelize,
   Sequelize,
   User,

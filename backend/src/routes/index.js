@@ -3,6 +3,7 @@ const router = express.Router();
 
 // Import route modules
 const authRoutes = require('./auth.routes');
+const staffRoutes = require('./staff.routes');
 const rabbitRoutes = require('./rabbit.routes');
 const breedRoutes = require('./breed.routes');
 const birthRoutes = require('./birth.routes');
@@ -44,6 +45,7 @@ router.get('/', (req, res) => {
 
 // Mount routes
 router.use('/auth', authRoutes);
+router.use('/staff', staffRoutes);
 router.use('/rabbits', rabbitRoutes);
 router.use('/breeds', breedRoutes);
 router.use('/births', birthRoutes);

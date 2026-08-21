@@ -14,6 +14,27 @@ class AuthService {
    * @param {Object} userData - User data
    * @returns {Object} User and tokens
    */
+  /**
+   * Выпустить пару токенов и запомнить refresh.
+   * @param {Object} user - пользователь
+   * @param {Object} transaction - необязательная транзакция
+   */
+  async issueTokens(user, transaction = null) {
+    const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role });
+    const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await RefreshToken.create({
+      user_id: user.id,
+      token: refreshToken,
+      expires_at: expiresAt
+    }, transaction ? { transaction } : {});
+
+    return { access_token: accessToken, refresh_token: refreshToken };
+  }
+
   async register(userData) {
     const transaction = await User.sequelize.transaction();
     try {
