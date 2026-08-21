@@ -30,7 +30,7 @@ const { Breeding, Rabbit, Task } = require('../../../src/models');
 const breedingService = require('../../../src/services/breedingService');
 
 describe('BreedingService', () => {
-  const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+  const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
   beforeEach(() => {
     jest.clearAllMocks();

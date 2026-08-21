@@ -43,7 +43,7 @@ const { deleteFile } = require('../../../src/utils/fileHelper');
 const rabbitService = require('../../../src/services/rabbitService');
 
 describe('RabbitService - uncovered lines', () => {
-  const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+  const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
   beforeEach(() => {
     jest.resetAllMocks();

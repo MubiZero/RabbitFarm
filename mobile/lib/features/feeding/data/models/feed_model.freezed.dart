@@ -39,8 +39,10 @@ mixin _$Feed {
   double? get costPerUnit => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Feed to a JSON map.
@@ -67,8 +69,12 @@ abstract class $FeedCopyWith<$Res> {
     @JsonKey(name: 'min_stock') @DoubleConverter() double minStock,
     @JsonKey(name: 'cost_per_unit') @DoubleConverter() double? costPerUnit,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   });
 }
 
@@ -169,8 +175,12 @@ abstract class _$$FeedImplCopyWith<$Res> implements $FeedCopyWith<$Res> {
     @JsonKey(name: 'min_stock') @DoubleConverter() double minStock,
     @JsonKey(name: 'cost_per_unit') @DoubleConverter() double? costPerUnit,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   });
 }
 
@@ -264,8 +274,8 @@ class _$FeedImpl implements _Feed {
     @JsonKey(name: 'min_stock') @DoubleConverter() required this.minStock,
     @JsonKey(name: 'cost_per_unit') @DoubleConverter() this.costPerUnit,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
   });
 
   factory _$FeedImpl.fromJson(Map<String, dynamic> json) =>
@@ -299,9 +309,11 @@ class _$FeedImpl implements _Feed {
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
 
   @override
@@ -380,8 +392,12 @@ abstract class _Feed implements Feed {
     @DoubleConverter()
     final double? costPerUnit,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
   }) = _$FeedImpl;
 
   factory _Feed.fromJson(Map<String, dynamic> json) = _$FeedImpl.fromJson;
@@ -414,9 +430,11 @@ abstract class _Feed implements Feed {
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt;
 
   /// Create a copy of Feed

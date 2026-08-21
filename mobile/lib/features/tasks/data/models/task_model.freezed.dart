@@ -29,8 +29,10 @@ mixin _$Task {
   TaskStatus get status => throw _privateConstructorUsedError;
   TaskPriority get priority => throw _privateConstructorUsedError;
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   DateTime get dueDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   DateTime? get completedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -53,8 +55,10 @@ mixin _$Task {
   int? get reminderBefore => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Relationships
   @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit => throw _privateConstructorUsedError;
@@ -82,8 +86,10 @@ abstract class $TaskCopyWith<$Res> {
     TaskType type,
     TaskStatus status,
     TaskPriority priority,
-    @JsonKey(name: 'due_date') DateTime dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @DateTimeConverter() DateTime dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -94,8 +100,12 @@ abstract class $TaskCopyWith<$Res> {
     @NullableIntConverter()
     int? reminderBefore,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
   });
@@ -271,8 +281,10 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
     TaskType type,
     TaskStatus status,
     TaskPriority priority,
-    @JsonKey(name: 'due_date') DateTime dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @DateTimeConverter() DateTime dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -283,8 +295,12 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
     @NullableIntConverter()
     int? reminderBefore,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
   });
@@ -425,8 +441,10 @@ class _$TaskImpl implements _Task {
     required this.type,
     required this.status,
     required this.priority,
-    @JsonKey(name: 'due_date') required this.dueDate,
-    @JsonKey(name: 'completed_at') this.completedAt,
+    @JsonKey(name: 'due_date') @DateTimeConverter() required this.dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    this.completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() this.assignedTo,
@@ -437,8 +455,8 @@ class _$TaskImpl implements _Task {
     @NullableIntConverter()
     this.reminderBefore,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) this.cage,
   });
@@ -461,9 +479,11 @@ class _$TaskImpl implements _Task {
   final TaskPriority priority;
   @override
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   final DateTime dueDate;
   @override
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   final DateTime? completedAt;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -495,9 +515,11 @@ class _$TaskImpl implements _Task {
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
   // Relationships
   @override
@@ -598,8 +620,12 @@ abstract class _Task implements Task {
     required final TaskType type,
     required final TaskStatus status,
     required final TaskPriority priority,
-    @JsonKey(name: 'due_date') required final DateTime dueDate,
-    @JsonKey(name: 'completed_at') final DateTime? completedAt,
+    @JsonKey(name: 'due_date')
+    @DateTimeConverter()
+    required final DateTime dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    final DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() final int? assignedTo,
@@ -610,8 +636,12 @@ abstract class _Task implements Task {
     @NullableIntConverter()
     final int? reminderBefore,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -635,9 +665,11 @@ abstract class _Task implements Task {
   TaskPriority get priority;
   @override
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   DateTime get dueDate;
   @override
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   DateTime? get completedAt;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -669,9 +701,11 @@ abstract class _Task implements Task {
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt; // Relationships
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -700,6 +734,7 @@ mixin _$TaskCreate {
   TaskStatus? get status => throw _privateConstructorUsedError;
   TaskPriority? get priority => throw _privateConstructorUsedError;
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   DateTime get dueDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -742,7 +777,7 @@ abstract class $TaskCreateCopyWith<$Res> {
     TaskType type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') DateTime dueDate,
+    @JsonKey(name: 'due_date') @DateTimeConverter() DateTime dueDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -859,7 +894,7 @@ abstract class _$$TaskCreateImplCopyWith<$Res>
     TaskType type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') DateTime dueDate,
+    @JsonKey(name: 'due_date') @DateTimeConverter() DateTime dueDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -968,7 +1003,7 @@ class _$TaskCreateImpl implements _TaskCreate {
     required this.type,
     this.status,
     this.priority,
-    @JsonKey(name: 'due_date') required this.dueDate,
+    @JsonKey(name: 'due_date') @DateTimeConverter() required this.dueDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() this.assignedTo,
@@ -995,6 +1030,7 @@ class _$TaskCreateImpl implements _TaskCreate {
   final TaskPriority? priority;
   @override
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   final DateTime dueDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -1093,7 +1129,9 @@ abstract class _TaskCreate implements TaskCreate {
     required final TaskType type,
     final TaskStatus? status,
     final TaskPriority? priority,
-    @JsonKey(name: 'due_date') required final DateTime dueDate,
+    @JsonKey(name: 'due_date')
+    @DateTimeConverter()
+    required final DateTime dueDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() final int? assignedTo,
@@ -1120,6 +1158,7 @@ abstract class _TaskCreate implements TaskCreate {
   TaskPriority? get priority;
   @override
   @JsonKey(name: 'due_date')
+  @DateTimeConverter()
   DateTime get dueDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -1166,8 +1205,10 @@ mixin _$TaskUpdate {
   TaskStatus? get status => throw _privateConstructorUsedError;
   TaskPriority? get priority => throw _privateConstructorUsedError;
   @JsonKey(name: 'due_date')
+  @NullableDateTimeConverter()
   DateTime? get dueDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   DateTime? get completedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -1210,8 +1251,10 @@ abstract class $TaskUpdateCopyWith<$Res> {
     TaskType? type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') DateTime? dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @NullableDateTimeConverter() DateTime? dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -1333,8 +1376,10 @@ abstract class _$$TaskUpdateImplCopyWith<$Res>
     TaskType? type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') DateTime? dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @NullableDateTimeConverter() DateTime? dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -1448,8 +1493,10 @@ class _$TaskUpdateImpl implements _TaskUpdate {
     this.type,
     this.status,
     this.priority,
-    @JsonKey(name: 'due_date') this.dueDate,
-    @JsonKey(name: 'completed_at') this.completedAt,
+    @JsonKey(name: 'due_date') @NullableDateTimeConverter() this.dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    this.completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() this.assignedTo,
@@ -1476,9 +1523,11 @@ class _$TaskUpdateImpl implements _TaskUpdate {
   final TaskPriority? priority;
   @override
   @JsonKey(name: 'due_date')
+  @NullableDateTimeConverter()
   final DateTime? dueDate;
   @override
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   final DateTime? completedAt;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -1580,8 +1629,12 @@ abstract class _TaskUpdate implements TaskUpdate {
     final TaskType? type,
     final TaskStatus? status,
     final TaskPriority? priority,
-    @JsonKey(name: 'due_date') final DateTime? dueDate,
-    @JsonKey(name: 'completed_at') final DateTime? completedAt,
+    @JsonKey(name: 'due_date')
+    @NullableDateTimeConverter()
+    final DateTime? dueDate,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    final DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() final int? assignedTo,
@@ -1608,9 +1661,11 @@ abstract class _TaskUpdate implements TaskUpdate {
   TaskPriority? get priority;
   @override
   @JsonKey(name: 'due_date')
+  @NullableDateTimeConverter()
   DateTime? get dueDate;
   @override
   @JsonKey(name: 'completed_at')
+  @NullableDateTimeConverter()
   DateTime? get completedAt;
   @override
   @JsonKey(name: 'rabbit_id')

@@ -14,6 +14,10 @@ const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
 const { farmMemberIds } = require('../utils/farm');
 
+// Живым считается всё, кроме проданных и павших. Перечислять живые
+// статусы поимённо опасно: список уже расходился с моделью.
+const ALIVE_STATUS = { [Op.notIn]: ['dead', 'sold'] };
+
 /**
  * Report Controller
  * Handles all reporting and analytics operations
@@ -54,10 +58,11 @@ exports.getDashboard = async (req, res, next) => {
       allRabbits,
       recentBirthsList
     ] = await Promise.all([
-      // Rabbits statistics
-      Rabbit.count({ where: { user_id: userId } }),
-      Rabbit.count({ where: { sex: 'male', user_id: userId } }),
-      Rabbit.count({ where: { sex: 'female', user_id: userId } }),
+      // Поголовье считается без проданных и павших: иначе ферма, продавшая
+      // за год три сотни кроликов, видела их в заголовке «кроликов на ферме».
+      Rabbit.count({ where: { user_id: userId, status: ALIVE_STATUS } }),
+      Rabbit.count({ where: { sex: 'male', user_id: userId, status: ALIVE_STATUS } }),
+      Rabbit.count({ where: { sex: 'female', user_id: userId, status: ALIVE_STATUS } }),
 
       // Cages statistics
       Cage.count({ where: { user_id: userId } }),
@@ -302,11 +307,9 @@ exports.getFarmReport = async (req, res, next) => {
     const effectiveFromDate = from_date || defaultDateFrom;
     const effectiveToDate = to_date || defaultDateTo;
 
-    const where = {};
-    where.created_at = {
-      [Op.gte]: effectiveFromDate,
-      [Op.lte]: effectiveToDate
-    };
+    // Состав фермы нужен нескольким запросам ниже — читаем один раз.
+    const memberIds = await farmMemberIds(req.farmId);
+    const period = { [Op.gte]: effectiveFromDate, [Op.lte]: effectiveToDate };
 
     // Rabbit population dynamics
     const rabbitsByBreed = await Rabbit.findAll({
@@ -322,11 +325,8 @@ exports.getFarmReport = async (req, res, next) => {
     // Financial summary
     const transactions = await Transaction.findAll({
       where: {
-        created_by: { [Op.in]: await farmMemberIds(req.farmId) },
-        transaction_date: {
-          [Op.gte]: effectiveFromDate,
-          [Op.lte]: effectiveToDate
-        }
+        created_by: { [Op.in]: memberIds },
+        transaction_date: period
       },
       attributes: [
         'type',
@@ -337,11 +337,14 @@ exports.getFarmReport = async (req, res, next) => {
       raw: true
     });
 
-    // Health overview
+    // Отчёт заявляет период, поэтому и считать нужно за период: раньше рядом
+    // с финансами за март стояло число прививок за всё время фермы.
     const vaccinationsCount = await Vaccination.count({
+      where: { vaccination_date: period },
       include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }]
     });
     const medicalRecordsCount = await MedicalRecord.count({
+      where: { started_at: period },
       include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, attributes: [] }]
     });
 
@@ -349,26 +352,32 @@ exports.getFarmReport = async (req, res, next) => {
     const breedingsCount = await Breeding.count({
       where: {
         user_id: req.farmId,
-        breeding_date: {
-          [Op.gte]: effectiveFromDate,
-          [Op.lte]: effectiveToDate
-        }
+        breeding_date: period
       }
     });
 
     const birthsCount = await Birth.count({
       include: [{ model: Rabbit, as: 'mother', where: { user_id: req.farmId }, attributes: [] }],
-      where: {
-        birth_date: {
-          [Op.gte]: effectiveFromDate,
-          [Op.lte]: effectiveToDate
-        }
-      }
+      where: { birth_date: period }
     });
 
-    // Feeding statistics
-    const feedingRecordsCount = await FeedingRecord.count({ where: { fed_by: { [Op.in]: await farmMemberIds(req.farmId) } } });
-    const totalFeedConsumption = await FeedingRecord.sum('quantity', { where: { fed_by: { [Op.in]: await farmMemberIds(req.farmId) } } }) || 0;
+    const feedingRecordsCount = await FeedingRecord.count({
+      where: { fed_by: { [Op.in]: memberIds }, fed_at: period }
+    });
+
+    // Расход разбит по единицам измерения. Общая сумма складывала килограммы
+    // комбикорма со штуками моркови — получалось число, которое невозможно
+    // истолковать.
+    const consumptionByUnit = await FeedingRecord.findAll({
+      where: { fed_by: { [Op.in]: memberIds }, fed_at: period },
+      attributes: [
+        [Sequelize.col('feed.unit'), 'unit'],
+        [Sequelize.fn('SUM', Sequelize.col('FeedingRecord.quantity')), 'total']
+      ],
+      include: [{ model: Feed, as: 'feed', attributes: [] }],
+      group: [Sequelize.col('feed.unit')],
+      raw: true
+    });
 
     return ApiResponse.success(res, {
       period: {
@@ -376,7 +385,7 @@ exports.getFarmReport = async (req, res, next) => {
         to: effectiveToDate
       },
       population: {
-        total_rabbits: await Rabbit.count({ where: { user_id: req.farmId } }),
+        total_rabbits: await Rabbit.count({ where: { user_id: req.farmId, status: ALIVE_STATUS } }),
         by_breed: rabbitsByBreed
       },
       financial: {
@@ -400,7 +409,10 @@ exports.getFarmReport = async (req, res, next) => {
       },
       feeding: {
         total_feeding_records: feedingRecordsCount,
-        total_feed_consumption: parseFloat(totalFeedConsumption).toFixed(2)
+        consumption_by_unit: consumptionByUnit.map((row) => ({
+          unit: row.unit,
+          total: parseFloat(row.total).toFixed(2)
+        }))
       }
     }, 'Отчет по ферме получен');
   } catch (error) {

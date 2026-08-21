@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../cages/data/models/cage_model.dart';
 import '../../../../core/json/int_converter.dart';
@@ -56,8 +57,8 @@ class Task with _$Task {
     required TaskType type,
     required TaskStatus status,
     required TaskPriority priority,
-    @JsonKey(name: 'due_date') required DateTime dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @DateTimeConverter() required DateTime dueDate,
+    @JsonKey(name: 'completed_at') @NullableDateTimeConverter() DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -66,8 +67,8 @@ class Task with _$Task {
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
     @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     // Relationships
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
@@ -85,7 +86,7 @@ class TaskCreate with _$TaskCreate {
     required TaskType type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') required DateTime dueDate,
+    @JsonKey(name: 'due_date') @DateTimeConverter() required DateTime dueDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
@@ -108,8 +109,8 @@ class TaskUpdate with _$TaskUpdate {
     TaskType? type,
     TaskStatus? status,
     TaskPriority? priority,
-    @JsonKey(name: 'due_date') DateTime? dueDate,
-    @JsonKey(name: 'completed_at') DateTime? completedAt,
+    @JsonKey(name: 'due_date') @NullableDateTimeConverter() DateTime? dueDate,
+    @JsonKey(name: 'completed_at') @NullableDateTimeConverter() DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,

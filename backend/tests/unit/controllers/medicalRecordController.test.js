@@ -40,7 +40,7 @@ const mockRes = () => {
   return res;
 };
 const mockNext = jest.fn();
-const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
 describe('medicalRecordController', () => {
   beforeEach(() => {

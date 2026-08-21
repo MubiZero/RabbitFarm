@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../../core/json/double_converter.dart';
@@ -45,14 +46,14 @@ class MedicalRecord with _$MedicalRecord {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') required DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) required MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   }) = _MedicalRecord;
 
@@ -70,8 +71,8 @@ class MedicalRecordCreate with _$MedicalRecordCreate {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') required DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: 'ongoing') String? outcome,
     double? cost,
     String? veterinarian,
@@ -92,8 +93,8 @@ class MedicalRecordUpdate with _$MedicalRecordUpdate {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime? startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @NullableDateOnlyConverter() DateTime? startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     String? outcome,
     double? cost,
     String? veterinarian,
@@ -142,7 +143,7 @@ class OngoingTreatment with _$OngoingTreatment {
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     String? diagnosis,
-    @JsonKey(name: 'started_at') required DateTime startedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
     @JsonKey(name: 'days_ongoing') required int daysOngoing,
     String? symptoms,
   }) = _OngoingTreatment;
@@ -162,8 +163,8 @@ class MedicalRecordWithDays with _$MedicalRecordWithDays {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') required DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) required MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,

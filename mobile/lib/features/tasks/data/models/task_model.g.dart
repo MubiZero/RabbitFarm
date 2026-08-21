@@ -13,10 +13,8 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
   type: $enumDecode(_$TaskTypeEnumMap, json['type']),
   status: $enumDecode(_$TaskStatusEnumMap, json['status']),
   priority: $enumDecode(_$TaskPriorityEnumMap, json['priority']),
-  dueDate: DateTime.parse(json['due_date'] as String),
-  completedAt: json['completed_at'] == null
-      ? null
-      : DateTime.parse(json['completed_at'] as String),
+  dueDate: const DateTimeConverter().fromJson(json['due_date'] as Object),
+  completedAt: const NullableDateTimeConverter().fromJson(json['completed_at']),
   rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
   cageId: const NullableIntConverter().fromJson(json['cage_id']),
   assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
@@ -27,37 +25,36 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
     json['reminder_before'],
   ),
   notes: json['notes'] as String?,
-  createdAt: json['created_at'] == null
-      ? null
-      : DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
-      ? null
-      : DateTime.parse(json['updated_at'] as String),
+  createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+  updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
 );
 
-Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'title': instance.title,
-      'description': instance.description,
-      'type': _$TaskTypeEnumMap[instance.type]!,
-      'status': _$TaskStatusEnumMap[instance.status]!,
-      'priority': _$TaskPriorityEnumMap[instance.priority]!,
-      'due_date': instance.dueDate.toIso8601String(),
-      'completed_at': instance.completedAt?.toIso8601String(),
-      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
-      'cage_id': const NullableIntConverter().toJson(instance.cageId),
-      'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
-      'created_by': const NullableIntConverter().toJson(instance.createdBy),
-      'is_recurring': instance.isRecurring,
-      'recurrence_rule': instance.recurrenceRule,
-      'reminder_before': const NullableIntConverter().toJson(
-        instance.reminderBefore,
-      ),
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$TaskImplToJson(
+  _$TaskImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'title': instance.title,
+  'description': instance.description,
+  'type': _$TaskTypeEnumMap[instance.type]!,
+  'status': _$TaskStatusEnumMap[instance.status]!,
+  'priority': _$TaskPriorityEnumMap[instance.priority]!,
+  'due_date': const DateTimeConverter().toJson(instance.dueDate),
+  'completed_at': const NullableDateTimeConverter().toJson(
+    instance.completedAt,
+  ),
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+  'cage_id': const NullableIntConverter().toJson(instance.cageId),
+  'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
+  'created_by': const NullableIntConverter().toJson(instance.createdBy),
+  'is_recurring': instance.isRecurring,
+  'recurrence_rule': instance.recurrenceRule,
+  'reminder_before': const NullableIntConverter().toJson(
+    instance.reminderBefore,
+  ),
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+};
 
 const _$TaskTypeEnumMap = {
   TaskType.feeding: 'feeding',
@@ -89,7 +86,7 @@ _$TaskCreateImpl _$$TaskCreateImplFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$TaskTypeEnumMap, json['type']),
       status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
       priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
-      dueDate: DateTime.parse(json['due_date'] as String),
+      dueDate: const DateTimeConverter().fromJson(json['due_date'] as Object),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       cageId: const NullableIntConverter().fromJson(json['cage_id']),
       assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
@@ -108,7 +105,7 @@ Map<String, dynamic> _$$TaskCreateImplToJson(_$TaskCreateImpl instance) =>
       'type': _$TaskTypeEnumMap[instance.type]!,
       'status': _$TaskStatusEnumMap[instance.status],
       'priority': _$TaskPriorityEnumMap[instance.priority],
-      'due_date': instance.dueDate.toIso8601String(),
+      'due_date': const DateTimeConverter().toJson(instance.dueDate),
       'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
       'cage_id': const NullableIntConverter().toJson(instance.cageId),
       'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),
@@ -127,12 +124,10 @@ _$TaskUpdateImpl _$$TaskUpdateImplFromJson(Map<String, dynamic> json) =>
       type: $enumDecodeNullable(_$TaskTypeEnumMap, json['type']),
       status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
       priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
-      dueDate: json['due_date'] == null
-          ? null
-          : DateTime.parse(json['due_date'] as String),
-      completedAt: json['completed_at'] == null
-          ? null
-          : DateTime.parse(json['completed_at'] as String),
+      dueDate: const NullableDateTimeConverter().fromJson(json['due_date']),
+      completedAt: const NullableDateTimeConverter().fromJson(
+        json['completed_at'],
+      ),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       cageId: const NullableIntConverter().fromJson(json['cage_id']),
       assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
@@ -151,8 +146,10 @@ Map<String, dynamic> _$$TaskUpdateImplToJson(_$TaskUpdateImpl instance) =>
       'type': _$TaskTypeEnumMap[instance.type],
       'status': _$TaskStatusEnumMap[instance.status],
       'priority': _$TaskPriorityEnumMap[instance.priority],
-      'due_date': instance.dueDate?.toIso8601String(),
-      'completed_at': instance.completedAt?.toIso8601String(),
+      'due_date': const NullableDateTimeConverter().toJson(instance.dueDate),
+      'completed_at': const NullableDateTimeConverter().toJson(
+        instance.completedAt,
+      ),
       'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
       'cage_id': const NullableIntConverter().toJson(instance.cageId),
       'assigned_to': const NullableIntConverter().toJson(instance.assignedTo),

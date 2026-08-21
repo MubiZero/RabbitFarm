@@ -245,7 +245,11 @@ class MedicalRecordController {
       }
 
       const oldOutcome = medicalRecord.outcome;
-      medicalRecord.cost;
+
+      // Известный пробел: при создании записи стоимость превращается в
+      // расход, а при правке стоимости расход не пересчитывается — связи
+      // между медзаписью и транзакцией в схеме нет, найти нужную нечем.
+      // Чинится отдельно: нужна ссылка на источник в таблице транзакций.
 
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
@@ -465,8 +469,12 @@ class MedicalRecordController {
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
               user_id: req.farmId, // Filter by user
+              // Перечисление живых статусов пропускало 'active' и
+              // 'quarantine'. Статус 'active' код сам ставит матери после
+              // окрола, поэтому любая окролившаяся самка исчезала из списка
+              // просроченных прививок и из текущих лечений.
               status: {
-                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
+                [Op.notIn]: ['dead', 'sold']
               }
             },
             include: [

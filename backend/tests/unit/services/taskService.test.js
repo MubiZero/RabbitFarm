@@ -404,7 +404,7 @@ describe('TaskService', () => {
   // ─── completeTask ─────────────────────────────────────────────────────────
 
   describe('completeTask', () => {
-    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), finished: false };
+    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' }, finished: false };
 
     beforeEach(() => {
       Task.sequelize.transaction.mockResolvedValue(mockTransaction);

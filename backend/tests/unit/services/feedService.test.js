@@ -30,8 +30,8 @@ const feedService = require('../../../src/services/feedService');
 const mockTx = {
   commit: jest.fn(),
   rollback: jest.fn(),
-  finished: false,
-  LOCK: { UPDATE: 'UPDATE' }
+  LOCK: { UPDATE: 'UPDATE' },
+  finished: false
 };
 
 describe('feedService', () => {

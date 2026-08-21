@@ -21,31 +21,28 @@ _$FeedImpl _$$FeedImplFromJson(Map<String, dynamic> json) => _$FeedImpl(
     const DoubleConverter().fromJson,
   ),
   notes: json['notes'] as String?,
-  createdAt: json['created_at'] == null
-      ? null
-      : DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
-      ? null
-      : DateTime.parse(json['updated_at'] as String),
+  createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+  updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
 );
 
-Map<String, dynamic> _$$FeedImplToJson(_$FeedImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'name': instance.name,
-      'type': _$FeedTypeEnumMap[instance.type]!,
-      'brand': instance.brand,
-      'unit': _$FeedUnitEnumMap[instance.unit]!,
-      'current_stock': const DoubleConverter().toJson(instance.currentStock),
-      'min_stock': const DoubleConverter().toJson(instance.minStock),
-      'cost_per_unit': _$JsonConverterToJson<Object, double>(
-        instance.costPerUnit,
-        const DoubleConverter().toJson,
-      ),
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$FeedImplToJson(
+  _$FeedImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+  'type': _$FeedTypeEnumMap[instance.type]!,
+  'brand': instance.brand,
+  'unit': _$FeedUnitEnumMap[instance.unit]!,
+  'current_stock': const DoubleConverter().toJson(instance.currentStock),
+  'min_stock': const DoubleConverter().toJson(instance.minStock),
+  'cost_per_unit': _$JsonConverterToJson<Object, double>(
+    instance.costPerUnit,
+    const DoubleConverter().toJson,
+  ),
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+};
 
 const _$FeedTypeEnumMap = {
   FeedType.pellets: 'pellets',

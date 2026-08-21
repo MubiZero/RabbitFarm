@@ -50,7 +50,7 @@ describe('TransactionService', () => {
   // ─── createTransaction ────────────────────────────────────────────────────
 
   describe('createTransaction', () => {
-    const mockDbTransaction = { commit: jest.fn(), rollback: jest.fn(), finished: false };
+    const mockDbTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' }, finished: false };
 
     beforeEach(() => {
       Transaction.sequelize.transaction.mockResolvedValue(mockDbTransaction);

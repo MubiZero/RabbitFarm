@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import 'feed_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../cages/data/models/cage_model.dart';
@@ -17,10 +18,10 @@ class FeedingRecord with _$FeedingRecord {
     @JsonKey(name: 'feed_id') @IntConverter() required int feedId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @DoubleConverter() required double quantity,
-    @JsonKey(name: 'fed_at') required DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required DateTime fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
@@ -38,7 +39,7 @@ class FeedingRecordCreate with _$FeedingRecordCreate {
     @JsonKey(name: 'feed_id') required int feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     required double quantity,
-    @JsonKey(name: 'fed_at') required DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required DateTime fedAt,
     String? notes,
   }) = _FeedingRecordCreate;
 
@@ -54,7 +55,7 @@ class FeedingRecordUpdate with _$FeedingRecordUpdate {
     @JsonKey(name: 'feed_id') int? feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     double? quantity,
-    @JsonKey(name: 'fed_at') DateTime? fedAt,
+    @JsonKey(name: 'fed_at') @NullableDateTimeConverter() DateTime? fedAt,
     String? notes,
   }) = _FeedingRecordUpdate;
 

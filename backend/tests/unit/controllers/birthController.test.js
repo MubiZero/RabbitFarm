@@ -21,11 +21,12 @@ jest.mock('../../../src/models', () => {
     },
     Breeding: { findOne: jest.fn() },
     Breed: { findOne: jest.fn() },
+    Cage: { findOne: jest.fn() },
     Task: { create: jest.fn() }
   };
 });
 
-const { Rabbit, Birth, Breeding, Breed, Task } = require('../../../src/models');
+const { Rabbit, Birth, Breeding, Breed, Cage, Task } = require('../../../src/models');
 const ctrl = require('../../../src/controllers/birthController');
 
 const mockReq = (overrides = {}) => ({
@@ -38,7 +39,7 @@ const mockRes = () => {
   return res;
 };
 jest.fn();
-const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
 describe('birthController', () => {
   beforeEach(() => {
@@ -323,10 +324,13 @@ describe('birthController', () => {
 
     it('should return 400 if cage is full', async () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0 };
-      const mother = { id: 2, cage_id: 5, getCage: jest.fn().mockResolvedValue({ capacity: 2 }) };
+      const mother = { id: 2, cage_id: 5 };
       Birth.findOne.mockResolvedValue(birth);
       Rabbit.findOne.mockResolvedValue(mother);
       Breed.findOne.mockResolvedValue({ id: 1 });
+      // Клетка читается напрямую и с блокировкой строки, а не через
+      // ассоциацию матери: подсчёт мест иначе не защищён от гонки.
+      Cage.findOne.mockResolvedValue({ id: 5, capacity: 2 });
       Rabbit.count.mockResolvedValue(1); // 1 current + 3 new = 4 > capacity 2
 
       const req = mockReq({ params: { id: '1' }, body: kitBody });

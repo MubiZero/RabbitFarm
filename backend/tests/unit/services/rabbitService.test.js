@@ -26,7 +26,7 @@ describe('RabbitService', () => {
   beforeEach(() => jest.clearAllMocks());
 
   describe('createRabbit', () => {
-    const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
     beforeEach(() => {
       sequelize.transaction.mockResolvedValue(mockTransaction);

@@ -15,16 +15,12 @@ _$CageModelImpl _$$CageModelImplFromJson(Map<String, dynamic> json) =>
       capacity: const IntConverter().fromJson(json['capacity'] as Object),
       location: json['location'] as String?,
       condition: json['condition'] as String,
-      lastCleanedAt: json['last_cleaned_at'] == null
-          ? null
-          : DateTime.parse(json['last_cleaned_at'] as String),
+      lastCleanedAt: const NullableDateTimeConverter().fromJson(
+        json['last_cleaned_at'],
+      ),
       notes: json['notes'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
       rabbits: (json['rabbits'] as List<dynamic>?)
           ?.map((e) => RabbitModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -35,26 +31,29 @@ _$CageModelImpl _$$CageModelImplFromJson(Map<String, dynamic> json) =>
       isAvailable: json['is_available'] as bool?,
     );
 
-Map<String, dynamic> _$$CageModelImplToJson(_$CageModelImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'number': instance.number,
-      'type': instance.type,
-      'size': instance.size,
-      'capacity': const IntConverter().toJson(instance.capacity),
-      'location': instance.location,
-      'condition': instance.condition,
-      'last_cleaned_at': instance.lastCleanedAt?.toIso8601String(),
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'rabbits': instance.rabbits,
-      'current_occupancy': const NullableIntConverter().toJson(
-        instance.currentOccupancy,
-      ),
-      'is_full': instance.isFull,
-      'is_available': instance.isAvailable,
-    };
+Map<String, dynamic> _$$CageModelImplToJson(
+  _$CageModelImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'number': instance.number,
+  'type': instance.type,
+  'size': instance.size,
+  'capacity': const IntConverter().toJson(instance.capacity),
+  'location': instance.location,
+  'condition': instance.condition,
+  'last_cleaned_at': const NullableDateTimeConverter().toJson(
+    instance.lastCleanedAt,
+  ),
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+  'rabbits': instance.rabbits,
+  'current_occupancy': const NullableIntConverter().toJson(
+    instance.currentOccupancy,
+  ),
+  'is_full': instance.isFull,
+  'is_available': instance.isAvailable,
+};
 
 _$CageStatisticsImpl _$$CageStatisticsImplFromJson(Map<String, dynamic> json) =>
     _$CageStatisticsImpl(

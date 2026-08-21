@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../../core/json/double_converter.dart';
@@ -61,13 +62,13 @@ class Transaction with _$Transaction {
     required TransactionType type,
     required TransactionCategory category,
     @DoubleConverter() required double amount,
-    @JsonKey(name: 'transaction_date') required DateTime transactionDate,
+    @JsonKey(name: 'transaction_date') @DateOnlyConverter() required DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     // Relationships (not included in JSON serialization by default)
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   }) = _Transaction;
@@ -83,7 +84,7 @@ class TransactionCreate with _$TransactionCreate {
     required TransactionType type,
     required TransactionCategory category,
     required double amount,
-    @JsonKey(name: 'transaction_date') required DateTime transactionDate,
+    @JsonKey(name: 'transaction_date') @DateOnlyConverter() required DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -100,7 +101,7 @@ class TransactionUpdate with _$TransactionUpdate {
     TransactionType? type,
     TransactionCategory? category,
     double? amount,
-    @JsonKey(name: 'transaction_date') DateTime? transactionDate,
+    @JsonKey(name: 'transaction_date') @NullableDateOnlyConverter() DateTime? transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -159,8 +160,8 @@ class ReportPeriod with _$ReportPeriod {
   const factory ReportPeriod({
     @IntConverter() required int year,
     @IntConverter() required int month,
-    @JsonKey(name: 'start_date') required DateTime startDate,
-    @JsonKey(name: 'end_date') required DateTime endDate,
+    @JsonKey(name: 'start_date') @DateOnlyConverter() required DateTime startDate,
+    @JsonKey(name: 'end_date') @DateOnlyConverter() required DateTime endDate,
   }) = _ReportPeriod;
 
   factory ReportPeriod.fromJson(Map<String, dynamic> json) =>

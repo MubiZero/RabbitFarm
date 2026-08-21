@@ -1,5 +1,5 @@
 const { randomUUID } = require('crypto');
-const { Rabbit, Birth, Breeding, Task, Breed } = require('../models');
+const { Rabbit, Birth, Breeding, Task, Breed, Cage } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
 
@@ -406,7 +406,13 @@ exports.createKitsFromBirth = async (req, res) => {
     const cageId = mother.cage_id;
 
     if (cageId) {
-      const cage = await mother.getCage({ transaction });
+      // Клетка блокируется на время проверки: иначе два одновременных
+      // создания помёта видят одни и те же свободные места и оба их занимают.
+      const cage = await Cage.findOne({
+        where: { id: cageId, user_id: userId },
+        lock: transaction.LOCK.UPDATE,
+        transaction
+      });
       if (cage) {
         const currentCount = await Rabbit.count({
           where: { cage_id: cageId, user_id: userId },

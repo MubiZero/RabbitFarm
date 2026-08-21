@@ -18,29 +18,26 @@ _$BreedModelImpl _$$BreedModelImplFromJson(Map<String, dynamic> json) =>
       ),
       purpose: json['purpose'] as String?,
       photoUrl: json['photo_url'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
     );
 
-Map<String, dynamic> _$$BreedModelImplToJson(_$BreedModelImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'name': instance.name,
-      'description': instance.description,
-      'average_weight': instance.averageWeight,
-      'average_litter_size': _$JsonConverterToJson<Object, int>(
-        instance.averageLitterSize,
-        const IntConverter().toJson,
-      ),
-      'purpose': instance.purpose,
-      'photo_url': instance.photoUrl,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$BreedModelImplToJson(
+  _$BreedModelImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+  'description': instance.description,
+  'average_weight': instance.averageWeight,
+  'average_litter_size': _$JsonConverterToJson<Object, int>(
+    instance.averageLitterSize,
+    const IntConverter().toJson,
+  ),
+  'purpose': instance.purpose,
+  'photo_url': instance.photoUrl,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+};
 
 Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,

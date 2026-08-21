@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../../core/json/double_converter.dart';
 
@@ -78,8 +79,8 @@ class Feed with _$Feed {
     @JsonKey(name: 'min_stock') @DoubleConverter() required double minStock,
     @JsonKey(name: 'cost_per_unit') @DoubleConverter() double? costPerUnit,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
   }) = _Feed;
 
   factory Feed.fromJson(Map<String, dynamic> json) => _$FeedFromJson(json);

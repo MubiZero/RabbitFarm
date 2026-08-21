@@ -204,7 +204,7 @@ describe('RabbitService - extended methods', () => {
   });
 
   describe('addWeightRecord', () => {
-    const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+    const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
     beforeEach(() => {
       sequelize.transaction.mockResolvedValue(mockTx);

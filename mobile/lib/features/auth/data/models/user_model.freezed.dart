@@ -32,10 +32,13 @@ mixin _$UserModel {
   @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_login_at')
+  @NullableDateTimeConverter()
   DateTime? get lastLoginAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -61,9 +64,11 @@ abstract class $UserModelCopyWith<$Res> {
     String? phone,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'is_active') bool isActive,
-    @JsonKey(name: 'last_login_at') DateTime? lastLoginAt,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'last_login_at')
+    @NullableDateTimeConverter()
+    DateTime? lastLoginAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
   });
 }
 
@@ -158,9 +163,11 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String? phone,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'is_active') bool isActive,
-    @JsonKey(name: 'last_login_at') DateTime? lastLoginAt,
-    @JsonKey(name: 'created_at') DateTime createdAt,
-    @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'last_login_at')
+    @NullableDateTimeConverter()
+    DateTime? lastLoginAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
   });
 }
 
@@ -247,9 +254,11 @@ class _$UserModelImpl implements _UserModel {
     this.phone,
     @JsonKey(name: 'avatar_url') this.avatarUrl,
     @JsonKey(name: 'is_active') required this.isActive,
-    @JsonKey(name: 'last_login_at') this.lastLoginAt,
-    @JsonKey(name: 'created_at') required this.createdAt,
-    @JsonKey(name: 'updated_at') required this.updatedAt,
+    @JsonKey(name: 'last_login_at')
+    @NullableDateTimeConverter()
+    this.lastLoginAt,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required this.createdAt,
+    @JsonKey(name: 'updated_at') @DateTimeConverter() required this.updatedAt,
   });
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -274,12 +283,15 @@ class _$UserModelImpl implements _UserModel {
   final bool isActive;
   @override
   @JsonKey(name: 'last_login_at')
+  @NullableDateTimeConverter()
   final DateTime? lastLoginAt;
   @override
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   final DateTime createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   final DateTime updatedAt;
 
   @override
@@ -349,9 +361,15 @@ abstract class _UserModel implements UserModel {
     final String? phone,
     @JsonKey(name: 'avatar_url') final String? avatarUrl,
     @JsonKey(name: 'is_active') required final bool isActive,
-    @JsonKey(name: 'last_login_at') final DateTime? lastLoginAt,
-    @JsonKey(name: 'created_at') required final DateTime createdAt,
-    @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+    @JsonKey(name: 'last_login_at')
+    @NullableDateTimeConverter()
+    final DateTime? lastLoginAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required final DateTime createdAt,
+    @JsonKey(name: 'updated_at')
+    @DateTimeConverter()
+    required final DateTime updatedAt,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -376,12 +394,15 @@ abstract class _UserModel implements UserModel {
   bool get isActive;
   @override
   @JsonKey(name: 'last_login_at')
+  @NullableDateTimeConverter()
   DateTime? get lastLoginAt;
   @override
   @JsonKey(name: 'created_at')
+  @DateTimeConverter()
   DateTime get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @DateTimeConverter()
   DateTime get updatedAt;
 
   /// Create a copy of UserModel

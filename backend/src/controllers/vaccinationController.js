@@ -533,8 +533,12 @@ class VaccinationController {
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
               user_id: req.farmId, // Filter by user
+              // Перечисление живых статусов пропускало 'active' и
+              // 'quarantine'. Статус 'active' код сам ставит матери после
+              // окрола, поэтому любая окролившаяся самка исчезала из списка
+              // просроченных прививок и из текущих лечений.
               status: {
-                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
+                [Op.notIn]: ['dead', 'sold']
               }
             },
             include: [

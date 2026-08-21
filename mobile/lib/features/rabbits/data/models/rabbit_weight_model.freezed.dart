@@ -29,9 +29,11 @@ mixin _$RabbitWeight {
   @DoubleConverter()
   double get weight => throw _privateConstructorUsedError;
   @JsonKey(name: 'measured_at')
+  @DateTimeConverter()
   DateTime get measuredAt => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this RabbitWeight to a JSON map.
@@ -55,9 +57,11 @@ abstract class $RabbitWeightCopyWith<$Res> {
     @IntConverter() int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @DoubleConverter() double weight,
-    @JsonKey(name: 'measured_at') DateTime measuredAt,
+    @JsonKey(name: 'measured_at') @DateTimeConverter() DateTime measuredAt,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
   });
 }
 
@@ -128,9 +132,11 @@ abstract class _$$RabbitWeightImplCopyWith<$Res>
     @IntConverter() int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @DoubleConverter() double weight,
-    @JsonKey(name: 'measured_at') DateTime measuredAt,
+    @JsonKey(name: 'measured_at') @DateTimeConverter() DateTime measuredAt,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
   });
 }
 
@@ -193,9 +199,9 @@ class _$RabbitWeightImpl implements _RabbitWeight {
     @IntConverter() required this.id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required this.rabbitId,
     @DoubleConverter() required this.weight,
-    @JsonKey(name: 'measured_at') required this.measuredAt,
+    @JsonKey(name: 'measured_at') @DateTimeConverter() required this.measuredAt,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
   });
 
   factory _$RabbitWeightImpl.fromJson(Map<String, dynamic> json) =>
@@ -213,11 +219,13 @@ class _$RabbitWeightImpl implements _RabbitWeight {
   final double weight;
   @override
   @JsonKey(name: 'measured_at')
+  @DateTimeConverter()
   final DateTime measuredAt;
   @override
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
 
   @override
@@ -272,9 +280,13 @@ abstract class _RabbitWeight implements RabbitWeight {
     @IntConverter() required final int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required final int rabbitId,
     @DoubleConverter() required final double weight,
-    @JsonKey(name: 'measured_at') required final DateTime measuredAt,
+    @JsonKey(name: 'measured_at')
+    @DateTimeConverter()
+    required final DateTime measuredAt,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
   }) = _$RabbitWeightImpl;
 
   factory _RabbitWeight.fromJson(Map<String, dynamic> json) =
@@ -292,11 +304,13 @@ abstract class _RabbitWeight implements RabbitWeight {
   double get weight;
   @override
   @JsonKey(name: 'measured_at')
+  @DateTimeConverter()
   DateTime get measuredAt;
   @override
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
 
   /// Create a copy of RabbitWeight

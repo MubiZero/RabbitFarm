@@ -34,8 +34,10 @@ mixin _$BreedModel {
   @JsonKey(name: 'photo_url')
   String? get photoUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this BreedModel to a JSON map.
@@ -65,8 +67,12 @@ abstract class $BreedModelCopyWith<$Res> {
     int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   });
 }
 
@@ -158,8 +164,12 @@ abstract class _$$BreedModelImplCopyWith<$Res>
     int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   });
 }
 
@@ -243,8 +253,8 @@ class _$BreedModelImpl implements _BreedModel {
     this.averageLitterSize,
     this.purpose,
     @JsonKey(name: 'photo_url') this.photoUrl,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
   });
 
   factory _$BreedModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -271,9 +281,11 @@ class _$BreedModelImpl implements _BreedModel {
   final String? photoUrl;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
 
   @override
@@ -343,8 +355,12 @@ abstract class _BreedModel implements BreedModel {
     final int? averageLitterSize,
     final String? purpose,
     @JsonKey(name: 'photo_url') final String? photoUrl,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
   }) = _$BreedModelImpl;
 
   factory _BreedModel.fromJson(Map<String, dynamic> json) =
@@ -371,9 +387,11 @@ abstract class _BreedModel implements BreedModel {
   String? get photoUrl;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt;
 
   /// Create a copy of BreedModel

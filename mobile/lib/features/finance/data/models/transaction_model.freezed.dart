@@ -28,6 +28,7 @@ mixin _$Transaction {
   @DoubleConverter()
   double get amount => throw _privateConstructorUsedError;
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   DateTime get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -39,8 +40,10 @@ mixin _$Transaction {
   @NullableIntConverter()
   int? get createdBy => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Relationships (not included in JSON serialization by default)
   @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit => throw _privateConstructorUsedError;
@@ -67,13 +70,19 @@ abstract class $TransactionCopyWith<$Res> {
     TransactionType type,
     TransactionCategory category,
     @DoubleConverter() double amount,
-    @JsonKey(name: 'transaction_date') DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
 
@@ -192,13 +201,19 @@ abstract class _$$TransactionImplCopyWith<$Res>
     TransactionType type,
     TransactionCategory category,
     @DoubleConverter() double amount,
-    @JsonKey(name: 'transaction_date') DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
 
@@ -296,13 +311,15 @@ class _$TransactionImpl implements _Transaction {
     required this.type,
     required this.category,
     @DoubleConverter() required this.amount,
-    @JsonKey(name: 'transaction_date') required this.transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required this.transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() this.createdBy,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
   });
 
@@ -321,6 +338,7 @@ class _$TransactionImpl implements _Transaction {
   final double amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   final DateTime transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -337,9 +355,11 @@ class _$TransactionImpl implements _Transaction {
   final int? createdBy;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
   // Relationships (not included in JSON serialization by default)
   @override
@@ -416,13 +436,19 @@ abstract class _Transaction implements Transaction {
     required final TransactionType type,
     required final TransactionCategory category,
     @DoubleConverter() required final double amount,
-    @JsonKey(name: 'transaction_date') required final DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required final DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() final int? createdBy,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final RabbitModel? rabbit,
   }) = _$TransactionImpl;
@@ -442,6 +468,7 @@ abstract class _Transaction implements Transaction {
   double get amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   DateTime get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -458,9 +485,11 @@ abstract class _Transaction implements Transaction {
   int? get createdBy;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt; // Relationships (not included in JSON serialization by default)
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -484,6 +513,7 @@ mixin _$TransactionCreate {
   TransactionCategory get category => throw _privateConstructorUsedError;
   double get amount => throw _privateConstructorUsedError;
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   DateTime get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -513,7 +543,9 @@ abstract class $TransactionCreateCopyWith<$Res> {
     TransactionType type,
     TransactionCategory category,
     double amount,
-    @JsonKey(name: 'transaction_date') DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -592,7 +624,9 @@ abstract class _$$TransactionCreateImplCopyWith<$Res>
     TransactionType type,
     TransactionCategory category,
     double amount,
-    @JsonKey(name: 'transaction_date') DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -663,7 +697,9 @@ class _$TransactionCreateImpl implements _TransactionCreate {
     required this.type,
     required this.category,
     required this.amount,
-    @JsonKey(name: 'transaction_date') required this.transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required this.transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
@@ -680,6 +716,7 @@ class _$TransactionCreateImpl implements _TransactionCreate {
   final double amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   final DateTime transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -750,7 +787,9 @@ abstract class _TransactionCreate implements TransactionCreate {
     required final TransactionType type,
     required final TransactionCategory category,
     required final double amount,
-    @JsonKey(name: 'transaction_date') required final DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required final DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
@@ -767,6 +806,7 @@ abstract class _TransactionCreate implements TransactionCreate {
   double get amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @DateOnlyConverter()
   DateTime get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -796,6 +836,7 @@ mixin _$TransactionUpdate {
   TransactionCategory? get category => throw _privateConstructorUsedError;
   double? get amount => throw _privateConstructorUsedError;
   @JsonKey(name: 'transaction_date')
+  @NullableDateOnlyConverter()
   DateTime? get transactionDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'rabbit_id')
   @NullableIntConverter()
@@ -825,7 +866,9 @@ abstract class $TransactionUpdateCopyWith<$Res> {
     TransactionType? type,
     TransactionCategory? category,
     double? amount,
-    @JsonKey(name: 'transaction_date') DateTime? transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @NullableDateOnlyConverter()
+    DateTime? transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -904,7 +947,9 @@ abstract class _$$TransactionUpdateImplCopyWith<$Res>
     TransactionType? type,
     TransactionCategory? category,
     double? amount,
-    @JsonKey(name: 'transaction_date') DateTime? transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @NullableDateOnlyConverter()
+    DateTime? transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -975,7 +1020,9 @@ class _$TransactionUpdateImpl implements _TransactionUpdate {
     this.type,
     this.category,
     this.amount,
-    @JsonKey(name: 'transaction_date') this.transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @NullableDateOnlyConverter()
+    this.transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
     this.description,
     @JsonKey(name: 'receipt_url') this.receiptUrl,
@@ -992,6 +1039,7 @@ class _$TransactionUpdateImpl implements _TransactionUpdate {
   final double? amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @NullableDateOnlyConverter()
   final DateTime? transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -1062,7 +1110,9 @@ abstract class _TransactionUpdate implements TransactionUpdate {
     final TransactionType? type,
     final TransactionCategory? category,
     final double? amount,
-    @JsonKey(name: 'transaction_date') final DateTime? transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @NullableDateOnlyConverter()
+    final DateTime? transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
     final String? description,
     @JsonKey(name: 'receipt_url') final String? receiptUrl,
@@ -1079,6 +1129,7 @@ abstract class _TransactionUpdate implements TransactionUpdate {
   double? get amount;
   @override
   @JsonKey(name: 'transaction_date')
+  @NullableDateOnlyConverter()
   DateTime? get transactionDate;
   @override
   @JsonKey(name: 'rabbit_id')
@@ -1954,8 +2005,10 @@ mixin _$ReportPeriod {
   @IntConverter()
   int get month => throw _privateConstructorUsedError;
   @JsonKey(name: 'start_date')
+  @DateOnlyConverter()
   DateTime get startDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'end_date')
+  @DateOnlyConverter()
   DateTime get endDate => throw _privateConstructorUsedError;
 
   /// Serializes this ReportPeriod to a JSON map.
@@ -1978,8 +2031,8 @@ abstract class $ReportPeriodCopyWith<$Res> {
   $Res call({
     @IntConverter() int year,
     @IntConverter() int month,
-    @JsonKey(name: 'start_date') DateTime startDate,
-    @JsonKey(name: 'end_date') DateTime endDate,
+    @JsonKey(name: 'start_date') @DateOnlyConverter() DateTime startDate,
+    @JsonKey(name: 'end_date') @DateOnlyConverter() DateTime endDate,
   });
 }
 
@@ -2039,8 +2092,8 @@ abstract class _$$ReportPeriodImplCopyWith<$Res>
   $Res call({
     @IntConverter() int year,
     @IntConverter() int month,
-    @JsonKey(name: 'start_date') DateTime startDate,
-    @JsonKey(name: 'end_date') DateTime endDate,
+    @JsonKey(name: 'start_date') @DateOnlyConverter() DateTime startDate,
+    @JsonKey(name: 'end_date') @DateOnlyConverter() DateTime endDate,
   });
 }
 
@@ -2092,8 +2145,8 @@ class _$ReportPeriodImpl implements _ReportPeriod {
   const _$ReportPeriodImpl({
     @IntConverter() required this.year,
     @IntConverter() required this.month,
-    @JsonKey(name: 'start_date') required this.startDate,
-    @JsonKey(name: 'end_date') required this.endDate,
+    @JsonKey(name: 'start_date') @DateOnlyConverter() required this.startDate,
+    @JsonKey(name: 'end_date') @DateOnlyConverter() required this.endDate,
   });
 
   factory _$ReportPeriodImpl.fromJson(Map<String, dynamic> json) =>
@@ -2107,9 +2160,11 @@ class _$ReportPeriodImpl implements _ReportPeriod {
   final int month;
   @override
   @JsonKey(name: 'start_date')
+  @DateOnlyConverter()
   final DateTime startDate;
   @override
   @JsonKey(name: 'end_date')
+  @DateOnlyConverter()
   final DateTime endDate;
 
   @override
@@ -2151,8 +2206,12 @@ abstract class _ReportPeriod implements ReportPeriod {
   const factory _ReportPeriod({
     @IntConverter() required final int year,
     @IntConverter() required final int month,
-    @JsonKey(name: 'start_date') required final DateTime startDate,
-    @JsonKey(name: 'end_date') required final DateTime endDate,
+    @JsonKey(name: 'start_date')
+    @DateOnlyConverter()
+    required final DateTime startDate,
+    @JsonKey(name: 'end_date')
+    @DateOnlyConverter()
+    required final DateTime endDate,
   }) = _$ReportPeriodImpl;
 
   factory _ReportPeriod.fromJson(Map<String, dynamic> json) =
@@ -2166,9 +2225,11 @@ abstract class _ReportPeriod implements ReportPeriod {
   int get month;
   @override
   @JsonKey(name: 'start_date')
+  @DateOnlyConverter()
   DateTime get startDate;
   @override
   @JsonKey(name: 'end_date')
+  @DateOnlyConverter()
   DateTime get endDate;
 
   /// Create a copy of ReportPeriod

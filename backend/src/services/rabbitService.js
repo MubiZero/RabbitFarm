@@ -35,8 +35,13 @@ class RabbitService {
 
       // Check if cage exists and has capacity
       if (rabbitData.cage_id) {
+          // Блокируем строку клетки на время проверки: подсчёт и вставка
+          // идут двумя запросами, и без блокировки двое сотрудников с двух
+          // телефонов одновременно видят одно свободное место и оба его
+          // занимают — в клетке оказывается больше кроликов, чем вмещает.
         const cage = await Cage.findOne({
           where: { id: rabbitData.cage_id, user_id: rabbitData.user_id },
+          lock: transaction.LOCK.UPDATE,
           transaction
         });
         if (!cage) {
@@ -275,8 +280,13 @@ class RabbitService {
 
       // Check if cage exists and has capacity (if being updated)
       if (updateData.cage_id && updateData.cage_id !== rabbit.cage_id) {
+          // Блокируем строку клетки на время проверки: подсчёт и вставка
+          // идут двумя запросами, и без блокировки двое сотрудников с двух
+          // телефонов одновременно видят одно свободное место и оба его
+          // занимают — в клетке оказывается больше кроликов, чем вмещает.
         const cage = await Cage.findOne({
           where: { id: updateData.cage_id, user_id: userId },
+          lock: transaction.LOCK.UPDATE,
           transaction
         });
         if (!cage) throw new Error('CAGE_NOT_FOUND');
@@ -332,10 +342,17 @@ class RabbitService {
         deleteFile(rabbit.photo_url);
       }
 
+      // Прежний вес нужно запомнить до update: после него экземпляр уже
+      // хранит новое значение, сравнение всегда давало «не изменился», и
+      // правка веса в карточке не попадала в историю — на графике роста
+      // оставались дыры.
+      const previousWeight = rabbit.current_weight;
+
       await rabbit.update(updateData, { transaction });
 
-      // If weight is being updated, add weight record
-      if (updateData.current_weight && updateData.current_weight !== rabbit.current_weight) {
+      if (updateData.current_weight !== undefined &&
+          updateData.current_weight !== null &&
+          Number(updateData.current_weight) !== Number(previousWeight)) {
         await RabbitWeight.create({
           rabbit_id: rabbit.id,
           weight: updateData.current_weight,

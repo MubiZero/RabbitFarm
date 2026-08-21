@@ -170,4 +170,67 @@ describe('Rabbits API', () => {
       expect(res.body.data.breed).toBe('Серый великан');
     });
   });
+
+  describe('история веса', () => {
+    // Регрессия: сравнение с прежним весом стояло после update, когда объект
+    // уже хранил новое значение, — правка веса в карточке не попадала в
+    // историю, и в графике роста оставались дыры.
+    it('правка веса в карточке добавляет точку в историю', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Растущий',
+          breed_id: breedId,
+          sex: 'male',
+          birth_date: '2024-02-01',
+          current_weight: 2.0
+        });
+      const rabbitId = created.body.data.id;
+
+      const before = await request(app)
+        .get(`/api/v1/rabbits/${rabbitId}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const countBefore = (before.body.data.items || before.body.data).length;
+
+      await request(app)
+        .put(`/api/v1/rabbits/${rabbitId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ current_weight: 2.6 });
+
+      const after = await request(app)
+        .get(`/api/v1/rabbits/${rabbitId}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const items = after.body.data.items || after.body.data;
+
+      expect(items.length).toBe(countBefore + 1);
+      expect(items.map((w) => parseFloat(w.weight))).toContain(2.6);
+    });
+
+    it('правка без изменения веса истории не плодит', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Стабильный',
+          breed_id: breedId,
+          sex: 'male',
+          birth_date: '2024-02-01',
+          current_weight: 3.0
+        });
+
+      await request(app)
+        .put(`/api/v1/rabbits/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ current_weight: 3.0, notes: 'просто заметка' });
+
+      const after = await request(app)
+        .get(`/api/v1/rabbits/${created.body.data.id}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const items = after.body.data.items || after.body.data;
+
+      // Только точка, созданная вместе с карточкой.
+      expect(items.length).toBe(1);
+    });
+  });
 });

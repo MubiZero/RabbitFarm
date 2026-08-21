@@ -12,41 +12,44 @@ _$VaccinationImpl _$$VaccinationImplFromJson(Map<String, dynamic> json) =>
       rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
       vaccineName: json['vaccine_name'] as String,
       vaccineType: $enumDecode(_$VaccineTypeEnumMap, json['vaccine_type']),
-      vaccinationDate: DateTime.parse(json['vaccination_date'] as String),
-      nextVaccinationDate: json['next_vaccination_date'] == null
-          ? null
-          : DateTime.parse(json['next_vaccination_date'] as String),
+      vaccinationDate: const DateOnlyConverter().fromJson(
+        json['vaccination_date'] as Object,
+      ),
+      nextVaccinationDate: const NullableDateOnlyConverter().fromJson(
+        json['next_vaccination_date'],
+      ),
       batchNumber: json['batch_number'] as String?,
       veterinarian: json['veterinarian'] as String?,
       notes: json['notes'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
       daysUntil: (json['days_until'] as num?)?.toInt(),
       daysOverdue: (json['days_overdue'] as num?)?.toInt(),
       isOverdue: json['is_overdue'] as bool?,
     );
 
-Map<String, dynamic> _$$VaccinationImplToJson(_$VaccinationImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'rabbit_id': const IntConverter().toJson(instance.rabbitId),
-      'vaccine_name': instance.vaccineName,
-      'vaccine_type': _$VaccineTypeEnumMap[instance.vaccineType]!,
-      'vaccination_date': instance.vaccinationDate.toIso8601String(),
-      'next_vaccination_date': instance.nextVaccinationDate?.toIso8601String(),
-      'batch_number': instance.batchNumber,
-      'veterinarian': instance.veterinarian,
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'days_until': instance.daysUntil,
-      'days_overdue': instance.daysOverdue,
-      'is_overdue': instance.isOverdue,
-    };
+Map<String, dynamic> _$$VaccinationImplToJson(
+  _$VaccinationImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'rabbit_id': const IntConverter().toJson(instance.rabbitId),
+  'vaccine_name': instance.vaccineName,
+  'vaccine_type': _$VaccineTypeEnumMap[instance.vaccineType]!,
+  'vaccination_date': const DateOnlyConverter().toJson(
+    instance.vaccinationDate,
+  ),
+  'next_vaccination_date': const NullableDateOnlyConverter().toJson(
+    instance.nextVaccinationDate,
+  ),
+  'batch_number': instance.batchNumber,
+  'veterinarian': instance.veterinarian,
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+  'days_until': instance.daysUntil,
+  'days_overdue': instance.daysOverdue,
+  'is_overdue': instance.isOverdue,
+};
 
 const _$VaccineTypeEnumMap = {
   VaccineType.vhd: 'vhd',
@@ -105,7 +108,9 @@ _$UpcomingVaccinationItemImpl _$$UpcomingVaccinationItemImplFromJson(
   rabbitName: json['rabbit_name'] as String?,
   vaccineName: json['vaccine_name'] as String,
   vaccineType: $enumDecode(_$VaccineTypeEnumMap, json['vaccine_type']),
-  nextVaccinationDate: DateTime.parse(json['next_vaccination_date'] as String),
+  nextVaccinationDate: const DateOnlyConverter().fromJson(
+    json['next_vaccination_date'] as Object,
+  ),
   daysUntil: (json['days_until'] as num).toInt(),
   isOverdue: json['is_overdue'] as bool?,
 );
@@ -118,7 +123,9 @@ Map<String, dynamic> _$$UpcomingVaccinationItemImplToJson(
   'rabbit_name': instance.rabbitName,
   'vaccine_name': instance.vaccineName,
   'vaccine_type': _$VaccineTypeEnumMap[instance.vaccineType]!,
-  'next_vaccination_date': instance.nextVaccinationDate.toIso8601String(),
+  'next_vaccination_date': const DateOnlyConverter().toJson(
+    instance.nextVaccinationDate,
+  ),
   'days_until': instance.daysUntil,
   'is_overdue': instance.isOverdue,
 };
