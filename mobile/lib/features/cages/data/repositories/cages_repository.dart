@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/cage_model.dart';
 import '../../../../core/api/api_error.dart';
@@ -235,6 +236,7 @@ class CagesRepository {
 
 /// Provider для репозитория клеток
 final cagesRepositoryProvider = Provider<CagesRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return CagesRepository(apiClient: apiClient);
 });

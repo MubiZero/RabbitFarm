@@ -131,4 +131,140 @@ describe('Ферма и работники', () => {
 
     expect(res.status).toBe(404);
   });
+
+  describe('изоляция ферм на записях о здоровье', () => {
+    let vaccinationId;
+
+    beforeAll(async () => {
+      const created = await request(app)
+        .post('/api/v1/vaccinations')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          rabbit_id: rabbitId,
+          vaccine_name: 'ВГБК',
+          vaccine_type: 'vhd',
+          vaccination_date: '2026-03-01'
+        });
+      vaccinationId = created.body.data.id;
+    });
+
+    // Регрессия: правка вакцинации искала запись по одному идентификатору,
+    // без фильтра по ферме — чужую историю прививок можно было переписать.
+    it('сосед не может править вакцинацию чужой фермы', async () => {
+      const res = await request(app)
+        .put(`/api/v1/vaccinations/${vaccinationId}`)
+        .set('Authorization', `Bearer ${strangerToken}`)
+        .send({ vaccine_name: 'Подмена' });
+
+      expect(res.status).toBe(404);
+
+      const check = await request(app)
+        .get(`/api/v1/vaccinations/${vaccinationId}`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+      expect(check.body.data.vaccine_name).toBe('ВГБК');
+    });
+
+    it('владелец правит свою вакцинацию', async () => {
+      const res = await request(app)
+        .put(`/api/v1/vaccinations/${vaccinationId}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ vaccine_name: 'ВГБК-2' });
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('роли на финансах и складе', () => {
+    let transactionId;
+
+    beforeAll(async () => {
+      const created = await request(app)
+        .post('/api/v1/transactions')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          type: 'expense',
+          category: 'feed',
+          amount: 1000,
+          transaction_date: '2026-03-05'
+        });
+      transactionId = created.body.data.id;
+    });
+
+    // Регрессия: восемь роутеров не проверяли роль вообще, поэтому работник
+    // не мог удалить кролика, но мог стереть финансовую запись.
+    it('работнику не разрешено заводить расходы', async () => {
+      const res = await request(app)
+        .post('/api/v1/transactions')
+        .set('Authorization', `Bearer ${workerToken}`)
+        .send({ type: 'expense', category: 'feed', amount: 50, transaction_date: '2026-03-06' });
+
+      expect(res.status).toBe(403);
+    });
+
+    it('работнику не разрешено удалять финансовые записи', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/transactions/${transactionId}`)
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('работнику не разрешено удалять клетки', async () => {
+      const cage = await request(app)
+        .post('/api/v1/cages')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ number: 'Ж1', type: 'single', capacity: 1 });
+
+      const res = await request(app)
+        .delete(`/api/v1/cages/${cage.body.data.id}`)
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('владелец удаляет финансовую запись', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/transactions/${transactionId}`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('исполнитель задачи', () => {
+    // Регрессия: проверялось лишь существование пользователя, поэтому задачу
+    // можно было назначить работнику соседней фермы — она появлялась в его
+    // списке, а удалить её он не мог.
+    it('нельзя назначить задачу на пользователя другой фермы', async () => {
+      const stranger = await User.findOne({ where: { email: 'other_farm@example.com' } });
+
+      const res = await request(app)
+        .post('/api/v1/tasks')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          title: 'Чужая задача',
+          type: 'other',
+          due_date: '2026-04-01',
+          assigned_to: stranger.id
+        });
+
+      expect(res.status).toBe(404);
+    });
+
+    it('на работника своей фермы задача назначается', async () => {
+      const worker = await User.findOne({ where: { email: 'farm_worker@example.com' } });
+
+      const res = await request(app)
+        .post('/api/v1/tasks')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          title: 'Почистить клетки',
+          type: 'cleaning',
+          due_date: '2026-04-01',
+          assigned_to: worker.id
+        });
+
+      expect(res.status).toBe(201);
+    });
+  });
 });

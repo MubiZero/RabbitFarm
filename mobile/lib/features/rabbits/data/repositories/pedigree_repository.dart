@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/pedigree_model.dart';
 
@@ -46,6 +47,7 @@ class PedigreeRepository {
 
 /// Provider для репозитория родословной
 final pedigreeRepositoryProvider = Provider<PedigreeRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return PedigreeRepository(apiClient: apiClient);
 });

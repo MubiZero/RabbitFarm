@@ -63,6 +63,13 @@ module.exports = (sequelize) => {
     last_login_at: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    // Поколение токенов. Растёт при каждой смене пароля, и все выданные
+    // раньше токены перестают приниматься.
+    token_version: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     tableName: 'users',

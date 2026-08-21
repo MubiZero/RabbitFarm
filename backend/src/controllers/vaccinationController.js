@@ -229,7 +229,17 @@ class VaccinationController {
    */
   async update(req, res, next) {
     try {
-      const vaccination = await Vaccination.findByPk(req.params.id);
+      // Скоупинг по ферме обязателен: findByPk по одному идентификатору
+      // позволял править чужие записи перебором id.
+      const vaccination = await Vaccination.findOne({
+        where: { id: req.params.id },
+        include: [{
+          model: Rabbit,
+          as: 'rabbit',
+          where: { user_id: req.farmId },
+          attributes: ['id']
+        }]
+      });
 
       if (!vaccination) {
         return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');

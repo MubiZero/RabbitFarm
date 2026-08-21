@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const transactionController = require('../controllers/transactionController');
 const { createTransactionSchema, updateTransactionSchema } = require('../validators/transactionValidator');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -110,10 +110,10 @@ router.get('/statistics', transactionController.getStatistics);
 router.get('/monthly-report', transactionController.getMonthlyReport);
 
 // CRUD routes
-router.post('/', validate(createTransactionSchema), transactionController.create);
+router.post('/', authorize(['manager', 'owner']), validate(createTransactionSchema), transactionController.create);
 router.get('/', transactionController.list);
 router.get('/:id', transactionController.getById);
-router.put('/:id', validate(updateTransactionSchema), transactionController.update);
-router.delete('/:id', transactionController.delete);
+router.put('/:id', authorize(['manager', 'owner']), validate(updateTransactionSchema), transactionController.update);
+router.delete('/:id', authorize(['owner']), transactionController.delete);
 
 module.exports = router;

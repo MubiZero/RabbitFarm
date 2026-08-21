@@ -153,7 +153,11 @@ class AuthRepository {
   // Logout
   Future<void> logout() async {
     try {
-      await _apiClient.logout();
+      // Сервер гасит именно тот refresh-токен, который ему передали. Раньше
+      // запрос уходил с пустым телом, возвращал 422, ошибка глушилась — и
+      // серверная сессия жила ещё семь дней после «Выйти».
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      await _apiClient.logout(refreshToken: refreshToken);
     } catch (e) {
       // Ignore logout errors
     } finally {

@@ -287,9 +287,8 @@ describe('vaccinationController', () => {
         rabbit: { user_id: 1 },
         update: jest.fn().mockResolvedValue(true)
       };
-      Vaccination.findByPk
-        .mockResolvedValueOnce(vaccination)
-        .mockResolvedValueOnce({ id: 1 });
+      Vaccination.findOne.mockResolvedValueOnce(vaccination);
+      Vaccination.findByPk.mockResolvedValueOnce({ id: 1 });
 
       const req = mockReq({ params: { id: '1' }, body: { notes: 'Updated' } });
       const res = mockRes();
@@ -298,10 +297,18 @@ describe('vaccinationController', () => {
 
       expect(vaccination.update).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
+
+      // Запись ищется только внутри своей фермы: раньше findByPk по одному
+      // идентификатору позволял править чужие вакцинации перебором id.
+      expect(Vaccination.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: [expect.objectContaining({ where: { user_id: 1 } })]
+        })
+      );
     });
 
     it('should return 404 if not found', async () => {
-      Vaccination.findByPk.mockResolvedValueOnce(null);
+      Vaccination.findOne.mockResolvedValueOnce(null);
 
       const res = mockRes();
       await ctrl.update(mockReq({ params: { id: '999' }, body: {} }), res, mockNext);
@@ -311,7 +318,7 @@ describe('vaccinationController', () => {
 
     it('should return 404 for new rabbit_id not found', async () => {
       const vaccination = { id: 1, rabbit_id: 1, update: jest.fn() };
-      Vaccination.findByPk.mockResolvedValueOnce(vaccination);
+      Vaccination.findOne.mockResolvedValueOnce(vaccination);
       Rabbit.findOne.mockResolvedValueOnce(null); // new rabbit not found
 
       const res = mockRes();
@@ -329,7 +336,7 @@ describe('vaccinationController', () => {
           errors: [{ message: 'Invalid date' }]
         })
       };
-      Vaccination.findByPk.mockResolvedValueOnce(vaccination);
+      Vaccination.findOne.mockResolvedValueOnce(vaccination);
 
       const res = mockRes();
       await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), res, mockNext);
@@ -344,7 +351,7 @@ describe('vaccinationController', () => {
         rabbit: { user_id: 1 },
         update: jest.fn().mockRejectedValue(new Error('DB error'))
       };
-      Vaccination.findByPk.mockResolvedValueOnce(vaccination);
+      Vaccination.findOne.mockResolvedValueOnce(vaccination);
 
       await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), mockRes(), mockNext);
 

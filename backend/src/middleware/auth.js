@@ -41,6 +41,13 @@ const authenticate = async (req, res, next) => {
       return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
     }
 
+    // Смена пароля отзывает все выданные до неё токены. Без этой проверки
+    // access-токен продолжал работать до конца своего срока, и сброс пароля
+    // не отбирал доступ у того, кто уже вошёл.
+    if ((decoded.tv || 0) !== user.token_version) {
+      return ApiResponse.unauthorized(res, 'Токен отозван, войдите заново');
+    }
+
     // Attach user to request
     req.user = user;
     // Ферма запроса: у работника это ферма его владельца, у владельца — он сам.

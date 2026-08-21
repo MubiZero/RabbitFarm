@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/medical_record_model.dart';
 import '../../data/repositories/medical_records_repository.dart';
 
 /// Provider for medical records repository
 final medicalRecordsRepositoryProvider = Provider<MedicalRecordsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return MedicalRecordsRepository(apiClient);
 });

@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/task_model.dart';
 import '../../data/repositories/tasks_repository.dart';
 
 /// Tasks repository provider
 final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return TasksRepository(apiClient);
 });

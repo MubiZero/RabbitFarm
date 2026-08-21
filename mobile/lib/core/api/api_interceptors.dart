@@ -6,6 +6,27 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthInterceptor extends Interceptor {
   final FlutterSecureStorage storage;
 
+  /// Вызывается, когда сессию восстановить не удалось и нужно выйти.
+  /// Без этого приложение стирало токены, но продолжало считать себя
+  /// авторизованным: все экраны писали «не авторизован», а выйти было нельзя
+  /// иначе как перезапуском.
+  void Function()? onSessionExpired;
+
+  /// Основной клиент — повтор запроса должен идти через него, чтобы работали
+  /// таймауты и разбор ошибок, а не через одноразовый Dio без настроек.
+  Dio? client;
+
+  /// Единственное обновление токена на все параллельные 401.
+  ///
+  /// Экран может отправить несколько запросов сразу; когда срок токена
+  /// истекал, каждый начинал собственное обновление. Сервер выдаёт новый
+  /// refresh-токен и гасит старый, поэтому второе обновление приходило с уже
+  /// погашенным токеном, падало — и стирало только что полученные рабочие
+  /// токены. Со стороны это выглядело как случайные выходы из аккаунта.
+  Future<String?>? _refreshing;
+
+  static const _retriedMarker = 'auth_retried';
+
   AuthInterceptor({required this.storage});
 
   @override
@@ -13,7 +34,6 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Get access token from secure storage
     final token = await storage.read(key: 'access_token');
 
     if (token != null) {
@@ -23,59 +43,75 @@ class AuthInterceptor extends Interceptor {
     handler.next(options);
   }
 
+  Future<String?> _refreshToken() async {
+    final refreshToken = await storage.read(key: 'refresh_token');
+    if (refreshToken == null) return null;
+
+    // Через основной клиент, а не через одноразовый Dio: иначе теряются
+    // таймауты, разбор ошибок и настройка адреса. Рекурсии здесь нет — 401 на
+    // самом /auth/refresh не считается поводом для повтора.
+    final response = await (client ?? Dio()).post(
+      '/auth/refresh',
+      data: {'refresh_token': refreshToken},
+    );
+
+    if (response.statusCode != 200) return null;
+
+    final data = response.data['data'];
+    await storage.write(key: 'access_token', value: data['access_token']);
+    await storage.write(key: 'refresh_token', value: data['refresh_token']);
+    return data['access_token'] as String;
+  }
+
+  Future<void> _dropSession() async {
+    await storage.delete(key: 'access_token');
+    await storage.delete(key: 'refresh_token');
+    onSessionExpired?.call();
+  }
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // If 401 Unauthorized, try to refresh token
-    if (err.response?.statusCode == 401) {
-      final refreshToken = await storage.read(key: 'refresh_token');
+    final request = err.requestOptions;
+    final isRetryable = err.response?.statusCode == 401 &&
+        request.extra[_retriedMarker] != true &&
+        !request.path.contains('/auth/refresh');
 
-      if (refreshToken != null) {
-        try {
-          // Try to refresh token
-          final dio = Dio(BaseOptions(
-            baseUrl: err.requestOptions.baseUrl,
-          ));
-
-          final response = await dio.post(
-            '/auth/refresh',
-            data: {'refresh_token': refreshToken},
-          );
-
-          if (response.statusCode == 200) {
-            final newAccessToken = response.data['data']['access_token'];
-            final newRefreshToken = response.data['data']['refresh_token'];
-
-            // Save new tokens
-            await storage.write(key: 'access_token', value: newAccessToken);
-            await storage.write(key: 'refresh_token', value: newRefreshToken);
-
-            // Retry the original request with new token
-            err.requestOptions.headers['Authorization'] =
-                'Bearer $newAccessToken';
-
-            final opts = Options(
-              method: err.requestOptions.method,
-              headers: err.requestOptions.headers,
-            );
-
-            final retryResponse = await dio.request(
-              err.requestOptions.path,
-              options: opts,
-              data: err.requestOptions.data,
-              queryParameters: err.requestOptions.queryParameters,
-            );
-
-            return handler.resolve(retryResponse);
-          }
-        } catch (e) {
-          // Refresh failed, clear tokens
-          await storage.delete(key: 'access_token');
-          await storage.delete(key: 'refresh_token');
-        }
-      }
+    if (!isRetryable) {
+      handler.next(err);
+      return;
     }
 
-    handler.next(err);
+    // Тело FormData — одноразовый поток, повторно отправить его нельзя.
+    // Такой запрос честно возвращаем с ошибкой, а не роняем непонятно где.
+    if (request.data is FormData) {
+      handler.next(err);
+      return;
+    }
+
+    String? newToken;
+    try {
+      newToken = await (_refreshing ??= _refreshToken());
+    } catch (_) {
+      newToken = null;
+    } finally {
+      _refreshing = null;
+    }
+
+    if (newToken == null) {
+      await _dropSession();
+      handler.next(err);
+      return;
+    }
+
+    try {
+      request.headers['Authorization'] = 'Bearer $newToken';
+      request.extra[_retriedMarker] = true;
+
+      final retried = await (client ?? Dio()).fetch(request);
+      handler.resolve(retried);
+    } on DioException catch (retryError) {
+      handler.next(retryError);
+    }
   }
 }
 

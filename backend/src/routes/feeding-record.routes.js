@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const feedingRecordController = require('../controllers/feedingRecordController');
 const { createFeedingRecordSchema, updateFeedingRecordSchema } = require('../validators/feedingRecordValidator');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -114,6 +114,6 @@ router.post('/', validate(createFeedingRecordSchema), feedingRecordController.cr
 router.get('/', feedingRecordController.list);
 router.get('/:id', feedingRecordController.getById);
 router.put('/:id', validate(updateFeedingRecordSchema), feedingRecordController.update);
-router.delete('/:id', feedingRecordController.delete);
+router.delete('/:id', authorize(['manager', 'owner']), feedingRecordController.delete);
 
 module.exports = router;

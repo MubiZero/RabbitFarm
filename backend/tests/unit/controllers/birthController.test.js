@@ -8,8 +8,7 @@ jest.mock('../../../src/models', () => {
     findByPk: jest.fn(),
     create: jest.fn(),
     count: jest.fn(),
-    sequelize: mockSequelize,
-    associations: { Breed: { target: { name: 'Breed' } } }
+    sequelize: mockSequelize
   };
   return {
     Rabbit: RabbitMock,
@@ -21,11 +20,12 @@ jest.mock('../../../src/models', () => {
       sequelize: mockSequelize
     },
     Breeding: { findOne: jest.fn() },
+    Breed: { findOne: jest.fn() },
     Task: { create: jest.fn() }
   };
 });
 
-const { Rabbit, Birth, Breeding, Task } = require('../../../src/models');
+const { Rabbit, Birth, Breeding, Breed, Task } = require('../../../src/models');
 const ctrl = require('../../../src/controllers/birthController');
 
 const mockReq = (overrides = {}) => ({
@@ -242,11 +242,43 @@ describe('birthController', () => {
   describe('createKitsFromBirth', () => {
     const kitBody = { count: 3, breed_id: 1, birth_date: '2024-05-01' };
 
+    it('should return 404 when mother belongs to another farm', async () => {
+      const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0 };
+      Birth.findOne.mockResolvedValue(birth);
+      // Идентификатор матери приходит из тела запроса, поэтому проверяется
+      // по ферме: иначе крольчата уезжали в чужую клетку.
+      Rabbit.findOne.mockResolvedValue(null);
+
+      const res = mockRes();
+      await ctrl.createKitsFromBirth(
+        mockReq({ params: { id: '1' }, body: { ...kitBody, mother_id: 999 } }),
+        res
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(Rabbit.create).not.toHaveBeenCalled();
+      expect(mockTx.rollback).toHaveBeenCalled();
+    });
+
+    it('should return 404 when breed belongs to another farm', async () => {
+      const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0 };
+      Birth.findOne.mockResolvedValue(birth);
+      Rabbit.findOne.mockResolvedValue({ id: 2, cage_id: null, breed_id: 1 });
+      Breed.findOne.mockResolvedValue(null);
+
+      const res = mockRes();
+      await ctrl.createKitsFromBirth(mockReq({ params: { id: '1' }, body: kitBody }), res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(Rabbit.create).not.toHaveBeenCalled();
+    });
+
     it('should create kits successfully', async () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0, update: jest.fn().mockResolvedValue(true) };
       const mother = { id: 2, cage_id: null, getCage: jest.fn().mockResolvedValue(null) };
       Birth.findOne.mockResolvedValue(birth);
-      Rabbit.findByPk.mockResolvedValue(mother);
+      Rabbit.findOne.mockResolvedValue(mother);
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
 
       const req = mockReq({ params: { id: '1' }, body: kitBody });
@@ -293,7 +325,8 @@ describe('birthController', () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0 };
       const mother = { id: 2, cage_id: 5, getCage: jest.fn().mockResolvedValue({ capacity: 2 }) };
       Birth.findOne.mockResolvedValue(birth);
-      Rabbit.findByPk.mockResolvedValue(mother);
+      Rabbit.findOne.mockResolvedValue(mother);
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.count.mockResolvedValue(1); // 1 current + 3 new = 4 > capacity 2
 
       const req = mockReq({ params: { id: '1' }, body: kitBody });
@@ -309,7 +342,8 @@ describe('birthController', () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0, update: jest.fn().mockResolvedValue(true) };
       const mother = { id: 2, cage_id: null, getCage: jest.fn().mockResolvedValue(null) };
       Birth.findOne.mockResolvedValue(birth);
-      Rabbit.findByPk.mockResolvedValue(mother);
+      Rabbit.findOne.mockResolvedValue(mother);
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
 
       const req = mockReq({ params: { id: '1' }, body: kitBody });
@@ -327,7 +361,8 @@ describe('birthController', () => {
       const birth = { id: 1, mother_id: 2, birth_date: '2024-05-01', kits_weaned: 0, update: jest.fn().mockResolvedValue(true) };
       const mother = { id: 2, cage_id: null, getCage: jest.fn().mockResolvedValue(null) };
       Birth.findOne.mockResolvedValue(birth);
-      Rabbit.findByPk.mockResolvedValue(mother);
+      Rabbit.findOne.mockResolvedValue(mother);
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 11 });
 
       await ctrl.createKitsFromBirth(

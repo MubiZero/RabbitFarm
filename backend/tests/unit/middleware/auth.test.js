@@ -26,9 +26,36 @@ const mockNext = jest.fn();
 describe('authenticate middleware', () => {
   beforeEach(() => jest.clearAllMocks());
 
+  // Смена пароля увеличивает поколение токенов, и все выданные раньше
+  // перестают приниматься — иначе сброс пароля не отбирал уже выданный доступ.
+  it('отклоняет токен прошлого поколения', async () => {
+    JWTUtil.verifyAccessToken.mockReturnValue({ id: 1, jti: null, tv: 0 });
+    User.findByPk.mockResolvedValue({ id: 1, is_active: true, token_version: 1 });
+
+    const req = { headers: { authorization: 'Bearer stale-token' } };
+    const res = mockRes();
+
+    await authenticate(req, res, mockNext);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('принимает токен текущего поколения', async () => {
+    JWTUtil.verifyAccessToken.mockReturnValue({ id: 1, jti: null, tv: 2 });
+    User.findByPk.mockResolvedValue({ id: 1, is_active: true, token_version: 2 });
+
+    const req = { headers: { authorization: 'Bearer fresh-token' } };
+    const res = mockRes();
+
+    await authenticate(req, res, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith();
+  });
+
   it('should call next() for valid token with active user', async () => {
     const decoded = { id: 1, jti: 'test-jti' };
-    const user = { id: 1, is_active: true };
+    const user = { id: 1, is_active: true, token_version: 0 };
 
     JWTUtil.verifyAccessToken.mockReturnValue(decoded);
     TokenBlacklist.findOne.mockResolvedValue(null);
@@ -89,7 +116,7 @@ describe('authenticate middleware', () => {
 
   it('should return 403 if user is inactive', async () => {
     const decoded = { id: 1, jti: null };
-    const user = { id: 1, is_active: false };
+    const user = { id: 1, is_active: false, token_version: 0 };
     JWTUtil.verifyAccessToken.mockReturnValue(decoded);
     User.findByPk.mockResolvedValue(user);
 
@@ -131,7 +158,7 @@ describe('authenticate middleware', () => {
 
   it('should skip blacklist check when jti is not present', async () => {
     const decoded = { id: 1 }; // no jti
-    const user = { id: 1, is_active: true };
+    const user = { id: 1, is_active: true, token_version: 0 };
     JWTUtil.verifyAccessToken.mockReturnValue(decoded);
     User.findByPk.mockResolvedValue(user);
 
@@ -194,7 +221,7 @@ describe('optionalAuth middleware', () => {
 
   it('should attach user if valid token provided', async () => {
     const decoded = { id: 1 };
-    const user = { id: 1, is_active: true };
+    const user = { id: 1, is_active: true, token_version: 0 };
     JWTUtil.verifyAccessToken.mockReturnValue(decoded);
     User.findByPk.mockResolvedValue(user);
 
@@ -231,7 +258,7 @@ describe('optionalAuth middleware', () => {
 
   it('should not attach user if user is inactive', async () => {
     const decoded = { id: 1 };
-    const user = { id: 1, is_active: false };
+    const user = { id: 1, is_active: false, token_version: 0 };
     JWTUtil.verifyAccessToken.mockReturnValue(decoded);
     User.findByPk.mockResolvedValue(user);
 

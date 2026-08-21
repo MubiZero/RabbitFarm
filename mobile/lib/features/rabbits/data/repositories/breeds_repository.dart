@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/breed_model.dart';
 import '../../../../core/api/api_error.dart';
@@ -131,6 +132,7 @@ class BreedsRepository {
 
 /// Provider для репозитория пород
 final breedsRepositoryProvider = Provider<BreedsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return BreedsRepository(apiClient: apiClient);
 });

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 const { createTaskSchema, updateTaskSchema } = require('../validators/taskValidator');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -127,7 +127,7 @@ router.post('/', validate(createTaskSchema), taskController.create);
 router.get('/', taskController.list);
 router.get('/:id', taskController.getById);
 router.put('/:id', validate(updateTaskSchema), taskController.update);
-router.delete('/:id', taskController.delete);
+router.delete('/:id', authorize(['manager', 'owner']), taskController.delete);
 
 // Complete task
 router.post('/:id/complete', taskController.completeTask);

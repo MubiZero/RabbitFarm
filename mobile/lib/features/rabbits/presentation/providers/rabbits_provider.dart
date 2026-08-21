@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_statistics.dart';
@@ -6,6 +7,7 @@ import '../../data/repositories/rabbits_repository.dart';
 
 // Rabbits Repository provider
 final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return RabbitsRepository(apiClient: apiClient);
 });

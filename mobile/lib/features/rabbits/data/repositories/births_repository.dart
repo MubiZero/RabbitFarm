@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/birth_model.dart';
 import '../models/rabbit_model.dart';
@@ -223,6 +224,7 @@ class BirthsRepository {
 
 /// Provider для репозитория окролов
 final birthsRepositoryProvider = Provider<BirthsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return BirthsRepository(apiClient: apiClient);
 });

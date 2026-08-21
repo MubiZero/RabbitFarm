@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cageController = require('../controllers/cageController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const {
   createCageSchema,
@@ -109,11 +109,11 @@ router.get('/statistics', cageController.getStatistics);
 router.get('/layout', cageController.getLayout);
 
 // CRUD operations
-router.post('/', validate(createCageSchema), cageController.create);
+router.post('/', authorize(['manager', 'owner']), validate(createCageSchema), cageController.create);
 router.get('/', validate(listCagesQuerySchema, 'query'), cageController.list);
 router.get('/:id', cageController.getById);
-router.put('/:id', validate(updateCageSchema), cageController.update);
-router.delete('/:id', cageController.delete);
+router.put('/:id', authorize(['manager', 'owner']), validate(updateCageSchema), cageController.update);
+router.delete('/:id', authorize(['owner']), cageController.delete);
 
 // Mark as cleaned
 router.patch('/:id/clean', cageController.markCleaned);

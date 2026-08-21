@@ -125,10 +125,44 @@ const changePasswordSchema = Joi.object({
     })
 });
 
+// Восстановление пароля по почте
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .messages({
+      'string.email': 'Неверный формат email',
+      'any.required': 'Email обязателен'
+    })
+});
+
+// Установка нового пароля по коду из письма.
+// Раньше маршрут шёл без валидации вовсе: пароль можно было задать любой
+// длины в обход правила восьми символов, а запрос без токена уходил в 500.
+const resetPasswordSchema = Joi.object({
+  token: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Код восстановления обязателен'
+    }),
+
+  new_password: Joi.string()
+    .min(8)
+    .max(100)
+    .required()
+    .messages({
+      'string.min': 'Новый пароль должен быть минимум 8 символов',
+      'string.max': 'Новый пароль должен быть максимум 100 символов',
+      'any.required': 'Новый пароль обязателен'
+    })
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
   updateProfileSchema,
-  changePasswordSchema
+  changePasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
 };

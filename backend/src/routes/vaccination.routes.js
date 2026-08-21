@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const vaccinationController = require('../controllers/vaccinationController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const {
   createVaccinationSchema,
@@ -132,6 +132,6 @@ router.post('/', validate(createVaccinationSchema), vaccinationController.create
 router.get('/', validate(listVaccinationsQuerySchema, 'query'), vaccinationController.list);
 router.get('/:id', vaccinationController.getById);
 router.put('/:id', validate(updateVaccinationSchema), vaccinationController.update);
-router.delete('/:id', vaccinationController.delete);
+router.delete('/:id', authorize(['owner']), vaccinationController.delete);
 
 module.exports = router;

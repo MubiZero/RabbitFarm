@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../../data/repositories/breeding_repository.dart';
 
 // Breeding Repository provider
 final breedingRepositoryProvider = Provider<BreedingRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return BreedingRepository(apiClient: apiClient);
 });

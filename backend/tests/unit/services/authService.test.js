@@ -51,11 +51,24 @@ describe('AuthService', () => {
         .rejects.toThrow('INVALID_CREDENTIALS');
     });
 
+    // Про отключённый аккаунт узнаёт только тот, кто назвал верный пароль:
+    // иначе ответ 403 подтверждал бы, что такой адрес заведён на ферме.
     it('должен бросать USER_INACTIVE если аккаунт неактивен', async () => {
-      User.findOne.mockResolvedValue(createMockUser({ is_active: false }));
+      User.findOne.mockResolvedValue(
+        createMockUser({ is_active: false, password_hash: validPasswordHash })
+      );
 
-      await expect(authService.login('test@example.com', 'password'))
+      await expect(authService.login('test@example.com', 'password123'))
         .rejects.toThrow('USER_INACTIVE');
+    });
+
+    it('на отключённом аккаунте с неверным паролем не выдаёт, что он существует', async () => {
+      User.findOne.mockResolvedValue(
+        createMockUser({ is_active: false, password_hash: validPasswordHash })
+      );
+
+      await expect(authService.login('test@example.com', 'wrongpassword'))
+        .rejects.toThrow('INVALID_CREDENTIALS');
     });
 
     it('должен бросать INVALID_CREDENTIALS при неверном пароле', async () => {

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const medicalRecordController = require('../controllers/medicalRecordController');
 const { createMedicalRecordSchema, updateMedicalRecordSchema } = require('../validators/medicalRecordValidator');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -123,6 +123,6 @@ router.post('/', validate(createMedicalRecordSchema), medicalRecordController.cr
 router.get('/', medicalRecordController.list);
 router.get('/:id', medicalRecordController.getById);
 router.put('/:id', validate(updateMedicalRecordSchema), medicalRecordController.update);
-router.delete('/:id', medicalRecordController.delete);
+router.delete('/:id', authorize(['owner']), medicalRecordController.delete);
 
 module.exports = router;

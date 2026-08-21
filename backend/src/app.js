@@ -21,9 +21,32 @@ app.set('trust proxy', 1);
 // Security middleware
 app.use(helmet());
 
-// CORS configuration - Allow all origins for better mobile app compatibility
+// CORS. Мобильные клиенты ходят без Origin, поэтому запросы без него
+// пропускаем; для браузеров список разрешённых источников задаёт CORS_ORIGIN.
+// Пустой список означает «только не-браузерные клиенты»: раньше здесь стоял
+// origin: true, то есть любой сайт мог обращаться к API от имени вошедшего
+// владельца, несмотря на аккуратно настроенный CORS_ORIGIN в compose-файле.
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowAnyOrigin = allowedOrigins.includes('*');
+
+if (allowAnyOrigin && process.env.NODE_ENV === 'production') {
+  logger.warn(
+    'CORS_ORIGIN=* вместе с cookie-аутентификацией разрешает запросы к API ' +
+    'с любого сайта от имени вошедшего пользователя. Укажите адрес веб-клиента.'
+  );
+}
+
 const corsOptions = {
-  origin: true, // Accept all origins (required for mobile apps)
+  origin: (origin, callback) => {
+    if (!origin || allowAnyOrigin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Источник не разрешён политикой CORS'));
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -88,14 +111,17 @@ app.get('/health', async (req, res) => {
       version: process.env.API_VERSION || 'v1'
     });
   } catch (error) {
+    // Подробности только в лог: сообщение MySQL раскрывает хост, порт и имя
+    // пользователя любому, кто дёрнет /health.
+    logger.error('Health check failed', { error: error.message });
+
     res.status(503).json({
       status: 'unhealthy',
       database: 'disconnected',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV,
-      version: process.env.API_VERSION || 'v1',
-      error: error.message
+      version: process.env.API_VERSION || 'v1'
     });
   }
 });

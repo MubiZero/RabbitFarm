@@ -10,7 +10,9 @@ const {
   loginSchema,
   refreshTokenSchema,
   updateProfileSchema,
-  changePasswordSchema
+  changePasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
 } = require('../validators/authValidator');
 const { acceptInvitationSchema } = require('../validators/staffValidator');
 
@@ -79,6 +81,7 @@ const { acceptInvitationSchema } = require('../validators/staffValidator');
  */
 router.post(
   '/accept-invitation',
+  authLimiter,
   validate(acceptInvitationSchema),
   staffController.acceptInvitation
 );
@@ -280,6 +283,7 @@ router.post(
 router.post(
   '/forgot-password',
   authLimiter,
+  validate(forgotPasswordSchema),
   authController.forgotPassword
 );
 
@@ -311,6 +315,7 @@ router.post(
 router.post(
   '/reset-password',
   authLimiter,
+  validate(resetPasswordSchema),
   authController.resetPassword
 );
 

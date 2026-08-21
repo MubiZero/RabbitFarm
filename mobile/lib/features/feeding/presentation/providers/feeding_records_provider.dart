@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../../data/repositories/feeding_records_repository.dart';
 
 /// Provider for FeedingRecordsRepository
 final feedingRecordsRepositoryProvider = Provider<FeedingRecordsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return FeedingRecordsRepository(apiClient);
 });
