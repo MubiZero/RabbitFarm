@@ -25,7 +25,7 @@ stack.
 | Tasks | Farm to-dos with types, priorities and statuses |
 
 One installation serves one farm. The first person to register becomes its
-owner; after that registration is closed — see [Accounts](#accounts).
+owner and invites everyone else — see [Accounts](#accounts).
 
 ## Stack
 
@@ -92,12 +92,23 @@ Registration bootstraps the farm once: the first account created becomes the
 `owner`, every later attempt is refused with 403. That keeps a publicly
 reachable installation from being claimed by a stranger.
 
-To add another account set `ALLOW_REGISTRATION=true`, register the person —
-they come in as a `worker` — then set it back to `false`.
+Everyone else joins by invitation. The owner issues a code on the Работники
+screen and passes it on; the person enters it at `/join` and lands inside the
+owner's farm, seeing the same livestock, feed and tasks.
 
-Data is currently scoped per user, so an added account starts with an empty
-farm instead of sharing the owner's. Shared staff access needs a farm key and
-an invite flow, which is not built yet.
+| Role | Can |
+|---|---|
+| `owner` | everything, including inviting people and changing roles |
+| `manager` | run the farm: livestock, feed, finances |
+| `worker` | read the farm and record daily work |
+
+There is no mail server, so codes travel however the owner already talks to
+people, and a forgotten password is reset by the owner rather than by email.
+Codes and temporary passwords are shown once — only their hashes are stored.
+
+`ALLOW_REGISTRATION=true` reopens plain registration if you ever need it; new
+accounts then arrive as workers with their own empty farm, which is rarely
+what you want. Invitations are the normal path.
 
 ## Deployment
 
@@ -110,7 +121,7 @@ for uploads, and the backup job you have to set up yourself.
 ```
 backend/     Node API — src/{routes,controllers,services,models,middleware}
 mobile/      Flutter client — lib/features/<module>/{data,presentation}
-docs/        Deployment, architecture, manual API testing
+docs/        Deployment, mobile builds, architecture, manual API testing
 ```
 
 Backend:
@@ -119,7 +130,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 842 tests
+npm test                 # 860 tests
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change
@@ -133,12 +144,15 @@ Client:
 ```bash
 cd mobile
 flutter analyze
-flutter test             # 29 tests
+flutter test             # 34 tests
 dart run build_runner build --delete-conflicting-outputs   # after model changes
 ```
 
 Models use freezed and json_serializable, so anything touching a file in
 `data/models` needs a build_runner run.
+
+Building the app for phones — signing, CI, App Store — is in
+[docs/MOBILE.md](docs/MOBILE.md).
 
 ## API
 
@@ -160,8 +174,9 @@ one shape:
 ## Contributing
 
 Issues and pull requests are welcome. Run `npm test` in `backend/` and
-`flutter analyze && flutter test` in `mobile/` before opening a PR — there is
-no CI yet, so those checks are on you.
+`flutter analyze && flutter test` in `mobile/` before opening a PR: nothing
+runs them automatically on a pull request yet, so those checks are on you.
+(The mobile release workflow does run them, but only when a build is made.)
 
 ## License
 

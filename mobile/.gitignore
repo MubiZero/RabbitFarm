@@ -46,3 +46,8 @@ app.*.map.json
 
 #Claude code things
 .claude/
+
+# Ключ подписи Android — в репозитории не хранится
+android/key.properties
+*.jks
+*.keystore

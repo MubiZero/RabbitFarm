@@ -1,0 +1,97 @@
+name: Mobile release
+
+# Сборка мобильного приложения. Запускается вручную или по тегу вида v1.2.3.
+# iOS здесь нет намеренно: для него нужен macOS-раннер и сертификаты Apple,
+# которых у репозитория нет — как собирать iOS локально, описано в docs/DEPLOY.md.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Адрес API, который будет вшит в сборку'
+        required: false
+        default: 'https://api.rabbitfarm.mubi.dev/api/v1'
+
+env:
+  FLUTTER_VERSION: '3.41.6'
+  # Адрес API попадает в бандл при сборке: рантайм-конфигурации у Flutter нет.
+  API_URL: ${{ github.event.inputs.api_url || vars.API_URL || 'https://api.rabbitfarm.mubi.dev/api/v1' }}
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    env:
+      # Контекст secrets недоступен в условиях шагов, поэтому пробрасываем сюда.
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Зависимости
+        working-directory: mobile
+        run: flutter pub get
+
+      # Сборка не должна выезжать из красного кода, поэтому проверки идут первыми.
+      - name: Анализ
+        working-directory: mobile
+        run: flutter analyze
+
+      - name: Тесты
+        working-directory: mobile
+        run: flutter test
+
+      # Без секретов шаг пропускается, и сборка подписывается отладочным
+      # ключом: поставить на устройство можно, в Google Play — нет.
+      - name: Ключ подписи
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        working-directory: mobile/android
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > upload-keystore.jks
+          cat > key.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=$ANDROID_STORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+
+      - name: APK для установки на устройство
+        working-directory: mobile
+        run: flutter build apk --release --split-per-abi --dart-define=API_URL=$API_URL
+
+      - name: Пакет для Google Play
+        working-directory: mobile
+        run: flutter build appbundle --release --dart-define=API_URL=$API_URL
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            mobile/build/app/outputs/flutter-apk/*.apk
+            mobile/build/app/outputs/bundle/release/*.aab
+          retention-days: 30
+
+      # По тегу — публикуем APK в релиз, чтобы их можно было просто скачать.
+      - name: Релиз
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mobile/build/app/outputs/flutter-apk/*.apk
+          body: |
+            Сборка мобильного приложения.
+
+            APK разделены по архитектурам — берите `app-arm64-v8a-release.apk`,
+            он подходит практически всем современным устройствам.
+            Адрес API в сборке: ${{ env.API_URL }}
