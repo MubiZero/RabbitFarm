@@ -1,4 +1,5 @@
 const { randomUUID } = require('crypto');
+const { Op } = require('sequelize');
 const { Rabbit, Birth, Breeding, Task, Breed, Cage } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
@@ -6,11 +7,26 @@ const logger = require('../utils/logger');
 /**
  * Получить список всех окролов для текущего пользователя
  */
-exports.getBirths = async (req, res) => {
+exports.getBirths = async (req, res, next) => {
   try {
     const userId = req.farmId;
+    const { page, limit, mother_id: motherId, from_date: fromDate, to_date: toDate } = req.query;
 
-    const births = await Birth.findAll({
+    // Раньше отдавались все окролы фермы разом, без страниц и фильтров: у
+    // хозяйства с трёхлетней историей это многомегабайтный ответ на мобильной
+    // связи. Свой параметр page при этом был описан в Swagger и не работал.
+    const where = {};
+    if (motherId) where.mother_id = motherId;
+    if (fromDate || toDate) {
+      where.birth_date = {};
+      if (fromDate) where.birth_date[Op.gte] = fromDate;
+      if (toDate) where.birth_date[Op.lte] = toDate;
+    }
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Birth.findAndCountAll({
+      where,
       include: [
         {
           model: Rabbit,
@@ -26,19 +42,24 @@ exports.getBirths = async (req, res) => {
         },
       ],
       order: [['birth_date', 'DESC']],
+      limit,
+      offset,
+      distinct: true
     });
 
-    return ApiResponse.success(res, births, 'Список окролов получен успешно');
+    return ApiResponse.paginated(res, rows, page, limit, count, 'Список окролов получен успешно');
   } catch (error) {
     logger.error('Error fetching births', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось загрузить окролы');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Получить окрол по ID
  */
-exports.getBirthById = async (req, res) => {
+exports.getBirthById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -75,14 +96,16 @@ exports.getBirthById = async (req, res) => {
     return ApiResponse.success(res, birth);
   } catch (error) {
     logger.error('Error fetching birth', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось загрузить окрол');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Создать новый окрол
  */
-exports.createBirth = async (req, res) => {
+exports.createBirth = async (req, res, next) => {
   const transaction = await Rabbit.sequelize.transaction();
   try {
     const userId = req.farmId;
@@ -214,14 +237,16 @@ exports.createBirth = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     logger.error('Error creating birth', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось создать окрол');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Обновить окрол
  */
-exports.updateBirth = async (req, res) => {
+exports.updateBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -280,14 +305,16 @@ exports.updateBirth = async (req, res) => {
     return ApiResponse.success(res, birth, 'Окрол успешно обновлен');
   } catch (error) {
     logger.error('Error updating birth', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось обновить окрол');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Удалить окрол
  */
-exports.deleteBirth = async (req, res) => {
+exports.deleteBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -312,14 +339,16 @@ exports.deleteBirth = async (req, res) => {
     return ApiResponse.success(res, null, 'Окрол успешно удален');
   } catch (error) {
     logger.error('Error deleting birth', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось удалить окрол');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Создать карточки крольчат из окрола
  */
-exports.createKitsFromBirth = async (req, res) => {
+exports.createKitsFromBirth = async (req, res, next) => {
   const { id } = req.params;
   const userId = req.farmId;
   const {
@@ -451,6 +480,8 @@ exports.createKitsFromBirth = async (req, res) => {
   } catch (error) {
     if (!transaction.finished) await transaction.rollback();
     logger.error('Error creating kits', { error: error.message });
-    return ApiResponse.serverError(res, 'Не удалось создать крольчат');
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };

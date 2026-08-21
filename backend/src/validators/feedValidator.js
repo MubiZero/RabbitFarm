@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const listQuery = require('./listQuery');
 
 /**
  * Feed validation schemas
@@ -179,8 +180,25 @@ const adjustStockSchema = Joi.object({
     })
 });
 
+/**
+ * Параметры списка кормов.
+ * Раньше маршрут не валидировался вовсе: неизвестное sort_by уходило в SQL.
+ */
+const listFeedsQuerySchema = Joi.object({
+  page: listQuery.page,
+  limit: listQuery.limit,
+  sort_by: listQuery.sortBy(
+    ['name', 'type', 'current_stock', 'cost_per_unit', 'created_at'], 'name'),
+  sort_order: listQuery.sortOrder.default('ASC'),
+  type: Joi.string().optional(),
+  low_stock: Joi.boolean().optional(),
+  search: Joi.string().allow('').optional()
+});
+
 module.exports = {
   createFeedSchema,
   updateFeedSchema,
   adjustStockSchema
+,
+  listFeedsQuerySchema
 };

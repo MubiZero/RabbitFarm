@@ -178,15 +178,10 @@ exports.list = async (req, res, next) => {
       order: [[sort_by, sort_order.toUpperCase()]]
     });
 
-    return ApiResponse.success(res, {
-      rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit)
-      }
-    });
+    // Общий конверт пагинации. Раньше каждый сервис лепил свой: items/rows/
+    // tasks/transactions и totalPages/pages — клиенту приходилось угадывать
+    // форму в каждом репозитории, и в медкартах он угадал неверно.
+    return ApiResponse.paginated(res, rows, parseInt(page), parseInt(limit), count);
   } catch (error) {
     next(error);
   }

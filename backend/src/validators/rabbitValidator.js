@@ -322,7 +322,7 @@ const addWeightSchema = Joi.object({
 
   measured_at: Joi.date()
     .max('now')
-    .default(new Date())
+    .default(() => new Date())
     .messages({
       'date.base': 'Неверная дата измерения',
       'date.max': 'Дата измерения не может быть в будущем'

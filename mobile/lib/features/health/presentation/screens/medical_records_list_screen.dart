@@ -513,11 +513,16 @@ class _MedicalRecordsListScreenState
   }
 
   void _showStatistics() {
-    final statisticsAsync = ref.read(medicalStatisticsProvider);
-
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
+      // Consumer, а не снимок через ref.read: у модального окна свой контекст,
+      // и снятое значение не обновлялось. При первом открытии провайдер ещё
+      // грузился, поэтому пользователь видел вечный индикатор, пока не закроет
+      // и не откроет окно заново.
+      builder: (context) => Consumer(
+        builder: (context, ref, _) {
+          final statisticsAsync = ref.watch(medicalStatisticsProvider);
+          return Container(
         padding: const EdgeInsets.all(16),
         child: statisticsAsync.when(
           data: (stats) => Column(
@@ -587,6 +592,8 @@ class _MedicalRecordsListScreenState
             ),
           ),
         ),
+          );
+        },
       ),
     );
   }

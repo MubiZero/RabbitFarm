@@ -137,7 +137,13 @@ describe('TaskController', () => {
 
       expect(taskService.listTasks).toHaveBeenCalledWith(1, { status: 'pending' });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({
+          items: result.items,
+          pagination: expect.objectContaining({ total: result.total })
+        })
+      }));
     });
 
     it('should call next for unexpected errors', async () => {

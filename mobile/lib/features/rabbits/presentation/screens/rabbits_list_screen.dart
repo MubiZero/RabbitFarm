@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,7 @@ class RabbitsListScreen extends ConsumerStatefulWidget {
 
 class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
   final ScrollController _scrollController = ScrollController();
 
   String? _selectedSex;
@@ -33,6 +35,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -49,12 +52,22 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
     }
   }
 
+  /// Поиск с задержкой.
+  ///
+  /// Раньше запрос уходил на каждое нажатие клавиши: слово из пяти букв — это
+  /// пять запросов, список между ними мигал индикатором, а ответы могли
+  /// прийти не в том порядке, в котором их отправляли, и показать устаревший
+  /// результат.
   void _onSearchChanged(String value) {
-    ref.read(rabbitsListProvider.notifier).loadRabbits(
-      search: value,
-      sex: _selectedSex,
-      status: _selectedStatus,
-    );
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      ref.read(rabbitsListProvider.notifier).loadRabbits(
+        search: value,
+        sex: _selectedSex,
+        status: _selectedStatus,
+      );
+    });
   }
 
   void _applyFilters() {

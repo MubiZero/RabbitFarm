@@ -151,7 +151,7 @@ describe('Medical Records API', () => {
       const transactions = await request(app)
         .get('/api/v1/transactions')
         .set('Authorization', `Bearer ${accessToken}`);
-      const created = (transactions.body.data.transactions || transactions.body.data.items)
+      const created = transactions.body.data.items
         .find((t) => Number(t.amount) === 250);
 
       expect(created).toBeDefined();

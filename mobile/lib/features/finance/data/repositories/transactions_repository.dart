@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
-import '../../../../core/api/api_endpoints.dart';
 import '../models/transaction_model.dart';
 import '../../../../core/api/api_error.dart';
 
@@ -46,20 +46,15 @@ class TransactionsRepository {
       if (maxAmount != null) queryParams['max_amount'] = maxAmount;
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.baseUrl}/transactions',
+        '/transactions',
         queryParameters: queryParams,
       );
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        if (data is Map && data.containsKey('transactions')) {
-          // Paginated response
-          final List<dynamic> transactions = data['transactions'];
-          return transactions.map((json) => Transaction.fromJson(json)).toList();
-        } else if (data is List) {
-          // Direct list response
-          return data.map((json) => Transaction.fromJson(json)).toList();
-        }
+        return itemsOf(data)
+            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
 
       return [];
@@ -72,7 +67,7 @@ class TransactionsRepository {
   Future<Transaction> getTransactionById(int id) async {
     try {
       final response = await _apiClient.get(
-        '${ApiEndpoints.baseUrl}/transactions/$id',
+        '/transactions/$id',
       );
 
       if (response.data['success'] == true) {
@@ -89,7 +84,7 @@ class TransactionsRepository {
   Future<RabbitTransactionsSummary> getRabbitTransactions(int rabbitId) async {
     try {
       final response = await _apiClient.get(
-        '${ApiEndpoints.baseUrl}/rabbits/$rabbitId/transactions',
+        '/rabbits//transactions',
       );
 
       if (response.data['success'] == true) {
@@ -106,7 +101,7 @@ class TransactionsRepository {
   Future<Transaction> createTransaction(TransactionCreate transaction) async {
     try {
       final response = await _apiClient.post(
-        '${ApiEndpoints.baseUrl}/transactions',
+        '/transactions',
         data: transaction.toJson(),
       );
 
@@ -125,7 +120,7 @@ class TransactionsRepository {
       int id, TransactionUpdate transaction) async {
     try {
       final response = await _apiClient.put(
-        '${ApiEndpoints.baseUrl}/transactions/$id',
+        '/transactions/$id',
         data: transaction.toJson(),
       );
 
@@ -143,7 +138,7 @@ class TransactionsRepository {
   Future<void> deleteTransaction(int id) async {
     try {
       final response = await _apiClient.delete(
-        '${ApiEndpoints.baseUrl}/transactions/$id',
+        '/transactions/$id',
       );
 
       if (response.data['success'] != true) {
@@ -170,7 +165,7 @@ class TransactionsRepository {
       }
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.baseUrl}/transactions/statistics',
+        '/transactions/statistics',
         queryParameters: queryParams,
       );
 
@@ -196,7 +191,7 @@ class TransactionsRepository {
       };
 
       final response = await _apiClient.get(
-        '${ApiEndpoints.baseUrl}/transactions/monthly-report',
+        '/transactions/monthly-report',
         queryParameters: queryParams,
       );
 

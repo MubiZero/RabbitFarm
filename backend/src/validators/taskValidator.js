@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const listQuery = require('./listQuery');
 
 /**
  * Task validation schemas
@@ -224,10 +225,32 @@ const updateTaskSchema = Joi.object({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
 });
 
+/** Параметры списка задач. */
+const listTasksQuerySchema = Joi.object({
+  page: listQuery.page,
+  limit: listQuery.limit.default(10),
+  sort_by: listQuery.sortBy(
+    ['due_date', 'priority', 'status', 'type', 'created_at'], 'due_date'),
+  sort_order: listQuery.sortOrder.default('ASC'),
+  type: Joi.string().optional(),
+  status: Joi.string().optional(),
+  priority: Joi.string().optional(),
+  rabbit_id: Joi.number().integer().optional(),
+  cage_id: Joi.number().integer().optional(),
+  assigned_to: Joi.number().integer().optional(),
+  created_by: Joi.number().integer().optional(),
+  from_date: listQuery.fromDate,
+  to_date: listQuery.toDate,
+  overdue_only: Joi.boolean().optional(),
+  today_only: Joi.boolean().optional()
+});
+
 module.exports = {
   createTaskSchema,
   updateTaskSchema,
   TASK_TYPES,
   TASK_STATUSES,
   TASK_PRIORITIES
+,
+  listTasksQuerySchema
 };

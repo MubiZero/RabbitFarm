@@ -34,10 +34,14 @@ class FeedsState {
     bool? hasMore,
     int? currentPage,
   }) {
+    // clearError передаёт сюда null, а «?? this.error» его игнорировал —
+    // сообщение об ошибке залипало в состоянии до перезапуска приложения,
+    // переживая любые успешные загрузки. В остальных фичах принято
+    // присваивать error напрямую; приводим к тому же виду.
     return FeedsState(
       feeds: feeds ?? this.feeds,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: error,
       hasMore: hasMore ?? this.hasMore,
       currentPage: currentPage ?? this.currentPage,
     );

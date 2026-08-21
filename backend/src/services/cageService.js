@@ -77,7 +77,9 @@ class CageService {
 
     // When only_available is requested, push condition filter to SQL and
     // handle occupancy check after fetch but before pagination so counts stay correct.
-    if (only_available === 'true') {
+    // Joi приводит значение к булеву, поэтому сравнение со строкой никогда
+    // не срабатывало: галочка «только свободные» не работала вовсе.
+    if (only_available === true || only_available === 'true') {
       // A cage can only be available if its condition is 'good'.
       // If caller explicitly requests a non-good condition, no cages can be available.
       if (condition && condition !== 'good') {

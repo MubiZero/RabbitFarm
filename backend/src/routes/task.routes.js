@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-const { createTaskSchema, updateTaskSchema } = require('../validators/taskValidator');
+const { createTaskSchema, updateTaskSchema, listTasksQuerySchema } = require('../validators/taskValidator');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
@@ -124,7 +124,7 @@ router.get('/upcoming', taskController.getUpcoming);
 
 // CRUD routes
 router.post('/', validate(createTaskSchema), taskController.create);
-router.get('/', taskController.list);
+router.get('/', validate(listTasksQuerySchema, 'query'), taskController.list);
 router.get('/:id', taskController.getById);
 router.put('/:id', validate(updateTaskSchema), taskController.update);
 router.delete('/:id', authorize(['manager', 'owner']), taskController.delete);

@@ -115,15 +115,7 @@ class TransactionService {
       distinct: true
     });
 
-    return {
-      transactions: rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit)
-      }
-    };
+    return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
   async updateTransaction(id, userId, data) {

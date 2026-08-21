@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const listQuery = require('./listQuery');
 
 /**
  * Medical Record validation schemas
@@ -218,7 +219,23 @@ const updateMedicalRecordSchema = Joi.object({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
 });
 
+/** Параметры списка медицинских записей. */
+const listMedicalRecordsQuerySchema = Joi.object({
+  page: listQuery.page,
+  limit: listQuery.limit,
+  sort_by: listQuery.sortBy(
+    ['started_at', 'ended_at', 'outcome', 'cost', 'created_at'], 'started_at'),
+  sort_order: listQuery.sortOrder,
+  rabbit_id: Joi.number().integer().optional(),
+  outcome: Joi.string().valid('recovered', 'ongoing', 'died', 'euthanized').optional(),
+  from_date: listQuery.fromDate,
+  to_date: listQuery.toDate,
+  ongoing: Joi.boolean().optional()
+});
+
 module.exports = {
   createMedicalRecordSchema,
   updateMedicalRecordSchema
+,
+  listMedicalRecordsQuerySchema
 };

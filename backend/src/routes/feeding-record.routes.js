@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const feedingRecordController = require('../controllers/feedingRecordController');
-const { createFeedingRecordSchema, updateFeedingRecordSchema } = require('../validators/feedingRecordValidator');
+const { createFeedingRecordSchema, updateFeedingRecordSchema, listFeedingRecordsQuerySchema } = require('../validators/feedingRecordValidator');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
@@ -111,7 +111,7 @@ router.get('/recent', feedingRecordController.getRecent);
 
 // CRUD routes
 router.post('/', validate(createFeedingRecordSchema), feedingRecordController.create);
-router.get('/', feedingRecordController.list);
+router.get('/', validate(listFeedingRecordsQuerySchema, 'query'), feedingRecordController.list);
 router.get('/:id', feedingRecordController.getById);
 router.put('/:id', validate(updateFeedingRecordSchema), feedingRecordController.update);
 router.delete('/:id', authorize(['manager', 'owner']), feedingRecordController.delete);

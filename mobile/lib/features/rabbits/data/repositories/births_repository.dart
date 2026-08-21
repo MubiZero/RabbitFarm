@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/session.dart';
@@ -30,12 +31,7 @@ class BirthsRepository {
         throw Exception(responseData['message'] ?? 'Ошибка получения окролов');
       }
 
-      final data = responseData['data'];
-      if (data == null || data is! List) {
-        throw Exception('Данные окролов отсутствуют или имеют неверный формат');
-      }
-
-      return data
+      return itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
@@ -70,7 +66,7 @@ class BirthsRepository {
   /// Получить окролы самки
   Future<List<BirthModel>> getBirthsByMother(int motherId) async {
     try {
-      final response = await _apiClient.dio.get('/rabbits/$motherId/births');
+      final response = await _apiClient.dio.get('/births', queryParameters: {'mother_id': motherId});
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
@@ -83,12 +79,7 @@ class BirthsRepository {
         throw Exception(responseData['message'] ?? 'Ошибка получения окролов');
       }
 
-      final data = responseData['data'];
-      if (data == null || data is! List) {
-        throw Exception('Данные окролов отсутствуют или имеют неверный формат');
-      }
-
-      return data
+      return itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {

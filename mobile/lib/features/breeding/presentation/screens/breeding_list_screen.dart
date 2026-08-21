@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/app_error_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
-import '../../../../shared/widgets/error_view.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 
 class BreedingListScreen extends ConsumerStatefulWidget {
@@ -59,7 +59,11 @@ class _BreedingListScreenState extends ConsumerState<BreedingListScreen> {
           slivers: [
             if (breedingState.error != null)
               SliverToBoxAdapter(
-                child: ErrorView(
+                // AppErrorState из общей библиотеки: ErrorView был написан до
+                // неё и красил карточку светло-розовым по светло-красному —
+                // в тёмной теме это единственный экран, который выглядел
+                // сломанным.
+                child: AppErrorState(
                   message: breedingState.error!,
                   onRetry: () => ref.read(breedingListProvider.notifier).refresh(),
                 ),

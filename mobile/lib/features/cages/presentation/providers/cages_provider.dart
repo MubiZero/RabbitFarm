@@ -165,10 +165,12 @@ class CagesNotifier extends StateNotifier<CagesState> {
   /// Создать новую клетку
   Future<bool> createCage(Map<String, dynamic> cageData) async {
     try {
-      final newCage = await _repository.createCage(cageData);
-      state = state.copyWith(
-        cages: [...state.cages, newCage],
-      );
+      await _repository.createCage(cageData);
+      // Перечитываем список, а не дописываем клетку в конец: список идёт с
+      // фильтрами сервера, и при включённой галочке «только свободные»
+      // занятая клетка появлялась в списке, который обещает обратное — до
+      // первого обновления, после которого она молча исчезала.
+      await loadCages();
       return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());

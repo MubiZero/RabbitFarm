@@ -14,6 +14,7 @@ jest.mock('../../../src/models', () => {
     Rabbit: RabbitMock,
     Birth: {
       findAll: jest.fn(),
+      findAndCountAll: jest.fn(),
       findOne: jest.fn(),
       findByPk: jest.fn(),
       create: jest.fn(),
@@ -38,7 +39,7 @@ const mockRes = () => {
   res.json = jest.fn().mockReturnValue(res);
   return res;
 };
-jest.fn();
+const mockNext = jest.fn();
 const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
 describe('birthController', () => {
@@ -49,24 +50,48 @@ describe('birthController', () => {
   });
 
   describe('getBirths', () => {
-    it('should return all births for user', async () => {
-      const births = [{ id: 1 }, { id: 2 }];
-      Birth.findAll.mockResolvedValue(births);
+    it('отдаёт окролы фермы постранично', async () => {
+      Birth.findAndCountAll.mockResolvedValue({ count: 2, rows: [{ id: 1 }, { id: 2 }] });
 
-      const req = mockReq();
+      const req = mockReq({ query: { page: 1, limit: 50 } });
       const res = mockRes();
 
-      await ctrl.getBirths(req, res);
+      await ctrl.getBirths(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          items: [{ id: 1 }, { id: 2 }],
+          pagination: expect.objectContaining({ total: 2 })
+        })
+      }));
     });
 
-    it('should return 500 on error', async () => {
+    // Раньше выдавались все окролы фермы разом: у хозяйства с трёхлетней
+    // историей это многомегабайтный ответ на мобильной связи.
+    it('фильтрует по матери и ограничивает выборку', async () => {
+      Birth.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
+
+      await ctrl.getBirths(
+        mockReq({ query: { page: 2, limit: 10, mother_id: 7 } }),
+        mockRes(),
+        mockNext
+      );
+
+      const args = Birth.findAndCountAll.mock.calls[0][0];
+      expect(args.where.mother_id).toBe(7);
+      expect(args.limit).toBe(10);
+      expect(args.offset).toBe(10);
+    });
+
+    // Ошибка уходит в общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422 вместо общей пятисотки.
+    it('неожиданная ошибка передаётся общему обработчику', async () => {
       Birth.findAll.mockRejectedValue(new Error('DB error'));
 
-      await ctrl.getBirths(mockReq(), mockRes());
+      await ctrl.getBirths(mockReq(), mockRes(), mockNext);
 
-      // Error handled, no throw
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -178,13 +203,14 @@ describe('birthController', () => {
       expect(mother.update).toHaveBeenCalledWith({ status: 'active' }, expect.any(Object));
     });
 
-    it('should return 500 on unexpected error', async () => {
+    it('неожиданная ошибка при создании передаётся общему обработчику', async () => {
       Rabbit.findOne.mockRejectedValue(new Error('DB error'));
 
       const res = mockRes();
-      await ctrl.createBirth(mockReq({ body: baseBody }), res);
+      await ctrl.createBirth(mockReq({ body: baseBody }), res, mockNext);
 
       expect(mockTx.rollback).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 

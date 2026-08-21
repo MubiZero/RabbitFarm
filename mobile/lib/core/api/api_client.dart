@@ -88,7 +88,7 @@ class ApiClient {
   }
 
   Future<Response> updateProfile(Map<String, dynamic> data) {
-    return _dio.put(ApiEndpoints.profile, data: data);
+    return _dio.put(ApiEndpoints.updateProfile, data: data);
   }
 
   Future<Response> refreshToken(String refreshToken) {

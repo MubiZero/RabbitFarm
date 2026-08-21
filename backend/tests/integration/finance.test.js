@@ -77,8 +77,9 @@ describe('Transactions API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data).toHaveProperty('transactions');
-      expect(Array.isArray(res.body.data.transactions)).toBe(true);
+      expect(res.body.data).toHaveProperty('items');
+      expect(res.body.data).toHaveProperty('pagination');
+      expect(Array.isArray(res.body.data.items)).toBe(true);
     });
 
     it('должен применять фильтр по типу', async () => {
@@ -87,7 +88,7 @@ describe('Transactions API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      res.body.data.transactions.forEach(tx => {
+      res.body.data.items.forEach(tx => {
         expect(tx.type).toBe('income');
       });
     });

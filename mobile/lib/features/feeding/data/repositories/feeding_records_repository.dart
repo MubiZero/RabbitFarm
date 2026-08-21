@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/feeding_record_model.dart';
@@ -46,14 +47,9 @@ class FeedingRecordsRepository {
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        if (data is Map && data.containsKey('rows')) {
-          // Paginated response
-          final List<dynamic> rows = data['rows'];
-          return rows.map((json) => FeedingRecord.fromJson(json)).toList();
-        } else if (data is List) {
-          // Direct list response
-          return data.map((json) => FeedingRecord.fromJson(json)).toList();
-        }
+        return itemsOf(data)
+            .map((json) => FeedingRecord.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
 
       return [];

@@ -191,10 +191,10 @@ describe('TaskService', () => {
 
       const result = await taskService.listTasks(1);
 
-      expect(result.tasks).toHaveLength(2);
-      expect(result.pagination.total).toBe(2);
-      expect(result.pagination.page).toBe(1);
-      expect(result.pagination.limit).toBe(10);
+      expect(result.items).toHaveLength(2);
+      expect(result.total).toBe(2);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(10);
     });
 
     it('should apply type/status/priority filters', async () => {
@@ -202,7 +202,7 @@ describe('TaskService', () => {
 
       const result = await taskService.listTasks(1, { type: 'vet', status: 'in_progress', priority: 'high' });
 
-      expect(result.tasks).toHaveLength(1);
+      expect(result.items).toHaveLength(1);
       const callArg = Task.findAndCountAll.mock.calls[0][0];
       expect(callArg.where.type).toBe('vet');
       expect(callArg.where.status).toBe('in_progress');

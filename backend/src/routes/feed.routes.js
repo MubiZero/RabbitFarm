@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const feedController = require('../controllers/feedController');
-const { createFeedSchema, updateFeedSchema, adjustStockSchema } = require('../validators/feedValidator');
+const { createFeedSchema, updateFeedSchema, adjustStockSchema, listFeedsQuerySchema } = require('../validators/feedValidator');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
@@ -132,7 +132,7 @@ router.get('/low-stock', feedController.getLowStock);
 
 // CRUD routes
 router.post('/', authorize(['manager', 'owner']), validate(createFeedSchema), feedController.create);
-router.get('/', feedController.list);
+router.get('/', validate(listFeedsQuerySchema, 'query'), feedController.list);
 router.get('/:id', feedController.getById);
 router.put('/:id', authorize(['manager', 'owner']), validate(updateFeedSchema), feedController.update);
 router.delete('/:id', authorize(['owner']), feedController.delete);

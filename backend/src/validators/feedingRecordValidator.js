@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const listQuery = require('./listQuery');
 
 /**
  * Feeding Record validation schemas
@@ -63,15 +64,17 @@ const createFeedingRecordSchema = Joi.object({
       'string.base': 'Примечания должны быть строкой',
       'string.max': 'Примечания не могут превышать 1000 символов'
     })
-}).custom((value, helpers) => {
-  // Either rabbit_id or cage_id must be provided
-  if (!value.rabbit_id && !value.cage_id) {
-    return helpers.error('any.custom', {
-      message: 'Необходимо указать либо кролика, либо клетку'
-    });
-  }
-  return value;
-});
+})
+  // Кормление относится либо к кролику, либо к клетке.
+  //
+  // Раньше проверка была написана через helpers.error('any.custom', {message}):
+  // встроенный шаблон any.custom подставляет #error.message, которого в
+  // переданном объекте нет, поэтому клиент получал пустую английскую фразу
+  // «value failed custom validation because » без имени поля.
+  .or('rabbit_id', 'cage_id')
+  .messages({
+    'object.missing': 'Необходимо указать либо кролика, либо клетку'
+  });
 
 /**
  * Update feeding record validation schema
@@ -131,7 +134,23 @@ const updateFeedingRecordSchema = Joi.object({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
 });
 
+/** Параметры списка кормлений. */
+const listFeedingRecordsQuerySchema = Joi.object({
+  page: listQuery.page,
+  limit: listQuery.limit,
+  sort_by: listQuery.sortBy(
+    ['fed_at', 'quantity', 'created_at'], 'fed_at'),
+  sort_order: listQuery.sortOrder,
+  rabbit_id: Joi.number().integer().optional(),
+  feed_id: Joi.number().integer().optional(),
+  cage_id: Joi.number().integer().optional(),
+  from_date: listQuery.fromDate,
+  to_date: listQuery.toDate
+});
+
 module.exports = {
   createFeedingRecordSchema,
   updateFeedingRecordSchema
+,
+  listFeedingRecordsQuerySchema
 };

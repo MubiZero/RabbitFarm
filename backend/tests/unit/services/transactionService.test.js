@@ -245,9 +245,9 @@ describe('TransactionService', () => {
 
       const result = await transactionService.listTransactions(1);
 
-      expect(result.transactions).toHaveLength(3);
-      expect(result.pagination.total).toBe(3);
-      expect(result.pagination.page).toBe(1);
+      expect(result.items).toHaveLength(3);
+      expect(result.total).toBe(3);
+      expect(result.page).toBe(1);
     });
 
     it('should apply type, category, rabbit_id filters', async () => {

@@ -27,3 +27,19 @@ String? serverErrorCode(DioException e) {
   final error = data['error'];
   return error is Map ? error['code'] as String? : null;
 }
+
+/// Выполнить запрос, превратив ошибку Dio в понятное пользователю исключение.
+///
+/// Без обёртки наружу уходит сырой DioException, и экран показывает
+/// «Ошибка: DioException [bad response]: This exception was thrown because…»
+/// — техническую английскую простыню вместо сообщения сервера.
+Future<T> guardRequest<T>(
+  Future<T> Function() request,
+  String fallbackMessage,
+) async {
+  try {
+    return await request();
+  } on DioException catch (e) {
+    throw Exception(serverMessage(e) ?? fallbackMessage);
+  }
+}

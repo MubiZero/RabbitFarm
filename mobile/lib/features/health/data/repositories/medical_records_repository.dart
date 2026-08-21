@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/medical_record_model.dart';
@@ -46,14 +47,9 @@ class MedicalRecordsRepository {
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        if (data is Map && data.containsKey('items')) {
-          // Paginated response
-          final List<dynamic> rows = data['items'];
-          return rows.map((json) => MedicalRecord.fromJson(json)).toList();
-        } else if (data is List) {
-          // Direct list response
-          return data.map((json) => MedicalRecord.fromJson(json)).toList();
-        }
+        return itemsOf(data)
+            .map((json) => MedicalRecord.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
 
       return [];

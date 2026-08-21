@@ -143,7 +143,9 @@ class VaccinationController {
       }
 
       // Filter for upcoming vaccinations
-      if (upcoming === 'true') {
+      // Значение уже приведено валидатором к булеву; сравнение со строкой
+      // не срабатывало, и фильтр «только предстоящие» ничего не менял.
+      if (upcoming === true || upcoming === 'true') {
         where.next_vaccination_date = {
           [Op.gte]: new Date(),
           [Op.lte]: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // Next 90 days
