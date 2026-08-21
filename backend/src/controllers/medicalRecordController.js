@@ -1,5 +1,6 @@
-const { MedicalRecord, Rabbit, Breed, Transaction, sequelize } = require('../models');
+const { MedicalRecord, Rabbit, Breed, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
+const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
 
 /**
@@ -44,17 +45,15 @@ class MedicalRecordController {
       }
 
       // Automation 2: Financial Transaction
-      if (cost && parseFloat(cost) > 0) {
-        await Transaction.create({
-          type: 'expense',
-          category: 'veterinary',
-          amount: cost,
-          transaction_date: started_at || new Date(),
-          rabbit_id: rabbit_id,
-          description: `Medical: ${diagnosis || 'Treatment'}`,
-          created_by: req.user.id
-        }, { transaction: t });
-      }
+      await syncAutoExpense({
+        link: { medical_record_id: medicalRecord.id },
+        cost,
+        rabbitId: rabbit_id,
+        transactionDate: started_at,
+        description: `Лечение: ${diagnosis || 'без диагноза'}`,
+        userId: req.user.id,
+        transaction: t
+      });
 
       await t.commit();
 
@@ -246,10 +245,6 @@ class MedicalRecordController {
 
       const oldOutcome = medicalRecord.outcome;
 
-      // Известный пробел: при создании записи стоимость превращается в
-      // расход, а при правке стоимости расход не пересчитывается — связи
-      // между медзаписью и транзакцией в схеме нет, найти нужную нечем.
-      // Чинится отдельно: нужна ссылка на источник в таблице транзакций.
 
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
@@ -264,6 +259,18 @@ class MedicalRecordController {
       }
 
       await medicalRecord.update(req.body, { transaction: t });
+
+      // Расход идёт следом за стоимостью: меняется — пересчитывается,
+      // убрали — удаляется, появилась впервые — создаётся.
+      await syncAutoExpense({
+        link: { medical_record_id: medicalRecord.id },
+        cost: medicalRecord.cost,
+        rabbitId: medicalRecord.rabbit_id,
+        transactionDate: medicalRecord.started_at,
+        description: `Лечение: ${medicalRecord.diagnosis || 'без диагноза'}`,
+        userId: req.user.id,
+        transaction: t
+      });
 
       // Automation: Status Update
       const newOutcome = req.body.outcome;

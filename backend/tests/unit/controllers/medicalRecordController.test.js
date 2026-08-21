@@ -18,7 +18,7 @@ jest.mock('../../../src/models', () => {
     },
     Rabbit: { findOne: jest.fn() },
     Breed: {},
-    Transaction: { create: jest.fn() },
+    Transaction: { create: jest.fn(), findOne: jest.fn() },
     sequelize: mockSequelize
   };
 });

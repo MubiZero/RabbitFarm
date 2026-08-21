@@ -189,4 +189,97 @@ describe('Medical Records API', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  describe('расход следует за стоимостью лечения', () => {
+    // Расход создавался один раз и дальше жил сам по себе: правка стоимости
+    // его не трогала, удаление записи оставляло сироту в ведомости.
+    const expensesOf = async (amount) => {
+      const res = await request(app)
+        .get('/api/v1/transactions')
+        .set('Authorization', `Bearer ${accessToken}`);
+      return res.body.data.items.filter((t) => Number(t.amount) === amount);
+    };
+
+    it('изменение стоимости пересчитывает расход', async () => {
+      const created = await request(app)
+        .post('/api/v1/medical-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ rabbit_id: rabbitId, symptoms: 'Хромота', started_at: '2024-07-01', cost: 400 });
+
+      expect(await expensesOf(400)).toHaveLength(1);
+
+      await request(app)
+        .put(`/api/v1/medical-records/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ cost: 550 });
+
+      expect(await expensesOf(400)).toHaveLength(0);
+      expect(await expensesOf(550)).toHaveLength(1);
+    });
+
+    it('стоимость, добавленная позже, создаёт расход', async () => {
+      const created = await request(app)
+        .post('/api/v1/medical-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ rabbit_id: rabbitId, symptoms: 'Царапина', started_at: '2024-07-02' });
+
+      expect(await expensesOf(120)).toHaveLength(0);
+
+      await request(app)
+        .put(`/api/v1/medical-records/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ cost: 120 });
+
+      expect(await expensesOf(120)).toHaveLength(1);
+    });
+
+    it('снятая стоимость убирает расход', async () => {
+      const created = await request(app)
+        .post('/api/v1/medical-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ rabbit_id: rabbitId, symptoms: 'Ушиб', started_at: '2024-07-03', cost: 777 });
+
+      expect(await expensesOf(777)).toHaveLength(1);
+
+      await request(app)
+        .put(`/api/v1/medical-records/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ cost: null });
+
+      expect(await expensesOf(777)).toHaveLength(0);
+    });
+
+    it('удаление записи уносит и её расход', async () => {
+      const created = await request(app)
+        .post('/api/v1/medical-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ rabbit_id: rabbitId, symptoms: 'Отёк', started_at: '2024-07-04', cost: 999 });
+
+      expect(await expensesOf(999)).toHaveLength(1);
+
+      await request(app)
+        .delete(`/api/v1/medical-records/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(await expensesOf(999)).toHaveLength(0);
+    });
+
+    it('самостоятельный расход правки лечения не касаются', async () => {
+      await request(app)
+        .post('/api/v1/transactions')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ type: 'expense', category: 'feed', amount: 1234, transaction_date: '2024-07-05' });
+
+      const record = await request(app)
+        .post('/api/v1/medical-records')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ rabbit_id: rabbitId, symptoms: 'Насморк', started_at: '2024-07-05', cost: 300 });
+
+      await request(app)
+        .delete(`/api/v1/medical-records/${record.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(await expensesOf(1234)).toHaveLength(1);
+    });
+  });
 });

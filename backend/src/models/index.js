@@ -112,6 +112,12 @@ FeedingRecord.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
 FeedingRecord.belongsTo(User, { as: 'fedBy', foreignKey: 'fed_by' });
 
 Transaction.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+// Автоматический расход живёт ровно столько, сколько запись, из которой он
+// создан: иначе в ведомости остаётся сирота со ссылкой на удалённое лечение.
+MedicalRecord.hasOne(Transaction, { as: 'expense', foreignKey: 'medical_record_id', onDelete: 'CASCADE' });
+Transaction.belongsTo(MedicalRecord, { as: 'medicalRecord', foreignKey: 'medical_record_id' });
+Vaccination.hasOne(Transaction, { as: 'expense', foreignKey: 'vaccination_id', onDelete: 'CASCADE' });
+Transaction.belongsTo(Vaccination, { as: 'vaccination', foreignKey: 'vaccination_id' });
 Transaction.belongsTo(User, { as: 'creator', foreignKey: 'created_by' });
 
 Task.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });

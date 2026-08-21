@@ -1,5 +1,6 @@
-const { Vaccination, Rabbit, Breed, Transaction, sequelize } = require('../models');
+const { Vaccination, Rabbit, Breed, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
+const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
 
 /**
@@ -35,17 +36,15 @@ class VaccinationController {
       const vaccination = await Vaccination.create(req.body, { transaction: t });
 
       // Automation: Financial Transaction
-      if (cost && parseFloat(cost) > 0) {
-        await Transaction.create({
-          type: 'expense',
-          category: 'veterinary',
-          amount: cost,
-          transaction_date: vaccination_date || new Date(),
-          rabbit_id: rabbit_id,
-          description: `Vaccination: ${vaccine_name}`,
-          created_by: req.user.id
-        }, { transaction: t });
-      }
+      await syncAutoExpense({
+        link: { vaccination_id: vaccination.id },
+        cost,
+        rabbitId: rabbit_id,
+        transactionDate: vaccination_date,
+        description: `Вакцинация: ${vaccine_name}`,
+        userId: req.user.id,
+        transaction: t
+      });
 
       await t.commit();
 
@@ -230,6 +229,9 @@ class VaccinationController {
    * PUT /api/v1/vaccinations/:id
    */
   async update(req, res, next) {
+    // Запись и связанный с ней расход меняются одной транзакцией: иначе при
+    // сбое на втором шаге в ведомости осталась бы прежняя сумма.
+    const t = await sequelize.transaction();
     try {
       // Скоупинг по ферме обязателен: findByPk по одному идентификатору
       // позволял править чужие записи перебором id.
@@ -240,10 +242,12 @@ class VaccinationController {
           as: 'rabbit',
           where: { user_id: req.farmId },
           attributes: ['id']
-        }]
+        }],
+        transaction: t
       });
 
       if (!vaccination) {
+        await t.rollback();
         return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
       }
 
@@ -253,14 +257,30 @@ class VaccinationController {
           where: {
             id: req.body.rabbit_id,
             user_id: req.farmId
-          }
+          },
+          transaction: t
         });
         if (!rabbit) {
+          await t.rollback();
           return ApiResponse.notFound(res, 'Кролик не найден');
         }
       }
 
-      await vaccination.update(req.body);
+      await vaccination.update(req.body, { transaction: t });
+
+      // Расход идёт следом за стоимостью: меняется — пересчитывается,
+      // убрали — удаляется, появилась впервые — создаётся.
+      await syncAutoExpense({
+        link: { vaccination_id: vaccination.id },
+        cost: vaccination.cost,
+        rabbitId: vaccination.rabbit_id,
+        transactionDate: vaccination.vaccination_date,
+        description: `Вакцинация: ${vaccination.vaccine_name}`,
+        userId: req.user.id,
+        transaction: t
+      });
+
+      await t.commit();
 
       // Fetch updated vaccination with rabbit info
       const result = await Vaccination.findByPk(vaccination.id, {
@@ -282,6 +302,7 @@ class VaccinationController {
 
       return ApiResponse.success(res, result, 'Запись о вакцинации успешно обновлена');
     } catch (error) {
+      if (!t.finished) await t.rollback();
       if (error.name === 'SequelizeValidationError') {
         return ApiResponse.badRequest(res, error.errors[0].message);
       }
