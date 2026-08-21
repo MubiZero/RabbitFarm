@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { User } = require('../../src/models');
 
 describe('Breeds API', () => {
   let accessToken;
@@ -150,6 +151,64 @@ describe('Breeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
+    });
+  });
+
+  describe('Изоляция между фермами', () => {
+    let strangerToken;
+
+    beforeAll(async () => {
+      // Владельцем становится только первый зарегистрированный, поэтому
+      // соседа поднимаем до владельца напрямую и логинимся заново: роль
+      // зашита в токен, старый остался бы токеном работника.
+      const email = 'other_breed@example.com';
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email, password: 'Password123!', full_name: 'Сосед' });
+      await User.update({ role: 'owner' }, { where: { email } });
+
+      const login = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email, password: 'Password123!' });
+      strangerToken = login.body.data.access_token;
+    });
+
+    it('чужая порода не видна в списке', async () => {
+      const res = await request(app)
+        .get('/api/v1/breeds')
+        .set('Authorization', `Bearer ${strangerToken}`);
+
+      expect(res.status).toBe(200);
+      const names = (res.body.data.items || res.body.data).map(b => b.name);
+      expect(names).not.toContain('Новозеландский белый');
+    });
+
+    it('чужую породу нельзя получить по id', async () => {
+      const res = await request(app)
+        .get(`/api/v1/breeds/${breedId}`)
+        .set('Authorization', `Bearer ${strangerToken}`);
+
+      expect(res.status).toBe(404);
+    });
+
+    it('чужую породу нельзя удалить', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/breeds/${breedId}`)
+        .set('Authorization', `Bearer ${strangerToken}`);
+
+      expect(res.status).toBe(404);
+    });
+
+    it('одноимённую породу на своей ферме завести можно', async () => {
+      // Раньше имя было уникально глобально, и сосед получал конфликт
+      // из-за породы, которой даже не видит.
+      const res = await request(app)
+        .post('/api/v1/breeds')
+        .set('Authorization', `Bearer ${strangerToken}`)
+        .send({ name: 'Новозеландский белый' });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.name).toBe('Новозеландский белый');
     });
   });
 });

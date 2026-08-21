@@ -55,6 +55,9 @@ services:
       - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
       - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      # Публичная регистрация закрыта: ферму поднимает первый
+      # зарегистрировавшийся, дальше учётки выдаёт владелец.
+      - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-false}
       # Справочники наливаются только по явному указанию.
       - RUN_SEEDS=${RUN_SEEDS:-false}
     volumes:

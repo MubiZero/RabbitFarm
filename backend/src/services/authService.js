@@ -17,6 +17,16 @@ class AuthService {
   async register(userData) {
     const transaction = await User.sequelize.transaction();
     try {
+      // Первая регистрация поднимает ферму и её владельца. Дальше публичная
+      // регистрация закрыта: приглашать работников должен владелец, а такой
+      // возможности пока нет — до неё сервис не должен пускать посторонних,
+      // иначе любой прохожий заводит себе аккаунт на чужом стенде.
+      const userCount = await User.count({ transaction });
+      const registrationOpen = process.env.ALLOW_REGISTRATION === 'true';
+      if (userCount > 0 && !registrationOpen) {
+        throw new Error('REGISTRATION_CLOSED');
+      }
+
       // Check if user already exists
       const existingUser = await User.findOne({
         where: { email: userData.email },
@@ -29,13 +39,14 @@ class AuthService {
       // Hash password
       const passwordHash = await PasswordUtil.hash(userData.password);
 
-      // Create user — self-registered users are always owners of their farm
+      // Владелец — только первый: он и есть ферма. Остальные (когда
+      // регистрацию открывают вручную) получают минимальные права.
       const user = await User.create({
         email: userData.email,
         password_hash: passwordHash,
         full_name: userData.full_name,
         phone: userData.phone || null,
-        role: 'owner'
+        role: userCount === 0 ? 'owner' : 'worker'
       }, { transaction });
 
       // Generate tokens

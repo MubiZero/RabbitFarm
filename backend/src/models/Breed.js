@@ -10,10 +10,15 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: true,
       validate: {
         notEmpty: { msg: 'Название породы обязательно' }
       }
+    },
+    // Порода принадлежит конкретной ферме: имена уникальны в пределах
+    // пользователя, а не на весь сервис.
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     description: {
       type: DataTypes.TEXT,

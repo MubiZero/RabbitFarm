@@ -49,6 +49,7 @@ User.hasMany(Photo, { foreignKey: 'uploaded_by', onDelete: 'SET NULL' });
 User.hasMany(Note, { foreignKey: 'created_by', onDelete: 'SET NULL' });
 
 // Breed associations
+Breed.belongsTo(User, { foreignKey: 'user_id' });
 Breed.hasMany(Rabbit, { foreignKey: 'breed_id', onDelete: 'RESTRICT' });
 
 // Cage associations

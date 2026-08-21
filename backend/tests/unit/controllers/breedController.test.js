@@ -28,7 +28,8 @@ describe('BreedController', () => {
 
       await breedController.list(mockReq(), res, mockNext);
 
-      expect(breedService.getAllBreeds).toHaveBeenCalled();
+      // Владелец берётся из токена, а не из тела запроса.
+      expect(breedService.getAllBreeds).toHaveBeenCalledWith(1);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: breeds }));
     });
@@ -50,7 +51,7 @@ describe('BreedController', () => {
 
       await breedController.getById(req, res, mockNext);
 
-      expect(breedService.getBreedById).toHaveBeenCalledWith('3');
+      expect(breedService.getBreedById).toHaveBeenCalledWith('3', 1);
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -79,7 +80,7 @@ describe('BreedController', () => {
 
       await breedController.create(req, res, mockNext);
 
-      expect(breedService.createBreed).toHaveBeenCalledWith({ name: 'Калифорниец' });
+      expect(breedService.createBreed).toHaveBeenCalledWith({ name: 'Калифорниец' }, 1);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: breed }));
     });
@@ -109,7 +110,7 @@ describe('BreedController', () => {
 
       await breedController.update(req, res, mockNext);
 
-      expect(breedService.updateBreed).toHaveBeenCalledWith('1', { name: 'Обновлённый' });
+      expect(breedService.updateBreed).toHaveBeenCalledWith('1', { name: 'Обновлённый' }, 1);
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -143,7 +144,7 @@ describe('BreedController', () => {
 
       await breedController.delete(req, res, mockNext);
 
-      expect(breedService.deleteBreed).toHaveBeenCalledWith('1');
+      expect(breedService.deleteBreed).toHaveBeenCalledWith('1', 1);
       expect(res.status).toHaveBeenCalledWith(200);
     });
 

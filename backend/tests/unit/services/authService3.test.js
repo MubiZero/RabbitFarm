@@ -3,6 +3,7 @@
  */
 jest.mock('../../../src/models', () => ({
   User: {
+    count: jest.fn().mockResolvedValue(0),
     findOne: jest.fn(),
     update: jest.fn(),
     sequelize: { transaction: jest.fn() }

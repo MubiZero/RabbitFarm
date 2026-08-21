@@ -1,5 +1,6 @@
 jest.mock('../../../src/models', () => ({
   User: {
+    count: jest.fn().mockResolvedValue(0),
     findOne: jest.fn(),
     findByPk: jest.fn(),
     create: jest.fn(),

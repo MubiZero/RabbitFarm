@@ -13,7 +13,7 @@ class BreedController {
    */
   async list(req, res, next) {
     try {
-      const breeds = await breedService.getAllBreeds();
+      const breeds = await breedService.getAllBreeds(req.user.id);
 
       return ApiResponse.success(res, breeds, 'Список пород получен успешно');
     } catch (error) {
@@ -27,7 +27,7 @@ class BreedController {
    */
   async getById(req, res, next) {
     try {
-      const breed = await breedService.getBreedById(req.params.id);
+      const breed = await breedService.getBreedById(req.params.id, req.user.id);
 
       return ApiResponse.success(res, breed);
     } catch (error) {
@@ -44,7 +44,7 @@ class BreedController {
    */
   async create(req, res, next) {
     try {
-      const breed = await breedService.createBreed(req.body);
+      const breed = await breedService.createBreed(req.body, req.user.id);
 
       return ApiResponse.created(res, breed, 'Порода успешно создана');
     } catch (error) {
@@ -61,7 +61,7 @@ class BreedController {
    */
   async update(req, res, next) {
     try {
-      const breed = await breedService.updateBreed(req.params.id, req.body);
+      const breed = await breedService.updateBreed(req.params.id, req.body, req.user.id);
 
       return ApiResponse.success(res, breed, 'Порода успешно обновлена');
     } catch (error) {
@@ -81,7 +81,7 @@ class BreedController {
    */
   async delete(req, res, next) {
     try {
-      await breedService.deleteBreed(req.params.id);
+      await breedService.deleteBreed(req.params.id, req.user.id);
 
       return ApiResponse.success(res, null, 'Порода успешно удалена');
     } catch (error) {

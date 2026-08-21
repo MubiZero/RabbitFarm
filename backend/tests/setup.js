@@ -1,4 +1,7 @@
 process.env.NODE_ENV = 'test';
+// Часть сценариев заводит несколько пользователей (например проверки IDOR),
+// поэтому в тестах регистрация открыта. Закрытую проверяем отдельно.
+process.env.ALLOW_REGISTRATION = 'true';
 process.env.JWT_SECRET = 'test_secret_key_minimum_32_chars_long';
 process.env.JWT_REFRESH_SECRET = 'test_refresh_secret_key_minimum_32_chars';
 process.env.JWT_EXPIRE = '15m';

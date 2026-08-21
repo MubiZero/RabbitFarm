@@ -44,6 +44,7 @@ module.exports = {
     await queryInterface.bulkInsert('breeds', [
       {
         name: 'Калифорнийская',
+        user_id: 1,
         description: 'Мясная порода кроликов с белым окрасом и темными ушами, лапами и носом. Отличается быстрым набором веса.',
         average_weight: 4.5,
         average_litter_size: 8,
@@ -53,6 +54,7 @@ module.exports = {
       },
       {
         name: 'Новозеландская белая',
+        user_id: 1,
         description: 'Популярная мясная порода с чисто белым окрасом. Быстро растет и дает хорошее мясо.',
         average_weight: 5.0,
         average_litter_size: 9,
@@ -62,6 +64,7 @@ module.exports = {
       },
       {
         name: 'Советская шиншилла',
+        user_id: 1,
         description: 'Мясо-шкурковая порода с серебристо-голубым окрасом. Ценится за качественный мех.',
         average_weight: 5.0,
         average_litter_size: 8,
@@ -71,6 +74,7 @@ module.exports = {
       },
       {
         name: 'Серый великан',
+        user_id: 1,
         description: 'Крупная порода кроликов серого окраса. Вынослива и неприхотлива в содержании.',
         average_weight: 6.0,
         average_litter_size: 8,
@@ -80,6 +84,7 @@ module.exports = {
       },
       {
         name: 'Фландр (Бельгийский великан)',
+        user_id: 1,
         description: 'Одна из самых крупных пород кроликов. Спокойный темперамент, крупное телосложение.',
         average_weight: 7.0,
         average_litter_size: 7,
@@ -89,6 +94,7 @@ module.exports = {
       },
       {
         name: 'Рекс',
+        user_id: 1,
         description: 'Порода с уникальным велюровым мехом. Среднего размера, спокойный характер.',
         average_weight: 4.0,
         average_litter_size: 6,
@@ -98,6 +104,7 @@ module.exports = {
       },
       {
         name: 'Венский голубой',
+        user_id: 1,
         description: 'Мясо-шкурковая порода с красивым серо-голубым окрасом. Качественный мех и вкусное мясо.',
         average_weight: 4.5,
         average_litter_size: 8,
@@ -107,6 +114,7 @@ module.exports = {
       },
       {
         name: 'Белый великан',
+        user_id: 1,
         description: 'Крупная порода белого цвета. Альбиносы с красными глазами. Хорошие мясные качества.',
         average_weight: 5.5,
         average_litter_size: 7,
