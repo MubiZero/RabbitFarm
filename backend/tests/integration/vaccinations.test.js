@@ -182,4 +182,33 @@ describe('Vaccinations API', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  describe('автоматизация расхода', () => {
+    // Регрессия: категория 'Health' отсутствует в ENUM транзакций, поэтому
+    // любая вакцинация со стоимостью откатывалась целиком.
+    it('стоимость вакцинации превращается в ветеринарный расход', async () => {
+      const res = await request(app)
+        .post('/api/v1/vaccinations')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          rabbit_id: rabbitId,
+          vaccine_name: 'ВГБК',
+          vaccine_type: 'vhd',
+          vaccination_date: '2024-05-01',
+          cost: 320
+        });
+
+      expect(res.status).toBe(201);
+
+      const transactions = await request(app)
+        .get('/api/v1/transactions')
+        .set('Authorization', `Bearer ${accessToken}`);
+      const created = (transactions.body.data.transactions || transactions.body.data.items)
+        .find((t) => Number(t.amount) === 320);
+
+      expect(created).toBeDefined();
+      expect(created.category).toBe('veterinary');
+      expect(created.type).toBe('expense');
+    });
+  });
 });

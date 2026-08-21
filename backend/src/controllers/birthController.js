@@ -1,5 +1,5 @@
 const { randomUUID } = require('crypto');
-const { Rabbit, Birth, Breeding, Task } = require('../models');
+const { Rabbit, Birth, Breeding, Task, Breed } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
@@ -52,8 +52,8 @@ exports.getBirthById = async (req, res) => {
           attributes: ['id', 'name', 'tag_id', 'breed_id'],
           include: [
             {
-              model: Rabbit.associations.Breed.target,
-              as: 'Breed',
+              model: Breed,
+              as: 'breed',
               attributes: ['id', 'name'],
             },
           ],

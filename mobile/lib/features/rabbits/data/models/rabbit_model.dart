@@ -32,7 +32,7 @@ class RabbitModel with _$RabbitModel {
     @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() required DateTime updatedAt,
     // Relations
-    @JsonKey(name: 'Breed') BreedModel? breed,
+    @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
     @JsonKey(name: 'mother') ParentInfo? mother,

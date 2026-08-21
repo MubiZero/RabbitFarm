@@ -39,8 +39,8 @@ class TransactionService {
 
       // If selling a rabbit, mark it as sold (skip if already in terminal state)
       if (rabbit && type === 'income' &&
-        (category?.toLowerCase() === 'sale' || category?.toLowerCase() === 'продажа')) {
-        if (rabbit.status !== 'sold' && rabbit.status !== 'died') {
+        category?.startsWith('sale_')) {
+        if (rabbit.status !== 'sold' && rabbit.status !== 'dead') {
           await rabbit.update({ status: 'sold', cage_id: null }, { transaction: t });
         }
       }

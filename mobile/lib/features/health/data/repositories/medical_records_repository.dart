@@ -46,9 +46,9 @@ class MedicalRecordsRepository {
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        if (data is Map && data.containsKey('rows')) {
+        if (data is Map && data.containsKey('items')) {
           // Paginated response
-          final List<dynamic> rows = data['rows'];
+          final List<dynamic> rows = data['items'];
           return rows.map((json) => MedicalRecord.fromJson(json)).toList();
         } else if (data is List) {
           // Direct list response

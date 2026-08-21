@@ -1,6 +1,5 @@
 const { MedicalRecord, Rabbit, Breed, Transaction, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 const { Op } = require('sequelize');
 
 /**
@@ -39,7 +38,7 @@ class MedicalRecordController {
       if (['died', 'euthanized'].includes(outcome)) {
         await rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
       } else if (outcome === 'recovered') {
-        await rabbit.update({ status: 'alive' }, { transaction: t });
+        await rabbit.update({ status: 'healthy' }, { transaction: t });
       } else if (outcome === 'ongoing') {
         await rabbit.update({ status: 'sick' }, { transaction: t });
       }
@@ -48,7 +47,7 @@ class MedicalRecordController {
       if (cost && parseFloat(cost) > 0) {
         await Transaction.create({
           type: 'expense',
-          category: 'Health',
+          category: 'veterinary',
           amount: cost,
           transaction_date: started_at || new Date(),
           rabbit_id: rabbit_id,
@@ -246,7 +245,7 @@ class MedicalRecordController {
       }
 
       const oldOutcome = medicalRecord.outcome;
-      const oldCost = medicalRecord.cost;
+      medicalRecord.cost;
 
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
@@ -268,7 +267,7 @@ class MedicalRecordController {
         if (['died', 'euthanized'].includes(newOutcome)) {
           await medicalRecord.rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
         } else if (newOutcome === 'recovered') {
-          await medicalRecord.rabbit.update({ status: 'alive' }, { transaction: t });
+          await medicalRecord.rabbit.update({ status: 'healthy' }, { transaction: t });
         } else if (newOutcome === 'ongoing') {
           await medicalRecord.rabbit.update({ status: 'sick' }, { transaction: t });
         }
@@ -308,6 +307,7 @@ class MedicalRecordController {
         where: { id: req.params.id },
         include: [{
           model: Rabbit,
+          as: 'rabbit',
           where: { user_id: req.farmId },
           attributes: ['id']
         }]

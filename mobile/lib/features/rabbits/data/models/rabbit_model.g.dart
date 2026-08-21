@@ -33,9 +33,9 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
   photoUrl: json['photo_url'] as String?,
   createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
   updatedAt: const DateTimeConverter().fromJson(json['updated_at'] as Object),
-  breed: json['Breed'] == null
+  breed: json['breed'] == null
       ? null
-      : BreedModel.fromJson(json['Breed'] as Map<String, dynamic>),
+      : BreedModel.fromJson(json['breed'] as Map<String, dynamic>),
   cage: json['Cage'] == null
       ? null
       : CageInfo.fromJson(json['Cage'] as Map<String, dynamic>),
@@ -74,7 +74,7 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'photo_url': instance.photoUrl,
   'created_at': const DateTimeConverter().toJson(instance.createdAt),
   'updated_at': const DateTimeConverter().toJson(instance.updatedAt),
-  'Breed': instance.breed,
+  'breed': instance.breed,
   'Cage': instance.cage,
   'father': instance.father,
   'mother': instance.mother,

@@ -76,7 +76,7 @@ describe('vaccinationController', () => {
       );
 
       expect(Transaction.create).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'expense', category: 'Health' }),
+        expect.objectContaining({ type: 'expense', category: 'veterinary' }),
         expect.any(Object)
       );
     });
@@ -461,7 +461,7 @@ describe('vaccinationController', () => {
 
   describe('getUpcoming', () => {
     it('should return upcoming vaccinations', async () => {
-      const now = new Date();
+      new Date();
       const futureDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
       const records = [{
         id: 1,

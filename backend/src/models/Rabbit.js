@@ -1,4 +1,4 @@
-const { DataTypes, Op } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const Rabbit = sequelize.define('Rabbit', {
@@ -115,7 +115,8 @@ module.exports = (sequelize) => {
       { fields: ['cage_id'] },
       { fields: ['father_id'] },
       { fields: ['mother_id'] },
-      { unique: true, fields: ['user_id', 'tag_id'], where: { tag_id: { [Op.ne]: null } } }
+      // MySQL считает NULL различными, поэтому кролики без бирки не конфликтуют.
+      { unique: true, name: 'unique_user_rabbit_tag', fields: ['user_id', 'tag_id'] }
     ]
   });
 

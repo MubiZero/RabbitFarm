@@ -1,6 +1,5 @@
 const { Vaccination, Rabbit, Breed, Transaction, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 const { Op } = require('sequelize');
 
 /**
@@ -39,7 +38,7 @@ class VaccinationController {
       if (cost && parseFloat(cost) > 0) {
         await Transaction.create({
           type: 'expense',
-          category: 'Health', // or 'Vaccination'
+          category: 'veterinary',
           amount: cost,
           transaction_date: vaccination_date || new Date(),
           rabbit_id: rabbit_id,

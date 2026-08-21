@@ -136,4 +136,38 @@ describe('Rabbits API', () => {
       expect(rabbitRes.status).toBe(404);
     });
   });
+
+  describe('вложенная порода в ответе', () => {
+    // Регрессия: клиент читал породу по ключу 'Breed', а Sequelize отдаёт её
+    // под алиасом связи 'breed' — порода не показывалась ни на одном экране.
+    it('кролик отдаётся вместе с породой под ключом breed', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'С породой', breed_id: breedId, sex: 'female', birth_date: '2023-05-05' });
+
+      const res = await request(app)
+        .get(`/api/v1/rabbits/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.breed).toBeDefined();
+      expect(res.body.data.breed.name).toBe('Серый великан');
+      expect(res.body.data.Breed).toBeUndefined();
+    });
+
+    it('родословная отдаёт название породы', async () => {
+      const rabbit = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Потомок', breed_id: breedId, sex: 'male', birth_date: '2024-01-01' });
+
+      const res = await request(app)
+        .get(`/api/v1/rabbits/${rabbit.body.data.id}/pedigree`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.breed).toBe('Серый великан');
+    });
+  });
 });

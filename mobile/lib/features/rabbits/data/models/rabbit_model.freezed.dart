@@ -68,7 +68,7 @@ mixin _$RabbitModel {
   @JsonKey(name: 'updated_at')
   @DateTimeConverter()
   DateTime get updatedAt => throw _privateConstructorUsedError; // Relations
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   BreedModel? get breed => throw _privateConstructorUsedError;
   @JsonKey(name: 'Cage')
   CageInfo? get cage => throw _privateConstructorUsedError;
@@ -121,7 +121,7 @@ abstract class $RabbitModelCopyWith<$Res> {
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
-    @JsonKey(name: 'Breed') BreedModel? breed,
+    @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
     @JsonKey(name: 'mother') ParentInfo? mother,
@@ -379,7 +379,7 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
-    @JsonKey(name: 'Breed') BreedModel? breed,
+    @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
     @JsonKey(name: 'mother') ParentInfo? mother,
@@ -575,7 +575,7 @@ class _$RabbitModelImpl implements _RabbitModel {
     @JsonKey(name: 'photo_url') this.photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() required this.createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() required this.updatedAt,
-    @JsonKey(name: 'Breed') this.breed,
+    @JsonKey(name: 'breed') this.breed,
     @JsonKey(name: 'Cage') this.cage,
     @JsonKey(name: 'father') this.father,
     @JsonKey(name: 'mother') this.mother,
@@ -655,7 +655,7 @@ class _$RabbitModelImpl implements _RabbitModel {
   final DateTime updatedAt;
   // Relations
   @override
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   final BreedModel? breed;
   @override
   @JsonKey(name: 'Cage')
@@ -799,7 +799,7 @@ abstract class _RabbitModel implements RabbitModel {
     @JsonKey(name: 'updated_at')
     @DateTimeConverter()
     required final DateTime updatedAt,
-    @JsonKey(name: 'Breed') final BreedModel? breed,
+    @JsonKey(name: 'breed') final BreedModel? breed,
     @JsonKey(name: 'Cage') final CageInfo? cage,
     @JsonKey(name: 'father') final ParentInfo? father,
     @JsonKey(name: 'mother') final ParentInfo? mother,
@@ -878,7 +878,7 @@ abstract class _RabbitModel implements RabbitModel {
   @DateTimeConverter()
   DateTime get updatedAt; // Relations
   @override
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   BreedModel? get breed;
   @override
   @JsonKey(name: 'Cage')

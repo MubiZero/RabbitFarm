@@ -3,14 +3,11 @@ const {
   Breed,
   Cage,
   RabbitWeight,
-  Photo,
   Breeding,
   Birth,
   Vaccination,
   MedicalRecord,
-  FeedingRecord,
   Transaction,
-  Task,
   sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
@@ -545,12 +542,8 @@ class RabbitService {
     try {
       const rabbit = await this.getRabbitById(rabbitId, userId);
       const buildPedigree = async (currentRabbit, level, pathVisited = new Set()) => {
-        if (!currentRabbit || level >= generations) {
-          return currentRabbit;
-        }
-
+        if (!currentRabbit) return null;
         if (pathVisited.has(currentRabbit.id)) return null;
-        pathVisited.add(currentRabbit.id);
 
         const result = {
           id: currentRabbit.id,
@@ -558,8 +551,14 @@ class RabbitService {
           tag_id: currentRabbit.tag_id || null,
           sex: currentRabbit.sex || 'unknown',
           birth_date: currentRabbit.birth_date || null,
-          breed: currentRabbit.Breed?.name || null
+          breed: currentRabbit.breed?.name || null
         };
+
+        // Последнее поколение отдаём в том же виде, что и остальные узлы,
+        // но родителей у него уже не раскрываем.
+        if (level >= generations) return result;
+
+        pathVisited.add(currentRabbit.id);
 
         if (currentRabbit.father_id) {
           try {
