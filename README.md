@@ -1,6 +1,6 @@
 # 🐰 RabbitFarm - Rabbit Farm Management System
 
-Complete farm management solution with Flutter mobile app (Android) and REST API backend.
+Complete farm management solution: a Flutter app (Android, iOS and web) and a REST API backend.
 
 ## 📋 Table of Contents
 
@@ -77,12 +77,18 @@ RabbitFarm/
 The easiest way to run the entire backend system (API + Database) is using Docker:
 
 ```bash
+cp backend/.env.example .env   # секретов в репозитории нет — заполните их
 docker-compose up -d
 ```
 
+Заполните в `.env` как минимум `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `JWT_SECRET`
+и `JWT_REFRESH_SECRET` — например, `openssl rand -base64 32` на каждое.
+Без них compose не запустится: это защита от развёртывания со значениями
+по умолчанию.
+
 #### 🛡️ Port Configuration
 - **Backend API**: `http://localhost:4567` (External access)
-- **MySQL Database**: `localhost:33060` (Mapped to 3306 internally to avoid conflicts with local MySQL)
+- **MySQL Database**: `localhost:3307` (Mapped to 3306 internally to avoid conflicts with local MySQL)
 - **Adminer (DB Web UI)**: `http://localhost:8080`
 
 **Note:** If you get an error that a port is already in use, you can change the host port in `docker-compose.yml`.
@@ -105,6 +111,11 @@ flutter run --dart-define=API_URL=http://YOUR_IP:4567/api/v1
 - **DB Connection Issues**: If the API fails to connect to the DB, check `docker logs rabbitfarm-api`. The API automatically waits for the DB to be ready.
 - **Data Persistence**: Database data is stored in a Docker volume `rabbitfarm_mysql_data`.
 - **CORS Issues**: The backend is configured to accept all origins in development mode for easier mobile testing.
+
+## 🚀 Развёртывание
+
+Как поднять всё это на своём сервере (Coolify, отдельная база, домены,
+сертификаты, бэкапы) — в [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## 📚 Documentation
 
@@ -171,7 +182,7 @@ npx sequelize-cli migration:generate --name migration-name
 
 ### Base URL
 ```
-http://localhost:3000/api/v1
+http://localhost:4567/api/v1
 ```
 
 ### Endpoints (Planned)
@@ -258,7 +269,7 @@ mysql -u root -p
 
 ## 📝 License
 
-This project is licensed under the MIT License.
+MIT — see [LICENSE](LICENSE).
 
 ## 👥 Team
 
