@@ -19,7 +19,7 @@ jest.mock('../../../src/utils/logger', () => ({
   warn: jest.fn()
 }));
 
-const { Cage, Rabbit } = require('../../../src/models');
+const { Cage } = require('../../../src/models');
 const cageService = require('../../../src/services/cageService');
 
 const createMockCage = (overrides = {}) => ({

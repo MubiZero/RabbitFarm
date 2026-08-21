@@ -46,7 +46,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    const result = await feedService.deleteFeed(req.params.id, req.farmId);
+    await feedService.deleteFeed(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Корм успешно удален');
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);

@@ -1,6 +1,5 @@
 const rabbitService = require('../services/rabbitService');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 
 /**
  * Rabbit controller

@@ -168,7 +168,7 @@ class AuthService {
   async refreshAccessToken(refreshToken) {
     try {
       // Verify refresh token
-      const decoded = JWTUtil.verifyRefreshToken(refreshToken);
+      JWTUtil.verifyRefreshToken(refreshToken);
 
       // Find refresh token in database
       const tokenRecord = await RefreshToken.findOne({

@@ -1,6 +1,5 @@
 const authService = require('../services/authService');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 
 /**
  * Authentication controller
@@ -135,7 +134,7 @@ class AuthController {
   async forgotPassword(req, res, next) {
     try {
       const { email } = req.body;
-      const result = await authService.forgotPassword(email);
+      await authService.forgotPassword(email);
 
       // Always return 200 to avoid email enumeration
       return ApiResponse.success(res, null, 'Если аккаунт существует, инструкции отправлены на email');

@@ -43,7 +43,7 @@ jest.mock('../../../src/utils/password', () => ({
   compare: jest.fn()
 }));
 
-const { User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../../../src/models');
+const { User, RefreshToken, TokenBlacklist } = require('../../../src/models');
 const PasswordUtil = require('../../../src/utils/password');
 const authService = require('../../../src/services/authService');
 

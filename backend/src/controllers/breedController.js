@@ -1,6 +1,5 @@
 const breedService = require('../services/breedService');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 
 /**
  * Breed controller

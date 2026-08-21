@@ -37,7 +37,7 @@ const mockRes = () => {
   res.json = jest.fn().mockReturnValue(res);
   return res;
 };
-const mockNext = jest.fn();
+jest.fn();
 const mockTx = { commit: jest.fn(), rollback: jest.fn() };
 
 describe('birthController', () => {

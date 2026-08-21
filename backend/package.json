@@ -19,10 +19,10 @@
     "test": "jest --runInBand --coverage",
     "test:unit": "jest tests/unit --coverage --coverageThreshold={}",
     "test:integration": "jest tests/integration --runInBand --coverageThreshold={}",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --runInBand",
     "test:api": "node test-api.js",
-    "lint": "eslint src/**/*.js",
-    "lint:fix": "eslint src/**/*.js --fix"
+    "lint": "eslint src tests migrations seeders",
+    "lint:fix": "eslint src tests migrations seeders --fix"
   },
   "keywords": [
     "rabbit",

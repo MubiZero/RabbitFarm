@@ -33,7 +33,7 @@ jest.mock('../../../src/utils/logger', () => ({
 }));
 
 const {
-  Rabbit, Breed, Cage, RabbitWeight, Breeding, Birth, Vaccination, MedicalRecord, Transaction, sequelize
+  Rabbit, RabbitWeight, Breeding, Birth, Vaccination, MedicalRecord, Transaction, sequelize
 } = require('../../../src/models');
 const rabbitService = require('../../../src/services/rabbitService');
 
@@ -73,7 +73,7 @@ describe('RabbitService - extended methods', () => {
       Rabbit.count.mockResolvedValue(1);
       Rabbit.findAll.mockResolvedValue([{ id: 1, breed_id: 5 }]);
 
-      const result = await rabbitService.listRabbits(1, { breed_id: 5 });
+      await rabbitService.listRabbits(1, { breed_id: 5 });
 
       expect(Rabbit.count).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ breed_id: 5 })
@@ -216,7 +216,7 @@ describe('RabbitService - extended methods', () => {
       Rabbit.findOne.mockResolvedValue(rabbit);
       RabbitWeight.create.mockResolvedValue(weightRecord);
 
-      const result = await rabbitService.addWeightRecord(1, 1, { weight: 3.0, measured_at: '2024-05-01' });
+      await rabbitService.addWeightRecord(1, 1, { weight: 3.0, measured_at: '2024-05-01' });
 
       expect(RabbitWeight.create).toHaveBeenCalled();
       expect(rabbit.update).toHaveBeenCalled();

@@ -280,7 +280,7 @@ describe('BreedingService', () => {
         .mockResolvedValueOnce({ id: 1 }); // getBreedingById at end
       existingBreeding.update.mockResolvedValue(true);
 
-      const result = await breedingService.updateBreeding(1, 1, { status: 'completed' });
+      await breedingService.updateBreeding(1, 1, { status: 'completed' });
 
       expect(existingBreeding.update).toHaveBeenCalledWith({ status: 'completed' }, { transaction: mockTx });
       expect(mockTx.commit).toHaveBeenCalled();

@@ -9,7 +9,6 @@ const {
   Task,
   Breeding,
   Birth,
-  sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
