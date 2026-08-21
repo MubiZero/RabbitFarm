@@ -39,7 +39,7 @@ class AuthController {
         return ApiResponse.unauthorized(res, 'Неверный email или пароль');
       }
       if (error.message === 'USER_INACTIVE') {
-        return ApiResponse.forbidden(res, 'Аккаунт неактивен');
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
       }
       next(error);
     }
@@ -63,7 +63,7 @@ class AuthController {
         return ApiResponse.unauthorized(res, 'Срок действия refresh-токена истёк');
       }
       if (error.message === 'USER_INACTIVE') {
-        return ApiResponse.forbidden(res, 'Аккаунт неактивен');
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
       }
       next(error);
     }
@@ -156,7 +156,7 @@ class AuthController {
         return ApiResponse.badRequest(res, 'Срок действия токена истек');
       }
       if (error.message === 'USER_INACTIVE') {
-        return ApiResponse.forbidden(res, 'Аккаунт неактивен');
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
       }
       next(error);
     }

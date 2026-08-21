@@ -99,6 +99,7 @@ describe('authenticate middleware', () => {
     await authenticate(req, res, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
   });
 
   it('should return 401 when token error contains "token"', async () => {

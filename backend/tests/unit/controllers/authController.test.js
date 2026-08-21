@@ -117,6 +117,9 @@ describe('AuthController', () => {
       await authController.login(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
+      // Формулировка одна на все места, где встречается это состояние.
+      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
       expect(mockNext).not.toHaveBeenCalled();
     });
 
@@ -174,6 +177,7 @@ describe('AuthController', () => {
       await authController.refresh(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
     });
 
     it('should call next for unexpected errors', async () => {
@@ -362,6 +366,7 @@ describe('AuthController', () => {
       await authController.resetPassword(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
     });
 
     it('should call next for unexpected errors', async () => {

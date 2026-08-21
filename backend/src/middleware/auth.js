@@ -38,7 +38,7 @@ const authenticate = async (req, res, next) => {
     }
 
     if (!user.is_active) {
-      return ApiResponse.forbidden(res, 'Аккаунт отключён');
+      return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
     }
 
     // Attach user to request
