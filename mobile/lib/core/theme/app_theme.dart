@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-import 'app_typography.dart';
 import 'app_radius.dart';
+import 'app_spacing.dart';
+import 'app_typography.dart';
 
 class AppTheme {
-  /// Build a ThemeData for the given brightness and accent color.
+  /// Собирает тему для указанной яркости и акцента.
+  ///
+  /// Здесь описан весь визуальный слой приложения: экраны настраивают
+  /// компоновку, но не внешний вид элементов. Если кнопке или шторке
+  /// понадобился локальный стиль — почти всегда это значит, что чего-то не
+  /// хватает здесь.
   static ThemeData build({
     required Brightness brightness,
     required Color accent,
@@ -31,14 +37,22 @@ class AppTheme {
       onSecondaryContainer: accent,
       error: AppColors.error,
       onError: Colors.white,
+      errorContainer: AppColors.error.withValues(alpha: 0.12),
+      onErrorContainer: AppColors.error,
       surface: surface,
       onSurface: txtPri,
+      surfaceContainerHighest: surfaceVar,
       onSurfaceVariant: txtSec,
       outline: border,
       outlineVariant: border.withValues(alpha: 0.5),
       shadow: Colors.black,
       scrim: Colors.black,
     );
+
+    // Форма и высота у всех крупных кнопок общие: на экране формы кнопки
+    // стоят друг под другом, и разница даже в 4 пикселя читается как брак.
+    final buttonShape = RoundedRectangleBorder(borderRadius: AppRadius.mdAll);
+    const buttonSize = Size(double.infinity, 52);
 
     return ThemeData(
       useMaterial3: true,
@@ -60,7 +74,7 @@ class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.lg_,
+          borderRadius: AppRadius.lgAll,
           side: BorderSide(color: border, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -70,36 +84,61 @@ class AppTheme {
         filled: true,
         fillColor: surfaceVar,
         border: OutlineInputBorder(
-          borderRadius: AppRadius.md_,
+          borderRadius: AppRadius.mdAll,
           borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.md_,
+          borderRadius: AppRadius.mdAll,
           borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.md_,
+          borderRadius: AppRadius.mdAll,
           borderSide: BorderSide(color: accent, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.md_,
+          borderRadius: AppRadius.mdAll,
           borderSide: const BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.md_,
+          borderRadius: AppRadius.mdAll,
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
         labelStyle: AppTypography.bodyMd.copyWith(color: txtSec),
         hintStyle: AppTypography.bodyMd.copyWith(color: txtHint),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        // Подсказка и текст ошибки заданы явно: по умолчанию Material красит
+        // их бледнее основного текста, и на цветной подложке они пропадают.
+        helperStyle: AppTypography.labelSm.copyWith(color: txtSec),
+        errorStyle: AppTypography.labelSm.copyWith(color: AppColors.error),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: accent,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.md_),
+          disabledBackgroundColor: accent.withValues(alpha: 0.3),
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+          minimumSize: buttonSize,
+          shape: buttonShape,
+          elevation: 0,
+          textStyle: AppTypography.labelLg,
+        ),
+      ),
+
+      // FilledButton выглядит и ведёт себя как ElevatedButton: обе кнопки в
+      // приложении означают «основное действие», и различать их на глаз
+      // пользователь не должен.
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: accent,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: accent.withValues(alpha: 0.3),
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+          minimumSize: buttonSize,
+          shape: buttonShape,
           elevation: 0,
           textStyle: AppTypography.labelLg,
         ),
@@ -109,8 +148,8 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: accent,
           side: BorderSide(color: accent),
-          minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.md_),
+          minimumSize: buttonSize,
+          shape: buttonShape,
           textStyle: AppTypography.labelLg,
         ),
       ),
@@ -118,31 +157,150 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: accent,
+          // Палец попадает по цели 44×44 даже в перчатке; у TextButton по
+          // умолчанию высота меньше.
+          minimumSize: const Size(0, 44),
           textStyle: AppTypography.labelLg,
         ),
+      ),
+
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(foregroundColor: txtPri),
       ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: accent,
         foregroundColor: Colors.white,
         elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
         shape: const CircleBorder(),
+        extendedTextStyle: AppTypography.labelLg,
+        extendedSizeConstraints: const BoxConstraints.tightFor(height: 52),
       ),
 
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      // Приложение использует NavigationBar из Material 3. Раньше здесь стоял
+      // bottomNavigationBarTheme, который к нему не применяется: панель
+      // оставалась в стандартных цветах Material и не следовала за акцентом.
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surface,
-        selectedItemColor: accent,
-        unselectedItemColor: txtSec,
-        type: BottomNavigationBarType.fixed,
+        indicatorColor: accent.withValues(alpha: 0.15),
+        indicatorShape: const StadiumBorder(),
         elevation: 0,
-        selectedLabelStyle: AppTypography.labelSm,
-        unselectedLabelStyle: AppTypography.labelSm,
+        height: 64,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 24,
+            color: states.contains(WidgetState.selected) ? accent : txtSec,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => AppTypography.labelSm.copyWith(
+            color: states.contains(WidgetState.selected) ? accent : txtSec,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w600
+                : FontWeight.w500,
+          ),
+        ),
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        modalElevation: 0,
+        showDragHandle: true,
+        dragHandleColor: border,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheetTop),
+      ),
+
+      dialogTheme: DialogThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.lgAll,
+          side: BorderSide(color: border),
+        ),
+        titleTextStyle: AppTypography.titleLg.copyWith(color: txtPri),
+        contentTextStyle: AppTypography.bodyMd.copyWith(color: txtSec),
+      ),
+
+      // Всплывающие сообщения плавают над плавающей кнопкой и панелью навигации,
+      // поэтому им нужна собственная форма, а не полоса во всю ширину экрана.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isDark ? surfaceVar : AppColors.lightTextPrimary,
+        contentTextStyle: AppTypography.bodyMd.copyWith(
+          color: isDark ? txtPri : AppColors.lightSurface,
+        ),
+        actionTextColor: accent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.all(AppSpacing.lg),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+      ),
+
+      chipTheme: ChipThemeData(
+        backgroundColor: surfaceVar,
+        selectedColor: accent.withValues(alpha: 0.12),
+        checkmarkColor: accent,
+        side: BorderSide(color: border),
+        shape: const StadiumBorder(),
+        labelStyle: AppTypography.labelSm.copyWith(color: txtSec),
+        secondaryLabelStyle: AppTypography.labelSm.copyWith(color: accent),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+      ),
+
+      listTileTheme: ListTileThemeData(
+        iconColor: txtSec,
+        textColor: txtPri,
+        titleTextStyle: AppTypography.bodyLg.copyWith(color: txtPri),
+        subtitleTextStyle: AppTypography.bodyMd.copyWith(color: txtSec),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      ),
+
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.lgAll),
+        headerBackgroundColor: accent,
+        headerForegroundColor: Colors.white,
+      ),
+
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: accent,
+        linearTrackColor: surfaceVar,
+        circularTrackColor: Colors.transparent,
       ),
 
       dividerTheme: DividerThemeData(
         color: border,
         thickness: 1,
         space: 1,
+      ),
+
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: isDark ? surfaceVar : AppColors.lightTextPrimary,
+          borderRadius: AppRadius.smAll,
+        ),
+        textStyle: AppTypography.labelSm.copyWith(
+          color: isDark ? txtPri : AppColors.lightSurface,
+        ),
+      ),
+
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
       ),
 
       textTheme: TextTheme(
@@ -160,19 +318,4 @@ class AppTheme {
     );
   }
 
-  // Convenience shortcuts for common color lookups via BuildContext.
-  static Color bg(BuildContext context) =>
-      Theme.of(context).scaffoldBackgroundColor;
-  static Color surface(BuildContext context) =>
-      Theme.of(context).colorScheme.surface;
-  static Color surfaceVar(BuildContext context) =>
-      Theme.of(context).colorScheme.secondaryContainer;
-  static Color border(BuildContext context) =>
-      Theme.of(context).colorScheme.outline;
-  static Color textPrimary(BuildContext context) =>
-      Theme.of(context).colorScheme.onSurface;
-  static Color textSecondary(BuildContext context) =>
-      Theme.of(context).colorScheme.onSurfaceVariant;
-  static Color accent(BuildContext context) =>
-      Theme.of(context).colorScheme.primary;
 }
