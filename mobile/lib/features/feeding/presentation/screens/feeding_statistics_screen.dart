@@ -10,6 +10,7 @@ import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
 import '../utils/feed_labels.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Аналитика кормлений: сколько раз кормили, чем и на какую сумму.
 class FeedingStatisticsScreen extends ConsumerStatefulWidget {
@@ -32,7 +33,7 @@ class _FeedingStatisticsScreenState
     final statsAsync = ref.watch(feedingStatisticsProvider(_params));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Аналитика кормлений')),
+      appBar: AppBar(title: Text(context.l10n.feedingStatsTitle)),
       body: Column(
         children: [
           StatsPeriodBar(
@@ -59,10 +60,9 @@ class _FeedingStatisticsScreenState
     if (stats.totalFeedings == 0) {
       return AppEmptyState(
         icon: Icons.restaurant_outlined,
-        title: 'За этот период кормлений не было',
-        subtitle: 'Выберите период шире или запишите кормление — '
-            'расход корма и затраты посчитаются сами.',
-        actionLabel: 'Записать кормление',
+        title: context.l10n.feedingStatsEmptyTitle,
+        subtitle: context.l10n.feedingStatsEmptyBody,
+        actionLabel: context.l10n.feedingAdd,
         onAction: () => context.push('/feeding-records/form'),
       );
     }
@@ -86,7 +86,7 @@ class _FeedingStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.restaurant,
-                  label: 'Кормлений',
+                  label: context.l10n.feedingStatsCount,
                   value: '${stats.totalFeedings}',
                   accent: AppColors.accentOcean,
                 ),
@@ -95,7 +95,7 @@ class _FeedingStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.payments_outlined,
-                  label: 'Затраты на корм',
+                  label: context.l10n.feedingStatsCost,
                   value: formatMoney(stats.totalCost),
                   accent: AppColors.accentSunset,
                 ),
@@ -109,7 +109,7 @@ class _FeedingStatisticsScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Выдано',
+                    context.l10n.feedingStatsGiven,
                     style: AppTypography.labelSm.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -147,7 +147,7 @@ class _FeedingStatisticsScreenState
           ],
           if (byFeed.isNotEmpty) ...[
             const SizedBox(height: 24),
-            AppGroupLabel('По кормам'),
+            AppGroupLabel(context.l10n.feedingStatsByFeed),
             const SizedBox(height: 12),
             AppCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -186,8 +186,8 @@ class _TypeBreakdown extends StatelessWidget {
 
     final max = entries.first.value;
     final title = showUnitInTitle
-        ? 'Расход по типам корма, ${unitLabel(unit)}'
-        : 'Расход по типам корма';
+        ? context.l10n.feedingStatsChartTitle(unitLabel(unit))
+        : context.l10n.feedingStatsChartTitlePlain;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

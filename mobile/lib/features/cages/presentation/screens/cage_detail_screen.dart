@@ -392,7 +392,7 @@ class _ResidentTile extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.logout, color: AppColors.error),
                     title: Text(
-                      'Убрать',
+                      context.l10n.cageRemoveConfirm,
                       style: AppTypography.bodyLg
                           .copyWith(color: AppColors.error),
                     ),

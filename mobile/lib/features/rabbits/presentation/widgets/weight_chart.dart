@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/rabbit_weight_model.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class WeightChart extends StatelessWidget {
   final List<RabbitWeight> weights;
@@ -16,7 +17,7 @@ class WeightChart extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xxl),
           child: Text(
-            'Нет данных для отображения',
+            context.l10n.chartNoData,
             style: AppTypography.bodyLg
                 .copyWith(color: context.colors.onSurfaceVariant),
           ),
@@ -46,7 +47,7 @@ class WeightChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'График веса',
+              context.l10n.chartWeight,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),

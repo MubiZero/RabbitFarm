@@ -33,7 +33,7 @@ class _TransactionStatisticsScreenState
     final statsAsync = ref.watch(financialStatisticsProvider(_params));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Аналитика финансов')),
+      appBar: AppBar(title: Text(context.l10n.financeStatsTitle)),
       body: Column(
         children: [
           StatsPeriodBar(
@@ -60,10 +60,9 @@ class _TransactionStatisticsScreenState
     if (stats.totalTransactions == 0) {
       return AppEmptyState(
         icon: Icons.query_stats,
-        title: 'За этот период операций не было',
-        subtitle: 'Выберите период шире или добавьте первую операцию — '
-            'аналитика посчитается сама.',
-        actionLabel: 'Добавить операцию',
+        title: context.l10n.financeStatsEmptyTitle,
+        subtitle: context.l10n.financeStatsEmptyBody,
+        actionLabel: context.l10n.financeAdd,
         onAction: () => context.push('/transactions/form'),
       );
     }
@@ -81,7 +80,7 @@ class _TransactionStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.arrow_upward,
-                  label: 'Доходы',
+                  label: context.l10n.financeIncome,
                   value: formatMoney(stats.totalIncome),
                   accent: AppColors.success,
                 ),
@@ -90,7 +89,7 @@ class _TransactionStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.arrow_downward,
-                  label: 'Расходы',
+                  label: context.l10n.financeExpenses,
                   value: formatMoney(stats.totalExpenses),
                   accent: AppColors.error,
                 ),
@@ -115,7 +114,7 @@ class _TransactionStatisticsScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isProfit ? 'Прибыль' : 'Убыток',
+                        isProfit ? context.l10n.financeProfit : context.l10n.financeLoss,
                         style: AppTypography.labelSm.copyWith(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant,
@@ -143,7 +142,7 @@ class _TransactionStatisticsScreenState
           if (stats.incomeByCategory.isNotEmpty) ...[
             const SizedBox(height: 24),
             _CategoryBreakdown(
-              title: 'Доходы по категориям',
+              title: context.l10n.financeIncomeByCategory,
               categories: stats.incomeByCategory,
               color: AppColors.success,
             ),
@@ -151,14 +150,14 @@ class _TransactionStatisticsScreenState
           if (stats.expensesByCategory.isNotEmpty) ...[
             const SizedBox(height: 24),
             _CategoryBreakdown(
-              title: 'Расходы по категориям',
+              title: context.l10n.financeExpensesByCategory,
               categories: stats.expensesByCategory,
               color: AppColors.error,
             ),
           ],
           if (stats.recentTransactions.isNotEmpty) ...[
             const SizedBox(height: 24),
-            AppGroupLabel('Последние операции'),
+            AppGroupLabel(context.l10n.financeRecent),
             const SizedBox(height: 12),
             AppCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

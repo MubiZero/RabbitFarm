@@ -1016,6 +1016,64 @@
   "statusDead": "Погиб",
   "purposeShow": "На выставку",
 
+  "tourSkip": "Пропустить",
+  "tourNext": "Дальше",
+  "tourDone": "Понятно",
+  "periodDays": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}",
+  "@periodDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "periodMonths": "{count, plural, one{{count} месяц} few{{count} месяца} many{{count} месяцев} other{{count} месяца}}",
+  "@periodMonths": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "periodYear": "Год",
+  "periodAll": "Всё время",
+  "statusActive": "Активен",
+  "statusInactive": "Неактивен",
+  "pedigreeSelf": "Кролик",
+  "pedigreeGrandparents": "Бабушки и дедушки",
+  "pedigreeFathersParents": "Родители отца",
+  "pedigreeMothersParents": "Родители матери",
+  "pedigreeHint": "Нажмите на карточку, чтобы открыть кролика",
+  "pedigreeGrandfather": "Дедушка",
+  "pedigreeGrandmother": "Бабушка",
+  "chartNoData": "Пока нечего показать",
+  "chartWeight": "График веса",
+  "feedStatsTitle": "Склад в цифрах",
+  "feedStatsEmptyTitle": "Склад пока пуст",
+  "feedStatsEmptyBody": "Заведите корма — здесь появится состав запаса, его стоимость и предупреждения об остатках.",
+  "feedStatsPositions": "Видов корма",
+  "feedStatsLow": "На исходе",
+  "feedStatsValue": "Стоимость запаса",
+  "feedStatsByType": "Состав по типам",
+  "feedStatsLowList": "Остатки на исходе",
+  "feedStatsAllGood": "Запасов хватает по всем позициям",
+  "feedStatsMinimum": "минимум {amount}",
+  "@feedStatsMinimum": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedingStatsTitle": "Кормления в цифрах",
+  "feedingStatsEmptyTitle": "За этот период кормлений не было",
+  "feedingStatsEmptyBody": "Выберите период шире или запишите кормление — расход корма и затраты посчитаются сами.",
+  "feedingStatsCount": "Кормлений",
+  "feedingStatsCost": "Затраты на корм",
+  "feedingStatsGiven": "Выдано",
+  "feedingStatsByFeed": "По кормам",
+  "feedingStatsChartTitle": "Расход по типам корма, {unit}",
+  "@feedingStatsChartTitle": {
+    "placeholders": { "unit": { "type": "String" } }
+  },
+  "feedingStatsChartTitlePlain": "Расход по типам корма",
+  "financeStatsTitle": "Финансы в цифрах",
+  "financeStatsEmptyTitle": "За этот период операций не было",
+  "financeStatsEmptyBody": "Выберите период шире или запишите первую операцию — итоги посчитаются сами.",
+  "financeProfit": "Прибыль",
+  "financeLoss": "Убыток",
+  "financeIncomeByCategory": "Доходы по категориям",
+  "financeExpensesByCategory": "Расходы по категориям",
+  "financeRecent": "Последние операции",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

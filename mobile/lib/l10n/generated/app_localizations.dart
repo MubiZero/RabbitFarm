@@ -4792,6 +4792,276 @@ abstract class AppLocalizations {
   /// **'На выставку'**
   String get purposeShow;
 
+  /// No description provided for @tourSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропустить'**
+  String get tourSkip;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дальше'**
+  String get tourNext;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Понятно'**
+  String get tourDone;
+
+  /// No description provided for @periodDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}'**
+  String periodDays(int count);
+
+  /// No description provided for @periodMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} месяц} few{{count} месяца} many{{count} месяцев} other{{count} месяца}}'**
+  String periodMonths(int count);
+
+  /// No description provided for @periodYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Год'**
+  String get periodYear;
+
+  /// No description provided for @periodAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всё время'**
+  String get periodAll;
+
+  /// No description provided for @statusActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активен'**
+  String get statusActive;
+
+  /// No description provided for @statusInactive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неактивен'**
+  String get statusInactive;
+
+  /// No description provided for @pedigreeSelf.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик'**
+  String get pedigreeSelf;
+
+  /// No description provided for @pedigreeGrandparents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бабушки и дедушки'**
+  String get pedigreeGrandparents;
+
+  /// No description provided for @pedigreeFathersParents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родители отца'**
+  String get pedigreeFathersParents;
+
+  /// No description provided for @pedigreeMothersParents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родители матери'**
+  String get pedigreeMothersParents;
+
+  /// No description provided for @pedigreeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите на карточку, чтобы открыть кролика'**
+  String get pedigreeHint;
+
+  /// No description provided for @pedigreeGrandfather.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дедушка'**
+  String get pedigreeGrandfather;
+
+  /// No description provided for @pedigreeGrandmother.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бабушка'**
+  String get pedigreeGrandmother;
+
+  /// No description provided for @chartNoData.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нечего показать'**
+  String get chartNoData;
+
+  /// No description provided for @chartWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'График веса'**
+  String get chartWeight;
+
+  /// No description provided for @feedStatsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад в цифрах'**
+  String get feedStatsTitle;
+
+  /// No description provided for @feedStatsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад пока пуст'**
+  String get feedStatsEmptyTitle;
+
+  /// No description provided for @feedStatsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите корма — здесь появится состав запаса, его стоимость и предупреждения об остатках.'**
+  String get feedStatsEmptyBody;
+
+  /// No description provided for @feedStatsPositions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видов корма'**
+  String get feedStatsPositions;
+
+  /// No description provided for @feedStatsLow.
+  ///
+  /// In ru, this message translates to:
+  /// **'На исходе'**
+  String get feedStatsLow;
+
+  /// No description provided for @feedStatsValue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стоимость запаса'**
+  String get feedStatsValue;
+
+  /// No description provided for @feedStatsByType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состав по типам'**
+  String get feedStatsByType;
+
+  /// No description provided for @feedStatsLowList.
+  ///
+  /// In ru, this message translates to:
+  /// **'Остатки на исходе'**
+  String get feedStatsLowList;
+
+  /// No description provided for @feedStatsAllGood.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запасов хватает по всем позициям'**
+  String get feedStatsAllGood;
+
+  /// No description provided for @feedStatsMinimum.
+  ///
+  /// In ru, this message translates to:
+  /// **'минимум {amount}'**
+  String feedStatsMinimum(String amount);
+
+  /// No description provided for @feedingStatsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормления в цифрах'**
+  String get feedingStatsTitle;
+
+  /// No description provided for @feedingStatsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот период кормлений не было'**
+  String get feedingStatsEmptyTitle;
+
+  /// No description provided for @feedingStatsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите период шире или запишите кормление — расход корма и затраты посчитаются сами.'**
+  String get feedingStatsEmptyBody;
+
+  /// No description provided for @feedingStatsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормлений'**
+  String get feedingStatsCount;
+
+  /// No description provided for @feedingStatsCost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Затраты на корм'**
+  String get feedingStatsCost;
+
+  /// No description provided for @feedingStatsGiven.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдано'**
+  String get feedingStatsGiven;
+
+  /// No description provided for @feedingStatsByFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'По кормам'**
+  String get feedingStatsByFeed;
+
+  /// No description provided for @feedingStatsChartTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расход по типам корма, {unit}'**
+  String feedingStatsChartTitle(String unit);
+
+  /// No description provided for @feedingStatsChartTitlePlain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расход по типам корма'**
+  String get feedingStatsChartTitlePlain;
+
+  /// No description provided for @financeStatsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Финансы в цифрах'**
+  String get financeStatsTitle;
+
+  /// No description provided for @financeStatsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот период операций не было'**
+  String get financeStatsEmptyTitle;
+
+  /// No description provided for @financeStatsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите период шире или запишите первую операцию — итоги посчитаются сами.'**
+  String get financeStatsEmptyBody;
+
+  /// No description provided for @financeProfit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прибыль'**
+  String get financeProfit;
+
+  /// No description provided for @financeLoss.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убыток'**
+  String get financeLoss;
+
+  /// No description provided for @financeIncomeByCategory.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы по категориям'**
+  String get financeIncomeByCategory;
+
+  /// No description provided for @financeExpensesByCategory.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расходы по категориям'**
+  String get financeExpensesByCategory;
+
+  /// No description provided for @financeRecent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последние операции'**
+  String get financeRecent;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

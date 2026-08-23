@@ -64,7 +64,7 @@ class PedigreeScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       children: [
         // Заголовок
-        _buildGenerationHeader('Кролик', 0),
+        _buildGenerationHeader(context.l10n.pedigreeSelf, 0),
         const SizedBox(height: 12),
 
         // Сам кролик
@@ -73,23 +73,23 @@ class PedigreeScreen extends ConsumerWidget {
         // Родители (Поколение 1)
         if (pedigree.father != null || pedigree.mother != null) ...[
           const SizedBox(height: 32),
-          _buildGenerationHeader('Родители', 1),
+          _buildGenerationHeader(context.l10n.rabbitParents, 1),
           const SizedBox(height: 12),
 
           if (pedigree.father != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildRabbitCard(context, pedigree.father!, label: 'Отец'),
+              child: _buildRabbitCard(context, pedigree.father!, label: context.l10n.rabbitFather),
             ),
 
           if (pedigree.mother != null)
-            _buildRabbitCard(context, pedigree.mother!, label: 'Мать'),
+            _buildRabbitCard(context, pedigree.mother!, label: context.l10n.rabbitMother),
         ],
 
         // Бабушки и дедушки (Поколение 2)
         if (_hasGrandparents(pedigree)) ...[
           const SizedBox(height: 32),
-          _buildGenerationHeader('Бабушки и дедушки', 2),
+          _buildGenerationHeader(context.l10n.pedigreeGrandparents, 2),
           const SizedBox(height: 12),
 
           // Родители отца
@@ -99,7 +99,7 @@ class PedigreeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _buildParentsGroup(
                   context,
-                  'Родители отца',
+                  context.l10n.pedigreeFathersParents,
                   pedigree.father!.father,
                   pedigree.father!.mother,
                 ),
@@ -111,7 +111,7 @@ class PedigreeScreen extends ConsumerWidget {
             if (pedigree.mother!.father != null || pedigree.mother!.mother != null)
               _buildParentsGroup(
                 context,
-                'Родители матери',
+                context.l10n.pedigreeMothersParents,
                 pedigree.mother!.father,
                 pedigree.mother!.mother,
               ),
@@ -131,7 +131,7 @@ class PedigreeScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Нажмите на карточку кролика, чтобы открыть его детали',
+                    context.l10n.pedigreeHint,
                     style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                   ),
                 ),
@@ -206,10 +206,10 @@ class PedigreeScreen extends ConsumerWidget {
         if (father != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: _buildRabbitCard(context, father, label: 'Дедушка', isSmall: true),
+            child: _buildRabbitCard(context, father, label: context.l10n.pedigreeGrandfather, isSmall: true),
           ),
         if (mother != null)
-          _buildRabbitCard(context, mother, label: 'Бабушка', isSmall: true),
+          _buildRabbitCard(context, mother, label: context.l10n.pedigreeGrandmother, isSmall: true),
       ],
     );
   }

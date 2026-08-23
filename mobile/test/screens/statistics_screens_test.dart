@@ -159,7 +159,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика финансов'), findsOneWidget);
+      expect(find.text('Финансы в цифрах'), findsOneWidget);
       expect(find.text('184\u00A0500 ₽'), findsOneWidget); // доходы
       expect(find.text('96\u00A0200 ₽'), findsOneWidget); // расходы
       expect(find.text('88\u00A0300 ₽'), findsOneWidget); // прибыль
@@ -225,7 +225,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика склада'), findsOneWidget);
+      expect(find.text('Склад в цифрах'), findsOneWidget);
       expect(find.text('9'), findsOneWidget); // позиций на складе
       expect(find.text('43\u00A0700 ₽'), findsOneWidget); // стоимость запаса
       expect(find.text('СОСТАВ ПО ТИПАМ'), findsOneWidget);
@@ -277,7 +277,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика кормлений'), findsOneWidget);
+      expect(find.text('Кормления в цифрах'), findsOneWidget);
       expect(find.text('214'), findsOneWidget);
       expect(find.text('40\u00A0265 ₽'), findsOneWidget);
       expect(find.text('Выдано'), findsOneWidget);

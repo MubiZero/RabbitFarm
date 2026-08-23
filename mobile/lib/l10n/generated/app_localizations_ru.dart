@@ -2595,6 +2595,168 @@ class AppLocalizationsRu extends AppLocalizations {
   String get purposeShow => 'На выставку';
 
   @override
+  String get tourSkip => 'Пропустить';
+
+  @override
+  String get tourNext => 'Дальше';
+
+  @override
+  String get tourDone => 'Понятно';
+
+  @override
+  String periodDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дня',
+      many: '$count дней',
+      few: '$count дня',
+      one: '$count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String periodMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count месяца',
+      many: '$count месяцев',
+      few: '$count месяца',
+      one: '$count месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get periodYear => 'Год';
+
+  @override
+  String get periodAll => 'Всё время';
+
+  @override
+  String get statusActive => 'Активен';
+
+  @override
+  String get statusInactive => 'Неактивен';
+
+  @override
+  String get pedigreeSelf => 'Кролик';
+
+  @override
+  String get pedigreeGrandparents => 'Бабушки и дедушки';
+
+  @override
+  String get pedigreeFathersParents => 'Родители отца';
+
+  @override
+  String get pedigreeMothersParents => 'Родители матери';
+
+  @override
+  String get pedigreeHint => 'Нажмите на карточку, чтобы открыть кролика';
+
+  @override
+  String get pedigreeGrandfather => 'Дедушка';
+
+  @override
+  String get pedigreeGrandmother => 'Бабушка';
+
+  @override
+  String get chartNoData => 'Пока нечего показать';
+
+  @override
+  String get chartWeight => 'График веса';
+
+  @override
+  String get feedStatsTitle => 'Склад в цифрах';
+
+  @override
+  String get feedStatsEmptyTitle => 'Склад пока пуст';
+
+  @override
+  String get feedStatsEmptyBody =>
+      'Заведите корма — здесь появится состав запаса, его стоимость и предупреждения об остатках.';
+
+  @override
+  String get feedStatsPositions => 'Видов корма';
+
+  @override
+  String get feedStatsLow => 'На исходе';
+
+  @override
+  String get feedStatsValue => 'Стоимость запаса';
+
+  @override
+  String get feedStatsByType => 'Состав по типам';
+
+  @override
+  String get feedStatsLowList => 'Остатки на исходе';
+
+  @override
+  String get feedStatsAllGood => 'Запасов хватает по всем позициям';
+
+  @override
+  String feedStatsMinimum(String amount) {
+    return 'минимум $amount';
+  }
+
+  @override
+  String get feedingStatsTitle => 'Кормления в цифрах';
+
+  @override
+  String get feedingStatsEmptyTitle => 'За этот период кормлений не было';
+
+  @override
+  String get feedingStatsEmptyBody =>
+      'Выберите период шире или запишите кормление — расход корма и затраты посчитаются сами.';
+
+  @override
+  String get feedingStatsCount => 'Кормлений';
+
+  @override
+  String get feedingStatsCost => 'Затраты на корм';
+
+  @override
+  String get feedingStatsGiven => 'Выдано';
+
+  @override
+  String get feedingStatsByFeed => 'По кормам';
+
+  @override
+  String feedingStatsChartTitle(String unit) {
+    return 'Расход по типам корма, $unit';
+  }
+
+  @override
+  String get feedingStatsChartTitlePlain => 'Расход по типам корма';
+
+  @override
+  String get financeStatsTitle => 'Финансы в цифрах';
+
+  @override
+  String get financeStatsEmptyTitle => 'За этот период операций не было';
+
+  @override
+  String get financeStatsEmptyBody =>
+      'Выберите период шире или запишите первую операцию — итоги посчитаются сами.';
+
+  @override
+  String get financeProfit => 'Прибыль';
+
+  @override
+  String get financeLoss => 'Убыток';
+
+  @override
+  String get financeIncomeByCategory => 'Доходы по категориям';
+
+  @override
+  String get financeExpensesByCategory => 'Расходы по категориям';
+
+  @override
+  String get financeRecent => 'Последние операции';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override
