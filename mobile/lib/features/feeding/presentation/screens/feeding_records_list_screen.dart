@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/feeding_record_model.dart';
-import '../../data/models/feed_model.dart';
-import '../providers/feeding_records_provider.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
 
-/// Экран списка записей о кормлении
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../data/models/feed_model.dart';
+import '../../data/models/feeding_record_model.dart';
+import '../providers/feeding_records_provider.dart';
+
+/// История кормлений.
 class FeedingRecordsListScreen extends ConsumerStatefulWidget {
   const FeedingRecordsListScreen({super.key});
 
@@ -19,378 +23,281 @@ class FeedingRecordsListScreen extends ConsumerStatefulWidget {
 
 class _FeedingRecordsListScreenState
     extends ConsumerState<FeedingRecordsListScreen> {
-  DateTime? _fromDate;
-  DateTime? _toDate;
-
   @override
   void initState() {
     super.initState();
-    // Загружаем список при открытии экрана
-    Future.microtask(() {
-      ref.read(feedingRecordsProvider.notifier).loadFeedingRecords(
-            refresh: true,
-          );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(feedingRecordsProvider.notifier)
+          .loadFeedingRecords(refresh: true);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final recordsState = ref.watch(feedingRecordsProvider);
+    final state = ref.watch(feedingRecordsProvider);
+    final notifier = ref.read(feedingRecordsProvider.notifier);
+    final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('История кормления'),
+        title: Text(context.l10n.feedingTitle),
         actions: [
-          // Фильтры
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilters(context),
+            tooltip: context.l10n.medStats,
+            icon: const Icon(Icons.insights_outlined),
+            onPressed: () => context.push('/feeding-records/statistics'),
           ),
-          // Статистика
           IconButton(
-            icon: const Icon(Icons.analytics_outlined),
-            onPressed: () => _showStatistics(context),
+            tooltip: context.l10n.feedingPeriod,
+            icon: Icon(state.hasFilters
+                ? Icons.filter_list_alt
+                : Icons.filter_list),
+            onPressed: () => _showPeriodPicker(context),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Активные фильтры
-          if (_fromDate != null || _toDate != null) _buildActiveFilters(),
-
-          // Список записей
-          Expanded(
-            child: _buildRecordsList(context, recordsState),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showFeedingForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить кормление'),
-      ),
-    );
-  }
-
-  Widget _buildActiveFilters() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          const Text(
-            'Период:',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 8),
-          if (_fromDate != null)
-            Chip(
-              label: Text('С ${DateFormat('dd.MM.yyyy').format(_fromDate!)}'),
-              onDeleted: () {
-                setState(() {
-                  _fromDate = null;
-                });
-                _applyFilters();
-              },
-            ),
-          const SizedBox(width: 8),
-          if (_toDate != null)
-            Chip(
-              label: Text('До ${DateFormat('dd.MM.yyyy').format(_toDate!)}'),
-              onDeleted: () {
-                setState(() {
-                  _toDate = null;
-                });
-                _applyFilters();
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _applyFilters() {
-    ref.read(feedingRecordsProvider.notifier).loadFeedingRecords(
-          refresh: true,
-          fromDate: _fromDate,
-          toDate: _toDate,
-        );
-  }
-
-  Widget _buildRecordsList(
-      BuildContext context, FeedingRecordsState recordsState) {
-    if (recordsState.isLoading && recordsState.records.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (recordsState.error != null && recordsState.records.isEmpty) {
-      return AppErrorState(
-        message: recordsState.error!,
-        onRetry: () => ref.read(feedingRecordsProvider.notifier).refresh(),
-      );
-    }
-
-    if (recordsState.records.isEmpty) {
-      return AppEmptyState(
-        icon: Icons.restaurant_outlined,
-        title: 'Записей не найдено',
-        subtitle: 'Добавьте первую запись о кормлении',
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(feedingRecordsProvider.notifier).refresh(),
-      child: ListView.builder(
-        itemCount:
-            recordsState.records.length + (recordsState.hasMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == recordsState.records.length) {
-            // Загрузка следующей страницы
-            if (recordsState.hasMore && !recordsState.isLoading) {
-              Future.microtask(
-                  () => ref.read(feedingRecordsProvider.notifier).loadMore());
-            }
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
+      body: PagedListView<FeedingRecord>(
+        items: state.records,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.refresh,
+        onLoadMore: notifier.loadMore,
+        header: state.hasFilters ? _PeriodChips(state: state) : null,
+        empty: state.hasFilters
+            ? AppEmptyState(
+                icon: Icons.event_busy_outlined,
+                title: context.l10n.feedingNoneInView,
+                subtitle: context.l10n.feedingNoneInViewBody,
+                actionLabel: context.l10n.tasksFiltersReset,
+                onAction: () => notifier.setPeriod(null, null),
+              )
+            : AppEmptyState(
+                icon: Icons.restaurant_outlined,
+                title: context.l10n.feedingEmptyTitle,
+                subtitle: context.l10n.feedingEmptyBody,
+                actionLabel: canRecord ? context.l10n.feedingAdd : null,
+                onAction: canRecord
+                    ? () => context.push('/feeding-records/form')
+                    : null,
               ),
-            );
-          }
-
-          final record = recordsState.records[index];
-          return _buildRecordCard(context, record);
-        },
+        itemBuilder: (context, record, _) => _RecordCard(
+          record: record,
+          canRecord: canRecord,
+          onTap: canRecord
+              ? () => context.push('/feeding-records/form', extra: record)
+              : null,
+          onDelete: () => _delete(record),
+        ),
       ),
+      floatingActionButton: canRecord
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/feeding-records/form'),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.feedingAdd),
+            )
+          : null,
     );
   }
 
-  Widget _buildRecordCard(BuildContext context, FeedingRecord record) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(Icons.restaurant, color: Theme.of(context).colorScheme.onPrimaryContainer),
-        ),
-        title: Text(
-          record.feed?.name ?? 'Корм #${record.feedId}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            if (record.rabbit != null)
-              Row(
-                children: [
-                  const Icon(Icons.pets, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text('Кролик: ${record.rabbit!.name}'),
-                ],
-              ),
-            if (record.cage != null)
-              Row(
-                children: [
-                  const Icon(Icons.home, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text('Клетка: ${record.cage!.number}'),
-                ],
-              ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.scale, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(
-                  'Количество: ${record.quantity.toStringAsFixed(1)} ${record.feed?.unit.displayName ?? ''}',
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(DateFormat('dd.MM.yyyy HH:mm').format(record.fedAt)),
-              ],
-            ),
-            if (record.notes != null && record.notes!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  record.notes!,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () => _showRecordOptions(context, record),
-        ),
-        onTap: () => _showFeedingForm(context, record),
-      ),
-    );
-  }
-
-  void _showFeedingForm(BuildContext context, FeedingRecord? record) {
-    context.push('/feeding-records/form', extra: record);
-  }
-
-  void _showRecordOptions(BuildContext context, FeedingRecord record) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Редактировать'),
-              onTap: () {
-                Navigator.pop(context);
-                _showFeedingForm(context, record);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Удалить', style: TextStyle(color: Colors.red)),
-              onTap: () {
-                Navigator.pop(context);
-                _confirmDelete(context, record);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _confirmDelete(BuildContext context, FeedingRecord record) async {
+  Future<void> _delete(FeedingRecord record) async {
     final messenger = ScaffoldMessenger.of(context);
+    final done = context.l10n.feedingDeleted;
+    final failed = context.l10n.feedingDeleteFailed;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить запись?'),
-        content: const Text('Вы уверены, что хотите удалить эту запись о кормлении?'),
+        title: Text(context.l10n.feedingDeleteTitle),
+        content: Text(context.l10n.feedingDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Удалить'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      try {
-        await ref.read(deleteFeedingRecordProvider(record.id).future);
-
-        if (mounted) {
-          ref.read(feedingRecordsProvider.notifier).refresh();
-        }
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Запись успешно удалена')),
-        );
-      } catch (e) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Ошибка при удалении: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showFilters(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Фильтры'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Дата начала'),
-              subtitle: Text(
-                _fromDate != null
-                    ? DateFormat('dd.MM.yyyy').format(_fromDate!)
-                    : 'Не выбрана',
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _fromDate ?? DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _fromDate = date;
-                  });
-                }
-              },
-            ),
-            ListTile(
-              title: const Text('Дата окончания'),
-              subtitle: Text(
-                _toDate != null
-                    ? DateFormat('dd.MM.yyyy').format(_toDate!)
-                    : 'Не выбрана',
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _toDate ?? DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _toDate = date;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-        actions: [
           TextButton(
-            onPressed: () {
-              setState(() {
-                _fromDate = null;
-                _toDate = null;
-              });
-              Navigator.pop(context);
-              _applyFilters();
-            },
-            child: const Text('Сбросить'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _applyFilters();
-            },
-            child: const Text('Применить'),
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true) return;
+
+    final error =
+        await ref.read(feedingRecordsProvider.notifier).deleteRecord(record.id);
+    messenger.showSnackBar(
+      error == null
+          ? SnackBar(content: Text(done))
+          : SnackBar(
+              content: Text('$failed: $error'),
+              backgroundColor: AppColors.error,
+            ),
+    );
   }
 
-  void _showStatistics(BuildContext context) {
-    context.push('/feeding-records/statistics');
+  Future<void> _showPeriodPicker(BuildContext context) async {
+    final state = ref.read(feedingRecordsProvider);
+    final range = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: state.fromDate != null && state.toDate != null
+          ? DateTimeRange(start: state.fromDate!, end: state.toDate!)
+          : null,
+      // Один выбор диапазона вместо двух отдельных календарей: раньше начало
+      // и конец периода выбирались в разных диалогах, и перепутать их местами
+      // ничего не мешало.
+      helpText: context.l10n.feedingPeriod,
+    );
+    if (range == null) return;
+    await ref
+        .read(feedingRecordsProvider.notifier)
+        .setPeriod(range.start, range.end);
+  }
+}
+
+class _PeriodChips extends ConsumerWidget {
+  final FeedingRecordsState state;
+
+  const _PeriodChips({required this.state});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final format = DateFormat('d MMM y', 'ru');
+    final from = state.fromDate;
+    final to = state.toDate;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.md,
+        AppSpacing.screenH,
+        0,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InputChip(
+          label: Text([
+            if (from != null) format.format(from),
+            if (to != null) format.format(to),
+          ].join(' — ')),
+          deleteIcon: const Icon(Icons.close, size: 16),
+          onDeleted: () => ref
+              .read(feedingRecordsProvider.notifier)
+              .setPeriod(null, null),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordCard extends StatelessWidget {
+  final FeedingRecord record;
+  final bool canRecord;
+  final VoidCallback? onTap;
+  final VoidCallback onDelete;
+
+  const _RecordCard({
+    required this.record,
+    required this.canRecord,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Раньше при отсутствии связанного корма показывался номер записи в базе
+    // («Корм #17») — для фермера это не подсказка.
+    final feedName = record.feed?.name ?? context.l10n.feedingUnknownFeed;
+    final unit = record.feed?.unit.displayName;
+
+    final target = record.rabbit != null
+        ? context.l10n.feedingForRabbit(record.rabbit!.name)
+        : record.cage != null
+            ? context.l10n.feedingForCage(record.cage!.number)
+            : context.l10n.feedingForFarm;
+
+    return AppCard(
+      onTap: onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.domainFeeding.withValues(alpha: 0.12),
+              borderRadius: AppRadius.smAll,
+            ),
+            child: const Icon(Icons.restaurant_outlined,
+                color: AppColors.domainFeeding, size: 20),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  feedName,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  target,
+                  style: AppTypography.bodyMd
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Row(
+                  children: [
+                    Icon(Icons.scale_outlined,
+                        size: 14, color: context.colors.onSurfaceVariant),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      formatQuantity(record.quantity, unit),
+                      style: AppTypography.labelLg
+                          .copyWith(color: context.colors.onSurface),
+                    ),
+                    const SizedBox(width: AppSpacing.lg),
+                    Icon(Icons.schedule,
+                        size: 14, color: context.colors.onSurfaceVariant),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        DateFormat('d MMM, HH:mm', 'ru').format(record.fedAt),
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
+                    ),
+                  ],
+                ),
+                if (record.notes?.trim().isNotEmpty == true) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    record.notes!.trim(),
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (canRecord)
+            IconButton(
+              tooltip: context.l10n.commonDelete,
+              icon: const Icon(Icons.delete_outline),
+              color: context.colors.onSurfaceVariant,
+              onPressed: onDelete,
+            ),
+        ],
+      ),
+    );
   }
 }

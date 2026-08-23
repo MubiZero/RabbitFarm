@@ -15,6 +15,7 @@ export 'app_error_state.dart';
 export 'app_filter_bar.dart';
 export 'app_form_scaffold.dart';
 export 'app_form_section.dart';
+export 'app_group_label.dart';
 export 'app_section_title.dart';
 export 'delayed_spinner.dart';
 export 'metric_bar.dart';

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_form_section.dart';
 
-/// Экран создания/редактирования корма
+/// Карточка корма на складе.
 class FeedFormScreen extends ConsumerStatefulWidget {
   final Feed? feed;
 
@@ -18,320 +21,256 @@ class FeedFormScreen extends ConsumerStatefulWidget {
 
 class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _currentStockController;
-  late TextEditingController _minStockController;
-  late TextEditingController _costPerUnitController;
 
-  FeedType _selectedType = FeedType.pellets;
-  FeedUnit _selectedUnit = FeedUnit.kg;
-  bool _isLoading = false;
+  late final TextEditingController _name;
+  late final TextEditingController _currentStock;
+  late final TextEditingController _minStock;
+  late final TextEditingController _costPerUnit;
+
+  late FeedType _type;
+  late FeedUnit _unit;
+  bool _touched = false;
+
+  Feed? get _feed => widget.feed;
+  bool get _isEditing => _feed != null;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.feed?.name ?? '');
-    _currentStockController = TextEditingController(
-      text: widget.feed?.currentStock.toString() ?? '0',
-    );
-    _minStockController = TextEditingController(
-      text: widget.feed?.minStock.toString() ?? '0',
-    );
-    _costPerUnitController = TextEditingController(
-      text: widget.feed?.costPerUnit?.toString() ?? '',
-    );
+    _name = TextEditingController(text: _feed?.name ?? '');
+    _currentStock =
+        TextEditingController(text: _feed?.currentStock.toString() ?? '0');
+    _minStock = TextEditingController(text: _feed?.minStock.toString() ?? '0');
+    _costPerUnit =
+        TextEditingController(text: _feed?.costPerUnit?.toString() ?? '');
 
-    if (widget.feed != null) {
-      _selectedType = widget.feed!.type;
-      _selectedUnit = widget.feed!.unit;
+    _type = _feed?.type ?? FeedType.pellets;
+    _unit = _feed?.unit ?? FeedUnit.kg;
+
+    for (final c in [_name, _currentStock, _minStock, _costPerUnit]) {
+      c.addListener(() => _touched = true);
     }
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _currentStockController.dispose();
-    _minStockController.dispose();
-    _costPerUnitController.dispose();
+    for (final c in [_name, _currentStock, _minStock, _costPerUnit]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.feed == null ? 'Новый корм' : 'Редактировать корм'),
-        actions: [
-          if (widget.feed != null)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              color: AppColors.error,
-              onPressed: _confirmDelete,
-            ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          children: [
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Название *',
-                    prefixIcon: Icon(Icons.label),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите название корма';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<FeedType>(
-                  initialValue: _selectedType,
-                  decoration: const InputDecoration(
-                    labelText: 'Тип корма *',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: FeedType.values.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(type.displayName),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _selectedType = value);
-                  },
-                ),
-                DropdownButtonFormField<FeedUnit>(
-                  initialValue: _selectedUnit,
-                  decoration: const InputDecoration(
-                    labelText: 'Единица измерения *',
-                    prefixIcon: Icon(Icons.straighten),
-                  ),
-                  items: FeedUnit.values.map((unit) {
-                    return DropdownMenuItem(
-                      value: unit,
-                      child: Text(unit.displayName),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _selectedUnit = value);
-                  },
-                ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Склад',
-              children: [
-                TextFormField(
-                  controller: _currentStockController,
-                  decoration: InputDecoration(
-                    labelText: 'Текущий остаток *',
-                    prefixIcon: const Icon(Icons.inventory),
-                    suffixText: _selectedUnit.displayName,
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите текущий остаток';
-                    }
-                    final number = double.tryParse(value);
-                    if (number == null || number < 0) {
-                      return 'Введите корректное число';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _minStockController,
-                  decoration: InputDecoration(
-                    labelText: 'Минимальный остаток *',
-                    prefixIcon: const Icon(Icons.warning_amber_outlined),
-                    suffixText: _selectedUnit.displayName,
-                    helperText: 'Порог для предупреждения о низком запасе',
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите минимальный остаток';
-                    }
-                    final number = double.tryParse(value);
-                    if (number == null || number < 0) {
-                      return 'Введите корректное число';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _costPerUnitController,
-                  decoration: InputDecoration(
-                    labelText: 'Стоимость за единицу',
-                    prefixIcon: const Icon(Icons.payments_outlined),
-                    suffixText: 'руб/${_selectedUnit.displayName}',
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final number = double.tryParse(value);
-                      if (number == null || number < 0) {
-                        return 'Введите корректное число';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _saveFeed,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.feed == null ? 'Создать' : 'Сохранить'),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  Future<String?> _save() async {
+    final failed = context.l10n.feedFormFailed;
+    final repository = ref.read(feedsRepositoryProvider);
+    final notifier = ref.read(feedsProvider.notifier);
 
-  Future<void> _saveFeed() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
+    final currentStock = parseDecimal(_currentStock.text) ?? 0;
+    final minStock = parseDecimal(_minStock.text) ?? 0;
+    final costPerUnit = parseDecimal(_costPerUnit.text);
 
     try {
-      final currentStock = double.parse(_currentStockController.text);
-      final minStock = double.parse(_minStockController.text);
-      final costPerUnit = _costPerUnitController.text.isNotEmpty
-          ? double.parse(_costPerUnitController.text)
-          : null;
-
-      if (widget.feed == null) {
-        // Создание нового корма
-        final feedCreate = FeedCreate(
-          name: _nameController.text,
-          type: _selectedType.name,
-          unit: _selectedUnit.name,
-          currentStock: currentStock,
-          minStock: minStock,
-          costPerUnit: costPerUnit,
-        );
-
-        await ref.read(createFeedProvider(feedCreate).future);
-
-        if (mounted) {
-          ref.read(feedsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Корм успешно создан')),
-          );
-          context.pop();
-        }
-      } else {
-        // Обновление существующего корма
-        final feedUpdate = FeedUpdate(
-          name: _nameController.text,
-          type: _selectedType.name,
-          unit: _selectedUnit.name,
-          currentStock: currentStock,
-          minStock: minStock,
-          costPerUnit: costPerUnit,
-        );
-
-        await ref.read(
-          updateFeedProvider((id: widget.feed!.id, update: feedUpdate)).future,
-        );
-
-        if (mounted) {
-          ref.read(feedsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Корм успешно обновлен')),
-          );
-          context.pop();
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка: $e'),
-            backgroundColor: AppColors.error,
+      if (_isEditing) {
+        final updated = await repository.updateFeed(
+          _feed!.id,
+          FeedUpdate(
+            name: _name.text.trim(),
+            type: _type.name,
+            unit: _unit.name,
+            currentStock: currentStock,
+            minStock: minStock,
+            costPerUnit: costPerUnit,
           ),
         );
+        notifier.updateFeed(updated);
+      } else {
+        final created = await repository.createFeed(
+          FeedCreate(
+            name: _name.text.trim(),
+            type: _type.name,
+            unit: _unit.name,
+            currentStock: currentStock,
+            minStock: minStock,
+            costPerUnit: costPerUnit,
+          ),
+        );
+        notifier.addFeed(created);
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      return null;
+    } catch (e) {
+      final message = e.toString().replaceAll('Exception: ', '').trim();
+      return message.isEmpty ? failed : message;
     }
   }
 
-  Future<void> _confirmDelete() async {
+  Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить корм?'),
-        content: Text(
-          'Вы уверены, что хотите удалить "${widget.feed!.name}"?',
-        ),
+        title: Text(context.l10n.feedsDeleteTitle),
+        content: Text(context.l10n.feedsDeleteBody(_feed!.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true || !mounted) return;
 
-    if (confirmed == true && mounted) {
-      try {
-        await ref.read(deleteFeedProvider(widget.feed!.id).future);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.feedsDeleted;
+    final failed = context.l10n.feedsDeleteFailed;
 
-        if (mounted) {
-          ref.read(feedsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Корм успешно удален')),
-          );
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка при удалении: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
+    final error = await ref.read(feedsProvider.notifier).deleteFeed(_feed!.id);
+    if (error == null) {
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+      if (navigator.canPop()) navigator.pop();
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$failed: $error'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
+  }
+
+  String? _validateAmount(String? value, {required bool required}) {
+    final l10n = context.l10n;
+    if (value == null || value.trim().isEmpty) {
+      return required ? l10n.feedFormRequired : null;
+    }
+    final number = parseDecimal(value);
+    if (number == null) return l10n.commonNumberInvalid;
+    if (number < 0) return l10n.feedFormNegative;
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+
+    return AppFormScaffold(
+      title: _isEditing ? l10n.feedFormEditTitle : l10n.feedFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage:
+          _isEditing ? l10n.feedFormUpdated : l10n.feedFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      actions: [
+        if (_isEditing && canDelete)
+          IconButton(
+            tooltip: l10n.commonDelete,
+            icon: const Icon(Icons.delete_outline),
+            color: AppColors.error,
+            onPressed: _delete,
+          ),
+      ],
+      children: [
+        AppFormSection(
+          title: l10n.feedFormSectionMain,
+          children: [
+            TextFormField(
+              controller: _name,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.feedFormName,
+                prefixIcon: const Icon(Icons.label_outline),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.feedFormNameEmpty
+                  : null,
+            ),
+            DropdownButtonFormField<FeedType>(
+              initialValue: _type,
+              decoration: InputDecoration(
+                labelText: l10n.feedFormType,
+                prefixIcon: const Icon(Icons.category_outlined),
+              ),
+              items: [
+                for (final type in FeedType.values)
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(type.displayName),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _type = v;
+                _touched = true;
+              }),
+            ),
+            DropdownButtonFormField<FeedUnit>(
+              initialValue: _unit,
+              decoration: InputDecoration(
+                labelText: l10n.feedFormUnit,
+                prefixIcon: const Icon(Icons.straighten),
+              ),
+              items: [
+                for (final unit in FeedUnit.values)
+                  DropdownMenuItem(
+                    value: unit,
+                    child: Text(unit.displayName),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _unit = v;
+                _touched = true;
+              }),
+            ),
+          ],
+        ),
+        AppFormSection(
+          title: l10n.feedFormSectionStock,
+          children: [
+            TextFormField(
+              controller: _currentStock,
+              // Дробный ввод: мешок редко весит целое число килограммов.
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.feedFormCurrentStock,
+                prefixIcon: const Icon(Icons.inventory_2_outlined),
+                suffixText: _unit.displayName,
+              ),
+              validator: (v) => _validateAmount(v, required: true),
+            ),
+            TextFormField(
+              controller: _minStock,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.feedFormMinStock,
+                prefixIcon: const Icon(Icons.warning_amber_outlined),
+                suffixText: _unit.displayName,
+                helperText: l10n.feedFormMinStockHelp,
+                helperMaxLines: 2,
+              ),
+              validator: (v) => _validateAmount(v, required: true),
+            ),
+            TextFormField(
+              controller: _costPerUnit,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.feedFormCost,
+                prefixIcon: const Icon(Icons.payments_outlined),
+                suffixText: '₽/${_unit.displayName}',
+              ),
+              validator: (v) => _validateAmount(v, required: false),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

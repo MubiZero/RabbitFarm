@@ -2074,6 +2074,480 @@ abstract class AppLocalizations {
   /// **'Введите число'**
   String get commonNumberInvalid;
 
+  /// No description provided for @feedsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад кормов'**
+  String get feedsTitle;
+
+  /// No description provided for @feedsAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить корм'**
+  String get feedsAdd;
+
+  /// No description provided for @feedsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад пуст'**
+  String get feedsEmptyTitle;
+
+  /// No description provided for @feedsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите корм, и приложение предупредит, когда он начнёт заканчиваться.'**
+  String get feedsEmptyBody;
+
+  /// No description provided for @feedsNoneInView.
+  ///
+  /// In ru, this message translates to:
+  /// **'Под фильтры ничего не подошло'**
+  String get feedsNoneInView;
+
+  /// No description provided for @feedsNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимите условия, чтобы увидеть весь склад.'**
+  String get feedsNoneInViewBody;
+
+  /// No description provided for @feedsFilterAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get feedsFilterAll;
+
+  /// No description provided for @feedsFilterLowStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'На исходе'**
+  String get feedsFilterLowStock;
+
+  /// No description provided for @feedsFilterType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип корма'**
+  String get feedsFilterType;
+
+  /// No description provided for @feedsFilterAllTypes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все типы'**
+  String get feedsFilterAllTypes;
+
+  /// No description provided for @feedsInStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'На складе'**
+  String get feedsInStock;
+
+  /// No description provided for @feedsMinStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Минимум'**
+  String get feedsMinStock;
+
+  /// No description provided for @feedsLowStockWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осталось меньше минимума'**
+  String get feedsLowStockWarning;
+
+  /// No description provided for @feedsRefill.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пополнить'**
+  String get feedsRefill;
+
+  /// No description provided for @feedsWriteOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Списать'**
+  String get feedsWriteOff;
+
+  /// No description provided for @feedsRefillTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пополнить склад'**
+  String get feedsRefillTitle;
+
+  /// No description provided for @feedsWriteOffTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Списать со склада'**
+  String get feedsWriteOffTitle;
+
+  /// No description provided for @feedsCurrentStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сейчас на складе: {amount}'**
+  String feedsCurrentStock(String amount);
+
+  /// No description provided for @feedsQuantity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько'**
+  String get feedsQuantity;
+
+  /// No description provided for @feedsQuantityPositive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите количество больше нуля'**
+  String get feedsQuantityPositive;
+
+  /// No description provided for @feedsRefilled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад пополнен на {amount}'**
+  String feedsRefilled(String amount);
+
+  /// No description provided for @feedsWrittenOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Списано {amount}'**
+  String feedsWrittenOff(String amount);
+
+  /// No description provided for @feedsAdjustFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось изменить остаток'**
+  String get feedsAdjustFailed;
+
+  /// No description provided for @feedsDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить корм?'**
+  String get feedsDeleteTitle;
+
+  /// No description provided for @feedsDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'«{name}» исчезнет со склада вместе с историей остатков.'**
+  String feedsDeleteBody(String name);
+
+  /// No description provided for @feedsDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм удалён'**
+  String get feedsDeleted;
+
+  /// No description provided for @feedsDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить корм'**
+  String get feedsDeleteFailed;
+
+  /// No description provided for @feedFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый корм'**
+  String get feedFormNewTitle;
+
+  /// No description provided for @feedFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм'**
+  String get feedFormEditTitle;
+
+  /// No description provided for @feedFormSectionMain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основное'**
+  String get feedFormSectionMain;
+
+  /// No description provided for @feedFormSectionStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад'**
+  String get feedFormSectionStock;
+
+  /// No description provided for @feedFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get feedFormName;
+
+  /// No description provided for @feedFormNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название корма'**
+  String get feedFormNameEmpty;
+
+  /// No description provided for @feedFormType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип корма'**
+  String get feedFormType;
+
+  /// No description provided for @feedFormUnit.
+  ///
+  /// In ru, this message translates to:
+  /// **'В чём считаем'**
+  String get feedFormUnit;
+
+  /// No description provided for @feedFormCurrentStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сейчас на складе'**
+  String get feedFormCurrentStock;
+
+  /// No description provided for @feedFormMinStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предупреждать, когда останется'**
+  String get feedFormMinStock;
+
+  /// No description provided for @feedFormMinStockHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ниже этого остатка корм попадёт в «Требует внимания» на главном экране.'**
+  String get feedFormMinStockHelp;
+
+  /// No description provided for @feedFormCost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена за единицу'**
+  String get feedFormCost;
+
+  /// No description provided for @feedFormRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заполните поле'**
+  String get feedFormRequired;
+
+  /// No description provided for @feedFormNegative.
+  ///
+  /// In ru, this message translates to:
+  /// **'Число не может быть отрицательным'**
+  String get feedFormNegative;
+
+  /// No description provided for @feedFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм добавлен на склад'**
+  String get feedFormCreated;
+
+  /// No description provided for @feedFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм обновлён'**
+  String get feedFormUpdated;
+
+  /// No description provided for @feedFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить корм'**
+  String get feedFormFailed;
+
+  /// No description provided for @feedingTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормления'**
+  String get feedingTitle;
+
+  /// No description provided for @feedingAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать кормление'**
+  String get feedingAdd;
+
+  /// No description provided for @feedingEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей о кормлении нет'**
+  String get feedingEmptyTitle;
+
+  /// No description provided for @feedingEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмечайте кормления — расход корма будет списываться со склада сам.'**
+  String get feedingEmptyBody;
+
+  /// No description provided for @feedingNoneInView.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот период записей нет'**
+  String get feedingNoneInView;
+
+  /// No description provided for @feedingNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите другой период или сбросьте фильтр.'**
+  String get feedingNoneInViewBody;
+
+  /// No description provided for @feedingUnknownFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм не указан'**
+  String get feedingUnknownFeed;
+
+  /// No description provided for @feedingForRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик {name}'**
+  String feedingForRabbit(String name);
+
+  /// No description provided for @feedingForCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка {number}'**
+  String feedingForCage(String number);
+
+  /// No description provided for @feedingForFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всей ферме'**
+  String get feedingForFarm;
+
+  /// No description provided for @feedingEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get feedingEdit;
+
+  /// No description provided for @feedingDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить запись?'**
+  String get feedingDeleteTitle;
+
+  /// No description provided for @feedingDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о кормлении будет удалена. Списанный корм на склад не вернётся.'**
+  String get feedingDeleteBody;
+
+  /// No description provided for @feedingDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись удалена'**
+  String get feedingDeleted;
+
+  /// No description provided for @feedingDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить запись'**
+  String get feedingDeleteFailed;
+
+  /// No description provided for @feedingPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Период'**
+  String get feedingPeriod;
+
+  /// No description provided for @feedingFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое кормление'**
+  String get feedingFormNewTitle;
+
+  /// No description provided for @feedingFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление'**
+  String get feedingFormEditTitle;
+
+  /// No description provided for @feedingFormSectionWhom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кого кормим'**
+  String get feedingFormSectionWhom;
+
+  /// No description provided for @feedingFormSectionWhat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чем и сколько'**
+  String get feedingFormSectionWhat;
+
+  /// No description provided for @feedingFormModeRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Одного кролика'**
+  String get feedingFormModeRabbit;
+
+  /// No description provided for @feedingFormModeCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всю клетку'**
+  String get feedingFormModeCage;
+
+  /// No description provided for @feedingFormCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка'**
+  String get feedingFormCage;
+
+  /// No description provided for @feedingFormCageRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите клетку'**
+  String get feedingFormCageRequired;
+
+  /// No description provided for @feedingFormFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм'**
+  String get feedingFormFeed;
+
+  /// No description provided for @feedingFormFeedRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите корм'**
+  String get feedingFormFeedRequired;
+
+  /// No description provided for @feedingFormQuantity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько'**
+  String get feedingFormQuantity;
+
+  /// No description provided for @feedingFormQuantityRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите количество'**
+  String get feedingFormQuantityRequired;
+
+  /// No description provided for @feedingFormWhen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда'**
+  String get feedingFormWhen;
+
+  /// No description provided for @feedingFormNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Примечания'**
+  String get feedingFormNotes;
+
+  /// No description provided for @feedingFormStockLeft.
+  ///
+  /// In ru, this message translates to:
+  /// **'осталось {amount}'**
+  String feedingFormStockLeft(String amount);
+
+  /// No description provided for @feedingFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление записано'**
+  String get feedingFormCreated;
+
+  /// No description provided for @feedingFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись обновлена'**
+  String get feedingFormUpdated;
+
+  /// No description provided for @feedingFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить запись'**
+  String get feedingFormFailed;
+
+  /// No description provided for @feedingFormStockNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Указанное количество спишется со склада.'**
+  String get feedingFormStockNote;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

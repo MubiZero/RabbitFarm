@@ -461,6 +461,110 @@
   "medFormCostLabel": "Затраты, ₽",
   "commonNumberInvalid": "Введите число",
 
+  "feedsTitle": "Склад кормов",
+  "feedsAdd": "Добавить корм",
+  "feedsEmptyTitle": "Склад пуст",
+  "feedsEmptyBody": "Заведите корм, и приложение предупредит, когда он начнёт заканчиваться.",
+  "feedsNoneInView": "Под фильтры ничего не подошло",
+  "feedsNoneInViewBody": "Снимите условия, чтобы увидеть весь склад.",
+  "feedsFilterAll": "Все",
+  "feedsFilterLowStock": "На исходе",
+  "feedsFilterType": "Тип корма",
+  "feedsFilterAllTypes": "Все типы",
+  "feedsInStock": "На складе",
+  "feedsMinStock": "Минимум",
+  "feedsLowStockWarning": "Осталось меньше минимума",
+  "feedsRefill": "Пополнить",
+  "feedsWriteOff": "Списать",
+  "feedsRefillTitle": "Пополнить склад",
+  "feedsWriteOffTitle": "Списать со склада",
+  "feedsCurrentStock": "Сейчас на складе: {amount}",
+  "@feedsCurrentStock": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedsQuantity": "Сколько",
+  "feedsQuantityPositive": "Введите количество больше нуля",
+  "feedsRefilled": "Склад пополнен на {amount}",
+  "@feedsRefilled": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedsWrittenOff": "Списано {amount}",
+  "@feedsWrittenOff": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedsAdjustFailed": "Не удалось изменить остаток",
+  "feedsDeleteTitle": "Удалить корм?",
+  "feedsDeleteBody": "«{name}» исчезнет со склада вместе с историей остатков.",
+  "@feedsDeleteBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "feedsDeleted": "Корм удалён",
+  "feedsDeleteFailed": "Не удалось удалить корм",
+
+  "feedFormNewTitle": "Новый корм",
+  "feedFormEditTitle": "Корм",
+  "feedFormSectionMain": "Основное",
+  "feedFormSectionStock": "Склад",
+  "feedFormName": "Название",
+  "feedFormNameEmpty": "Введите название корма",
+  "feedFormType": "Тип корма",
+  "feedFormUnit": "В чём считаем",
+  "feedFormCurrentStock": "Сейчас на складе",
+  "feedFormMinStock": "Предупреждать, когда останется",
+  "feedFormMinStockHelp": "Ниже этого остатка корм попадёт в «Требует внимания» на главном экране.",
+  "feedFormCost": "Цена за единицу",
+  "feedFormRequired": "Заполните поле",
+  "feedFormNegative": "Число не может быть отрицательным",
+  "feedFormCreated": "Корм добавлен на склад",
+  "feedFormUpdated": "Корм обновлён",
+  "feedFormFailed": "Не удалось сохранить корм",
+
+  "feedingTitle": "Кормления",
+  "feedingAdd": "Записать кормление",
+  "feedingEmptyTitle": "Записей о кормлении нет",
+  "feedingEmptyBody": "Отмечайте кормления — расход корма будет списываться со склада сам.",
+  "feedingNoneInView": "За этот период записей нет",
+  "feedingNoneInViewBody": "Выберите другой период или сбросьте фильтр.",
+  "feedingUnknownFeed": "Корм не указан",
+  "feedingForRabbit": "Кролик {name}",
+  "@feedingForRabbit": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "feedingForCage": "Клетка {number}",
+  "@feedingForCage": {
+    "placeholders": { "number": { "type": "String" } }
+  },
+  "feedingForFarm": "Всей ферме",
+  "feedingEdit": "Изменить",
+  "feedingDeleteTitle": "Удалить запись?",
+  "feedingDeleteBody": "Запись о кормлении будет удалена. Списанный корм на склад не вернётся.",
+  "feedingDeleted": "Запись удалена",
+  "feedingDeleteFailed": "Не удалось удалить запись",
+  "feedingPeriod": "Период",
+
+  "feedingFormNewTitle": "Новое кормление",
+  "feedingFormEditTitle": "Кормление",
+  "feedingFormSectionWhom": "Кого кормим",
+  "feedingFormSectionWhat": "Чем и сколько",
+  "feedingFormModeRabbit": "Одного кролика",
+  "feedingFormModeCage": "Всю клетку",
+  "feedingFormCage": "Клетка",
+  "feedingFormCageRequired": "Выберите клетку",
+  "feedingFormFeed": "Корм",
+  "feedingFormFeedRequired": "Выберите корм",
+  "feedingFormQuantity": "Сколько",
+  "feedingFormQuantityRequired": "Введите количество",
+  "feedingFormWhen": "Когда",
+  "feedingFormNotes": "Примечания",
+  "feedingFormStockLeft": "осталось {amount}",
+  "@feedingFormStockLeft": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedingFormCreated": "Кормление записано",
+  "feedingFormUpdated": "Запись обновлена",
+  "feedingFormFailed": "Не удалось сохранить запись",
+  "feedingFormStockNote": "Указанное количество спишется со склада.",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

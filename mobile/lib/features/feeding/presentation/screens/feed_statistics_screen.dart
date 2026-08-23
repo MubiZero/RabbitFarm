@@ -5,15 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_utils.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/metric_bar.dart';
-import '../../../../core/widgets/skeleton.dart';
-import '../../../../core/widgets/stat_tile.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
 import '../utils/feed_labels.dart';
+import '../../../../core/widgets/widgets.dart';
 
 /// Аналитика склада кормов: состав запаса, его стоимость и что заканчивается.
 class FeedStatisticsScreen extends ConsumerWidget {
@@ -128,7 +123,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
           ),
           if (presentTypes.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _SectionTitle('Состав по типам'),
+            AppGroupLabel('Состав по типам'),
             const SizedBox(height: 12),
             AppCard(
               child: Column(
@@ -146,7 +141,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: 24),
-          _SectionTitle('Остатки на исходе'),
+          AppGroupLabel('Остатки на исходе'),
           const SizedBox(height: 12),
           if (hasLowStock)
             AppCard(
@@ -186,22 +181,6 @@ class FeedStatisticsScreen extends ConsumerWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: AppTypography.labelSm.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
 
 class _LowStockRow extends StatelessWidget {
   final LowStockItem item;

@@ -1139,6 +1139,263 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonNumberInvalid => 'Введите число';
 
   @override
+  String get feedsTitle => 'Склад кормов';
+
+  @override
+  String get feedsAdd => 'Добавить корм';
+
+  @override
+  String get feedsEmptyTitle => 'Склад пуст';
+
+  @override
+  String get feedsEmptyBody =>
+      'Заведите корм, и приложение предупредит, когда он начнёт заканчиваться.';
+
+  @override
+  String get feedsNoneInView => 'Под фильтры ничего не подошло';
+
+  @override
+  String get feedsNoneInViewBody =>
+      'Снимите условия, чтобы увидеть весь склад.';
+
+  @override
+  String get feedsFilterAll => 'Все';
+
+  @override
+  String get feedsFilterLowStock => 'На исходе';
+
+  @override
+  String get feedsFilterType => 'Тип корма';
+
+  @override
+  String get feedsFilterAllTypes => 'Все типы';
+
+  @override
+  String get feedsInStock => 'На складе';
+
+  @override
+  String get feedsMinStock => 'Минимум';
+
+  @override
+  String get feedsLowStockWarning => 'Осталось меньше минимума';
+
+  @override
+  String get feedsRefill => 'Пополнить';
+
+  @override
+  String get feedsWriteOff => 'Списать';
+
+  @override
+  String get feedsRefillTitle => 'Пополнить склад';
+
+  @override
+  String get feedsWriteOffTitle => 'Списать со склада';
+
+  @override
+  String feedsCurrentStock(String amount) {
+    return 'Сейчас на складе: $amount';
+  }
+
+  @override
+  String get feedsQuantity => 'Сколько';
+
+  @override
+  String get feedsQuantityPositive => 'Введите количество больше нуля';
+
+  @override
+  String feedsRefilled(String amount) {
+    return 'Склад пополнен на $amount';
+  }
+
+  @override
+  String feedsWrittenOff(String amount) {
+    return 'Списано $amount';
+  }
+
+  @override
+  String get feedsAdjustFailed => 'Не удалось изменить остаток';
+
+  @override
+  String get feedsDeleteTitle => 'Удалить корм?';
+
+  @override
+  String feedsDeleteBody(String name) {
+    return '«$name» исчезнет со склада вместе с историей остатков.';
+  }
+
+  @override
+  String get feedsDeleted => 'Корм удалён';
+
+  @override
+  String get feedsDeleteFailed => 'Не удалось удалить корм';
+
+  @override
+  String get feedFormNewTitle => 'Новый корм';
+
+  @override
+  String get feedFormEditTitle => 'Корм';
+
+  @override
+  String get feedFormSectionMain => 'Основное';
+
+  @override
+  String get feedFormSectionStock => 'Склад';
+
+  @override
+  String get feedFormName => 'Название';
+
+  @override
+  String get feedFormNameEmpty => 'Введите название корма';
+
+  @override
+  String get feedFormType => 'Тип корма';
+
+  @override
+  String get feedFormUnit => 'В чём считаем';
+
+  @override
+  String get feedFormCurrentStock => 'Сейчас на складе';
+
+  @override
+  String get feedFormMinStock => 'Предупреждать, когда останется';
+
+  @override
+  String get feedFormMinStockHelp =>
+      'Ниже этого остатка корм попадёт в «Требует внимания» на главном экране.';
+
+  @override
+  String get feedFormCost => 'Цена за единицу';
+
+  @override
+  String get feedFormRequired => 'Заполните поле';
+
+  @override
+  String get feedFormNegative => 'Число не может быть отрицательным';
+
+  @override
+  String get feedFormCreated => 'Корм добавлен на склад';
+
+  @override
+  String get feedFormUpdated => 'Корм обновлён';
+
+  @override
+  String get feedFormFailed => 'Не удалось сохранить корм';
+
+  @override
+  String get feedingTitle => 'Кормления';
+
+  @override
+  String get feedingAdd => 'Записать кормление';
+
+  @override
+  String get feedingEmptyTitle => 'Записей о кормлении нет';
+
+  @override
+  String get feedingEmptyBody =>
+      'Отмечайте кормления — расход корма будет списываться со склада сам.';
+
+  @override
+  String get feedingNoneInView => 'За этот период записей нет';
+
+  @override
+  String get feedingNoneInViewBody =>
+      'Выберите другой период или сбросьте фильтр.';
+
+  @override
+  String get feedingUnknownFeed => 'Корм не указан';
+
+  @override
+  String feedingForRabbit(String name) {
+    return 'Кролик $name';
+  }
+
+  @override
+  String feedingForCage(String number) {
+    return 'Клетка $number';
+  }
+
+  @override
+  String get feedingForFarm => 'Всей ферме';
+
+  @override
+  String get feedingEdit => 'Изменить';
+
+  @override
+  String get feedingDeleteTitle => 'Удалить запись?';
+
+  @override
+  String get feedingDeleteBody =>
+      'Запись о кормлении будет удалена. Списанный корм на склад не вернётся.';
+
+  @override
+  String get feedingDeleted => 'Запись удалена';
+
+  @override
+  String get feedingDeleteFailed => 'Не удалось удалить запись';
+
+  @override
+  String get feedingPeriod => 'Период';
+
+  @override
+  String get feedingFormNewTitle => 'Новое кормление';
+
+  @override
+  String get feedingFormEditTitle => 'Кормление';
+
+  @override
+  String get feedingFormSectionWhom => 'Кого кормим';
+
+  @override
+  String get feedingFormSectionWhat => 'Чем и сколько';
+
+  @override
+  String get feedingFormModeRabbit => 'Одного кролика';
+
+  @override
+  String get feedingFormModeCage => 'Всю клетку';
+
+  @override
+  String get feedingFormCage => 'Клетка';
+
+  @override
+  String get feedingFormCageRequired => 'Выберите клетку';
+
+  @override
+  String get feedingFormFeed => 'Корм';
+
+  @override
+  String get feedingFormFeedRequired => 'Выберите корм';
+
+  @override
+  String get feedingFormQuantity => 'Сколько';
+
+  @override
+  String get feedingFormQuantityRequired => 'Введите количество';
+
+  @override
+  String get feedingFormWhen => 'Когда';
+
+  @override
+  String get feedingFormNotes => 'Примечания';
+
+  @override
+  String feedingFormStockLeft(String amount) {
+    return 'осталось $amount';
+  }
+
+  @override
+  String get feedingFormCreated => 'Кормление записано';
+
+  @override
+  String get feedingFormUpdated => 'Запись обновлена';
+
+  @override
+  String get feedingFormFailed => 'Не удалось сохранить запись';
+
+  @override
+  String get feedingFormStockNote => 'Указанное количество спишется со склада.';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

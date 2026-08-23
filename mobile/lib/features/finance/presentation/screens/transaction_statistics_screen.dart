@@ -6,17 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_utils.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/metric_bar.dart';
-import '../../../../core/widgets/skeleton.dart';
-import '../../../../core/widgets/stat_tile.dart';
-import '../../../../core/widgets/stats_period.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/widgets/widgets.dart';
 
 /// Аналитика финансов: доходы, расходы, прибыль и структура по категориям.
 class TransactionStatisticsScreen extends ConsumerStatefulWidget {
@@ -164,7 +158,7 @@ class _TransactionStatisticsScreenState
           ],
           if (stats.recentTransactions.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _SectionTitle('Последние операции'),
+            AppGroupLabel('Последние операции'),
             const SizedBox(height: 12),
             AppCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -182,22 +176,6 @@ class _TransactionStatisticsScreenState
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: AppTypography.labelSm.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
 
 class _CategoryBreakdown extends StatelessWidget {
   final String title;
@@ -218,7 +196,7 @@ class _CategoryBreakdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(title),
+        AppGroupLabel(title),
         const SizedBox(height: 12),
         AppCard(
           child: Column(

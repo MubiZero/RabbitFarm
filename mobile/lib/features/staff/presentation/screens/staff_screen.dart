@@ -5,11 +5,9 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/skeleton.dart';
 import '../../data/models/staff_models.dart';
 import '../providers/staff_provider.dart';
+import '../../../../core/widgets/widgets.dart';
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -55,12 +53,12 @@ class StaffScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
           if (owner.isNotEmpty) ...[
-            _SectionTitle('Владелец'),
+            AppGroupLabel('Владелец'),
             const SizedBox(height: 12),
             for (final member in owner) _MemberCard(member: member),
             const SizedBox(height: 24),
           ],
-          _SectionTitle('Сотрудники'),
+          AppGroupLabel('Сотрудники'),
           const SizedBox(height: 12),
           if (staff.isEmpty)
             AppCard(
@@ -116,7 +114,7 @@ class StaffScreen extends ConsumerWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionTitle('Ждут ответа'),
+                      AppGroupLabel('Ждут ответа'),
                       const SizedBox(height: 12),
                       for (final invitation in invitations)
                         _InvitationCard(
@@ -454,22 +452,6 @@ class StaffScreen extends ConsumerWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: AppTypography.labelSm.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
 
 class _MemberCard extends StatelessWidget {
   final FarmMember member;

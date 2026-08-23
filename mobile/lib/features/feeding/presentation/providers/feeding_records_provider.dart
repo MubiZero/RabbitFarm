@@ -19,13 +19,23 @@ class FeedingRecordsState {
   final bool hasMore;
   final int currentPage;
 
+  /// Выбранный период. Фильтр живёт в состоянии, а не в экране: обновление
+  /// жестом и подгрузка следующей страницы вызывали загрузку без него, и
+  /// список незаметно показывал записи за всё время.
+  final DateTime? fromDate;
+  final DateTime? toDate;
+
   const FeedingRecordsState({
     this.records = const [],
     this.isLoading = false,
     this.error,
     this.hasMore = true,
     this.currentPage = 1,
+    this.fromDate,
+    this.toDate,
   });
+
+  bool get hasFilters => fromDate != null || toDate != null;
 
   FeedingRecordsState copyWith({
     List<FeedingRecord>? records,
@@ -33,6 +43,10 @@ class FeedingRecordsState {
     String? error,
     bool? hasMore,
     int? currentPage,
+    DateTime? fromDate,
+    bool clearFromDate = false,
+    DateTime? toDate,
+    bool clearToDate = false,
   }) {
     // clearError передаёт сюда null, а «?? this.error» его игнорировал —
     // сообщение об ошибке залипало в состоянии до перезапуска приложения,
@@ -44,6 +58,8 @@ class FeedingRecordsState {
       error: error,
       hasMore: hasMore ?? this.hasMore,
       currentPage: currentPage ?? this.currentPage,
+      fromDate: clearFromDate ? null : (fromDate ?? this.fromDate),
+      toDate: clearToDate ? null : (toDate ?? this.toDate),
     );
   }
 }
@@ -63,14 +79,16 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
     int? rabbitId,
     int? feedId,
     int? cageId,
-    DateTime? fromDate,
-    DateTime? toDate,
     bool refresh = false,
   }) async {
     if (state.isLoading) return;
 
     if (refresh) {
-      state = const FeedingRecordsState(isLoading: true);
+      state = FeedingRecordsState(
+        isLoading: true,
+        fromDate: state.fromDate,
+        toDate: state.toDate,
+      );
     } else {
       state = state.copyWith(isLoading: true, error: null);
     }
@@ -84,8 +102,8 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
         rabbitId: rabbitId,
         feedId: feedId,
         cageId: cageId,
-        fromDate: fromDate,
-        toDate: toDate,
+        fromDate: state.fromDate,
+        toDate: state.toDate,
       );
 
       if (refresh) {
@@ -94,6 +112,8 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
           isLoading: false,
           hasMore: records.length >= (limit ?? 10),
           currentPage: page ?? 1,
+          fromDate: state.fromDate,
+          toDate: state.toDate,
         );
       } else {
         state = state.copyWith(
@@ -142,6 +162,30 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
   void removeRecord(int recordId) {
     final updatedRecords = state.records.where((r) => r.id != recordId).toList();
     state = state.copyWith(records: updatedRecords);
+  }
+
+  /// Задать период и перезагрузить список.
+  Future<void> setPeriod(DateTime? from, DateTime? to) async {
+    state = state.copyWith(
+      fromDate: from,
+      clearFromDate: from == null,
+      toDate: to,
+      clearToDate: to == null,
+    );
+    await loadFeedingRecords(refresh: true);
+  }
+
+  /// Удалить запись о кормлении. Возвращает текст ошибки или `null`.
+  Future<String?> deleteRecord(int id) async {
+    try {
+      await _repository.deleteFeedingRecord(id);
+      state = state.copyWith(
+        records: state.records.where((r) => r.id != id).toList(),
+      );
+      return null;
+    } catch (e) {
+      return e.toString().replaceAll('Exception: ', '');
+    }
   }
 
   /// Clear error

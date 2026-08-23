@@ -259,3 +259,9 @@ final cageLayoutProvider = FutureProvider<Map<String, List<CageModel>>>((ref) as
   final repository = ref.watch(cagesRepositoryProvider);
   return repository.getLayout();
 });
+
+/// Полный список клеток для выпадающих полей в формах.
+final cageOptionsProvider = FutureProvider<List<CageModel>>((ref) async {
+  final repository = ref.watch(cagesRepositoryProvider);
+  return repository.getCages(limit: 200);
+});
