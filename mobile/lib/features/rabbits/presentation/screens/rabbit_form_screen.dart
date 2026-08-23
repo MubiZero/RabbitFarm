@@ -13,6 +13,8 @@ import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../utils/rabbit_labels.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -78,7 +80,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Ошибка загрузки: ${e.toString().replaceAll('Exception: ', '')}'),
+                '${context.l10n.rabbitFormLoadFailed}: ${e.toString().replaceAll('Exception: ', '')}'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -135,7 +137,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ошибка выбора фото: ${e.toString()}'),
+            content: Text(context.l10n.rabbitFormPhotoFailed),
             backgroundColor: AppColors.error,
           ),
         );
@@ -163,7 +165,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ошибка фото с камеры: ${e.toString()}'),
+            content: Text(context.l10n.rabbitFormPhotoFailed),
             backgroundColor: AppColors.error,
           ),
         );
@@ -188,7 +190,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Выбрать из галереи'),
+                title: Text(context.l10n.rabbitFormPhotoGallery),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromGallery();
@@ -196,7 +198,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_camera),
-                title: const Text('Сделать фото'),
+                title: Text(context.l10n.rabbitFormPhotoCamera),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromCamera();
@@ -205,7 +207,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
               if (_selectedImage != null || _currentPhotoUrl != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: AppColors.error),
-                  title: const Text('Удалить фото',
+                  title: Text(context.l10n.rabbitFormPhotoRemove,
                       style: TextStyle(color: AppColors.error)),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -268,8 +270,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    'Предупреждение: ${e.toString().replaceAll('Exception: ', '')}'),
+                content: Text(context.l10n.rabbitFormPhotoFailed),
                 backgroundColor: AppColors.warning,
               ),
             );
@@ -292,7 +293,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditMode ? 'Данные обновлены' : 'Кролик добавлен'),
+            content: Text(isEditMode ? context.l10n.rabbitFormUpdated : context.l10n.rabbitFormCreated),
           ),
         );
         context.pop();
@@ -320,7 +321,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditMode ? 'Редактировать' : 'Добавить кролика'),
+        title: Text(isEditMode
+            ? context.l10n.rabbitFormEditTitle
+            : context.l10n.rabbitFormNewTitle),
       ),
       body: Form(
         key: _formKey,
@@ -377,8 +380,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                     icon: const Icon(Icons.camera_alt),
                     label: Text(
                       _selectedImage != null || displayPhotoUrl != null
-                          ? 'Изменить фото'
-                          : 'Добавить фото',
+                          ? context.l10n.rabbitFormPhotoChange
+                          : context.l10n.rabbitFormPhotoAdd,
                     ),
                   ),
                 ],
@@ -387,32 +390,32 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             const SizedBox(height: 8),
 
             AppFormSection(
-              title: 'Основное',
+              title: context.l10n.feedFormSectionMain,
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Кличка *',
-                    hintText: 'Введите кличку',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitFormName,
+                    hintText: context.l10n.rabbitFormNameHint,
                     prefixIcon: Icon(Icons.pets),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите кличку';
+                      return context.l10n.rabbitFormNameEmpty;
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _tagIdController,
-                  decoration: const InputDecoration(
-                    labelText: 'Номер бирки *',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitFormTag,
                     hintText: 'R-XXX',
                     prefixIcon: Icon(Icons.tag),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите номер бирки';
+                      return context.l10n.rabbitFormTagEmpty;
                     }
                     return null;
                   },
@@ -428,15 +431,15 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Ошибка загрузки пород: ${breedsState.error}',
+                      context.l10n.rabbitFormBreedsFailed,
                       style: TextStyle(color: cs.error),
                     ),
                   )
                 else
                   DropdownButtonFormField<int>(
                     initialValue: _selectedBreedId,
-                    decoration: const InputDecoration(
-                      labelText: 'Порода *',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitBreed,
                       prefixIcon: Icon(Icons.category),
                     ),
                     items: breedsState.breeds.map((breed) {
@@ -448,23 +451,25 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                     onChanged: (value) =>
                         setState(() => _selectedBreedId = value),
                     validator: (value) =>
-                        value == null ? 'Выберите породу' : null,
+                        value == null ? context.l10n.rabbitFormBreedRequired : null,
                   ),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedSex,
-                  decoration: const InputDecoration(
-                    labelText: 'Пол *',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitSex,
                     prefixIcon: Icon(Icons.wc),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'male', child: Text('Самец')),
-                    DropdownMenuItem(value: 'female', child: Text('Самка')),
+                  items: [
+                    DropdownMenuItem(
+                        value: 'male', child: Text(context.l10n.sexMale)),
+                    DropdownMenuItem(
+                        value: 'female', child: Text(context.l10n.sexFemale)),
                   ],
                   onChanged: (value) =>
                       setState(() => _selectedSex = value!),
                 ),
                 AppDateField(
-                  label: 'Дата рождения *',
+                  label: context.l10n.rabbitBirthDate,
                   value: _birthDate,
                   onChanged: (date) => setState(() => _birthDate = date),
                   prefixIcon: Icons.cake,
@@ -474,13 +479,13 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             ),
 
             AppFormSection(
-              title: 'Родословная',
+              title: context.l10n.rabbitPedigree,
               children: [
                 // Родитель выбирается поиском по серверу: прежний виджет
                 // предлагал только тех кроликов, что успели подгрузиться в
                 // постраничный список.
                 RabbitPickerField(
-                  label: 'Отец',
+                  label: context.l10n.rabbitFather,
                   icon: Icons.male,
                   sex: 'male',
                   selected: _father,
@@ -493,7 +498,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                   }),
                 ),
                 RabbitPickerField(
-                  label: 'Мать',
+                  label: context.l10n.rabbitMother,
                   icon: Icons.female,
                   sex: 'female',
                   selected: _mother,
@@ -509,55 +514,52 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             ),
 
             AppFormSection(
-              title: 'Дополнительно',
+              title: context.l10n.txFormSectionDetails,
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: _selectedStatus,
-                  decoration: const InputDecoration(
-                    labelText: 'Статус *',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitStatus,
                     prefixIcon: Icon(Icons.info_outline),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'healthy', child: Text('Здоров')),
-                    DropdownMenuItem(value: 'sick', child: Text('Болен')),
-                    DropdownMenuItem(
-                        value: 'quarantine', child: Text('Карантин')),
-                    DropdownMenuItem(
-                        value: 'pregnant', child: Text('Беременна')),
-                    DropdownMenuItem(value: 'sold', child: Text('Продан')),
-                    DropdownMenuItem(value: 'dead', child: Text('Умер')),
+                  items: [
+                    for (final status in rabbitStatuses)
+                      DropdownMenuItem(
+                        value: status,
+                        child: Text(rabbitStatusLabel(context, status)),
+                      ),
                   ],
                   onChanged: (value) =>
                       setState(() => _selectedStatus = value!),
                 ),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedPurpose,
-                  decoration: const InputDecoration(
-                    labelText: 'Назначение *',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitPurpose,
                     prefixIcon: Icon(Icons.flag_outlined),
                   ),
-                  items: const [
-                    DropdownMenuItem(
-                        value: 'breeding', child: Text('Разведение')),
-                    DropdownMenuItem(value: 'meat', child: Text('Мясо')),
-                    DropdownMenuItem(value: 'sale', child: Text('Продажа')),
-                    DropdownMenuItem(value: 'show', child: Text('Выставка')),
+                  items: [
+                    for (final purpose in rabbitPurposes)
+                      DropdownMenuItem(
+                        value: purpose,
+                        child: Text(rabbitPurposeLabel(context, purpose)),
+                      ),
                   ],
                   onChanged: (value) =>
                       setState(() => _selectedPurpose = value!),
                 ),
                 TextFormField(
                   controller: _colorController,
-                  decoration: const InputDecoration(
-                    labelText: 'Окрас',
-                    hintText: 'Серый, белый, черный...',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitFormColor,
+                    hintText: context.l10n.rabbitFormColorHint,
                     prefixIcon: Icon(Icons.palette_outlined),
                   ),
                 ),
                 TextFormField(
                   controller: _weightController,
-                  decoration: const InputDecoration(
-                    labelText: 'Вес (кг)',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitFormWeight,
                     hintText: '0.0',
                     prefixIcon: Icon(Icons.monitor_weight_outlined),
                     suffixText: 'кг',
@@ -566,7 +568,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                   validator: (value) {
                     if (value != null && value.isNotEmpty) {
                       if (double.tryParse(value) == null) {
-                        return 'Введите корректное число';
+                        return context.l10n.commonNumberInvalid;
                       }
                     }
                     return null;
@@ -576,13 +578,13 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             ),
 
             AppFormSection(
-              title: 'Заметки',
+              title: context.l10n.rabbitFormNotes,
               children: [
                 TextFormField(
                   controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Заметки',
-                    hintText: 'Дополнительная информация',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.rabbitFormNotes,
+                    hintText: context.l10n.rabbitFormNotesHint,
                     prefixIcon: Icon(Icons.notes),
                   ),
                   maxLines: 3,
@@ -606,7 +608,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(isEditMode ? 'Сохранить изменения' : 'Добавить кролика'),
+                  : Text(isEditMode ? context.l10n.commonSave : context.l10n.commonAdd),
             ),
           ),
         ),

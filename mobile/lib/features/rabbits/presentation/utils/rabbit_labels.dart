@@ -25,3 +25,41 @@ Color sexColor(BuildContext context, String? sex) => switch (sex) {
       'female' => AppColors.domainBreeding,
       _ => context.colors.onSurfaceVariant,
     };
+
+/// Для чего держат кролика. Раньше этот список был выписан в карточке
+/// кролика и назывался «Мясо», «Мех», «Продажа» — набором существительных,
+/// который читался как перечень товаров, а не как назначение животного.
+String rabbitPurposeLabel(BuildContext context, String? purpose) =>
+    switch (purpose) {
+      'breeding' => context.l10n.purposeBreeding,
+      'meat' => context.l10n.purposeMeat,
+      'fur' => context.l10n.purposeFur,
+      'sale' => context.l10n.purposeSale,
+      'pet' => context.l10n.purposePet,
+      'show' => context.l10n.purposeShow,
+      _ => purpose ?? '',
+    };
+
+/// Статусы кролика, которые понимает сервер.
+const rabbitStatuses = [
+  'healthy',
+  'sick',
+  'quarantine',
+  'pregnant',
+  'sold',
+  'dead',
+];
+
+String rabbitStatusLabel(BuildContext context, String? status) =>
+    switch (status) {
+      'healthy' || 'active' => context.l10n.statusHealthy,
+      'sick' => context.l10n.statusSick,
+      'quarantine' => context.l10n.statusQuarantine,
+      'pregnant' => context.l10n.statusPregnant,
+      'sold' => context.l10n.statusSold,
+      'dead' || 'deceased' => context.l10n.statusDead,
+      _ => status ?? '',
+    };
+
+/// Назначения кролика, которые понимает сервер.
+const rabbitPurposes = ['breeding', 'meat', 'fur', 'sale', 'show', 'pet'];

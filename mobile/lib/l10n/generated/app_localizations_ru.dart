@@ -2407,6 +2407,194 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffCloseAccess => 'Закрыть доступ';
 
   @override
+  String get rabbitTapToZoom => 'Нажмите, чтобы рассмотреть';
+
+  @override
+  String rabbitTagLine(String tag) {
+    return 'Бирка $tag';
+  }
+
+  @override
+  String get rabbitMainInfo => 'Главное';
+
+  @override
+  String get rabbitBreed => 'Порода';
+
+  @override
+  String get rabbitBreedUnknown => 'Не указана';
+
+  @override
+  String get rabbitSex => 'Пол';
+
+  @override
+  String get rabbitAge => 'Возраст';
+
+  @override
+  String get rabbitBirthDate => 'Дата рождения';
+
+  @override
+  String get rabbitColor => 'Окрас';
+
+  @override
+  String get rabbitWeight => 'Вес';
+
+  @override
+  String get rabbitQuickActions => 'Что можно посмотреть';
+
+  @override
+  String get rabbitWeightHistory => 'История взвешиваний';
+
+  @override
+  String get rabbitPedigree => 'Родословная';
+
+  @override
+  String get rabbitStatus => 'Статус';
+
+  @override
+  String get rabbitCondition => 'Состояние';
+
+  @override
+  String get rabbitPurpose => 'Назначение';
+
+  @override
+  String get rabbitPlacement => 'Где живёт';
+
+  @override
+  String get rabbitCage => 'Клетка';
+
+  @override
+  String get rabbitLocation => 'Место';
+
+  @override
+  String get rabbitParents => 'Родители';
+
+  @override
+  String get rabbitFather => 'Отец';
+
+  @override
+  String get rabbitMother => 'Мать';
+
+  @override
+  String get rabbitNotes => 'Заметки';
+
+  @override
+  String get rabbitDates => 'Записи';
+
+  @override
+  String get rabbitCreatedAt => 'Заведён';
+
+  @override
+  String get rabbitUpdatedAt => 'Изменён';
+
+  @override
+  String get purposeBreeding => 'На развод';
+
+  @override
+  String get purposeMeat => 'На мясо';
+
+  @override
+  String get purposeFur => 'На мех';
+
+  @override
+  String get purposeSale => 'На продажу';
+
+  @override
+  String get purposePet => 'Питомец';
+
+  @override
+  String get rabbitFormNewTitle => 'Новый кролик';
+
+  @override
+  String get rabbitFormEditTitle => 'Кролик';
+
+  @override
+  String get rabbitFormPhotoAdd => 'Добавить фото';
+
+  @override
+  String get rabbitFormPhotoChange => 'Изменить фото';
+
+  @override
+  String get rabbitFormPhotoGallery => 'Выбрать из галереи';
+
+  @override
+  String get rabbitFormPhotoCamera => 'Снять на камеру';
+
+  @override
+  String get rabbitFormPhotoRemove => 'Убрать фото';
+
+  @override
+  String get rabbitFormPhotoFailed => 'Не удалось взять фото';
+
+  @override
+  String get rabbitFormName => 'Кличка';
+
+  @override
+  String get rabbitFormNameHint => 'Как зовут';
+
+  @override
+  String get rabbitFormNameEmpty => 'Введите кличку';
+
+  @override
+  String get rabbitFormTag => 'Номер бирки';
+
+  @override
+  String get rabbitFormTagEmpty => 'Введите номер бирки';
+
+  @override
+  String get rabbitFormBreedRequired => 'Выберите породу';
+
+  @override
+  String get rabbitFormBreedsFailed => 'Не удалось загрузить породы';
+
+  @override
+  String get rabbitFormColor => 'Окрас';
+
+  @override
+  String get rabbitFormColorHint => 'Серый, белый, чёрный…';
+
+  @override
+  String get rabbitFormWeight => 'Вес, кг';
+
+  @override
+  String get rabbitFormNotes => 'Заметки';
+
+  @override
+  String get rabbitFormNotesHint => 'Что стоит помнить об этом кролике';
+
+  @override
+  String get rabbitFormCreated => 'Кролик добавлен';
+
+  @override
+  String get rabbitFormUpdated => 'Данные обновлены';
+
+  @override
+  String get rabbitFormFailed => 'Не удалось сохранить';
+
+  @override
+  String get rabbitFormLoadFailed => 'Не удалось загрузить кролика';
+
+  @override
+  String get statusHealthy => 'Здоров';
+
+  @override
+  String get statusSick => 'Болен';
+
+  @override
+  String get statusQuarantine => 'Карантин';
+
+  @override
+  String get statusPregnant => 'Беременна';
+
+  @override
+  String get statusSold => 'Продан';
+
+  @override
+  String get statusDead => 'Погиб';
+
+  @override
+  String get purposeShow => 'На выставку';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

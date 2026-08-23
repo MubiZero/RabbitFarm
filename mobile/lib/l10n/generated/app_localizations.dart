@@ -4420,6 +4420,378 @@ abstract class AppLocalizations {
   /// **'Закрыть доступ'**
   String get staffCloseAccess;
 
+  /// No description provided for @rabbitTapToZoom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите, чтобы рассмотреть'**
+  String get rabbitTapToZoom;
+
+  /// No description provided for @rabbitTagLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бирка {tag}'**
+  String rabbitTagLine(String tag);
+
+  /// No description provided for @rabbitMainInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Главное'**
+  String get rabbitMainInfo;
+
+  /// No description provided for @rabbitBreed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода'**
+  String get rabbitBreed;
+
+  /// No description provided for @rabbitBreedUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не указана'**
+  String get rabbitBreedUnknown;
+
+  /// No description provided for @rabbitSex.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пол'**
+  String get rabbitSex;
+
+  /// No description provided for @rabbitAge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возраст'**
+  String get rabbitAge;
+
+  /// No description provided for @rabbitBirthDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата рождения'**
+  String get rabbitBirthDate;
+
+  /// No description provided for @rabbitColor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрас'**
+  String get rabbitColor;
+
+  /// No description provided for @rabbitWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес'**
+  String get rabbitWeight;
+
+  /// No description provided for @rabbitQuickActions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что можно посмотреть'**
+  String get rabbitQuickActions;
+
+  /// No description provided for @rabbitWeightHistory.
+  ///
+  /// In ru, this message translates to:
+  /// **'История взвешиваний'**
+  String get rabbitWeightHistory;
+
+  /// No description provided for @rabbitPedigree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родословная'**
+  String get rabbitPedigree;
+
+  /// No description provided for @rabbitStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статус'**
+  String get rabbitStatus;
+
+  /// No description provided for @rabbitCondition.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состояние'**
+  String get rabbitCondition;
+
+  /// No description provided for @rabbitPurpose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назначение'**
+  String get rabbitPurpose;
+
+  /// No description provided for @rabbitPlacement.
+  ///
+  /// In ru, this message translates to:
+  /// **'Где живёт'**
+  String get rabbitPlacement;
+
+  /// No description provided for @rabbitCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка'**
+  String get rabbitCage;
+
+  /// No description provided for @rabbitLocation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Место'**
+  String get rabbitLocation;
+
+  /// No description provided for @rabbitParents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родители'**
+  String get rabbitParents;
+
+  /// No description provided for @rabbitFather.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отец'**
+  String get rabbitFather;
+
+  /// No description provided for @rabbitMother.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать'**
+  String get rabbitMother;
+
+  /// No description provided for @rabbitNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get rabbitNotes;
+
+  /// No description provided for @rabbitDates.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записи'**
+  String get rabbitDates;
+
+  /// No description provided for @rabbitCreatedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведён'**
+  String get rabbitCreatedAt;
+
+  /// No description provided for @rabbitUpdatedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменён'**
+  String get rabbitUpdatedAt;
+
+  /// No description provided for @purposeBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'На развод'**
+  String get purposeBreeding;
+
+  /// No description provided for @purposeMeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'На мясо'**
+  String get purposeMeat;
+
+  /// No description provided for @purposeFur.
+  ///
+  /// In ru, this message translates to:
+  /// **'На мех'**
+  String get purposeFur;
+
+  /// No description provided for @purposeSale.
+  ///
+  /// In ru, this message translates to:
+  /// **'На продажу'**
+  String get purposeSale;
+
+  /// No description provided for @purposePet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Питомец'**
+  String get purposePet;
+
+  /// No description provided for @rabbitFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый кролик'**
+  String get rabbitFormNewTitle;
+
+  /// No description provided for @rabbitFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик'**
+  String get rabbitFormEditTitle;
+
+  /// No description provided for @rabbitFormPhotoAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить фото'**
+  String get rabbitFormPhotoAdd;
+
+  /// No description provided for @rabbitFormPhotoChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить фото'**
+  String get rabbitFormPhotoChange;
+
+  /// No description provided for @rabbitFormPhotoGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать из галереи'**
+  String get rabbitFormPhotoGallery;
+
+  /// No description provided for @rabbitFormPhotoCamera.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять на камеру'**
+  String get rabbitFormPhotoCamera;
+
+  /// No description provided for @rabbitFormPhotoRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать фото'**
+  String get rabbitFormPhotoRemove;
+
+  /// No description provided for @rabbitFormPhotoFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось взять фото'**
+  String get rabbitFormPhotoFailed;
+
+  /// No description provided for @rabbitFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кличка'**
+  String get rabbitFormName;
+
+  /// No description provided for @rabbitFormNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как зовут'**
+  String get rabbitFormNameHint;
+
+  /// No description provided for @rabbitFormNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите кличку'**
+  String get rabbitFormNameEmpty;
+
+  /// No description provided for @rabbitFormTag.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер бирки'**
+  String get rabbitFormTag;
+
+  /// No description provided for @rabbitFormTagEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите номер бирки'**
+  String get rabbitFormTagEmpty;
+
+  /// No description provided for @rabbitFormBreedRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите породу'**
+  String get rabbitFormBreedRequired;
+
+  /// No description provided for @rabbitFormBreedsFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить породы'**
+  String get rabbitFormBreedsFailed;
+
+  /// No description provided for @rabbitFormColor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрас'**
+  String get rabbitFormColor;
+
+  /// No description provided for @rabbitFormColorHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Серый, белый, чёрный…'**
+  String get rabbitFormColorHint;
+
+  /// No description provided for @rabbitFormWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес, кг'**
+  String get rabbitFormWeight;
+
+  /// No description provided for @rabbitFormNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get rabbitFormNotes;
+
+  /// No description provided for @rabbitFormNotesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что стоит помнить об этом кролике'**
+  String get rabbitFormNotesHint;
+
+  /// No description provided for @rabbitFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик добавлен'**
+  String get rabbitFormCreated;
+
+  /// No description provided for @rabbitFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные обновлены'**
+  String get rabbitFormUpdated;
+
+  /// No description provided for @rabbitFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить'**
+  String get rabbitFormFailed;
+
+  /// No description provided for @rabbitFormLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить кролика'**
+  String get rabbitFormLoadFailed;
+
+  /// No description provided for @statusHealthy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоров'**
+  String get statusHealthy;
+
+  /// No description provided for @statusSick.
+  ///
+  /// In ru, this message translates to:
+  /// **'Болен'**
+  String get statusSick;
+
+  /// No description provided for @statusQuarantine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карантин'**
+  String get statusQuarantine;
+
+  /// No description provided for @statusPregnant.
+  ///
+  /// In ru, this message translates to:
+  /// **'Беременна'**
+  String get statusPregnant;
+
+  /// No description provided for @statusSold.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продан'**
+  String get statusSold;
+
+  /// No description provided for @statusDead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Погиб'**
+  String get statusDead;
+
+  /// No description provided for @purposeShow.
+  ///
+  /// In ru, this message translates to:
+  /// **'На выставку'**
+  String get purposeShow;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

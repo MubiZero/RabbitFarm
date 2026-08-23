@@ -12,6 +12,8 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../utils/rabbit_labels.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -41,24 +43,25 @@ class RabbitDetailScreen extends ConsumerWidget {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit),
-                      SizedBox(width: 8),
-                      Text('Редактировать'),
-                    ],
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.edit_outlined),
+                    title: Text(context.l10n.cageEdit),
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: AppColors.error),
-                      SizedBox(width: 8),
-                      Text('Удалить', style: TextStyle(color: AppColors.error)),
-                    ],
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.delete_outline,
+                        color: AppColors.error),
+                    title: Text(
+                      context.l10n.commonDelete,
+                      style: AppTypography.bodyLg
+                          .copyWith(color: AppColors.error),
+                    ),
                   ),
                 ),
                 ],
@@ -133,7 +136,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         Icon(Icons.touch_app, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
-                          'Нажмите для увеличения',
+                          context.l10n.rabbitTapToZoom,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -195,7 +198,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Бирка: ${rabbit.tagId}',
+                          context.l10n.rabbitTagLine(rabbit.tagId),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -212,23 +215,25 @@ class RabbitDetailScreen extends ConsumerWidget {
           // Basic info
           _buildSection(
             context,
-            title: 'Основная информация',
+            title: context.l10n.rabbitMainInfo,
             children: [
-              _buildInfoRow(context, 'Порода', rabbit.breed?.name ?? 'Не указана'),
-              _buildInfoRow(context, 'Пол', rabbit.sex == 'male' ? 'Самец' : 'Самка'),
-              _buildInfoRow(context, 'Возраст', age),
+              _buildInfoRow(context, context.l10n.rabbitBreed,
+                  rabbit.breed?.name ?? context.l10n.rabbitBreedUnknown),
+              _buildInfoRow(
+                  context, context.l10n.rabbitSex, sexLabel(context, rabbit.sex)),
+              _buildInfoRow(context, context.l10n.rabbitAge, age),
               _buildInfoRow(
                 context,
-                'Дата рождения',
-                DateFormat('dd.MM.yyyy').format(rabbit.birthDate),
+                context.l10n.rabbitBirthDate,
+                DateFormat('d MMMM y', 'ru').format(rabbit.birthDate),
               ),
               if (rabbit.color != null)
-                _buildInfoRow(context, 'Окрас', rabbit.color!),
+                _buildInfoRow(context, context.l10n.rabbitColor, rabbit.color!),
               if (rabbit.currentWeight != null)
                 _buildInfoRow(
                   context,
-                  'Текущий вес',
-                  '${rabbit.currentWeight!.toStringAsFixed(2)} кг',
+                  context.l10n.rabbitWeight,
+                  formatQuantity(rabbit.currentWeight!, 'кг'),
                 ),
             ],
           ),
@@ -240,7 +245,7 @@ class RabbitDetailScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Быстрые действия',
+                  context.l10n.rabbitQuickActions,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                   const SizedBox(height: 12),
@@ -256,7 +261,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(Icons.scale),
-                      label: const Text('История взвешиваний'),
+                      label: Text(context.l10n.rabbitWeightHistory),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -272,7 +277,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(Icons.account_tree),
-                      label: const Text('Родословная'),
+                      label: Text(context.l10n.rabbitPedigree),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -286,7 +291,7 @@ class RabbitDetailScreen extends ConsumerWidget {
           // Status
           _buildSection(
             context,
-            title: 'Статус',
+            title: context.l10n.rabbitStatus,
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -295,7 +300,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                     SizedBox(
                       width: 120,
                       child: Text(
-                        'Состояние',
+                        context.l10n.rabbitCondition,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -305,7 +310,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              _buildInfoRow(context, 'Назначение', _getPurposeText(rabbit.purpose)),
+              _buildInfoRow(context, context.l10n.rabbitPurpose, _getPurposeText(context, rabbit.purpose)),
             ],
           ),
           const SizedBox(height: 16),
@@ -314,11 +319,11 @@ class RabbitDetailScreen extends ConsumerWidget {
           if (rabbit.cage != null)
             _buildSection(
               context,
-              title: 'Размещение',
+              title: context.l10n.rabbitPlacement,
               children: [
-                _buildInfoRow(context, 'Клетка', rabbit.cage!.number),
+                _buildInfoRow(context, context.l10n.rabbitCage, rabbit.cage!.number),
                 if (rabbit.cage!.location != null)
-                  _buildInfoRow(context, 'Расположение', rabbit.cage!.location!),
+                  _buildInfoRow(context, context.l10n.rabbitLocation, rabbit.cage!.location!),
               ],
             ),
           const SizedBox(height: 16),
@@ -330,15 +335,16 @@ class RabbitDetailScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Родители',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    context.l10n.rabbitParents,
+                    style: AppTypography.titleMd
+                        .copyWith(color: context.colors.onSurface),
                   ),
                   const SizedBox(height: 12),
                   if (rabbit.father != null)
                     _buildParentCard(
                       context,
                       rabbit.father!,
-                      'Отец',
+                      context.l10n.rabbitFather,
                       Icons.male,
                       AppColors.accentOcean,
                     ),
@@ -348,7 +354,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                     _buildParentCard(
                       context,
                       rabbit.mother!,
-                      'Мать',
+                      context.l10n.rabbitMother,
                       Icons.female,
                       AppColors.accentRose,
                     ),
@@ -361,7 +367,7 @@ class RabbitDetailScreen extends ConsumerWidget {
           if (rabbit.notes != null && rabbit.notes!.isNotEmpty)
             _buildSection(
               context,
-              title: 'Заметки',
+              title: context.l10n.rabbitNotes,
               children: [
                 Text(
                   rabbit.notes!,
@@ -374,16 +380,16 @@ class RabbitDetailScreen extends ConsumerWidget {
           // Dates
           _buildSection(
             context,
-            title: 'Даты',
+            title: context.l10n.rabbitDates,
             children: [
               _buildInfoRow(
                 context,
-                'Создано',
+                context.l10n.rabbitCreatedAt,
                 DateFormat('dd.MM.yyyy HH:mm').format(rabbit.createdAt),
               ),
               _buildInfoRow(
                 context,
-                'Обновлено',
+                context.l10n.rabbitUpdatedAt,
                 DateFormat('dd.MM.yyyy HH:mm').format(rabbit.updatedAt),
               ),
             ],
@@ -487,7 +493,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                         ),
                   ),
                   Text(
-                    'Бирка: ${parent.tagId}',
+                    context.l10n.rabbitTagLine(parent.tagId),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -514,22 +520,8 @@ class RabbitDetailScreen extends ConsumerWidget {
     return AppColors.info;
   }
 
-  String _getPurposeText(String purpose) {
-    switch (purpose) {
-      case 'breeding':
-        return 'Разведение';
-      case 'meat':
-        return 'Мясо';
-      case 'fur':
-        return 'Мех';
-      case 'sale':
-        return 'Продажа';
-      case 'pet':
-        return 'Питомец';
-      default:
-        return purpose;
-    }
-  }
+  String _getPurposeText(BuildContext context, String purpose) =>
+      rabbitPurposeLabel(context, purpose);
 
   void _showPhotoDialog(BuildContext context, String photoUrl) {
     showDialog(
@@ -578,12 +570,12 @@ class RabbitDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить кролика?'),
-        content: Text('Вы уверены, что хотите удалить ${rabbit.name}?'),
+        title: Text(context.l10n.rabbitDetailDeleteTitle),
+        content: Text(context.l10n.rabbitDetailDeleteBody(rabbit.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () async {
@@ -594,8 +586,8 @@ class RabbitDetailScreen extends ConsumerWidget {
                 if (context.mounted) {
                   context.pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Кролик удален'),
+                    SnackBar(
+                      content: Text(context.l10n.rabbitDetailDeleted),
                     ),
                   );
                 }
@@ -611,7 +603,7 @@ class RabbitDetailScreen extends ConsumerWidget {
               }
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
