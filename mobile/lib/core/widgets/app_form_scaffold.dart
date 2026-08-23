@@ -89,27 +89,7 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
     if (navigator.canPop()) navigator.pop(true);
   }
 
-  Future<bool> _confirmDiscard() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.formDiscardTitle),
-        content: Text(context.l10n.formDiscardBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.formDiscardStay),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.formDiscardLeave),
-          ),
-        ],
-      ),
-    );
-    return confirmed ?? false;
-  }
+  Future<bool> _confirmDiscard() => confirmDiscardChanges(context);
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +105,10 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
         appBar: AppBar(title: Text(widget.title), actions: widget.actions),
         body: Form(
           key: widget.formKey,
+          // Набор текста не перестраивает экран сам по себе, поэтому вопрос
+          // «выйти без сохранения?» вычислялся по состоянию пустой формы и
+          // не задавался никогда: заполненная форма закрывалась молча.
+          onChanged: () => setState(() {}),
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.screenH),
             children: [
@@ -191,4 +175,31 @@ class AppSubmitBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Спросить, не жалко ли потерять заполненное.
+///
+/// Живёт отдельно от каркаса: форма кролика собирает свой экран сама, и без
+/// общей функции у неё либо не было бы вопроса вовсе, либо появился бы
+/// второй такой же диалог со своим текстом.
+Future<bool> confirmDiscardChanges(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(context.l10n.formDiscardTitle),
+      content: Text(context.l10n.formDiscardBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(context.l10n.formDiscardStay),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          style: TextButton.styleFrom(foregroundColor: AppColors.error),
+          child: Text(context.l10n.formDiscardLeave),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }
