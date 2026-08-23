@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/report_model.dart';
+import '../../../rabbits/presentation/providers/breeds_provider.dart';
 import '../../data/repositories/reports_repository.dart';
 
 /// Reports repository provider
@@ -92,3 +93,15 @@ class FinancialReportParams extends ReportDateParams {
   @override
   int get hashCode => super.hashCode ^ groupBy.hashCode;
 }
+
+/// Названия пород по идентификатору.
+///
+/// В отчёте по ферме сервер отдаёт разбивку поголовья только по `breed_id`.
+/// «Порода №7» человеку ничего не говорит, а список пород в приложении уже
+/// загружается — остаётся сопоставить. Отдельный провайдер нужен, чтобы экран
+/// отчётов не зависел от устройства списка пород (и чтобы в тестах хватало
+/// одной подмены).
+final reportBreedNamesProvider = Provider<Map<int, String>>((ref) {
+  final breeds = ref.watch(breedsProvider).breeds;
+  return {for (final breed in breeds) breed.id: breed.name};
+});

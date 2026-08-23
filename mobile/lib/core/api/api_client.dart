@@ -99,27 +99,6 @@ class ApiClient {
   }
 
   // Rabbits endpoints
-  Future<Response> getRabbits({
-    int page = 1,
-    int limit = 10,
-    String? search,
-    String? sex,
-    String? status,
-    int? breedId,
-  }) {
-    return _dio.get(
-      ApiEndpoints.rabbits,
-      queryParameters: {
-        'page': page,
-        'limit': limit,
-        if (search != null) 'search': search,
-        if (sex != null) 'sex': sex,
-        if (status != null) 'status': status,
-        if (breedId != null) 'breed_id': breedId,
-      },
-    );
-  }
-
   Future<Response> getRabbitById(int id) {
     return _dio.get('${ApiEndpoints.rabbits}/$id');
   }

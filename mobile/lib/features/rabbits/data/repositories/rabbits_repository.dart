@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/api_endpoints.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/rabbit_model.dart';
 import '../models/rabbit_statistics.dart';
@@ -19,16 +20,25 @@ class RabbitsRepository {
     String? search,
     String? sex,
     String? status,
+    String? purpose,
     int? breedId,
   }) async {
     try {
-      final response = await _apiClient.getRabbits(
-        page: page,
-        limit: limit,
-        search: search,
-        sex: sex,
-        status: status,
-        breedId: breedId,
+      // Запрос собирается здесь, а не в типизированном `ApiClient.getRabbits`:
+      // тот не умеет передавать `purpose`, а сервер по нему фильтрует. Отбор
+      // назначения на клиенте врал бы при постраничной выдаче — «племенных»
+      // было бы ровно столько, сколько их попало в загруженную страницу.
+      final response = await _apiClient.get(
+        ApiEndpoints.rabbits,
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+          if (sex != null) 'sex': sex,
+          if (status != null) 'status': status,
+          if (purpose != null) 'purpose': purpose,
+          if (breedId != null) 'breed_id': breedId,
+        },
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

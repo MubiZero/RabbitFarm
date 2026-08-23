@@ -9,12 +9,19 @@ import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
 
-/// Меню: всё, до чего не дотянуться с четырёх основных вкладок.
+/// Экран «Хозяйство» — то, чем на ферме управляют, а не то, что записывают
+/// каждый день.
 ///
-/// Разделы сгруппированы по областям работы, и цвет значка помечает область
-/// целиком. Раньше цвет выбирался у каждой строки отдельно — восемь разных
-/// оттенков подряд, включая тревожный красный на обычном пункте «Вакцинации»,
-/// — и подсказкой это быть переставало.
+/// Раньше это было «Меню»: двенадцать пунктов подряд, от клеток до настроек,
+/// и ничто не подсказывало, что их объединяет. Поголовье и разведение уехали
+/// в свои вкладки, а здесь остались области хозяйства — деньги, корма,
+/// здоровье, отчёты, люди. Цвет значка помечает область целиком: раньше он
+/// выбирался у каждой строки отдельно, восемь оттенков подряд, включая
+/// тревожный красный на обычном пункте «Вакцинации», — подсказкой это быть
+/// переставало.
+///
+/// Работнику управлять нечем, поэтому у него та же вкладка подписана
+/// «Профиль»: карточка, настройки и выход.
 class FarmScreen extends ConsumerWidget {
   const FarmScreen({super.key});
 
@@ -30,7 +37,9 @@ class FarmScreen extends ConsumerWidget {
             AppSpacing.screenH,
             AppSpacing.xl,
             AppSpacing.screenH,
-            AppSpacing.xxl,
+            // Кнопка «Записать» висит и над этой вкладкой, поэтому последняя
+            // строка списка должна из-под неё выходить.
+            AppSpacing.fabSafeBottom,
           ),
           children: [
             Padding(
@@ -39,7 +48,7 @@ class FarmScreen extends ConsumerWidget {
                 bottom: AppSpacing.lg,
               ),
               child: Text(
-                context.l10n.menuTitle,
+                _screenTitle(context, role),
                 style: AppTypography.displayMd
                     .copyWith(color: context.colors.onSurface),
               ),
@@ -53,69 +62,73 @@ class FarmScreen extends ConsumerWidget {
             ),
 
             _Section(
-              title: context.l10n.menuSectionLivestock,
-              domain: AppDomain.livestock,
-              items: [
-                _Item(Icons.grid_view_outlined, context.l10n.menuCages, '/cages'),
-                _Item(Icons.category_outlined, context.l10n.menuBreeds, '/breeds'),
-              ],
-            ),
-
-            _Section(
-              title: context.l10n.menuSectionBreeding,
-              domain: AppDomain.breeding,
-              items: [
-                _Item(Icons.favorite_outline, context.l10n.menuBreedings, '/breeding'),
-                _Item(Icons.child_care_outlined, context.l10n.menuBirths, '/births'),
-                // Подбор пар с проверкой на родство был написан, но не был
-                // связан ни с одним экраном: попасть в него из приложения
-                // было невозможно.
-                _Item(Icons.hub_outlined, context.l10n.menuPairPlanner,
-                    '/breeding/planner'),
-              ],
-            ),
-
-            _Section(
-              title: context.l10n.menuSectionHealth,
-              domain: AppDomain.health,
-              items: [
-                _Item(Icons.vaccines_outlined, context.l10n.menuVaccinations,
-                    '/vaccinations'),
-                _Item(Icons.medical_services_outlined,
-                    context.l10n.menuMedicalRecords, '/medical-records'),
-              ],
-            ),
-
-            _Section(
-              title: context.l10n.menuSectionFeeding,
-              domain: AppDomain.feeding,
-              items: [
-                _Item(Icons.inventory_2_outlined, context.l10n.menuFeedStock,
-                    '/feeds'),
-                _Item(Icons.restaurant_outlined,
-                    context.l10n.menuFeedingRecords, '/feeding-records'),
-              ],
-            ),
-
-            _Section(
-              title: context.l10n.menuSectionLedger,
+              title: context.l10n.farmSectionMoney,
               domain: AppDomain.admin,
               items: [
                 // Книга доходов и расходов работнику не открывается — пункт
                 // без доступа привёл бы его к отказу сервера.
                 if (role.can(FarmCapability.manageFinance))
                   _Item(Icons.account_balance_wallet_outlined,
-                      context.l10n.menuFinance, '/transactions'),
-                if (role.can(FarmCapability.manageStaff))
-                  _Item(Icons.groups_outlined, context.l10n.menuStaff, '/staff'),
+                      context.l10n.farmTransactions, '/transactions'),
               ],
             ),
 
             _Section(
-              title: context.l10n.menuSectionApp,
+              title: context.l10n.farmSectionFeed,
+              domain: AppDomain.feeding,
+              items: [
+                // Остаток и расход смотрят вместе: «сколько осталось» без
+                // «сколько уходит в день» не говорит, когда закупаться.
+                if (role.can(FarmCapability.manageStock)) ...[
+                  _Item(Icons.inventory_2_outlined, context.l10n.farmFeedStock,
+                      '/feeds'),
+                  _Item(Icons.restaurant_outlined,
+                      context.l10n.farmFeedingRecords, '/feeding-records'),
+                ],
+              ],
+            ),
+
+            _Section(
+              title: context.l10n.farmSectionHealth,
+              domain: AppDomain.health,
+              items: [
+                // История прививок и лечения по всему стаду — это взгляд
+                // управляющего; работник свои записи вносит из «Записать».
+                if (role.can(FarmCapability.manageLivestock)) ...[
+                  _Item(Icons.vaccines_outlined, context.l10n.farmVaccinations,
+                      '/vaccinations'),
+                  _Item(Icons.medical_services_outlined,
+                      context.l10n.farmMedicalRecords, '/medical-records'),
+                ],
+              ],
+            ),
+
+            _Section(
+              title: context.l10n.farmSectionReports,
               domain: AppDomain.admin,
               items: [
-                _Item(Icons.settings_outlined, context.l10n.menuSettings,
+                // Отчёты сводят деньги вместе с поголовьем, поэтому доступны
+                // тому же кругу, что и деньги.
+                if (role.can(FarmCapability.viewReports))
+                  _Item(Icons.insights_outlined, context.l10n.farmReports,
+                      '/reports'),
+              ],
+            ),
+
+            _Section(
+              title: context.l10n.farmSectionPeople,
+              domain: AppDomain.admin,
+              items: [
+                if (role.can(FarmCapability.manageStaff))
+                  _Item(Icons.groups_outlined, context.l10n.farmStaff, '/staff'),
+              ],
+            ),
+
+            _Section(
+              title: context.l10n.farmSectionApp,
+              domain: AppDomain.admin,
+              items: [
+                _Item(Icons.settings_outlined, context.l10n.farmSettings,
                     '/settings'),
               ],
               extra: _AboutTile(),
@@ -128,6 +141,12 @@ class FarmScreen extends ConsumerWidget {
       ),
     );
   }
+
+  /// У работника вкладка называется так же, как её подписывает нижнее меню.
+  String _screenTitle(BuildContext context, FarmRoleAccess role) =>
+      role == FarmRoleAccess.worker
+          ? context.l10n.navProfile
+          : context.l10n.farmTitle;
 
   String _roleLabel(BuildContext context, FarmRoleAccess role) =>
       switch (role) {
@@ -184,7 +203,7 @@ class _ProfileCard extends StatelessWidget {
                     Text(
                       name?.trim().isNotEmpty == true
                           ? name!.trim()
-                          : context.l10n.menuProfile,
+                          : context.l10n.navProfile,
                       style: AppTypography.titleMd
                           .copyWith(color: context.colors.onSurface),
                       maxLines: 1,
@@ -249,8 +268,8 @@ class _Section extends StatelessWidget {
       if (extra != null) extra!,
     ];
 
-    // Разделы собираются из пунктов, доступных роли. У работника «Учёт»
-    // остаётся пустым, и заголовок над пустотой выглядел бы поломкой.
+    // Разделы собираются из пунктов, доступных роли. У работника пусты почти
+    // все, и заголовок над пустотой выглядел бы поломкой.
     if (rows.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -348,14 +367,14 @@ class _AboutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return _MenuRow(
       icon: Icons.info_outline,
-      label: context.l10n.menuAbout,
+      label: context.l10n.farmAbout,
       color: AppDomain.admin.color(context),
       onTap: () => showAboutDialog(
         context: context,
         applicationName: context.l10n.appName,
         applicationVersion: '1.0.0',
         applicationIcon: Icon(Icons.pets, size: 40, color: context.accent),
-        children: [Text(context.l10n.menuAboutBody)],
+        children: [Text(context.l10n.farmAboutBody)],
       ),
     );
   }
@@ -382,7 +401,7 @@ class _LogoutButton extends StatelessWidget {
               const Icon(Icons.logout, color: AppColors.error, size: 20),
               const SizedBox(width: AppSpacing.md),
               Text(
-                context.l10n.menuLogout,
+                context.l10n.farmLogout,
                 style:
                     AppTypography.titleMd.copyWith(color: AppColors.error),
               ),

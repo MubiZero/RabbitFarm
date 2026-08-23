@@ -25,11 +25,13 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   final _search = TextEditingController();
   Timer? _debounce;
 
-  String? _sex;
-  String? _status;
-
-  bool get _hasFilters =>
-      _sex != null || _status != null || _search.text.trim().isNotEmpty;
+  @override
+  void initState() {
+    super.initState();
+    // Отбор хранит список, а не экран: если сюда пришли со «Стада», строка
+    // поиска должна показывать то, по чему список отобран на самом деле.
+    _search.text = ref.read(rabbitsListProvider).filter.search ?? '';
+  }
 
   @override
   void dispose() {
@@ -44,27 +46,22 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
   void _onSearchChanged(String value) {
     _debounce?.cancel();
     _debounce = Timer(AppDuration.normal, () {
-      if (mounted) _load();
+      if (!mounted) return;
+      final query = value.trim();
+      _apply(ref
+          .read(rabbitsListProvider)
+          .filter
+          .withSearch(query.isEmpty ? null : query));
     });
   }
 
-  Future<void> _load() => ref.read(rabbitsListProvider.notifier).loadRabbits(
-        search: _search.text.trim().isEmpty ? null : _search.text.trim(),
-        sex: _sex,
-        status: _status,
-      );
-
-  void _setFilter({String? sex, String? status}) {
-    setState(() {
-      _sex = sex;
-      _status = status;
-    });
-    _load();
-  }
+  void _apply(RabbitsFilter filter) =>
+      ref.read(rabbitsListProvider.notifier).applyFilter(filter);
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(rabbitsListProvider);
+    final filter = state.filter;
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
@@ -74,20 +71,15 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
         isLoading: state.isLoading,
         error: state.error,
         hasMore: state.hasMore,
-        onRefresh: _load,
-        onLoadMore: () => ref.read(rabbitsListProvider.notifier).loadMore(
-              search: _search.text.trim().isEmpty ? null : _search.text.trim(),
-              sex: _sex,
-              status: _status,
-            ),
+        onRefresh: ref.read(rabbitsListProvider.notifier).loadRabbits,
+        onLoadMore: ref.read(rabbitsListProvider.notifier).loadMore,
         header: _Header(
           controller: _search,
           onSearchChanged: _onSearchChanged,
-          sex: _sex,
-          status: _status,
-          onFilter: _setFilter,
+          filter: filter,
+          onFilter: _apply,
         ),
-        empty: _hasFilters
+        empty: !filter.isEmpty
             ? AppEmptyState(
                 icon: Icons.search_off,
                 title: context.l10n.rabbitsNothingFound,
@@ -95,7 +87,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                 actionLabel: context.l10n.commonReset,
                 onAction: () {
                   _search.clear();
-                  _setFilter();
+                  _apply(const RabbitsFilter());
                 },
               )
             : AppEmptyState(
@@ -106,7 +98,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                     canManage ? context.l10n.rabbitsEmptyAction : null,
                 onAction: canManage ? () => context.push('/rabbits/new') : null,
               ),
-        itemBuilder: (context, rabbit, _) => _RabbitCard(
+        itemBuilder: (context, rabbit, _) => RabbitListCard(
           rabbit: rabbit,
           onTap: () => context.push('/rabbits/${rabbit.id}'),
         ),
@@ -118,15 +110,13 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
 class _Header extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onSearchChanged;
-  final String? sex;
-  final String? status;
-  final void Function({String? sex, String? status}) onFilter;
+  final RabbitsFilter filter;
+  final ValueChanged<RabbitsFilter> onFilter;
 
   const _Header({
     required this.controller,
     required this.onSearchChanged,
-    required this.sex,
-    required this.status,
+    required this.filter,
     required this.onFilter,
   });
 
@@ -159,35 +149,36 @@ class _Header extends StatelessWidget {
           chips: [
             AppFilterChipData(
               label: l10n.rabbitsFilterAll,
-              isSelected: sex == null && status == null,
-              onTap: () => onFilter(),
+              isSelected: filter.sex == null && filter.status == null,
+              onTap: () =>
+                  onFilter(filter.withSex(null).withStatus(null)),
             ),
             AppFilterChipData(
               label: l10n.rabbitsFilterMales,
-              isSelected: sex == 'male',
+              isSelected: filter.sex == 'male',
               onTap: () =>
-                  onFilter(sex: sex == 'male' ? null : 'male', status: status),
+                  onFilter(filter.withSex(filter.sex == 'male' ? null : 'male')),
               color: sexColor(context, 'male'),
             ),
             AppFilterChipData(
               label: l10n.rabbitsFilterFemales,
-              isSelected: sex == 'female',
+              isSelected: filter.sex == 'female',
               onTap: () => onFilter(
-                  sex: sex == 'female' ? null : 'female', status: status),
+                  filter.withSex(filter.sex == 'female' ? null : 'female')),
               color: sexColor(context, 'female'),
             ),
             AppFilterChipData(
               label: l10n.rabbitsFilterActive,
-              isSelected: status == 'active',
-              onTap: () => onFilter(
-                  sex: sex, status: status == 'active' ? null : 'active'),
+              isSelected: filter.status == 'active',
+              onTap: () => onFilter(filter
+                  .withStatus(filter.status == 'active' ? null : 'active')),
               color: AppColors.success,
             ),
             AppFilterChipData(
               label: l10n.rabbitsFilterSold,
-              isSelected: status == 'sold',
-              onTap: () =>
-                  onFilter(sex: sex, status: status == 'sold' ? null : 'sold'),
+              isSelected: filter.status == 'sold',
+              onTap: () => onFilter(
+                  filter.withStatus(filter.status == 'sold' ? null : 'sold')),
               color: AppColors.warning,
             ),
           ],
@@ -197,11 +188,21 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _RabbitCard extends StatelessWidget {
+/// Карточка кролика в списке поголовья.
+///
+/// Живёт отдельным классом, потому что тем же списком особей смотрят на стадо
+/// со вкладки «Стадо». Вторая копия карточки разошлась бы с этой в первый же
+/// день: они уже разошлись у клеток, где один и тот же тип клетки назывался
+/// двумя разными словами.
+class RabbitListCard extends StatelessWidget {
   final RabbitModel rabbit;
   final VoidCallback onTap;
 
-  const _RabbitCard({required this.rabbit, required this.onTap});
+  const RabbitListCard({
+    super.key,
+    required this.rabbit,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +254,16 @@ class _RabbitCard extends StatelessWidget {
                       icon: rabbitSexIcon(rabbit.sex),
                       label: sexLabel(context, rabbit.sex),
                       color: sexColor(context, rabbit.sex),
+                    ),
+                    // Назначение — главное деление стада: по нему решают,
+                    // кого случать, а кого ставить на откорм. В карточке его
+                    // не было видно вовсе, хотя в базе поле обязательное.
+                    // Значок и цвет нейтральные: пол и порода уже цветные,
+                    // третья краска в строке превратила бы её в пестроту.
+                    _Badge(
+                      icon: Icons.label_outline,
+                      label: rabbitPurposeLabel(context, rabbit.purpose),
+                      color: context.colors.onSurfaceVariant,
                     ),
                     if (rabbit.breed?.name != null)
                       _Badge(

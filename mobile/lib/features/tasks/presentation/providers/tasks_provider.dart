@@ -288,3 +288,87 @@ class TaskActions {
   }
 }
 
+
+/// Задачи, которые горят сегодня: просроченные и сегодняшние, ранние сверху.
+///
+/// Живёт отдельно от постраничного [tasksListProvider]: тот принадлежит экрану
+/// со своими фильтрами, и перезагружать его ради одной галочки на «Сегодня»
+/// означало бы сбрасывать то, что человек там настроил.
+class TodayTasksNotifier extends AutoDisposeAsyncNotifier<List<Task>> {
+  /// Столько строк помещается на «Сегодня», не оттесняя сводку по ферме за
+  /// нижний край. Остальное — по ссылке «Все задачи».
+  static const _limit = 5;
+
+  /// Экран могли закрыть, пока шёл запрос: возвращать строку на место уже
+  /// некуда, а попытка тронуть выброшенное состояние ломается сама.
+  var _disposed = false;
+
+  @override
+  Future<List<Task>> build() async {
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
+
+    // Фильтры по сроку не просим: `to_date` без `from_date` сервер отклоняет,
+    // а `overdue_only`/`today_only` он сейчас не применяет вовсе. Сортировка
+    // по сроку по возрастанию и так ставит просроченные и сегодняшние первыми,
+    // остаётся отсечь будущее.
+    final result = await ref.watch(tasksRepositoryProvider).getTasks(
+          page: 1,
+          limit: _limit,
+          sortBy: 'due_date',
+          sortOrder: 'ASC',
+          status: TaskStatus.pending,
+        );
+
+    final endOfToday = _endOfToday();
+    return [
+      for (final task in result['tasks'] as List<Task>)
+        if (!task.dueDate.isAfter(endOfToday)) task,
+    ];
+  }
+
+  /// Закрыть задачу.
+  ///
+  /// Галочка встаёт до ответа сервера: в сарае с одной палкой связи полсекунды
+  /// ожидания читаются как «не нажалось», и задачу отмечают второй раз. Отказ
+  /// возвращает в прежний вид только эту строку — соседние отметки, сделанные
+  /// пока шёл запрос, откатывать нельзя.
+  Future<void> complete(int id) async {
+    final before = state.valueOrNull;
+    if (before == null) return;
+
+    final index = before.indexWhere((task) => task.id == id);
+    if (index < 0) return;
+    final original = before[index];
+
+    state = AsyncData(_replace(
+      before,
+      original.copyWith(
+        status: TaskStatus.completed,
+        completedAt: DateTime.now(),
+      ),
+    ));
+
+    try {
+      await ref.read(tasksRepositoryProvider).completeTask(id);
+    } catch (_) {
+      if (!_disposed) {
+        state = AsyncData(_replace(state.valueOrNull ?? before, original));
+      }
+      rethrow;
+    }
+  }
+
+  List<Task> _replace(List<Task> tasks, Task task) =>
+      [for (final item in tasks) item.id == task.id ? task : item];
+
+  static DateTime _endOfToday() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+  }
+}
+
+/// Задачи для экрана «Сегодня».
+final todayTasksProvider =
+    AsyncNotifierProvider.autoDispose<TodayTasksNotifier, List<Task>>(
+        TodayTasksNotifier.new);

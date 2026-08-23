@@ -271,9 +271,11 @@ _$FeedingDataImpl _$$FeedingDataImplFromJson(Map<String, dynamic> json) =>
       totalFeedingRecords: const IntConverter().fromJson(
         json['total_feeding_records'] as Object,
       ),
-      totalFeedConsumption: const DoubleConverter().fromJson(
-        json['total_feed_consumption'] as Object,
-      ),
+      consumptionByUnit:
+          (json['consumption_by_unit'] as List<dynamic>?)
+              ?.map((e) => FeedConsumption.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$FeedingDataImplToJson(_$FeedingDataImpl instance) =>
@@ -281,10 +283,22 @@ Map<String, dynamic> _$$FeedingDataImplToJson(_$FeedingDataImpl instance) =>
       'total_feeding_records': const IntConverter().toJson(
         instance.totalFeedingRecords,
       ),
-      'total_feed_consumption': const DoubleConverter().toJson(
-        instance.totalFeedConsumption,
-      ),
+      'consumption_by_unit': instance.consumptionByUnit,
     };
+
+_$FeedConsumptionImpl _$$FeedConsumptionImplFromJson(
+  Map<String, dynamic> json,
+) => _$FeedConsumptionImpl(
+  unit: json['unit'] as String,
+  total: const DoubleConverter().fromJson(json['total'] as Object),
+);
+
+Map<String, dynamic> _$$FeedConsumptionImplToJson(
+  _$FeedConsumptionImpl instance,
+) => <String, dynamic>{
+  'unit': instance.unit,
+  'total': const DoubleConverter().toJson(instance.total),
+};
 
 _$HealthReportImpl _$$HealthReportImplFromJson(Map<String, dynamic> json) =>
     _$HealthReportImpl(
@@ -335,26 +349,28 @@ Map<String, dynamic> _$$VaccineTypeCountImplToJson(
 _$MedicalRecordsDataImpl _$$MedicalRecordsDataImplFromJson(
   Map<String, dynamic> json,
 ) => _$MedicalRecordsDataImpl(
-  byType: (json['by_type'] as List<dynamic>)
-      .map((e) => RecordTypeCount.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  byOutcome:
+      (json['by_outcome'] as List<dynamic>?)
+          ?.map((e) => RecordOutcomeCount.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$$MedicalRecordsDataImplToJson(
   _$MedicalRecordsDataImpl instance,
-) => <String, dynamic>{'by_type': instance.byType};
+) => <String, dynamic>{'by_outcome': instance.byOutcome};
 
-_$RecordTypeCountImpl _$$RecordTypeCountImplFromJson(
+_$RecordOutcomeCountImpl _$$RecordOutcomeCountImplFromJson(
   Map<String, dynamic> json,
-) => _$RecordTypeCountImpl(
-  recordType: json['record_type'] as String,
+) => _$RecordOutcomeCountImpl(
+  outcome: json['outcome'] as String?,
   count: const IntConverter().fromJson(json['count'] as Object),
 );
 
-Map<String, dynamic> _$$RecordTypeCountImplToJson(
-  _$RecordTypeCountImpl instance,
+Map<String, dynamic> _$$RecordOutcomeCountImplToJson(
+  _$RecordOutcomeCountImpl instance,
 ) => <String, dynamic>{
-  'record_type': instance.recordType,
+  'outcome': instance.outcome,
   'count': const IntConverter().toJson(instance.count),
 };
 

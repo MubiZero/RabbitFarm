@@ -72,6 +72,46 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonEmail => 'Почта';
 
   @override
+  String get quickGroupOften => 'Часто';
+
+  @override
+  String get journalPeriodToday => 'Сегодня';
+
+  @override
+  String get journalPeriodWeek => 'Неделя';
+
+  @override
+  String get journalKindAll => 'Все';
+
+  @override
+  String get journalKindFeeding => 'Кормление';
+
+  @override
+  String get journalKindTreatment => 'Лечение';
+
+  @override
+  String get journalKindVaccination => 'Прививка';
+
+  @override
+  String get journalKindTask => 'Задача';
+
+  @override
+  String get journalEmptyTodayTitle => 'Сегодня ещё ничего не записано';
+
+  @override
+  String get journalEmptyWeekTitle => 'За неделю ничего не записано';
+
+  @override
+  String get journalEmptyBody =>
+      'Кормления, лечение, прививки и закрытые задачи попадают сюда сами. Запишите первое — и оно появится здесь.';
+
+  @override
+  String get journalNoneInViewTitle => 'В этой выборке пусто';
+
+  @override
+  String get journalNoneInViewBody => 'Смените вид записи или срок.';
+
+  @override
   String get loginSubtitle => 'Вход в вашу ферму';
 
   @override
@@ -146,9 +186,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayFarmNow => 'Ферма сейчас';
 
   @override
-  String get todayLast30Days => 'За 30 дней';
-
-  @override
   String get todayStatLivestock => 'Поголовье';
 
   @override
@@ -158,22 +195,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayStatFreeCages => 'Клеток свободно';
 
   @override
-  String get todayStatBirths => 'Родилось';
-
-  @override
-  String get todayStatIncome => 'Доход';
-
-  @override
-  String get todayStatExpenses => 'Расход';
-
-  @override
-  String get todayAlertOverdueTasks => 'Просроченные задачи';
-
-  @override
   String get todayAlertOverdueVaccination => 'Вакцинация просрочена';
-
-  @override
-  String get todayAlertUrgentTasks => 'Срочные задачи';
 
   @override
   String get todayAlertLowFeed => 'Заканчивается корм';
@@ -186,7 +208,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get todayTourAlertsBody =>
-      'Просроченные задачи, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.';
+      'Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.';
 
   @override
   String get todayTourStatsTitle => 'Состояние фермы';
@@ -196,74 +218,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.';
 
   @override
-  String get menuTitle => 'Меню';
-
-  @override
   String get menuProfile => 'Профиль';
-
-  @override
-  String get menuSectionLivestock => 'Поголовье';
-
-  @override
-  String get menuSectionBreeding => 'Разведение';
-
-  @override
-  String get menuSectionHealth => 'Здоровье';
-
-  @override
-  String get menuSectionFeeding => 'Корма';
-
-  @override
-  String get menuSectionLedger => 'Учёт';
-
-  @override
-  String get menuSectionApp => 'Приложение';
-
-  @override
-  String get menuCages => 'Клетки';
-
-  @override
-  String get menuBreeds => 'Породы';
-
-  @override
-  String get menuBreedings => 'Случки';
-
-  @override
-  String get menuBirths => 'Роды';
-
-  @override
-  String get menuPairPlanner => 'Подбор пар';
-
-  @override
-  String get menuVaccinations => 'Вакцинации';
-
-  @override
-  String get menuMedicalRecords => 'Лечение';
-
-  @override
-  String get menuFeedStock => 'Запасы';
-
-  @override
-  String get menuFeedingRecords => 'Кормления';
-
-  @override
-  String get menuFinance => 'Финансы';
-
-  @override
-  String get menuStaff => 'Работники';
-
-  @override
-  String get menuSettings => 'Настройки';
-
-  @override
-  String get menuAbout => 'О приложении';
-
-  @override
-  String get menuAboutBody =>
-      'Учёт поголовья, кормов, здоровья и денег кроличьей фермы.';
-
-  @override
-  String get menuLogout => 'Выйти';
 
   @override
   String get roleOwner => 'Владелец фермы';
@@ -279,12 +234,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get navRabbits => 'Кролики';
-
-  @override
-  String get navTasks => 'Задачи';
-
-  @override
-  String get navMenu => 'Меню';
 
   @override
   String get navHerd => 'Стадо';
@@ -335,9 +284,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get herdTabRabbits => 'Кролики';
 
   @override
-  String get breedingCycleTitle => 'Разведение';
-
-  @override
   String get journalTitle => 'Журнал';
 
   @override
@@ -345,12 +291,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get farmTitle => 'Хозяйство';
-
-  @override
-  String get navNewTask => 'Новая задача';
-
-  @override
-  String get navQuickEntry => 'Быстрая запись';
 
   @override
   String get navQuickTitle => 'Что записать';
@@ -386,7 +326,86 @@ class AppLocalizationsRu extends AppLocalizations {
   String get formDiscardLeave => 'Выйти';
 
   @override
-  String get breedingListTitle => 'Случки';
+  String get cycleTitle => 'Разведение';
+
+  @override
+  String get cycleFindPair => 'Подобрать пару';
+
+  @override
+  String get cycleRecordBirth => 'Записать окрол';
+
+  @override
+  String get cycleStageCheck => 'Проверить сукрольность';
+
+  @override
+  String get cycleStageBirth => 'Окрол ожидается';
+
+  @override
+  String get cycleStageWeaning => 'Отсадка молодняка';
+
+  @override
+  String get cycleStageNotPregnant => 'Самка пустая';
+
+  @override
+  String get cycleStageFailed => 'Случка не удалась';
+
+  @override
+  String get cycleStageCancelled => 'Случка отменена';
+
+  @override
+  String get cycleStageClosed => 'Цикл отработан';
+
+  @override
+  String cycleDay(int day) {
+    return '$day-й день';
+  }
+
+  @override
+  String cycleMaleLine(String name) {
+    return 'Самец: $name';
+  }
+
+  @override
+  String cycleActionWhen(String date, String when) {
+    return '$date · $when';
+  }
+
+  @override
+  String cycleApproxDate(String date) {
+    return 'примерно $date';
+  }
+
+  @override
+  String get cycleDueToday => 'сегодня';
+
+  @override
+  String get cycleDueTomorrow => 'завтра';
+
+  @override
+  String cycleInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'через $count дня',
+      many: 'через $count дней',
+      few: 'через $count дня',
+      one: 'через $count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cycleOverdueDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'просрочено на $count дня',
+      many: 'просрочено на $count дней',
+      few: 'просрочено на $count дня',
+      one: 'просрочено на $count день',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get breedingEmptyTitle => 'Случек пока нет';
@@ -406,11 +425,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get commonNameMissing => 'Имя не указано';
-
-  @override
-  String breedingExpectedBirth(String date) {
-    return 'Окрол ожидается $date';
-  }
 
   @override
   String get breedingStatusPlanned => 'Запланирована';
@@ -619,6 +633,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tasksTitle => 'Задачи';
+
+  @override
+  String get todayTasksTitle => 'Задачи на сегодня';
+
+  @override
+  String get todayTasksAll => 'Все задачи';
+
+  @override
+  String get todayTasksNone => 'На сегодня задач нет';
 
   @override
   String get commonFilters => 'Фильтры';
@@ -1719,6 +1742,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitsSearchHint => 'Кличка или номер бирки';
 
   @override
+  String get herdCagesNoPlace => 'Место не указано';
+
+  @override
   String get rabbitsEmptyTitle => 'Кроликов пока нет';
 
   @override
@@ -1840,6 +1866,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsTitle => 'Настройки';
+
+  @override
+  String get farmSectionMoney => 'Деньги';
+
+  @override
+  String get farmTransactions => 'Доходы и расходы';
+
+  @override
+  String get farmSectionFeed => 'Корма';
+
+  @override
+  String get farmFeedStock => 'Запас корма';
+
+  @override
+  String get farmFeedingRecords => 'Кормления';
+
+  @override
+  String get farmSectionHealth => 'Здоровье';
+
+  @override
+  String get farmVaccinations => 'Вакцинации';
+
+  @override
+  String get farmMedicalRecords => 'Лечение';
+
+  @override
+  String get farmSectionReports => 'Отчёты';
+
+  @override
+  String get farmReports => 'Сводка по ферме';
+
+  @override
+  String get farmSectionPeople => 'Люди';
+
+  @override
+  String get farmStaff => 'Сотрудники';
+
+  @override
+  String get farmSectionApp => 'Приложение';
+
+  @override
+  String get farmSettings => 'Настройки';
+
+  @override
+  String get farmAbout => 'О приложении';
+
+  @override
+  String get farmAboutBody =>
+      'Учёт поголовья, кормов, здоровья и денег кроличьей фермы.';
+
+  @override
+  String get farmLogout => 'Выйти';
 
   @override
   String get settingsAppearance => 'Внешний вид';
@@ -2874,6 +2952,86 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get txCategoryOther => 'Прочее';
+
+  @override
+  String get reportsOutcomeUnknown => 'Исход не указан';
+
+  @override
+  String get reportsFeedUsed => 'Израсходовано';
+
+  @override
+  String get reportsTabFarm => 'Ферма';
+
+  @override
+  String get reportsTabHealth => 'Здоровье';
+
+  @override
+  String get reportsTabFinance => 'Деньги';
+
+  @override
+  String reportsPeriodRange(String from, String to) {
+    return 'С $from по $to';
+  }
+
+  @override
+  String get reportsPopulationNow => 'Кроликов сейчас';
+
+  @override
+  String get reportsBirths => 'Окролы';
+
+  @override
+  String get reportsBreedings => 'Случки';
+
+  @override
+  String get reportsVaccinations => 'Вакцинации';
+
+  @override
+  String get reportsMedicalRecords => 'Лечение';
+
+  @override
+  String get reportsFeedings => 'Кормления';
+
+  @override
+  String get reportsActivity => 'За период';
+
+  @override
+  String get reportsByBreed => 'Поголовье по породам';
+
+  @override
+  String reportsBreedUnknown(int id) {
+    return 'Порода №$id';
+  }
+
+  @override
+  String get reportsMoney => 'Деньги за период';
+
+  @override
+  String get reportsNoActivityTitle => 'За этот период записей нет';
+
+  @override
+  String get reportsNoActivityBody =>
+      'Выберите период шире — или запишите случку, прививку, кормление, и они появятся здесь.';
+
+  @override
+  String get reportsFarmEmptyTitle => 'Отчёту пока не из чего собраться';
+
+  @override
+  String get reportsFarmEmptyBody =>
+      'Заведите первого кролика — дальше отчёт соберётся сам из ежедневных записей.';
+
+  @override
+  String get reportsHealthEmptyTitle =>
+      'За этот период прививок и лечений не было';
+
+  @override
+  String get reportsHealthEmptyBody =>
+      'Выберите период шире или отметьте прививку — отчёт посчитается сам.';
+
+  @override
+  String get reportsVaccinesByName => 'Прививки по вакцинам';
+
+  @override
+  String get reportsRecordsByOutcome => 'Лечение по исходу';
 
   @override
   String get emptyNoRecordsTitle => 'Записей нет';

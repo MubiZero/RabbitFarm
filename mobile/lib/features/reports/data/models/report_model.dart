@@ -204,13 +204,31 @@ class FeedingData with _$FeedingData {
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
     required int totalFeedingRecords,
-    @JsonKey(name: 'total_feed_consumption')
-    @DoubleConverter()
-    required double totalFeedConsumption,
+
+    /// Расход по каждой единице измерения отдельно.
+    ///
+    /// Модель требовала одно общее число `total_feed_consumption`, которого
+    /// сервер никогда не отдавал, — на настоящем ответе разбор всего отчёта
+    /// падал. Не отдавал он его намеренно: складывать килограммы со штуками
+    /// нельзя, сумма получилась бы бессмысленной.
+    @JsonKey(name: 'consumption_by_unit')
+    @Default([])
+    List<FeedConsumption> consumptionByUnit,
   }) = _FeedingData;
 
   factory FeedingData.fromJson(Map<String, dynamic> json) =>
       _$FeedingDataFromJson(json);
+}
+
+@freezed
+class FeedConsumption with _$FeedConsumption {
+  const factory FeedConsumption({
+    required String unit,
+    @DoubleConverter() required double total,
+  }) = _FeedConsumption;
+
+  factory FeedConsumption.fromJson(Map<String, dynamic> json) =>
+      _$FeedConsumptionFromJson(json);
 }
 
 /// Health Report Model
@@ -249,8 +267,13 @@ class VaccineTypeCount with _$VaccineTypeCount {
 
 @freezed
 class MedicalRecordsData with _$MedicalRecordsData {
+  /// Сервер группирует лечение по исходу, а не по виду записи. Модель ждала
+  /// `by_type` с полем `record_type` — таких полей в ответе нет, и отчёт по
+  /// здоровью падал при разборе целиком.
   const factory MedicalRecordsData({
-    @JsonKey(name: 'by_type') required List<RecordTypeCount> byType,
+    @JsonKey(name: 'by_outcome')
+    @Default([])
+    List<RecordOutcomeCount> byOutcome,
   }) = _MedicalRecordsData;
 
   factory MedicalRecordsData.fromJson(Map<String, dynamic> json) =>
@@ -258,14 +281,16 @@ class MedicalRecordsData with _$MedicalRecordsData {
 }
 
 @freezed
-class RecordTypeCount with _$RecordTypeCount {
-  const factory RecordTypeCount({
-    @JsonKey(name: 'record_type') required String recordType,
+class RecordOutcomeCount with _$RecordOutcomeCount {
+  /// Исход может быть не проставлен — в базе поле необязательное, и такие
+  /// записи приходят отдельной группой с пустым исходом.
+  const factory RecordOutcomeCount({
+    String? outcome,
     @IntConverter() required int count,
-  }) = _RecordTypeCount;
+  }) = _RecordOutcomeCount;
 
-  factory RecordTypeCount.fromJson(Map<String, dynamic> json) =>
-      _$RecordTypeCountFromJson(json);
+  factory RecordOutcomeCount.fromJson(Map<String, dynamic> json) =>
+      _$RecordOutcomeCountFromJson(json);
 }
 
 /// Financial Report Model

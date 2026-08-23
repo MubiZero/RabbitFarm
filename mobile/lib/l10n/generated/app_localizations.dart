@@ -220,6 +220,84 @@ abstract class AppLocalizations {
   /// **'Почта'**
   String get commonEmail;
 
+  /// No description provided for @quickGroupOften.
+  ///
+  /// In ru, this message translates to:
+  /// **'Часто'**
+  String get quickGroupOften;
+
+  /// No description provided for @journalPeriodToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get journalPeriodToday;
+
+  /// No description provided for @journalPeriodWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неделя'**
+  String get journalPeriodWeek;
+
+  /// No description provided for @journalKindAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get journalKindAll;
+
+  /// No description provided for @journalKindFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление'**
+  String get journalKindFeeding;
+
+  /// No description provided for @journalKindTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get journalKindTreatment;
+
+  /// No description provided for @journalKindVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививка'**
+  String get journalKindVaccination;
+
+  /// No description provided for @journalKindTask.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача'**
+  String get journalKindTask;
+
+  /// No description provided for @journalEmptyTodayTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня ещё ничего не записано'**
+  String get journalEmptyTodayTitle;
+
+  /// No description provided for @journalEmptyWeekTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'За неделю ничего не записано'**
+  String get journalEmptyWeekTitle;
+
+  /// No description provided for @journalEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормления, лечение, прививки и закрытые задачи попадают сюда сами. Запишите первое — и оно появится здесь.'**
+  String get journalEmptyBody;
+
+  /// No description provided for @journalNoneInViewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этой выборке пусто'**
+  String get journalNoneInViewTitle;
+
+  /// No description provided for @journalNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смените вид записи или срок.'**
+  String get journalNoneInViewBody;
+
   /// No description provided for @loginSubtitle.
   ///
   /// In ru, this message translates to:
@@ -358,12 +436,6 @@ abstract class AppLocalizations {
   /// **'Ферма сейчас'**
   String get todayFarmNow;
 
-  /// No description provided for @todayLast30Days.
-  ///
-  /// In ru, this message translates to:
-  /// **'За 30 дней'**
-  String get todayLast30Days;
-
   /// No description provided for @todayStatLivestock.
   ///
   /// In ru, this message translates to:
@@ -382,41 +454,11 @@ abstract class AppLocalizations {
   /// **'Клеток свободно'**
   String get todayStatFreeCages;
 
-  /// No description provided for @todayStatBirths.
-  ///
-  /// In ru, this message translates to:
-  /// **'Родилось'**
-  String get todayStatBirths;
-
-  /// No description provided for @todayStatIncome.
-  ///
-  /// In ru, this message translates to:
-  /// **'Доход'**
-  String get todayStatIncome;
-
-  /// No description provided for @todayStatExpenses.
-  ///
-  /// In ru, this message translates to:
-  /// **'Расход'**
-  String get todayStatExpenses;
-
-  /// No description provided for @todayAlertOverdueTasks.
-  ///
-  /// In ru, this message translates to:
-  /// **'Просроченные задачи'**
-  String get todayAlertOverdueTasks;
-
   /// No description provided for @todayAlertOverdueVaccination.
   ///
   /// In ru, this message translates to:
   /// **'Вакцинация просрочена'**
   String get todayAlertOverdueVaccination;
-
-  /// No description provided for @todayAlertUrgentTasks.
-  ///
-  /// In ru, this message translates to:
-  /// **'Срочные задачи'**
-  String get todayAlertUrgentTasks;
 
   /// No description provided for @todayAlertLowFeed.
   ///
@@ -439,7 +481,7 @@ abstract class AppLocalizations {
   /// No description provided for @todayTourAlertsBody.
   ///
   /// In ru, this message translates to:
-  /// **'Просроченные задачи, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.'**
+  /// **'Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.'**
   String get todayTourAlertsBody;
 
   /// No description provided for @todayTourStatsTitle.
@@ -454,143 +496,11 @@ abstract class AppLocalizations {
   /// **'Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.'**
   String get todayTourStatsBody;
 
-  /// No description provided for @menuTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Меню'**
-  String get menuTitle;
-
   /// No description provided for @menuProfile.
   ///
   /// In ru, this message translates to:
   /// **'Профиль'**
   String get menuProfile;
-
-  /// No description provided for @menuSectionLivestock.
-  ///
-  /// In ru, this message translates to:
-  /// **'Поголовье'**
-  String get menuSectionLivestock;
-
-  /// No description provided for @menuSectionBreeding.
-  ///
-  /// In ru, this message translates to:
-  /// **'Разведение'**
-  String get menuSectionBreeding;
-
-  /// No description provided for @menuSectionHealth.
-  ///
-  /// In ru, this message translates to:
-  /// **'Здоровье'**
-  String get menuSectionHealth;
-
-  /// No description provided for @menuSectionFeeding.
-  ///
-  /// In ru, this message translates to:
-  /// **'Корма'**
-  String get menuSectionFeeding;
-
-  /// No description provided for @menuSectionLedger.
-  ///
-  /// In ru, this message translates to:
-  /// **'Учёт'**
-  String get menuSectionLedger;
-
-  /// No description provided for @menuSectionApp.
-  ///
-  /// In ru, this message translates to:
-  /// **'Приложение'**
-  String get menuSectionApp;
-
-  /// No description provided for @menuCages.
-  ///
-  /// In ru, this message translates to:
-  /// **'Клетки'**
-  String get menuCages;
-
-  /// No description provided for @menuBreeds.
-  ///
-  /// In ru, this message translates to:
-  /// **'Породы'**
-  String get menuBreeds;
-
-  /// No description provided for @menuBreedings.
-  ///
-  /// In ru, this message translates to:
-  /// **'Случки'**
-  String get menuBreedings;
-
-  /// No description provided for @menuBirths.
-  ///
-  /// In ru, this message translates to:
-  /// **'Роды'**
-  String get menuBirths;
-
-  /// No description provided for @menuPairPlanner.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подбор пар'**
-  String get menuPairPlanner;
-
-  /// No description provided for @menuVaccinations.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вакцинации'**
-  String get menuVaccinations;
-
-  /// No description provided for @menuMedicalRecords.
-  ///
-  /// In ru, this message translates to:
-  /// **'Лечение'**
-  String get menuMedicalRecords;
-
-  /// No description provided for @menuFeedStock.
-  ///
-  /// In ru, this message translates to:
-  /// **'Запасы'**
-  String get menuFeedStock;
-
-  /// No description provided for @menuFeedingRecords.
-  ///
-  /// In ru, this message translates to:
-  /// **'Кормления'**
-  String get menuFeedingRecords;
-
-  /// No description provided for @menuFinance.
-  ///
-  /// In ru, this message translates to:
-  /// **'Финансы'**
-  String get menuFinance;
-
-  /// No description provided for @menuStaff.
-  ///
-  /// In ru, this message translates to:
-  /// **'Работники'**
-  String get menuStaff;
-
-  /// No description provided for @menuSettings.
-  ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get menuSettings;
-
-  /// No description provided for @menuAbout.
-  ///
-  /// In ru, this message translates to:
-  /// **'О приложении'**
-  String get menuAbout;
-
-  /// No description provided for @menuAboutBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Учёт поголовья, кормов, здоровья и денег кроличьей фермы.'**
-  String get menuAboutBody;
-
-  /// No description provided for @menuLogout.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выйти'**
-  String get menuLogout;
 
   /// No description provided for @roleOwner.
   ///
@@ -621,18 +531,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Кролики'**
   String get navRabbits;
-
-  /// No description provided for @navTasks.
-  ///
-  /// In ru, this message translates to:
-  /// **'Задачи'**
-  String get navTasks;
-
-  /// No description provided for @navMenu.
-  ///
-  /// In ru, this message translates to:
-  /// **'Меню'**
-  String get navMenu;
 
   /// No description provided for @navHerd.
   ///
@@ -730,12 +628,6 @@ abstract class AppLocalizations {
   /// **'Кролики'**
   String get herdTabRabbits;
 
-  /// No description provided for @breedingCycleTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Разведение'**
-  String get breedingCycleTitle;
-
   /// No description provided for @journalTitle.
   ///
   /// In ru, this message translates to:
@@ -753,18 +645,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Хозяйство'**
   String get farmTitle;
-
-  /// No description provided for @navNewTask.
-  ///
-  /// In ru, this message translates to:
-  /// **'Новая задача'**
-  String get navNewTask;
-
-  /// No description provided for @navQuickEntry.
-  ///
-  /// In ru, this message translates to:
-  /// **'Быстрая запись'**
-  String get navQuickEntry;
 
   /// No description provided for @navQuickTitle.
   ///
@@ -832,11 +712,113 @@ abstract class AppLocalizations {
   /// **'Выйти'**
   String get formDiscardLeave;
 
-  /// No description provided for @breedingListTitle.
+  /// No description provided for @cycleTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Случки'**
-  String get breedingListTitle;
+  /// **'Разведение'**
+  String get cycleTitle;
+
+  /// No description provided for @cycleFindPair.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подобрать пару'**
+  String get cycleFindPair;
+
+  /// No description provided for @cycleRecordBirth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать окрол'**
+  String get cycleRecordBirth;
+
+  /// No description provided for @cycleStageCheck.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить сукрольность'**
+  String get cycleStageCheck;
+
+  /// No description provided for @cycleStageBirth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрол ожидается'**
+  String get cycleStageBirth;
+
+  /// No description provided for @cycleStageWeaning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отсадка молодняка'**
+  String get cycleStageWeaning;
+
+  /// No description provided for @cycleStageNotPregnant.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка пустая'**
+  String get cycleStageNotPregnant;
+
+  /// No description provided for @cycleStageFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка не удалась'**
+  String get cycleStageFailed;
+
+  /// No description provided for @cycleStageCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка отменена'**
+  String get cycleStageCancelled;
+
+  /// No description provided for @cycleStageClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цикл отработан'**
+  String get cycleStageClosed;
+
+  /// No description provided for @cycleDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'{day}-й день'**
+  String cycleDay(int day);
+
+  /// No description provided for @cycleMaleLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самец: {name}'**
+  String cycleMaleLine(String name);
+
+  /// No description provided for @cycleActionWhen.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date} · {when}'**
+  String cycleActionWhen(String date, String when);
+
+  /// No description provided for @cycleApproxDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'примерно {date}'**
+  String cycleApproxDate(String date);
+
+  /// No description provided for @cycleDueToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'сегодня'**
+  String get cycleDueToday;
+
+  /// No description provided for @cycleDueTomorrow.
+  ///
+  /// In ru, this message translates to:
+  /// **'завтра'**
+  String get cycleDueTomorrow;
+
+  /// No description provided for @cycleInDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{через {count} день} few{через {count} дня} many{через {count} дней} other{через {count} дня}}'**
+  String cycleInDays(int count);
+
+  /// No description provided for @cycleOverdueDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{просрочено на {count} день} few{просрочено на {count} дня} many{просрочено на {count} дней} other{просрочено на {count} дня}}'**
+  String cycleOverdueDays(int count);
 
   /// No description provided for @breedingEmptyTitle.
   ///
@@ -873,12 +855,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Имя не указано'**
   String get commonNameMissing;
-
-  /// No description provided for @breedingExpectedBirth.
-  ///
-  /// In ru, this message translates to:
-  /// **'Окрол ожидается {date}'**
-  String breedingExpectedBirth(String date);
 
   /// No description provided for @breedingStatusPlanned.
   ///
@@ -1143,6 +1119,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Задачи'**
   String get tasksTitle;
+
+  /// No description provided for @todayTasksTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задачи на сегодня'**
+  String get todayTasksTitle;
+
+  /// No description provided for @todayTasksAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все задачи'**
+  String get todayTasksAll;
+
+  /// No description provided for @todayTasksNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'На сегодня задач нет'**
+  String get todayTasksNone;
 
   /// No description provided for @commonFilters.
   ///
@@ -3172,6 +3166,12 @@ abstract class AppLocalizations {
   /// **'Кличка или номер бирки'**
   String get rabbitsSearchHint;
 
+  /// No description provided for @herdCagesNoPlace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Место не указано'**
+  String get herdCagesNoPlace;
+
   /// No description provided for @rabbitsEmptyTitle.
   ///
   /// In ru, this message translates to:
@@ -3405,6 +3405,108 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Настройки'**
   String get settingsTitle;
+
+  /// No description provided for @farmSectionMoney.
+  ///
+  /// In ru, this message translates to:
+  /// **'Деньги'**
+  String get farmSectionMoney;
+
+  /// No description provided for @farmTransactions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы и расходы'**
+  String get farmTransactions;
+
+  /// No description provided for @farmSectionFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корма'**
+  String get farmSectionFeed;
+
+  /// No description provided for @farmFeedStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запас корма'**
+  String get farmFeedStock;
+
+  /// No description provided for @farmFeedingRecords.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормления'**
+  String get farmFeedingRecords;
+
+  /// No description provided for @farmSectionHealth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоровье'**
+  String get farmSectionHealth;
+
+  /// No description provided for @farmVaccinations.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинации'**
+  String get farmVaccinations;
+
+  /// No description provided for @farmMedicalRecords.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get farmMedicalRecords;
+
+  /// No description provided for @farmSectionReports.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отчёты'**
+  String get farmSectionReports;
+
+  /// No description provided for @farmReports.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка по ферме'**
+  String get farmReports;
+
+  /// No description provided for @farmSectionPeople.
+  ///
+  /// In ru, this message translates to:
+  /// **'Люди'**
+  String get farmSectionPeople;
+
+  /// No description provided for @farmStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сотрудники'**
+  String get farmStaff;
+
+  /// No description provided for @farmSectionApp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приложение'**
+  String get farmSectionApp;
+
+  /// No description provided for @farmSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get farmSettings;
+
+  /// No description provided for @farmAbout.
+  ///
+  /// In ru, this message translates to:
+  /// **'О приложении'**
+  String get farmAbout;
+
+  /// No description provided for @farmAboutBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Учёт поголовья, кормов, здоровья и денег кроличьей фермы.'**
+  String get farmAboutBody;
+
+  /// No description provided for @farmLogout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get farmLogout;
 
   /// No description provided for @settingsAppearance.
   ///
@@ -5295,6 +5397,150 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Прочее'**
   String get txCategoryOther;
+
+  /// No description provided for @reportsOutcomeUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исход не указан'**
+  String get reportsOutcomeUnknown;
+
+  /// No description provided for @reportsFeedUsed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Израсходовано'**
+  String get reportsFeedUsed;
+
+  /// No description provided for @reportsTabFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма'**
+  String get reportsTabFarm;
+
+  /// No description provided for @reportsTabHealth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоровье'**
+  String get reportsTabHealth;
+
+  /// No description provided for @reportsTabFinance.
+  ///
+  /// In ru, this message translates to:
+  /// **'Деньги'**
+  String get reportsTabFinance;
+
+  /// No description provided for @reportsPeriodRange.
+  ///
+  /// In ru, this message translates to:
+  /// **'С {from} по {to}'**
+  String reportsPeriodRange(String from, String to);
+
+  /// No description provided for @reportsPopulationNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кроликов сейчас'**
+  String get reportsPopulationNow;
+
+  /// No description provided for @reportsBirths.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окролы'**
+  String get reportsBirths;
+
+  /// No description provided for @reportsBreedings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случки'**
+  String get reportsBreedings;
+
+  /// No description provided for @reportsVaccinations.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинации'**
+  String get reportsVaccinations;
+
+  /// No description provided for @reportsMedicalRecords.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get reportsMedicalRecords;
+
+  /// No description provided for @reportsFeedings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормления'**
+  String get reportsFeedings;
+
+  /// No description provided for @reportsActivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'За период'**
+  String get reportsActivity;
+
+  /// No description provided for @reportsByBreed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поголовье по породам'**
+  String get reportsByBreed;
+
+  /// No description provided for @reportsBreedUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода №{id}'**
+  String reportsBreedUnknown(int id);
+
+  /// No description provided for @reportsMoney.
+  ///
+  /// In ru, this message translates to:
+  /// **'Деньги за период'**
+  String get reportsMoney;
+
+  /// No description provided for @reportsNoActivityTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот период записей нет'**
+  String get reportsNoActivityTitle;
+
+  /// No description provided for @reportsNoActivityBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите период шире — или запишите случку, прививку, кормление, и они появятся здесь.'**
+  String get reportsNoActivityBody;
+
+  /// No description provided for @reportsFarmEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отчёту пока не из чего собраться'**
+  String get reportsFarmEmptyTitle;
+
+  /// No description provided for @reportsFarmEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите первого кролика — дальше отчёт соберётся сам из ежедневных записей.'**
+  String get reportsFarmEmptyBody;
+
+  /// No description provided for @reportsHealthEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот период прививок и лечений не было'**
+  String get reportsHealthEmptyTitle;
+
+  /// No description provided for @reportsHealthEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите период шире или отметьте прививку — отчёт посчитается сам.'**
+  String get reportsHealthEmptyBody;
+
+  /// No description provided for @reportsVaccinesByName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививки по вакцинам'**
+  String get reportsVaccinesByName;
+
+  /// No description provided for @reportsRecordsByOutcome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение по исходу'**
+  String get reportsRecordsByOutcome;
 
   /// No description provided for @emptyNoRecordsTitle.
   ///

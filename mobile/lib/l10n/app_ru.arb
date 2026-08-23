@@ -27,6 +27,20 @@
   "commonActions": "Действия",
   "commonEmail": "Почта",
 
+  "quickGroupOften": "Часто",
+  "journalPeriodToday": "Сегодня",
+  "journalPeriodWeek": "Неделя",
+  "journalKindAll": "Все",
+  "journalKindFeeding": "Кормление",
+  "journalKindTreatment": "Лечение",
+  "journalKindVaccination": "Прививка",
+  "journalKindTask": "Задача",
+  "journalEmptyTodayTitle": "Сегодня ещё ничего не записано",
+  "journalEmptyWeekTitle": "За неделю ничего не записано",
+  "journalEmptyBody": "Кормления, лечение, прививки и закрытые задачи попадают сюда сами. Запишите первое — и оно появится здесь.",
+  "journalNoneInViewTitle": "В этой выборке пусто",
+  "journalNoneInViewBody": "Смените вид записи или срок.",
+
   "loginSubtitle": "Вход в вашу ферму",
   "loginEmailLabel": "Почта",
   "loginEmailHint": "name@example.com",
@@ -62,46 +76,18 @@
   "todayNeedsAttention": "Требует внимания",
   "todayAllClear": "Всё под контролем — срочного нет",
   "todayFarmNow": "Ферма сейчас",
-  "todayLast30Days": "За 30 дней",
   "todayStatLivestock": "Поголовье",
   "todayStatTasks": "Задачи в работе",
   "todayStatFreeCages": "Клеток свободно",
-  "todayStatBirths": "Родилось",
-  "todayStatIncome": "Доход",
-  "todayStatExpenses": "Расход",
-  "todayAlertOverdueTasks": "Просроченные задачи",
   "todayAlertOverdueVaccination": "Вакцинация просрочена",
-  "todayAlertUrgentTasks": "Срочные задачи",
   "todayAlertLowFeed": "Заканчивается корм",
   "todayAlertUpcomingVaccination": "Скоро вакцинация",
   "todayTourAlertsTitle": "Что требует внимания",
-  "todayTourAlertsBody": "Просроченные задачи, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.",
+  "todayTourAlertsBody": "Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.",
   "todayTourStatsTitle": "Состояние фермы",
   "todayTourStatsBody": "Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.",
 
-  "menuTitle": "Меню",
   "menuProfile": "Профиль",
-  "menuSectionLivestock": "Поголовье",
-  "menuSectionBreeding": "Разведение",
-  "menuSectionHealth": "Здоровье",
-  "menuSectionFeeding": "Корма",
-  "menuSectionLedger": "Учёт",
-  "menuSectionApp": "Приложение",
-  "menuCages": "Клетки",
-  "menuBreeds": "Породы",
-  "menuBreedings": "Случки",
-  "menuBirths": "Роды",
-  "menuPairPlanner": "Подбор пар",
-  "menuVaccinations": "Вакцинации",
-  "menuMedicalRecords": "Лечение",
-  "menuFeedStock": "Запасы",
-  "menuFeedingRecords": "Кормления",
-  "menuFinance": "Финансы",
-  "menuStaff": "Работники",
-  "menuSettings": "Настройки",
-  "menuAbout": "О приложении",
-  "menuAboutBody": "Учёт поголовья, кормов, здоровья и денег кроличьей фермы.",
-  "menuLogout": "Выйти",
 
   "roleOwner": "Владелец фермы",
   "roleManager": "Управляющий",
@@ -109,8 +95,6 @@
 
   "navToday": "Сегодня",
   "navRabbits": "Кролики",
-  "navTasks": "Задачи",
-  "navMenu": "Меню",
   "navHerd": "Стадо",
   "navBreeding": "Разведение",
   "navFarm": "Хозяйство",
@@ -128,12 +112,9 @@
   "herdTitle": "Стадо",
   "herdTabCages": "Клетки",
   "herdTabRabbits": "Кролики",
-  "breedingCycleTitle": "Разведение",
   "journalTitle": "Журнал",
   "reportsTitle": "Отчёты",
   "farmTitle": "Хозяйство",
-  "navNewTask": "Новая задача",
-  "navQuickEntry": "Быстрая запись",
   "navQuickTitle": "Что записать",
   "quickRecordFeeding": "Записать кормление",
   "quickRecordVaccination": "Записать вакцинацию",
@@ -147,19 +128,51 @@
   "formDiscardStay": "Продолжить ввод",
   "formDiscardLeave": "Выйти",
 
-  "breedingListTitle": "Случки",
+  "cycleTitle": "Разведение",
+  "cycleFindPair": "Подобрать пару",
+  "cycleRecordBirth": "Записать окрол",
+  "cycleStageCheck": "Проверить сукрольность",
+  "cycleStageBirth": "Окрол ожидается",
+  "cycleStageWeaning": "Отсадка молодняка",
+  "cycleStageNotPregnant": "Самка пустая",
+  "cycleStageFailed": "Случка не удалась",
+  "cycleStageCancelled": "Случка отменена",
+  "cycleStageClosed": "Цикл отработан",
+  "cycleDay": "{day}-й день",
+  "@cycleDay": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "cycleMaleLine": "Самец: {name}",
+  "@cycleMaleLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "cycleActionWhen": "{date} · {when}",
+  "@cycleActionWhen": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "when": { "type": "String" }
+    }
+  },
+  "cycleApproxDate": "примерно {date}",
+  "@cycleApproxDate": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "cycleDueToday": "сегодня",
+  "cycleDueTomorrow": "завтра",
+  "cycleInDays": "{count, plural, one{через {count} день} few{через {count} дня} many{через {count} дней} other{через {count} дня}}",
+  "@cycleInDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "cycleOverdueDays": "{count, plural, one{просрочено на {count} день} few{просрочено на {count} дня} many{просрочено на {count} дней} other{просрочено на {count} дня}}",
+  "@cycleOverdueDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "breedingEmptyTitle": "Случек пока нет",
   "breedingEmptyBody": "Запишите случку, и приложение подскажет ожидаемую дату окрола.",
   "breedingEmptyAction": "Записать случку",
   "breedingMale": "Самец",
   "breedingFemale": "Самка",
   "commonNameMissing": "Имя не указано",
-  "breedingExpectedBirth": "Окрол ожидается {date}",
-  "@breedingExpectedBirth": {
-    "placeholders": {
-      "date": { "type": "String" }
-    }
-  },
   "breedingStatusPlanned": "Запланирована",
   "breedingStatusCompleted": "Завершена",
   "breedingStatusFailed": "Неудачная",
@@ -273,6 +286,9 @@
   },
 
   "tasksTitle": "Задачи",
+  "todayTasksTitle": "Задачи на сегодня",
+  "todayTasksAll": "Все задачи",
+  "todayTasksNone": "На сегодня задач нет",
   "commonFilters": "Фильтры",
   "commonApply": "Применить",
   "commonReset": "Сбросить",
@@ -685,6 +701,7 @@
 
   "rabbitsTitle": "Кролики",
   "rabbitsSearchHint": "Кличка или номер бирки",
+  "herdCagesNoPlace": "Место не указано",
   "rabbitsEmptyTitle": "Кроликов пока нет",
   "rabbitsEmptyBody": "Заведите первого кролика — от него пойдёт весь учёт: родословная, здоровье и приплод.",
   "rabbitsEmptyAction": "Добавить кролика",
@@ -733,6 +750,25 @@
   "rabbitDetailDeleteFailed": "Не удалось удалить кролика",
 
   "settingsTitle": "Настройки",
+
+  "farmSectionMoney": "Деньги",
+  "farmTransactions": "Доходы и расходы",
+  "farmSectionFeed": "Корма",
+  "farmFeedStock": "Запас корма",
+  "farmFeedingRecords": "Кормления",
+  "farmSectionHealth": "Здоровье",
+  "farmVaccinations": "Вакцинации",
+  "farmMedicalRecords": "Лечение",
+  "farmSectionReports": "Отчёты",
+  "farmReports": "Сводка по ферме",
+  "farmSectionPeople": "Люди",
+  "farmStaff": "Сотрудники",
+  "farmSectionApp": "Приложение",
+  "farmSettings": "Настройки",
+  "farmAbout": "О приложении",
+  "farmAboutBody": "Учёт поголовья, кормов, здоровья и денег кроличьей фермы.",
+  "farmLogout": "Выйти",
+
   "settingsAppearance": "Внешний вид",
   "settingsTheme": "Тема",
   "settingsAccent": "Цвет акцента",
@@ -1117,6 +1153,40 @@
   "txCategoryEquipment": "Оборудование",
   "txCategoryUtilities": "Свет, вода, отопление",
   "txCategoryOther": "Прочее",
+  "reportsOutcomeUnknown": "Исход не указан",
+  "reportsFeedUsed": "Израсходовано",
+
+  "reportsTabFarm": "Ферма",
+  "reportsTabHealth": "Здоровье",
+  "reportsTabFinance": "Деньги",
+  "reportsPeriodRange": "С {from} по {to}",
+  "@reportsPeriodRange": {
+    "placeholders": {
+      "from": { "type": "String" },
+      "to": { "type": "String" }
+    }
+  },
+  "reportsPopulationNow": "Кроликов сейчас",
+  "reportsBirths": "Окролы",
+  "reportsBreedings": "Случки",
+  "reportsVaccinations": "Вакцинации",
+  "reportsMedicalRecords": "Лечение",
+  "reportsFeedings": "Кормления",
+  "reportsActivity": "За период",
+  "reportsByBreed": "Поголовье по породам",
+  "reportsBreedUnknown": "Порода №{id}",
+  "@reportsBreedUnknown": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "reportsMoney": "Деньги за период",
+  "reportsNoActivityTitle": "За этот период записей нет",
+  "reportsNoActivityBody": "Выберите период шире — или запишите случку, прививку, кормление, и они появятся здесь.",
+  "reportsFarmEmptyTitle": "Отчёту пока не из чего собраться",
+  "reportsFarmEmptyBody": "Заведите первого кролика — дальше отчёт соберётся сам из ежедневных записей.",
+  "reportsHealthEmptyTitle": "За этот период прививок и лечений не было",
+  "reportsHealthEmptyBody": "Выберите период шире или отметьте прививку — отчёт посчитается сам.",
+  "reportsVaccinesByName": "Прививки по вакцинам",
+  "reportsRecordsByOutcome": "Лечение по исходу",
 
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."

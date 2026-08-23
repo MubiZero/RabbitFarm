@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
+import '../../../../shared/models/api_response.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_statistics.dart';
 import '../../data/repositories/rabbits_repository.dart';
@@ -12,6 +13,50 @@ final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {
   return RabbitsRepository(apiClient: apiClient);
 });
 
+/// Отбор, которым сейчас смотрят на поголовье.
+///
+/// Живёт рядом со списком, а не в каждом экране по отдельности. Раньше отбор
+/// хранил экран и передавал его в каждый вызов — и любой, кто вызывал список
+/// мимо экрана, тихо сбрасывал фильтры: после добавления кролика форма звала
+/// `refresh()`, список приезжал целиком, а ярлыки над ним продолжали
+/// показывать выбранный отбор.
+class RabbitsFilter {
+  final String? search;
+  final String? sex;
+  final String? status;
+  final String? purpose;
+  final int? breedId;
+
+  const RabbitsFilter({
+    this.search,
+    this.sex,
+    this.status,
+    this.purpose,
+    this.breedId,
+  });
+
+  bool get isEmpty =>
+      search == null &&
+      sex == null &&
+      status == null &&
+      purpose == null &&
+      breedId == null;
+
+  /// Заменяют по одному полю. Обычный `copyWith` здесь не годится: снять
+  /// фильтр — значит передать null, а `??` вернул бы прежнее значение.
+  RabbitsFilter withSearch(String? value) => RabbitsFilter(
+      search: value, sex: sex, status: status, purpose: purpose, breedId: breedId);
+
+  RabbitsFilter withSex(String? value) => RabbitsFilter(
+      search: search, sex: value, status: status, purpose: purpose, breedId: breedId);
+
+  RabbitsFilter withStatus(String? value) => RabbitsFilter(
+      search: search, sex: sex, status: value, purpose: purpose, breedId: breedId);
+
+  RabbitsFilter withPurpose(String? value) => RabbitsFilter(
+      search: search, sex: sex, status: status, purpose: value, breedId: breedId);
+}
+
 // Rabbits List State
 class RabbitsListState {
   final List<RabbitModel> rabbits;
@@ -21,6 +66,7 @@ class RabbitsListState {
   final int totalPages;
   final int total;
   final bool hasMore;
+  final RabbitsFilter filter;
 
   RabbitsListState({
     this.rabbits = const [],
@@ -30,6 +76,7 @@ class RabbitsListState {
     this.totalPages = 1,
     this.total = 0,
     this.hasMore = false,
+    this.filter = const RabbitsFilter(),
   });
 
   RabbitsListState copyWith({
@@ -40,6 +87,7 @@ class RabbitsListState {
     int? totalPages,
     int? total,
     bool? hasMore,
+    RabbitsFilter? filter,
   }) {
     return RabbitsListState(
       rabbits: rabbits ?? this.rabbits,
@@ -49,6 +97,7 @@ class RabbitsListState {
       totalPages: totalPages ?? this.totalPages,
       total: total ?? this.total,
       hasMore: hasMore ?? this.hasMore,
+      filter: filter ?? this.filter,
     );
   }
 }
@@ -61,24 +110,20 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
     loadRabbits();
   }
 
+  static const _pageSize = 10;
+
+  /// Сменить отбор и перечитать список с первой страницы.
+  Future<void> applyFilter(RabbitsFilter filter) {
+    state = state.copyWith(filter: filter);
+    return loadRabbits();
+  }
+
   // Load rabbits (first page or refresh)
-  Future<void> loadRabbits({
-    String? search,
-    String? sex,
-    String? status,
-    int? breedId,
-  }) async {
+  Future<void> loadRabbits() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await _repository.getRabbits(
-        page: 1,
-        limit: 10,
-        search: search,
-        sex: sex,
-        status: status,
-        breedId: breedId,
-      );
+      final result = await _load(page: 1);
 
       state = state.copyWith(
         rabbits: result.items,
@@ -97,25 +142,13 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
   }
 
   // Load more rabbits (pagination)
-  Future<void> loadMore({
-    String? search,
-    String? sex,
-    String? status,
-    int? breedId,
-  }) async {
+  Future<void> loadMore() async {
     if (state.isLoading || !state.hasMore) return;
 
     state = state.copyWith(isLoading: true);
 
     try {
-      final result = await _repository.getRabbits(
-        page: state.currentPage + 1,
-        limit: 10,
-        search: search,
-        sex: sex,
-        status: status,
-        breedId: breedId,
-      );
+      final result = await _load(page: state.currentPage + 1);
 
       state = state.copyWith(
         rabbits: [...state.rabbits, ...result.items],
@@ -131,6 +164,23 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
         error: e,
       );
     }
+  }
+
+  /// Отбор уходит на сервер целиком — и в первую страницу, и в подгрузку.
+  /// Отбирать назначение среди приехавшей страницы значило бы показать
+  /// «племя» ровно в том количестве, в каком оно попало в первые десять
+  /// записей.
+  Future<PaginatedResponse<RabbitModel>> _load({required int page}) {
+    final filter = state.filter;
+    return _repository.getRabbits(
+      page: page,
+      limit: _pageSize,
+      search: filter.search,
+      sex: filter.sex,
+      status: filter.status,
+      purpose: filter.purpose,
+      breedId: filter.breedId,
+    );
   }
 
   // Refresh

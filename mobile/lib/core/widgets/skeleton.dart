@@ -74,9 +74,16 @@ class SkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Заглушка встаёт и на месте высокой карточки, и на месте низкой строки
+    // списка. При жёстком отступе низкая заглушка не помещалась в свою же
+    // высоту и рисовалась с полосатой лентой переполнения.
+    final tight = height < 72;
+    final pad = tight ? AppSpacing.sm : AppSpacing.lg;
+    final glyph = tight ? 32.0 : 40.0;
+
     return Container(
       height: height,
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: pad),
       decoration: BoxDecoration(
         color: context.colors.surface,
         borderRadius: AppRadius.lgAll,
@@ -84,7 +91,7 @@ class SkeletonCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const SkeletonBox(width: 40, height: 40, borderRadius: AppRadius.mdAll),
+          SkeletonBox(width: glyph, height: glyph, borderRadius: AppRadius.mdAll),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(

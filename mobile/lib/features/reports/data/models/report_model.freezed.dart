@@ -3511,9 +3511,16 @@ mixin _$FeedingData {
   @JsonKey(name: 'total_feeding_records')
   @IntConverter()
   int get totalFeedingRecords => throw _privateConstructorUsedError;
-  @JsonKey(name: 'total_feed_consumption')
-  @DoubleConverter()
-  double get totalFeedConsumption => throw _privateConstructorUsedError;
+
+  /// Расход по каждой единице измерения отдельно.
+  ///
+  /// Модель требовала одно общее число `total_feed_consumption`, которого
+  /// сервер никогда не отдавал, — на настоящем ответе разбор всего отчёта
+  /// падал. Не отдавал он его намеренно: складывать килограммы со штуками
+  /// нельзя, сумма получилась бы бессмысленной.
+  @JsonKey(name: 'consumption_by_unit')
+  List<FeedConsumption> get consumptionByUnit =>
+      throw _privateConstructorUsedError;
 
   /// Serializes this FeedingData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -3536,9 +3543,8 @@ abstract class $FeedingDataCopyWith<$Res> {
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
     int totalFeedingRecords,
-    @JsonKey(name: 'total_feed_consumption')
-    @DoubleConverter()
-    double totalFeedConsumption,
+    @JsonKey(name: 'consumption_by_unit')
+    List<FeedConsumption> consumptionByUnit,
   });
 }
 
@@ -3558,7 +3564,7 @@ class _$FeedingDataCopyWithImpl<$Res, $Val extends FeedingData>
   @override
   $Res call({
     Object? totalFeedingRecords = null,
-    Object? totalFeedConsumption = null,
+    Object? consumptionByUnit = null,
   }) {
     return _then(
       _value.copyWith(
@@ -3566,10 +3572,10 @@ class _$FeedingDataCopyWithImpl<$Res, $Val extends FeedingData>
                 ? _value.totalFeedingRecords
                 : totalFeedingRecords // ignore: cast_nullable_to_non_nullable
                       as int,
-            totalFeedConsumption: null == totalFeedConsumption
-                ? _value.totalFeedConsumption
-                : totalFeedConsumption // ignore: cast_nullable_to_non_nullable
-                      as double,
+            consumptionByUnit: null == consumptionByUnit
+                ? _value.consumptionByUnit
+                : consumptionByUnit // ignore: cast_nullable_to_non_nullable
+                      as List<FeedConsumption>,
           )
           as $Val,
     );
@@ -3589,9 +3595,8 @@ abstract class _$$FeedingDataImplCopyWith<$Res>
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
     int totalFeedingRecords,
-    @JsonKey(name: 'total_feed_consumption')
-    @DoubleConverter()
-    double totalFeedConsumption,
+    @JsonKey(name: 'consumption_by_unit')
+    List<FeedConsumption> consumptionByUnit,
   });
 }
 
@@ -3610,7 +3615,7 @@ class __$$FeedingDataImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? totalFeedingRecords = null,
-    Object? totalFeedConsumption = null,
+    Object? consumptionByUnit = null,
   }) {
     return _then(
       _$FeedingDataImpl(
@@ -3618,10 +3623,10 @@ class __$$FeedingDataImplCopyWithImpl<$Res>
             ? _value.totalFeedingRecords
             : totalFeedingRecords // ignore: cast_nullable_to_non_nullable
                   as int,
-        totalFeedConsumption: null == totalFeedConsumption
-            ? _value.totalFeedConsumption
-            : totalFeedConsumption // ignore: cast_nullable_to_non_nullable
-                  as double,
+        consumptionByUnit: null == consumptionByUnit
+            ? _value._consumptionByUnit
+            : consumptionByUnit // ignore: cast_nullable_to_non_nullable
+                  as List<FeedConsumption>,
       ),
     );
   }
@@ -3634,10 +3639,9 @@ class _$FeedingDataImpl implements _FeedingData {
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
     required this.totalFeedingRecords,
-    @JsonKey(name: 'total_feed_consumption')
-    @DoubleConverter()
-    required this.totalFeedConsumption,
-  });
+    @JsonKey(name: 'consumption_by_unit')
+    final List<FeedConsumption> consumptionByUnit = const [],
+  }) : _consumptionByUnit = consumptionByUnit;
 
   factory _$FeedingDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$FeedingDataImplFromJson(json);
@@ -3646,14 +3650,33 @@ class _$FeedingDataImpl implements _FeedingData {
   @JsonKey(name: 'total_feeding_records')
   @IntConverter()
   final int totalFeedingRecords;
+
+  /// Расход по каждой единице измерения отдельно.
+  ///
+  /// Модель требовала одно общее число `total_feed_consumption`, которого
+  /// сервер никогда не отдавал, — на настоящем ответе разбор всего отчёта
+  /// падал. Не отдавал он его намеренно: складывать килограммы со штуками
+  /// нельзя, сумма получилась бы бессмысленной.
+  final List<FeedConsumption> _consumptionByUnit;
+
+  /// Расход по каждой единице измерения отдельно.
+  ///
+  /// Модель требовала одно общее число `total_feed_consumption`, которого
+  /// сервер никогда не отдавал, — на настоящем ответе разбор всего отчёта
+  /// падал. Не отдавал он его намеренно: складывать килограммы со штуками
+  /// нельзя, сумма получилась бы бессмысленной.
   @override
-  @JsonKey(name: 'total_feed_consumption')
-  @DoubleConverter()
-  final double totalFeedConsumption;
+  @JsonKey(name: 'consumption_by_unit')
+  List<FeedConsumption> get consumptionByUnit {
+    if (_consumptionByUnit is EqualUnmodifiableListView)
+      return _consumptionByUnit;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_consumptionByUnit);
+  }
 
   @override
   String toString() {
-    return 'FeedingData(totalFeedingRecords: $totalFeedingRecords, totalFeedConsumption: $totalFeedConsumption)';
+    return 'FeedingData(totalFeedingRecords: $totalFeedingRecords, consumptionByUnit: $consumptionByUnit)';
   }
 
   @override
@@ -3663,14 +3686,19 @@ class _$FeedingDataImpl implements _FeedingData {
             other is _$FeedingDataImpl &&
             (identical(other.totalFeedingRecords, totalFeedingRecords) ||
                 other.totalFeedingRecords == totalFeedingRecords) &&
-            (identical(other.totalFeedConsumption, totalFeedConsumption) ||
-                other.totalFeedConsumption == totalFeedConsumption));
+            const DeepCollectionEquality().equals(
+              other._consumptionByUnit,
+              _consumptionByUnit,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, totalFeedingRecords, totalFeedConsumption);
+  int get hashCode => Object.hash(
+    runtimeType,
+    totalFeedingRecords,
+    const DeepCollectionEquality().hash(_consumptionByUnit),
+  );
 
   /// Create a copy of FeedingData
   /// with the given fields replaced by the non-null parameter values.
@@ -3691,9 +3719,8 @@ abstract class _FeedingData implements FeedingData {
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
     required final int totalFeedingRecords,
-    @JsonKey(name: 'total_feed_consumption')
-    @DoubleConverter()
-    required final double totalFeedConsumption,
+    @JsonKey(name: 'consumption_by_unit')
+    final List<FeedConsumption> consumptionByUnit,
   }) = _$FeedingDataImpl;
 
   factory _FeedingData.fromJson(Map<String, dynamic> json) =
@@ -3703,16 +3730,199 @@ abstract class _FeedingData implements FeedingData {
   @JsonKey(name: 'total_feeding_records')
   @IntConverter()
   int get totalFeedingRecords;
+
+  /// Расход по каждой единице измерения отдельно.
+  ///
+  /// Модель требовала одно общее число `total_feed_consumption`, которого
+  /// сервер никогда не отдавал, — на настоящем ответе разбор всего отчёта
+  /// падал. Не отдавал он его намеренно: складывать килограммы со штуками
+  /// нельзя, сумма получилась бы бессмысленной.
   @override
-  @JsonKey(name: 'total_feed_consumption')
-  @DoubleConverter()
-  double get totalFeedConsumption;
+  @JsonKey(name: 'consumption_by_unit')
+  List<FeedConsumption> get consumptionByUnit;
 
   /// Create a copy of FeedingData
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$FeedingDataImplCopyWith<_$FeedingDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+FeedConsumption _$FeedConsumptionFromJson(Map<String, dynamic> json) {
+  return _FeedConsumption.fromJson(json);
+}
+
+/// @nodoc
+mixin _$FeedConsumption {
+  String get unit => throw _privateConstructorUsedError;
+  @DoubleConverter()
+  double get total => throw _privateConstructorUsedError;
+
+  /// Serializes this FeedConsumption to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of FeedConsumption
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $FeedConsumptionCopyWith<FeedConsumption> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $FeedConsumptionCopyWith<$Res> {
+  factory $FeedConsumptionCopyWith(
+    FeedConsumption value,
+    $Res Function(FeedConsumption) then,
+  ) = _$FeedConsumptionCopyWithImpl<$Res, FeedConsumption>;
+  @useResult
+  $Res call({String unit, @DoubleConverter() double total});
+}
+
+/// @nodoc
+class _$FeedConsumptionCopyWithImpl<$Res, $Val extends FeedConsumption>
+    implements $FeedConsumptionCopyWith<$Res> {
+  _$FeedConsumptionCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of FeedConsumption
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? unit = null, Object? total = null}) {
+    return _then(
+      _value.copyWith(
+            unit: null == unit
+                ? _value.unit
+                : unit // ignore: cast_nullable_to_non_nullable
+                      as String,
+            total: null == total
+                ? _value.total
+                : total // ignore: cast_nullable_to_non_nullable
+                      as double,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$FeedConsumptionImplCopyWith<$Res>
+    implements $FeedConsumptionCopyWith<$Res> {
+  factory _$$FeedConsumptionImplCopyWith(
+    _$FeedConsumptionImpl value,
+    $Res Function(_$FeedConsumptionImpl) then,
+  ) = __$$FeedConsumptionImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String unit, @DoubleConverter() double total});
+}
+
+/// @nodoc
+class __$$FeedConsumptionImplCopyWithImpl<$Res>
+    extends _$FeedConsumptionCopyWithImpl<$Res, _$FeedConsumptionImpl>
+    implements _$$FeedConsumptionImplCopyWith<$Res> {
+  __$$FeedConsumptionImplCopyWithImpl(
+    _$FeedConsumptionImpl _value,
+    $Res Function(_$FeedConsumptionImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of FeedConsumption
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? unit = null, Object? total = null}) {
+    return _then(
+      _$FeedConsumptionImpl(
+        unit: null == unit
+            ? _value.unit
+            : unit // ignore: cast_nullable_to_non_nullable
+                  as String,
+        total: null == total
+            ? _value.total
+            : total // ignore: cast_nullable_to_non_nullable
+                  as double,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$FeedConsumptionImpl implements _FeedConsumption {
+  const _$FeedConsumptionImpl({
+    required this.unit,
+    @DoubleConverter() required this.total,
+  });
+
+  factory _$FeedConsumptionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$FeedConsumptionImplFromJson(json);
+
+  @override
+  final String unit;
+  @override
+  @DoubleConverter()
+  final double total;
+
+  @override
+  String toString() {
+    return 'FeedConsumption(unit: $unit, total: $total)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FeedConsumptionImpl &&
+            (identical(other.unit, unit) || other.unit == unit) &&
+            (identical(other.total, total) || other.total == total));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, unit, total);
+
+  /// Create a copy of FeedConsumption
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FeedConsumptionImplCopyWith<_$FeedConsumptionImpl> get copyWith =>
+      __$$FeedConsumptionImplCopyWithImpl<_$FeedConsumptionImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$FeedConsumptionImplToJson(this);
+  }
+}
+
+abstract class _FeedConsumption implements FeedConsumption {
+  const factory _FeedConsumption({
+    required final String unit,
+    @DoubleConverter() required final double total,
+  }) = _$FeedConsumptionImpl;
+
+  factory _FeedConsumption.fromJson(Map<String, dynamic> json) =
+      _$FeedConsumptionImpl.fromJson;
+
+  @override
+  String get unit;
+  @override
+  @DoubleConverter()
+  double get total;
+
+  /// Create a copy of FeedConsumption
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$FeedConsumptionImplCopyWith<_$FeedConsumptionImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4319,8 +4529,8 @@ MedicalRecordsData _$MedicalRecordsDataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$MedicalRecordsData {
-  @JsonKey(name: 'by_type')
-  List<RecordTypeCount> get byType => throw _privateConstructorUsedError;
+  @JsonKey(name: 'by_outcome')
+  List<RecordOutcomeCount> get byOutcome => throw _privateConstructorUsedError;
 
   /// Serializes this MedicalRecordsData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -4339,7 +4549,7 @@ abstract class $MedicalRecordsDataCopyWith<$Res> {
     $Res Function(MedicalRecordsData) then,
   ) = _$MedicalRecordsDataCopyWithImpl<$Res, MedicalRecordsData>;
   @useResult
-  $Res call({@JsonKey(name: 'by_type') List<RecordTypeCount> byType});
+  $Res call({@JsonKey(name: 'by_outcome') List<RecordOutcomeCount> byOutcome});
 }
 
 /// @nodoc
@@ -4356,13 +4566,13 @@ class _$MedicalRecordsDataCopyWithImpl<$Res, $Val extends MedicalRecordsData>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? byType = null}) {
+  $Res call({Object? byOutcome = null}) {
     return _then(
       _value.copyWith(
-            byType: null == byType
-                ? _value.byType
-                : byType // ignore: cast_nullable_to_non_nullable
-                      as List<RecordTypeCount>,
+            byOutcome: null == byOutcome
+                ? _value.byOutcome
+                : byOutcome // ignore: cast_nullable_to_non_nullable
+                      as List<RecordOutcomeCount>,
           )
           as $Val,
     );
@@ -4378,7 +4588,7 @@ abstract class _$$MedicalRecordsDataImplCopyWith<$Res>
   ) = __$$MedicalRecordsDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({@JsonKey(name: 'by_type') List<RecordTypeCount> byType});
+  $Res call({@JsonKey(name: 'by_outcome') List<RecordOutcomeCount> byOutcome});
 }
 
 /// @nodoc
@@ -4394,13 +4604,13 @@ class __$$MedicalRecordsDataImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? byType = null}) {
+  $Res call({Object? byOutcome = null}) {
     return _then(
       _$MedicalRecordsDataImpl(
-        byType: null == byType
-            ? _value._byType
-            : byType // ignore: cast_nullable_to_non_nullable
-                  as List<RecordTypeCount>,
+        byOutcome: null == byOutcome
+            ? _value._byOutcome
+            : byOutcome // ignore: cast_nullable_to_non_nullable
+                  as List<RecordOutcomeCount>,
       ),
     );
   }
@@ -4410,24 +4620,25 @@ class __$$MedicalRecordsDataImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$MedicalRecordsDataImpl implements _MedicalRecordsData {
   const _$MedicalRecordsDataImpl({
-    @JsonKey(name: 'by_type') required final List<RecordTypeCount> byType,
-  }) : _byType = byType;
+    @JsonKey(name: 'by_outcome')
+    final List<RecordOutcomeCount> byOutcome = const [],
+  }) : _byOutcome = byOutcome;
 
   factory _$MedicalRecordsDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$MedicalRecordsDataImplFromJson(json);
 
-  final List<RecordTypeCount> _byType;
+  final List<RecordOutcomeCount> _byOutcome;
   @override
-  @JsonKey(name: 'by_type')
-  List<RecordTypeCount> get byType {
-    if (_byType is EqualUnmodifiableListView) return _byType;
+  @JsonKey(name: 'by_outcome')
+  List<RecordOutcomeCount> get byOutcome {
+    if (_byOutcome is EqualUnmodifiableListView) return _byOutcome;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_byType);
+    return EqualUnmodifiableListView(_byOutcome);
   }
 
   @override
   String toString() {
-    return 'MedicalRecordsData(byType: $byType)';
+    return 'MedicalRecordsData(byOutcome: $byOutcome)';
   }
 
   @override
@@ -4435,13 +4646,16 @@ class _$MedicalRecordsDataImpl implements _MedicalRecordsData {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$MedicalRecordsDataImpl &&
-            const DeepCollectionEquality().equals(other._byType, _byType));
+            const DeepCollectionEquality().equals(
+              other._byOutcome,
+              _byOutcome,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_byType));
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_byOutcome));
 
   /// Create a copy of MedicalRecordsData
   /// with the given fields replaced by the non-null parameter values.
@@ -4462,15 +4676,15 @@ class _$MedicalRecordsDataImpl implements _MedicalRecordsData {
 
 abstract class _MedicalRecordsData implements MedicalRecordsData {
   const factory _MedicalRecordsData({
-    @JsonKey(name: 'by_type') required final List<RecordTypeCount> byType,
+    @JsonKey(name: 'by_outcome') final List<RecordOutcomeCount> byOutcome,
   }) = _$MedicalRecordsDataImpl;
 
   factory _MedicalRecordsData.fromJson(Map<String, dynamic> json) =
       _$MedicalRecordsDataImpl.fromJson;
 
   @override
-  @JsonKey(name: 'by_type')
-  List<RecordTypeCount> get byType;
+  @JsonKey(name: 'by_outcome')
+  List<RecordOutcomeCount> get byOutcome;
 
   /// Create a copy of MedicalRecordsData
   /// with the given fields replaced by the non-null parameter values.
@@ -4480,61 +4694,57 @@ abstract class _MedicalRecordsData implements MedicalRecordsData {
       throw _privateConstructorUsedError;
 }
 
-RecordTypeCount _$RecordTypeCountFromJson(Map<String, dynamic> json) {
-  return _RecordTypeCount.fromJson(json);
+RecordOutcomeCount _$RecordOutcomeCountFromJson(Map<String, dynamic> json) {
+  return _RecordOutcomeCount.fromJson(json);
 }
 
 /// @nodoc
-mixin _$RecordTypeCount {
-  @JsonKey(name: 'record_type')
-  String get recordType => throw _privateConstructorUsedError;
+mixin _$RecordOutcomeCount {
+  String? get outcome => throw _privateConstructorUsedError;
   @IntConverter()
   int get count => throw _privateConstructorUsedError;
 
-  /// Serializes this RecordTypeCount to a JSON map.
+  /// Serializes this RecordOutcomeCount to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of RecordTypeCount
+  /// Create a copy of RecordOutcomeCount
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $RecordTypeCountCopyWith<RecordTypeCount> get copyWith =>
+  $RecordOutcomeCountCopyWith<RecordOutcomeCount> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $RecordTypeCountCopyWith<$Res> {
-  factory $RecordTypeCountCopyWith(
-    RecordTypeCount value,
-    $Res Function(RecordTypeCount) then,
-  ) = _$RecordTypeCountCopyWithImpl<$Res, RecordTypeCount>;
+abstract class $RecordOutcomeCountCopyWith<$Res> {
+  factory $RecordOutcomeCountCopyWith(
+    RecordOutcomeCount value,
+    $Res Function(RecordOutcomeCount) then,
+  ) = _$RecordOutcomeCountCopyWithImpl<$Res, RecordOutcomeCount>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'record_type') String recordType,
-    @IntConverter() int count,
-  });
+  $Res call({String? outcome, @IntConverter() int count});
 }
 
 /// @nodoc
-class _$RecordTypeCountCopyWithImpl<$Res, $Val extends RecordTypeCount>
-    implements $RecordTypeCountCopyWith<$Res> {
-  _$RecordTypeCountCopyWithImpl(this._value, this._then);
+class _$RecordOutcomeCountCopyWithImpl<$Res, $Val extends RecordOutcomeCount>
+    implements $RecordOutcomeCountCopyWith<$Res> {
+  _$RecordOutcomeCountCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of RecordTypeCount
+  /// Create a copy of RecordOutcomeCount
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? recordType = null, Object? count = null}) {
+  $Res call({Object? outcome = freezed, Object? count = null}) {
     return _then(
       _value.copyWith(
-            recordType: null == recordType
-                ? _value.recordType
-                : recordType // ignore: cast_nullable_to_non_nullable
-                      as String,
+            outcome: freezed == outcome
+                ? _value.outcome
+                : outcome // ignore: cast_nullable_to_non_nullable
+                      as String?,
             count: null == count
                 ? _value.count
                 : count // ignore: cast_nullable_to_non_nullable
@@ -4546,40 +4756,37 @@ class _$RecordTypeCountCopyWithImpl<$Res, $Val extends RecordTypeCount>
 }
 
 /// @nodoc
-abstract class _$$RecordTypeCountImplCopyWith<$Res>
-    implements $RecordTypeCountCopyWith<$Res> {
-  factory _$$RecordTypeCountImplCopyWith(
-    _$RecordTypeCountImpl value,
-    $Res Function(_$RecordTypeCountImpl) then,
-  ) = __$$RecordTypeCountImplCopyWithImpl<$Res>;
+abstract class _$$RecordOutcomeCountImplCopyWith<$Res>
+    implements $RecordOutcomeCountCopyWith<$Res> {
+  factory _$$RecordOutcomeCountImplCopyWith(
+    _$RecordOutcomeCountImpl value,
+    $Res Function(_$RecordOutcomeCountImpl) then,
+  ) = __$$RecordOutcomeCountImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'record_type') String recordType,
-    @IntConverter() int count,
-  });
+  $Res call({String? outcome, @IntConverter() int count});
 }
 
 /// @nodoc
-class __$$RecordTypeCountImplCopyWithImpl<$Res>
-    extends _$RecordTypeCountCopyWithImpl<$Res, _$RecordTypeCountImpl>
-    implements _$$RecordTypeCountImplCopyWith<$Res> {
-  __$$RecordTypeCountImplCopyWithImpl(
-    _$RecordTypeCountImpl _value,
-    $Res Function(_$RecordTypeCountImpl) _then,
+class __$$RecordOutcomeCountImplCopyWithImpl<$Res>
+    extends _$RecordOutcomeCountCopyWithImpl<$Res, _$RecordOutcomeCountImpl>
+    implements _$$RecordOutcomeCountImplCopyWith<$Res> {
+  __$$RecordOutcomeCountImplCopyWithImpl(
+    _$RecordOutcomeCountImpl _value,
+    $Res Function(_$RecordOutcomeCountImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of RecordTypeCount
+  /// Create a copy of RecordOutcomeCount
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? recordType = null, Object? count = null}) {
+  $Res call({Object? outcome = freezed, Object? count = null}) {
     return _then(
-      _$RecordTypeCountImpl(
-        recordType: null == recordType
-            ? _value.recordType
-            : recordType // ignore: cast_nullable_to_non_nullable
-                  as String,
+      _$RecordOutcomeCountImpl(
+        outcome: freezed == outcome
+            ? _value.outcome
+            : outcome // ignore: cast_nullable_to_non_nullable
+                  as String?,
         count: null == count
             ? _value.count
             : count // ignore: cast_nullable_to_non_nullable
@@ -4591,79 +4798,76 @@ class __$$RecordTypeCountImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RecordTypeCountImpl implements _RecordTypeCount {
-  const _$RecordTypeCountImpl({
-    @JsonKey(name: 'record_type') required this.recordType,
+class _$RecordOutcomeCountImpl implements _RecordOutcomeCount {
+  const _$RecordOutcomeCountImpl({
+    this.outcome,
     @IntConverter() required this.count,
   });
 
-  factory _$RecordTypeCountImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RecordTypeCountImplFromJson(json);
+  factory _$RecordOutcomeCountImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RecordOutcomeCountImplFromJson(json);
 
   @override
-  @JsonKey(name: 'record_type')
-  final String recordType;
+  final String? outcome;
   @override
   @IntConverter()
   final int count;
 
   @override
   String toString() {
-    return 'RecordTypeCount(recordType: $recordType, count: $count)';
+    return 'RecordOutcomeCount(outcome: $outcome, count: $count)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$RecordTypeCountImpl &&
-            (identical(other.recordType, recordType) ||
-                other.recordType == recordType) &&
+            other is _$RecordOutcomeCountImpl &&
+            (identical(other.outcome, outcome) || other.outcome == outcome) &&
             (identical(other.count, count) || other.count == count));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, recordType, count);
+  int get hashCode => Object.hash(runtimeType, outcome, count);
 
-  /// Create a copy of RecordTypeCount
+  /// Create a copy of RecordOutcomeCount
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$RecordTypeCountImplCopyWith<_$RecordTypeCountImpl> get copyWith =>
-      __$$RecordTypeCountImplCopyWithImpl<_$RecordTypeCountImpl>(
+  _$$RecordOutcomeCountImplCopyWith<_$RecordOutcomeCountImpl> get copyWith =>
+      __$$RecordOutcomeCountImplCopyWithImpl<_$RecordOutcomeCountImpl>(
         this,
         _$identity,
       );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$RecordTypeCountImplToJson(this);
+    return _$$RecordOutcomeCountImplToJson(this);
   }
 }
 
-abstract class _RecordTypeCount implements RecordTypeCount {
-  const factory _RecordTypeCount({
-    @JsonKey(name: 'record_type') required final String recordType,
+abstract class _RecordOutcomeCount implements RecordOutcomeCount {
+  const factory _RecordOutcomeCount({
+    final String? outcome,
     @IntConverter() required final int count,
-  }) = _$RecordTypeCountImpl;
+  }) = _$RecordOutcomeCountImpl;
 
-  factory _RecordTypeCount.fromJson(Map<String, dynamic> json) =
-      _$RecordTypeCountImpl.fromJson;
+  factory _RecordOutcomeCount.fromJson(Map<String, dynamic> json) =
+      _$RecordOutcomeCountImpl.fromJson;
 
   @override
-  @JsonKey(name: 'record_type')
-  String get recordType;
+  String? get outcome;
   @override
   @IntConverter()
   int get count;
 
-  /// Create a copy of RecordTypeCount
+  /// Create a copy of RecordOutcomeCount
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$RecordTypeCountImplCopyWith<_$RecordTypeCountImpl> get copyWith =>
+  _$$RecordOutcomeCountImplCopyWith<_$RecordOutcomeCountImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

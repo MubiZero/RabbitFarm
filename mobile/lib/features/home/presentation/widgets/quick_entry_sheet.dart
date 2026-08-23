@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../providers/quick_entry_usage_provider.dart';
 
 /// Всё, что человек может записать, в одном списке.
 ///
@@ -128,7 +130,8 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
 }
 
 /// Открывает лист записей. Пустые по роли группы не показываются.
-Future<void> showQuickEntrySheet(BuildContext context, FarmRoleAccess role) {
+Future<void> showQuickEntrySheet(
+    BuildContext context, FarmRoleAccess role) async {
   final groups = [
     for (final group in quickEntryGroups(context))
       if (group.actions.any((a) => role.can(a.capability)))
@@ -139,76 +142,137 @@ Future<void> showQuickEntrySheet(BuildContext context, FarmRoleAccess role) {
         ),
   ];
 
+  // Счётчик выборов читается до показа листа, а не внутри него: группа
+  // «Часто» стоит первой, и появись она через кадр после открытия — весь
+  // список прыгнул бы вниз под уже занесённым пальцем.
+  await ProviderScope.containerOf(context, listen: false)
+      .read(quickEntryUsageProvider.future);
+  if (!context.mounted) return;
+
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
+    // Одиннадцать пунктов в половину экрана не помещаются, а на маленьком
+    // телефоне не помещаются и четыре: лист занимает столько, сколько нужно,
+    // но не больше пяти шестых экрана, и дальше прокручивается.
+    isScrollControlled: true,
+    useSafeArea: true,
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+    ),
     builder: (context) => _QuickEntrySheet(groups: groups),
   );
 }
 
-class _QuickEntrySheet extends StatelessWidget {
+class _QuickEntrySheet extends ConsumerWidget {
   final List<QuickEntryGroup> groups;
 
   const _QuickEntrySheet({required this.groups});
 
+  /// Часто выбираемое поднимается наверх отдельной группой, но из своей
+  /// остаётся на месте: список, который переставляется под человеком, каждый
+  /// раз приходится перечитывать заново.
+  List<QuickEntryGroup> _withFrequent(BuildContext context, WidgetRef ref) {
+    final picks = ref.watch(quickEntryUsageProvider).value ?? const {};
+    final byRoute = {
+      for (final group in groups)
+        for (final action in group.actions) action.route: action,
+    };
+
+    final frequent = [
+      for (final route in frequentRoutes(picks))
+        if (byRoute[route] != null) byRoute[route]!,
+    ];
+
+    return [
+      if (frequent.isNotEmpty)
+        QuickEntryGroup(
+          title: context.l10n.quickGroupOften,
+          actions: frequent,
+        ),
+      ...groups,
+    ];
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                0,
-                AppSpacing.xl,
-                AppSpacing.md,
-              ),
-              child: Text(
-                context.l10n.navQuickTitle,
-                style: AppTypography.titleLg
-                    .copyWith(color: context.colors.onSurface),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              0,
+              AppSpacing.xl,
+              AppSpacing.md,
+            ),
+            child: Text(
+              context.l10n.navQuickTitle,
+              style: AppTypography.titleLg
+                  .copyWith(color: context.colors.onSurface),
+            ),
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final group in _withFrequent(context, ref)) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.xl,
+                        AppSpacing.sm,
+                        AppSpacing.xl,
+                        AppSpacing.sm,
+                      ),
+                      child: Text(
+                        group.title,
+                        style: AppTypography.labelLg
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
+                    ),
+                    for (final action in group.actions)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.xl,
+                          0,
+                          AppSpacing.xl,
+                          AppSpacing.sm,
+                        ),
+                        child: _ActionRow(
+                          action: action,
+                          onTap: () => _open(context, ref, action),
+                        ),
+                      ),
+                  ],
+                  const SizedBox(height: AppSpacing.lg),
+                ],
               ),
             ),
-            for (final group in groups) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.sm,
-                  AppSpacing.xl,
-                  AppSpacing.sm,
-                ),
-                child: Text(
-                  group.title,
-                  style: AppTypography.labelLg
-                      .copyWith(color: context.colors.onSurfaceVariant),
-                ),
-              ),
-              for (final action in group.actions)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.xl,
-                    0,
-                    AppSpacing.xl,
-                    AppSpacing.sm,
-                  ),
-                  child: _ActionRow(action: action),
-                ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _open(BuildContext context, WidgetRef ref, QuickEntryAction action) {
+    // Роутер берётся до закрытия листа: после `pop` этот контекст из дерева
+    // уже вынут, и добраться до навигатора через него нельзя.
+    final router = GoRouter.of(context);
+    ref.read(quickEntryUsageProvider.notifier).record(action.route);
+    Navigator.pop(context);
+    router.push(action.route);
   }
 }
 
 class _ActionRow extends StatelessWidget {
   final QuickEntryAction action;
+  final VoidCallback onTap;
 
-  const _ActionRow({required this.action});
+  const _ActionRow({required this.action, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -219,10 +283,7 @@ class _ActionRow extends StatelessWidget {
       borderRadius: AppRadius.mdAll,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-          context.push(action.route);
-        },
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(

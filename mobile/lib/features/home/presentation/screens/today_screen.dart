@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
+import '../../../../core/utils/date_labels.dart';
 import '../../../../core/widgets/coach_mark.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -13,6 +15,8 @@ import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../onboarding/presentation/providers/tour_provider.dart';
 import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
+import '../../../tasks/data/models/task_model.dart';
+import '../../../tasks/presentation/providers/tasks_provider.dart';
 
 /// Экран «Сегодня» — с чего начинается рабочий день.
 ///
@@ -22,6 +26,10 @@ import '../../../reports/presentation/providers/reports_provider.dart';
 /// действий» вели на вкладки, до которых можно дотянуться внизу этого же
 /// экрана. Зато число просроченных задач, самое важное для фермы, не
 /// показывалось нигде.
+///
+/// Задачи с тех пор переехали сюда целиком: карточка «просроченные задачи»
+/// умела только отослать на другой экран, и чтобы поставить галочку, человек
+/// уходил с «Сегодня» и терял место, на котором стоял.
 class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
@@ -63,7 +71,16 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
   Future<void> _refresh() async {
     ref.invalidate(dashboardReportProvider);
-    await ref.read(dashboardReportProvider.future);
+    ref.invalidate(todayTasksProvider);
+    try {
+      await Future.wait([
+        ref.read(dashboardReportProvider.future),
+        ref.read(todayTasksProvider.future),
+      ]);
+    } catch (_) {
+      // Об ошибке рассказывают сами блоки — каждый на своём месте. Здесь
+      // ожидание нужно только чтобы вовремя убрать индикатор обновления.
+    }
   }
 
   @override
@@ -117,13 +134,15 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         const _Greeting(),
         const SizedBox(height: AppSpacing.xl),
 
+        // Всё, что горит сегодня, — один блок: дела, которые можно закрыть
+        // отсюда же, и тревоги, за которыми надо идти в другой раздел.
         Column(
           key: _alertsKey,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (alerts.isEmpty)
-              const _AllClearCard()
-            else ...[
+            _TodayTasks(quietWhenEmpty: alerts.isNotEmpty),
+            if (alerts.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xl),
               AppSectionTitle(context.l10n.todayNeedsAttention),
               for (var i = 0; i < alerts.length; i++) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.sm),
@@ -172,56 +191,16 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
             ),
           ],
         ),
-
-        const SizedBox(height: AppSpacing.xl),
-
-        AppSectionTitle(context.l10n.todayLast30Days),
-        Row(
-          children: [
-            Expanded(
-              child: StatTile(
-                icon: Icons.child_care_outlined,
-                label: context.l10n.todayStatBirths,
-                value: '${d.breeding.recentBirths}',
-                accent: AppColors.domainBreeding,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: Icons.trending_up,
-                label: context.l10n.todayStatIncome,
-                value: formatMoney(d.finance.income30days),
-                accent: AppColors.success,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: Icons.trending_down,
-                label: context.l10n.todayStatExpenses,
-                value: formatMoney(d.finance.expenses30days),
-                accent: AppColors.error,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
   /// Срочное — сверху. Просроченное важнее предстоящего, поэтому порядок
   /// здесь фиксированный, а не «в каком порядке пришли поля».
+  ///
+  /// Задач здесь больше нет: их видно строками выше, и там их можно закрыть.
   List<Widget> _alerts(DashboardReport d) {
     return [
-      if (d.tasks.overdue > 0)
-        AlertCard(
-          title: context.l10n.todayAlertOverdueTasks,
-          description: context.l10n.countTasks(d.tasks.overdue),
-          icon: Icons.event_busy_outlined,
-          color: AppColors.error,
-          onTap: () => context.go('/tasks'),
-        ),
       if (d.health.overdueVaccinations > 0)
         AlertCard(
           title: context.l10n.todayAlertOverdueVaccination,
@@ -230,14 +209,6 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           icon: Icons.vaccines_outlined,
           color: AppColors.error,
           onTap: () => context.push('/vaccinations'),
-        ),
-      if (d.tasks.urgent > 0)
-        AlertCard(
-          title: context.l10n.todayAlertUrgentTasks,
-          description: context.l10n.countTasks(d.tasks.urgent),
-          icon: Icons.priority_high,
-          color: AppColors.warning,
-          onTap: () => context.go('/tasks'),
         ),
       if (d.inventory.lowStockFeeds > 0)
         AlertCard(
@@ -258,6 +229,198 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           onTap: () => context.push('/vaccinations'),
         ),
     ];
+  }
+}
+
+/// Дела на сегодня — прямо на «Сегодня», с галочкой на месте.
+///
+/// Показывает просроченное и сегодняшнее, ранние сроки сверху. Полный список
+/// с фильтрами остаётся за ссылкой: на первом экране нужна работа на ближайший
+/// час, а не картотека.
+class _TodayTasks extends ConsumerWidget {
+  /// Пусто, когда рядом есть другие тревоги: «всё под контролем» под карточкой
+  /// о просроченной вакцинации — это неправда.
+  final bool quietWhenEmpty;
+
+  const _TodayTasks({required this.quietWhenEmpty});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tasks = ref.watch(todayTasksProvider);
+    // Правила те же, что в [AppAsyncView], но блоком, а не экраном: ошибка
+    // задач не должна съедать сводку по ферме, которая грузится отдельно.
+    // Уже показанные строки при обновлении остаются на месте — иначе каждая
+    // отметка галочкой сменялась бы миганием заглушек.
+    final loaded = tasks.valueOrNull;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppSectionTitle(
+          context.l10n.todayTasksTitle,
+          actionLabel: context.l10n.todayTasksAll,
+          onAction: () => context.push('/tasks'),
+        ),
+        if (loaded == null && tasks.hasError)
+          _error(context, ref, tasks.error)
+        else if (loaded == null)
+          const _TasksSkeleton()
+        else if (loaded.isEmpty)
+          _empty(context)
+        else
+          for (var i = 0; i < loaded.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.sm),
+            _TaskRow(
+              task: loaded[i],
+              onComplete: () => _complete(context, ref, loaded[i]),
+              onOpen: () => context.push('/tasks/form', extra: loaded[i]),
+            ),
+          ],
+      ],
+    );
+  }
+
+  Widget _empty(BuildContext context) => quietWhenEmpty
+      ? Text(
+          context.l10n.todayTasksNone,
+          style: AppTypography.bodyMd
+              .copyWith(color: context.colors.onSurfaceVariant),
+        )
+      : const _AllClearCard();
+
+  Widget _error(BuildContext context, WidgetRef ref, Object? error) {
+    return AppCard(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              errorText(context.l10n, error),
+              style: AppTypography.bodyMd
+                  .copyWith(color: context.colors.onSurfaceVariant),
+            ),
+          ),
+          TextButton(
+            onPressed: () => ref.invalidate(todayTasksProvider),
+            child: Text(context.l10n.commonRetryShort),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _complete(
+      BuildContext context, WidgetRef ref, Task task) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    HapticFeedback.selectionClick();
+
+    try {
+      await ref.read(todayTasksProvider.notifier).complete(task.id);
+      // Счётчик незакрытых задач стоит на том же экране: оставить его прежним
+      // — значит дать два разных ответа на один вопрос.
+      ref.invalidate(dashboardReportProvider);
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, e)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+}
+
+/// Две строки-заглушки в геометрии будущих задач: когда список приезжает,
+/// заголовок фермы под ним не прыгает.
+class _TasksSkeleton extends StatelessWidget {
+  const _TasksSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        SkeletonCard(height: 64),
+        SizedBox(height: AppSpacing.sm),
+        SkeletonCard(height: 64),
+      ],
+    );
+  }
+}
+
+/// Строка задачи: галочка слева, срок под названием.
+///
+/// Отметить выполненной можно только галочкой, а не нажатием на всю строку:
+/// отменить выполнение приложение не умеет, и случайное касание списка стоило
+/// бы человеку задачи. Нажатие на строку открывает её целиком.
+class _TaskRow extends StatelessWidget {
+  final Task task;
+  final VoidCallback onComplete;
+  final VoidCallback onOpen;
+
+  const _TaskRow({
+    required this.task,
+    required this.onComplete,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final done = task.status == TaskStatus.completed;
+    final overdue = !done && isOverdue(task.dueDate);
+
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      onTap: onOpen,
+      child: Row(
+        children: [
+          if (done)
+            const Padding(
+              padding: EdgeInsets.all(AppSpacing.md),
+              child: Icon(Icons.check_circle, color: AppColors.success),
+            )
+          else
+            Checkbox(
+              value: false,
+              semanticLabel: context.l10n.tasksComplete,
+              onChanged: (_) => onComplete(),
+            ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  task.title,
+                  style: AppTypography.titleMd.copyWith(
+                    color: done
+                        ? context.colors.onSurfaceVariant
+                        : context.colors.onSurface,
+                    decoration: done ? TextDecoration.lineThrough : null,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  humanDueDate(context, task.dueDate),
+                  style: AppTypography.labelSm.copyWith(
+                    color: overdue
+                        ? AppColors.error
+                        : context.colors.onSurfaceVariant,
+                    fontWeight: overdue ? FontWeight.w600 : null,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -326,8 +489,8 @@ class _AllClearCard extends StatelessWidget {
   }
 }
 
-/// Заглушка в геометрии готового экрана: заголовок, блок уведомлений и две
-/// строки плиток. Когда данные приезжают, ничего не подпрыгивает.
+/// Заглушка в геометрии готового экрана: заголовок, строки задач и ряд плиток.
+/// Когда данные приезжают, ничего не подпрыгивает.
 class _TodaySkeleton extends StatelessWidget {
   const _TodaySkeleton();
 
@@ -346,13 +509,13 @@ class _TodaySkeleton extends StatelessWidget {
         SizedBox(height: AppSpacing.sm),
         SkeletonBox(width: 140, height: 16),
         SizedBox(height: AppSpacing.xl),
-        SkeletonCard(height: 76),
+        SkeletonBox(width: 180, height: 20),
+        SizedBox(height: AppSpacing.md),
+        SkeletonCard(height: 64),
+        SizedBox(height: AppSpacing.sm),
+        SkeletonCard(height: 64),
         SizedBox(height: AppSpacing.xl),
         SkeletonBox(width: 160, height: 20),
-        SizedBox(height: AppSpacing.md),
-        SkeletonStatRow(count: 3),
-        SizedBox(height: AppSpacing.xl),
-        SkeletonBox(width: 120, height: 20),
         SizedBox(height: AppSpacing.md),
         SkeletonStatRow(count: 3),
       ],
