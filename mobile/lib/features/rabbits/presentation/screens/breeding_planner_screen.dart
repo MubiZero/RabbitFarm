@@ -5,6 +5,8 @@ import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/theme/theme.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Экран планирования случек с анализом инбридинга
 ///
@@ -32,9 +34,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Планирование случек'),
-        centerTitle: true,
-        backgroundColor: AppColors.accentViolet,
+        title: Text(context.l10n.plannerTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -52,7 +52,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Выберите самца и самку для автоматического анализа родословной и оценки рисков инбридинга',
+                        context.l10n.plannerIntro,
                         style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                       ),
                     ),
@@ -65,7 +65,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
             // Выбор самца
             _buildRabbitSelector(
-              label: 'Самец',
+              label: context.l10n.breedingMale,
               sex: 'male',
               icon: Icons.male,
               color: AppColors.accentOcean,
@@ -86,7 +86,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
             // Выбор самки
             _buildRabbitSelector(
-              label: 'Самка',
+              label: context.l10n.breedingFemale,
               sex: 'female',
               icon: Icons.female,
               color: AppColors.accentRose,
@@ -123,7 +123,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                       Icon(Icons.error_outline, size: 48, color: AppColors.error),
                       const SizedBox(height: 16),
                       Text(
-                        'Ошибка анализа',
+                        context.l10n.plannerAnalysisFailed,
                         style: AppTypography.titleLg.copyWith(color: AppColors.error),
                       ),
                       const SizedBox(height: 8),
@@ -174,9 +174,10 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               initialValue: selectedId,
-              decoration: const InputDecoration(
-                hintText: 'Выберите кролика',
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: InputDecoration(
+                hintText: context.l10n.rabbitPickerTitle,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
               ),
               items: rabbits.map<DropdownMenuItem<int>>((rabbit) {
                 return DropdownMenuItem(
@@ -223,7 +224,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       children: [
         // Заголовок результатов
         Text(
-          'Результаты анализа',
+          context.l10n.plannerResults,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -244,7 +245,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Коэффициент инбридинга',
+                  context.l10n.plannerCoefficient,
                   style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 8),
@@ -284,12 +285,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.family_restroom),
                       SizedBox(width: 8),
                       Text(
-                        'Общие предки',
+                        context.l10n.plannerCommonAncestors,
                         style: AppTypography.titleMd,
                       ),
                     ],
@@ -316,7 +317,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                             ),
                           ),
                           Text(
-                            '${ancestor.closestGeneration} пок.',
+                            context.l10n.plannerGenerations(ancestor.closestGeneration),
                             style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                         ],
@@ -337,12 +338,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.lightbulb_outline),
                     SizedBox(width: 8),
                     Text(
-                      'Рекомендации',
+                      context.l10n.plannerAdvice,
                       style: AppTypography.titleMd,
                     ),
                   ],
@@ -370,11 +371,15 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               final router = GoRouter.of(context);
+              // Тексты снимаются до перехода: экран может закрыться, пока
+              // пользователь заполняет форму случки.
+              final pickBoth = context.l10n.plannerPickBoth;
+              final planned = context.l10n.plannerPlanned;
 
               if (_selectedMaleId == null || _selectedFemaleId == null) {
                 messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Выберите самца и самку'),
+                  SnackBar(
+                    content: Text(pickBoth),
                     backgroundColor: AppColors.warning,
                   ),
                 );
@@ -393,8 +398,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
               if (result == true) {
                 messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Случка успешно запланирована'),
+                  SnackBar(
+                    content: Text(planned),
                     backgroundColor: AppColors.success,
                   ),
                 );
@@ -404,11 +409,10 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),
-              backgroundColor: AppColors.accentViolet,
-            ),
+              ),
             icon: const Icon(Icons.add),
-            label: const Text(
-              'Запланировать случку',
+            label: Text(
+              context.l10n.plannerPlan,
               style: AppTypography.titleMd,
             ),
           ),
@@ -455,21 +459,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Не удалось загрузить родословную: $e';
+        _error = '${context.l10n.plannerPedigreeFailed}: $e';
         _isLoadingPedigrees = false;
       });
     }
   }
 
-  String _formatDate(DateTime date) {
-    try {
-      final months = [
-        'янв', 'фев', 'мар', 'апр', 'май', 'июн',
-        'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (e) {
-      return date.toString();
-    }
-  }
+  /// Форматировщик дат знает сокращения месяцев для каждого языка — своя
+  /// таблица здесь была лишней.
+  String _formatDate(DateTime date) => DateFormat('d MMM y', 'ru').format(date);
 }

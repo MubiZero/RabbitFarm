@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../data/models/staff_models.dart';
 import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -18,11 +19,11 @@ class StaffScreen extends ConsumerWidget {
     final membersAsync = ref.watch(farmMembersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Работники')),
+      appBar: AppBar(title: Text(context.l10n.staffTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _inviteDialog(context, ref),
         icon: const Icon(Icons.person_add_alt),
-        label: const Text('Пригласить'),
+        label: Text(context.l10n.staffInvite),
       ),
       body: membersAsync.when(
         loading: () => const _StaffSkeleton(),
@@ -53,12 +54,12 @@ class StaffScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
           if (owner.isNotEmpty) ...[
-            AppGroupLabel('Владелец'),
+            AppGroupLabel(context.l10n.staffOwner),
             const SizedBox(height: 12),
             for (final member in owner) _MemberCard(member: member),
             const SizedBox(height: 24),
           ],
-          AppGroupLabel('Сотрудники'),
+          AppGroupLabel(context.l10n.staffMembers),
           const SizedBox(height: 12),
           if (staff.isEmpty)
             AppCard(
@@ -71,8 +72,7 @@ class StaffScreen extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'На ферме пока только вы. Пригласите помощника — '
-                      'он получит доступ к этому же хозяйству.',
+                      context.l10n.staffEmptyBody,
                       style: AppTypography.bodyMd.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -105,7 +105,7 @@ class StaffScreen extends ConsumerWidget {
             error: (error, _) => AppCard(
               variant: AppCardVariant.error,
               child: Text(
-                'Не удалось загрузить приглашения',
+                context.l10n.staffInvitesFailed,
                 style: AppTypography.bodyMd.copyWith(color: AppColors.error),
               ),
             ),
@@ -114,7 +114,7 @@ class StaffScreen extends ConsumerWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppGroupLabel('Ждут ответа'),
+                      AppGroupLabel(context.l10n.staffPendingInvites),
                       const SizedBox(height: 12),
                       for (final invitation in invitations)
                         _InvitationCard(
@@ -138,19 +138,16 @@ class StaffScreen extends ConsumerWidget {
     bool? isActive,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
+    // Тексты снимаются до запроса: экран может закрыться, пока идёт ответ.
+    final closed = context.l10n.staffAccessClosed(member.fullName);
+    final saved = context.l10n.staffSaved;
     try {
       await ref
           .read(staffRepositoryProvider)
           .updateMember(member.id, role: role, isActive: isActive);
       ref.invalidate(farmMembersProvider);
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            isActive == false
-                ? 'Доступ для ${member.fullName} закрыт'
-                : 'Изменения сохранены',
-          ),
-        ),
+        SnackBar(content: Text(isActive == false ? closed : saved)),
       );
     } catch (e) {
       messenger.showSnackBar(
@@ -173,19 +170,16 @@ class StaffScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Сбросить пароль?'),
-        content: Text(
-          '${member.fullName} выйдет из приложения, а вы получите временный '
-          'пароль, который нужно ему передать.',
-        ),
+        title: Text(context.l10n.staffResetPasswordTitle),
+        content: Text(context.l10n.staffResetPasswordBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Сбросить'),
+            child: Text(context.l10n.staffReset),
           ),
         ],
       ),
@@ -199,10 +193,8 @@ class StaffScreen extends ConsumerWidget {
       if (!context.mounted) return;
       await _showSecretDialog(
         context,
-        title: 'Временный пароль',
-        explanation:
-            'Передайте пароль ${member.fullName}. Второй раз он не покажется — '
-            'при необходимости сбросьте ещё раз.',
+        title: context.l10n.staffTempPassword,
+        explanation: context.l10n.staffTempPasswordBody(member.fullName),
         secret: password,
       );
     } catch (e) {
@@ -221,23 +213,21 @@ class StaffScreen extends ConsumerWidget {
     FarmInvitation invitation,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
+    final revoked = context.l10n.staffRevoked;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Отозвать приглашение?'),
-        content: Text(
-          'Код для ${invitation.email} перестанет работать. '
-          'Выписать новый можно в любой момент.',
-        ),
+        title: Text(context.l10n.staffRevokeTitle),
+        content: Text(context.l10n.staffRevokeBody(invitation.email)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Оставить'),
+            child: Text(context.l10n.staffKeep),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Отозвать'),
+            child: Text(context.l10n.staffRevoke),
           ),
         ],
       ),
@@ -248,9 +238,7 @@ class StaffScreen extends ConsumerWidget {
     try {
       await ref.read(staffRepositoryProvider).revokeInvitation(invitation.id);
       ref.invalidate(farmInvitationsProvider);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Приглашение отозвано')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(revoked)));
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
@@ -297,7 +285,7 @@ class StaffScreen extends ConsumerWidget {
           }
 
           return AlertDialog(
-            title: const Text('Пригласить на ферму'),
+            title: Text(context.l10n.staffInviteTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,14 +294,14 @@ class StaffScreen extends ConsumerWidget {
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'на него человек и войдёт',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.loginEmailLabel,
+                    hintText: context.l10n.staffInviteEmailHint,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Роль',
+                  context.l10n.staffRole,
                   style: AppTypography.labelSm.copyWith(
                     color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
                   ),
@@ -324,18 +312,18 @@ class StaffScreen extends ConsumerWidget {
                   onChanged: (value) {
                     if (value != null) setDialogState(() => role = value);
                   },
-                  child: const Column(
+                  child: Column(
                     children: [
                       RadioListTile<FarmRole>(
                         value: FarmRole.worker,
-                        title: Text('Работник'),
-                        subtitle: Text('Смотрит данные и отмечает работу'),
+                        title: Text(context.l10n.roleWorker),
+                        subtitle: Text(FarmRole.worker.description),
                         contentPadding: EdgeInsets.zero,
                       ),
                       RadioListTile<FarmRole>(
                         value: FarmRole.manager,
-                        title: Text('Управляющий'),
-                        subtitle: Text('Ведёт поголовье, корма и финансы'),
+                        title: Text(context.l10n.roleManager),
+                        subtitle: Text(FarmRole.manager.description),
                         contentPadding: EdgeInsets.zero,
                       ),
                     ],
@@ -347,7 +335,7 @@ class StaffScreen extends ConsumerWidget {
               TextButton(
                 onPressed:
                     isSending ? null : () => Navigator.pop(dialogContext),
-                child: const Text('Отмена'),
+                child: Text(context.l10n.commonCancel),
               ),
               FilledButton(
                 onPressed: isSending ? null : submit,
@@ -357,7 +345,7 @@ class StaffScreen extends ConsumerWidget {
                         height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Выписать код'),
+                    : Text(context.l10n.staffIssueCode),
               ),
             ],
           );
@@ -378,13 +366,11 @@ class StaffScreen extends ConsumerWidget {
   ) async {
     await _showSecretDialog(
       context,
-      title: 'Код приглашения',
-      explanation:
-          'Передайте этот код ${invitation.email} любым удобным способом. '
-          'Второй раз он не покажется: сервер хранит только его отпечаток.',
+      title: context.l10n.staffInviteCode,
+      explanation: context.l10n.staffInviteCodeBody(invitation.email),
       secret: invitation.code,
-      footnote:
-          'Действует до ${DateFormat('d MMMM', 'ru_RU').format(invitation.expiresAt)}',
+      footnote: context.l10n.staffValidUntil(
+          DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
     );
   }
 
@@ -432,19 +418,20 @@ class StaffScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Закрыть'),
+            child: Text(context.l10n.commonClose),
           ),
           FilledButton.icon(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(dialogContext);
+              final copied = dialogContext.l10n.staffCopied;
               await Clipboard.setData(ClipboardData(text: secret));
               await HapticFeedback.lightImpact();
               messenger.showSnackBar(
-                const SnackBar(content: Text('Скопировано')),
+                SnackBar(content: Text(copied)),
               );
             },
             icon: const Icon(Icons.copy_all_outlined),
-            label: const Text('Скопировать'),
+            label: Text(context.l10n.staffCopy),
           ),
         ],
       ),
@@ -534,22 +521,22 @@ class _MemberCard extends StatelessWidget {
                 },
                 itemBuilder: (context) => [
                   if (member.role != FarmRole.manager)
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'manager',
-                      child: Text('Сделать управляющим'),
+                      child: Text(context.l10n.staffMakeManager),
                     ),
                   if (member.role != FarmRole.worker)
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'worker',
-                      child: Text('Сделать работником'),
+                      child: Text(context.l10n.staffMakeWorker),
                     ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'password',
-                    child: Text('Сбросить пароль'),
+                    child: Text(context.l10n.staffResetPassword),
                   ),
                   PopupMenuItem(
                     value: 'access',
-                    child: Text(inactive ? 'Открыть доступ' : 'Закрыть доступ'),
+                    child: Text(inactive ? context.l10n.staffOpenAccess : context.l10n.staffCloseAccess),
                   ),
                 ],
               ),
@@ -599,7 +586,7 @@ class _InvitationCard extends StatelessWidget {
             TextButton(
               onPressed: onRevoke,
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('Отозвать'),
+              child: Text(context.l10n.staffRevoke),
             ),
           ],
         ),

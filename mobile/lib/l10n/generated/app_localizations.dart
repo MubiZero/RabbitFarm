@@ -4150,6 +4150,276 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить запись'**
   String get breedingFormFailed;
 
+  /// No description provided for @plannerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подбор пар'**
+  String get plannerTitle;
+
+  /// No description provided for @plannerIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите самца и самку — приложение посмотрит родословную и скажет, насколько они в родстве.'**
+  String get plannerIntro;
+
+  /// No description provided for @plannerAnalysisFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось разобрать родословную'**
+  String get plannerAnalysisFailed;
+
+  /// No description provided for @plannerResults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что получилось'**
+  String get plannerResults;
+
+  /// No description provided for @plannerCoefficient.
+  ///
+  /// In ru, this message translates to:
+  /// **'Степень родства'**
+  String get plannerCoefficient;
+
+  /// No description provided for @plannerCommonAncestors.
+  ///
+  /// In ru, this message translates to:
+  /// **'Общие предки'**
+  String get plannerCommonAncestors;
+
+  /// No description provided for @plannerGenerations.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} поколение} few{{count} поколения} many{{count} поколений} other{{count} поколения}} назад'**
+  String plannerGenerations(int count);
+
+  /// No description provided for @plannerAdvice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что делать'**
+  String get plannerAdvice;
+
+  /// No description provided for @plannerPickBoth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите обоих'**
+  String get plannerPickBoth;
+
+  /// No description provided for @plannerPlanned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка запланирована'**
+  String get plannerPlanned;
+
+  /// No description provided for @plannerPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запланировать случку'**
+  String get plannerPlan;
+
+  /// No description provided for @plannerPedigreeFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить родословную'**
+  String get plannerPedigreeFailed;
+
+  /// No description provided for @staffTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Работники'**
+  String get staffTitle;
+
+  /// No description provided for @staffInvite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пригласить'**
+  String get staffInvite;
+
+  /// No description provided for @staffOwner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец'**
+  String get staffOwner;
+
+  /// No description provided for @staffMembers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сотрудники'**
+  String get staffMembers;
+
+  /// No description provided for @staffEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'На ферме пока только вы. Пригласите помощника — он получит доступ к этому же хозяйству.'**
+  String get staffEmptyBody;
+
+  /// No description provided for @staffInvitesFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить приглашения'**
+  String get staffInvitesFailed;
+
+  /// No description provided for @staffPendingInvites.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ждут ответа'**
+  String get staffPendingInvites;
+
+  /// No description provided for @staffAccessClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ для {name} закрыт'**
+  String staffAccessClosed(String name);
+
+  /// No description provided for @staffSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменения сохранены'**
+  String get staffSaved;
+
+  /// No description provided for @staffResetPasswordTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить пароль?'**
+  String get staffResetPasswordTitle;
+
+  /// No description provided for @staffResetPasswordBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прежний пароль перестанет работать. Взамен приложение выдаст временный — его нужно передать человеку.'**
+  String get staffResetPasswordBody;
+
+  /// No description provided for @staffReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить'**
+  String get staffReset;
+
+  /// No description provided for @staffTempPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Временный пароль'**
+  String get staffTempPassword;
+
+  /// No description provided for @staffTempPasswordBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передайте пароль {name}. Второй раз он не покажется — при необходимости сбросьте ещё раз.'**
+  String staffTempPasswordBody(String name);
+
+  /// No description provided for @staffRevokeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать приглашение?'**
+  String get staffRevokeTitle;
+
+  /// No description provided for @staffRevokeBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код для {email} перестанет работать. Выписать новый можно в любой момент.'**
+  String staffRevokeBody(String email);
+
+  /// No description provided for @staffKeep.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставить'**
+  String get staffKeep;
+
+  /// No description provided for @staffRevoke.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать'**
+  String get staffRevoke;
+
+  /// No description provided for @staffRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение отозвано'**
+  String get staffRevoked;
+
+  /// No description provided for @staffInviteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пригласить на ферму'**
+  String get staffInviteTitle;
+
+  /// No description provided for @staffInviteEmailHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'На эту почту человек и будет входить'**
+  String get staffInviteEmailHint;
+
+  /// No description provided for @staffRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Роль'**
+  String get staffRole;
+
+  /// No description provided for @staffIssueCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выписать код'**
+  String get staffIssueCode;
+
+  /// No description provided for @staffInviteCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код приглашения'**
+  String get staffInviteCode;
+
+  /// No description provided for @staffInviteCodeBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.'**
+  String staffInviteCodeBody(String email);
+
+  /// No description provided for @staffValidUntil.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует до {date}'**
+  String staffValidUntil(String date);
+
+  /// No description provided for @staffCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировано'**
+  String get staffCopied;
+
+  /// No description provided for @staffCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать'**
+  String get staffCopy;
+
+  /// No description provided for @staffMakeManager.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сделать управляющим'**
+  String get staffMakeManager;
+
+  /// No description provided for @staffMakeWorker.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сделать работником'**
+  String get staffMakeWorker;
+
+  /// No description provided for @staffResetPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить пароль'**
+  String get staffResetPassword;
+
+  /// No description provided for @staffOpenAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть доступ'**
+  String get staffOpenAccess;
+
+  /// No description provided for @staffCloseAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть доступ'**
+  String get staffCloseAccess;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

@@ -2249,6 +2249,164 @@ class AppLocalizationsRu extends AppLocalizations {
   String get breedingFormFailed => 'Не удалось сохранить запись';
 
   @override
+  String get plannerTitle => 'Подбор пар';
+
+  @override
+  String get plannerIntro =>
+      'Выберите самца и самку — приложение посмотрит родословную и скажет, насколько они в родстве.';
+
+  @override
+  String get plannerAnalysisFailed => 'Не удалось разобрать родословную';
+
+  @override
+  String get plannerResults => 'Что получилось';
+
+  @override
+  String get plannerCoefficient => 'Степень родства';
+
+  @override
+  String get plannerCommonAncestors => 'Общие предки';
+
+  @override
+  String plannerGenerations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count поколения',
+      many: '$count поколений',
+      few: '$count поколения',
+      one: '$count поколение',
+    );
+    return '$_temp0 назад';
+  }
+
+  @override
+  String get plannerAdvice => 'Что делать';
+
+  @override
+  String get plannerPickBoth => 'Выберите обоих';
+
+  @override
+  String get plannerPlanned => 'Случка запланирована';
+
+  @override
+  String get plannerPlan => 'Запланировать случку';
+
+  @override
+  String get plannerPedigreeFailed => 'Не удалось загрузить родословную';
+
+  @override
+  String get staffTitle => 'Работники';
+
+  @override
+  String get staffInvite => 'Пригласить';
+
+  @override
+  String get staffOwner => 'Владелец';
+
+  @override
+  String get staffMembers => 'Сотрудники';
+
+  @override
+  String get staffEmptyBody =>
+      'На ферме пока только вы. Пригласите помощника — он получит доступ к этому же хозяйству.';
+
+  @override
+  String get staffInvitesFailed => 'Не удалось загрузить приглашения';
+
+  @override
+  String get staffPendingInvites => 'Ждут ответа';
+
+  @override
+  String staffAccessClosed(String name) {
+    return 'Доступ для $name закрыт';
+  }
+
+  @override
+  String get staffSaved => 'Изменения сохранены';
+
+  @override
+  String get staffResetPasswordTitle => 'Сбросить пароль?';
+
+  @override
+  String get staffResetPasswordBody =>
+      'Прежний пароль перестанет работать. Взамен приложение выдаст временный — его нужно передать человеку.';
+
+  @override
+  String get staffReset => 'Сбросить';
+
+  @override
+  String get staffTempPassword => 'Временный пароль';
+
+  @override
+  String staffTempPasswordBody(String name) {
+    return 'Передайте пароль $name. Второй раз он не покажется — при необходимости сбросьте ещё раз.';
+  }
+
+  @override
+  String get staffRevokeTitle => 'Отозвать приглашение?';
+
+  @override
+  String staffRevokeBody(String email) {
+    return 'Код для $email перестанет работать. Выписать новый можно в любой момент.';
+  }
+
+  @override
+  String get staffKeep => 'Оставить';
+
+  @override
+  String get staffRevoke => 'Отозвать';
+
+  @override
+  String get staffRevoked => 'Приглашение отозвано';
+
+  @override
+  String get staffInviteTitle => 'Пригласить на ферму';
+
+  @override
+  String get staffInviteEmailHint => 'На эту почту человек и будет входить';
+
+  @override
+  String get staffRole => 'Роль';
+
+  @override
+  String get staffIssueCode => 'Выписать код';
+
+  @override
+  String get staffInviteCode => 'Код приглашения';
+
+  @override
+  String staffInviteCodeBody(String email) {
+    return 'Передайте этот код $email любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.';
+  }
+
+  @override
+  String staffValidUntil(String date) {
+    return 'Действует до $date';
+  }
+
+  @override
+  String get staffCopied => 'Скопировано';
+
+  @override
+  String get staffCopy => 'Скопировать';
+
+  @override
+  String get staffMakeManager => 'Сделать управляющим';
+
+  @override
+  String get staffMakeWorker => 'Сделать работником';
+
+  @override
+  String get staffResetPassword => 'Сбросить пароль';
+
+  @override
+  String get staffOpenAccess => 'Открыть доступ';
+
+  @override
+  String get staffCloseAccess => 'Закрыть доступ';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

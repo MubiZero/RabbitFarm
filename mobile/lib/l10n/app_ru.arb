@@ -884,6 +884,71 @@
   "breedingFormUpdated": "Запись обновлена",
   "breedingFormFailed": "Не удалось сохранить запись",
 
+  "plannerTitle": "Подбор пар",
+  "plannerIntro": "Выберите самца и самку — приложение посмотрит родословную и скажет, насколько они в родстве.",
+  "plannerAnalysisFailed": "Не удалось разобрать родословную",
+  "plannerResults": "Что получилось",
+  "plannerCoefficient": "Степень родства",
+  "plannerCommonAncestors": "Общие предки",
+  "plannerGenerations": "{count, plural, one{{count} поколение} few{{count} поколения} many{{count} поколений} other{{count} поколения}} назад",
+  "@plannerGenerations": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "plannerAdvice": "Что делать",
+  "plannerPickBoth": "Выберите обоих",
+  "plannerPlanned": "Случка запланирована",
+  "plannerPlan": "Запланировать случку",
+  "plannerPedigreeFailed": "Не удалось загрузить родословную",
+
+  "staffTitle": "Работники",
+  "staffInvite": "Пригласить",
+  "staffOwner": "Владелец",
+  "staffMembers": "Сотрудники",
+  "staffEmptyBody": "На ферме пока только вы. Пригласите помощника — он получит доступ к этому же хозяйству.",
+  "staffInvitesFailed": "Не удалось загрузить приглашения",
+  "staffPendingInvites": "Ждут ответа",
+  "staffAccessClosed": "Доступ для {name} закрыт",
+  "@staffAccessClosed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "staffSaved": "Изменения сохранены",
+  "staffResetPasswordTitle": "Сбросить пароль?",
+  "staffResetPasswordBody": "Прежний пароль перестанет работать. Взамен приложение выдаст временный — его нужно передать человеку.",
+  "staffReset": "Сбросить",
+  "staffTempPassword": "Временный пароль",
+  "staffTempPasswordBody": "Передайте пароль {name}. Второй раз он не покажется — при необходимости сбросьте ещё раз.",
+  "@staffTempPasswordBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "staffRevokeTitle": "Отозвать приглашение?",
+  "staffRevokeBody": "Код для {email} перестанет работать. Выписать новый можно в любой момент.",
+  "@staffRevokeBody": {
+    "placeholders": { "email": { "type": "String" } }
+  },
+  "staffKeep": "Оставить",
+  "staffRevoke": "Отозвать",
+  "staffRevoked": "Приглашение отозвано",
+  "staffInviteTitle": "Пригласить на ферму",
+  "staffInviteEmailHint": "На эту почту человек и будет входить",
+  "staffRole": "Роль",
+  "staffIssueCode": "Выписать код",
+  "staffInviteCode": "Код приглашения",
+  "staffInviteCodeBody": "Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.",
+  "@staffInviteCodeBody": {
+    "placeholders": { "email": { "type": "String" } }
+  },
+  "staffValidUntil": "Действует до {date}",
+  "@staffValidUntil": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "staffCopied": "Скопировано",
+  "staffCopy": "Скопировать",
+  "staffMakeManager": "Сделать управляющим",
+  "staffMakeWorker": "Сделать работником",
+  "staffResetPassword": "Сбросить пароль",
+  "staffOpenAccess": "Открыть доступ",
+  "staffCloseAccess": "Закрыть доступ",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }
