@@ -128,16 +128,6 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40, height: 4,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
             Text('Окрол ${_dateFormat.format(DateTime.parse(birth.birthDate))}',
                 style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
