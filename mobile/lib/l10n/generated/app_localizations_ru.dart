@@ -1749,6 +1749,178 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitDetailDeleteFailed => 'Не удалось удалить кролика';
 
   @override
+  String get settingsTitle => 'Настройки';
+
+  @override
+  String get settingsAppearance => 'Внешний вид';
+
+  @override
+  String get settingsTheme => 'Тема';
+
+  @override
+  String get settingsAccent => 'Цвет акцента';
+
+  @override
+  String get settingsAbout => 'О приложении';
+
+  @override
+  String get settingsVersion => 'Версия';
+
+  @override
+  String get settingsLogout => 'Выйти из аккаунта';
+
+  @override
+  String get settingsThemeLight => 'Светлая';
+
+  @override
+  String get settingsThemeSystem => 'Как в системе';
+
+  @override
+  String get settingsThemeDark => 'Тёмная';
+
+  @override
+  String get joinTitle => 'Присоединиться к ферме';
+
+  @override
+  String get joinIntro =>
+      'Код выдаёт владелец фермы. После входа вы увидите её хозяйство — поголовье, корма и задачи.';
+
+  @override
+  String get joinCode => 'Код приглашения';
+
+  @override
+  String get joinCodeHint => 'Введите код, который передал владелец';
+
+  @override
+  String get joinName => 'Ваше имя';
+
+  @override
+  String get joinNameHint => 'Как к вам обращаться?';
+
+  @override
+  String get joinPassword => 'Пароль';
+
+  @override
+  String get joinPasswordHint => 'Не короче 8 символов';
+
+  @override
+  String get joinPasswordShort => 'Пароль должен быть не короче 8 символов';
+
+  @override
+  String get joinSubmit => 'Присоединиться';
+
+  @override
+  String get joinHaveAccount => 'У меня уже есть аккаунт';
+
+  @override
+  String get onboardWelcomeTitle => 'Ферма под рукой';
+
+  @override
+  String get onboardWelcomeBody =>
+      'Кролики, кормление, здоровье и деньги — в одном месте';
+
+  @override
+  String get onboardStart => 'Начать';
+
+  @override
+  String get onboardHaveAccount => 'Уже есть аккаунт? Войти';
+
+  @override
+  String get onboardFarmNameTitle => 'Как называется ваша ферма?';
+
+  @override
+  String get onboardFarmNameHint => 'Например, Ферма «Берёзки»';
+
+  @override
+  String get onboardNext => 'Далее';
+
+  @override
+  String get onboardSkip => 'Пропустить';
+
+  @override
+  String get onboardFarmTypeTitle => 'Кто ведёт хозяйство?';
+
+  @override
+  String get onboardSoloTitle => 'Только я';
+
+  @override
+  String get onboardSoloBody => 'Веду ферму сам';
+
+  @override
+  String get onboardTeamTitle => 'Я и работники';
+
+  @override
+  String get onboardTeamBody => 'У каждого своя роль и свой доступ';
+
+  @override
+  String get onboardReadyFarm => 'ваша ферма';
+
+  @override
+  String get onboardReadyBody =>
+      'Остальное настроим по ходу — приложение подскажет, что делать дальше';
+
+  @override
+  String get onboardRegister => 'Зарегистрироваться';
+
+  @override
+  String get splashTagline => 'Управление фермой';
+
+  @override
+  String get registerTitle => 'Своя ферма';
+
+  @override
+  String get registerSubtitle =>
+      'Заведите ферму — доступ работникам выдадите потом';
+
+  @override
+  String get registerFullName => 'Имя и фамилия';
+
+  @override
+  String get registerFullNameHint => 'Как вас зовут';
+
+  @override
+  String get registerFullNameEmpty => 'Введите имя';
+
+  @override
+  String get registerFullNameShort => 'Слишком коротко';
+
+  @override
+  String get registerEmailEmpty => 'Введите почту';
+
+  @override
+  String get registerEmailInvalid => 'Похоже, в адресе опечатка';
+
+  @override
+  String get registerPhone => 'Телефон, если нужен';
+
+  @override
+  String get registerPasswordHint => 'Не короче 6 символов';
+
+  @override
+  String get registerPasswordEmpty => 'Придумайте пароль';
+
+  @override
+  String get registerPasswordShort => 'Пароль должен быть не короче 6 символов';
+
+  @override
+  String get registerPasswordRepeat => 'Повторите пароль';
+
+  @override
+  String get registerPasswordRepeatEmpty => 'Введите пароль ещё раз';
+
+  @override
+  String get registerPasswordMismatch => 'Пароли не совпадают';
+
+  @override
+  String get registerSubmit => 'Завести ферму';
+
+  @override
+  String get registerHaveAccount => 'Уже есть аккаунт?';
+
+  @override
+  String get registerFailed => 'Не удалось зарегистрироваться';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

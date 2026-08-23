@@ -3220,6 +3220,342 @@ abstract class AppLocalizations {
   /// **'Не удалось удалить кролика'**
   String get rabbitDetailDeleteFailed;
 
+  /// No description provided for @settingsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внешний вид'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsAccent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цвет акцента'**
+  String get settingsAccent;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In ru, this message translates to:
+  /// **'О приложении'**
+  String get settingsAbout;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия'**
+  String get settingsVersion;
+
+  /// No description provided for @settingsLogout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта'**
+  String get settingsLogout;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Светлая'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как в системе'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тёмная'**
+  String get settingsThemeDark;
+
+  /// No description provided for @joinTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Присоединиться к ферме'**
+  String get joinTitle;
+
+  /// No description provided for @joinIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код выдаёт владелец фермы. После входа вы увидите её хозяйство — поголовье, корма и задачи.'**
+  String get joinIntro;
+
+  /// No description provided for @joinCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код приглашения'**
+  String get joinCode;
+
+  /// No description provided for @joinCodeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код, который передал владелец'**
+  String get joinCodeHint;
+
+  /// No description provided for @joinName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваше имя'**
+  String get joinName;
+
+  /// No description provided for @joinNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как к вам обращаться?'**
+  String get joinNameHint;
+
+  /// No description provided for @joinPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get joinPassword;
+
+  /// No description provided for @joinPasswordHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не короче 8 символов'**
+  String get joinPasswordHint;
+
+  /// No description provided for @joinPasswordShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль должен быть не короче 8 символов'**
+  String get joinPasswordShort;
+
+  /// No description provided for @joinSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Присоединиться'**
+  String get joinSubmit;
+
+  /// No description provided for @joinHaveAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'У меня уже есть аккаунт'**
+  String get joinHaveAccount;
+
+  /// No description provided for @onboardWelcomeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма под рукой'**
+  String get onboardWelcomeTitle;
+
+  /// No description provided for @onboardWelcomeBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики, кормление, здоровье и деньги — в одном месте'**
+  String get onboardWelcomeBody;
+
+  /// No description provided for @onboardStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начать'**
+  String get onboardStart;
+
+  /// No description provided for @onboardHaveAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уже есть аккаунт? Войти'**
+  String get onboardHaveAccount;
+
+  /// No description provided for @onboardFarmNameTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как называется ваша ферма?'**
+  String get onboardFarmNameTitle;
+
+  /// No description provided for @onboardFarmNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, Ферма «Берёзки»'**
+  String get onboardFarmNameHint;
+
+  /// No description provided for @onboardNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Далее'**
+  String get onboardNext;
+
+  /// No description provided for @onboardSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропустить'**
+  String get onboardSkip;
+
+  /// No description provided for @onboardFarmTypeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто ведёт хозяйство?'**
+  String get onboardFarmTypeTitle;
+
+  /// No description provided for @onboardSoloTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только я'**
+  String get onboardSoloTitle;
+
+  /// No description provided for @onboardSoloBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Веду ферму сам'**
+  String get onboardSoloBody;
+
+  /// No description provided for @onboardTeamTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я и работники'**
+  String get onboardTeamTitle;
+
+  /// No description provided for @onboardTeamBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'У каждого своя роль и свой доступ'**
+  String get onboardTeamBody;
+
+  /// No description provided for @onboardReadyFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'ваша ферма'**
+  String get onboardReadyFarm;
+
+  /// No description provided for @onboardReadyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Остальное настроим по ходу — приложение подскажет, что делать дальше'**
+  String get onboardReadyBody;
+
+  /// No description provided for @onboardRegister.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зарегистрироваться'**
+  String get onboardRegister;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управление фермой'**
+  String get splashTagline;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Своя ферма'**
+  String get registerTitle;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите ферму — доступ работникам выдадите потом'**
+  String get registerSubtitle;
+
+  /// No description provided for @registerFullName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя и фамилия'**
+  String get registerFullName;
+
+  /// No description provided for @registerFullNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как вас зовут'**
+  String get registerFullNameHint;
+
+  /// No description provided for @registerFullNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите имя'**
+  String get registerFullNameEmpty;
+
+  /// No description provided for @registerFullNameShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком коротко'**
+  String get registerFullNameShort;
+
+  /// No description provided for @registerEmailEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите почту'**
+  String get registerEmailEmpty;
+
+  /// No description provided for @registerEmailInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Похоже, в адресе опечатка'**
+  String get registerEmailInvalid;
+
+  /// No description provided for @registerPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон, если нужен'**
+  String get registerPhone;
+
+  /// No description provided for @registerPasswordHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не короче 6 символов'**
+  String get registerPasswordHint;
+
+  /// No description provided for @registerPasswordEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Придумайте пароль'**
+  String get registerPasswordEmpty;
+
+  /// No description provided for @registerPasswordShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль должен быть не короче 6 символов'**
+  String get registerPasswordShort;
+
+  /// No description provided for @registerPasswordRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите пароль'**
+  String get registerPasswordRepeat;
+
+  /// No description provided for @registerPasswordRepeatEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите пароль ещё раз'**
+  String get registerPasswordRepeatEmpty;
+
+  /// No description provided for @registerPasswordMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароли не совпадают'**
+  String get registerPasswordMismatch;
+
+  /// No description provided for @registerSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести ферму'**
+  String get registerSubmit;
+
+  /// No description provided for @registerHaveAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уже есть аккаунт?'**
+  String get registerHaveAccount;
+
+  /// No description provided for @registerFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось зарегистрироваться'**
+  String get registerFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

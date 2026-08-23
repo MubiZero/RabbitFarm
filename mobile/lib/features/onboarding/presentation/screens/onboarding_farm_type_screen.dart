@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/onboarding_progress.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class OnboardingFarmTypeScreen extends ConsumerStatefulWidget {
   const OnboardingFarmTypeScreen({super.key});
@@ -31,7 +32,7 @@ class _OnboardingFarmTypeScreenState
               const OnboardingProgress(current: 2, total: 2),
               const Spacer(flex: 2),
               Text(
-                'Как вы управляете\nфермой?',
+                context.l10n.onboardFarmTypeTitle,
                 style: AppTypography.displayMd.copyWith(
                   color: cs.onSurface,
                 ),
@@ -39,29 +40,29 @@ class _OnboardingFarmTypeScreenState
               const SizedBox(height: 32),
               _TypeCard(
                 icon: Icons.person,
-                title: 'Один хозяин',
-                subtitle: 'Я управляю фермой самостоятельно',
+                title: context.l10n.onboardSoloTitle,
+                subtitle: context.l10n.onboardSoloBody,
                 selected: _selected == 'solo',
                 onTap: () => setState(() => _selected = 'solo'),
               ),
               const SizedBox(height: 12),
               _TypeCard(
                 icon: Icons.group,
-                title: 'Команда',
-                subtitle: 'У меня есть сотрудники с разными ролями',
+                title: context.l10n.onboardTeamTitle,
+                subtitle: context.l10n.onboardTeamBody,
                 selected: _selected == 'team',
                 onTap: () => setState(() => _selected = 'team'),
               ),
               const Spacer(flex: 3),
               ElevatedButton(
                 onPressed: _selected != null ? _next : null,
-                child: const Text('Далее'),
+                child: Text(context.l10n.onboardNext),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/onboarding/ready'),
                 child: Text(
-                  'Пропустить',
+                  context.l10n.onboardSkip,
                   style: AppTypography.labelLg.copyWith(
                     color: cs.onSurfaceVariant,
                   ),

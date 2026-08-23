@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class OnboardingWelcomeScreen extends StatelessWidget {
   const OnboardingWelcomeScreen({super.key});
@@ -33,7 +34,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                'Управляйте фермой умно',
+                context.l10n.onboardWelcomeTitle,
                 style: AppTypography.displayLg.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -41,7 +42,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Кролики, кормление, здоровье\nи финансы — всё в одном месте',
+                context.l10n.onboardWelcomeBody,
                 style: AppTypography.bodyLg.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -50,13 +51,13 @@ class OnboardingWelcomeScreen extends StatelessWidget {
               const Spacer(flex: 3),
               ElevatedButton(
                 onPressed: () => context.go('/onboarding/farm-name'),
-                child: const Text('Начать'),
+                child: Text(context.l10n.onboardStart),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.go('/login'),
                 child: Text(
-                  'Уже есть аккаунт? Войти',
+                  context.l10n.onboardHaveAccount,
                   style: AppTypography.labelLg,
                 ),
               ),

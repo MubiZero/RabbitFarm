@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -18,7 +19,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Настройки'),
+        title: Text(context.l10n.settingsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -31,13 +32,13 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Appearance
-          _SectionLabel('Внешний вид'),
+          _SectionLabel(context.l10n.settingsAppearance),
           _GroupCard(
             context: context,
             children: [
               _SettingsTile(
                 icon: Icons.brightness_6_outlined,
-                label: 'Тема',
+                label: context.l10n.settingsTheme,
                 trailing: _ThemeModeToggle(
                   mode: themeState.mode,
                   onChanged: (m) =>
@@ -46,7 +47,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               _SettingsTile(
                 icon: Icons.palette_outlined,
-                label: 'Цвет акцента',
+                label: context.l10n.settingsAccent,
                 trailing: _AccentPicker(
                   selectedIndex: themeState.accentIndex,
                   onChanged: (i) =>
@@ -58,13 +59,13 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // About
-          _SectionLabel('О приложении'),
+          _SectionLabel(context.l10n.settingsAbout),
           _GroupCard(
             context: context,
             children: [
               _SettingsTile(
                 icon: Icons.info_outline,
-                label: 'Версия',
+                label: context.l10n.settingsVersion,
                 trailing: Text(
                   '1.0.0',
                   style: AppTypography.bodyMd.copyWith(
@@ -83,7 +84,7 @@ class SettingsScreen extends ConsumerWidget {
               onPressed: () => showLogoutDialog(context, ref),
               icon: const Icon(Icons.logout, color: AppColors.error),
               label: Text(
-                'Выйти из аккаунта',
+                context.l10n.settingsLogout,
                 style: AppTypography.titleMd.copyWith(color: AppColors.error),
               ),
               style: OutlinedButton.styleFrom(
@@ -163,7 +164,7 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
-    final displayName = name ?? 'Пользователь';
+    final displayName = name ?? context.l10n.menuProfile;
     final userInitials = initials(displayName);
 
     return Padding(
@@ -259,21 +260,21 @@ class _ThemeModeToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SegmentedButton<ThemeMode>(
-      segments: const [
+      segments: [
         ButtonSegment(
           value: ThemeMode.light,
-          icon: Icon(Icons.light_mode, size: 16),
-          tooltip: 'Светлая',
+          icon: const Icon(Icons.light_mode, size: 16),
+          tooltip: context.l10n.settingsThemeLight,
         ),
         ButtonSegment(
           value: ThemeMode.system,
-          icon: Icon(Icons.brightness_auto, size: 16),
-          tooltip: 'Авто',
+          icon: const Icon(Icons.brightness_auto, size: 16),
+          tooltip: context.l10n.settingsThemeSystem,
         ),
         ButtonSegment(
           value: ThemeMode.dark,
-          icon: Icon(Icons.dark_mode, size: 16),
-          tooltip: 'Тёмная',
+          icon: const Icon(Icons.dark_mode, size: 16),
+          tooltip: context.l10n.settingsThemeDark,
         ),
       ],
       selected: {mode},
