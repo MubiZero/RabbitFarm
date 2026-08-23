@@ -1074,6 +1074,16 @@
   "financeExpensesByCategory": "Расходы по категориям",
   "financeRecent": "Последние операции",
 
+  "txCategorySaleRabbit": "Продажа кролика",
+  "txCategorySaleMeat": "Продажа мяса",
+  "txCategorySaleFur": "Продажа шкурок",
+  "txCategoryBreedingFee": "Плата за случку",
+  "txCategoryFeed": "Корм",
+  "txCategoryVeterinary": "Лечение",
+  "txCategoryEquipment": "Оборудование",
+  "txCategoryUtilities": "Свет, вода, отопление",
+  "txCategoryOther": "Прочее",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

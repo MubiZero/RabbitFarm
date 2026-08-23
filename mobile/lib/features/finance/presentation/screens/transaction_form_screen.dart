@@ -223,7 +223,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                 for (final category in _categories)
                   DropdownMenuItem(
                     value: category,
-                    child: Text(category.label),
+                    child: Text(transactionCategoryLabel(context, category)),
                   ),
               ],
               onChanged: (v) => setState(() {

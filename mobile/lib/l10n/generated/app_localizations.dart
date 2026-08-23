@@ -5062,6 +5062,60 @@ abstract class AppLocalizations {
   /// **'Последние операции'**
   String get financeRecent;
 
+  /// No description provided for @txCategorySaleRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа кролика'**
+  String get txCategorySaleRabbit;
+
+  /// No description provided for @txCategorySaleMeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа мяса'**
+  String get txCategorySaleMeat;
+
+  /// No description provided for @txCategorySaleFur.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа шкурок'**
+  String get txCategorySaleFur;
+
+  /// No description provided for @txCategoryBreedingFee.
+  ///
+  /// In ru, this message translates to:
+  /// **'Плата за случку'**
+  String get txCategoryBreedingFee;
+
+  /// No description provided for @txCategoryFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм'**
+  String get txCategoryFeed;
+
+  /// No description provided for @txCategoryVeterinary.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get txCategoryVeterinary;
+
+  /// No description provided for @txCategoryEquipment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оборудование'**
+  String get txCategoryEquipment;
+
+  /// No description provided for @txCategoryUtilities.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свет, вода, отопление'**
+  String get txCategoryUtilities;
+
+  /// No description provided for @txCategoryOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прочее'**
+  String get txCategoryOther;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

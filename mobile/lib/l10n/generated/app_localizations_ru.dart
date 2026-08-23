@@ -2757,6 +2757,33 @@ class AppLocalizationsRu extends AppLocalizations {
   String get financeRecent => 'Последние операции';
 
   @override
+  String get txCategorySaleRabbit => 'Продажа кролика';
+
+  @override
+  String get txCategorySaleMeat => 'Продажа мяса';
+
+  @override
+  String get txCategorySaleFur => 'Продажа шкурок';
+
+  @override
+  String get txCategoryBreedingFee => 'Плата за случку';
+
+  @override
+  String get txCategoryFeed => 'Корм';
+
+  @override
+  String get txCategoryVeterinary => 'Лечение';
+
+  @override
+  String get txCategoryEquipment => 'Оборудование';
+
+  @override
+  String get txCategoryUtilities => 'Свет, вода, отопление';
+
+  @override
+  String get txCategoryOther => 'Прочее';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

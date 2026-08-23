@@ -203,7 +203,7 @@ class _CategoryBreakdown extends StatelessWidget {
               for (final item in sorted)
                 MetricBar(
                   icon: item.category.icon,
-                  label: item.category.label,
+                  label: transactionCategoryLabel(context, item.category),
                   value: formatMoney(item.total),
                   fraction: max == 0 ? 0 : item.total / max,
                   color: color,
@@ -238,7 +238,7 @@ class _RecentTransactionRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.category.label,
+                  transactionCategoryLabel(context, transaction.category),
                   style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

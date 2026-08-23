@@ -320,7 +320,7 @@ class _ActiveFilters extends ConsumerWidget {
         children: [
           if (state.category != null)
             InputChip(
-              label: Text(state.category!.label),
+              label: Text(transactionCategoryLabel(context, state.category!)),
               deleteIcon: const Icon(Icons.close, size: 16),
               onDeleted: () => notifier.setFilters(
                 type: state.type,
@@ -381,7 +381,7 @@ class _TransactionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.category.label,
+                  transactionCategoryLabel(context, transaction.category),
                   style: AppTypography.titleMd
                       .copyWith(color: context.colors.onSurface),
                   maxLines: 1,
@@ -523,7 +523,7 @@ class _DetailsSheet extends ConsumerWidget {
             _Row(
               icon: Icons.category_outlined,
               label: context.l10n.financeCategory,
-              value: transaction.category.label,
+              value: transactionCategoryLabel(context, transaction.category),
             ),
             _Row(
               icon: Icons.swap_horiz,
@@ -666,7 +666,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                 for (final category in TransactionCategory.values)
                   DropdownMenuItem(
                     value: category,
-                    child: Text(category.label),
+                    child: Text(transactionCategoryLabel(context, category)),
                   ),
               ],
               onChanged: (v) => setState(() => _category = v),
