@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 
@@ -53,13 +54,13 @@ class Vaccination with _$Vaccination {
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') required DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date') @DateOnlyConverter() required DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date') @NullableDateOnlyConverter() DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') String? batchNumber,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     // Related rabbit info (from API) - не сериализуем, создаем вручную
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     // Calculated fields
@@ -98,10 +99,10 @@ class VaccinationRequest {
         'rabbit_id': rabbitId,
         'vaccine_name': vaccineName,
         'vaccine_type': vaccineType.name,
-        'vaccination_date': vaccinationDate.toIso8601String().split('T')[0],
+        'vaccination_date': const DateOnlyConverter().toJson(vaccinationDate),
         if (nextVaccinationDate != null)
           'next_vaccination_date':
-              nextVaccinationDate!.toIso8601String().split('T')[0],
+              const DateOnlyConverter().toJson(nextVaccinationDate!),
         if (batchNumber != null && batchNumber!.isNotEmpty)
           'batch_number': batchNumber,
         if (veterinarian != null && veterinarian!.isNotEmpty)
@@ -146,7 +147,7 @@ class UpcomingVaccinationItem with _$UpcomingVaccinationItem {
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'next_vaccination_date') required DateTime nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date') @DateOnlyConverter() required DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') required int daysUntil,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   }) = _UpcomingVaccinationItem;

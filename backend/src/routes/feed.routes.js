@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const feedController = require('../controllers/feedController');
-const { createFeedSchema, updateFeedSchema, adjustStockSchema } = require('../validators/feedValidator');
-const { authenticate } = require('../middleware/auth');
+const { createFeedSchema, updateFeedSchema, adjustStockSchema, listFeedsQuerySchema } = require('../validators/feedValidator');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -131,13 +131,13 @@ router.get('/statistics', feedController.getStatistics);
 router.get('/low-stock', feedController.getLowStock);
 
 // CRUD routes
-router.post('/', validate(createFeedSchema), feedController.create);
-router.get('/', feedController.list);
+router.post('/', authorize(['manager', 'owner']), validate(createFeedSchema), feedController.create);
+router.get('/', validate(listFeedsQuerySchema, 'query'), feedController.list);
 router.get('/:id', feedController.getById);
-router.put('/:id', validate(updateFeedSchema), feedController.update);
-router.delete('/:id', feedController.delete);
+router.put('/:id', authorize(['manager', 'owner']), validate(updateFeedSchema), feedController.update);
+router.delete('/:id', authorize(['owner']), feedController.delete);
 
 // Stock adjustment
-router.post('/:id/adjust-stock', validate(adjustStockSchema), feedController.adjustStock);
+router.post('/:id/adjust-stock', authorize(['manager', 'owner']), validate(adjustStockSchema), feedController.adjustStock);
 
 module.exports = router;

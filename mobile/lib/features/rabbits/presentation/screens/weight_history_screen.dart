@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_weight_model.dart';
 import '../providers/weights_provider.dart';
 import '../widgets/weight_chart.dart';
 
+/// История взвешиваний одного кролика.
 class WeightHistoryScreen extends ConsumerWidget {
   final RabbitModel rabbit;
 
@@ -14,299 +20,232 @@ class WeightHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weightHistory = ref.watch(weightHistoryProvider(rabbit.id));
+    final weightsAsync = ref.watch(weightHistoryProvider(rabbit.id));
+    final canRecord = ref.watch(canProvider(FarmCapability.manageLivestock));
+
+    Future<void> refresh() async {
+      ref.invalidate(weightHistoryProvider(rabbit.id));
+      await ref.read(weightHistoryProvider(rabbit.id).future);
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('История взвешиваний - ${rabbit.name}'),
-      ),
-      body: weightHistory.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Ошибка загрузки данных',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(error.toString()),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () => ref.invalidate(weightHistoryProvider(rabbit.id)),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Повторить'),
-              ),
-            ],
-          ),
-        ),
-        data: (weights) {
-          if (weights.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.scale_outlined,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Нет записей о взвешивании',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Добавьте первое взвешивание',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () => _showAddWeightDialog(context, ref),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Добавить взвешивание'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          // Calculate weight trend
-          final trend = _calculateTrend(weights);
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(weightHistoryProvider(rabbit.id));
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Weight chart
-                  WeightChart(weights: weights),
-
-                  // Current weight summary
-                  _buildWeightSummary(context, weights, trend),
-
-                  // Weight history list
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Последние измерения',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: weights.length,
-                    itemBuilder: (context, index) {
-                      final weight = weights[index];
-                      final prevWeight = index < weights.length - 1
-                          ? weights[index + 1]
-                          : null;
-                      final difference = prevWeight != null
-                          ? weight.weight - prevWeight.weight
-                          : null;
-
-                      return _buildWeightListTile(context, weight, difference);
-                    },
-                  ),
-                  const SizedBox(height: 80), // Space for FAB
-                ],
+        title: Text(context.l10n.weightTitle),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(24),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.screenH,
+              bottom: AppSpacing.sm,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                rabbit.name,
+                style: AppTypography.bodyMd
+                    .copyWith(color: context.colors.onSurfaceVariant),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddWeightDialog(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить взвешивание'),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: AppAsyncView<List<RabbitWeight>>(
+          value: weightsAsync,
+          onRetry: refresh,
+          skeleton: (_) => const SkeletonList(itemHeight: 72),
+          builder: (weights) => weights.isEmpty
+              ? AppEmptyState(
+                  icon: Icons.scale_outlined,
+                  title: context.l10n.weightEmptyTitle,
+                  subtitle: context.l10n.weightEmptyBody,
+                  actionLabel: canRecord ? context.l10n.weightAdd : null,
+                  onAction: canRecord
+                      ? () => _showAddDialog(context, ref)
+                      : null,
+                )
+              : _content(context, weights),
+        ),
       ),
+      floatingActionButton: canRecord
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddDialog(context, ref),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.weightAdd),
+            )
+          : null,
     );
   }
 
-  Widget _buildWeightSummary(
-    BuildContext context,
-    List<RabbitWeight> weights,
-    double? trend,
-  ) {
+  Widget _content(BuildContext context, List<RabbitWeight> weights) {
     final latest = weights.first;
     final oldest = weights.last;
     final totalChange = latest.weight - oldest.weight;
+    final trend = weights.length >= 2 ? latest.weight - weights[1].weight : null;
 
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.lg,
+        AppSpacing.screenH,
+        AppSpacing.fabSafeBottom,
+      ),
+      children: [
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: WeightChart(weights: weights),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        AppSectionTitle(context.l10n.weightSummary),
+        Row(
           children: [
-            Text(
-              'Сводка',
-              style: Theme.of(context).textTheme.titleMedium,
+            Expanded(
+              child: StatTile(
+                icon: Icons.scale_outlined,
+                label: context.l10n.weightCurrent,
+                value: formatQuantity(latest.weight, 'кг'),
+                accent: AppColors.domainLivestock,
+              ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  context,
-                  'Текущий вес',
-                  '${latest.weight.toStringAsFixed(2)} кг',
-                  Icons.scale,
-                  Colors.blue,
-                ),
-                _buildStatItem(
-                  context,
-                  'Тенденция',
-                  trend != null
-                      ? '${trend > 0 ? '+' : ''}${trend.toStringAsFixed(2)} кг'
-                      : '-',
-                  trend != null && trend > 0
-                      ? Icons.trending_up
-                      : Icons.trending_down,
-                  trend != null && trend > 0 ? Colors.green : Colors.orange,
-                ),
-                _buildStatItem(
-                  context,
-                  'Общее изменение',
-                  '${totalChange > 0 ? '+' : ''}${totalChange.toStringAsFixed(2)} кг',
-                  totalChange > 0 ? Icons.arrow_upward : Icons.arrow_downward,
-                  totalChange > 0 ? Colors.green : Colors.red,
-                ),
-              ],
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: StatTile(
+                icon: _changeIcon(trend),
+                label: context.l10n.weightTrend,
+                value: _changeText(trend),
+                accent: _changeColor(context, trend),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: StatTile(
+                icon: _changeIcon(totalChange),
+                label: context.l10n.weightTotalChange,
+                value: _changeText(totalChange),
+                accent: _changeColor(context, totalChange),
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    BuildContext context,
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.center,
-        ),
+        const SizedBox(height: AppSpacing.xl),
+        AppSectionTitle(context.l10n.weightHistory),
+        for (var i = 0; i < weights.length; i++) ...[
+          if (i > 0) const SizedBox(height: AppSpacing.sm),
+          _WeightRow(
+            weight: weights[i],
+            difference: i < weights.length - 1
+                ? weights[i].weight - weights[i + 1].weight
+                : null,
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildWeightListTile(
-    BuildContext context,
-    RabbitWeight weight,
-    double? difference,
-  ) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            Icons.scale,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-        ),
-        title: Row(
-          children: [
-            Text(
-              '${weight.weight.toStringAsFixed(2)} кг',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (difference != null) ...[
-              const SizedBox(width: 8),
-              Row(
-                children: [
-                  Icon(
-                    difference > 0
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    size: 16,
-                    color: difference > 0 ? Colors.green : Colors.red,
-                  ),
-                  Text(
-                    '${difference.abs().toStringAsFixed(2)} кг',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: difference > 0 ? Colors.green : Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              DateFormat('dd MMMM yyyy, HH:mm', 'ru_RU')
-                  .format(weight.measuredAt),
-            ),
-            if (weight.notes != null && weight.notes!.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                weight.notes!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ],
-        ),
-        isThreeLine: weight.notes != null && weight.notes!.isNotEmpty,
+  /// Потеря веса — повод присмотреться, а не авария, поэтому она помечена
+  /// предупреждающим цветом, а не тревожным. Раньше одна и та же убыль в
+  /// соседних плитках красилась то оранжевым, то красным.
+  Color _changeColor(BuildContext context, double? change) {
+    if (change == null || change == 0) return context.colors.onSurfaceVariant;
+    return change > 0 ? AppColors.success : AppColors.warning;
+  }
+
+  IconData _changeIcon(double? change) {
+    if (change == null || change == 0) return Icons.remove;
+    return change > 0 ? Icons.trending_up : Icons.trending_down;
+  }
+
+  String _changeText(double? change) {
+    if (change == null) return '—';
+    final sign = change > 0 ? '+' : '';
+    return '$sign${formatQuantity(change, 'кг')}';
+  }
+
+  void _showAddDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (_) => AddWeightDialog(
+        rabbitId: rabbit.id,
+        onSuccess: () => ref.invalidate(weightHistoryProvider(rabbit.id)),
       ),
     );
   }
+}
 
-  double? _calculateTrend(List<RabbitWeight> weights) {
-    if (weights.length < 2) return null;
-    final latest = weights.first;
-    final previous = weights[1];
-    return latest.weight - previous.weight;
-  }
+class _WeightRow extends StatelessWidget {
+  final RabbitWeight weight;
+  final double? difference;
 
-  void _showAddWeightDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AddWeightDialog(
-        rabbitId: rabbit.id,
-        onSuccess: () {
-          ref.invalidate(weightHistoryProvider(rabbit.id));
-          if (context.mounted) {
-            context.pop();
-          }
-        },
+  const _WeightRow({required this.weight, required this.difference});
+
+  @override
+  Widget build(BuildContext context) {
+    final change = difference;
+    final changeColor = change == null || change == 0
+        ? context.colors.onSurfaceVariant
+        : change > 0
+            ? AppColors.success
+            : AppColors.warning;
+
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.domainLivestock.withValues(alpha: 0.12),
+              borderRadius: AppRadius.smAll,
+            ),
+            child: const Icon(Icons.scale_outlined,
+                color: AppColors.domainLivestock, size: 20),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      formatQuantity(weight.weight, 'кг'),
+                      style: AppTypography.titleMd
+                          .copyWith(color: context.colors.onSurface),
+                    ),
+                    if (change != null && change != 0) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Icon(
+                        change > 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                        size: 14,
+                        color: changeColor,
+                      ),
+                      Text(
+                        formatQuantity(change.abs(), 'кг'),
+                        style:
+                            AppTypography.labelSm.copyWith(color: changeColor),
+                      ),
+                    ],
+                  ],
+                ),
+                Text(
+                  DateFormat('d MMMM y, HH:mm', 'ru').format(weight.measuredAt),
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                if (weight.notes?.trim().isNotEmpty == true) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    weight.notes!.trim(),
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -328,151 +267,142 @@ class AddWeightDialog extends ConsumerStatefulWidget {
 
 class _AddWeightDialogState extends ConsumerState<AddWeightDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _weightController = TextEditingController();
-  final _notesController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+  final _weight = TextEditingController();
+  final _notes = TextEditingController();
+  DateTime _measuredAt = DateTime.now();
+  bool _busy = false;
 
   @override
   void dispose() {
-    _weightController.dispose();
-    _notesController.dispose();
+    _weight.dispose();
+    _notes.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _measuredAt,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (date == null || !mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_measuredAt),
+    );
+    if (time == null) return;
+
+    setState(() {
+      _measuredAt = DateTime(
+          date.year, date.month, date.day, time.hour, time.minute);
+    });
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.weightSaved;
+    final failed = context.l10n.weightSaveFailed;
+
+    setState(() => _busy = true);
+    final notifier = ref.read(weightsNotifierProvider.notifier);
+    await notifier.addWeightRecord(
+      widget.rabbitId,
+      AddWeightRequest(
+        weight: parseDecimal(_weight.text)!,
+        measuredAt: _measuredAt,
+        notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+      ),
+    );
+    if (mounted) setState(() => _busy = false);
+
+    final state = ref.read(weightsNotifierProvider);
+    if (state.hasError) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$failed: ${state.error}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    widget.onSuccess();
+    navigator.pop();
+    messenger.showSnackBar(SnackBar(content: Text(done)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return AlertDialog(
-      title: const Text('Добавить взвешивание'),
+      title: Text(l10n.weightAdd),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
-              controller: _weightController,
-              decoration: const InputDecoration(
-                labelText: 'Вес (кг)',
-                hintText: '3.5',
-                prefixIcon: Icon(Icons.scale),
+              controller: _weight,
+              autofocus: true,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.weightValue,
+                hintText: l10n.weightValueHint,
+                prefixIcon: const Icon(Icons.scale_outlined),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Введите вес';
-                }
-                final weight = double.tryParse(value);
-                if (weight == null || weight <= 0) {
-                  return 'Введите корректный вес';
-                }
+              validator: (v) {
+                final value = parseDecimal(v);
+                if (value == null) return l10n.weightValueEmpty;
+                if (value <= 0) return l10n.weightValuePositive;
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             InkWell(
-              onTap: () => _selectDate(context),
+              borderRadius: AppRadius.mdAll,
+              onTap: _pickDate,
               child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Дата взвешивания',
-                  prefixIcon: Icon(Icons.calendar_today),
+                decoration: InputDecoration(
+                  labelText: l10n.weightWhen,
+                  prefixIcon: const Icon(Icons.event_outlined),
                 ),
                 child: Text(
-                  DateFormat('dd MMMM yyyy, HH:mm', 'ru_RU')
-                      .format(_selectedDate),
+                  DateFormat('d MMMM y, HH:mm', 'ru').format(_measuredAt),
+                  style: AppTypography.bodyLg
+                      .copyWith(color: context.colors.onSurface),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Заметки (необязательно)',
-                hintText: 'Дополнительная информация',
-                prefixIcon: Icon(Icons.note),
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: l10n.weightNotes,
+                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
               ),
-              maxLines: 3,
             ),
           ],
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Отмена'),
+          onPressed: _busy ? null : () => Navigator.pop(context),
+          child: Text(l10n.commonCancel),
         ),
-        ElevatedButton(
-          onPressed: () => _handleSubmit(context),
-          child: const Text('Добавить'),
+        TextButton(
+          onPressed: _busy ? null : _submit,
+          child: Text(l10n.commonAdd),
         ),
       ],
     );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-      locale: const Locale('ru', 'RU'),
-    );
-
-    if (date != null && context.mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_selectedDate),
-      );
-
-      if (time != null) {
-        setState(() {
-          _selectedDate = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-        });
-      }
-    }
-  }
-
-  Future<void> _handleSubmit(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    final weight = double.parse(_weightController.text);
-    final notes = _notesController.text.trim();
-
-    final request = AddWeightRequest(
-      weight: weight,
-      measuredAt: _selectedDate,
-      notes: notes.isEmpty ? null : notes,
-    );
-
-    final notifier = ref.read(weightsNotifierProvider.notifier);
-    await notifier.addWeightRecord(widget.rabbitId, request);
-
-    final state = ref.read(weightsNotifierProvider);
-
-    if (state.hasError && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Ошибка: ${state.error}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (!state.hasError && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Взвешивание добавлено'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      widget.onSuccess();
-    }
   }
 }

@@ -7,15 +7,19 @@ import '../../data/models/pedigree_model.dart';
 /// - Общих предков
 /// - Степень родства
 class InbreedingAnalyzer {
-  /// Вычислить коэффициент инбридинга между двумя кроликами
+  /// Максимальная глубина обхода родословной.
+  static const _maxGeneration = 5;
+
+  /// Проанализировать пару перед случкой.
   ///
-  /// Возвращает значение от 0.0 (не родственники) до 1.0 (полное родство)
+  /// Возвращает коэффициент инбридинга **будущего потомства**: 0.0 —
+  /// неродственная пара, 0.25 — родитель с потомком или полные брат с сестрой.
   static InbreedingAnalysis analyze(
     PedigreeModel male,
     PedigreeModel female,
   ) {
     final commonAncestors = _findCommonAncestors(male, female);
-    final coefficient = _calculateInbreedingCoefficient(male, female, commonAncestors);
+    final coefficient = _kinship(male, female, {}, 0);
 
     return InbreedingAnalysis(
       coefficient: coefficient,
@@ -25,23 +29,90 @@ class InbreedingAnalyzer {
     );
   }
 
-  /// Найти общих предков
+  /// Коэффициент родства пары — он же коэффициент инбридинга их потомства.
+  ///
+  /// Считается по рекуррентному соотношению:
+  ///   f(x, x) = 1/2
+  ///   f(x, y) = ( f(отец x, y) + f(мать x, y) ) / 2, если предки x известны
+  ///   f(x, y) = 0, если предки неизвестны
+  ///
+  /// Раньше здесь была прямая сумма (1/2)^(поколение самца + поколение самки)
+  /// с отдельными случаями «родитель-потомок» и «полные сибсы». В формуле
+  /// Райта не хватало единицы в показателе, поэтому все значения выходили
+  /// вдвое больше настоящих: полусибсы получали те же 25%, что и полные
+  /// сибсы, — то есть инструмент не различал ровно те две вязки, которые
+  /// заводчику важнее всего различать. Верное число давала только зашитая
+  /// ветка про полных сибсов, и она же прятала ошибку.
+  ///
+  /// Рекуррентная форма считает все пути сразу и не нуждается в частных
+  /// случаях: и родитель с потомком, и полные сибсы дают 0.25 сами собой.
+  static double _kinship(
+    PedigreeModel? x,
+    PedigreeModel? y,
+    Map<String, double> memo,
+    int depth,
+  ) {
+    if (x == null || y == null || depth > _maxGeneration * 2) return 0.0;
+
+    // Один и тот же кролик: половина его генов совпадает сама с собой.
+    if (x.id == y.id) return 0.5;
+
+    final key = x.id < y.id ? '${x.id}:${y.id}' : '${y.id}:${x.id}';
+    final cached = memo[key];
+    if (cached != null) return cached;
+
+    // Спускаться нужно от младшего: иначе родство деда с внуком посчитается
+    // так, будто внук — предок деда.
+    final younger = _younger(x, y);
+    final other = identical(younger, x) ? y : x;
+
+    final result = (younger.father == null && younger.mother == null)
+        ? 0.0
+        : (_kinship(younger.father, other, memo, depth + 1) +
+                _kinship(younger.mother, other, memo, depth + 1)) /
+            2;
+
+    memo[key] = result;
+    return result;
+  }
+
+  /// Кто из двоих младше.
+  ///
+  /// По дате рождения, если она известна у обоих; иначе младшим считаем того,
+  /// чьи родители известны — подниматься по родословной можно только от него.
+  static PedigreeModel _younger(PedigreeModel a, PedigreeModel b) {
+    final aBorn = DateTime.tryParse(a.birthDate ?? '');
+    final bBorn = DateTime.tryParse(b.birthDate ?? '');
+
+    if (aBorn != null && bBorn != null && aBorn != bBorn) {
+      return aBorn.isAfter(bBorn) ? a : b;
+    }
+
+    final aHasParents = a.father != null || a.mother != null;
+    final bHasParents = b.father != null || b.mother != null;
+
+    if (aHasParents != bHasParents) return aHasParents ? a : b;
+    return a;
+  }
+
+  /// Найти общих предков — для показа в интерфейсе.
   static List<CommonAncestor> _findCommonAncestors(
     PedigreeModel male,
     PedigreeModel female,
   ) {
-    final maleAncestors = _collectAncestors(male, 1);
-    final femaleAncestors = _collectAncestors(female, 1);
+    final maleAncestors = _collectAncestors(male);
+    final femaleAncestors = _collectAncestors(female);
 
     final common = <CommonAncestor>[];
 
-    for (var maleEntry in maleAncestors.entries) {
-      if (femaleAncestors.containsKey(maleEntry.key)) {
+    for (final maleEntry in maleAncestors.entries) {
+      final femaleAncestor = femaleAncestors[maleEntry.key];
+      if (femaleAncestor != null) {
         common.add(CommonAncestor(
           id: maleEntry.key,
           name: maleEntry.value.name,
           maleGeneration: maleEntry.value.generation,
-          femaleGeneration: femaleAncestors[maleEntry.key]!.generation,
+          femaleGeneration: femaleAncestor.generation,
         ));
       }
     }
@@ -49,80 +120,49 @@ class InbreedingAnalyzer {
     return common;
   }
 
-  /// Собрать всех предков с указанием поколения
-  static Map<int, AncestorInfo> _collectAncestors(
-    PedigreeModel rabbit,
-    int generation,
-  ) {
+  /// Собрать предков с номером ближайшего поколения.
+  ///
+  /// Сам кролик тоже попадает в список нулевым поколением: иначе пара
+  /// «отец и дочь» не имела бы общих предков вовсе, если родители отца
+  /// неизвестны, — а это обычное дело для покупного производителя.
+  static Map<int, AncestorInfo> _collectAncestors(PedigreeModel rabbit) {
     final ancestors = <int, AncestorInfo>{};
 
-    void traverse(PedigreeModel? current, int gen) {
-      if (current == null || gen > 5) return; // Ограничиваем глубину до 5 поколений
+    void traverse(PedigreeModel? current, int generation) {
+      if (current == null || generation > _maxGeneration) return;
 
-      if (!ancestors.containsKey(current.id)) {
+      final known = ancestors[current.id];
+      // Ближайшее поколение, а не первое найденное: обход идёт сначала по
+      // отцовской линии, и предок из её глубины иначе записывался бы дальним,
+      // хотя по материнской линии он совсем близкий.
+      if (known == null || generation < known.generation) {
         ancestors[current.id] = AncestorInfo(
           name: current.name,
-          generation: gen,
+          generation: generation,
         );
+      } else {
+        return;
       }
 
-      traverse(current.father, gen + 1);
-      traverse(current.mother, gen + 1);
+      traverse(current.father, generation + 1);
+      traverse(current.mother, generation + 1);
     }
 
-    // Не включаем самого кролика, только родителей
-    traverse(rabbit.father, generation);
-    traverse(rabbit.mother, generation);
+    traverse(rabbit, 0);
 
     return ancestors;
   }
 
-  /// Вычислить коэффициент инбридинга
+  /// Уровень риска по коэффициенту инбридинга потомства.
   ///
-  /// Упрощенная формула: сумма (1/2)^n для каждого общего предка,
-  /// где n - сумма поколений до этого предка
-  static double _calculateInbreedingCoefficient(
-    PedigreeModel male,
-    PedigreeModel female,
-    List<CommonAncestor> commonAncestors,
-  ) {
-    if (commonAncestors.isEmpty) {
-      return 0.0;
-    }
-
-    // Проверка прямого родства
-    if (male.id == female.father?.id || male.id == female.mother?.id) {
-      return 0.5; // Отец-дочь или обратно
-    }
-    if (female.id == male.father?.id || female.id == male.mother?.id) {
-      return 0.5; // Мать-сын или обратно
-    }
-
-    // Проверка на полное сиблингство (брат-сестра)
-    if (male.father?.id == female.father?.id &&
-        male.mother?.id == female.mother?.id &&
-        male.father != null && male.mother != null) {
-      return 0.25; // Полные братья/сестры
-    }
-
-    // Вычисление для общих предков
-    double coefficient = 0.0;
-
-    for (var ancestor in commonAncestors) {
-      final pathLength = ancestor.maleGeneration + ancestor.femaleGeneration;
-      coefficient += 1.0 / (1 << pathLength); // 2^pathLength
-    }
-
-    return coefficient.clamp(0.0, 1.0);
-  }
-
-  /// Определить уровень риска
+  /// Пороги соответствуют реальным значениям: 0.25 — родитель с потомком или
+  /// полные сибсы, 0.125 — полусибсы, 0.0625 — двоюродные.
   static InbreedingRiskLevel _getRiskLevel(double coefficient) {
-    if (coefficient >= 0.5) {
+    if (coefficient >= 0.25) {
       return InbreedingRiskLevel.critical;
-    } else if (coefficient >= 0.25) {
-      return InbreedingRiskLevel.high;
     } else if (coefficient >= 0.125) {
+      return InbreedingRiskLevel.high;
+    } else if (coefficient >= 0.0625) {
       return InbreedingRiskLevel.medium;
     } else if (coefficient > 0.0) {
       return InbreedingRiskLevel.low;
@@ -138,17 +178,18 @@ class InbreedingAnalyzer {
   ) {
     final recommendations = <String>[];
 
-    if (coefficient >= 0.5) {
+    if (coefficient >= 0.25) {
       recommendations.add('⛔ Критический уровень родства! Скрещивание настоятельно не рекомендуется.');
+      recommendations.add('Так близки родитель с потомком или полные брат с сестрой.');
       recommendations.add('Высокий риск генетических дефектов и проблем со здоровьем потомства.');
-    } else if (coefficient >= 0.25) {
-      recommendations.add('⚠️ Высокий уровень родства. Скрещивание не рекомендуется.');
-      recommendations.add('Возможны генетические проблемы у потомства.');
-      recommendations.add('Рассмотрите использование неродственных производителей.');
     } else if (coefficient >= 0.125) {
+      recommendations.add('⚠️ Высокий уровень родства. Скрещивание не рекомендуется.');
+      recommendations.add('Так близки полубрат с полусестрой или дядя с племянницей.');
+      recommendations.add('Рассмотрите использование неродственных производителей.');
+    } else if (coefficient >= 0.0625) {
       recommendations.add('⚡ Средний уровень родства. Скрещивание допустимо с осторожностью.');
+      recommendations.add('Примерно так близки двоюродные.');
       recommendations.add('Рекомендуется тщательный отбор и контроль здоровья потомства.');
-      recommendations.add('Желательно чередовать с неродственным разведением.');
     } else if (coefficient > 0.0) {
       recommendations.add('✓ Низкий уровень родства. Скрещивание допустимо.');
       recommendations.add('Общие предки находятся в дальних поколениях.');

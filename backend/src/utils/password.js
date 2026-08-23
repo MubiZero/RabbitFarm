@@ -2,6 +2,9 @@ const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 10;
 
+// Хеш-заглушка того же формата и стоимости, что и настоящие.
+const DUMMY_HASH = bcrypt.hashSync('unused-placeholder-password', SALT_ROUNDS);
+
 /**
  * Password hashing utilities
  */
@@ -13,6 +16,18 @@ class PasswordUtil {
    */
   static async hash(password) {
     return await bcrypt.hash(password, SALT_ROUNDS);
+  }
+
+  /**
+   * Сжечь столько же времени, сколько занимает настоящая проверка пароля.
+   *
+   * Для несуществующего email логин раньше возвращался мгновенно, а для
+   * существующего — после bcrypt. По одной этой разнице можно перебором
+   * выяснить, какие адреса зарегистрированы на ферме.
+   */
+  static async fakeCompare(password) {
+    await bcrypt.compare(String(password || ''), DUMMY_HASH);
+    return false;
   }
 
   /**

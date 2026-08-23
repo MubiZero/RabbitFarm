@@ -54,15 +54,21 @@ class ApiResponse {
    * @param {String} message - Success message
    */
   static paginated(res, items, page, limit, total, message = 'Успешно') {
+    // Значения по умолчанию, чтобы в ответ не утекали NaN, если вызывающий
+    // не передал страницу или размер: клиент по ним считает «показать ещё».
+    const safePage = parseInt(page) || 1;
+    const safeTotal = parseInt(total) || 0;
+    const safeLimit = parseInt(limit) || items.length || safeTotal || 1;
+
     return res.status(200).json({
       success: true,
       data: {
         items,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: parseInt(total),
-          totalPages: Math.ceil(total / limit)
+          page: safePage,
+          limit: safeLimit,
+          total: safeTotal,
+          totalPages: Math.ceil(safeTotal / safeLimit)
         }
       },
       message,

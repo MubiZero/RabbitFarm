@@ -114,7 +114,7 @@ class StaffController {
 
       return ApiResponse.created(
         res,
-        { user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role }, ...tokens },
+        { user: user.toJSON(), ...tokens },
         'Вы присоединились к ферме'
       );
     } catch (error) {

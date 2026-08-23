@@ -7,7 +7,7 @@ import '../../data/repositories/births_repository.dart';
 class BirthsState {
   final List<BirthModel> births;
   final bool isLoading;
-  final String? error;
+  final Object? error;
 
   BirthsState({
     this.births = const [],
@@ -18,7 +18,7 @@ class BirthsState {
   BirthsState copyWith({
     List<BirthModel>? births,
     bool? isLoading,
-    String? error,
+    Object? error,
   }) {
     return BirthsState(
       births: births ?? this.births,
@@ -103,7 +103,7 @@ class BirthsNotifier extends StateNotifier<BirthsState> {
     required int birthId,
     required int motherId,
     required int? fatherId,
-    required int breedId,
+    int? breedId,
     required String birthDate,
     required int count,
     String? namePrefix,

@@ -31,7 +31,7 @@ mixin _$RabbitModel {
   int get breedId => throw _privateConstructorUsedError;
   String get sex => throw _privateConstructorUsedError;
   @JsonKey(name: 'birth_date')
-  @DateTimeConverter()
+  @DateOnlyConverter()
   DateTime get birthDate => throw _privateConstructorUsedError;
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'cage_id')
@@ -46,13 +46,13 @@ mixin _$RabbitModel {
   String get status => throw _privateConstructorUsedError;
   String get purpose => throw _privateConstructorUsedError;
   @JsonKey(name: 'acquired_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get acquiredDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'sold_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get soldDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'death_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get deathDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'death_reason')
   String? get deathReason => throw _privateConstructorUsedError;
@@ -68,7 +68,7 @@ mixin _$RabbitModel {
   @JsonKey(name: 'updated_at')
   @DateTimeConverter()
   DateTime get updatedAt => throw _privateConstructorUsedError; // Relations
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   BreedModel? get breed => throw _privateConstructorUsedError;
   @JsonKey(name: 'Cage')
   CageInfo? get cage => throw _privateConstructorUsedError;
@@ -100,7 +100,7 @@ abstract class $RabbitModelCopyWith<$Res> {
     String name,
     @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
-    @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
+    @JsonKey(name: 'birth_date') @DateOnlyConverter() DateTime birthDate,
     String? color,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'father_id') @NullableIntConverter() int? fatherId,
@@ -108,11 +108,11 @@ abstract class $RabbitModelCopyWith<$Res> {
     String status,
     String purpose,
     @JsonKey(name: 'acquired_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() DateTime? soldDate,
+    @JsonKey(name: 'sold_date') @NullableDateOnlyConverter() DateTime? soldDate,
     @JsonKey(name: 'death_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
@@ -121,7 +121,7 @@ abstract class $RabbitModelCopyWith<$Res> {
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
-    @JsonKey(name: 'Breed') BreedModel? breed,
+    @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
     @JsonKey(name: 'mother') ParentInfo? mother,
@@ -358,7 +358,7 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     String name,
     @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
-    @JsonKey(name: 'birth_date') @DateTimeConverter() DateTime birthDate,
+    @JsonKey(name: 'birth_date') @DateOnlyConverter() DateTime birthDate,
     String? color,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'father_id') @NullableIntConverter() int? fatherId,
@@ -366,11 +366,11 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     String status,
     String purpose,
     @JsonKey(name: 'acquired_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     DateTime? acquiredDate,
-    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() DateTime? soldDate,
+    @JsonKey(name: 'sold_date') @NullableDateOnlyConverter() DateTime? soldDate,
     @JsonKey(name: 'death_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
@@ -379,7 +379,7 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
-    @JsonKey(name: 'Breed') BreedModel? breed,
+    @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
     @JsonKey(name: 'father') ParentInfo? father,
     @JsonKey(name: 'mother') ParentInfo? mother,
@@ -556,7 +556,7 @@ class _$RabbitModelImpl implements _RabbitModel {
     required this.name,
     @JsonKey(name: 'breed_id') @IntConverter() required this.breedId,
     required this.sex,
-    @JsonKey(name: 'birth_date') @DateTimeConverter() required this.birthDate,
+    @JsonKey(name: 'birth_date') @DateOnlyConverter() required this.birthDate,
     this.color,
     @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
     @JsonKey(name: 'father_id') @NullableIntConverter() this.fatherId,
@@ -564,10 +564,10 @@ class _$RabbitModelImpl implements _RabbitModel {
     required this.status,
     required this.purpose,
     @JsonKey(name: 'acquired_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     this.acquiredDate,
-    @JsonKey(name: 'sold_date') @NullableDateTimeConverter() this.soldDate,
-    @JsonKey(name: 'death_date') @NullableDateTimeConverter() this.deathDate,
+    @JsonKey(name: 'sold_date') @NullableDateOnlyConverter() this.soldDate,
+    @JsonKey(name: 'death_date') @NullableDateOnlyConverter() this.deathDate,
     @JsonKey(name: 'death_reason') this.deathReason,
     @JsonKey(name: 'current_weight') this.currentWeight,
     this.temperament,
@@ -575,7 +575,7 @@ class _$RabbitModelImpl implements _RabbitModel {
     @JsonKey(name: 'photo_url') this.photoUrl,
     @JsonKey(name: 'created_at') @DateTimeConverter() required this.createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() required this.updatedAt,
-    @JsonKey(name: 'Breed') this.breed,
+    @JsonKey(name: 'breed') this.breed,
     @JsonKey(name: 'Cage') this.cage,
     @JsonKey(name: 'father') this.father,
     @JsonKey(name: 'mother') this.mother,
@@ -600,7 +600,7 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String sex;
   @override
   @JsonKey(name: 'birth_date')
-  @DateTimeConverter()
+  @DateOnlyConverter()
   final DateTime birthDate;
   @override
   final String? color;
@@ -622,15 +622,15 @@ class _$RabbitModelImpl implements _RabbitModel {
   final String purpose;
   @override
   @JsonKey(name: 'acquired_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   final DateTime? acquiredDate;
   @override
   @JsonKey(name: 'sold_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   final DateTime? soldDate;
   @override
   @JsonKey(name: 'death_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   final DateTime? deathDate;
   @override
   @JsonKey(name: 'death_reason')
@@ -655,7 +655,7 @@ class _$RabbitModelImpl implements _RabbitModel {
   final DateTime updatedAt;
   // Relations
   @override
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   final BreedModel? breed;
   @override
   @JsonKey(name: 'Cage')
@@ -771,7 +771,7 @@ abstract class _RabbitModel implements RabbitModel {
     @JsonKey(name: 'breed_id') @IntConverter() required final int breedId,
     required final String sex,
     @JsonKey(name: 'birth_date')
-    @DateTimeConverter()
+    @DateOnlyConverter()
     required final DateTime birthDate,
     final String? color,
     @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
@@ -780,13 +780,13 @@ abstract class _RabbitModel implements RabbitModel {
     required final String status,
     required final String purpose,
     @JsonKey(name: 'acquired_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     final DateTime? acquiredDate,
     @JsonKey(name: 'sold_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     final DateTime? soldDate,
     @JsonKey(name: 'death_date')
-    @NullableDateTimeConverter()
+    @NullableDateOnlyConverter()
     final DateTime? deathDate,
     @JsonKey(name: 'death_reason') final String? deathReason,
     @JsonKey(name: 'current_weight') final double? currentWeight,
@@ -799,7 +799,7 @@ abstract class _RabbitModel implements RabbitModel {
     @JsonKey(name: 'updated_at')
     @DateTimeConverter()
     required final DateTime updatedAt,
-    @JsonKey(name: 'Breed') final BreedModel? breed,
+    @JsonKey(name: 'breed') final BreedModel? breed,
     @JsonKey(name: 'Cage') final CageInfo? cage,
     @JsonKey(name: 'father') final ParentInfo? father,
     @JsonKey(name: 'mother') final ParentInfo? mother,
@@ -824,7 +824,7 @@ abstract class _RabbitModel implements RabbitModel {
   String get sex;
   @override
   @JsonKey(name: 'birth_date')
-  @DateTimeConverter()
+  @DateOnlyConverter()
   DateTime get birthDate;
   @override
   String? get color;
@@ -846,15 +846,15 @@ abstract class _RabbitModel implements RabbitModel {
   String get purpose;
   @override
   @JsonKey(name: 'acquired_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get acquiredDate;
   @override
   @JsonKey(name: 'sold_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get soldDate;
   @override
   @JsonKey(name: 'death_date')
-  @NullableDateTimeConverter()
+  @NullableDateOnlyConverter()
   DateTime? get deathDate;
   @override
   @JsonKey(name: 'death_reason')
@@ -878,7 +878,7 @@ abstract class _RabbitModel implements RabbitModel {
   @DateTimeConverter()
   DateTime get updatedAt; // Relations
   @override
-  @JsonKey(name: 'Breed')
+  @JsonKey(name: 'breed')
   BreedModel? get breed;
   @override
   @JsonKey(name: 'Cage')

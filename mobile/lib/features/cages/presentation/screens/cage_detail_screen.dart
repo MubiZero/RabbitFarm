@@ -1,499 +1,525 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/models/cage_model.dart';
-import '../providers/cages_provider.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
+import '../../data/models/cage_model.dart';
+import '../providers/cages_provider.dart';
+import '../utils/cage_labels.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
+/// Карточка клетки: состояние, заполненность и кто в ней живёт.
 class CageDetailScreen extends ConsumerStatefulWidget {
   final int cageId;
 
-  const CageDetailScreen({
-    super.key,
-    required this.cageId,
-  });
+  const CageDetailScreen({super.key, required this.cageId});
 
   @override
   ConsumerState<CageDetailScreen> createState() => _CageDetailScreenState();
 }
 
 class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
-  bool _isLoading = false;
+  /// Идёт перемещение кролика. Содержимое экрана при этом остаётся на месте:
+  /// раньше вместо него на весь экран разворачивался спиннер, и человек
+  /// терял из виду список, с которым только что работал.
+  bool _busy = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Refresh cage data on enter
-     Future.microtask(() => 
-       ref.read(cagesProvider.notifier).loadCages()
-    );
+  Future<void> _refresh() async {
+    ref.invalidate(cageDetailProvider(widget.cageId));
+    await ref.read(cageDetailProvider(widget.cageId).future);
+  }
+
+  /// Общая обвязка действий над жителями клетки: занятость, обновление
+  /// экрана и сообщение о результате.
+  Future<void> _run(Future<void> Function() action, String success) async {
+    setState(() => _busy = true);
+    // Всё, что зависит от контекста, снимается до ожидания: экран может
+    // закрыться, пока ответ идёт с сервера.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final failedTemplate = context.l10n.commonActionFailed;
+    try {
+      await action();
+      ref.invalidate(cagesProvider);
+      await _refresh();
+      messenger.showSnackBar(SnackBar(content: Text(success)));
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+              failedTemplate(errorText(l10n, e))),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   Future<void> _removeRabbit(RabbitModel rabbit) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Убрать из клетки?'),
-        content: Text('Кролик "${rabbit.name}" будет перемещен в список без клетки.'),
+        title: Text(context.l10n.cageRemoveTitle),
+        content: Text(context.l10n.cageRemoveBody(rabbit.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Убрать'),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(context.l10n.cageRemoveConfirm),
           ),
         ],
       ),
     );
+    if (confirmed != true || !mounted) return;
 
-    if (confirmed == true) {
-      setState(() => _isLoading = true);
-      try {
-        await ref.read(rabbitsRepositoryProvider).updateRabbit(
-          rabbit.id,
-          {'cage_id': null},
-        );
-        ref.invalidate(cagesProvider); // Refresh cages to update occupancy
-        if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Кролик убран из клетки')),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
-          );
-        }
-      } finally {
-        if (mounted) setState(() => _isLoading = false);
-      }
-    }
+    await _run(
+      () => ref
+          .read(rabbitsRepositoryProvider)
+          .updateRabbit(rabbit.id, {'cage_id': null}),
+      context.l10n.cageRemoved(rabbit.name),
+    );
   }
 
   Future<void> _moveRabbit(RabbitModel rabbit) async {
-    // Show dialog to select target cage
-    // For simplicity, we'll fetch all cages and show them
-    // Ideally this should be a paginated search dialog
-    final cages = ref.read(cagesProvider).cages
-        .where((c) => c.id != widget.cageId && (c.isAvailable ?? false)) // Filter current and full cages
-        .toList();
-
-    if (cages.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Нет доступных клеток для перемещения')),
-      );
-      return;
-    }
-
-    final targetCage = await showDialog<CageModel>(
+    final target = await showModalBottomSheet<CageModel>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Переместить в...'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: cages.length,
-            itemBuilder: (context, index) {
-              final cage = cages[index];
-              return ListTile(
-                title: Text('Клетка ${cage.number}'),
-                subtitle: Text('${cage.type} • ${cage.location ?? ""}'),
-                onTap: () => Navigator.pop(context, cage),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      builder: (_) => _CagePickerSheet(excludeCageId: widget.cageId),
     );
+    if (target == null || !mounted) return;
 
-    if (targetCage != null) {
-      setState(() => _isLoading = true);
-      try {
-         await ref.read(rabbitsRepositoryProvider).updateRabbit(
-          rabbit.id,
-          {'cage_id': targetCage.id},
-        );
-        ref.invalidate(cagesProvider);
-        if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Кролик перемещен в клетку ${targetCage.number}')),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
-          );
-        }
-      } finally {
-        if (mounted) setState(() => _isLoading = false);
-      }
-    }
-  }
-
- Future<void> _addRabbit(int cageId) async {
-    // Navigate to a rabbit selection screen or show a dialog.
-    // We'll show a simple dialog with recently added rabbits or a search field.
-    // For MVP/clean implementation, let's fetch rabbits without cage (if possible) or just all rabbits.
-    // Since backend doesn't support 'no_cage' filter explicitly yet, we fetch recent rabbits and filter client side 
-    // or just show search.
-    
-    // We will use a search dialog
-    final messenger = ScaffoldMessenger.of(context);
-    await showDialog(
-      context: context,
-      builder: (dialogContext) => _AddRabbitDialog(
-        onSelect: (rabbit) async {
-          Navigator.pop(dialogContext);
-          setState(() => _isLoading = true);
-          try {
-             await ref.read(rabbitsRepositoryProvider).updateRabbit(
-              rabbit.id,
-              {'cage_id': cageId},
-            );
-            ref.invalidate(cagesProvider);
-            messenger.showSnackBar(
-              const SnackBar(content: Text('Кролик добавлен в клетку')),
-            );
-          } catch (e) {
-            messenger.showSnackBar(
-              SnackBar(content: Text('Ошибка: $e'), backgroundColor: AppColors.error),
-            );
-          } finally {
-            if (mounted) setState(() => _isLoading = false);
-          }
-        }
-      )
+    await _run(
+      () => ref
+          .read(rabbitsRepositoryProvider)
+          .updateRabbit(rabbit.id, {'cage_id': target.id}),
+      context.l10n.cageMoved(rabbit.name, target.number),
     );
   }
 
+  Future<void> _addRabbit() async {
+    final rabbit = await showModalBottomSheet<RabbitModel>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => RabbitPickerSheet(excludeCageId: widget.cageId),
+    );
+    if (rabbit == null || !mounted) return;
+
+    await _run(
+      () => ref
+          .read(rabbitsRepositoryProvider)
+          .updateRabbit(rabbit.id, {'cage_id': widget.cageId}),
+      context.l10n.cageSettled(rabbit.name),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Find the cage in the provider list
-    final cagesState = ref.watch(cagesProvider);
-    final cage = cagesState.cages.firstWhere(
-      (c) => c.id == widget.cageId,
-      orElse: () => CageModel(id: widget.cageId, number: '...', type: 'single', capacity: 0, condition: 'good'),
-    );
-
-    // If loading specifically for this screen or global loading
-    // But since we are selecting from list, we might have data.
-    // The cage object inside 'cages' might have 'rabbits' populated if getCages included them.
-    // Controller.list includes rabbits.
+    final cageAsync = ref.watch(cageDetailProvider(widget.cageId));
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final cage = cageAsync.valueOrNull;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Клетка ${cage.number}'),
+        title: Text(cage == null
+            ? context.l10n.cageTitle
+            : context.l10n.cageTitleNumbered(cage.number)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => context.push('/cages/form', extra: cage),
-          ),
+          if (canManage && cage != null)
+            IconButton(
+              tooltip: context.l10n.cageEdit,
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => context.push('/cages/form', extra: cage),
+            ),
         ],
+        bottom: _busy
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(2),
+                child: LinearProgressIndicator(minHeight: 2),
+              )
+            : null,
       ),
-      body: _isLoading 
-          ? const Center(child: CircularProgressIndicator()) 
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCageInfo(cage),
-                  const SizedBox(height: 24),
-                  _buildRabbitsSection(cage),
-                ],
-              ),
-            ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: (cage.isFull ?? false) ? null : () => _addRabbit(cage.id),
-        backgroundColor: (cage.isFull ?? false) ? null : AppColors.warning,
-        icon: const Icon(Icons.add),
-        label: const Text('Посадить кролика'),
-      ),
-    );
-  }
-
-  Widget _buildCageInfo(CageModel cage) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Тип: ${_getTypeText(cage.type)}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Состояние: ${_getConditionText(cage.condition)}',
-                      style: TextStyle(
-                        color: _getConditionColor(cage.condition),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                _buildOccupancyCircle(cage),
-              ],
-            ),
-            const Divider(height: 24),
-            Row(
-              children: [
-                Icon(Icons.location_on, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  cage.location ?? 'Нет локации',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-          ],
+      body: AbsorbPointer(
+        absorbing: _busy,
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: AppAsyncView<CageModel>(
+            value: cageAsync,
+            onRetry: _refresh,
+            skeleton: (_) => const SkeletonList(count: 3, itemHeight: 120),
+            builder: (cage) => _content(cage, canManage),
+          ),
         ),
       ),
+      floatingActionButton: _fab(cage, canManage),
     );
   }
 
-  Widget _buildOccupancyCircle(CageModel cage) {
-    final occupancy = cage.rabbits?.length ?? 0;
-    final percent = cage.capacity > 0 ? occupancy / cage.capacity : 0.0;
-    
-    return Stack(
-      alignment: Alignment.center,
+  Widget? _fab(CageModel? cage, bool canManage) {
+    if (cage == null || !canManage) return null;
+    final full = cage.isFull ?? false;
+
+    return FloatingActionButton.extended(
+      // Заполненная клетка — не ошибка приложения, поэтому кнопка остаётся на
+      // месте и прямо говорит, почему не работает.
+      onPressed: full || _busy ? null : _addRabbit,
+      icon: Icon(full ? Icons.do_not_disturb_on_outlined : Icons.add),
+      label: Text(full ? context.l10n.cageFull : context.l10n.cageAddRabbit),
+    );
+  }
+
+  Widget _content(CageModel cage, bool canManage) {
+    final rabbits = cage.rabbits ?? const <RabbitModel>[];
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.lg,
+        AppSpacing.screenH,
+        AppSpacing.fabSafeBottom,
+      ),
       children: [
-        CircularProgressIndicator(
-          value: percent,
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-          color: percent >= 1 ? AppColors.error : AppColors.success,
-          strokeWidth: 8,
+        _CageSummary(cage: cage),
+        const SizedBox(height: AppSpacing.xl),
+        AppSectionTitle(
+          context.l10n.cageResidents,
+          subtitle: context.l10n.countRabbits(rabbits.length),
         ),
-        Text(
-          '$occupancy/${cage.capacity}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRabbitsSection(CageModel cage) {
-    final rabbits = cage.rabbits ?? [];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Жители',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
         if (rabbits.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Text('В этой клетке пока никого нет', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          AppCard(
+            child: Row(
+              children: [
+                Icon(Icons.pets_outlined,
+                    color: context.colors.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    canManage
+                        ? context.l10n.cageEmptyManaged
+                        : context.l10n.cageEmptyReadOnly,
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                  ),
+                ),
+              ],
             ),
           )
         else
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: rabbits.length,
-            itemBuilder: (context, index) {
-              final rabbit = rabbits[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: rabbit.photoUrl != null ? NetworkImage(rabbit.photoUrl!) : null,
-                    child: rabbit.photoUrl == null ? const Icon(Icons.pets, size: 20) : null,
-                  ),
-                  title: Text(rabbit.name),
-                  subtitle: Text(rabbit.tagId),
-                  trailing: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'move') _moveRabbit(rabbit);
-                      if (value == 'remove') _removeRabbit(rabbit);
-                      if (value == 'profile') context.push('/rabbits/${rabbit.id}');
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'profile',
-                        child: Row(children: [Icon(Icons.visibility), SizedBox(width: 8), Text('Профиль')]),
-                      ),
-                      const PopupMenuItem(
-                        value: 'move',
-                        child: Row(children: [Icon(Icons.low_priority), SizedBox(width: 8), Text('Переместить')]),
-                      ),
-                      PopupMenuItem(
-                         value: 'remove',
-                         child: Row(children: [Icon(Icons.output, color: AppColors.error), SizedBox(width: 8), Text('Убрать', style: TextStyle(color: AppColors.error))]),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+          for (var i = 0; i < rabbits.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.sm),
+            _ResidentTile(
+              rabbit: rabbits[i],
+              canManage: canManage,
+              onOpen: () => context.push('/rabbits/${rabbits[i].id}'),
+              onMove: () => _moveRabbit(rabbits[i]),
+              onRemove: () => _removeRabbit(rabbits[i]),
+            ),
+          ],
       ],
     );
   }
-
-  String _getTypeText(String type) {
-    switch (type) {
-      case 'single':
-        return 'Одиночная';
-      case 'group':
-        return 'Групповая';
-      case 'maternity':
-        return 'Для окрола';
-      default:
-        return type;
-    }
-  }
-
-  String _getConditionText(String condition) {
-    switch (condition) {
-      case 'good':
-        return 'Хорошее';
-      case 'needs_repair':
-        return 'Нужен ремонт';
-      case 'broken':
-        return 'Сломана';
-      default:
-        return condition;
-    }
-  }
-
-  Color _getConditionColor(String condition) {
-    switch (condition) {
-      case 'good':
-        return AppColors.success;
-      case 'needs_repair':
-        return AppColors.warning;
-      case 'broken':
-        return AppColors.error;
-      default:
-        return Theme.of(context).colorScheme.onSurfaceVariant;
-    }
-  }
 }
 
-class _AddRabbitDialog extends ConsumerStatefulWidget {
-  final Function(RabbitModel) onSelect;
+class _CageSummary extends StatelessWidget {
+  final CageModel cage;
 
-  const _AddRabbitDialog({required this.onSelect});
-
-  @override
-  ConsumerState<_AddRabbitDialog> createState() => _AddRabbitDialogState();
-}
-
-class _AddRabbitDialogState extends ConsumerState<_AddRabbitDialog> {
-  final TextEditingController _searchController = TextEditingController();
-  List<RabbitModel> _allRabbits = [];
-  List<RabbitModel> _filteredRabbits = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadRabbits();
-  }
-
-  Future<void> _loadRabbits() async {
-    // Ideally we fetch rabbits that are NOT in a cage.
-    // For now, load all
-    try {
-      final repo = ref.read(rabbitsRepositoryProvider);
-      final result = await repo.getRabbits(limit: 100); // Increased limit for ease
-      if (mounted) {
-        setState(() {
-          _allRabbits = result.items;
-          _filteredRabbits = result.items;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  void _filter(String query) {
-    setState(() {
-      _filteredRabbits = _allRabbits.where((r) => 
-        r.name.toLowerCase().contains(query.toLowerCase()) || 
-        r.tagId.toLowerCase().contains(query.toLowerCase())
-      ).toList();
-    });
-  }
+  const _CageSummary({required this.cage});
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Выберите кролика'),
-      content: SizedBox(
-        width: double.maxFinite,
-        height: 400,
-        child: Column(
-          children: [
-            TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Поиск...',
-                prefixIcon: Icon(Icons.search),
+    final occupied = cage.rabbits?.length ?? cage.currentOccupancy ?? 0;
+    final conditionColor = cageConditionColor(context, cage.condition);
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cageTypeLabel(context, cage.type),
+                      style: AppTypography.titleMd
+                          .copyWith(color: context.colors.onSurface),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      cageConditionLabel(context, cage.condition),
+                      style:
+                          AppTypography.labelLg.copyWith(color: conditionColor),
+                    ),
+                  ],
+                ),
               ),
-              onChanged: _filter,
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: _isLoading 
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _filteredRabbits.length,
-                    itemBuilder: (context, index) {
-                      final rabbit = _filteredRabbits[index];
-                      // Optional: visually distinguish rabbits already in a cage
-                      final isInCage = rabbit.cageId != null;
-                      
-                      return ListTile(
-                        enabled: !isInCage, // Disable selection if already in cage? Users might want to move directly.
-                        // Let's allow moving directly from this dialog too
-                        leading: const Icon(Icons.pets),
-                        title: Text(rabbit.name),
-                        subtitle: Text(isInCage ? 'В клетке #${rabbit.cageId}' : 'Без клетки'),
-                        onTap: () => widget.onSelect(rabbit),
-                      );
-                    },
-                  ),
-            ),
-          ],
-        ),
+              _Occupancy(occupied: occupied, capacity: cage.capacity),
+            ],
+          ),
+          const Divider(height: AppSpacing.xxl),
+          Row(
+            children: [
+              Icon(Icons.place_outlined,
+                  size: 20, color: context.colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  cage.location?.trim().isNotEmpty == true
+                      ? cage.location!.trim()
+                      : context.l10n.cageNoLocation,
+                  style: AppTypography.bodyMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Отмена'),
-        ),
-      ],
+    );
+  }
+}
+
+class _Occupancy extends StatelessWidget {
+  final int occupied;
+  final int capacity;
+
+  const _Occupancy({required this.occupied, required this.capacity});
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = capacity > 0 ? (occupied / capacity).clamp(0.0, 1.0) : 0.0;
+    final color = ratio >= 1 ? AppColors.warning : AppColors.success;
+
+    return SizedBox(
+      width: 56,
+      height: 56,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: ratio,
+            backgroundColor: context.colors.surfaceContainerHighest,
+            color: color,
+            strokeWidth: 6,
+          ),
+          Text(
+            '$occupied/$capacity',
+            style: AppTypography.labelSm.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResidentTile extends StatelessWidget {
+  final RabbitModel rabbit;
+  final bool canManage;
+  final VoidCallback onOpen;
+  final VoidCallback onMove;
+  final VoidCallback onRemove;
+
+  const _ResidentTile({
+    required this.rabbit,
+    required this.canManage,
+    required this.onOpen,
+    required this.onMove,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      onTap: onOpen,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          RabbitAvatar(photoUrl: rabbit.photoUrl),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  rabbit.name,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  rabbit.tagId,
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+          if (canManage)
+            PopupMenuButton<_ResidentAction>(
+              tooltip: context.l10n.commonActions,
+              onSelected: (action) => switch (action) {
+                _ResidentAction.move => onMove(),
+                _ResidentAction.remove => onRemove(),
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _ResidentAction.move,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.swap_horiz),
+                    title: Text(context.l10n.cageResidentMove),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _ResidentAction.remove,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.logout, color: AppColors.error),
+                    title: Text(
+                      context.l10n.cageRemoveConfirm,
+                      style: AppTypography.bodyLg
+                          .copyWith(color: AppColors.error),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            Icon(Icons.chevron_right, color: context.colors.onSurfaceVariant),
+        ],
+      ),
+    );
+  }
+}
+
+enum _ResidentAction { move, remove }
+
+/// Выбор клетки для переезда.
+class _CagePickerSheet extends ConsumerWidget {
+  final int excludeCageId;
+
+  const _CagePickerSheet({required this.excludeCageId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(cagesProvider);
+    final available = state.cages
+        .where((c) => c.id != excludeCageId && (c.isAvailable ?? false))
+        .toList();
+
+    return _PickerSheet(
+      title: context.l10n.cagePickCageTitle,
+      child: available.isEmpty
+          ? AppEmptyState(
+              icon: Icons.grid_off_outlined,
+              title: context.l10n.cagePickNoFreeCages,
+              subtitle: context.l10n.cagePickNoFreeCagesBody,
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenH,
+                0,
+                AppSpacing.screenH,
+                AppSpacing.xl,
+              ),
+              itemCount: available.length,
+              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+              itemBuilder: (context, i) {
+                final cage = available[i];
+                final occupied =
+                    cage.rabbits?.length ?? cage.currentOccupancy ?? 0;
+
+                return AppCard(
+                  onTap: () => Navigator.pop(context, cage),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.l10n.cageTitleNumbered(cage.number),
+                              style: AppTypography.titleMd
+                                  .copyWith(color: context.colors.onSurface),
+                            ),
+                            Text(
+                              [
+                                cageTypeLabel(context, cage.type),
+                                if (cage.location?.trim().isNotEmpty == true)
+                                  cage.location!.trim(),
+                              ].join(' · '),
+                              style: AppTypography.labelSm.copyWith(
+                                  color: context.colors.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '$occupied/${cage.capacity}',
+                        style: AppTypography.labelLg
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+/// Общая рамка модальной шторки выбора: заголовок и высота в три четверти
+/// экрана, чтобы список не приходилось листать в щели.
+class _PickerSheet extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _PickerSheet({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.75,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              0,
+              AppSpacing.screenH,
+              AppSpacing.lg,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                title,
+                style: AppTypography.titleLg
+                    .copyWith(color: context.colors.onSurface),
+              ),
+            ),
+          ),
+          Expanded(child: child),
+        ],
+      ),
     );
   }
 }

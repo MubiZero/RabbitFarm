@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/medical_record_model.dart';
-import '../../../rabbits/presentation/providers/rabbits_provider.dart';
-import '../providers/medical_records_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_date_field.dart';
-import '../../../../core/widgets/app_form_section.dart';
 
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../../rabbits/data/models/rabbit_model.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
+import '../../data/models/medical_record_model.dart';
+import '../providers/medical_records_provider.dart';
+import '../utils/medical_labels.dart';
+
+/// Карта лечения: что случилось, чем лечили, чем закончилось.
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
   final MedicalRecord? medicalRecord;
 
@@ -22,385 +26,316 @@ class MedicalRecordFormScreen extends ConsumerStatefulWidget {
 class _MedicalRecordFormScreenState
     extends ConsumerState<MedicalRecordFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _symptomsController = TextEditingController();
-  final _diagnosisController = TextEditingController();
-  final _treatmentController = TextEditingController();
-  final _medicationController = TextEditingController();
-  final _dosageController = TextEditingController();
-  final _costController = TextEditingController();
-  final _veterinarianController = TextEditingController();
-  final _notesController = TextEditingController();
 
-  int? _selectedRabbitId;
+  final _symptoms = TextEditingController();
+  final _diagnosis = TextEditingController();
+  final _treatment = TextEditingController();
+  final _medication = TextEditingController();
+  final _dosage = TextEditingController();
+  final _cost = TextEditingController();
+  final _veterinarian = TextEditingController();
+  final _notes = TextEditingController();
+
+  RabbitModel? _rabbit;
+  int? _rabbitId;
   DateTime _startedAt = DateTime.now();
   DateTime? _endedAt;
-  String _outcome = 'ongoing';
+  MedicalOutcome _outcome = MedicalOutcome.ongoing;
+  bool _touched = false;
 
-  bool _isLoading = false;
+  MedicalRecord? get _record => widget.medicalRecord;
+  bool get _isEditing => _record != null;
 
   @override
   void initState() {
     super.initState();
-    if (widget.medicalRecord != null) {
-      _loadMedicalRecord();
+    final record = _record;
+    if (record != null) {
+      _rabbitId = record.rabbitId;
+      _rabbit = record.rabbit;
+      _symptoms.text = record.symptoms;
+      _diagnosis.text = record.diagnosis ?? '';
+      _treatment.text = record.treatment ?? '';
+      _medication.text = record.medication ?? '';
+      _dosage.text = record.dosage ?? '';
+      _cost.text = record.cost?.toString() ?? '';
+      _veterinarian.text = record.veterinarian ?? '';
+      _notes.text = record.notes ?? '';
+      _startedAt = record.startedAt;
+      _endedAt = record.endedAt;
+      _outcome = record.outcome;
+    }
+
+    for (final c in _controllers) {
+      c.addListener(() => _touched = true);
     }
   }
 
-  void _loadMedicalRecord() {
-    final record = widget.medicalRecord!;
-    _selectedRabbitId = record.rabbitId;
-    _symptomsController.text = record.symptoms;
-    _diagnosisController.text = record.diagnosis ?? '';
-    _treatmentController.text = record.treatment ?? '';
-    _medicationController.text = record.medication ?? '';
-    _dosageController.text = record.dosage ?? '';
-    _startedAt = record.startedAt;
-    _endedAt = record.endedAt;
-    _outcome = record.outcome.name;
-    _costController.text = record.cost?.toString() ?? '';
-    _veterinarianController.text = record.veterinarian ?? '';
-    _notesController.text = record.notes ?? '';
-  }
+  List<TextEditingController> get _controllers => [
+        _symptoms,
+        _diagnosis,
+        _treatment,
+        _medication,
+        _dosage,
+        _cost,
+        _veterinarian,
+        _notes,
+      ];
 
   @override
   void dispose() {
-    _symptomsController.dispose();
-    _diagnosisController.dispose();
-    _treatmentController.dispose();
-    _medicationController.dispose();
-    _dosageController.dispose();
-    _costController.dispose();
-    _veterinarianController.dispose();
-    _notesController.dispose();
+    for (final c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  String? _optional(TextEditingController c) =>
+      c.text.trim().isEmpty ? null : c.text.trim();
+
+  Future<Object?> _save() async {
+    final noRabbit = context.l10n.rabbitPickerRequired;
+    if (_rabbitId == null) return noRabbit;
+
+    final notifier = ref.read(medicalRecordsProvider.notifier);
+    final outcome = medicalOutcomeValue(_outcome);
+    final cost = parseDecimal(_cost.text);
+
+    try {
+      if (_isEditing) {
+        await notifier.updateMedicalRecord(
+          _record!.id,
+          MedicalRecordUpdate(
+            rabbitId: _rabbitId,
+            symptoms: _symptoms.text.trim(),
+            diagnosis: _optional(_diagnosis),
+            treatment: _optional(_treatment),
+            medication: _optional(_medication),
+            dosage: _optional(_dosage),
+            startedAt: _startedAt,
+            endedAt: _endedAt,
+            outcome: outcome,
+            cost: cost,
+            veterinarian: _optional(_veterinarian),
+            notes: _optional(_notes),
+          ),
+        );
+      } else {
+        await notifier.addMedicalRecord(
+          MedicalRecordCreate(
+            rabbitId: _rabbitId!,
+            symptoms: _symptoms.text.trim(),
+            diagnosis: _optional(_diagnosis),
+            treatment: _optional(_treatment),
+            medication: _optional(_medication),
+            dosage: _optional(_dosage),
+            startedAt: _startedAt,
+            endedAt: _endedAt,
+            outcome: outcome,
+            cost: cost,
+            veterinarian: _optional(_veterinarian),
+            notes: _optional(_notes),
+          ),
+        );
+      }
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _endedAt ?? DateTime.now(),
+      firstDate: _startedAt,
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _endedAt = picked;
+        _touched = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final rabbitsState = ref.watch(rabbitsListProvider);
+    final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.medicalRecord == null
-            ? 'Новая медицинская карта'
-            : 'Редактировать карту'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+    return AppFormScaffold(
+      title: _isEditing ? l10n.medFormEditTitle : l10n.medFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage: _isEditing ? l10n.medFormUpdated : l10n.medFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      children: [
+        AppFormSection(
+          title: l10n.medFormSectionCase,
           children: [
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                if (rabbitsState.isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else if (rabbitsState.error != null)
-                  Text('Ошибка загрузки кроликов: ${rabbitsState.error}',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error))
-                else
-                  DropdownButtonFormField<int>(
-                    initialValue: _selectedRabbitId,
-                    decoration: const InputDecoration(
-                      labelText: 'Кролик *',
-                      prefixIcon: Icon(Icons.pets),
-                    ),
-                    items: rabbitsState.rabbits.map((rabbit) {
-                      return DropdownMenuItem(
-                        value: rabbit.id,
-                        child: Text('${rabbit.name} (${rabbit.tagId})'),
-                      );
-                    }).toList(),
-                    onChanged: (value) => setState(() => _selectedRabbitId = value),
-                    validator: (value) =>
-                        value == null ? 'Выберите кролика' : null,
-                  ),
-                TextFormField(
-                  controller: _symptomsController,
-                  decoration: const InputDecoration(
-                    labelText: 'Симптомы *',
-                    prefixIcon: Icon(Icons.sick_outlined),
-                  ),
-                  maxLines: 3,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите симптомы';
-                    }
-                    return null;
-                  },
-                ),
-                AppDateField(
-                  label: 'Дата начала *',
-                  value: _startedAt,
-                  onChanged: (date) => setState(() => _startedAt = date),
-                  prefixIcon: Icons.calendar_today,
-                  lastDate: DateTime.now(),
-                ),
-              ],
+            RabbitPickerField(
+              label: l10n.medFormRabbit,
+              selected: _rabbit,
+              required: true,
+              onChanged: (rabbit) => setState(() {
+                _rabbit = rabbit;
+                _rabbitId = rabbit?.id;
+                _touched = true;
+              }),
             ),
-            AppFormSection(
-              title: 'Диагностика и лечение',
-              children: [
-                TextFormField(
-                  controller: _diagnosisController,
-                  decoration: const InputDecoration(
-                    labelText: 'Диагноз',
-                    prefixIcon: Icon(Icons.medical_information_outlined),
-                  ),
-                ),
-                TextFormField(
-                  controller: _treatmentController,
-                  decoration: const InputDecoration(
-                    labelText: 'Лечение',
-                    prefixIcon: Icon(Icons.healing_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-                TextFormField(
-                  controller: _medicationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Препараты',
-                    prefixIcon: Icon(Icons.medication_outlined),
-                  ),
-                ),
-                TextFormField(
-                  controller: _dosageController,
-                  decoration: const InputDecoration(
-                    labelText: 'Дозировка',
-                    prefixIcon: Icon(Icons.straighten),
-                  ),
-                ),
-              ],
+            TextFormField(
+              controller: _symptoms,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.medSymptoms,
+                prefixIcon: const Icon(Icons.sick_outlined),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.medFormSymptomsEmpty
+                  : null,
             ),
-            AppFormSection(
-              title: 'Дополнительно',
-              children: [
-                _buildEndedDateField(context),
-                DropdownButtonFormField<String>(
-                  initialValue: _outcome,
-                  decoration: const InputDecoration(
-                    labelText: 'Исход',
-                    prefixIcon: Icon(Icons.flag_outlined),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'ongoing',
-                      child: Text('Лечение продолжается'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'recovered',
-                      child: Text('Выздоровел'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'died',
-                      child: Text('Умер'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'euthanized',
-                      child: Text('Эвтаназия'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _outcome = value);
-                  },
-                ),
-                TextFormField(
-                  controller: _costController,
-                  decoration: const InputDecoration(
-                    labelText: 'Стоимость (руб.)',
-                    prefixIcon: Icon(Icons.payments_outlined),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      if (double.tryParse(value) == null) {
-                        return 'Введите корректное число';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _veterinarianController,
-                  decoration: const InputDecoration(
-                    labelText: 'Ветеринар',
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
-                ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Заметки',
-              children: [
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Примечания',
-                    prefixIcon: Icon(Icons.note_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
+            TextFormField(
+              controller: _diagnosis,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.medDiagnosis,
+                prefixIcon: const Icon(Icons.medical_information_outlined),
+              ),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _submitForm,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.medicalRecord == null ? 'Создать' : 'Сохранить'),
+        AppFormSection(
+          title: l10n.medFormSectionTreatment,
+          children: [
+            TextFormField(
+              controller: _treatment,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.medTreatment,
+                prefixIcon: const Icon(Icons.healing_outlined),
+              ),
             ),
-          ),
+            TextFormField(
+              controller: _medication,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.medMedication,
+                prefixIcon: const Icon(Icons.medication_outlined),
+              ),
+            ),
+            TextFormField(
+              controller: _dosage,
+              decoration: InputDecoration(
+                labelText: l10n.medFormDosage,
+                prefixIcon: const Icon(Icons.straighten),
+              ),
+            ),
+            TextFormField(
+              controller: _veterinarian,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l10n.medVet,
+                prefixIcon: const Icon(Icons.person_outline),
+              ),
+            ),
+          ],
         ),
-      ),
+        AppFormSection(
+          title: l10n.medFormSectionDates,
+          children: [
+            AppDateField(
+              label: l10n.medStarted,
+              value: _startedAt,
+              onChanged: (date) => setState(() {
+                _startedAt = date;
+                _touched = true;
+                if (_endedAt != null && _endedAt!.isBefore(date)) {
+                  _endedAt = null;
+                }
+              }),
+              prefixIcon: Icons.event_available_outlined,
+              lastDate: DateTime.now(),
+            ),
+            InkWell(
+              borderRadius: AppRadius.mdAll,
+              onTap: _pickEndDate,
+              child: InputDecorator(
+                isEmpty: _endedAt == null,
+                decoration: InputDecoration(
+                  labelText: l10n.medFormEndedDate,
+                  prefixIcon: const Icon(Icons.event_outlined),
+                  suffixIcon: _endedAt != null
+                      ? IconButton(
+                          tooltip: l10n.rabbitPickerClear,
+                          icon: const Icon(Icons.clear),
+                          onPressed: () => setState(() {
+                            _endedAt = null;
+                            _touched = true;
+                          }),
+                        )
+                      : const Icon(Icons.arrow_drop_down),
+                ),
+                child: _endedAt == null
+                    ? null
+                    : Text(
+                        DateFormat('d MMMM y', 'ru').format(_endedAt!),
+                        style: AppTypography.bodyLg
+                            .copyWith(color: context.colors.onSurface),
+                      ),
+              ),
+            ),
+            DropdownButtonFormField<MedicalOutcome>(
+              initialValue: _outcome,
+              decoration: InputDecoration(
+                labelText: l10n.medFormOutcome,
+                prefixIcon: Icon(medicalOutcomeIcon(_outcome)),
+              ),
+              items: [
+                for (final outcome in MedicalOutcome.values)
+                  DropdownMenuItem(
+                    value: outcome,
+                    child: Text(medicalOutcomeLabel(context, outcome)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _outcome = v;
+                _touched = true;
+              }),
+            ),
+            TextFormField(
+              controller: _cost,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.medFormCostLabel,
+                prefixIcon: const Icon(Icons.payments_outlined),
+                // Сумма не просто хранится в карте: сервер заводит на неё
+                // расход. Пользователь должен знать об этом до сохранения.
+                helperText: l10n.medFormCostHelp,
+                helperMaxLines: 2,
+              ),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                return parseDecimal(v) == null
+                    ? l10n.commonNumberInvalid
+                    : null;
+              },
+            ),
+            TextFormField(
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.medNotes,
+                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
-  }
-
-  Widget _buildEndedDateField(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final dateText = _endedAt != null
-        ? DateFormat('dd.MM.yyyy').format(_endedAt!)
-        : 'Не указана';
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          initialDate: _endedAt ?? DateTime.now(),
-          firstDate: _startedAt,
-          lastDate: DateTime.now(),
-        );
-        if (date != null && mounted) {
-          setState(() => _endedAt = date);
-        }
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: 'Дата окончания',
-          prefixIcon: const Icon(Icons.calendar_month_outlined),
-          suffixIcon: _endedAt != null
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () => setState(() => _endedAt = null),
-                )
-              : null,
-        ),
-        child: Text(
-          dateText,
-          style: TextStyle(color: cs.onSurface),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      if (widget.medicalRecord == null) {
-        final record = MedicalRecordCreate(
-          rabbitId: _selectedRabbitId!,
-          symptoms: _symptomsController.text,
-          diagnosis: _diagnosisController.text.isNotEmpty
-              ? _diagnosisController.text
-              : null,
-          treatment: _treatmentController.text.isNotEmpty
-              ? _treatmentController.text
-              : null,
-          medication: _medicationController.text.isNotEmpty
-              ? _medicationController.text
-              : null,
-          dosage: _dosageController.text.isNotEmpty
-              ? _dosageController.text
-              : null,
-          startedAt: _startedAt,
-          endedAt: _endedAt,
-          outcome: _outcome,
-          cost: _costController.text.isNotEmpty
-              ? double.parse(_costController.text)
-              : null,
-          veterinarian: _veterinarianController.text.isNotEmpty
-              ? _veterinarianController.text
-              : null,
-          notes:
-              _notesController.text.isNotEmpty ? _notesController.text : null,
-        );
-
-        await ref.read(medicalRecordsProvider.notifier).addMedicalRecord(record);
-      } else {
-        final update = MedicalRecordUpdate(
-          rabbitId: _selectedRabbitId,
-          symptoms: _symptomsController.text,
-          diagnosis: _diagnosisController.text.isNotEmpty
-              ? _diagnosisController.text
-              : null,
-          treatment: _treatmentController.text.isNotEmpty
-              ? _treatmentController.text
-              : null,
-          medication: _medicationController.text.isNotEmpty
-              ? _medicationController.text
-              : null,
-          dosage: _dosageController.text.isNotEmpty
-              ? _dosageController.text
-              : null,
-          startedAt: _startedAt,
-          endedAt: _endedAt,
-          outcome: _outcome,
-          cost: _costController.text.isNotEmpty
-              ? double.parse(_costController.text)
-              : null,
-          veterinarian: _veterinarianController.text.isNotEmpty
-              ? _veterinarianController.text
-              : null,
-          notes:
-              _notesController.text.isNotEmpty ? _notesController.text : null,
-        );
-
-        await ref
-            .read(medicalRecordsProvider.notifier)
-            .updateMedicalRecord(widget.medicalRecord!.id, update);
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.medicalRecord == null
-                ? 'Медицинская карта создана'
-                : 'Медицинская карта обновлена'),
-          ),
-        );
-        context.pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
   }
 }

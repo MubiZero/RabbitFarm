@@ -1,4 +1,5 @@
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/api_error.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/report_model.dart';
 
@@ -10,25 +11,26 @@ class ReportsRepository {
 
   /// Get dashboard report
   Future<DashboardReport> getDashboard() async {
-    final response = await _apiClient.get(ApiEndpoints.reportDashboard);
-    return DashboardReport.fromJson(response.data['data']);
+    return guardRequest(() async {
+      final response = await _apiClient.get(ApiEndpoints.reportDashboard);
+      return DashboardReport.fromJson(response.data['data']);
+    }, 'Не удалось загрузить сводку');
   }
 
   /// Get farm report
-  Future<FarmReport> getFarmReport({
-    String? fromDate,
-    String? toDate,
-  }) async {
-    final queryParams = <String, dynamic>{
-      if (fromDate != null) 'from_date': fromDate,
-      if (toDate != null) 'to_date': toDate,
-    };
+  Future<FarmReport> getFarmReport({String? fromDate, String? toDate}) async {
+    return guardRequest(() async {
+      final queryParams = <String, dynamic>{
+        if (fromDate != null) 'from_date': fromDate,
+        if (toDate != null) 'to_date': toDate,
+      };
 
-    final response = await _apiClient.get(
-      ApiEndpoints.reportFarm,
-      queryParameters: queryParams,
-    );
-    return FarmReport.fromJson(response.data['data']);
+      final response = await _apiClient.get(
+        ApiEndpoints.reportFarm,
+        queryParameters: queryParams,
+      );
+      return FarmReport.fromJson(response.data['data']);
+    }, 'Не удалось загрузить отчёт по ферме');
   }
 
   /// Get health report
@@ -36,16 +38,18 @@ class ReportsRepository {
     String? fromDate,
     String? toDate,
   }) async {
-    final queryParams = <String, dynamic>{
-      if (fromDate != null) 'from_date': fromDate,
-      if (toDate != null) 'to_date': toDate,
-    };
+    return guardRequest(() async {
+      final queryParams = <String, dynamic>{
+        if (fromDate != null) 'from_date': fromDate,
+        if (toDate != null) 'to_date': toDate,
+      };
 
-    final response = await _apiClient.get(
-      ApiEndpoints.reportHealth,
-      queryParameters: queryParams,
-    );
-    return HealthReport.fromJson(response.data['data']);
+      final response = await _apiClient.get(
+        ApiEndpoints.reportHealth,
+        queryParameters: queryParams,
+      );
+      return HealthReport.fromJson(response.data['data']);
+    }, 'Не удалось загрузить отчёт по здоровью');
   }
 
   /// Get financial report
@@ -54,16 +58,18 @@ class ReportsRepository {
     String? toDate,
     String? groupBy,
   }) async {
-    final queryParams = <String, dynamic>{
-      if (fromDate != null) 'from_date': fromDate,
-      if (toDate != null) 'to_date': toDate,
-      if (groupBy != null) 'groupBy': groupBy,
-    };
+    return guardRequest(() async {
+      final queryParams = <String, dynamic>{
+        if (fromDate != null) 'from_date': fromDate,
+        if (toDate != null) 'to_date': toDate,
+        if (groupBy != null) 'groupBy': groupBy,
+      };
 
-    final response = await _apiClient.get(
-      ApiEndpoints.reportFinancial,
-      queryParameters: queryParams,
-    );
-    return FinancialReport.fromJson(response.data['data']);
+      final response = await _apiClient.get(
+        ApiEndpoints.reportFinancial,
+        queryParameters: queryParams,
+      );
+      return FinancialReport.fromJson(response.data['data']);
+    }, 'Не удалось загрузить финансовый отчёт');
   }
 }

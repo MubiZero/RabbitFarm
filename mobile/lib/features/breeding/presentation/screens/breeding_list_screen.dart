@@ -1,119 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/breeding_provider.dart';
-import '../../../../shared/widgets/error_view.dart';
-import '../../../rabbits/data/models/breeding_model.dart';
+import 'package:intl/intl.dart';
 
-class BreedingListScreen extends ConsumerStatefulWidget {
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../../rabbits/data/models/breeding_model.dart';
+import '../providers/breeding_provider.dart';
+import '../../../../core/l10n/l10n_context.dart';
+
+/// Список случек.
+///
+/// Раньше экран разбирал состояние четырьмя независимыми условиями, и первая
+/// загрузка не подходила ни под одно из них: пока список ехал с сервера,
+/// пользователь видел пустой экран без заголовка, подсказки и индикатора.
+/// Теперь состояния разбирает [PagedListView] — одинаково на всех списках.
+class BreedingListScreen extends ConsumerWidget {
   const BreedingListScreen({super.key});
 
   @override
-  ConsumerState<BreedingListScreen> createState() => _BreedingListScreenState();
-}
-
-class _BreedingListScreenState extends ConsumerState<BreedingListScreen> {
-  final _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      ref.read(breedingListProvider.notifier).loadMore();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final breedingState = ref.watch(breedingListProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(breedingListProvider);
+    final notifier = ref.read(breedingListProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Случки'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ref.read(breedingListProvider.notifier).refresh();
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await ref.read(breedingListProvider.notifier).refresh();
-        },
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            if (breedingState.error != null)
-              SliverToBoxAdapter(
-                child: ErrorView(
-                  message: breedingState.error!,
-                  onRetry: () => ref.read(breedingListProvider.notifier).refresh(),
-                ),
-              ),
-
-            if (!breedingState.isLoading && breedingState.breedings.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Нет записей о случках',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: () => context.push('/breeding/new'),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Добавить случку'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            if (breedingState.breedings.isNotEmpty)
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final breeding = breedingState.breedings[index];
-                      return _BreedingCard(
-                        breeding: breeding,
-                        onTap: () => context.push('/breeding/${breeding.id}'),
-                      );
-                    },
-                    childCount: breedingState.breedings.length,
-                  ),
-                ),
-              ),
-
-            if (breedingState.isLoading && breedingState.breedings.isNotEmpty)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ),
-          ],
+      appBar: AppBar(title: Text(context.l10n.breedingListTitle)),
+      body: PagedListView<BreedingModel>(
+        items: state.breedings,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.refresh,
+        onLoadMore: notifier.loadMore,
+        empty: AppEmptyState(
+          icon: Icons.favorite_border,
+          title: context.l10n.breedingEmptyTitle,
+          subtitle: context.l10n.breedingEmptyBody,
+          actionLabel: context.l10n.breedingEmptyAction,
+          onAction: () => context.push('/breeding/new'),
+        ),
+        itemBuilder: (context, breeding, _) => _BreedingCard(
+          breeding: breeding,
+          onTap: () => context.push('/breeding/${breeding.id}'),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -128,144 +56,169 @@ class _BreedingCard extends StatelessWidget {
   final BreedingModel breeding;
   final VoidCallback onTap;
 
-  const _BreedingCard({
-    required this.breeding,
-    required this.onTap,
-  });
+  const _BreedingCard({required this.breeding, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor;
-    String statusText;
+    final status = BreedingStatus.fromValue(breeding.status);
 
-    switch (breeding.status) {
-      case 'planned':
-        statusColor = Colors.blue;
-        statusText = 'Запланировано';
-        break;
-      case 'completed':
-        statusColor = Colors.green;
-        statusText = 'Завершено';
-        break;
-      case 'failed':
-        statusColor = Colors.red;
-        statusText = 'Неудача';
-        break;
-      case 'cancelled':
-        statusColor = Colors.grey;
-        statusText = 'Отменено';
-        break;
-      default:
-        statusColor = Colors.grey;
-        statusText = breeding.status;
-    }
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: statusColor),
-                    ),
-                    child: Text(
-                      statusText,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    _formatDate(breeding.breedingDate),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
-                  ),
-                ],
+              _StatusChip(status: status),
+              Text(
+                _formatDate(breeding.breedingDate),
+                style: AppTypography.labelSm
+                    .copyWith(color: context.colors.onSurfaceVariant),
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.male, size: 16, color: Colors.blue),
-                            SizedBox(width: 4),
-                            Text('Самец', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          breeding.male?.name ?? 'ID: ${breeding.maleId}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.favorite, color: Colors.pinkAccent, size: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text('Самка', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            SizedBox(width: 4),
-                            Icon(Icons.female, size: 16, color: Colors.pink),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          breeding.female?.name ?? 'ID: ${breeding.femaleId}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (breeding.expectedBirthDate != null) ...[
-                const Divider(height: 24),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Ожидаемая дата окрола: ${_formatDate(breeding.expectedBirthDate!)}',
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
-                ),
-              ],
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _Parent(
+                  icon: Icons.male,
+                  color: AppColors.info,
+                  role: context.l10n.breedingMale,
+                  name: breeding.male?.name,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                child: Icon(Icons.favorite,
+                    color: AppColors.domainBreeding, size: 20),
+              ),
+              Expanded(
+                child: _Parent(
+                  icon: Icons.female,
+                  color: AppColors.domainBreeding,
+                  role: context.l10n.breedingFemale,
+                  name: breeding.female?.name,
+                  alignEnd: true,
+                ),
+              ),
+            ],
+          ),
+          if (breeding.expectedBirthDate != null) ...[
+            const Divider(height: AppSpacing.xl * 1.5),
+            Row(
+              children: [
+                Icon(Icons.event_outlined,
+                    size: 16, color: context.colors.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  context.l10n.breedingExpectedBirth(
+                      _formatDate(breeding.expectedBirthDate!)),
+                  style: AppTypography.bodyMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
 
-  String _formatDate(String dateString) {
-    try {
-      final date = DateTime.parse(dateString);
-      return '${date.day}.${date.month}.${date.year}';
-    } catch (e) {
-      return dateString;
-    }
+  String _formatDate(String raw) {
+    final date = DateTime.tryParse(raw);
+    return date == null ? raw : DateFormat('d MMMM y', 'ru').format(date);
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final BreedingStatus status;
+
+  const _StatusChip({required this.status});
+
+  String _label(BuildContext context, BreedingStatus status) => switch (status) {
+        BreedingStatus.planned => context.l10n.breedingStatusPlanned,
+        BreedingStatus.completed => context.l10n.breedingStatusCompleted,
+        BreedingStatus.failed => context.l10n.breedingStatusFailed,
+        BreedingStatus.cancelled => context.l10n.breedingStatusCancelled,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (status) {
+      BreedingStatus.planned => AppColors.info,
+      BreedingStatus.completed => AppColors.success,
+      BreedingStatus.failed => AppColors.error,
+      BreedingStatus.cancelled => context.colors.onSurfaceVariant,
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: AppRadius.pillAll,
+      ),
+      child: Text(
+        _label(context, status),
+        style: AppTypography.labelSm.copyWith(color: color),
+      ),
+    );
+  }
+}
+
+class _Parent extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String role;
+  final String? name;
+  final bool alignEnd;
+
+  const _Parent({
+    required this.icon,
+    required this.color,
+    required this.role,
+    required this.name,
+    this.alignEnd = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = [
+      Icon(icon, size: 16, color: color),
+      const SizedBox(width: AppSpacing.xs),
+      Text(
+        role,
+        style: AppTypography.labelSm
+            .copyWith(color: context.colors.onSurfaceVariant),
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment:
+          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment:
+              alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: alignEnd ? label.reversed.toList() : label,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          // Раньше вместо неизвестного имени показывался номер записи в базе
+          // («ID: 42») — для фермера это не подсказка, а мусор.
+          name?.trim().isNotEmpty == true
+              ? name!.trim()
+              : context.l10n.commonNameMissing,
+          style: AppTypography.titleMd.copyWith(color: context.colors.onSurface),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+        ),
+      ],
+    );
   }
 }

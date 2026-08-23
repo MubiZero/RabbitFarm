@@ -32,8 +32,10 @@ mixin _$MedicalRecord {
   String? get medication => throw _privateConstructorUsedError;
   String? get dosage => throw _privateConstructorUsedError;
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt => throw _privateConstructorUsedError;
   @JsonKey(defaultValue: MedicalOutcome.ongoing)
   MedicalOutcome get outcome => throw _privateConstructorUsedError;
@@ -42,8 +44,10 @@ mixin _$MedicalRecord {
   String? get veterinarian => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit => throw _privateConstructorUsedError;
@@ -73,14 +77,18 @@ abstract class $MedicalRecordCopyWith<$Res> {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
 
@@ -222,14 +230,18 @@ abstract class _$$MedicalRecordImplCopyWith<$Res>
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
   });
 
@@ -350,14 +362,14 @@ class _$MedicalRecordImpl implements _MedicalRecord {
     this.treatment,
     this.medication,
     this.dosage,
-    @JsonKey(name: 'started_at') required this.startedAt,
-    @JsonKey(name: 'ended_at') this.endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required this.startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() this.endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) required this.outcome,
     @DoubleConverter() this.cost,
     this.veterinarian,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
   });
 
@@ -383,9 +395,11 @@ class _$MedicalRecordImpl implements _MedicalRecord {
   final String? dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   final DateTime startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   final DateTime? endedAt;
   @override
   @JsonKey(defaultValue: MedicalOutcome.ongoing)
@@ -399,9 +413,11 @@ class _$MedicalRecordImpl implements _MedicalRecord {
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -489,15 +505,23 @@ abstract class _MedicalRecord implements MedicalRecord {
     final String? treatment,
     final String? medication,
     final String? dosage,
-    @JsonKey(name: 'started_at') required final DateTime startedAt,
-    @JsonKey(name: 'ended_at') final DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required final DateTime startedAt,
+    @JsonKey(name: 'ended_at')
+    @NullableDateOnlyConverter()
+    final DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing)
     required final MedicalOutcome outcome,
     @DoubleConverter() final double? cost,
     final String? veterinarian,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final RabbitModel? rabbit,
   }) = _$MedicalRecordImpl;
@@ -524,9 +548,11 @@ abstract class _MedicalRecord implements MedicalRecord {
   String? get dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt;
   @override
   @JsonKey(defaultValue: MedicalOutcome.ongoing)
@@ -540,9 +566,11 @@ abstract class _MedicalRecord implements MedicalRecord {
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -570,8 +598,10 @@ mixin _$MedicalRecordCreate {
   String? get medication => throw _privateConstructorUsedError;
   String? get dosage => throw _privateConstructorUsedError;
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt => throw _privateConstructorUsedError;
   @JsonKey(defaultValue: 'ongoing')
   String? get outcome => throw _privateConstructorUsedError;
@@ -603,8 +633,8 @@ abstract class $MedicalRecordCreateCopyWith<$Res> {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: 'ongoing') String? outcome,
     double? cost,
     String? veterinarian,
@@ -712,8 +742,8 @@ abstract class _$$MedicalRecordCreateImplCopyWith<$Res>
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: 'ongoing') String? outcome,
     double? cost,
     String? veterinarian,
@@ -813,8 +843,8 @@ class _$MedicalRecordCreateImpl implements _MedicalRecordCreate {
     this.treatment,
     this.medication,
     this.dosage,
-    @JsonKey(name: 'started_at') required this.startedAt,
-    @JsonKey(name: 'ended_at') this.endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required this.startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() this.endedAt,
     @JsonKey(defaultValue: 'ongoing') this.outcome,
     this.cost,
     this.veterinarian,
@@ -839,9 +869,11 @@ class _$MedicalRecordCreateImpl implements _MedicalRecordCreate {
   final String? dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   final DateTime startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   final DateTime? endedAt;
   @override
   @JsonKey(defaultValue: 'ongoing')
@@ -927,8 +959,12 @@ abstract class _MedicalRecordCreate implements MedicalRecordCreate {
     final String? treatment,
     final String? medication,
     final String? dosage,
-    @JsonKey(name: 'started_at') required final DateTime startedAt,
-    @JsonKey(name: 'ended_at') final DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required final DateTime startedAt,
+    @JsonKey(name: 'ended_at')
+    @NullableDateOnlyConverter()
+    final DateTime? endedAt,
     @JsonKey(defaultValue: 'ongoing') final String? outcome,
     final double? cost,
     final String? veterinarian,
@@ -953,9 +989,11 @@ abstract class _MedicalRecordCreate implements MedicalRecordCreate {
   String? get dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt;
   @override
   @JsonKey(defaultValue: 'ongoing')
@@ -989,8 +1027,10 @@ mixin _$MedicalRecordUpdate {
   String? get medication => throw _privateConstructorUsedError;
   String? get dosage => throw _privateConstructorUsedError;
   @JsonKey(name: 'started_at')
+  @NullableDateOnlyConverter()
   DateTime? get startedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt => throw _privateConstructorUsedError;
   String? get outcome => throw _privateConstructorUsedError;
   double? get cost => throw _privateConstructorUsedError;
@@ -1021,8 +1061,10 @@ abstract class $MedicalRecordUpdateCopyWith<$Res> {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime? startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @NullableDateOnlyConverter()
+    DateTime? startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     String? outcome,
     double? cost,
     String? veterinarian,
@@ -1130,8 +1172,10 @@ abstract class _$$MedicalRecordUpdateImplCopyWith<$Res>
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime? startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @NullableDateOnlyConverter()
+    DateTime? startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     String? outcome,
     double? cost,
     String? veterinarian,
@@ -1231,8 +1275,8 @@ class _$MedicalRecordUpdateImpl implements _MedicalRecordUpdate {
     this.treatment,
     this.medication,
     this.dosage,
-    @JsonKey(name: 'started_at') this.startedAt,
-    @JsonKey(name: 'ended_at') this.endedAt,
+    @JsonKey(name: 'started_at') @NullableDateOnlyConverter() this.startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() this.endedAt,
     this.outcome,
     this.cost,
     this.veterinarian,
@@ -1257,9 +1301,11 @@ class _$MedicalRecordUpdateImpl implements _MedicalRecordUpdate {
   final String? dosage;
   @override
   @JsonKey(name: 'started_at')
+  @NullableDateOnlyConverter()
   final DateTime? startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   final DateTime? endedAt;
   @override
   final String? outcome;
@@ -1344,8 +1390,12 @@ abstract class _MedicalRecordUpdate implements MedicalRecordUpdate {
     final String? treatment,
     final String? medication,
     final String? dosage,
-    @JsonKey(name: 'started_at') final DateTime? startedAt,
-    @JsonKey(name: 'ended_at') final DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @NullableDateOnlyConverter()
+    final DateTime? startedAt,
+    @JsonKey(name: 'ended_at')
+    @NullableDateOnlyConverter()
+    final DateTime? endedAt,
     final String? outcome,
     final double? cost,
     final String? veterinarian,
@@ -1370,9 +1420,11 @@ abstract class _MedicalRecordUpdate implements MedicalRecordUpdate {
   String? get dosage;
   @override
   @JsonKey(name: 'started_at')
+  @NullableDateOnlyConverter()
   DateTime? get startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt;
   @override
   String? get outcome;
@@ -1974,6 +2026,7 @@ mixin _$OngoingTreatment {
   String? get rabbitName => throw _privateConstructorUsedError;
   String? get diagnosis => throw _privateConstructorUsedError;
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'days_ongoing')
   int get daysOngoing => throw _privateConstructorUsedError;
@@ -2001,7 +2054,7 @@ abstract class $OngoingTreatmentCopyWith<$Res> {
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     String? diagnosis,
-    @JsonKey(name: 'started_at') DateTime startedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
     String? symptoms,
   });
@@ -2080,7 +2133,7 @@ abstract class _$$OngoingTreatmentImplCopyWith<$Res>
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     String? diagnosis,
-    @JsonKey(name: 'started_at') DateTime startedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
     String? symptoms,
   });
@@ -2151,7 +2204,7 @@ class _$OngoingTreatmentImpl implements _OngoingTreatment {
     @JsonKey(name: 'rabbit_id') @IntConverter() required this.rabbitId,
     @JsonKey(name: 'rabbit_name') this.rabbitName,
     this.diagnosis,
-    @JsonKey(name: 'started_at') required this.startedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required this.startedAt,
     @JsonKey(name: 'days_ongoing') required this.daysOngoing,
     this.symptoms,
   });
@@ -2173,6 +2226,7 @@ class _$OngoingTreatmentImpl implements _OngoingTreatment {
   final String? diagnosis;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   final DateTime startedAt;
   @override
   @JsonKey(name: 'days_ongoing')
@@ -2241,7 +2295,9 @@ abstract class _OngoingTreatment implements OngoingTreatment {
     @JsonKey(name: 'rabbit_id') @IntConverter() required final int rabbitId,
     @JsonKey(name: 'rabbit_name') final String? rabbitName,
     final String? diagnosis,
-    @JsonKey(name: 'started_at') required final DateTime startedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required final DateTime startedAt,
     @JsonKey(name: 'days_ongoing') required final int daysOngoing,
     final String? symptoms,
   }) = _$OngoingTreatmentImpl;
@@ -2263,6 +2319,7 @@ abstract class _OngoingTreatment implements OngoingTreatment {
   String? get diagnosis;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt;
   @override
   @JsonKey(name: 'days_ongoing')
@@ -2297,8 +2354,10 @@ mixin _$MedicalRecordWithDays {
   String? get medication => throw _privateConstructorUsedError;
   String? get dosage => throw _privateConstructorUsedError;
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt => throw _privateConstructorUsedError;
   @JsonKey(defaultValue: MedicalOutcome.ongoing)
   MedicalOutcome get outcome => throw _privateConstructorUsedError;
@@ -2336,8 +2395,8 @@ abstract class $MedicalRecordWithDaysCopyWith<$Res> {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
@@ -2482,8 +2541,8 @@ abstract class _$$MedicalRecordWithDaysImplCopyWith<$Res>
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') DateTime startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() DateTime startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
@@ -2605,8 +2664,8 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
     this.treatment,
     this.medication,
     this.dosage,
-    @JsonKey(name: 'started_at') required this.startedAt,
-    @JsonKey(name: 'ended_at') this.endedAt,
+    @JsonKey(name: 'started_at') @DateOnlyConverter() required this.startedAt,
+    @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() this.endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing) required this.outcome,
     @DoubleConverter() this.cost,
     this.veterinarian,
@@ -2637,9 +2696,11 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
   final String? dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   final DateTime startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   final DateTime? endedAt;
   @override
   @JsonKey(defaultValue: MedicalOutcome.ongoing)
@@ -2741,8 +2802,12 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
     final String? treatment,
     final String? medication,
     final String? dosage,
-    @JsonKey(name: 'started_at') required final DateTime startedAt,
-    @JsonKey(name: 'ended_at') final DateTime? endedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required final DateTime startedAt,
+    @JsonKey(name: 'ended_at')
+    @NullableDateOnlyConverter()
+    final DateTime? endedAt,
     @JsonKey(defaultValue: MedicalOutcome.ongoing)
     required final MedicalOutcome outcome,
     @DoubleConverter() final double? cost,
@@ -2775,9 +2840,11 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
   String? get dosage;
   @override
   @JsonKey(name: 'started_at')
+  @DateOnlyConverter()
   DateTime get startedAt;
   @override
   @JsonKey(name: 'ended_at')
+  @NullableDateOnlyConverter()
   DateTime? get endedAt;
   @override
   @JsonKey(defaultValue: MedicalOutcome.ongoing)

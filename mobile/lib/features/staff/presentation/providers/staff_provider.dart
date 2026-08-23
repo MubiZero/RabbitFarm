@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/staff_models.dart';
 import '../../data/repositories/staff_repository.dart';
 
 final staffRepositoryProvider = Provider<StaffRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   return StaffRepository(ref.watch(apiClientProvider));
 });
 

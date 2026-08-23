@@ -336,6 +336,7 @@ mixin _$FarmInvitation {
   String get email => throw _privateConstructorUsedError;
   FarmRole get role => throw _privateConstructorUsedError;
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   DateTime get expiresAt => throw _privateConstructorUsedError;
 
   /// Serializes this FarmInvitation to a JSON map.
@@ -359,7 +360,7 @@ abstract class $FarmInvitationCopyWith<$Res> {
     @IntConverter() int id,
     String email,
     FarmRole role,
-    @JsonKey(name: 'expires_at') DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() DateTime expiresAt,
   });
 }
 
@@ -420,7 +421,7 @@ abstract class _$$FarmInvitationImplCopyWith<$Res>
     @IntConverter() int id,
     String email,
     FarmRole role,
-    @JsonKey(name: 'expires_at') DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() DateTime expiresAt,
   });
 }
 
@@ -473,7 +474,7 @@ class _$FarmInvitationImpl implements _FarmInvitation {
     @IntConverter() required this.id,
     required this.email,
     required this.role,
-    @JsonKey(name: 'expires_at') required this.expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() required this.expiresAt,
   });
 
   factory _$FarmInvitationImpl.fromJson(Map<String, dynamic> json) =>
@@ -488,6 +489,7 @@ class _$FarmInvitationImpl implements _FarmInvitation {
   final FarmRole role;
   @override
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   final DateTime expiresAt;
 
   @override
@@ -533,7 +535,9 @@ abstract class _FarmInvitation implements FarmInvitation {
     @IntConverter() required final int id,
     required final String email,
     required final FarmRole role,
-    @JsonKey(name: 'expires_at') required final DateTime expiresAt,
+    @JsonKey(name: 'expires_at')
+    @DateTimeConverter()
+    required final DateTime expiresAt,
   }) = _$FarmInvitationImpl;
 
   factory _FarmInvitation.fromJson(Map<String, dynamic> json) =
@@ -548,6 +552,7 @@ abstract class _FarmInvitation implements FarmInvitation {
   FarmRole get role;
   @override
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   DateTime get expiresAt;
 
   /// Create a copy of FarmInvitation
@@ -570,6 +575,7 @@ mixin _$CreatedInvitation {
   FarmRole get role => throw _privateConstructorUsedError;
   String get code => throw _privateConstructorUsedError;
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   DateTime get expiresAt => throw _privateConstructorUsedError;
 
   /// Serializes this CreatedInvitation to a JSON map.
@@ -594,7 +600,7 @@ abstract class $CreatedInvitationCopyWith<$Res> {
     String email,
     FarmRole role,
     String code,
-    @JsonKey(name: 'expires_at') DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() DateTime expiresAt,
   });
 }
 
@@ -661,7 +667,7 @@ abstract class _$$CreatedInvitationImplCopyWith<$Res>
     String email,
     FarmRole role,
     String code,
-    @JsonKey(name: 'expires_at') DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() DateTime expiresAt,
   });
 }
 
@@ -720,7 +726,7 @@ class _$CreatedInvitationImpl implements _CreatedInvitation {
     required this.email,
     required this.role,
     required this.code,
-    @JsonKey(name: 'expires_at') required this.expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() required this.expiresAt,
   });
 
   factory _$CreatedInvitationImpl.fromJson(Map<String, dynamic> json) =>
@@ -737,6 +743,7 @@ class _$CreatedInvitationImpl implements _CreatedInvitation {
   final String code;
   @override
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   final DateTime expiresAt;
 
   @override
@@ -785,7 +792,9 @@ abstract class _CreatedInvitation implements CreatedInvitation {
     required final String email,
     required final FarmRole role,
     required final String code,
-    @JsonKey(name: 'expires_at') required final DateTime expiresAt,
+    @JsonKey(name: 'expires_at')
+    @DateTimeConverter()
+    required final DateTime expiresAt,
   }) = _$CreatedInvitationImpl;
 
   factory _CreatedInvitation.fromJson(Map<String, dynamic> json) =
@@ -802,6 +811,7 @@ abstract class _CreatedInvitation implements CreatedInvitation {
   String get code;
   @override
   @JsonKey(name: 'expires_at')
+  @DateTimeConverter()
   DateTime get expiresAt;
 
   /// Create a copy of CreatedInvitation

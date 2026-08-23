@@ -30,8 +30,8 @@ const feedService = require('../../../src/services/feedService');
 const mockTx = {
   commit: jest.fn(),
   rollback: jest.fn(),
-  finished: false,
-  LOCK: { UPDATE: 'UPDATE' }
+  LOCK: { UPDATE: 'UPDATE' },
+  finished: false
 };
 
 describe('feedService', () => {
@@ -84,7 +84,8 @@ describe('feedService', () => {
       const result = await feedService.listFeeds(1);
 
       expect(Feed.findAndCountAll).toHaveBeenCalled();
-      expect(result.pagination).toBeDefined();
+      expect(result.items).toBeDefined();
+      expect(result.total).toBeDefined();
     });
 
     it('should apply type filter', async () => {

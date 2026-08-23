@@ -31,16 +31,20 @@ mixin _$Vaccination {
   @JsonKey(name: 'vaccine_type')
   VaccineType get vaccineType => throw _privateConstructorUsedError;
   @JsonKey(name: 'vaccination_date')
+  @DateOnlyConverter()
   DateTime get vaccinationDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'next_vaccination_date')
+  @NullableDateOnlyConverter()
   DateTime? get nextVaccinationDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'batch_number')
   String? get batchNumber => throw _privateConstructorUsedError;
   String? get veterinarian => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Related rabbit info (from API) - не сериализуем, создаем вручную
   @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit => throw _privateConstructorUsedError; // Calculated fields
@@ -73,13 +77,21 @@ abstract class $VaccinationCopyWith<$Res> {
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @JsonKey(name: 'vaccine_name') String vaccineName,
     @JsonKey(name: 'vaccine_type') VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') String? batchNumber,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
@@ -216,13 +228,21 @@ abstract class _$$VaccinationImplCopyWith<$Res>
     @JsonKey(name: 'rabbit_id') @IntConverter() int rabbitId,
     @JsonKey(name: 'vaccine_name') String vaccineName,
     @JsonKey(name: 'vaccine_type') VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') String? batchNumber,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
@@ -338,13 +358,17 @@ class _$VaccinationImpl implements _Vaccination {
     @JsonKey(name: 'rabbit_id') @IntConverter() required this.rabbitId,
     @JsonKey(name: 'vaccine_name') required this.vaccineName,
     @JsonKey(name: 'vaccine_type') required this.vaccineType,
-    @JsonKey(name: 'vaccination_date') required this.vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') this.nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    required this.vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    this.nextVaccinationDate,
     @JsonKey(name: 'batch_number') this.batchNumber,
     this.veterinarian,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
     @JsonKey(name: 'days_until') this.daysUntil,
     @JsonKey(name: 'days_overdue') this.daysOverdue,
@@ -369,9 +393,11 @@ class _$VaccinationImpl implements _Vaccination {
   final VaccineType vaccineType;
   @override
   @JsonKey(name: 'vaccination_date')
+  @DateOnlyConverter()
   final DateTime vaccinationDate;
   @override
   @JsonKey(name: 'next_vaccination_date')
+  @NullableDateOnlyConverter()
   final DateTime? nextVaccinationDate;
   @override
   @JsonKey(name: 'batch_number')
@@ -382,9 +408,11 @@ class _$VaccinationImpl implements _Vaccination {
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
   // Related rabbit info (from API) - не сериализуем, создаем вручную
   @override
@@ -481,13 +509,21 @@ abstract class _Vaccination implements Vaccination {
     @JsonKey(name: 'rabbit_id') @IntConverter() required final int rabbitId,
     @JsonKey(name: 'vaccine_name') required final String vaccineName,
     @JsonKey(name: 'vaccine_type') required final VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') required final DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') final DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    required final DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    final DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') final String? batchNumber,
     final String? veterinarian,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final RabbitModel? rabbit,
     @JsonKey(name: 'days_until') final int? daysUntil,
@@ -513,9 +549,11 @@ abstract class _Vaccination implements Vaccination {
   VaccineType get vaccineType;
   @override
   @JsonKey(name: 'vaccination_date')
+  @DateOnlyConverter()
   DateTime get vaccinationDate;
   @override
   @JsonKey(name: 'next_vaccination_date')
+  @NullableDateOnlyConverter()
   DateTime? get nextVaccinationDate;
   @override
   @JsonKey(name: 'batch_number')
@@ -526,9 +564,11 @@ abstract class _Vaccination implements Vaccination {
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt; // Related rabbit info (from API) - не сериализуем, создаем вручную
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1114,6 +1154,7 @@ mixin _$UpcomingVaccinationItem {
   @JsonKey(name: 'vaccine_type')
   VaccineType get vaccineType => throw _privateConstructorUsedError;
   @JsonKey(name: 'next_vaccination_date')
+  @DateOnlyConverter()
   DateTime get nextVaccinationDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'days_until')
   int get daysUntil => throw _privateConstructorUsedError;
@@ -1143,7 +1184,9 @@ abstract class $UpcomingVaccinationItemCopyWith<$Res> {
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     @JsonKey(name: 'vaccine_name') String vaccineName,
     @JsonKey(name: 'vaccine_type') VaccineType vaccineType,
-    @JsonKey(name: 'next_vaccination_date') DateTime nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
+    DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') int daysUntil,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
@@ -1231,7 +1274,9 @@ abstract class _$$UpcomingVaccinationItemImplCopyWith<$Res>
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     @JsonKey(name: 'vaccine_name') String vaccineName,
     @JsonKey(name: 'vaccine_type') VaccineType vaccineType,
-    @JsonKey(name: 'next_vaccination_date') DateTime nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
+    DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') int daysUntil,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
@@ -1312,7 +1357,9 @@ class _$UpcomingVaccinationItemImpl implements _UpcomingVaccinationItem {
     @JsonKey(name: 'rabbit_name') this.rabbitName,
     @JsonKey(name: 'vaccine_name') required this.vaccineName,
     @JsonKey(name: 'vaccine_type') required this.vaccineType,
-    @JsonKey(name: 'next_vaccination_date') required this.nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
+    required this.nextVaccinationDate,
     @JsonKey(name: 'days_until') required this.daysUntil,
     @JsonKey(name: 'is_overdue') this.isOverdue,
   });
@@ -1338,6 +1385,7 @@ class _$UpcomingVaccinationItemImpl implements _UpcomingVaccinationItem {
   final VaccineType vaccineType;
   @override
   @JsonKey(name: 'next_vaccination_date')
+  @DateOnlyConverter()
   final DateTime nextVaccinationDate;
   @override
   @JsonKey(name: 'days_until')
@@ -1412,6 +1460,7 @@ abstract class _UpcomingVaccinationItem implements UpcomingVaccinationItem {
     @JsonKey(name: 'vaccine_name') required final String vaccineName,
     @JsonKey(name: 'vaccine_type') required final VaccineType vaccineType,
     @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
     required final DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') required final int daysUntil,
     @JsonKey(name: 'is_overdue') final bool? isOverdue,
@@ -1438,6 +1487,7 @@ abstract class _UpcomingVaccinationItem implements UpcomingVaccinationItem {
   VaccineType get vaccineType;
   @override
   @JsonKey(name: 'next_vaccination_date')
+  @DateOnlyConverter()
   DateTime get nextVaccinationDate;
   @override
   @JsonKey(name: 'days_until')

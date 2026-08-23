@@ -14,7 +14,7 @@ jest.mock('../../../src/models', () => {
     },
     Rabbit: { findOne: jest.fn(), findByPk: jest.fn() },
     Cage: { findOne: jest.fn(), findByPk: jest.fn() },
-    User: { findByPk: jest.fn() },
+    User: { findByPk: jest.fn(), findAll: jest.fn() },
     sequelize: mockSequelize
   };
 });
@@ -91,8 +91,10 @@ describe('TaskService', () => {
       expect(Task.create).not.toHaveBeenCalled();
     });
 
-    it('should throw ASSIGNEE_NOT_FOUND when assigned_to user does not exist', async () => {
-      User.findByPk.mockResolvedValue(null);
+    // Проверяется не существование пользователя, а принадлежность ферме:
+    // иначе задачу можно было подсунуть работнику соседнего хозяйства.
+    it('should throw ASSIGNEE_NOT_FOUND when assignee is from another farm', async () => {
+      User.findAll.mockResolvedValue([{ id: 1 }, { id: 3 }]);
 
       await expect(
         taskService.createTask({ title: 'Task', assigned_to: 99, user_id: 1 })
@@ -142,7 +144,7 @@ describe('TaskService', () => {
     it('should create a task with valid rabbit, cage, and assignee', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 2 });
-      User.findByPk.mockResolvedValue({ id: 3 });
+      User.findAll.mockResolvedValue([{ id: 1 }, { id: 3 }]);
 
       const mockTask = createMockTask({ rabbit_id: 1, cage_id: 2, assigned_to: 3 });
       Task.create.mockResolvedValue(mockTask);
@@ -189,10 +191,10 @@ describe('TaskService', () => {
 
       const result = await taskService.listTasks(1);
 
-      expect(result.tasks).toHaveLength(2);
-      expect(result.pagination.total).toBe(2);
-      expect(result.pagination.page).toBe(1);
-      expect(result.pagination.limit).toBe(10);
+      expect(result.items).toHaveLength(2);
+      expect(result.total).toBe(2);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(10);
     });
 
     it('should apply type/status/priority filters', async () => {
@@ -200,7 +202,7 @@ describe('TaskService', () => {
 
       const result = await taskService.listTasks(1, { type: 'vet', status: 'in_progress', priority: 'high' });
 
-      expect(result.tasks).toHaveLength(1);
+      expect(result.items).toHaveLength(1);
       const callArg = Task.findAndCountAll.mock.calls[0][0];
       expect(callArg.where.type).toBe('vet');
       expect(callArg.where.status).toBe('in_progress');
@@ -297,22 +299,22 @@ describe('TaskService', () => {
     it('should throw ASSIGNEE_NOT_FOUND when updating to a non-existent user', async () => {
       const mockTask = createMockTask();
       Task.findOne.mockResolvedValue(mockTask);
-      User.findByPk.mockResolvedValue(null);
+      User.findAll.mockResolvedValue([{ id: 1 }, { id: 5 }]);
 
       await expect(taskService.updateTask(1, 1, { assigned_to: 99 })).rejects.toThrow('ASSIGNEE_NOT_FOUND');
-      expect(User.findByPk).toHaveBeenCalledWith(99);
+      expect(mockTask.update).not.toHaveBeenCalled();
     });
 
     it('should succeed when assigned_to points to an existing user', async () => {
       const mockTask = createMockTask();
       Task.findOne.mockResolvedValue(mockTask);
-      User.findByPk.mockResolvedValue({ id: 5, full_name: 'Jane Doe', email: 'jane@example.com' });
+      User.findAll.mockResolvedValue([{ id: 1 }, { id: 5 }]);
       const updatedTask = createMockTask({ assigned_to: 5 });
       Task.findByPk.mockResolvedValue(updatedTask);
 
       const result = await taskService.updateTask(1, 1, { assigned_to: 5 });
 
-      expect(User.findByPk).toHaveBeenCalledWith(5);
+      expect(User.findAll).toHaveBeenCalled();
       expect(mockTask.update).toHaveBeenCalled();
       expect(result).toBe(updatedTask);
     });
@@ -402,7 +404,7 @@ describe('TaskService', () => {
   // ─── completeTask ─────────────────────────────────────────────────────────
 
   describe('completeTask', () => {
-    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), finished: false };
+    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' }, finished: false };
 
     beforeEach(() => {
       Task.sequelize.transaction.mockResolvedValue(mockTransaction);

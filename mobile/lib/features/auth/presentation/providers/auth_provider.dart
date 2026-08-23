@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/api_providers.dart';
+import '../../../../core/providers/session.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 
@@ -15,7 +16,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 class AuthState {
   final UserModel? user;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool isAuthenticated;
 
   AuthState({
@@ -28,7 +29,7 @@ class AuthState {
   AuthState copyWith({
     UserModel? user,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? isAuthenticated,
   }) {
     return AuthState(
@@ -43,9 +44,21 @@ class AuthState {
 // Auth Notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
+  final Ref _ref;
 
-  AuthNotifier(this._authRepository) : super(AuthState()) {
+  AuthNotifier(this._authRepository, this._ref) : super(AuthState()) {
+    // Клиент сообщает сюда, что обновить токен не удалось. Раньше он молча
+    // стирал токены, а приложение продолжало считать себя авторизованным:
+    // все экраны писали «не авторизован», и выйти можно было только
+    // перезапуском.
+    _ref.read(apiClientProvider).onSessionExpired = _handleSessionExpired;
     _checkAuthStatus();
+  }
+
+  void _handleSessionExpired() {
+    if (!mounted) return;
+    state = AuthState();
+    resetSessionData(_ref);
   }
 
   bool _isNetworkError(DioException e) {
@@ -118,7 +131,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -149,7 +162,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -178,7 +191,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -195,6 +208,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } finally {
       // Always reset auth state
       state = AuthState();
+      // Данные предыдущего пользователя нужно забыть: на общем планшете фермы
+      // следующий вошедший иначе увидит чужое поголовье прямо из памяти.
+      resetSessionData(_ref);
     }
   }
 
@@ -217,5 +233,5 @@ class AuthNotifier extends StateNotifier<AuthState> {
 // Auth Provider
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(authRepository);
+  return AuthNotifier(authRepository, ref);
 });

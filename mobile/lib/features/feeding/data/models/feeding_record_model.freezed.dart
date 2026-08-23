@@ -35,12 +35,14 @@ mixin _$FeedingRecord {
   @DoubleConverter()
   double get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   DateTime get fedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'fed_by')
   @NullableIntConverter()
   int? get fedBy => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: false, includeToJson: false)
   Feed? get feed => throw _privateConstructorUsedError;
@@ -72,10 +74,12 @@ abstract class $FeedingRecordCopyWith<$Res> {
     @JsonKey(name: 'feed_id') @IntConverter() int feedId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @DoubleConverter() double quantity,
-    @JsonKey(name: 'fed_at') DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() DateTime fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
@@ -227,10 +231,12 @@ abstract class _$$FeedingRecordImplCopyWith<$Res>
     @JsonKey(name: 'feed_id') @IntConverter() int feedId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @DoubleConverter() double quantity,
-    @JsonKey(name: 'fed_at') DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() DateTime fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
     @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
@@ -335,10 +341,10 @@ class _$FeedingRecordImpl implements _FeedingRecord {
     @JsonKey(name: 'feed_id') @IntConverter() required this.feedId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() this.cageId,
     @DoubleConverter() required this.quantity,
-    @JsonKey(name: 'fed_at') required this.fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required this.fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() this.fedBy,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) this.feed,
     @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
     @JsonKey(includeFromJson: false, includeToJson: false) this.cage,
@@ -367,6 +373,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
   final double quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   final DateTime fedAt;
   @override
   @JsonKey(name: 'fed_by')
@@ -376,6 +383,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -453,10 +461,12 @@ abstract class _FeedingRecord implements FeedingRecord {
     @JsonKey(name: 'feed_id') @IntConverter() required final int feedId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() final int? cageId,
     @DoubleConverter() required final double quantity,
-    @JsonKey(name: 'fed_at') required final DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required final DateTime fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() final int? fedBy,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
     @JsonKey(includeFromJson: false, includeToJson: false) final Feed? feed,
     @JsonKey(includeFromJson: false, includeToJson: false)
     final RabbitModel? rabbit,
@@ -487,6 +497,7 @@ abstract class _FeedingRecord implements FeedingRecord {
   double get quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   DateTime get fedAt;
   @override
   @JsonKey(name: 'fed_by')
@@ -496,6 +507,7 @@ abstract class _FeedingRecord implements FeedingRecord {
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -529,6 +541,7 @@ mixin _$FeedingRecordCreate {
   int? get cageId => throw _privateConstructorUsedError;
   double get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   DateTime get fedAt => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
 
@@ -554,7 +567,7 @@ abstract class $FeedingRecordCreateCopyWith<$Res> {
     @JsonKey(name: 'feed_id') int feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     double quantity,
-    @JsonKey(name: 'fed_at') DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() DateTime fedAt,
     String? notes,
   });
 }
@@ -627,7 +640,7 @@ abstract class _$$FeedingRecordCreateImplCopyWith<$Res>
     @JsonKey(name: 'feed_id') int feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     double quantity,
-    @JsonKey(name: 'fed_at') DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() DateTime fedAt,
     String? notes,
   });
 }
@@ -692,7 +705,7 @@ class _$FeedingRecordCreateImpl implements _FeedingRecordCreate {
     @JsonKey(name: 'feed_id') required this.feedId,
     @JsonKey(name: 'cage_id') this.cageId,
     required this.quantity,
-    @JsonKey(name: 'fed_at') required this.fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required this.fedAt,
     this.notes,
   });
 
@@ -712,6 +725,7 @@ class _$FeedingRecordCreateImpl implements _FeedingRecordCreate {
   final double quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   final DateTime fedAt;
   @override
   final String? notes;
@@ -771,7 +785,7 @@ abstract class _FeedingRecordCreate implements FeedingRecordCreate {
     @JsonKey(name: 'feed_id') required final int feedId,
     @JsonKey(name: 'cage_id') final int? cageId,
     required final double quantity,
-    @JsonKey(name: 'fed_at') required final DateTime fedAt,
+    @JsonKey(name: 'fed_at') @DateTimeConverter() required final DateTime fedAt,
     final String? notes,
   }) = _$FeedingRecordCreateImpl;
 
@@ -791,6 +805,7 @@ abstract class _FeedingRecordCreate implements FeedingRecordCreate {
   double get quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @DateTimeConverter()
   DateTime get fedAt;
   @override
   String? get notes;
@@ -817,6 +832,7 @@ mixin _$FeedingRecordUpdate {
   int? get cageId => throw _privateConstructorUsedError;
   double? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'fed_at')
+  @NullableDateTimeConverter()
   DateTime? get fedAt => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
 
@@ -842,7 +858,7 @@ abstract class $FeedingRecordUpdateCopyWith<$Res> {
     @JsonKey(name: 'feed_id') int? feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     double? quantity,
-    @JsonKey(name: 'fed_at') DateTime? fedAt,
+    @JsonKey(name: 'fed_at') @NullableDateTimeConverter() DateTime? fedAt,
     String? notes,
   });
 }
@@ -915,7 +931,7 @@ abstract class _$$FeedingRecordUpdateImplCopyWith<$Res>
     @JsonKey(name: 'feed_id') int? feedId,
     @JsonKey(name: 'cage_id') int? cageId,
     double? quantity,
-    @JsonKey(name: 'fed_at') DateTime? fedAt,
+    @JsonKey(name: 'fed_at') @NullableDateTimeConverter() DateTime? fedAt,
     String? notes,
   });
 }
@@ -980,7 +996,7 @@ class _$FeedingRecordUpdateImpl implements _FeedingRecordUpdate {
     @JsonKey(name: 'feed_id') this.feedId,
     @JsonKey(name: 'cage_id') this.cageId,
     this.quantity,
-    @JsonKey(name: 'fed_at') this.fedAt,
+    @JsonKey(name: 'fed_at') @NullableDateTimeConverter() this.fedAt,
     this.notes,
   });
 
@@ -1000,6 +1016,7 @@ class _$FeedingRecordUpdateImpl implements _FeedingRecordUpdate {
   final double? quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @NullableDateTimeConverter()
   final DateTime? fedAt;
   @override
   final String? notes;
@@ -1059,7 +1076,7 @@ abstract class _FeedingRecordUpdate implements FeedingRecordUpdate {
     @JsonKey(name: 'feed_id') final int? feedId,
     @JsonKey(name: 'cage_id') final int? cageId,
     final double? quantity,
-    @JsonKey(name: 'fed_at') final DateTime? fedAt,
+    @JsonKey(name: 'fed_at') @NullableDateTimeConverter() final DateTime? fedAt,
     final String? notes,
   }) = _$FeedingRecordUpdateImpl;
 
@@ -1079,6 +1096,7 @@ abstract class _FeedingRecordUpdate implements FeedingRecordUpdate {
   double? get quantity;
   @override
   @JsonKey(name: 'fed_at')
+  @NullableDateTimeConverter()
   DateTime? get fedAt;
   @override
   String? get notes;

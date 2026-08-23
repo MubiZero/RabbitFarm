@@ -28,7 +28,10 @@ exports.getById = async (req, res, next) => {
 exports.list = async (req, res, next) => {
   try {
     const result = await feedService.listFeeds(req.farmId, req.query);
-    return ApiResponse.success(res, result);
+    // Общий конверт пагинации. Раньше каждый сервис лепил свой: items/rows/
+    // tasks/transactions и totalPages/pages — клиенту приходилось угадывать
+    // форму в каждом репозитории, и в медкартах он угадал неверно.
+    return ApiResponse.paginated(res, result.items, result.page, result.limit, result.total);
   } catch (error) {
     next(error);
   }
@@ -46,7 +49,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    const result = await feedService.deleteFeed(req.params.id, req.farmId);
+    await feedService.deleteFeed(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Корм успешно удален');
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);

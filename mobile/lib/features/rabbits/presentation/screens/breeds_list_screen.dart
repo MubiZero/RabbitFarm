@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../utils/breed_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Экран списка пород кроликов
 class BreedsListScreen extends ConsumerStatefulWidget {
@@ -30,7 +34,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Породы'),
+        title: Text(context.l10n.breedsTitle),
       ),
       body: Column(
         children: [
@@ -40,7 +44,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Поиск пород...',
+                hintText: context.l10n.breedsSearchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -68,7 +72,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showBreedForm(context, null),
         icon: const Icon(Icons.add),
-        label: const Text('Добавить породу'),
+        label: Text(context.l10n.breedsAdd),
       ),
     );
   }
@@ -82,7 +86,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
 
     if (state.error != null) {
       return AppErrorState(
-        message: state.error!,
+        message: errorText(context.l10n, state.error),
         onRetry: () => ref.read(breedsProvider.notifier).loadBreeds(),
       );
     }
@@ -93,11 +97,11 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
       return AppEmptyState(
         icon: state.searchQuery.isNotEmpty ? Icons.search_off : Icons.pets,
         title: state.searchQuery.isNotEmpty
-            ? 'Породы не найдены'
-            : 'Нет пород',
+            ? context.l10n.breedsNothingFound
+            : context.l10n.breedsEmptyTitle,
         subtitle: state.searchQuery.isNotEmpty
-            ? 'Попробуйте изменить запрос'
-            : 'Добавьте первую породу',
+            ? context.l10n.breedsNothingFoundBody
+            : context.l10n.breedsEmptyBody,
       );
     }
 
@@ -117,10 +121,6 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
   Widget _buildBreedCard(BuildContext context, BreedModel breed) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: InkWell(
         onTap: () => _showBreedForm(context, breed),
         borderRadius: BorderRadius.circular(12),
@@ -151,18 +151,12 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                       children: [
                         Text(
                           breed.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTypography.titleLg,
                         ),
                         if (breed.purpose != null)
                           Text(
-                            _getPurposeText(breed.purpose!),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            breedPurposeLabel(context, breed.purpose),
+                            style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                       ],
                     ),
@@ -177,24 +171,25 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 20),
-                            SizedBox(width: 8),
-                            Text('Редактировать'),
-                          ],
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.edit_outlined),
+                          title: Text(context.l10n.cageEdit),
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 20, color: AppColors.error),
-                            SizedBox(width: 8),
-                            Text('Удалить', style: TextStyle(color: AppColors.error)),
-                          ],
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.delete_outline,
+                              color: AppColors.error),
+                          title: Text(
+                            context.l10n.commonDelete,
+                            style: AppTypography.bodyLg
+                                .copyWith(color: AppColors.error),
+                          ),
                         ),
                       ),
                     ],
@@ -207,10 +202,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                 const SizedBox(height: 12),
                 Text(
                   breed.description!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -225,13 +217,13 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   if (breed.averageWeight != null)
                     _buildInfoChip(
                       Icons.monitor_weight,
-                      '${breed.averageWeight} кг',
+                      formatQuantity(breed.averageWeight!, 'кг'),
                       AppColors.accentOcean,
                     ),
                   if (breed.averageLitterSize != null)
                     _buildInfoChip(
                       Icons.family_restroom,
-                      '${breed.averageLitterSize} крольчат',
+                      '${breed.averageLitterSize} ${context.l10n.breedFormLitterSuffix}',
                       AppColors.accentEmerald,
                     ),
                 ],
@@ -248,26 +240,11 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
       avatar: Icon(icon, size: 16, color: color),
       label: Text(
         label,
-        style: const TextStyle(fontSize: 12),
+        style: AppTypography.labelSm,
       ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
     );
-  }
-
-  String _getPurposeText(String purpose) {
-    switch (purpose) {
-      case 'meat':
-        return 'Мясная';
-      case 'fur':
-        return 'Пуховая';
-      case 'decorative':
-        return 'Декоративная';
-      case 'combined':
-        return 'Мясо-шкурковая';
-      default:
-        return purpose;
-    }
   }
 
   void _showBreedForm(BuildContext context, BreedModel? breed) {
@@ -278,33 +255,31 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить породу?'),
-        content: Text(
-          'Вы уверены, что хотите удалить породу "${breed.name}"?\n\n'
-          'Это действие нельзя отменить.',
-        ),
+        title: Text(context.l10n.breedsDeleteTitle),
+        content: Text(context.l10n.breedsDeleteBody(breed.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
 
     if (confirmed == true && context.mounted) {
+      final l10n = context.l10n;
       final success = await ref.read(breedsProvider.notifier).deleteBreed(breed.id);
 
       if (context.mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Порода "${breed.name}" удалена'),
+              content: Text(context.l10n.breedsDeleted),
               backgroundColor: AppColors.success,
             ),
           );
@@ -312,7 +287,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                ref.read(breedsProvider).error ?? 'Ошибка удаления породы',
+                errorText(l10n, ref.read(breedsProvider).error),
               ),
               backgroundColor: AppColors.error,
             ),

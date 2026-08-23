@@ -7,6 +7,7 @@ import 'api_interceptors.dart';
 
 class ApiClient {
   late final Dio _dio;
+  late final AuthInterceptor _authInterceptor;
   final FlutterSecureStorage _storage;
 
   ApiClient({
@@ -26,12 +27,21 @@ class ApiClient {
     );
 
     // Add interceptors
-    _dio.interceptors.add(AuthInterceptor(storage: _storage));
+    _authInterceptor = AuthInterceptor(storage: _storage);
+    // Повтор запроса после обновления токена должен идти через этот же клиент:
+    // одноразовый Dio терял таймауты и разбор ошибок.
+    _authInterceptor.client = _dio;
+    _dio.interceptors.add(_authInterceptor);
     if (kDebugMode) _dio.interceptors.add(LoggingInterceptor());
     _dio.interceptors.add(ErrorInterceptor());
   }
 
   Dio get dio => _dio;
+
+  /// Сессия окончательно потеряна: обновить токен не удалось.
+  set onSessionExpired(void Function()? callback) {
+    _authInterceptor.onSessionExpired = callback;
+  }
 
   // Generic HTTP methods
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) {
@@ -66,8 +76,11 @@ class ApiClient {
     return _dio.post(ApiEndpoints.register, data: data);
   }
 
-  Future<Response> logout() {
-    return _dio.post(ApiEndpoints.logout);
+  Future<Response> logout({String? refreshToken}) {
+    return _dio.post(
+      ApiEndpoints.logout,
+      data: refreshToken == null ? null : {'refresh_token': refreshToken},
+    );
   }
 
   Future<Response> getProfile() {
@@ -75,7 +88,7 @@ class ApiClient {
   }
 
   Future<Response> updateProfile(Map<String, dynamic> data) {
-    return _dio.put(ApiEndpoints.profile, data: data);
+    return _dio.put(ApiEndpoints.updateProfile, data: data);
   }
 
   Future<Response> refreshToken(String refreshToken) {

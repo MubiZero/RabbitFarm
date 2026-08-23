@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_statistics.dart';
@@ -6,6 +7,7 @@ import '../../data/repositories/rabbits_repository.dart';
 
 // Rabbits Repository provider
 final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return RabbitsRepository(apiClient: apiClient);
 });
@@ -14,7 +16,7 @@ final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {
 class RabbitsListState {
   final List<RabbitModel> rabbits;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int currentPage;
   final int totalPages;
   final int total;
@@ -33,7 +35,7 @@ class RabbitsListState {
   RabbitsListState copyWith({
     List<RabbitModel>? rabbits,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? currentPage,
     int? totalPages,
     int? total,
@@ -89,7 +91,7 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -126,7 +128,7 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -146,7 +148,7 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
       );
     } catch (e) {
       state = state.copyWith(
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -169,7 +171,7 @@ final rabbitsListProvider =
 class StatisticsState {
   final RabbitStatistics? statistics;
   final bool isLoading;
-  final String? error;
+  final Object? error;
 
   StatisticsState({
     this.statistics,
@@ -180,7 +182,7 @@ class StatisticsState {
   StatisticsState copyWith({
     RabbitStatistics? statistics,
     bool? isLoading,
-    String? error,
+    Object? error,
   }) {
     return StatisticsState(
       statistics: statistics ?? this.statistics,
@@ -210,7 +212,7 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }

@@ -15,6 +15,16 @@ Object.values(uploadDirs).forEach(dir => {
   }
 });
 
+// Расширение файла определяется сервером по типу содержимого: значение,
+// присланное клиентом, доверия не заслуживает.
+const EXTENSION_BY_MIME = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'application/pdf': '.pdf'
+};
+
 // Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,14 +32,19 @@ const storage = multer.diskStorage({
     if (req.originalUrl && req.originalUrl.includes('/rabbits/') && req.originalUrl.includes('/photo')) {
       cb(null, uploadDirs.rabbits);
     } else {
-      const type = req.body.type || 'temp';
-      const dest = uploadDirs[type] || uploadDirs.temp;
+      // hasOwn обязателен: req.body.type — строка от клиента, и обычный доступ
+      // по ключу для '__proto__' возвращает объект из прототипа, а не каталог.
+      const type = req.body.type;
+      const dest = Object.hasOwn(uploadDirs, type) ? uploadDirs[type] : uploadDirs.temp;
       cb(null, dest);
     }
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
+    // Расширение берём из типа, который прошёл фильтр, а не из имени файла.
+    // Каталог uploads отдаётся статикой, поэтому имя вроде photo.svg или
+    // photo.html означало бы активное содержимое с адреса нашего API.
+    const ext = Object.hasOwn(EXTENSION_BY_MIME, file.mimetype) ? EXTENSION_BY_MIME[file.mimetype] : '.bin';
     cb(null, file.fieldname + '-' + uniqueSuffix + ext);
   }
 });
@@ -38,10 +53,14 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedMimes = (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/jpg').split(',');
 
-  if (allowedMimes.includes(file.mimetype)) {
+  if (allowedMimes.includes(file.mimetype) && Object.hasOwn(EXTENSION_BY_MIME, file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type. Allowed types: ${allowedMimes.join(', ')}`), false);
+    // MulterError, а не обычный Error: обработчик ошибок различает их по имени
+    // и только для MulterError отвечает понятным 400 вместо общего 500.
+    const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname);
+    error.userMessage = `Недопустимый тип файла. Разрешены: ${allowedMimes.join(', ')}`;
+    cb(error, false);
   }
 };
 

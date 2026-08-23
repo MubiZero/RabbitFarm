@@ -6,12 +6,18 @@ import '../../data/repositories/cages_repository.dart';
 class CagesState {
   final List<CageModel> cages;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final String searchQuery;
   final String? typeFilter;
   final String? conditionFilter;
   final String? locationFilter;
   final bool onlyAvailable;
+
+  /// Постраничная выдача. Раньше загружалась ровно одна страница на пятьдесят
+  /// клеток, и на этом список заканчивался: клетки с шестидесятой в приложении
+  /// не существовали.
+  final int currentPage;
+  final bool hasMore;
 
   CagesState({
     this.cages = const [],
@@ -22,65 +28,49 @@ class CagesState {
     this.conditionFilter,
     this.locationFilter,
     this.onlyAvailable = false,
+    this.currentPage = 1,
+    this.hasMore = false,
   });
 
+  bool get hasFilters =>
+      typeFilter != null ||
+      conditionFilter != null ||
+      locationFilter != null ||
+      onlyAvailable ||
+      searchQuery.isNotEmpty;
+
+  /// Флаги `clear*` нужны, чтобы отличить «параметр не передали» от «передали
+  /// null»: без них снять фильтр было невозможно — крестик на ярлыке возвращал
+  /// прежнее значение.
   CagesState copyWith({
     List<CageModel>? cages,
     bool? isLoading,
-    String? error,
+    Object? error,
     String? searchQuery,
     String? typeFilter,
+    bool clearType = false,
     String? conditionFilter,
+    bool clearCondition = false,
     String? locationFilter,
+    bool clearLocation = false,
     bool? onlyAvailable,
+    int? currentPage,
+    bool? hasMore,
   }) {
     return CagesState(
       cages: cages ?? this.cages,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       searchQuery: searchQuery ?? this.searchQuery,
-      typeFilter: typeFilter ?? this.typeFilter,
-      conditionFilter: conditionFilter ?? this.conditionFilter,
-      locationFilter: locationFilter ?? this.locationFilter,
+      typeFilter: clearType ? null : (typeFilter ?? this.typeFilter),
+      conditionFilter:
+          clearCondition ? null : (conditionFilter ?? this.conditionFilter),
+      locationFilter:
+          clearLocation ? null : (locationFilter ?? this.locationFilter),
       onlyAvailable: onlyAvailable ?? this.onlyAvailable,
+      currentPage: currentPage ?? this.currentPage,
+      hasMore: hasMore ?? this.hasMore,
     );
-  }
-
-  /// Получить отфильтрованный список клеток
-  List<CageModel> get filteredCages {
-    var result = cages;
-
-    // Поиск
-    if (searchQuery.isNotEmpty) {
-      final query = searchQuery.toLowerCase();
-      result = result.where((cage) {
-        return cage.number.toLowerCase().contains(query) ||
-            (cage.location?.toLowerCase().contains(query) ?? false) ||
-            (cage.notes?.toLowerCase().contains(query) ?? false);
-      }).toList();
-    }
-
-    // Фильтр по типу
-    if (typeFilter != null && typeFilter!.isNotEmpty) {
-      result = result.where((cage) => cage.type == typeFilter).toList();
-    }
-
-    // Фильтр по состоянию
-    if (conditionFilter != null && conditionFilter!.isNotEmpty) {
-      result = result.where((cage) => cage.condition == conditionFilter).toList();
-    }
-
-    // Фильтр по локации
-    if (locationFilter != null && locationFilter!.isNotEmpty) {
-      result = result.where((cage) => cage.location == locationFilter).toList();
-    }
-
-    // Только доступные
-    if (onlyAvailable) {
-      result = result.where((cage) => cage.isAvailable ?? false).toList();
-    }
-
-    return result;
   }
 
   /// Получить уникальные локации
@@ -103,12 +93,16 @@ class CagesNotifier extends StateNotifier<CagesState> {
     loadCages();
   }
 
-  /// Загрузить список клеток
+  static const _pageSize = 30;
+
+  /// Загрузить первую страницу списка по текущим фильтрам.
   Future<void> loadCages() async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, error: null, currentPage: 1);
 
     try {
       final cages = await _repository.getCages(
+        page: 1,
+        limit: _pageSize,
         type: state.typeFilter,
         condition: state.conditionFilter,
         location: state.locationFilter,
@@ -118,57 +112,95 @@ class CagesNotifier extends StateNotifier<CagesState> {
       state = state.copyWith(
         cages: cages,
         isLoading: false,
+        currentPage: 1,
+        hasMore: cages.length >= _pageSize,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  /// Обновить поисковый запрос
-  void updateSearchQuery(String query) {
+  /// Догрузить следующую страницу.
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+    final nextPage = state.currentPage + 1;
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final cages = await _repository.getCages(
+        page: nextPage,
+        limit: _pageSize,
+        type: state.typeFilter,
+        condition: state.conditionFilter,
+        location: state.locationFilter,
+        search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+        onlyAvailable: state.onlyAvailable ? true : null,
+      );
+      state = state.copyWith(
+        cages: [...state.cages, ...cages],
+        isLoading: false,
+        currentPage: nextPage,
+        hasMore: cages.length >= _pageSize,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Поиск идёт на сервере: искать среди подгруженной страницы значило бы
+  /// «не находить» клетки, которые ещё не приехали.
+  Future<void> setSearchQuery(String query) async {
     state = state.copyWith(searchQuery: query);
+    await loadCages();
   }
 
-  /// Установить фильтр по типу
-  void setTypeFilter(String? type) {
-    state = state.copyWith(typeFilter: type);
-    loadCages();
+  Future<void> setTypeFilter(String? type) async {
+    state = state.copyWith(typeFilter: type, clearType: type == null);
+    await loadCages();
   }
 
-  /// Установить фильтр по состоянию
-  void setConditionFilter(String? condition) {
-    state = state.copyWith(conditionFilter: condition);
-    loadCages();
+  Future<void> setConditionFilter(String? condition) async {
+    state = state.copyWith(
+      conditionFilter: condition,
+      clearCondition: condition == null,
+    );
+    await loadCages();
   }
 
-  /// Установить фильтр по локации
-  void setLocationFilter(String? location) {
-    state = state.copyWith(locationFilter: location);
-    loadCages();
+  Future<void> setLocationFilter(String? location) async {
+    state = state.copyWith(
+      locationFilter: location,
+      clearLocation: location == null,
+    );
+    await loadCages();
   }
 
-  /// Переключить фильтр "только доступные"
-  void toggleOnlyAvailable() {
+  Future<void> toggleOnlyAvailable() async {
     state = state.copyWith(onlyAvailable: !state.onlyAvailable);
-    loadCages();
+    await loadCages();
   }
 
   /// Сбросить все фильтры
-  void resetFilters() {
-    state = CagesState(cages: state.cages);
-    loadCages();
+  Future<void> resetFilters() async {
+    state = state.copyWith(
+      searchQuery: '',
+      clearType: true,
+      clearCondition: true,
+      clearLocation: true,
+      onlyAvailable: false,
+    );
+    await loadCages();
   }
 
   /// Создать новую клетку
   Future<bool> createCage(Map<String, dynamic> cageData) async {
     try {
-      final newCage = await _repository.createCage(cageData);
-      state = state.copyWith(
-        cages: [...state.cages, newCage],
-      );
+      await _repository.createCage(cageData);
+      // Перечитываем список, а не дописываем клетку в конец: список идёт с
+      // фильтрами сервера, и при включённой галочке «только свободные»
+      // занятая клетка появлялась в списке, который обещает обратное — до
+      // первого обновления, после которого она молча исчезала.
+      await loadCages();
       return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -234,6 +266,18 @@ final cagesProvider = StateNotifierProvider<CagesNotifier, CagesState>((ref) {
   return CagesNotifier(repository);
 });
 
+/// Одна клетка со списком жителей.
+///
+/// Экран клетки раньше искал её в уже загруженной странице списка, а если не
+/// находил — рисовал выдуманную клетку с номером «...» и вместимостью ноль.
+/// Так выглядел переход по ссылке и открытие клетки со второй страницы:
+/// пользователь видел правдоподобный, но полностью ложный экран.
+final cageDetailProvider =
+    FutureProvider.autoDispose.family<CageModel, int>((ref, id) async {
+  final repository = ref.watch(cagesRepositoryProvider);
+  return repository.getCageById(id);
+});
+
 /// Provider для статистики клеток
 final cageStatisticsProvider = FutureProvider<CageStatistics>((ref) async {
   final repository = ref.watch(cagesRepositoryProvider);
@@ -244,4 +288,10 @@ final cageStatisticsProvider = FutureProvider<CageStatistics>((ref) async {
 final cageLayoutProvider = FutureProvider<Map<String, List<CageModel>>>((ref) async {
   final repository = ref.watch(cagesRepositoryProvider);
   return repository.getLayout();
+});
+
+/// Полный список клеток для выпадающих полей в формах.
+final cageOptionsProvider = FutureProvider<List<CageModel>>((ref) async {
+  final repository = ref.watch(cagesRepositoryProvider);
+  return repository.getCages(limit: 200);
 });

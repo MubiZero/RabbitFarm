@@ -25,7 +25,7 @@ jest.mock('../../../src/utils/logger', () => ({
   warn: jest.fn()
 }));
 
-const { Transaction, Rabbit, User } = require('../../../src/models');
+const { Transaction, Rabbit } = require('../../../src/models');
 const transactionService = require('../../../src/services/transactionService');
 
 const createMockTransaction = (overrides = {}) => ({
@@ -50,7 +50,7 @@ describe('TransactionService', () => {
   // ─── createTransaction ────────────────────────────────────────────────────
 
   describe('createTransaction', () => {
-    const mockDbTransaction = { commit: jest.fn(), rollback: jest.fn(), finished: false };
+    const mockDbTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' }, finished: false };
 
     beforeEach(() => {
       Transaction.sequelize.transaction.mockResolvedValue(mockDbTransaction);
@@ -89,13 +89,13 @@ describe('TransactionService', () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
-      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
       Transaction.findByPk.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
-        category: 'sale',
+        category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
         user_id: 1
@@ -108,17 +108,17 @@ describe('TransactionService', () => {
       expect(mockDbTransaction.commit).toHaveBeenCalled();
     });
 
-    it('should mark rabbit as sold on income/продажа (Russian category) transaction', async () => {
+    it('should mark rabbit as sold on any sale_* category', async () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
-      const mockTx = createMockTransaction({ type: 'income', category: 'Продажа', rabbit_id: 1 });
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale_meat', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
       Transaction.findByPk.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
-        category: 'Продажа',
+        category: 'sale_meat',
         amount: 500,
         rabbit_id: 1,
         user_id: 1
@@ -134,13 +134,13 @@ describe('TransactionService', () => {
       const mockRabbit = { id: 1, status: 'sold', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
-      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
       Transaction.findByPk.mockResolvedValue(mockTx);
 
       const result = await transactionService.createTransaction({
         type: 'income',
-        category: 'sale',
+        category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
         user_id: 1
@@ -151,17 +151,17 @@ describe('TransactionService', () => {
       expect(result).toBe(mockTx);
     });
 
-    it('should NOT update rabbit status when rabbit is died', async () => {
-      const mockRabbit = { id: 1, status: 'died', update: jest.fn().mockResolvedValue(true) };
+    it('should NOT update rabbit status when rabbit is dead', async () => {
+      const mockRabbit = { id: 1, status: 'dead', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
-      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
       Transaction.findByPk.mockResolvedValue(mockTx);
 
       const result = await transactionService.createTransaction({
         type: 'income',
-        category: 'sale',
+        category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
         user_id: 1
@@ -172,17 +172,17 @@ describe('TransactionService', () => {
       expect(result).toBe(mockTx);
     });
 
-    it('should mark alive rabbit as sold on sale transaction', async () => {
-      const mockRabbit = { id: 1, status: 'alive', update: jest.fn().mockResolvedValue(true) };
+    it('should mark healthy rabbit as sold on sale transaction', async () => {
+      const mockRabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
-      const mockTx = createMockTransaction({ type: 'income', category: 'sale', rabbit_id: 1 });
+      const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
       Transaction.findByPk.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
-        category: 'sale',
+        category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
         user_id: 1
@@ -245,19 +245,19 @@ describe('TransactionService', () => {
 
       const result = await transactionService.listTransactions(1);
 
-      expect(result.transactions).toHaveLength(3);
-      expect(result.pagination.total).toBe(3);
-      expect(result.pagination.page).toBe(1);
+      expect(result.items).toHaveLength(3);
+      expect(result.total).toBe(3);
+      expect(result.page).toBe(1);
     });
 
     it('should apply type, category, rabbit_id filters', async () => {
       Transaction.findAndCountAll.mockResolvedValue({ count: 1, rows: [createMockTransaction()] });
 
-      await transactionService.listTransactions(1, { type: 'income', category: 'sale', rabbit_id: 5 });
+      await transactionService.listTransactions(1, { type: 'income', category: 'sale_rabbit', rabbit_id: 5 });
 
       const callArg = Transaction.findAndCountAll.mock.calls[0][0];
       expect(callArg.where.type).toBe('income');
-      expect(callArg.where.category).toBe('sale');
+      expect(callArg.where.category).toBe('sale_rabbit');
       expect(callArg.where.rabbit_id).toBe(5);
     });
 
@@ -339,7 +339,7 @@ describe('TransactionService', () => {
 
       Transaction.findAll
         .mockResolvedValueOnce([
-          { category: 'sale', dataValues: { total: '1000.00', count: '2' } }
+          { category: 'sale_rabbit', dataValues: { total: '1000.00', count: '2' } }
         ])
         .mockResolvedValueOnce([
           { category: 'feed', dataValues: { total: '400.00', count: '3' } }
@@ -354,7 +354,7 @@ describe('TransactionService', () => {
       expect(result.total_expenses).toBe('400.00');
       expect(result.net_profit).toBe('600.00');
       expect(result.total_transactions).toBe(5);
-      expect(result.income_by_category).toEqual([{ category: 'sale', total: '1000.00', count: 2 }]);
+      expect(result.income_by_category).toEqual([{ category: 'sale_rabbit', total: '1000.00', count: 2 }]);
       expect(result.expenses_by_category).toEqual([{ category: 'feed', total: '400.00', count: 3 }]);
     });
 

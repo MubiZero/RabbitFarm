@@ -12,33 +12,34 @@ _$TransactionImpl _$$TransactionImplFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
       category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
       amount: const DoubleConverter().fromJson(json['amount'] as Object),
-      transactionDate: DateTime.parse(json['transaction_date'] as String),
+      transactionDate: const DateOnlyConverter().fromJson(
+        json['transaction_date'] as Object,
+      ),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       description: json['description'] as String?,
       receiptUrl: json['receipt_url'] as String?,
       createdBy: const NullableIntConverter().fromJson(json['created_by']),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
     );
 
-Map<String, dynamic> _$$TransactionImplToJson(_$TransactionImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'type': _$TransactionTypeEnumMap[instance.type]!,
-      'category': _$TransactionCategoryEnumMap[instance.category]!,
-      'amount': const DoubleConverter().toJson(instance.amount),
-      'transaction_date': instance.transactionDate.toIso8601String(),
-      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
-      'description': instance.description,
-      'receipt_url': instance.receiptUrl,
-      'created_by': const NullableIntConverter().toJson(instance.createdBy),
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$TransactionImplToJson(
+  _$TransactionImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'type': _$TransactionTypeEnumMap[instance.type]!,
+  'category': _$TransactionCategoryEnumMap[instance.category]!,
+  'amount': const DoubleConverter().toJson(instance.amount),
+  'transaction_date': const DateOnlyConverter().toJson(
+    instance.transactionDate,
+  ),
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+  'description': instance.description,
+  'receipt_url': instance.receiptUrl,
+  'created_by': const NullableIntConverter().toJson(instance.createdBy),
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+};
 
 const _$TransactionTypeEnumMap = {
   TransactionType.income: 'income',
@@ -63,7 +64,9 @@ _$TransactionCreateImpl _$$TransactionCreateImplFromJson(
   type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
   category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
   amount: (json['amount'] as num).toDouble(),
-  transactionDate: DateTime.parse(json['transaction_date'] as String),
+  transactionDate: const DateOnlyConverter().fromJson(
+    json['transaction_date'] as Object,
+  ),
   rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
   description: json['description'] as String?,
   receiptUrl: json['receipt_url'] as String?,
@@ -75,7 +78,9 @@ Map<String, dynamic> _$$TransactionCreateImplToJson(
   'type': _$TransactionTypeEnumMap[instance.type]!,
   'category': _$TransactionCategoryEnumMap[instance.category]!,
   'amount': instance.amount,
-  'transaction_date': instance.transactionDate.toIso8601String(),
+  'transaction_date': const DateOnlyConverter().toJson(
+    instance.transactionDate,
+  ),
   'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
   'description': instance.description,
   'receipt_url': instance.receiptUrl,
@@ -87,9 +92,9 @@ _$TransactionUpdateImpl _$$TransactionUpdateImplFromJson(
   type: $enumDecodeNullable(_$TransactionTypeEnumMap, json['type']),
   category: $enumDecodeNullable(_$TransactionCategoryEnumMap, json['category']),
   amount: (json['amount'] as num?)?.toDouble(),
-  transactionDate: json['transaction_date'] == null
-      ? null
-      : DateTime.parse(json['transaction_date'] as String),
+  transactionDate: const NullableDateOnlyConverter().fromJson(
+    json['transaction_date'],
+  ),
   rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
   description: json['description'] as String?,
   receiptUrl: json['receipt_url'] as String?,
@@ -101,7 +106,9 @@ Map<String, dynamic> _$$TransactionUpdateImplToJson(
   'type': _$TransactionTypeEnumMap[instance.type],
   'category': _$TransactionCategoryEnumMap[instance.category],
   'amount': instance.amount,
-  'transaction_date': instance.transactionDate?.toIso8601String(),
+  'transaction_date': const NullableDateOnlyConverter().toJson(
+    instance.transactionDate,
+  ),
   'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
   'description': instance.description,
   'receipt_url': instance.receiptUrl,
@@ -177,16 +184,18 @@ _$ReportPeriodImpl _$$ReportPeriodImplFromJson(Map<String, dynamic> json) =>
     _$ReportPeriodImpl(
       year: const IntConverter().fromJson(json['year'] as Object),
       month: const IntConverter().fromJson(json['month'] as Object),
-      startDate: DateTime.parse(json['start_date'] as String),
-      endDate: DateTime.parse(json['end_date'] as String),
+      startDate: const DateOnlyConverter().fromJson(
+        json['start_date'] as Object,
+      ),
+      endDate: const DateOnlyConverter().fromJson(json['end_date'] as Object),
     );
 
 Map<String, dynamic> _$$ReportPeriodImplToJson(_$ReportPeriodImpl instance) =>
     <String, dynamic>{
       'year': const IntConverter().toJson(instance.year),
       'month': const IntConverter().toJson(instance.month),
-      'start_date': instance.startDate.toIso8601String(),
-      'end_date': instance.endDate.toIso8601String(),
+      'start_date': const DateOnlyConverter().toJson(instance.startDate),
+      'end_date': const DateOnlyConverter().toJson(instance.endDate),
     };
 
 _$ReportSummaryImpl _$$ReportSummaryImplFromJson(Map<String, dynamic> json) =>

@@ -1,11 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_date_field.dart';
-import '../../../../core/widgets/app_form_section.dart';
+import '../utils/task_labels.dart';
+import '../../../../core/l10n/error_text.dart';
+
+/// Правило повторения задачи.
+///
+/// Значения совпадают с теми, что понимает сервер: он сам создаёт следующую
+/// задачу, когда текущую отмечают выполненной. Раньше в форме стоял простой
+/// переключатель «Повторяющаяся задача», который включал признак повтора, но
+/// не задавал период, — сервер такую задачу не повторял, и переключатель
+/// молча ничего не делал.
+enum TaskRepeat {
+  daily('daily'),
+  weekly('weekly'),
+  biweekly('biweekly'),
+  monthly('monthly'),
+  quarterly('quarterly'),
+  yearly('yearly');
+
+  final String value;
+  const TaskRepeat(this.value);
+
+  static TaskRepeat? fromValue(String? raw) {
+    if (raw == null) return null;
+    final lower = raw.toLowerCase();
+    for (final r in TaskRepeat.values) {
+      if (r.value == lower) return r;
+    }
+    return null;
+  }
+
+  String label(BuildContext context) => switch (this) {
+        TaskRepeat.daily => context.l10n.repeatDaily,
+        TaskRepeat.weekly => context.l10n.repeatWeekly,
+        TaskRepeat.biweekly => context.l10n.repeatBiweekly,
+        TaskRepeat.monthly => context.l10n.repeatMonthly,
+        TaskRepeat.quarterly => context.l10n.repeatQuarterly,
+        TaskRepeat.yearly => context.l10n.repeatYearly,
+      };
+}
 
 class TaskFormScreen extends ConsumerStatefulWidget {
   final Task? task;
@@ -18,353 +58,295 @@ class TaskFormScreen extends ConsumerStatefulWidget {
 
 class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _titleController;
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _notesController;
+  late final TextEditingController _title;
+  late final TextEditingController _description;
+  late final TextEditingController _notes;
 
-  TaskType _type = TaskType.other;
-  TaskStatus _status = TaskStatus.pending;
-  TaskPriority _priority = TaskPriority.medium;
-  DateTime _dueDate = DateTime.now().add(const Duration(days: 1));
-  int? _rabbitId;
-  int? _cageId;
-  bool _isRecurring = false;
-  String? _recurrenceRule;
-  int? _reminderBefore;
+  late TaskType _type;
+  late TaskStatus _status;
+  late TaskPriority _priority;
+  late DateTime _dueDate;
+  TaskRepeat? _repeat;
 
-  bool _isLoading = false;
+  bool _touched = false;
+
+  Task? get _task => widget.task;
+  bool get _isEditing => _task != null;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.task?.title);
-    _descriptionController = TextEditingController(text: widget.task?.description);
-    _notesController = TextEditingController(text: widget.task?.notes);
+    _title = TextEditingController(text: _task?.title);
+    _description = TextEditingController(text: _task?.description);
+    _notes = TextEditingController(text: _task?.notes);
 
-    if (widget.task != null) {
-      _type = widget.task!.type;
-      _status = widget.task!.status;
-      _priority = widget.task!.priority;
-      _dueDate = widget.task!.dueDate;
-      _rabbitId = widget.task!.rabbitId;
-      _cageId = widget.task!.cageId;
-      _isRecurring = widget.task!.isRecurring ?? false;
-      _recurrenceRule = widget.task!.recurrenceRule;
-      _reminderBefore = widget.task!.reminderBefore;
+    _type = _task?.type ?? TaskType.other;
+    _status = _task?.status ?? TaskStatus.pending;
+    _priority = _task?.priority ?? TaskPriority.medium;
+    _dueDate = _task?.dueDate ?? DateTime.now().add(const Duration(days: 1));
+    _repeat = TaskRepeat.fromValue(_task?.recurrenceRule);
+
+    for (final c in [_title, _description, _notes]) {
+      c.addListener(_markTouched);
     }
+  }
+
+  void _markTouched() {
+    if (!_touched) _touched = true;
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _notesController.dispose();
+    _title.dispose();
+    _description.dispose();
+    _notes.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.task == null ? 'Новая задача' : 'Редактировать задачу'),
-        actions: [
-          if (widget.task != null)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              color: AppColors.error,
-              onPressed: _deleteTask,
-            ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          children: [
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Название *',
-                    prefixIcon: Icon(Icons.title),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите название';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Описание',
-                    prefixIcon: Icon(Icons.notes),
-                  ),
-                  maxLines: 3,
-                ),
-                AppDateField(
-                  label: 'Срок выполнения *',
-                  value: _dueDate,
-                  onChanged: (date) => setState(() => _dueDate = date),
-                  prefixIcon: Icons.calendar_today,
-                  firstDate: DateTime.now(),
-                  showTime: true,
-                ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Параметры',
-              children: [
-                DropdownButtonFormField<TaskType>(
-                  initialValue: _type,
-                  decoration: const InputDecoration(
-                    labelText: 'Тип *',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: TaskType.values
-                      .map((type) => DropdownMenuItem(
-                            value: type,
-                            child: Text(_taskTypeToString(type)),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _type = value);
-                  },
-                ),
-                DropdownButtonFormField<TaskStatus>(
-                  initialValue: _status,
-                  decoration: const InputDecoration(
-                    labelText: 'Статус *',
-                    prefixIcon: Icon(Icons.flag_outlined),
-                  ),
-                  items: TaskStatus.values
-                      .map((status) => DropdownMenuItem(
-                            value: status,
-                            child: Text(_taskStatusToString(status)),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _status = value);
-                  },
-                ),
-                DropdownButtonFormField<TaskPriority>(
-                  initialValue: _priority,
-                  decoration: const InputDecoration(
-                    labelText: 'Приоритет *',
-                    prefixIcon: Icon(Icons.priority_high),
-                  ),
-                  items: TaskPriority.values
-                      .map((priority) => DropdownMenuItem(
-                            value: priority,
-                            child: Text(_taskPriorityToString(priority)),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _priority = value);
-                  },
-                ),
-                SwitchListTile(
-                  title: const Text('Повторяющаяся задача'),
-                  value: _isRecurring,
-                  onChanged: (value) => setState(() => _isRecurring = value),
-                ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Заметки',
-              children: [
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Примечания',
-                    prefixIcon: Icon(Icons.note_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _saveTask,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.task == null ? 'Создать' : 'Сохранить'),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  String? _optional(TextEditingController c) =>
+      c.text.trim().isEmpty ? null : c.text.trim();
 
-  Future<void> _saveTask() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-
+  Future<String?> _save() async {
+    final l10n = context.l10n;
+    final actions = ref.read(taskActionsProvider);
     try {
-      final taskActions = ref.read(taskActionsProvider);
-
-      if (widget.task == null) {
-        final taskCreate = TaskCreate(
-          title: _titleController.text,
-          description: _descriptionController.text.isEmpty
-              ? null
-              : _descriptionController.text,
-          type: _type,
-          status: _status,
-          priority: _priority,
-          dueDate: _dueDate,
-          rabbitId: _rabbitId,
-          cageId: _cageId,
-          isRecurring: _isRecurring,
-          recurrenceRule: _recurrenceRule,
-          reminderBefore: _reminderBefore,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
+      if (_isEditing) {
+        await actions.updateTask(
+          _task!.id,
+          TaskUpdate(
+            title: _title.text.trim(),
+            description: _optional(_description),
+            type: _type,
+            status: _status,
+            priority: _priority,
+            dueDate: _dueDate,
+            rabbitId: _task!.rabbitId,
+            cageId: _task!.cageId,
+            isRecurring: _repeat != null,
+            recurrenceRule: _repeat?.value,
+            reminderBefore: _task!.reminderBefore,
+            notes: _optional(_notes),
+          ),
         );
-
-        await taskActions.createTask(taskCreate);
       } else {
-        final taskUpdate = TaskUpdate(
-          title: _titleController.text,
-          description: _descriptionController.text.isEmpty
-              ? null
-              : _descriptionController.text,
-          type: _type,
-          status: _status,
-          priority: _priority,
-          dueDate: _dueDate,
-          rabbitId: _rabbitId,
-          cageId: _cageId,
-          isRecurring: _isRecurring,
-          recurrenceRule: _recurrenceRule,
-          reminderBefore: _reminderBefore,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
-        );
-
-        await taskActions.updateTask(widget.task!.id, taskUpdate);
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.task == null ? 'Задача создана' : 'Задача обновлена'),
+        await actions.createTask(
+          TaskCreate(
+            title: _title.text.trim(),
+            description: _optional(_description),
+            type: _type,
+            status: _status,
+            priority: _priority,
+            dueDate: _dueDate,
+            isRecurring: _repeat != null,
+            recurrenceRule: _repeat?.value,
+            notes: _optional(_notes),
           ),
         );
-        context.pop();
       }
+      return null;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      return errorText(l10n, e);
     }
   }
 
-  Future<void> _deleteTask() async {
+  Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить задачу?'),
-        content: const Text('Это действие нельзя отменить.'),
+        title: Text(context.l10n.taskFormDeleteTitle),
+        content: Text(context.l10n.taskFormDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true || !mounted) return;
 
-    if (confirmed == true && mounted) {
-      try {
-        await ref.read(taskActionsProvider).deleteTask(widget.task!.id);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Задача удалена')),
-          );
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка: $e'),
-              backgroundColor: AppColors.error,
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.taskFormDeleted;
+    final failed = context.l10n.taskFormDeleteFailed;
+
+    try {
+      await ref.read(taskActionsProvider).deleteTask(_task!.id);
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+      if (navigator.canPop()) navigator.pop();
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+
+    return AppFormScaffold(
+      title: _isEditing
+          ? context.l10n.taskFormEditTitle
+          : context.l10n.taskFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing
+          ? context.l10n.commonSave
+          : context.l10n.taskFormCreate,
+      successMessage: _isEditing
+          ? context.l10n.taskFormUpdated
+          : context.l10n.taskFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      actions: [
+        if (_isEditing && canDelete)
+          IconButton(
+            tooltip: context.l10n.commonDelete,
+            icon: const Icon(Icons.delete_outline),
+            color: AppColors.error,
+            onPressed: _delete,
+          ),
+      ],
+      children: [
+        AppFormSection(
+          title: context.l10n.taskFormSectionMain,
+          children: [
+            TextFormField(
+              controller: _title,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: context.l10n.taskFormTitleLabel,
+                prefixIcon: const Icon(Icons.title),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? context.l10n.taskFormTitleEmpty
+                  : null,
             ),
-          );
-        }
-      }
-    }
-  }
-
-  String _taskTypeToString(TaskType type) {
-    switch (type) {
-      case TaskType.feeding:
-        return 'Кормление';
-      case TaskType.cleaning:
-        return 'Уборка';
-      case TaskType.vaccination:
-        return 'Вакцинация';
-      case TaskType.checkup:
-        return 'Осмотр';
-      case TaskType.breeding:
-        return 'Разведение';
-      case TaskType.other:
-        return 'Другое';
-    }
-  }
-
-  String _taskStatusToString(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.pending:
-        return 'Ожидает';
-      case TaskStatus.inProgress:
-        return 'В процессе';
-      case TaskStatus.completed:
-        return 'Завершена';
-      case TaskStatus.cancelled:
-        return 'Отменена';
-    }
-  }
-
-  String _taskPriorityToString(TaskPriority priority) {
-    switch (priority) {
-      case TaskPriority.low:
-        return 'Низкий';
-      case TaskPriority.medium:
-        return 'Средний';
-      case TaskPriority.high:
-        return 'Высокий';
-      case TaskPriority.urgent:
-        return 'Срочный';
-    }
+            TextFormField(
+              controller: _description,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: context.l10n.taskFormDescriptionLabel,
+                prefixIcon: const Icon(Icons.notes),
+              ),
+            ),
+            AppDateField(
+              label: context.l10n.taskFormDueLabel,
+              value: _dueDate,
+              onChanged: (date) => setState(() {
+                _dueDate = date;
+                _touched = true;
+              }),
+              prefixIcon: Icons.event_outlined,
+              showTime: true,
+            ),
+          ],
+        ),
+        AppFormSection(
+          title: context.l10n.taskFormSectionParams,
+          children: [
+            DropdownButtonFormField<TaskType>(
+              initialValue: _type,
+              decoration: InputDecoration(
+                labelText: context.l10n.tasksFilterType,
+                prefixIcon: Icon(taskTypeIcon(_type)),
+              ),
+              items: [
+                for (final type in TaskType.values)
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(taskTypeLabel(context, type)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _type = v;
+                _touched = true;
+              }),
+            ),
+            DropdownButtonFormField<TaskPriority>(
+              initialValue: _priority,
+              decoration: InputDecoration(
+                labelText: context.l10n.tasksFilterPriority,
+                prefixIcon: const Icon(Icons.priority_high),
+              ),
+              items: [
+                for (final priority in TaskPriority.values)
+                  DropdownMenuItem(
+                    value: priority,
+                    child: Text(taskPriorityLabel(context, priority)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _priority = v;
+                _touched = true;
+              }),
+            ),
+            if (_isEditing)
+              DropdownButtonFormField<TaskStatus>(
+                initialValue: _status,
+                decoration: InputDecoration(
+                  labelText: context.l10n.tasksFilterStatus,
+                  prefixIcon: const Icon(Icons.flag_outlined),
+                ),
+                items: [
+                  for (final status in TaskStatus.values)
+                    DropdownMenuItem(
+                      value: status,
+                      child: Text(taskStatusLabel(context, status)),
+                    ),
+                ],
+                onChanged: (v) => setState(() {
+                  if (v != null) _status = v;
+                  _touched = true;
+                }),
+              ),
+            DropdownButtonFormField<TaskRepeat?>(
+              initialValue: _repeat,
+              decoration: InputDecoration(
+                labelText: context.l10n.taskFormRepeat,
+                prefixIcon: const Icon(Icons.repeat),
+                helperText: context.l10n.taskFormRepeatHelp,
+                helperMaxLines: 2,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: null,
+                  child: Text(context.l10n.taskFormRepeatNever),
+                ),
+                for (final repeat in TaskRepeat.values)
+                  DropdownMenuItem(
+                    value: repeat,
+                    child: Text(repeat.label(context)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                _repeat = v;
+                _touched = true;
+              }),
+            ),
+          ],
+        ),
+        AppFormSection(
+          title: context.l10n.taskFormSectionNotes,
+          children: [
+            TextFormField(
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: context.l10n.taskFormNotesLabel,
+                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

@@ -77,8 +77,9 @@ describe('Transactions API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data).toHaveProperty('transactions');
-      expect(Array.isArray(res.body.data.transactions)).toBe(true);
+      expect(res.body.data).toHaveProperty('items');
+      expect(res.body.data).toHaveProperty('pagination');
+      expect(Array.isArray(res.body.data.items)).toBe(true);
     });
 
     it('должен применять фильтр по типу', async () => {
@@ -87,7 +88,7 @@ describe('Transactions API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      res.body.data.transactions.forEach(tx => {
+      res.body.data.items.forEach(tx => {
         expect(tx.type).toBe('income');
       });
     });
@@ -102,6 +103,86 @@ describe('Transactions API', () => {
       expect(res.status).toBe(200);
       expect(res.body.data).toHaveProperty('total_income');
       expect(res.body.data).toHaveProperty('total_expenses');
+    });
+  });
+
+  describe('продажа кролика', () => {
+    // Регрессия: код искал категорию 'sale'/'продажа', которых нет в схеме,
+    // поэтому проданный кролик оставался активным и занимал место в клетке.
+    let rabbitId;
+
+    beforeAll(async () => {
+      const breed = await request(app)
+        .post('/api/v1/breeds')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Порода на продажу' });
+
+      const rabbit = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Кролик на продажу',
+          breed_id: breed.body.data.id,
+          sex: 'male',
+          birth_date: '2023-03-01',
+          status: 'healthy'
+        });
+      rabbitId = rabbit.body.data.id;
+    });
+
+    it('доход категории sale_rabbit помечает кролика проданным', async () => {
+      const res = await request(app)
+        .post('/api/v1/transactions')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          type: 'income',
+          category: 'sale_rabbit',
+          amount: 2000,
+          rabbit_id: rabbitId,
+          transaction_date: '2024-06-01'
+        });
+
+      expect(res.status).toBe(201);
+
+      const rabbit = await request(app)
+        .get(`/api/v1/rabbits/${rabbitId}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      expect(rabbit.body.data.status).toBe('sold');
+      expect(rabbit.body.data.cage_id).toBeNull();
+    });
+
+    it('доход другой категории кролика не трогает', async () => {
+      const breed = await request(app)
+        .post('/api/v1/breeds')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Порода для вязки' });
+
+      const rabbit = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Кролик по вязке',
+          breed_id: breed.body.data.id,
+          sex: 'male',
+          birth_date: '2023-03-01',
+          status: 'healthy'
+        });
+
+      await request(app)
+        .post('/api/v1/transactions')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          type: 'income',
+          category: 'breeding_fee',
+          amount: 500,
+          rabbit_id: rabbit.body.data.id,
+          transaction_date: '2024-06-02'
+        });
+
+      const after = await request(app)
+        .get(`/api/v1/rabbits/${rabbit.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      expect(after.body.data.status).toBe('healthy');
     });
   });
 });

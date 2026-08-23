@@ -13,26 +13,25 @@ _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
       feedId: const IntConverter().fromJson(json['feed_id'] as Object),
       cageId: const NullableIntConverter().fromJson(json['cage_id']),
       quantity: const DoubleConverter().fromJson(json['quantity'] as Object),
-      fedAt: DateTime.parse(json['fed_at'] as String),
+      fedAt: const DateTimeConverter().fromJson(json['fed_at'] as Object),
       fedBy: const NullableIntConverter().fromJson(json['fed_by']),
       notes: json['notes'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
     );
 
-Map<String, dynamic> _$$FeedingRecordImplToJson(_$FeedingRecordImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
-      'feed_id': const IntConverter().toJson(instance.feedId),
-      'cage_id': const NullableIntConverter().toJson(instance.cageId),
-      'quantity': const DoubleConverter().toJson(instance.quantity),
-      'fed_at': instance.fedAt.toIso8601String(),
-      'fed_by': const NullableIntConverter().toJson(instance.fedBy),
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$FeedingRecordImplToJson(
+  _$FeedingRecordImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+  'feed_id': const IntConverter().toJson(instance.feedId),
+  'cage_id': const NullableIntConverter().toJson(instance.cageId),
+  'quantity': const DoubleConverter().toJson(instance.quantity),
+  'fed_at': const DateTimeConverter().toJson(instance.fedAt),
+  'fed_by': const NullableIntConverter().toJson(instance.fedBy),
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+};
 
 _$FeedingRecordCreateImpl _$$FeedingRecordCreateImplFromJson(
   Map<String, dynamic> json,
@@ -41,7 +40,7 @@ _$FeedingRecordCreateImpl _$$FeedingRecordCreateImplFromJson(
   feedId: (json['feed_id'] as num).toInt(),
   cageId: (json['cage_id'] as num?)?.toInt(),
   quantity: (json['quantity'] as num).toDouble(),
-  fedAt: DateTime.parse(json['fed_at'] as String),
+  fedAt: const DateTimeConverter().fromJson(json['fed_at'] as Object),
   notes: json['notes'] as String?,
 );
 
@@ -52,7 +51,7 @@ Map<String, dynamic> _$$FeedingRecordCreateImplToJson(
   'feed_id': instance.feedId,
   'cage_id': instance.cageId,
   'quantity': instance.quantity,
-  'fed_at': instance.fedAt.toIso8601String(),
+  'fed_at': const DateTimeConverter().toJson(instance.fedAt),
   'notes': instance.notes,
 };
 
@@ -63,9 +62,7 @@ _$FeedingRecordUpdateImpl _$$FeedingRecordUpdateImplFromJson(
   feedId: (json['feed_id'] as num?)?.toInt(),
   cageId: (json['cage_id'] as num?)?.toInt(),
   quantity: (json['quantity'] as num?)?.toDouble(),
-  fedAt: json['fed_at'] == null
-      ? null
-      : DateTime.parse(json['fed_at'] as String),
+  fedAt: const NullableDateTimeConverter().fromJson(json['fed_at']),
   notes: json['notes'] as String?,
 );
 
@@ -76,7 +73,7 @@ Map<String, dynamic> _$$FeedingRecordUpdateImplToJson(
   'feed_id': instance.feedId,
   'cage_id': instance.cageId,
   'quantity': instance.quantity,
-  'fed_at': instance.fedAt?.toIso8601String(),
+  'fed_at': const NullableDateTimeConverter().toJson(instance.fedAt),
   'notes': instance.notes,
 };
 

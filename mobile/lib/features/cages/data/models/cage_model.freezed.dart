@@ -33,11 +33,14 @@ mixin _$CageModel {
   String get condition =>
       throw _privateConstructorUsedError; // good, needs_repair, broken
   @JsonKey(name: 'last_cleaned_at')
+  @NullableDateTimeConverter()
   DateTime? get lastCleanedAt => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Related data
   List<RabbitModel>? get rabbits => throw _privateConstructorUsedError;
   @JsonKey(name: 'current_occupancy')
@@ -71,10 +74,16 @@ abstract class $CageModelCopyWith<$Res> {
     @IntConverter() int capacity,
     String? location,
     String condition,
-    @JsonKey(name: 'last_cleaned_at') DateTime? lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at')
+    @NullableDateTimeConverter()
+    DateTime? lastCleanedAt,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy')
     @NullableIntConverter()
@@ -200,10 +209,16 @@ abstract class _$$CageModelImplCopyWith<$Res>
     @IntConverter() int capacity,
     String? location,
     String condition,
-    @JsonKey(name: 'last_cleaned_at') DateTime? lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at')
+    @NullableDateTimeConverter()
+    DateTime? lastCleanedAt,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy')
     @NullableIntConverter()
@@ -321,10 +336,12 @@ class _$CageModelImpl implements _CageModel {
     @IntConverter() required this.capacity,
     this.location,
     required this.condition,
-    @JsonKey(name: 'last_cleaned_at') this.lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at')
+    @NullableDateTimeConverter()
+    this.lastCleanedAt,
     this.notes,
-    @JsonKey(name: 'created_at') this.createdAt,
-    @JsonKey(name: 'updated_at') this.updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
     final List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy')
     @NullableIntConverter()
@@ -356,14 +373,17 @@ class _$CageModelImpl implements _CageModel {
   // good, needs_repair, broken
   @override
   @JsonKey(name: 'last_cleaned_at')
+  @NullableDateTimeConverter()
   final DateTime? lastCleanedAt;
   @override
   final String? notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   final DateTime? updatedAt;
   // Related data
   final List<RabbitModel>? _rabbits;
@@ -467,10 +487,16 @@ abstract class _CageModel implements CageModel {
     @IntConverter() required final int capacity,
     final String? location,
     required final String condition,
-    @JsonKey(name: 'last_cleaned_at') final DateTime? lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at')
+    @NullableDateTimeConverter()
+    final DateTime? lastCleanedAt,
     final String? notes,
-    @JsonKey(name: 'created_at') final DateTime? createdAt,
-    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    final DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    final DateTime? updatedAt,
     final List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy')
     @NullableIntConverter()
@@ -500,14 +526,17 @@ abstract class _CageModel implements CageModel {
   String get condition; // good, needs_repair, broken
   @override
   @JsonKey(name: 'last_cleaned_at')
+  @NullableDateTimeConverter()
   DateTime? get lastCleanedAt;
   @override
   String? get notes;
   @override
   @JsonKey(name: 'created_at')
+  @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
+  @NullableDateTimeConverter()
   DateTime? get updatedAt; // Related data
   @override
   List<RabbitModel>? get rabbits;

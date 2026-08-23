@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/app_filter_bar.dart';
-import '../../../../core/widgets/status_badge.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
+import '../utils/rabbit_labels.dart';
+import '../widgets/rabbit_picker.dart';
 
+/// Поголовье фермы.
 class RabbitsListScreen extends ConsumerStatefulWidget {
   const RabbitsListScreen({super.key});
 
@@ -19,312 +22,286 @@ class RabbitsListScreen extends ConsumerStatefulWidget {
 }
 
 class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  final _search = TextEditingController();
+  Timer? _debounce;
 
-  String? _selectedSex;
-  String? _selectedStatus;
+  String? _sex;
+  String? _status;
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
+  bool get _hasFilters =>
+      _sex != null || _status != null || _search.text.trim().isNotEmpty;
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _scrollController.dispose();
+    _debounce?.cancel();
+    _search.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      ref.read(rabbitsListProvider.notifier).loadMore(
-        search: _searchController.text.isNotEmpty ? _searchController.text : null,
-        sex: _selectedSex,
-        status: _selectedStatus,
-      );
-    }
-  }
-
+  /// Поиск с задержкой: слово из пяти букв — это пять запросов, между
+  /// которыми список мигал бы индикатором, а ответы могли прийти не в том
+  /// порядке, в котором их отправляли.
   void _onSearchChanged(String value) {
-    ref.read(rabbitsListProvider.notifier).loadRabbits(
-      search: value,
-      sex: _selectedSex,
-      status: _selectedStatus,
-    );
+    _debounce?.cancel();
+    _debounce = Timer(AppDuration.normal, () {
+      if (mounted) _load();
+    });
   }
 
-  void _applyFilters() {
-    ref.read(rabbitsListProvider.notifier).loadRabbits(
-      search: _searchController.text.isNotEmpty ? _searchController.text : null,
-      sex: _selectedSex,
-      status: _selectedStatus,
-    );
+  Future<void> _load() => ref.read(rabbitsListProvider.notifier).loadRabbits(
+        search: _search.text.trim().isEmpty ? null : _search.text.trim(),
+        sex: _sex,
+        status: _status,
+      );
+
+  void _setFilter({String? sex, String? status}) {
+    setState(() {
+      _sex = sex;
+      _status = status;
+    });
+    _load();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(rabbitsListProvider);
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Мои Кролики'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(64),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: _buildSearchField(context),
-          ),
-        ),
-      ),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          _buildFilters(),
-          if (state.isLoading && state.rabbits.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (state.error != null && state.rabbits.isEmpty)
-            SliverFillRemaining(
-              child: AppErrorState(
-                message: state.error!,
-                onRetry: () => ref.read(rabbitsListProvider.notifier).loadRabbits(),
-              ),
-            )
-          else if (state.rabbits.isEmpty)
-            const SliverFillRemaining(
-              child: AppEmptyState(
-                icon: Icons.pets,
-                title: 'Кролики не найдены',
-                subtitle: 'Попробуйте изменить фильтры или добавьте кролика',
-              ),
-            )
-          else
-            _buildRabbitsList(state.rabbits),
-          if (state.isLoading && state.rabbits.isNotEmpty)
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+      appBar: AppBar(title: Text(context.l10n.rabbitsTitle)),
+      body: PagedListView<RabbitModel>(
+        items: state.rabbits,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: _load,
+        onLoadMore: () => ref.read(rabbitsListProvider.notifier).loadMore(
+              search: _search.text.trim().isEmpty ? null : _search.text.trim(),
+              sex: _sex,
+              status: _status,
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchField(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: _onSearchChanged,
-        style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
-        decoration: InputDecoration(
-          hintText: 'Поиск по имени или клейму...',
-          hintStyle: AppTypography.bodyMd.copyWith(color: cs.onSurfaceVariant),
-          prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: cs.onSurfaceVariant),
-                  onPressed: () {
-                    _searchController.clear();
-                    _onSearchChanged('');
-                  },
-                )
-              : null,
+        header: _Header(
+          controller: _search,
+          onSearchChanged: _onSearchChanged,
+          sex: _sex,
+          status: _status,
+          onFilter: _setFilter,
+        ),
+        empty: _hasFilters
+            ? AppEmptyState(
+                icon: Icons.search_off,
+                title: context.l10n.rabbitsNothingFound,
+                subtitle: context.l10n.rabbitsNothingFoundBody,
+                actionLabel: context.l10n.commonReset,
+                onAction: () {
+                  _search.clear();
+                  _setFilter();
+                },
+              )
+            : AppEmptyState(
+                icon: Icons.pets_outlined,
+                title: context.l10n.rabbitsEmptyTitle,
+                subtitle: context.l10n.rabbitsEmptyBody,
+                actionLabel:
+                    canManage ? context.l10n.rabbitsEmptyAction : null,
+                onAction: canManage ? () => context.push('/rabbits/new') : null,
+              ),
+        itemBuilder: (context, rabbit, _) => _RabbitCard(
+          rabbit: rabbit,
+          onTap: () => context.push('/rabbits/${rabbit.id}'),
         ),
       ),
     );
   }
+}
 
-  Widget _buildFilters() {
-    return SliverToBoxAdapter(
-      child: AppFilterBar(
-        chips: [
-          AppFilterChipData(
-            label: 'Все',
-            isSelected: _selectedSex == null && _selectedStatus == null,
-            onTap: () {
-              setState(() {
-                _selectedSex = null;
-                _selectedStatus = null;
-              });
-              _applyFilters();
-            },
-          ),
-          AppFilterChipData(
-            label: 'Самцы',
-            isSelected: _selectedSex == 'male',
-            onTap: () {
-              setState(() {
-                _selectedSex = _selectedSex == 'male' ? null : 'male';
-              });
-              _applyFilters();
-            },
-            color: AppColors.accentOcean,
-          ),
-          AppFilterChipData(
-            label: 'Самки',
-            isSelected: _selectedSex == 'female',
-            onTap: () {
-              setState(() {
-                _selectedSex = _selectedSex == 'female' ? null : 'female';
-              });
-              _applyFilters();
-            },
-            color: AppColors.accentRose,
-          ),
-          AppFilterChipData(
-            label: 'Активные',
-            isSelected: _selectedStatus == 'active',
-            onTap: () {
-              setState(() {
-                _selectedStatus = _selectedStatus == 'active' ? null : 'active';
-              });
-              _applyFilters();
-            },
-            color: AppColors.success,
-          ),
-          AppFilterChipData(
-            label: 'Проданы',
-            isSelected: _selectedStatus == 'sold',
-            onTap: () {
-              setState(() {
-                _selectedStatus = _selectedStatus == 'sold' ? null : 'sold';
-              });
-              _applyFilters();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+class _Header extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String> onSearchChanged;
+  final String? sex;
+  final String? status;
+  final void Function({String? sex, String? status}) onFilter;
 
-  Widget _buildRabbitsList(List<RabbitModel> rabbits) {
-    return SliverPadding(
-      padding: const EdgeInsets.all(16),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => _buildRabbitCard(rabbits[index]),
-          childCount: rabbits.length,
+  const _Header({
+    required this.controller,
+    required this.onSearchChanged,
+    required this.sex,
+    required this.status,
+    required this.onFilter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenH,
+            AppSpacing.md,
+            AppSpacing.screenH,
+            AppSpacing.sm,
+          ),
+          child: TextField(
+            controller: controller,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: l10n.rabbitsSearchHint,
+              prefixIcon: const Icon(Icons.search),
+            ),
+            onChanged: onSearchChanged,
+            onSubmitted: onSearchChanged,
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildRabbitCard(RabbitModel rabbit) {
-    final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: AppCard(
-        onTap: () => context.push('/rabbits/${rabbit.id}'),
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Hero(
-              tag: 'rabbit_photo_${rabbit.id}',
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: cs.surfaceContainerHighest,
-                  image: rabbit.photoUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(rabbit.photoUrl!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: rabbit.photoUrl == null
-                    ? Icon(Icons.pets, size: 40, color: cs.onSurfaceVariant)
-                    : null,
-              ),
+        AppFilterBar(
+          chips: [
+            AppFilterChipData(
+              label: l10n.rabbitsFilterAll,
+              isSelected: sex == null && status == null,
+              onTap: () => onFilter(),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          rabbit.name,
-                          style: AppTypography.titleMd.copyWith(color: cs.onSurface),
-                        ),
-                      ),
-                      StatusBadge(status: RabbitStatusX.fromString(rabbit.status)),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Клеймо: ${rabbit.tagId.isEmpty ? "Нет" : rabbit.tagId}',
-                    style: AppTypography.bodyMd.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _buildInfoBadge(
-                        icon: rabbit.sex == 'male' ? Icons.male : rabbit.sex == 'female' ? Icons.female : Icons.question_mark,
-                        label: rabbit.sex == 'male' ? 'Самец' : rabbit.sex == 'female' ? 'Самка' : 'Неизвестно',
-                        color: rabbit.sex == 'male'
-                            ? AppColors.accentOcean
-                            : rabbit.sex == 'female' ? AppColors.accentRose : AppColors.info,
-                      ),
-                      if (rabbit.breed?.name != null) ...[
-                        const SizedBox(width: 8),
-                        _buildInfoBadge(
-                          icon: Icons.category,
-                          label: rabbit.breed!.name,
-                          color: AppColors.accentViolet,
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
+            AppFilterChipData(
+              label: l10n.rabbitsFilterMales,
+              isSelected: sex == 'male',
+              onTap: () =>
+                  onFilter(sex: sex == 'male' ? null : 'male', status: status),
+              color: sexColor(context, 'male'),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: cs.onSurfaceVariant),
+            AppFilterChipData(
+              label: l10n.rabbitsFilterFemales,
+              isSelected: sex == 'female',
+              onTap: () => onFilter(
+                  sex: sex == 'female' ? null : 'female', status: status),
+              color: sexColor(context, 'female'),
+            ),
+            AppFilterChipData(
+              label: l10n.rabbitsFilterActive,
+              isSelected: status == 'active',
+              onTap: () => onFilter(
+                  sex: sex, status: status == 'active' ? null : 'active'),
+              color: AppColors.success,
+            ),
+            AppFilterChipData(
+              label: l10n.rabbitsFilterSold,
+              isSelected: status == 'sold',
+              onTap: () =>
+                  onFilter(sex: sex, status: status == 'sold' ? null : 'sold'),
+              color: AppColors.warning,
+            ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+class _RabbitCard extends StatelessWidget {
+  final RabbitModel rabbit;
+  final VoidCallback onTap;
+
+  const _RabbitCard({required this.rabbit, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Hero(
+            tag: 'rabbit_photo_${rabbit.id}',
+            // Раньше фото подставлялось в NetworkImage напрямую, а адрес с
+            // сервера приходит относительный — картинка не грузилась никогда.
+            child: RabbitAvatar(photoUrl: rabbit.photoUrl, size: 72),
+          ),
+          const SizedBox(width: AppSpacing.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        rabbit.name,
+                        style: AppTypography.titleMd
+                            .copyWith(color: context.colors.onSurface),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    StatusBadge(
+                        status: RabbitStatusX.fromString(rabbit.status)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  rabbit.tagId.trim().isEmpty
+                      ? context.l10n.rabbitNoTag
+                      : rabbit.tagId,
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    _Badge(
+                      icon: rabbitSexIcon(rabbit.sex),
+                      label: sexLabel(context, rabbit.sex),
+                      color: sexColor(context, rabbit.sex),
+                    ),
+                    if (rabbit.breed?.name != null)
+                      _Badge(
+                        icon: Icons.category_outlined,
+                        label: rabbit.breed!.name,
+                        color: AppColors.domainLivestock,
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Icon(Icons.chevron_right, color: context.colors.onSurfaceVariant),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildInfoBadge({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
+class _Badge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _Badge({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: AppRadius.smAll,
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: AppTypography.labelSm.copyWith(color: color),
-          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(label, style: AppTypography.labelSm.copyWith(color: color)),
         ],
       ),
     );

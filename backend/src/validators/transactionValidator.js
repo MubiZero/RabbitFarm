@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const listQuery = require('./listQuery');
 
 /**
  * Transaction validation schemas
@@ -148,9 +149,27 @@ const updateTransactionSchema = Joi.object({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
 });
 
+/** Параметры списка финансовых операций. */
+const listTransactionsQuerySchema = Joi.object({
+  page: listQuery.page,
+  limit: listQuery.limit.default(10),
+  sort_by: listQuery.sortBy(
+    ['transaction_date', 'amount', 'type', 'category', 'created_at'], 'transaction_date'),
+  sort_order: listQuery.sortOrder,
+  type: Joi.string().valid('income', 'expense').optional(),
+  category: Joi.string().optional(),
+  rabbit_id: Joi.number().integer().optional(),
+  from_date: listQuery.fromDate,
+  to_date: listQuery.toDate,
+  min_amount: Joi.number().optional(),
+  max_amount: Joi.number().optional()
+});
+
 module.exports = {
   createTransactionSchema,
   updateTransactionSchema,
   TRANSACTION_TYPES,
   TRANSACTION_CATEGORIES
+,
+  listTransactionsQuerySchema
 };

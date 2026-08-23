@@ -59,8 +59,9 @@ describe('Tasks API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data).toHaveProperty('tasks');
-      expect(Array.isArray(res.body.data.tasks)).toBe(true);
+      expect(res.body.data).toHaveProperty('items');
+      expect(res.body.data).toHaveProperty('pagination');
+      expect(Array.isArray(res.body.data.items)).toBe(true);
     });
   });
 

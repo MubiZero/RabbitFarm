@@ -1,6 +1,6 @@
-const { Vaccination, Rabbit, Breed, Transaction, sequelize } = require('../models');
+const { Vaccination, Rabbit, Breed, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
+const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
 
 /**
@@ -36,17 +36,15 @@ class VaccinationController {
       const vaccination = await Vaccination.create(req.body, { transaction: t });
 
       // Automation: Financial Transaction
-      if (cost && parseFloat(cost) > 0) {
-        await Transaction.create({
-          type: 'expense',
-          category: 'Health', // or 'Vaccination'
-          amount: cost,
-          transaction_date: vaccination_date || new Date(),
-          rabbit_id: rabbit_id,
-          description: `Vaccination: ${vaccine_name}`,
-          created_by: req.user.id
-        }, { transaction: t });
-      }
+      await syncAutoExpense({
+        link: { vaccination_id: vaccination.id },
+        cost,
+        rabbitId: rabbit_id,
+        transactionDate: vaccination_date,
+        description: `Вакцинация: ${vaccine_name}`,
+        userId: req.user.id,
+        transaction: t
+      });
 
       await t.commit();
 
@@ -144,7 +142,9 @@ class VaccinationController {
       }
 
       // Filter for upcoming vaccinations
-      if (upcoming === 'true') {
+      // Значение уже приведено валидатором к булеву; сравнение со строкой
+      // не срабатывало, и фильтр «только предстоящие» ничего не менял.
+      if (upcoming === true || upcoming === 'true') {
         where.next_vaccination_date = {
           [Op.gte]: new Date(),
           [Op.lte]: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // Next 90 days
@@ -229,10 +229,25 @@ class VaccinationController {
    * PUT /api/v1/vaccinations/:id
    */
   async update(req, res, next) {
+    // Запись и связанный с ней расход меняются одной транзакцией: иначе при
+    // сбое на втором шаге в ведомости осталась бы прежняя сумма.
+    const t = await sequelize.transaction();
     try {
-      const vaccination = await Vaccination.findByPk(req.params.id);
+      // Скоупинг по ферме обязателен: findByPk по одному идентификатору
+      // позволял править чужие записи перебором id.
+      const vaccination = await Vaccination.findOne({
+        where: { id: req.params.id },
+        include: [{
+          model: Rabbit,
+          as: 'rabbit',
+          where: { user_id: req.farmId },
+          attributes: ['id']
+        }],
+        transaction: t
+      });
 
       if (!vaccination) {
+        await t.rollback();
         return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
       }
 
@@ -242,14 +257,30 @@ class VaccinationController {
           where: {
             id: req.body.rabbit_id,
             user_id: req.farmId
-          }
+          },
+          transaction: t
         });
         if (!rabbit) {
+          await t.rollback();
           return ApiResponse.notFound(res, 'Кролик не найден');
         }
       }
 
-      await vaccination.update(req.body);
+      await vaccination.update(req.body, { transaction: t });
+
+      // Расход идёт следом за стоимостью: меняется — пересчитывается,
+      // убрали — удаляется, появилась впервые — создаётся.
+      await syncAutoExpense({
+        link: { vaccination_id: vaccination.id },
+        cost: vaccination.cost,
+        rabbitId: vaccination.rabbit_id,
+        transactionDate: vaccination.vaccination_date,
+        description: `Вакцинация: ${vaccination.vaccine_name}`,
+        userId: req.user.id,
+        transaction: t
+      });
+
+      await t.commit();
 
       // Fetch updated vaccination with rabbit info
       const result = await Vaccination.findByPk(vaccination.id, {
@@ -271,6 +302,7 @@ class VaccinationController {
 
       return ApiResponse.success(res, result, 'Запись о вакцинации успешно обновлена');
     } catch (error) {
+      if (!t.finished) await t.rollback();
       if (error.name === 'SequelizeValidationError') {
         return ApiResponse.badRequest(res, error.errors[0].message);
       }
@@ -524,8 +556,12 @@ class VaccinationController {
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
               user_id: req.farmId, // Filter by user
+              // Перечисление живых статусов пропускало 'active' и
+              // 'quarantine'. Статус 'active' код сам ставит матери после
+              // окрола, поэтому любая окролившаяся самка исчезала из списка
+              // просроченных прививок и из текущих лечений.
               status: {
-                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
+                [Op.notIn]: ['dead', 'sold']
               }
             },
             include: [

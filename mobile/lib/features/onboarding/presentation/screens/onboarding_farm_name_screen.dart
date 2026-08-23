@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/onboarding_progress.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class OnboardingFarmNameScreen extends ConsumerStatefulWidget {
   const OnboardingFarmNameScreen({super.key});
@@ -37,7 +38,7 @@ class _OnboardingFarmNameScreenState
               const OnboardingProgress(current: 1, total: 2),
               const Spacer(flex: 2),
               Text(
-                'Как называется\nваша ферма?',
+                context.l10n.onboardFarmNameTitle,
                 style: AppTypography.displayMd.copyWith(
                   color: cs.onSurface,
                 ),
@@ -49,21 +50,21 @@ class _OnboardingFarmNameScreenState
                 style: AppTypography.bodyLg.copyWith(
                   color: cs.onSurface,
                 ),
-                decoration: const InputDecoration(
-                  hintText: 'Например: Ферма "Берёзки"',
+                decoration: InputDecoration(
+                  hintText: context.l10n.onboardFarmNameHint,
                 ),
                 onSubmitted: (_) => _next(),
               ),
               const Spacer(flex: 3),
               ElevatedButton(
                 onPressed: _next,
-                child: const Text('Далее'),
+                child: Text(context.l10n.onboardNext),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/onboarding/farm-type'),
                 child: Text(
-                  'Пропустить',
+                  context.l10n.onboardSkip,
                   style: AppTypography.labelLg.copyWith(
                     color: cs.onSurfaceVariant,
                   ),

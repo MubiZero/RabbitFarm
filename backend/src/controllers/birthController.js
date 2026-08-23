@@ -1,15 +1,32 @@
 const { randomUUID } = require('crypto');
-const { Rabbit, Birth, Breeding, Task } = require('../models');
+const { Op } = require('sequelize');
+const { Rabbit, Birth, Breeding, Task, Breed, Cage } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
+const logger = require('../utils/logger');
 
 /**
  * Получить список всех окролов для текущего пользователя
  */
-exports.getBirths = async (req, res) => {
+exports.getBirths = async (req, res, next) => {
   try {
     const userId = req.farmId;
+    const { page, limit, mother_id: motherId, from_date: fromDate, to_date: toDate } = req.query;
 
-    const births = await Birth.findAll({
+    // Раньше отдавались все окролы фермы разом, без страниц и фильтров: у
+    // хозяйства с трёхлетней историей это многомегабайтный ответ на мобильной
+    // связи. Свой параметр page при этом был описан в Swagger и не работал.
+    const where = {};
+    if (motherId) where.mother_id = motherId;
+    if (fromDate || toDate) {
+      where.birth_date = {};
+      if (fromDate) where.birth_date[Op.gte] = fromDate;
+      if (toDate) where.birth_date[Op.lte] = toDate;
+    }
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Birth.findAndCountAll({
+      where,
       include: [
         {
           model: Rabbit,
@@ -25,19 +42,24 @@ exports.getBirths = async (req, res) => {
         },
       ],
       order: [['birth_date', 'DESC']],
+      limit,
+      offset,
+      distinct: true
     });
 
-    return ApiResponse.success(res, births, 'Список окролов получен успешно');
+    return ApiResponse.paginated(res, rows, page, limit, count, 'Список окролов получен успешно');
   } catch (error) {
-    console.error('Error fetching births:', error);
-    return ApiResponse.serverError(res, 'Не удалось загрузить окролы');
+    logger.error('Error fetching births', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Получить окрол по ID
  */
-exports.getBirthById = async (req, res) => {
+exports.getBirthById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -52,8 +74,8 @@ exports.getBirthById = async (req, res) => {
           attributes: ['id', 'name', 'tag_id', 'breed_id'],
           include: [
             {
-              model: Rabbit.associations.Breed.target,
-              as: 'Breed',
+              model: Breed,
+              as: 'breed',
               attributes: ['id', 'name'],
             },
           ],
@@ -73,15 +95,17 @@ exports.getBirthById = async (req, res) => {
 
     return ApiResponse.success(res, birth);
   } catch (error) {
-    console.error('Error fetching birth:', error);
-    return ApiResponse.serverError(res, 'Не удалось загрузить окрол');
+    logger.error('Error fetching birth', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Создать новый окрол
  */
-exports.createBirth = async (req, res) => {
+exports.createBirth = async (req, res, next) => {
   const transaction = await Rabbit.sequelize.transaction();
   try {
     const userId = req.farmId;
@@ -212,15 +236,17 @@ exports.createBirth = async (req, res) => {
     return ApiResponse.created(res, createdBirth, 'Окрол успешно создан');
   } catch (error) {
     await transaction.rollback();
-    console.error('Error creating birth:', error);
-    return ApiResponse.serverError(res, 'Не удалось создать окрол');
+    logger.error('Error creating birth', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Обновить окрол
  */
-exports.updateBirth = async (req, res) => {
+exports.updateBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -278,15 +304,17 @@ exports.updateBirth = async (req, res) => {
 
     return ApiResponse.success(res, birth, 'Окрол успешно обновлен');
   } catch (error) {
-    console.error('Error updating birth:', error);
-    return ApiResponse.serverError(res, 'Не удалось обновить окрол');
+    logger.error('Error updating birth', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Удалить окрол
  */
-exports.deleteBirth = async (req, res) => {
+exports.deleteBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.farmId;
@@ -310,35 +338,37 @@ exports.deleteBirth = async (req, res) => {
 
     return ApiResponse.success(res, null, 'Окрол успешно удален');
   } catch (error) {
-    console.error('Error deleting birth:', error);
-    return ApiResponse.serverError(res, 'Не удалось удалить окрол');
+    logger.error('Error deleting birth', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };
 
 /**
  * Создать карточки крольчат из окрола
  */
-exports.createKitsFromBirth = async (req, res) => {
+exports.createKitsFromBirth = async (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.farmId;
+  const {
+    mother_id,
+    father_id,
+    breed_id,
+    birth_date,
+    count,
+    name_prefix,
+  } = req.body;
+
+  // Проверка количества стоит до открытия транзакции: раньше ранний return
+  // оставлял её висеть и удерживал соединение из пула до таймаута.
+  const kitCount = parseInt(count);
+  if (isNaN(kitCount) || kitCount <= 0 || kitCount > 20) {
+    return ApiResponse.error(res, 'Некорректное количество крольчат (макс 20)', 400);
+  }
+
   const transaction = await Birth.sequelize.transaction();
   try {
-    const { id } = req.params;
-    const userId = req.farmId;
-    const {
-      mother_id,
-      father_id,
-      breed_id,
-      birth_date,
-      count,
-      name_prefix,
-    } = req.body;
-
-    // Validate count
-    const kitCount = parseInt(count);
-    if (isNaN(kitCount) || kitCount <= 0 || kitCount > 20) {
-      return ApiResponse.error(res, 'Некорректное количество крольчат (макс 20)', 400);
-    }
-
-    // Проверяем окрол
     const birth = await Birth.findOne({
       where: { id },
       include: [
@@ -356,14 +386,68 @@ exports.createKitsFromBirth = async (req, res) => {
       return ApiResponse.notFound(res, 'Окрол не найден');
     }
 
-    // Получаем клетку матери для размещения крольчат
-    const mother = await Rabbit.findByPk(mother_id || birth.mother_id, { transaction });
-    const cageId = mother ? mother.cage_id : null;
+    // Идентификаторы приходят из тела запроса, поэтому каждый проверяется на
+    // принадлежность ферме: иначе крольчата уезжали в чужую клетку, а ответ
+    // об оставшихся местах раскрывал заполненность чужого хозяйства.
+    const mother = await Rabbit.findOne({
+      where: { id: mother_id || birth.mother_id, user_id: userId },
+      transaction
+    });
+
+    if (!mother) {
+      await transaction.rollback();
+      return ApiResponse.notFound(res, 'Мать не найдена');
+    }
+
+    let father = null;
+    if (father_id) {
+      father = await Rabbit.findOne({
+        where: { id: father_id, user_id: userId },
+        transaction
+      });
+
+      if (!father) {
+        await transaction.rollback();
+        return ApiResponse.notFound(res, 'Отец не найден');
+      }
+
+      if (father.sex !== 'male') {
+        await transaction.rollback();
+        return ApiResponse.error(res, 'Отцом может быть только самец', 400);
+      }
+    }
+
+    // Порода по умолчанию наследуется от матери — так карточка крольчонка не
+    // остаётся без обязательного поля.
+    const kitBreedId = breed_id || mother.breed_id;
+    if (breed_id) {
+      const breed = await Breed.findOne({
+        where: { id: breed_id, user_id: userId },
+        transaction
+      });
+
+      if (!breed) {
+        await transaction.rollback();
+        return ApiResponse.notFound(res, 'Порода не найдена');
+      }
+    }
+
+    const cageId = mother.cage_id;
 
     if (cageId) {
-      const cage = await mother.getCage({ transaction });
+      // Клетка блокируется на время проверки: иначе два одновременных
+      // создания помёта видят одни и те же свободные места и оба их занимают.
+      const cage = await Cage.findOne({
+        where: { id: cageId, user_id: userId },
+        lock: transaction.LOCK.UPDATE,
+        transaction
+      });
       if (cage) {
-        const currentCount = await Rabbit.count({ where: { cage_id: cageId }, transaction });
+        const currentCount = await Rabbit.count({
+          where: { cage_id: cageId, user_id: userId },
+          transaction
+        });
+
         if (currentCount + kitCount > cage.capacity) {
           await transaction.rollback();
           return ApiResponse.error(res, `Недостаточно места в клетке матери (свободно: ${cage.capacity - currentCount})`, 400);
@@ -371,7 +455,6 @@ exports.createKitsFromBirth = async (req, res) => {
       }
     }
 
-    // Создаём крольчат
     const kits = [];
     const prefix = name_prefix || 'Крольчонок';
 
@@ -380,14 +463,14 @@ exports.createKitsFromBirth = async (req, res) => {
         user_id: userId,
         tag_id: `kit-${randomUUID().slice(0, 8)}`,
         name: `${prefix}-${i}`,
-        breed_id,
+        breed_id: kitBreedId,
         sex: 'unknown',
         birth_date: birth_date || birth.birth_date,
-        mother_id: mother_id || birth.mother_id,
-        father_id: father_id || null,
+        mother_id: mother.id,
+        father_id: father ? father.id : null,
         status: 'active',
         cage_id: cageId,
-        purpose: 'meat', // По умолчанию молодняк на откорм? Или breeding?
+        purpose: 'meat',
       }, { transaction });
       kits.push(kit);
     }
@@ -395,8 +478,10 @@ exports.createKitsFromBirth = async (req, res) => {
     await transaction.commit();
     return ApiResponse.created(res, kits, 'Крольчата успешно созданы');
   } catch (error) {
-    await transaction.rollback();
-    console.error('Error creating kits:', error);
-    return ApiResponse.serverError(res, 'Не удалось создать крольчат');
+    if (!transaction.finished) await transaction.rollback();
+    logger.error('Error creating kits', { error: error.message });
+    // Дальше решает общий обработчик: он различает ошибки валидации
+    // Sequelize и отвечает понятным 422, а не общей пятисоткой.
+    return next(error);
   }
 };

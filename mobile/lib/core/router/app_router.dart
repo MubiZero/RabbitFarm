@@ -98,18 +98,28 @@ class RouterNotifier extends ChangeNotifier {
   }
 }
 
+/// Экраны, которые открываются «вглубь» (карточки, формы, справочники),
+/// должны закрывать вкладочную оболочку целиком. Без явного корневого ключа
+/// go_router кладёт их в навигатор оболочки: под формой оставались панель
+/// вкладок и кнопка «+», которой можно было начать вторую запись поверх
+/// незаконченной первой.
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = RouterNotifier(ref);
   ref.onDispose(notifier.dispose);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
     refreshListenable: notifier,
     redirect: notifier.redirect,
     routes: [
       // Splash
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
@@ -117,21 +127,25 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Onboarding routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingWelcomeScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/onboarding/farm-name',
         name: 'onboarding-farm-name',
         builder: (context, state) => const OnboardingFarmNameScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/onboarding/farm-type',
         name: 'onboarding-farm-type',
         builder: (context, state) => const OnboardingFarmTypeScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/onboarding/ready',
         name: 'onboarding-ready',
         builder: (context, state) => const OnboardingReadyScreen(),
@@ -139,16 +153,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Auth routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/join',
         name: 'join-farm',
         builder: (context, state) => const JoinFarmScreen(),
@@ -156,12 +173,14 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Root redirect
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/',
         redirect: (context, state) => '/today',
       ),
 
       // Main shell route with bottom navigation
       ShellRoute(
+        navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
           return MainNavigationScreen(
             currentPath: state.uri.path,
@@ -208,11 +227,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Rabbit detail and form routes (outside shell)
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/rabbits/new',
         name: 'rabbit-new',
         builder: (context, state) => const RabbitFormScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/rabbits/:id',
         name: 'rabbit-detail',
         builder: (context, state) {
@@ -221,6 +242,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/rabbits/:id/edit',
         name: 'rabbit-edit',
         builder: (context, state) {
@@ -233,6 +255,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/rabbits/:id/pedigree',
         name: 'rabbit-pedigree',
         builder: (context, state) {
@@ -247,11 +270,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Breeds routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeds',
         name: 'breeds',
         builder: (context, state) => const BreedsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeds/form',
         name: 'breed-form',
         builder: (context, state) {
@@ -262,16 +287,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Breeding routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeding/planner',
         name: 'breeding-planner',
         builder: (context, state) => const BreedingPlannerScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeding',
         name: 'breeding-list',
         builder: (context, state) => const BreedingListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeding/new',
         name: 'breeding-new',
         builder: (context, state) {
@@ -280,6 +308,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeding/:id',
         name: 'breeding-detail',
         builder: (context, state) {
@@ -288,6 +317,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/breeding/:id/edit',
         name: 'breeding-edit',
         builder: (context, state) {
@@ -302,11 +332,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Births routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/births',
         name: 'births',
         builder: (context, state) => const BirthsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/births/new',
         name: 'birth-new',
         builder: (context, state) {
@@ -321,11 +353,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Vaccinations routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/vaccinations',
         name: 'vaccinations',
         builder: (context, state) => const VaccinationsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/vaccinations/form',
         name: 'vaccination-form',
         builder: (context, state) {
@@ -336,11 +370,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Cages routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/cages',
         name: 'cages',
         builder: (context, state) => const CagesListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/cages/form',
         name: 'cage-form',
         builder: (context, state) {
@@ -349,6 +385,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/cages/:id',
         name: 'cage-detail',
         builder: (context, state) {
@@ -359,11 +396,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Medical Records routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/medical-records',
         name: 'medical-records',
         builder: (context, state) => const MedicalRecordsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/medical-records/form',
         name: 'medical-record-form',
         builder: (context, state) {
@@ -374,11 +413,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Feeds routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeds',
         name: 'feeds',
         builder: (context, state) => const FeedsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeds/form',
         name: 'feed-form',
         builder: (context, state) {
@@ -387,6 +428,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeds/statistics',
         name: 'feed-statistics',
         builder: (context, state) => const FeedStatisticsScreen(),
@@ -394,11 +436,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Feeding Records routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeding-records',
         name: 'feeding-records',
         builder: (context, state) => const FeedingRecordsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeding-records/form',
         name: 'feeding-record-form',
         builder: (context, state) {
@@ -407,6 +451,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/feeding-records/statistics',
         name: 'feeding-record-statistics',
         builder: (context, state) => const FeedingStatisticsScreen(),
@@ -414,11 +459,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Transactions routes
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/transactions',
         name: 'transactions',
         builder: (context, state) => const TransactionsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/transactions/form',
         name: 'transaction-form',
         builder: (context, state) {
@@ -427,6 +474,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/transactions/statistics',
         name: 'transaction-statistics',
         builder: (context, state) => const TransactionStatisticsScreen(),
@@ -434,6 +482,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Task form route (outside shell)
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/tasks/form',
         name: 'task-form',
         builder: (context, state) {
@@ -444,11 +493,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Settings screen
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/staff',
         name: 'staff',
         builder: (context, state) => const StaffScreen(),

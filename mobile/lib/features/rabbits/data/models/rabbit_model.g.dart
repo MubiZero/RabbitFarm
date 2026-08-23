@@ -14,18 +14,18 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
   name: json['name'] as String,
   breedId: const IntConverter().fromJson(json['breed_id'] as Object),
   sex: json['sex'] as String,
-  birthDate: const DateTimeConverter().fromJson(json['birth_date'] as Object),
+  birthDate: const DateOnlyConverter().fromJson(json['birth_date'] as Object),
   color: json['color'] as String?,
   cageId: const NullableIntConverter().fromJson(json['cage_id']),
   fatherId: const NullableIntConverter().fromJson(json['father_id']),
   motherId: const NullableIntConverter().fromJson(json['mother_id']),
   status: json['status'] as String,
   purpose: json['purpose'] as String,
-  acquiredDate: const NullableDateTimeConverter().fromJson(
+  acquiredDate: const NullableDateOnlyConverter().fromJson(
     json['acquired_date'],
   ),
-  soldDate: const NullableDateTimeConverter().fromJson(json['sold_date']),
-  deathDate: const NullableDateTimeConverter().fromJson(json['death_date']),
+  soldDate: const NullableDateOnlyConverter().fromJson(json['sold_date']),
+  deathDate: const NullableDateOnlyConverter().fromJson(json['death_date']),
   deathReason: json['death_reason'] as String?,
   currentWeight: (json['current_weight'] as num?)?.toDouble(),
   temperament: json['temperament'] as String?,
@@ -33,9 +33,9 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
   photoUrl: json['photo_url'] as String?,
   createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
   updatedAt: const DateTimeConverter().fromJson(json['updated_at'] as Object),
-  breed: json['Breed'] == null
+  breed: json['breed'] == null
       ? null
-      : BreedModel.fromJson(json['Breed'] as Map<String, dynamic>),
+      : BreedModel.fromJson(json['breed'] as Map<String, dynamic>),
   cage: json['Cage'] == null
       ? null
       : CageInfo.fromJson(json['Cage'] as Map<String, dynamic>),
@@ -55,18 +55,18 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'name': instance.name,
   'breed_id': const IntConverter().toJson(instance.breedId),
   'sex': instance.sex,
-  'birth_date': const DateTimeConverter().toJson(instance.birthDate),
+  'birth_date': const DateOnlyConverter().toJson(instance.birthDate),
   'color': instance.color,
   'cage_id': const NullableIntConverter().toJson(instance.cageId),
   'father_id': const NullableIntConverter().toJson(instance.fatherId),
   'mother_id': const NullableIntConverter().toJson(instance.motherId),
   'status': instance.status,
   'purpose': instance.purpose,
-  'acquired_date': const NullableDateTimeConverter().toJson(
+  'acquired_date': const NullableDateOnlyConverter().toJson(
     instance.acquiredDate,
   ),
-  'sold_date': const NullableDateTimeConverter().toJson(instance.soldDate),
-  'death_date': const NullableDateTimeConverter().toJson(instance.deathDate),
+  'sold_date': const NullableDateOnlyConverter().toJson(instance.soldDate),
+  'death_date': const NullableDateOnlyConverter().toJson(instance.deathDate),
   'death_reason': instance.deathReason,
   'current_weight': instance.currentWeight,
   'temperament': instance.temperament,
@@ -74,7 +74,7 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'photo_url': instance.photoUrl,
   'created_at': const DateTimeConverter().toJson(instance.createdAt),
   'updated_at': const DateTimeConverter().toJson(instance.updatedAt),
-  'Breed': instance.breed,
+  'breed': instance.breed,
   'Cage': instance.cage,
   'father': instance.father,
   'mother': instance.mother,

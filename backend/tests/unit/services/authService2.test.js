@@ -43,7 +43,7 @@ jest.mock('../../../src/utils/password', () => ({
   compare: jest.fn()
 }));
 
-const { User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../../../src/models');
+const { User, RefreshToken, TokenBlacklist } = require('../../../src/models');
 const PasswordUtil = require('../../../src/utils/password');
 const authService = require('../../../src/services/authService');
 
@@ -164,7 +164,7 @@ describe('AuthService - extended methods', () => {
   });
 
   describe('changePassword', () => {
-    const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+    const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
     beforeEach(() => {
       User.sequelize.transaction.mockResolvedValue(mockTx);

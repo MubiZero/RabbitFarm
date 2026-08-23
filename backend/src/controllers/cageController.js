@@ -1,6 +1,5 @@
 const cageService = require('../services/cageService');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
 
 /**
  * Cage controller

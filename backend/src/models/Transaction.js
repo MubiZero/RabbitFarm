@@ -41,6 +41,16 @@ module.exports = (sequelize) => {
     created_by: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    // Расход, созданный автоматически, принадлежит своей записи: по этой
+    // ссылке его находят, когда стоимость меняют, и удаляют вместе с ней.
+    medical_record_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    vaccination_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'transactions',
@@ -52,7 +62,10 @@ module.exports = (sequelize) => {
       { fields: ['type'] },
       { fields: ['category'] },
       { fields: ['transaction_date'] },
-      { fields: ['rabbit_id'] }
+      { fields: ['rabbit_id'] },
+      { fields: ['created_by'] },
+      { fields: ['medical_record_id'] },
+      { fields: ['vaccination_id'] }
     ]
   });
 };

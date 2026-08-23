@@ -4,7 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;
@@ -30,7 +30,7 @@ class AuthRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
@@ -47,7 +47,7 @@ class AuthRepository {
 
       return authResponse;
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка входа');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -72,7 +72,7 @@ class AuthRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
@@ -89,7 +89,7 @@ class AuthRepository {
 
       return authResponse;
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка регистрации');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -113,7 +113,7 @@ class AuthRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
@@ -129,7 +129,7 @@ class AuthRepository {
 
       return authResponse;
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось присоединиться к ферме');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -144,7 +144,7 @@ class AuthRepository {
     );
 
     if (!apiResponse.success || apiResponse.data == null) {
-      throw Exception(apiResponse.message);
+      throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
     }
 
     return UserModel.fromJson(apiResponse.data!);
@@ -153,7 +153,13 @@ class AuthRepository {
   // Logout
   Future<void> logout() async {
     try {
-      await _apiClient.logout();
+      // Сервер гасит именно тот refresh-токен, который ему передали. Раньше
+      // запрос уходил с пустым телом, возвращал 422, ошибка глушилась — и
+      // серверная сессия жила ещё семь дней после «Выйти».
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      await _apiClient.logout(refreshToken: refreshToken);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
       // Ignore logout errors
     } finally {

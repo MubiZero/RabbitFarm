@@ -38,7 +38,7 @@ until npm run migrate; do
 done
 
 if [ "${RUN_SEEDS:-false}" = "true" ]; then
-  echo "Заполняем справочники (RUN_SEEDS=true)..."
+  echo "Заливаем демо-данные для разработки (RUN_SEEDS=true)..."
   npm run seed
 fi
 

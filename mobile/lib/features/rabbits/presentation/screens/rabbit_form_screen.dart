@@ -8,21 +8,21 @@ import 'package:image_picker/image_picker.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
-import '../widgets/parent_selector.dart';
+import '../widgets/rabbit_picker.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../utils/rabbit_labels.dart';
+import '../../../../core/l10n/error_text.dart';
+import '../../../../core/widgets/app_form_scaffold.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
   final RabbitModel? rabbit;
 
-  const RabbitFormScreen({
-    super.key,
-    this.rabbitId,
-    this.rabbit,
-  });
+  const RabbitFormScreen({super.key, this.rabbitId, this.rabbit});
 
   @override
   ConsumerState<RabbitFormScreen> createState() => _RabbitFormScreenState();
@@ -40,11 +40,16 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   int? _selectedBreedId;
   int? _selectedFatherId;
   int? _selectedMotherId;
+  RabbitModel? _father;
+  RabbitModel? _mother;
+  String? _fatherLabel;
+  String? _motherLabel;
   String _selectedSex = 'male';
   String _selectedStatus = 'healthy';
   String _selectedPurpose = 'breeding';
   DateTime _birthDate = DateTime.now().subtract(const Duration(days: 60));
   bool _isLoading = false;
+  bool _touched = false;
   XFile? _selectedImage;
   String? _currentPhotoUrl;
   Uint8List? _webImageBytes;
@@ -57,8 +62,16 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     } else if (widget.rabbitId != null) {
       Future.microtask(() => _loadRabbitFromProvider());
     } else {
-      _tagIdController.text = 'R-${DateTime.now().millisecondsSinceEpoch}';
+      _tagIdController.text = _suggestedTag();
     }
+  }
+
+  /// Номер бирки человек пишет на ушной бирке от руки, поэтому он должен быть
+  /// коротким. Раньше подставлялась метка времени вида «R-1787510574403»:
+  /// переписать её на бирку невозможно, и её оставляли как есть.
+  String _suggestedTag() {
+    final next = ref.read(rabbitsListProvider).total + 1;
+    return 'R-${next.toString().padLeft(3, '0')}';
   }
 
   Future<void> _loadRabbitFromProvider() async {
@@ -74,7 +87,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Ошибка загрузки: ${e.toString().replaceAll('Exception: ', '')}'),
+              '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -91,6 +105,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     _selectedBreedId = rabbit.breedId;
     _selectedFatherId = rabbit.fatherId;
     _selectedMotherId = rabbit.motherId;
+    _fatherLabel = rabbit.father?.name;
+    _motherLabel = rabbit.mother?.name;
     _selectedSex = rabbit.sex;
     _selectedStatus = rabbit.status;
     _selectedPurpose = rabbit.purpose;
@@ -129,7 +145,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ошибка выбора фото: ${e.toString()}'),
+            content: Text(context.l10n.rabbitFormPhotoFailed),
             backgroundColor: AppColors.error,
           ),
         );
@@ -157,7 +173,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ошибка фото с камеры: ${e.toString()}'),
+            content: Text(context.l10n.rabbitFormPhotoFailed),
             backgroundColor: AppColors.error,
           ),
         );
@@ -182,7 +198,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Выбрать из галереи'),
+                title: Text(context.l10n.rabbitFormPhotoGallery),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromGallery();
@@ -190,7 +206,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_camera),
-                title: const Text('Сделать фото'),
+                title: Text(context.l10n.rabbitFormPhotoCamera),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromCamera();
@@ -199,8 +215,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
               if (_selectedImage != null || _currentPhotoUrl != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: AppColors.error),
-                  title: const Text('Удалить фото',
-                      style: TextStyle(color: AppColors.error)),
+                  title: Text(
+                    context.l10n.rabbitFormPhotoRemove,
+                    style: TextStyle(color: AppColors.error),
+                  ),
                   onTap: () {
                     Navigator.of(context).pop();
                     _removeSelectedImage();
@@ -227,8 +245,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         'birth_date': _birthDate.toIso8601String(),
         'status': _selectedStatus,
         'purpose': _selectedPurpose,
-        if (_selectedFatherId != null) 'father_id': _selectedFatherId,
-        if (_selectedMotherId != null) 'mother_id': _selectedMotherId,
+        // Ключи отправляются всегда, включая null: раньше убранный родитель
+        // просто не попадал в запрос, и сервер оставлял прежнего.
+        'father_id': _selectedFatherId,
+        'mother_id': _selectedMotherId,
         if (_colorController.text.isNotEmpty)
           'color': _colorController.text.trim(),
         if (_weightController.text.isNotEmpty)
@@ -244,14 +264,17 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         rabbitId = widget.rabbitId ?? widget.rabbit!.id;
         await ref.read(rabbitsRepositoryProvider).updateRabbit(rabbitId, data);
       } else {
-        final createdRabbit =
-            await ref.read(rabbitsRepositoryProvider).createRabbit(data);
+        final createdRabbit = await ref
+            .read(rabbitsRepositoryProvider)
+            .createRabbit(data);
         rabbitId = createdRabbit.id;
       }
 
       if (_selectedImage != null) {
         try {
-          await ref.read(rabbitsRepositoryProvider).uploadPhoto(
+          await ref
+              .read(rabbitsRepositoryProvider)
+              .uploadPhoto(
                 rabbitId,
                 _selectedImage!.path,
                 bytes: _webImageBytes,
@@ -260,8 +283,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    'Предупреждение: ${e.toString().replaceAll('Exception: ', '')}'),
+                content: Text(context.l10n.rabbitFormPhotoFailed),
                 backgroundColor: AppColors.warning,
               ),
             );
@@ -284,7 +306,11 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditMode ? 'Данные обновлены' : 'Кролик добавлен'),
+            content: Text(
+              isEditMode
+                  ? context.l10n.rabbitFormUpdated
+                  : context.l10n.rabbitFormCreated,
+            ),
           ),
         );
         context.pop();
@@ -293,7 +319,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+            content: Text(errorText(context.l10n, e)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -310,282 +336,330 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     final isEditMode = widget.rabbitId != null || widget.rabbit != null;
     final displayPhotoUrl = ImageUrlHelper.getFullImageUrl(_currentPhotoUrl);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditMode ? 'Редактировать' : 'Добавить кролика'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          children: [
-            // Photo section
-            Center(
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: _showImageSourceDialog,
-                    child: Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: cs.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: cs.outline, width: 2),
+    // Единственная форма, которая собирает экран сама, а не через
+    // AppFormScaffold: заполненные поля пропадали по кнопке «назад» без
+    // единого вопроса.
+    return PopScope(
+      canPop: !_touched && !_isLoading,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop || _isLoading) return;
+        if (await confirmDiscardChanges(context) && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            isEditMode
+                ? context.l10n.rabbitFormEditTitle
+                : context.l10n.rabbitFormNewTitle,
+          ),
+        ),
+        body: Form(
+          key: _formKey,
+          onChanged: () => setState(() => _touched = true),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            children: [
+              // Photo section
+              Center(
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: _showImageSourceDialog,
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          color: cs.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: cs.outline, width: 2),
+                        ),
+                        child: _selectedImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: kIsWeb
+                                    ? (_webImageBytes != null
+                                          ? Image.memory(
+                                              _webImageBytes!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Icon(
+                                              Icons.image,
+                                              size: 60,
+                                              color: cs.onSurfaceVariant,
+                                            ))
+                                    : Image.file(
+                                        File(_selectedImage!.path),
+                                        fit: BoxFit.cover,
+                                      ),
+                              )
+                            : displayPhotoUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  displayPhotoUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.pets,
+                                      size: 60,
+                                      color: cs.onSurfaceVariant,
+                                    );
+                                  },
+                                ),
+                              )
+                            : Icon(
+                                Icons.add_a_photo,
+                                size: 60,
+                                color: cs.onSurfaceVariant,
+                              ),
                       ),
-                      child: _selectedImage != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: kIsWeb
-                                  ? (_webImageBytes != null
-                                      ? Image.memory(_webImageBytes!,
-                                          fit: BoxFit.cover)
-                                      : Icon(Icons.image,
-                                          size: 60,
-                                          color: cs.onSurfaceVariant))
-                                  : Image.file(File(_selectedImage!.path),
-                                      fit: BoxFit.cover),
-                            )
-                          : displayPhotoUrl != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    displayPhotoUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.pets,
-                                          size: 60,
-                                          color: cs.onSurfaceVariant);
-                                    },
-                                  ),
-                                )
-                              : Icon(Icons.add_a_photo,
-                                  size: 60, color: cs.onSurfaceVariant),
                     ),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: _showImageSourceDialog,
+                      icon: const Icon(Icons.camera_alt),
+                      label: Text(
+                        _selectedImage != null || displayPhotoUrl != null
+                            ? context.l10n.rabbitFormPhotoChange
+                            : context.l10n.rabbitFormPhotoAdd,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              AppFormSection(
+                title: context.l10n.commonSectionMain,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormName,
+                      hintText: context.l10n.rabbitFormNameHint,
+                      prefixIcon: Icon(Icons.pets),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return context.l10n.rabbitFormNameEmpty;
+                      }
+                      return null;
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: _showImageSourceDialog,
-                    icon: const Icon(Icons.camera_alt),
-                    label: Text(
-                      _selectedImage != null || displayPhotoUrl != null
-                          ? 'Изменить фото'
-                          : 'Добавить фото',
+                  TextFormField(
+                    controller: _tagIdController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormTag,
+                      hintText: 'R-XXX',
+                      prefixIcon: Icon(Icons.tag),
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return context.l10n.rabbitFormTagEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                  if (breedsState.isLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  else if (breedsState.error != null)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        context.l10n.rabbitFormBreedsFailed,
+                        style: TextStyle(color: cs.error),
+                      ),
+                    )
+                  else
+                    DropdownButtonFormField<int>(
+                      initialValue: _selectedBreedId,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.rabbitBreed,
+                        prefixIcon: Icon(Icons.category),
+                      ),
+                      items: breedsState.breeds.map((breed) {
+                        return DropdownMenuItem(
+                          value: breed.id,
+                          child: Text(breed.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) =>
+                          setState(() => _selectedBreedId = value),
+                      validator: (value) => value == null
+                          ? context.l10n.rabbitFormBreedRequired
+                          : null,
+                    ),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedSex,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitSex,
+                      prefixIcon: Icon(Icons.wc),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'male',
+                        child: Text(context.l10n.sexMale),
+                      ),
+                      DropdownMenuItem(
+                        value: 'female',
+                        child: Text(context.l10n.sexFemale),
+                      ),
+                    ],
+                    onChanged: (value) => setState(() => _selectedSex = value!),
+                  ),
+                  AppDateField(
+                    label: context.l10n.rabbitBirthDate,
+                    value: _birthDate,
+                    onChanged: (date) => setState(() => _birthDate = date),
+                    prefixIcon: Icons.cake,
+                    lastDate: DateTime.now(),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
 
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Кличка *',
-                    hintText: 'Введите кличку',
-                    prefixIcon: Icon(Icons.pets),
+              AppFormSection(
+                title: context.l10n.rabbitPedigree,
+                children: [
+                  // Родитель выбирается поиском по серверу: прежний виджет
+                  // предлагал только тех кроликов, что успели подгрузиться в
+                  // постраничный список.
+                  RabbitPickerField(
+                    label: context.l10n.rabbitFather,
+                    icon: Icons.male,
+                    sex: 'male',
+                    selected: _father,
+                    selectedLabel: _fatherLabel,
+                    excludeId: widget.rabbitId ?? widget.rabbit?.id,
+                    onChanged: (rabbit) => setState(() {
+                      _father = rabbit;
+                      _fatherLabel = null;
+                      _selectedFatherId = rabbit?.id;
+                    }),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите кличку';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _tagIdController,
-                  decoration: const InputDecoration(
-                    labelText: 'Номер бирки *',
-                    hintText: 'R-XXX',
-                    prefixIcon: Icon(Icons.tag),
+                  RabbitPickerField(
+                    label: context.l10n.rabbitMother,
+                    icon: Icons.female,
+                    sex: 'female',
+                    selected: _mother,
+                    selectedLabel: _motherLabel,
+                    excludeId: widget.rabbitId ?? widget.rabbit?.id,
+                    onChanged: (rabbit) => setState(() {
+                      _mother = rabbit;
+                      _motherLabel = null;
+                      _selectedMotherId = rabbit?.id;
+                    }),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите номер бирки';
-                    }
-                    return null;
-                  },
-                ),
-                if (breedsState.isLoading)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
+                ],
+              ),
+
+              AppFormSection(
+                title: context.l10n.commonSectionDetails,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedStatus,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitStatus,
+                      prefixIcon: Icon(Icons.info_outline),
                     ),
-                  )
-                else if (breedsState.error != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Ошибка загрузки пород: ${breedsState.error}',
-                      style: TextStyle(color: cs.error),
-                    ),
-                  )
-                else
-                  DropdownButtonFormField<int>(
-                    initialValue: _selectedBreedId,
-                    decoration: const InputDecoration(
-                      labelText: 'Порода *',
-                      prefixIcon: Icon(Icons.category),
-                    ),
-                    items: breedsState.breeds.map((breed) {
-                      return DropdownMenuItem(
-                        value: breed.id,
-                        child: Text(breed.name),
-                      );
-                    }).toList(),
+                    items: [
+                      for (final status in rabbitStatuses)
+                        DropdownMenuItem(
+                          value: status,
+                          child: Text(rabbitStatusLabel(context, status)),
+                        ),
+                    ],
                     onChanged: (value) =>
-                        setState(() => _selectedBreedId = value),
-                    validator: (value) =>
-                        value == null ? 'Выберите породу' : null,
+                        setState(() => _selectedStatus = value!),
                   ),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedSex,
-                  decoration: const InputDecoration(
-                    labelText: 'Пол *',
-                    prefixIcon: Icon(Icons.wc),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedPurpose,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitPurpose,
+                      prefixIcon: Icon(Icons.flag_outlined),
+                    ),
+                    items: [
+                      for (final purpose in rabbitPurposes)
+                        DropdownMenuItem(
+                          value: purpose,
+                          child: Text(rabbitPurposeLabel(context, purpose)),
+                        ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _selectedPurpose = value!),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'male', child: Text('Самец')),
-                    DropdownMenuItem(value: 'female', child: Text('Самка')),
-                  ],
-                  onChanged: (value) =>
-                      setState(() => _selectedSex = value!),
-                ),
-                AppDateField(
-                  label: 'Дата рождения *',
-                  value: _birthDate,
-                  onChanged: (date) => setState(() => _birthDate = date),
-                  prefixIcon: Icons.cake,
-                  lastDate: DateTime.now(),
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Родословная',
-              children: [
-                ParentSelector(
-                  label: 'Отец',
-                  sex: 'male',
-                  selectedParentId: _selectedFatherId,
-                  excludeRabbitId: widget.rabbitId ?? widget.rabbit?.id,
-                  onChanged: (value) =>
-                      setState(() => _selectedFatherId = value),
-                ),
-                ParentSelector(
-                  label: 'Мать',
-                  sex: 'female',
-                  selectedParentId: _selectedMotherId,
-                  excludeRabbitId: widget.rabbitId ?? widget.rabbit?.id,
-                  onChanged: (value) =>
-                      setState(() => _selectedMotherId = value),
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Дополнительно',
-              children: [
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedStatus,
-                  decoration: const InputDecoration(
-                    labelText: 'Статус *',
-                    prefixIcon: Icon(Icons.info_outline),
+                  TextFormField(
+                    controller: _colorController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormColor,
+                      hintText: context.l10n.rabbitFormColorHint,
+                      prefixIcon: Icon(Icons.palette_outlined),
+                    ),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'healthy', child: Text('Здоров')),
-                    DropdownMenuItem(value: 'sick', child: Text('Болен')),
-                    DropdownMenuItem(
-                        value: 'quarantine', child: Text('Карантин')),
-                    DropdownMenuItem(
-                        value: 'pregnant', child: Text('Беременна')),
-                    DropdownMenuItem(value: 'sold', child: Text('Продан')),
-                    DropdownMenuItem(value: 'dead', child: Text('Умер')),
-                  ],
-                  onChanged: (value) =>
-                      setState(() => _selectedStatus = value!),
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedPurpose,
-                  decoration: const InputDecoration(
-                    labelText: 'Назначение *',
-                    prefixIcon: Icon(Icons.flag_outlined),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                        value: 'breeding', child: Text('Разведение')),
-                    DropdownMenuItem(value: 'meat', child: Text('Мясо')),
-                    DropdownMenuItem(value: 'sale', child: Text('Продажа')),
-                    DropdownMenuItem(value: 'show', child: Text('Выставка')),
-                  ],
-                  onChanged: (value) =>
-                      setState(() => _selectedPurpose = value!),
-                ),
-                TextFormField(
-                  controller: _colorController,
-                  decoration: const InputDecoration(
-                    labelText: 'Окрас',
-                    hintText: 'Серый, белый, черный...',
-                    prefixIcon: Icon(Icons.palette_outlined),
-                  ),
-                ),
-                TextFormField(
-                  controller: _weightController,
-                  decoration: const InputDecoration(
-                    labelText: 'Вес (кг)',
-                    hintText: '0.0',
-                    prefixIcon: Icon(Icons.monitor_weight_outlined),
-                    suffixText: 'кг',
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      if (double.tryParse(value) == null) {
-                        return 'Введите корректное число';
+                  TextFormField(
+                    controller: _weightController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormWeight,
+                      hintText: '0.0',
+                      prefixIcon: Icon(Icons.monitor_weight_outlined),
+                      suffixText: 'кг',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        if (double.tryParse(value) == null) {
+                          return context.l10n.commonNumberInvalid;
+                        }
                       }
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Заметки',
-              children: [
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Заметки',
-                    hintText: 'Дополнительная информация',
-                    prefixIcon: Icon(Icons.notes),
+                      return null;
+                    },
                   ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+
+              AppFormSection(
+                title: context.l10n.rabbitFormNotes,
+                children: [
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormNotes,
+                      hintText: context.l10n.rabbitFormNotesHint,
+                      prefixIcon: Icon(Icons.notes),
+                    ),
+                    maxLines: 3,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _handleSubmit,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(isEditMode ? 'Сохранить изменения' : 'Добавить кролика'),
+        bottomNavigationBar: BottomAppBar(
+          elevation: 0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleSubmit,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        isEditMode
+                            ? context.l10n.commonSave
+                            : context.l10n.commonAdd,
+                      ),
+              ),
             ),
           ),
         ),

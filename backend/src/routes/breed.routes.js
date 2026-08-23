@@ -2,6 +2,12 @@ const express = require('express');
 const router = express.Router();
 const breedController = require('../controllers/breedController');
 const { authenticate, authorize } = require('../middleware/auth');
+const validate = require('../middleware/validation');
+const {
+  createBreedSchema,
+  updateBreedSchema,
+  listBreedsQuerySchema
+} = require('../validators/breedValidator');
 
 /**
  * @swagger
@@ -80,7 +86,7 @@ router.use(authenticate);
  * @desc    Get list of all breeds
  * @access  Private
  */
-router.get('/', breedController.list);
+router.get('/', validate(listBreedsQuerySchema, 'query'), breedController.list);
 
 /**
  * @route   GET /api/v1/breeds/:id
@@ -97,6 +103,7 @@ router.get('/:id', breedController.getById);
 router.post(
   '/',
   authorize(['manager', 'owner']),
+  validate(createBreedSchema),
   breedController.create
 );
 
@@ -108,6 +115,7 @@ router.post(
 router.put(
   '/:id',
   authorize(['manager', 'owner']),
+  validate(updateBreedSchema),
   breedController.update
 );
 

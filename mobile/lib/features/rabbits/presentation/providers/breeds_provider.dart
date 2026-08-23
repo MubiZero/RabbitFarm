@@ -6,7 +6,7 @@ import '../../data/repositories/breeds_repository.dart';
 class BreedsState {
   final List<BreedModel> breeds;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final String searchQuery;
 
   BreedsState({
@@ -19,7 +19,7 @@ class BreedsState {
   BreedsState copyWith({
     List<BreedModel>? breeds,
     bool? isLoading,
-    String? error,
+    Object? error,
     String? searchQuery,
   }) {
     return BreedsState(

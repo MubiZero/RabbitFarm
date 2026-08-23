@@ -39,8 +39,8 @@ class TransactionService {
 
       // If selling a rabbit, mark it as sold (skip if already in terminal state)
       if (rabbit && type === 'income' &&
-        (category?.toLowerCase() === 'sale' || category?.toLowerCase() === 'продажа')) {
-        if (rabbit.status !== 'sold' && rabbit.status !== 'died') {
+        category?.startsWith('sale_')) {
+        if (rabbit.status !== 'sold' && rabbit.status !== 'dead') {
           await rabbit.update({ status: 'sold', cage_id: null }, { transaction: t });
         }
       }
@@ -115,15 +115,7 @@ class TransactionService {
       distinct: true
     });
 
-    return {
-      transactions: rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit)
-      }
-    };
+    return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
   async updateTransaction(id, userId, data) {

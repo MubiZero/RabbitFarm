@@ -5,6 +5,7 @@ import '../../../../shared/models/api_response.dart';
 import '../models/rabbit_model.dart';
 import '../models/rabbit_statistics.dart';
 import '../models/rabbit_weight_model.dart';
+import '../../../../core/api/api_failure.dart';
 
 class RabbitsRepository {
   final ApiClient _apiClient;
@@ -36,7 +37,7 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final paginatedData = apiResponse.data!;
@@ -76,7 +77,7 @@ class RabbitsRepository {
         totalPages: totalPages,
       );
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки списка кроликов');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -91,12 +92,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки данных кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -111,12 +112,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка создания кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -131,12 +132,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка обновления данных кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -145,7 +146,7 @@ class RabbitsRepository {
     try {
       await _apiClient.deleteRabbit(id);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка удаления кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -160,12 +161,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitStatistics.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки статистики');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -180,14 +181,14 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!
           .map((item) => RabbitWeight.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки истории взвешиваний');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -202,12 +203,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitWeight.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка добавления записи о весе');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -222,12 +223,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки фото');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -242,12 +243,12 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка удаления фото');
+      throw ApiFailure.from(e);
     }
   }
 }

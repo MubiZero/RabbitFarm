@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
-import '../../../../core/api/api_error.dart';
 import '../models/staff_models.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Работники фермы и приглашения.
 class StaffRepository {
@@ -18,7 +18,7 @@ class StaffRepository {
           .map((json) => FarmMember.fromJson(json as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить состав фермы');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -31,7 +31,7 @@ class StaffRepository {
           .map((json) => FarmInvitation.fromJson(json as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить приглашения');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -47,7 +47,7 @@ class StaffRepository {
       });
       return CreatedInvitation.fromJson(response.data['data']);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось создать приглашение');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -55,7 +55,7 @@ class StaffRepository {
     try {
       await _apiClient.delete('/staff/invitations/$id');
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось отозвать приглашение');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -72,7 +72,7 @@ class StaffRepository {
       });
       return FarmMember.fromJson(response.data['data']);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось изменить доступ');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -82,7 +82,7 @@ class StaffRepository {
       final response = await _apiClient.post('/staff/$id/reset-password');
       return response.data['data']['temporary_password'] as String;
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось сбросить пароль');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -100,7 +100,7 @@ class StaffRepository {
       });
       return response.data['data'] as Map<String, dynamic>;
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось присоединиться к ферме');
+      throw ApiFailure.from(e);
     }
   }
 }

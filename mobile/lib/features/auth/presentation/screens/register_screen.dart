@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -33,6 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _handleRegister() async {
+    final l10n = context.l10n;
     if (_formKey.currentState!.validate()) {
       try {
         await ref.read(authProvider.notifier).register(
@@ -49,22 +53,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
-          String message = e.toString().replaceAll('Exception: ', '');
+          String message = errorText(l10n, e);
           bool userExists = false;
 
           if (e is DioException) {
-            message = serverMessage(e) ?? e.message ?? 'Произошла ошибка';
+            message = serverMessage(e) ?? e.message ?? context.l10n.registerFailed;
             userExists = serverErrorCode(e) == 'USER_EXISTS';
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(message),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               duration: Duration(seconds: userExists ? 6 : 4),
               action: userExists
                   ? SnackBarAction(
-                      label: 'Войти',
+                      label: context.l10n.loginSubmit,
                       textColor: Colors.white,
                       onPressed: () => context.go('/login'),
                     )
@@ -82,7 +86,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Регистрация'),
+        title: Text(context.l10n.registerTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
@@ -106,8 +110,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Title
                 Text(
-                  'Создать аккаунт',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  context.l10n.registerTitle,
+                  style: AppTypography.displayMd
+                      .copyWith(color: context.colors.onSurface),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  context.l10n.registerSubtitle,
+                  style: AppTypography.bodyMd
+                      .copyWith(color: context.colors.onSurfaceVariant),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -115,17 +127,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 // Full name field
                 TextFormField(
                   controller: _fullNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Полное имя',
-                    hintText: 'Введите ФИО',
-                    prefixIcon: Icon(Icons.person),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.registerFullName,
+                    hintText: context.l10n.registerFullNameHint,
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите ФИО';
+                      return context.l10n.registerFullNameEmpty;
                     }
                     if (value.length < 3) {
-                      return 'ФИО должно быть не менее 3 символов';
+                      return context.l10n.registerFullNameShort;
                     }
                     return null;
                   },
@@ -136,17 +148,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Введите email',
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.loginEmailLabel,
+                    hintText: context.l10n.loginEmailHint,
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите email';
+                      return context.l10n.registerEmailEmpty;
                     }
                     if (!value.contains('@')) {
-                      return 'Введите корректный email';
+                      return context.l10n.registerEmailInvalid;
                     }
                     return null;
                   },
@@ -157,10 +169,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Телефон (опционально)',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.registerPhone,
                     hintText: '+7 (XXX) XXX-XX-XX',
-                    prefixIcon: Icon(Icons.phone),
+                    prefixIcon: const Icon(Icons.phone),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -170,8 +182,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: 'Пароль',
-                    hintText: 'Введите пароль',
+                    labelText: context.l10n.loginPasswordLabel,
+                    hintText: context.l10n.registerPasswordHint,
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -188,10 +200,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите пароль';
+                      return context.l10n.registerPasswordEmpty;
                     }
                     if (value.length < 6) {
-                      return 'Пароль должен быть не менее 6 символов';
+                      return context.l10n.registerPasswordShort;
                     }
                     return null;
                   },
@@ -203,8 +215,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
                   decoration: InputDecoration(
-                    labelText: 'Подтвердите пароль',
-                    hintText: 'Введите пароль еще раз',
+                    labelText: context.l10n.registerPasswordRepeat,
+                    hintText: context.l10n.registerPasswordRepeatEmpty,
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -221,10 +233,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Подтвердите пароль';
+                      return context.l10n.registerPasswordRepeatEmpty;
                     }
                     if (value != _passwordController.text) {
-                      return 'Пароли не совпадают';
+                      return context.l10n.registerPasswordMismatch;
                     }
                     return null;
                   },
@@ -244,7 +256,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text('Зарегистрироваться'),
+                      : Text(context.l10n.registerSubmit),
                 ),
                 const SizedBox(height: 16),
 
@@ -252,12 +264,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Уже есть аккаунт? '),
+                    Text('${context.l10n.registerHaveAccount} '),
                     TextButton(
                       onPressed: authState.isLoading
                           ? null
                           : () => context.go('/login'),
-                      child: const Text('Войти'),
+                      child: Text(context.l10n.loginSubmit),
                     ),
                   ],
                 ),

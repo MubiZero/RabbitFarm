@@ -56,8 +56,9 @@ const errorHandler = (err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return ApiResponse.badRequest(res, 'Файл слишком большой');
     }
-    // Текст multer-ошибки английский и технический; подробности уже в логе.
-    return ApiResponse.badRequest(res, 'Не удалось загрузить файл');
+    // Текст самого multer английский и технический, поэтому наружу идёт либо
+    // наше объяснение (userMessage), либо общая фраза; подробности — в логе.
+    return ApiResponse.badRequest(res, err.userMessage || 'Не удалось загрузить файл');
   }
 
   // Custom application errors

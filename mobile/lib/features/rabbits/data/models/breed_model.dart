@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
 
 part 'breed_model.freezed.dart';
@@ -14,8 +15,8 @@ class BreedModel with _$BreedModel {
     @JsonKey(name: 'average_litter_size') @IntConverter() int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
   }) = _BreedModel;
 
   factory BreedModel.fromJson(Map<String, dynamic> json) =>

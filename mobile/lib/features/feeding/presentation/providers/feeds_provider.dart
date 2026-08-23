@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/feed_model.dart';
 import '../../data/repositories/feeds_repository.dart';
 
 /// Provider for FeedsRepository
 final feedsRepositoryProvider = Provider<FeedsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return FeedsRepository(apiClient);
 });
@@ -13,9 +15,17 @@ final feedsRepositoryProvider = Provider<FeedsRepository>((ref) {
 class FeedsState {
   final List<Feed> feeds;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool hasMore;
   final int currentPage;
+
+  /// Выбранный тип корма и режим «только на исходе».
+  ///
+  /// Фильтры живут в состоянии, а не в экране: раньше обновление жестом и
+  /// подгрузка следующей страницы вызывали загрузку без них, и список
+  /// незаметно смешивался с кормами других типов.
+  final FeedType? type;
+  final bool lowStockOnly;
 
   const FeedsState({
     this.feeds = const [],
@@ -23,21 +33,34 @@ class FeedsState {
     this.error,
     this.hasMore = true,
     this.currentPage = 1,
+    this.type,
+    this.lowStockOnly = false,
   });
+
+  bool get hasFilters => type != null || lowStockOnly;
 
   FeedsState copyWith({
     List<Feed>? feeds,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? hasMore,
     int? currentPage,
+    FeedType? type,
+    bool clearType = false,
+    bool? lowStockOnly,
   }) {
+    // clearError передаёт сюда null, а «?? this.error» его игнорировал —
+    // сообщение об ошибке залипало в состоянии до перезапуска приложения,
+    // переживая любые успешные загрузки. В остальных фичах принято
+    // присваивать error напрямую; приводим к тому же виду.
     return FeedsState(
       feeds: feeds ?? this.feeds,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: error,
       hasMore: hasMore ?? this.hasMore,
       currentPage: currentPage ?? this.currentPage,
+      type: clearType ? null : (type ?? this.type),
+      lowStockOnly: lowStockOnly ?? this.lowStockOnly,
     );
   }
 }
@@ -54,14 +77,16 @@ class FeedsNotifier extends StateNotifier<FeedsState> {
     int? limit,
     String? sortBy,
     String? sortOrder,
-    FeedType? type,
-    bool? lowStockOnly,
     bool refresh = false,
   }) async {
     if (state.isLoading) return;
 
     if (refresh) {
-      state = const FeedsState(isLoading: true);
+      state = FeedsState(
+        isLoading: true,
+        type: state.type,
+        lowStockOnly: state.lowStockOnly,
+      );
     } else {
       state = state.copyWith(isLoading: true, error: null);
     }
@@ -72,8 +97,8 @@ class FeedsNotifier extends StateNotifier<FeedsState> {
         limit: limit,
         sortBy: sortBy,
         sortOrder: sortOrder,
-        type: type?.name,
-        lowStock: lowStockOnly,
+        type: state.type?.name,
+        lowStock: state.lowStockOnly ? true : null,
       );
 
       if (refresh) {
@@ -82,6 +107,8 @@ class FeedsNotifier extends StateNotifier<FeedsState> {
           isLoading: false,
           hasMore: feeds.length >= (limit ?? 10),
           currentPage: page ?? 1,
+          type: state.type,
+          lowStockOnly: state.lowStockOnly,
         );
       } else {
         state = state.copyWith(
@@ -130,6 +157,48 @@ class FeedsNotifier extends StateNotifier<FeedsState> {
   void removeFeed(int feedId) {
     final updatedFeeds = state.feeds.where((f) => f.id != feedId).toList();
     state = state.copyWith(feeds: updatedFeeds);
+  }
+
+  /// Задать фильтры и перезагрузить список.
+  Future<void> setFilters({FeedType? type, bool? lowStockOnly}) async {
+    state = state.copyWith(
+      type: type,
+      clearType: type == null,
+      lowStockOnly: lowStockOnly ?? state.lowStockOnly,
+    );
+    await loadFeeds(refresh: true);
+  }
+
+  Future<void> clearFilters() async {
+    state = state.copyWith(clearType: true, lowStockOnly: false);
+    await loadFeeds(refresh: true);
+  }
+
+  /// Изменить остаток на складе.
+  ///
+  /// Возвращает текст ошибки или `null` при успехе. Раньше экран запускал
+  /// запрос через `ref.read` одноразового провайдера и сразу сообщал об
+  /// успехе, не дожидаясь ответа: сообщение появлялось даже когда сервер
+  /// отказывал, а число на складе не менялось.
+  Future<Object?> adjustStock(int feedId, StockAdjustment adjustment) async {
+    try {
+      final feed = await _repository.adjustStock(feedId, adjustment);
+      updateFeed(feed);
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  /// Удалить корм со склада.
+  Future<Object?> deleteFeed(int feedId) async {
+    try {
+      await _repository.deleteFeed(feedId);
+      removeFeed(feedId);
+      return null;
+    } catch (e) {
+      return e;
+    }
   }
 
   /// Clear error
@@ -214,4 +283,14 @@ final feedsByTypeProvider = Provider.autoDispose.family<List<Feed>, FeedType?>((
 /// Provider for checking if feed has low stock
 final feedHasLowStockProvider = Provider.autoDispose.family<bool, Feed>((ref, feed) {
   return feed.currentStock <= feed.minStock;
+});
+
+/// Полный список кормов для выпадающих полей в формах.
+///
+/// Обычный список склада постраничный, и форма кормления показывала только
+/// первую страницу: корм, заведённый одиннадцатым, выбрать было нельзя.
+/// Видов корма на ферме десятки, а не тысячи, поэтому здесь берётся всё сразу.
+final feedOptionsProvider = FutureProvider<List<Feed>>((ref) async {
+  final repository = ref.watch(feedsRepositoryProvider);
+  return repository.getFeeds(limit: 200);
 });

@@ -43,23 +43,13 @@ const { deleteFile } = require('../../../src/utils/fileHelper');
 const rabbitService = require('../../../src/services/rabbitService');
 
 describe('RabbitService - uncovered lines', () => {
-  const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+  const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
   beforeEach(() => {
     jest.resetAllMocks();
     sequelize.transaction.mockResolvedValue(mockTx);
   });
 
-  // Helper: setup successful createRabbit defaults
-  function setupCreateDefaults(overrides = {}) {
-    Breed.findByPk.mockResolvedValue({ id: 1, name: 'Rex' });
-    Rabbit.create.mockResolvedValue({ id: 10 });
-    Rabbit.findOne.mockResolvedValue({ id: 10, name: 'Test' }); // for getRabbitById
-    Object.entries(overrides).forEach(([key, val]) => {
-      if (key === 'cageFindOne') Cage.findOne.mockResolvedValue(val);
-      if (key === 'rabbitCount') Rabbit.count.mockResolvedValue(val);
-    });
-  }
 
   // ========== createRabbit uncovered branches ==========
   describe('createRabbit', () => {
@@ -216,10 +206,6 @@ describe('RabbitService - uncovered lines', () => {
       update: jest.fn().mockResolvedValue(true)
     };
 
-    function setupUpdateDefaults() {
-      // findOne for rabbit lookup
-      Rabbit.findOne.mockResolvedValueOnce({ ...baseRabbit, update: jest.fn().mockResolvedValue(true) });
-    }
 
     it('should throw RABBIT_NOT_FOUND when rabbit does not exist', async () => {
       Rabbit.findOne.mockResolvedValueOnce(null);
@@ -259,7 +245,7 @@ describe('RabbitService - uncovered lines', () => {
       Rabbit.count.mockResolvedValueOnce(0); // offspring
       Breeding.count.mockResolvedValueOnce(0); // breedings
 
-      const result = await rabbitService.updateRabbit(1, 1, { sex: 'female' });
+      await rabbitService.updateRabbit(1, 1, { sex: 'female' });
 
       expect(mockUpdate).toHaveBeenCalledWith({ sex: 'female' }, { transaction: mockTx });
       expect(mockTx.commit).toHaveBeenCalled();
@@ -682,10 +668,10 @@ describe('RabbitService - uncovered lines', () => {
   // ========== getPedigree ==========
   describe('getPedigree', () => {
     it('should build pedigree tree with parents', async () => {
-      const grandFather = { id: 3, name: 'GrandPa', sex: 'male', tag_id: 'G1', birth_date: '2020-01-01', Breed: { name: 'Rex' }, father_id: null, mother_id: null };
-      const grandMother = { id: 4, name: 'GrandMa', sex: 'female', tag_id: 'G2', birth_date: '2020-02-01', Breed: { name: 'Rex' }, father_id: null, mother_id: null };
-      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: '2021-01-01', Breed: { name: 'Rex' }, father_id: 3, mother_id: 4 };
-      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: '2022-01-01', Breed: { name: 'Rex' }, father_id: 2, mother_id: null };
+      const grandFather = { id: 3, name: 'GrandPa', sex: 'male', tag_id: 'G1', birth_date: '2020-01-01', breed: { name: 'Rex' }, father_id: null, mother_id: null };
+      const grandMother = { id: 4, name: 'GrandMa', sex: 'female', tag_id: 'G2', birth_date: '2020-02-01', breed: { name: 'Rex' }, father_id: null, mother_id: null };
+      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: '2021-01-01', breed: { name: 'Rex' }, father_id: 3, mother_id: 4 };
+      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: '2022-01-01', breed: { name: 'Rex' }, father_id: 2, mother_id: null };
 
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit)       // getRabbitById(1) - initial
@@ -706,7 +692,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should use default name when rabbit has no name', async () => {
-      const rabbit = { id: 1, name: null, sex: 'male', tag_id: null, birth_date: null, Breed: null, father_id: null, mother_id: null };
+      const rabbit = { id: 1, name: null, sex: 'male', tag_id: null, birth_date: null, breed: null, father_id: null, mother_id: null };
       Rabbit.findOne.mockResolvedValueOnce(rabbit);
 
       const result = await rabbitService.getPedigree(1, 1, 3);
@@ -718,8 +704,8 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should stop at generation limit', async () => {
-      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: null, Breed: null, father_id: 3, mother_id: null };
-      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, Breed: null, father_id: 2, mother_id: null };
+      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: null, breed: null, father_id: 3, mother_id: null };
+      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, breed: null, father_id: 2, mother_id: null };
 
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit)  // getRabbitById(1)
@@ -734,7 +720,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should handle father not found gracefully (catch block)', async () => {
-      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, Breed: null, father_id: 99, mother_id: null };
+      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, breed: null, father_id: 99, mother_id: null };
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit) // getRabbitById(1) - initial
         .mockResolvedValueOnce(null);  // getRabbitById(99) - father not found -> throws RABBIT_NOT_FOUND
@@ -746,7 +732,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should handle mother not found gracefully (catch block)', async () => {
-      const rabbit = { id: 1, name: 'Bunny', sex: 'female', tag_id: 'R1', birth_date: null, Breed: null, father_id: null, mother_id: 88 };
+      const rabbit = { id: 1, name: 'Bunny', sex: 'female', tag_id: 'R1', birth_date: null, breed: null, father_id: null, mother_id: 88 };
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit) // getRabbitById(1)
         .mockResolvedValueOnce(null);  // getRabbitById(88) - mother not found
@@ -765,9 +751,9 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should build pedigree with both father and mother', async () => {
-      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: null, Breed: { name: 'Rex' }, father_id: null, mother_id: null };
-      const mother = { id: 3, name: 'Mom', sex: 'female', tag_id: 'M1', birth_date: null, Breed: { name: 'Angora' }, father_id: null, mother_id: null };
-      const rabbit = { id: 1, name: 'Baby', sex: 'female', tag_id: 'B1', birth_date: '2023-01-01', Breed: { name: 'Rex' }, father_id: 2, mother_id: 3 };
+      const father = { id: 2, name: 'Dad', sex: 'male', tag_id: 'F1', birth_date: null, breed: { name: 'Rex' }, father_id: null, mother_id: null };
+      const mother = { id: 3, name: 'Mom', sex: 'female', tag_id: 'M1', birth_date: null, breed: { name: 'Angora' }, father_id: null, mother_id: null };
+      const rabbit = { id: 1, name: 'Baby', sex: 'female', tag_id: 'B1', birth_date: '2023-01-01', breed: { name: 'Rex' }, father_id: 2, mother_id: 3 };
 
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit)
@@ -783,18 +769,15 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should handle generations=1 (no parents fetched)', async () => {
-      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, Breed: null, father_id: 2, mother_id: 3 };
+      const rabbit = { id: 1, name: 'Bunny', sex: 'male', tag_id: 'R1', birth_date: null, breed: null, father_id: 2, mother_id: 3 };
       Rabbit.findOne.mockResolvedValueOnce(rabbit);
 
-      // With generations=1, level 0 < 1 so we build result, but father/mother would be level 1 >= 1
-      // Actually level 0 < 1 so we enter buildPedigree, but then fetching father at level+1=1 >= 1 returns currentRabbit
+      // Родители остаются за границей глубины: их не раскрываем.
       const result = await rabbitService.getPedigree(1, 1, 1);
 
-      // At level 0, we build result. father_id exists so we fetch father.
-      // But buildPedigree(father, 1) with 1 >= 1 returns the father rabbit as-is
-      // Actually wait - let me re-check: if level >= generations return currentRabbit
-      // So father at level 1 would be returned as the raw rabbit object, not the pedigree format
       expect(result.id).toBe(1);
+      expect(result.name).toBe('Bunny');
+      expect(result.breed).toBeNull();
     });
   });
 });

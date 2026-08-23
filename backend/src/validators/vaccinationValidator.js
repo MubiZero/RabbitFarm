@@ -64,6 +64,19 @@ const createVaccinationSchema = Joi.object({
       'string.max': 'Имя ветеринара должно быть максимум 255 символов'
     }),
 
+  // Колонка cost есть в модели и в миграции 20260305000001, но в схеме её не
+  // было: stripUnknown молча выбрасывал стоимость, и расход не создавался.
+  cost: Joi.number()
+    .precision(2)
+    .min(0)
+    .optional()
+    .allow(null)
+    .messages({
+      'number.base': 'Стоимость должна быть числом',
+      'number.min': 'Стоимость не может быть отрицательной',
+      'number.precision': 'Стоимость может иметь до 2 знаков после запятой'
+    }),
+
   notes: Joi.string()
     .optional()
     .allow(null, '')
@@ -121,6 +134,19 @@ const updateVaccinationSchema = Joi.object({
     .allow(null, '')
     .messages({
       'string.max': 'Имя ветеринара должно быть максимум 255 символов'
+    }),
+
+  // Колонка cost есть в модели и в миграции 20260305000001, но в схеме её не
+  // было: stripUnknown молча выбрасывал стоимость, и расход не создавался.
+  cost: Joi.number()
+    .precision(2)
+    .min(0)
+    .optional()
+    .allow(null)
+    .messages({
+      'number.base': 'Стоимость должна быть числом',
+      'number.min': 'Стоимость не может быть отрицательной',
+      'number.precision': 'Стоимость может иметь до 2 знаков после запятой'
     }),
 
   notes: Joi.string()

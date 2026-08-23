@@ -8,7 +8,6 @@ const { syncTestDb, closeTestDb } = require('./helpers/testDb');
  */
 describe('Приглашения в ферму', () => {
   let ownerToken;
-  let ownerId;
   let breedId;
 
   beforeAll(async () => {
@@ -18,7 +17,6 @@ describe('Приглашения в ферму', () => {
       .post('/api/v1/auth/register')
       .send({ email: 'inv_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
     ownerToken = owner.body.data.access_token;
-    ownerId = owner.body.data.user.id;
 
     const breed = await request(app)
       .post('/api/v1/breeds')
@@ -224,5 +222,27 @@ describe('Приглашения в ферму', () => {
       .send({ email: 'someone@example.com', role: 'worker' });
 
     expect(res.status).toBe(403);
+  });
+
+  // Регрессия: контроллер отдавал урезанного пользователя (без is_active и
+  // временных меток), и клиент падал на разборе ответа до сохранения токенов —
+  // войти по приглашению было невозможно вообще.
+  it('в ответе приходит полный профиль пользователя', async () => {
+    const invite = await request(app)
+      .post('/api/v1/staff/invitations')
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({ email: 'full_payload@example.com', role: 'worker' });
+
+    const accepted = await request(app)
+      .post('/api/v1/auth/accept-invitation')
+      .send({ code: invite.body.data.code, password: 'Password123!', full_name: 'Полный Профиль' });
+
+    expect(accepted.status).toBe(201);
+
+    const user = accepted.body.data.user;
+    for (const field of ['id', 'email', 'full_name', 'role', 'is_active', 'created_at', 'updated_at']) {
+      expect(user[field]).toBeDefined();
+    }
+    expect(user.password_hash).toBeUndefined();
   });
 });

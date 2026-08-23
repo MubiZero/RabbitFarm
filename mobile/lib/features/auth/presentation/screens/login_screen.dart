@@ -1,10 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dio/dio.dart';
+
+import '../../../../core/theme/theme.dart';
 import '../providers/auth_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -17,246 +19,175 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordFocus = FocusNode();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await ref.read(authProvider.notifier).login(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            );
+    final l10n = context.l10n;
+    if (!_formKey.currentState!.validate()) return;
 
-        if (mounted) {
-          context.go('/');
-        }
-      } catch (e) {
-        if (mounted) {
-          String message = e.toString().replaceAll('Exception: ', '');
-          if (e is DioException) {
-            message = e.message ?? 'Произошла ошибка';
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: AppColors.error,
-            ),
+    try {
+      await ref.read(authProvider.notifier).login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
           );
-        }
-      }
+      if (mounted) context.go('/');
+    } catch (e) {
+      if (!mounted) return;
+      final message = e is DioException
+          ? (e.message ?? context.l10n.loginFailed)
+          : errorText(l10n, e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: AppColors.error),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final busy = authState.isLoading;
 
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo
-                  Center(
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.xxl,
+            ),
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: context.colors.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child:
+                            Icon(Icons.pets, size: 36, color: context.accent),
                       ),
-                      child: Icon(
-                        Icons.pets,
-                        size: 36,
-                        color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      context.l10n.appName,
+                      style: AppTypography.displayMd
+                          .copyWith(color: context.colors.onSurface),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      context.l10n.loginSubtitle,
+                      style: AppTypography.bodyMd
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xxl),
+
+                    // Кнопок «Войти через Google» и «Войти через Apple» здесь
+                    // больше нет: они ничего не делали. Нерабочая кнопка на
+                    // экране входа подрывает доверие ко всему остальному
+                    // приложению сильнее, чем её отсутствие.
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const [AutofillHints.username],
+                      autocorrect: false,
+                      enabled: !busy,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.loginEmailLabel,
+                        hintText: context.l10n.loginEmailHint,
+                        prefixIcon: const Icon(Icons.alternate_email),
                       ),
+                      onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+                      validator: (value) {
+                        final email = value?.trim() ?? '';
+                        if (email.isEmpty) return context.l10n.loginEmailEmpty;
+                        if (!email.contains('@') || !email.contains('.')) {
+                          return context.l10n.loginEmailInvalid;
+                        }
+                        return null;
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Title
-                  Text(
-                    'RabbitFarm',
-                    style: AppTypography.displayMd.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Subtitle
-                  Text(
-                    'Войдите в свой аккаунт',
-                    style: AppTypography.bodyMd.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Google button (UI only)
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: implement Google Sign-In
-                    },
-                    icon: const Icon(Icons.g_mobiledata, size: 22),
-                    label: const Text('Войти через Google'),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Apple button (UI only)
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: implement Apple Sign-In
-                    },
-                    icon: const Icon(Icons.apple, size: 22),
-                    label: const Text('Войти через Apple'),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Divider
-                  Row(
-                    children: [
-                      const Expanded(child: Divider()),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'или',
-                          style: AppTypography.labelSm.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    const SizedBox(height: AppSpacing.lg),
+                    TextFormField(
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      obscureText: _obscurePassword,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [AutofillHints.password],
+                      enabled: !busy,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.loginPasswordLabel,
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          tooltip: _obscurePassword
+                              ? context.l10n.loginPasswordShow
+                              : context.l10n.loginPasswordHide,
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
                           ),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
-                      const Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Email field
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: AppTypography.bodyMd,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'Введите email',
-                      prefixIcon: Icon(Icons.email_outlined),
+                      onFieldSubmitted: (_) => _handleLogin(),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? context.l10n.loginPasswordEmpty
+                          : null,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Введите email';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Введите корректный email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Password field
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    style: AppTypography.bodyMd,
-                    decoration: InputDecoration(
-                      labelText: 'Пароль',
-                      hintText: 'Введите пароль',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Введите пароль';
-                      }
-                      if (value.length < 6) {
-                        return 'Пароль должен быть не менее 6 символов';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Login button
-                  ElevatedButton(
-                    onPressed: authState.isLoading ? null : _handleLogin,
-                    child: authState.isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).colorScheme.onPrimary,
+                    const SizedBox(height: AppSpacing.xl),
+                    FilledButton(
+                      onPressed: busy ? null : _handleLogin,
+                      child: busy
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
                               ),
-                            ),
-                          )
-                        : const Text('Войти'),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Вступление по приглашению — основной путь для сотрудников:
-                  // регистрация на ферме закрыта, аккаунт выдаёт владелец.
-                  TextButton(
-                    onPressed: authState.isLoading
-                        ? null
-                        : () => context.go('/join'),
-                    child: const Text('У меня есть код приглашения'),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Забыли пароль? Его сбрасывает владелец фермы — '
-                    'письма сервис не отправляет.',
-                    textAlign: TextAlign.center,
-                    style: AppTypography.labelSm.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            )
+                          : Text(context.l10n.loginSubmit),
                     ),
-                  ),
-                  const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.lg),
 
-                  // Register link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Нет аккаунта? ',
-                        style: AppTypography.bodyMd.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: authState.isLoading
-                            ? null
-                            : () => context.go('/register'),
-                        child: const Text('Зарегистрироваться'),
-                      ),
-                    ],
-                  ),
-                ],
+                    // Вступление по приглашению — основной путь для сотрудников:
+                    // регистрация на ферме закрыта, аккаунт выдаёт владелец.
+                    TextButton(
+                      onPressed: busy ? null : () => context.go('/join'),
+                      child: Text(context.l10n.loginHasInvite),
+                    ),
+                    TextButton(
+                      onPressed: busy ? null : () => context.go('/register'),
+                      child: Text(context.l10n.loginCreateFarm),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      context.l10n.loginForgotPassword,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.labelSm
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

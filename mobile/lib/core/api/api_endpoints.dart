@@ -21,6 +21,8 @@ class ApiEndpoints {
   // iOS simulator: http://localhost:4567/api/v1
 
   // Health check
+  // Проверка живости отвечает в корне сервера, вне версии API, поэтому
+  // склеивать её с baseUrl нельзя — получался /api/v1/health и 404.
   static const String health = '/health';
 
   // Auth endpoints
@@ -29,6 +31,9 @@ class ApiEndpoints {
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
   static const String profile = '/auth/me';
+  // Чтение и запись профиля живут на разных маршрутах: PUT /auth/me на
+  // сервере нет, и запрос уходил в 404.
+  static const String updateProfile = '/auth/profile';
   static const String changePassword = '/auth/change-password';
 
   // Rabbits endpoints

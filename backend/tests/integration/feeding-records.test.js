@@ -76,7 +76,8 @@ describe('Feeding Records API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data).toHaveProperty('rows');
+      expect(res.body.data).toHaveProperty('items');
+      expect(res.body.data).toHaveProperty('pagination');
     });
 
     it('должен фильтровать по feed_id', async () => {

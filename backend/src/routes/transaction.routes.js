@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const transactionController = require('../controllers/transactionController');
-const { createTransactionSchema, updateTransactionSchema } = require('../validators/transactionValidator');
-const { authenticate } = require('../middleware/auth');
+const { createTransactionSchema, updateTransactionSchema, listTransactionsQuerySchema } = require('../validators/transactionValidator');
+const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -105,15 +105,20 @@ const validate = require('../middleware/validation');
 // Apply authentication to all routes
 router.use(authenticate);
 
+// Деньги фермы — не часть ежедневной работы. Записывать корма и лечение
+// работник должен, а видеть выручку, закупочные цены и баланс хозяйства —
+// нет: права на запись у него и не было, но читать книгу мог любой.
+const ledgerAccess = authorize(['manager']);
+
 // Statistics and special queries (before :id routes)
-router.get('/statistics', transactionController.getStatistics);
-router.get('/monthly-report', transactionController.getMonthlyReport);
+router.get('/statistics', ledgerAccess, transactionController.getStatistics);
+router.get('/monthly-report', ledgerAccess, transactionController.getMonthlyReport);
 
 // CRUD routes
-router.post('/', validate(createTransactionSchema), transactionController.create);
-router.get('/', transactionController.list);
-router.get('/:id', transactionController.getById);
-router.put('/:id', validate(updateTransactionSchema), transactionController.update);
-router.delete('/:id', transactionController.delete);
+router.post('/', authorize(['manager', 'owner']), validate(createTransactionSchema), transactionController.create);
+router.get('/', ledgerAccess, validate(listTransactionsQuerySchema, 'query'), transactionController.list);
+router.get('/:id', ledgerAccess, transactionController.getById);
+router.put('/:id', authorize(['manager', 'owner']), validate(updateTransactionSchema), transactionController.update);
+router.delete('/:id', authorize(['owner']), transactionController.delete);
 
 module.exports = router;

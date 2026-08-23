@@ -15,7 +15,6 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
 
   # State management
   flutter_riverpod: ^2.4.9
@@ -59,6 +58,11 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  # Строки интерфейса лежат в lib/l10n/*.arb; flutter gen-l10n собирает
+  # из них AppLocalizations. Русские окончания («1 задача» / «5 задач»)
+  # считает ICU-плюрал, а не собственная таблица.
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

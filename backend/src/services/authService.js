@@ -20,7 +20,7 @@ class AuthService {
    * @param {Object} transaction - необязательная транзакция
    */
   async issueTokens(user, transaction = null) {
-    const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role });
+    const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
     const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
 
     const expiresAt = new Date();
@@ -71,7 +71,7 @@ class AuthService {
       }, { transaction });
 
       // Generate tokens
-      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role });
+      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
       const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
 
       // Save refresh token
@@ -110,25 +110,29 @@ class AuthService {
    */
   async login(email, password) {
     try {
-      // Find user
       const user = await User.findOne({ where: { email } });
+
+      // Порядок проверок важен. Раньше отключённый аккаунт отвечал отдельным
+      // 403 ещё до сверки пароля, то есть любой желающий мог узнать, какие
+      // адреса заведены на ферме. Теперь про отключение узнаёт только тот,
+      // кто уже назвал верный пароль, а для неизвестного адреса тратится
+      // столько же времени, сколько на настоящую проверку.
       if (!user) {
+        await PasswordUtil.fakeCompare(password);
         throw new Error('INVALID_CREDENTIALS');
       }
 
-      // Check if user is active
-      if (!user.is_active) {
-        throw new Error('USER_INACTIVE');
-      }
-
-      // Verify password
       const isPasswordValid = await PasswordUtil.compare(password, user.password_hash);
       if (!isPasswordValid) {
         throw new Error('INVALID_CREDENTIALS');
       }
 
+      if (!user.is_active) {
+        throw new Error('USER_INACTIVE');
+      }
+
       // Generate tokens
-      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role });
+      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
       const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
 
       // Save refresh token
@@ -168,7 +172,7 @@ class AuthService {
   async refreshAccessToken(refreshToken) {
     try {
       // Verify refresh token
-      const decoded = JWTUtil.verifyRefreshToken(refreshToken);
+      JWTUtil.verifyRefreshToken(refreshToken);
 
       // Find refresh token in database
       const tokenRecord = await RefreshToken.findOne({
@@ -195,7 +199,8 @@ class AuthService {
       const accessToken = JWTUtil.generateAccessToken({
         id: tokenRecord.User.id,
         email: tokenRecord.User.email,
-        role: tokenRecord.User.role
+        role: tokenRecord.User.role,
+        tv: tokenRecord.User.token_version || 0
       });
 
       // Generate new refresh token
@@ -333,8 +338,13 @@ class AuthService {
       // Hash new password
       const newPasswordHash = await PasswordUtil.hash(newPassword);
 
-      // Update password
-      await user.update({ password_hash: newPasswordHash }, { transaction });
+      // Отметка времени отзывает и уже выданные access-токены: без неё они
+      // жили бы до конца своего срока, хотя пользователю сказано
+      // «войдите заново».
+      await user.update({
+        password_hash: newPasswordHash,
+        token_version: (user.token_version || 0) + 1
+      }, { transaction });
 
       // Invalidate all refresh tokens (force re-login on all devices)
       await RefreshToken.destroy({
@@ -405,7 +415,7 @@ class AuthService {
 
       const resetRecord = await PasswordResetToken.findOne({
         where: { token_hash: tokenHash },
-        include: [{ model: User, attributes: ['id', 'email', 'is_active'] }],
+        include: [{ model: User, attributes: ['id', 'email', 'is_active', 'token_version'] }],
         transaction
       });
 
@@ -425,7 +435,7 @@ class AuthService {
       const newPasswordHash = await PasswordUtil.hash(newPassword);
 
       await User.update(
-        { password_hash: newPasswordHash },
+        { password_hash: newPasswordHash, token_version: (resetRecord.User.token_version || 0) + 1 },
         { where: { id: resetRecord.User.id }, transaction }
       );
 

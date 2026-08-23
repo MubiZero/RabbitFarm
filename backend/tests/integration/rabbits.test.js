@@ -136,4 +136,101 @@ describe('Rabbits API', () => {
       expect(rabbitRes.status).toBe(404);
     });
   });
+
+  describe('вложенная порода в ответе', () => {
+    // Регрессия: клиент читал породу по ключу 'Breed', а Sequelize отдаёт её
+    // под алиасом связи 'breed' — порода не показывалась ни на одном экране.
+    it('кролик отдаётся вместе с породой под ключом breed', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'С породой', breed_id: breedId, sex: 'female', birth_date: '2023-05-05' });
+
+      const res = await request(app)
+        .get(`/api/v1/rabbits/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.breed).toBeDefined();
+      expect(res.body.data.breed.name).toBe('Серый великан');
+      expect(res.body.data.Breed).toBeUndefined();
+    });
+
+    it('родословная отдаёт название породы', async () => {
+      const rabbit = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Потомок', breed_id: breedId, sex: 'male', birth_date: '2024-01-01' });
+
+      const res = await request(app)
+        .get(`/api/v1/rabbits/${rabbit.body.data.id}/pedigree`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.breed).toBe('Серый великан');
+    });
+  });
+
+  describe('история веса', () => {
+    // Регрессия: сравнение с прежним весом стояло после update, когда объект
+    // уже хранил новое значение, — правка веса в карточке не попадала в
+    // историю, и в графике роста оставались дыры.
+    it('правка веса в карточке добавляет точку в историю', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Растущий',
+          breed_id: breedId,
+          sex: 'male',
+          birth_date: '2024-02-01',
+          current_weight: 2.0
+        });
+      const rabbitId = created.body.data.id;
+
+      const before = await request(app)
+        .get(`/api/v1/rabbits/${rabbitId}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const countBefore = (before.body.data.items || before.body.data).length;
+
+      await request(app)
+        .put(`/api/v1/rabbits/${rabbitId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ current_weight: 2.6 });
+
+      const after = await request(app)
+        .get(`/api/v1/rabbits/${rabbitId}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const items = after.body.data.items || after.body.data;
+
+      expect(items.length).toBe(countBefore + 1);
+      expect(items.map((w) => parseFloat(w.weight))).toContain(2.6);
+    });
+
+    it('правка без изменения веса истории не плодит', async () => {
+      const created = await request(app)
+        .post('/api/v1/rabbits')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          name: 'Стабильный',
+          breed_id: breedId,
+          sex: 'male',
+          birth_date: '2024-02-01',
+          current_weight: 3.0
+        });
+
+      await request(app)
+        .put(`/api/v1/rabbits/${created.body.data.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ current_weight: 3.0, notes: 'просто заметка' });
+
+      const after = await request(app)
+        .get(`/api/v1/rabbits/${created.body.data.id}/weights`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      const items = after.body.data.items || after.body.data;
+
+      // Только точка, созданная вместе с карточкой.
+      expect(items.length).toBe(1);
+    });
+  });
 });

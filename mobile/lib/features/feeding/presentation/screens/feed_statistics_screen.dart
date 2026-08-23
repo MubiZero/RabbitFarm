@@ -5,15 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_utils.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/metric_bar.dart';
-import '../../../../core/widgets/skeleton.dart';
-import '../../../../core/widgets/stat_tile.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
 import '../utils/feed_labels.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Аналитика склада кормов: состав запаса, его стоимость и что заканчивается.
 class FeedStatisticsScreen extends ConsumerWidget {
@@ -24,7 +20,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
     final statsAsync = ref.watch(feedStatisticsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Аналитика склада')),
+      appBar: AppBar(title: Text(context.l10n.feedStatsTitle)),
       body: statsAsync.when(
         loading: () => const _FeedStatisticsSkeleton(),
         error: (error, _) => AppErrorState(
@@ -44,10 +40,9 @@ class FeedStatisticsScreen extends ConsumerWidget {
     if (stats.totalFeeds == 0) {
       return AppEmptyState(
         icon: Icons.inventory_2_outlined,
-        title: 'Склад пока пуст',
-        subtitle: 'Добавьте корма — здесь появится состав запаса, '
-            'его стоимость и предупреждения об остатках.',
-        actionLabel: 'Добавить корм',
+        title: context.l10n.feedStatsEmptyTitle,
+        subtitle: context.l10n.feedStatsEmptyBody,
+        actionLabel: context.l10n.feedsAdd,
         onAction: () => context.push('/feeds/form'),
       );
     }
@@ -76,7 +71,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
               Expanded(
                 child: StatTile(
                   icon: Icons.inventory_2_outlined,
-                  label: 'Позиций на складе',
+                  label: context.l10n.feedStatsPositions,
                   value: '${stats.totalFeeds}',
                   accent: AppColors.accentOcean,
                 ),
@@ -85,7 +80,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
               Expanded(
                 child: StatTile(
                   icon: Icons.warning_amber_rounded,
-                  label: 'Заканчивается',
+                  label: context.l10n.feedStatsLow,
                   value: '${stats.lowStockCount}',
                   accent: hasLowStock ? AppColors.warning : AppColors.success,
                 ),
@@ -107,7 +102,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Стоимость запаса',
+                        context.l10n.feedStatsValue,
                         style: AppTypography.labelSm.copyWith(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant,
@@ -128,7 +123,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
           ),
           if (presentTypes.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _SectionTitle('Состав по типам'),
+            AppGroupLabel(context.l10n.feedStatsByType),
             const SizedBox(height: 12),
             AppCard(
               child: Column(
@@ -146,7 +141,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: 24),
-          _SectionTitle('Остатки на исходе'),
+          AppGroupLabel(context.l10n.feedStatsLowList),
           const SizedBox(height: 12),
           if (hasLowStock)
             AppCard(
@@ -171,7 +166,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Запасов хватает по всем позициям',
+                      context.l10n.feedStatsAllGood,
                       style: AppTypography.bodyMd.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -186,22 +181,6 @@ class FeedStatisticsScreen extends ConsumerWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: AppTypography.labelSm.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
 
 class _LowStockRow extends StatelessWidget {
   final LowStockItem item;
@@ -253,7 +232,7 @@ class _LowStockRow extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'минимум ${formatQuantity(item.minStock, item.unit)}',
+                context.l10n.feedStatsMinimum(formatQuantity(item.minStock, item.unit)),
                 style: AppTypography.labelSm.copyWith(
                   color: cs.onSurfaceVariant,
                 ),

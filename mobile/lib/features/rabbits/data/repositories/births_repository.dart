@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/birth_model.dart';
 import '../models/rabbit_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Репозиторий для работы с окролами
 class BirthsRepository {
@@ -20,27 +22,25 @@ class BirthsRepository {
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
-        throw Exception('Неверный формат ответа сервера');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       final responseData = response.data as Map<String, dynamic>;
 
       if (responseData['success'] != true) {
-        throw Exception(responseData['message'] ?? 'Ошибка получения окролов');
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: responseData['message'] as String?);
       }
 
-      final data = responseData['data'];
-      if (data == null || data is! List) {
-        throw Exception('Данные окролов отсутствуют или имеют неверный формат');
-      }
-
-      return data
+      return itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения списка окролов');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -55,45 +55,45 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения окрола');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
   /// Получить окролы самки
   Future<List<BirthModel>> getBirthsByMother(int motherId) async {
     try {
-      final response = await _apiClient.dio.get('/rabbits/$motherId/births');
+      final response = await _apiClient.dio.get('/births', queryParameters: {'mother_id': motherId});
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
-        throw Exception('Неверный формат ответа сервера');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       final responseData = response.data as Map<String, dynamic>;
 
       if (responseData['success'] != true) {
-        throw Exception(responseData['message'] ?? 'Ошибка получения окролов');
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: responseData['message'] as String?);
       }
 
-      final data = responseData['data'];
-      if (data == null || data is! List) {
-        throw Exception('Данные окролов отсутствуют или имеют неверный формат');
-      }
-
-      return data
+      return itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения окролов самки');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -111,14 +111,16 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка создания окрола');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка создания окрола: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -136,14 +138,16 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка обновления окрола');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка обновления окрола: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -158,12 +162,14 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка удаления окрола');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка удаления окрола: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -174,7 +180,8 @@ class BirthsRepository {
     required int birthId,
     required int motherId,
     required int? fatherId,
-    required int breedId,
+    // Порода необязательна: сервер берёт её у матери, если не передана.
+    int? breedId,
     required String birthDate,
     required int count,
     String? namePrefix,
@@ -185,7 +192,7 @@ class BirthsRepository {
         data: {
           'mother_id': motherId,
           if (fatherId != null) 'father_id': fatherId,
-          'breed_id': breedId,
+          if (breedId != null) 'breed_id': breedId,
           'birth_date': birthDate,
           'count': count,
           if (namePrefix != null) 'name_prefix': namePrefix,
@@ -194,35 +201,37 @@ class BirthsRepository {
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
-        throw Exception('Неверный формат ответа сервера');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       final responseData = response.data as Map<String, dynamic>;
 
       if (responseData['success'] != true) {
-        throw Exception(responseData['message'] ?? 'Ошибка создания крольчат');
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: responseData['message'] as String?);
       }
 
       final data = responseData['data'];
       if (data == null || data is! List) {
-        throw Exception('Данные крольчат отсутствуют или имеют неверный формат');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       return data
           .map((item) => RabbitModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(
-        serverMessage(e) ?? 'Ошибка создания крольчат',
-      );
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка создания крольчат: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 }
 
 /// Provider для репозитория окролов
 final birthsRepositoryProvider = Provider<BirthsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return BirthsRepository(apiClient: apiClient);
 });

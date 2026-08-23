@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:?задайте DB_PASSWORD в .env}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?задайте DB_ROOT_PASSWORD в .env}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -38,8 +38,12 @@ services:
       - JWT_EXPIRE=15m
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?задайте JWT_REFRESH_SECRET в .env}
       - JWT_REFRESH_EXPIRE=7d
-      - CORS_ORIGIN=*
-      # - RUN_SEEDS=true # Uncomment this to run seeders on first start
+      # Список источников для браузера через запятую. Мобильные клиенты
+      # ходят без Origin и под ограничение не попадают.
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:8080,http://localhost:3000}
+      # Демо-данные для разработки: три учётные записи с общеизвестными
+      # паролями, породы, клетки и корма. В продакшене сидер откажется работать.
+      # - RUN_SEEDS=true
     ports:
       - "4567:4567"
     depends_on:
@@ -49,12 +53,16 @@ services:
       - ./backend/uploads:/app/uploads
       - ./backend/logs:/app/logs
 
+  # Админка базы. Профиль debug: поднимается только явным
+  # `docker compose --profile debug up`, чтобы форма входа в БД не оказалась
+  # доступна всей сети при обычном старте стенда.
   adminer:
     image: adminer
     container_name: rabbitfarm-adminer
-    restart: always
+    restart: unless-stopped
+    profiles: [debug]
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
 
 volumes:
   mysql_data:

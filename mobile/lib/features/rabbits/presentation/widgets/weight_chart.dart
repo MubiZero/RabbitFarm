@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/rabbit_weight_model.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class WeightChart extends StatelessWidget {
   final List<RabbitWeight> weights;
@@ -11,12 +13,13 @@ class WeightChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (weights.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(AppSpacing.xxl),
           child: Text(
-            'Нет данных для отображения',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+            context.l10n.chartNoData,
+            style: AppTypography.bodyLg
+                .copyWith(color: context.colors.onSurfaceVariant),
           ),
         ),
       );
@@ -44,7 +47,7 @@ class WeightChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'График веса',
+              context.l10n.chartWeight,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -58,7 +61,7 @@ class WeightChart extends StatelessWidget {
                     horizontalInterval: weightRange > 0 ? weightRange / 4 : 1,
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: context.colors.outlineVariant,
                         strokeWidth: 1,
                       );
                     },
@@ -71,7 +74,8 @@ class WeightChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             '${value.toStringAsFixed(1)} кг',
-                            style: const TextStyle(fontSize: 10),
+                            style: AppTypography.labelSm
+                                .copyWith(color: context.colors.onSurfaceVariant),
                           );
                         },
                       ),
@@ -90,7 +94,8 @@ class WeightChart extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               DateFormat('dd.MM').format(date),
-                              style: const TextStyle(fontSize: 10),
+                              style: AppTypography.labelSm
+                                .copyWith(color: context.colors.onSurfaceVariant),
                             ),
                           );
                         },
@@ -106,7 +111,7 @@ class WeightChart extends StatelessWidget {
                   borderData: FlBorderData(
                     show: true,
                     border: Border.all(
-                      color: Colors.grey.withValues(alpha: 0.3),
+                      color: context.colors.outline,
                     ),
                   ),
                   minX: 0,

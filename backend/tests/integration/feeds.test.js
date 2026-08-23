@@ -77,8 +77,9 @@ describe('Feeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data).toHaveProperty('rows');
-      expect(Array.isArray(res.body.data.rows)).toBe(true);
+      expect(res.body.data).toHaveProperty('items');
+      expect(res.body.data).toHaveProperty('pagination');
+      expect(Array.isArray(res.body.data.items)).toBe(true);
     });
 
     it('должен применять фильтр по типу', async () => {
@@ -87,7 +88,7 @@ describe('Feeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      res.body.data.rows.forEach(feed => {
+      res.body.data.items.forEach(feed => {
         expect(feed.type).toBe('pellets');
       });
     });
@@ -99,7 +100,7 @@ describe('Feeds API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(Array.isArray(res.body.data.rows)).toBe(true);
+      expect(Array.isArray(res.body.data.items)).toBe(true);
     });
   });
 
@@ -234,6 +235,37 @@ describe('Feeds API', () => {
 
       const res = await request(app)
         .delete(`/api/v1/feeds/${tempFeedId}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('параметры списка проверяются', () => {
+    // Регрессия: sort_by уходил в SQL как есть, и опечатка возвращала общую
+    // пятисотку вместо понятного объяснения, какой параметр неверен.
+    it('неизвестное поле сортировки — понятная ошибка, а не 500', async () => {
+      const res = await request(app)
+        .get('/api/v1/feeds?sort_by=no_such_column')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(422);
+      expect(res.body.error.message).toBeTruthy();
+    });
+
+    // Регрессия: limit не был ограничен ничем — ?limit=500000 поднимал в
+    // память всю таблицу вместе со связями.
+    it('слишком большой лимит отклоняется', async () => {
+      const res = await request(app)
+        .get('/api/v1/feeds?limit=500000')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(res.status).toBe(422);
+    });
+
+    it('разрешённое поле сортировки работает', async () => {
+      const res = await request(app)
+        .get('/api/v1/feeds?sort_by=current_stock&sort_order=asc')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);

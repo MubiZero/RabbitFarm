@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/onboarding_provider.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class OnboardingReadyScreen extends ConsumerWidget {
   const OnboardingReadyScreen({super.key});
@@ -11,9 +12,10 @@ class OnboardingReadyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final onboarding = ref.watch(onboardingProvider).valueOrNull;
-    final farmName = onboarding?.farmName.isNotEmpty == true
-        ? onboarding!.farmName
-        : 'ваша ферма';
+    // Без названия фраза не должна изображать название: «"ваша ферма"
+    // готова к работе!» читалось так, будто ферму действительно так зовут.
+    final farmName =
+        onboarding?.farmName.trim().isNotEmpty == true ? onboarding!.farmName.trim() : null;
 
     return Scaffold(
       body: SafeArea(
@@ -40,7 +42,9 @@ class OnboardingReadyScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                '"$farmName"\nготова к работе!',
+                farmName == null
+                    ? context.l10n.onboardReadyPlain
+                    : context.l10n.onboardReadyNamed(farmName),
                 style: AppTypography.displayMd.copyWith(
                   color: cs.onSurface,
                 ),
@@ -48,7 +52,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Настроим остальное вместе — \nмы покажем как пользоваться приложением',
+                context.l10n.onboardReadyBody,
                 style: AppTypography.bodyLg.copyWith(
                   color: cs.onSurfaceVariant,
                 ),
@@ -60,7 +64,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
                   await ref.read(onboardingProvider.notifier).completeOnboarding();
                   if (context.mounted) context.go('/register');
                 },
-                child: const Text('Зарегистрироваться'),
+                child: Text(context.l10n.onboardRegister),
               ),
               const SizedBox(height: 12),
               TextButton(
@@ -69,7 +73,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
                   if (context.mounted) context.go('/login');
                 },
                 child: Text(
-                  'Уже есть аккаунт? Войти',
+                  context.l10n.onboardHaveAccount,
                   style: AppTypography.labelLg.copyWith(
                     color: cs.onSurfaceVariant,
                   ),

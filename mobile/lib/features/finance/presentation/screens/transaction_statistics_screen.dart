@@ -6,16 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_utils.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/metric_bar.dart';
-import '../../../../core/widgets/skeleton.dart';
-import '../../../../core/widgets/stat_tile.dart';
-import '../../../../core/widgets/stats_period.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/widgets/widgets.dart';
 
 /// Аналитика финансов: доходы, расходы, прибыль и структура по категориям.
 class TransactionStatisticsScreen extends ConsumerStatefulWidget {
@@ -38,7 +33,7 @@ class _TransactionStatisticsScreenState
     final statsAsync = ref.watch(financialStatisticsProvider(_params));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Аналитика финансов')),
+      appBar: AppBar(title: Text(context.l10n.financeStatsTitle)),
       body: Column(
         children: [
           StatsPeriodBar(
@@ -65,10 +60,9 @@ class _TransactionStatisticsScreenState
     if (stats.totalTransactions == 0) {
       return AppEmptyState(
         icon: Icons.query_stats,
-        title: 'За этот период операций не было',
-        subtitle: 'Выберите период шире или добавьте первую операцию — '
-            'аналитика посчитается сама.',
-        actionLabel: 'Добавить операцию',
+        title: context.l10n.financeStatsEmptyTitle,
+        subtitle: context.l10n.financeStatsEmptyBody,
+        actionLabel: context.l10n.financeAdd,
         onAction: () => context.push('/transactions/form'),
       );
     }
@@ -86,7 +80,7 @@ class _TransactionStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.arrow_upward,
-                  label: 'Доходы',
+                  label: context.l10n.financeIncome,
                   value: formatMoney(stats.totalIncome),
                   accent: AppColors.success,
                 ),
@@ -95,7 +89,7 @@ class _TransactionStatisticsScreenState
               Expanded(
                 child: StatTile(
                   icon: Icons.arrow_downward,
-                  label: 'Расходы',
+                  label: context.l10n.financeExpenses,
                   value: formatMoney(stats.totalExpenses),
                   accent: AppColors.error,
                 ),
@@ -120,7 +114,7 @@ class _TransactionStatisticsScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isProfit ? 'Прибыль' : 'Убыток',
+                        isProfit ? context.l10n.financeProfit : context.l10n.financeLoss,
                         style: AppTypography.labelSm.copyWith(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant,
@@ -137,7 +131,7 @@ class _TransactionStatisticsScreenState
                   ),
                 ),
                 Text(
-                  formatOperations(stats.totalTransactions),
+                  context.l10n.countOperations(stats.totalTransactions),
                   style: AppTypography.labelSm.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -148,7 +142,7 @@ class _TransactionStatisticsScreenState
           if (stats.incomeByCategory.isNotEmpty) ...[
             const SizedBox(height: 24),
             _CategoryBreakdown(
-              title: 'Доходы по категориям',
+              title: context.l10n.financeIncomeByCategory,
               categories: stats.incomeByCategory,
               color: AppColors.success,
             ),
@@ -156,14 +150,14 @@ class _TransactionStatisticsScreenState
           if (stats.expensesByCategory.isNotEmpty) ...[
             const SizedBox(height: 24),
             _CategoryBreakdown(
-              title: 'Расходы по категориям',
+              title: context.l10n.financeExpensesByCategory,
               categories: stats.expensesByCategory,
               color: AppColors.error,
             ),
           ],
           if (stats.recentTransactions.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _SectionTitle('Последние операции'),
+            AppGroupLabel(context.l10n.financeRecent),
             const SizedBox(height: 12),
             AppCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -181,22 +175,6 @@ class _TransactionStatisticsScreenState
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: AppTypography.labelSm.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
 
 class _CategoryBreakdown extends StatelessWidget {
   final String title;
@@ -217,7 +195,7 @@ class _CategoryBreakdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(title),
+        AppGroupLabel(title),
         const SizedBox(height: 12),
         AppCard(
           child: Column(
@@ -225,7 +203,7 @@ class _CategoryBreakdown extends StatelessWidget {
               for (final item in sorted)
                 MetricBar(
                   icon: item.category.icon,
-                  label: item.category.label,
+                  label: transactionCategoryLabel(context, item.category),
                   value: formatMoney(item.total),
                   fraction: max == 0 ? 0 : item.total / max,
                   color: color,
@@ -260,7 +238,7 @@ class _RecentTransactionRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.category.label,
+                  transactionCategoryLabel(context, transaction.category),
                   style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

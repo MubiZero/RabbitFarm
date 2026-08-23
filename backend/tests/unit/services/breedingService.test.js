@@ -30,7 +30,7 @@ const { Breeding, Rabbit, Task } = require('../../../src/models');
 const breedingService = require('../../../src/services/breedingService');
 
 describe('BreedingService', () => {
-  const mockTx = { commit: jest.fn(), rollback: jest.fn() };
+  const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -280,7 +280,7 @@ describe('BreedingService', () => {
         .mockResolvedValueOnce({ id: 1 }); // getBreedingById at end
       existingBreeding.update.mockResolvedValue(true);
 
-      const result = await breedingService.updateBreeding(1, 1, { status: 'completed' });
+      await breedingService.updateBreeding(1, 1, { status: 'completed' });
 
       expect(existingBreeding.update).toHaveBeenCalledWith({ status: 'completed' }, { transaction: mockTx });
       expect(mockTx.commit).toHaveBeenCalled();

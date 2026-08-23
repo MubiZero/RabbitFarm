@@ -1,6 +1,7 @@
 const { Task, Rabbit, Cage, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
 const logger = require('../utils/logger');
+const { farmMemberIds } = require('../utils/farm');
 
 const TASK_INCLUDE = [
   { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
@@ -8,6 +9,21 @@ const TASK_INCLUDE = [
   { model: User, as: 'assignedTo', attributes: ['id', 'full_name', 'email'] },
   { model: User, as: 'creator', attributes: ['id', 'full_name', 'email'] }
 ];
+
+/**
+ * Исполнителем может быть только человек с той же фермы.
+ *
+ * Раньше проверялось лишь существование пользователя, поэтому задачу можно
+ * было назначить работнику чужой фермы: она появлялась в его списке (фильтр
+ * идёт по assigned_to), а удалить её он не мог — удаление скоупится по автору.
+ */
+const assertAssigneeBelongsToFarm = async (assigneeId, farmId) => {
+  const members = await farmMemberIds(farmId);
+
+  if (!members.includes(Number(assigneeId))) {
+    throw new Error('ASSIGNEE_NOT_FOUND');
+  }
+};
 
 const RECURRENCE_OFFSETS = {
   daily: (d) => d.setDate(d.getDate() + 1),
@@ -37,8 +53,7 @@ class TaskService {
     }
 
     if (assigned_to) {
-      const user = await User.findByPk(assigned_to);
-      if (!user) throw new Error('ASSIGNEE_NOT_FOUND');
+      await assertAssigneeBelongsToFarm(assigned_to, user_id);
     }
 
     if (data.recurrence_rule && !RECURRENCE_OFFSETS[data.recurrence_rule.toLowerCase()]) {
@@ -145,15 +160,7 @@ class TaskService {
       distinct: true
     });
 
-    return {
-      tasks: rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit)
-      }
-    };
+    return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
   async updateTask(id, userId, data) {
@@ -173,8 +180,7 @@ class TaskService {
     }
 
     if (assigned_to) {
-      const user = await User.findByPk(assigned_to);
-      if (!user) throw new Error('ASSIGNEE_NOT_FOUND');
+      await assertAssigneeBelongsToFarm(assigned_to, userId);
     }
 
     const updateData = { ...data };

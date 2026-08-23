@@ -172,4 +172,80 @@ describe('Auth API', () => {
       expect(refreshRes.status).toBe(401);
     });
   });
+
+  describe('POST /api/v1/auth/forgot-password и reset-password', () => {
+    // Регрессия: у обоих маршрутов не было валидации вовсе. Через сброс можно
+    // было поставить пароль из одного символа в обход правила восьми, а запрос
+    // без токена уходил в общую пятисотку вместо понятной ошибки.
+    it('отклоняет слишком короткий новый пароль', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: 'какой-нибудь-код', new_password: 'a' });
+
+      expect(res.status).toBe(422);
+    });
+
+    it('отклоняет запрос без кода восстановления', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ new_password: 'Password123!' });
+
+      expect(res.status).toBe(422);
+    });
+
+    it('отклоняет некорректный email', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: 'это-не-почта' });
+
+      expect(res.status).toBe(422);
+    });
+
+    it('на неизвестный адрес отвечает так же, как на известный', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: 'never_registered@example.com' });
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('смена пароля отзывает выданные токены', () => {
+    // Регрессия: удалялись только refresh-токены, а уже выданный access-токен
+    // работал до конца своего срока. Владелец сбрасывал пароль работнику из-за
+    // потерянного телефона, а доступ у нашедшего оставался ещё 15 минут.
+    it('старый access-токен перестаёт действовать сразу', async () => {
+      const registered = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email: 'revoke@example.com', password: 'Password123!', full_name: 'Отзыв' });
+      const oldToken = registered.body.data.access_token;
+
+      const before = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${oldToken}`);
+      expect(before.status).toBe(200);
+
+      const changed = await request(app)
+        .post('/api/v1/auth/change-password')
+        .set('Authorization', `Bearer ${oldToken}`)
+        .send({ current_password: 'Password123!', new_password: 'NewPassword123!' });
+      expect(changed.status).toBe(200);
+
+      const after = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${oldToken}`);
+      expect(after.status).toBe(401);
+
+      // Новый вход работает, то есть отозваны именно старые токены.
+      const relogin = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: 'revoke@example.com', password: 'NewPassword123!' });
+      expect(relogin.status).toBe(200);
+
+      const withNew = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${relogin.body.data.access_token}`);
+      expect(withNew.status).toBe(200);
+    });
+  });
 });

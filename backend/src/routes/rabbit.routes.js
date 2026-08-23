@@ -4,6 +4,7 @@ const rabbitController = require('../controllers/rabbitController');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const upload = require('../config/multer');
+const { uploadLimiter } = require('../middleware/rateLimiter');
 const {
   createRabbitSchema,
   updateRabbitSchema,
@@ -147,6 +148,7 @@ router.get(
 router.post(
   '/',
   authorize(['manager', 'owner']),
+  uploadLimiter,
   upload.single('photo'),
   validate(createRabbitSchema),
   rabbitController.create
@@ -167,6 +169,7 @@ router.get('/:id', rabbitController.getById);
 router.put(
   '/:id',
   authorize(['manager', 'owner']),
+  uploadLimiter,
   upload.single('photo'),
   validate(updateRabbitSchema),
   rabbitController.update
@@ -217,6 +220,7 @@ router.get('/:id/pedigree', rabbitController.getPedigree);
 router.post(
   '/:id/photo',
   authorize(['manager', 'owner']),
+  uploadLimiter,
   upload.single('photo'),
   rabbitController.uploadPhoto
 );

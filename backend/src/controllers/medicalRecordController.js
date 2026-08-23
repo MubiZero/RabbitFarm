@@ -1,6 +1,6 @@
-const { MedicalRecord, Rabbit, Breed, Transaction, sequelize } = require('../models');
+const { MedicalRecord, Rabbit, Breed, sequelize } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
-const logger = require('../utils/logger');
+const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
 
 /**
@@ -39,23 +39,21 @@ class MedicalRecordController {
       if (['died', 'euthanized'].includes(outcome)) {
         await rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
       } else if (outcome === 'recovered') {
-        await rabbit.update({ status: 'alive' }, { transaction: t });
+        await rabbit.update({ status: 'healthy' }, { transaction: t });
       } else if (outcome === 'ongoing') {
         await rabbit.update({ status: 'sick' }, { transaction: t });
       }
 
       // Automation 2: Financial Transaction
-      if (cost && parseFloat(cost) > 0) {
-        await Transaction.create({
-          type: 'expense',
-          category: 'Health',
-          amount: cost,
-          transaction_date: started_at || new Date(),
-          rabbit_id: rabbit_id,
-          description: `Medical: ${diagnosis || 'Treatment'}`,
-          created_by: req.user.id
-        }, { transaction: t });
-      }
+      await syncAutoExpense({
+        link: { medical_record_id: medicalRecord.id },
+        cost,
+        rabbitId: rabbit_id,
+        transactionDate: started_at,
+        description: `Лечение: ${diagnosis || 'без диагноза'}`,
+        userId: req.user.id,
+        transaction: t
+      });
 
       await t.commit();
 
@@ -246,7 +244,7 @@ class MedicalRecordController {
       }
 
       const oldOutcome = medicalRecord.outcome;
-      const oldCost = medicalRecord.cost;
+
 
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
@@ -262,13 +260,25 @@ class MedicalRecordController {
 
       await medicalRecord.update(req.body, { transaction: t });
 
+      // Расход идёт следом за стоимостью: меняется — пересчитывается,
+      // убрали — удаляется, появилась впервые — создаётся.
+      await syncAutoExpense({
+        link: { medical_record_id: medicalRecord.id },
+        cost: medicalRecord.cost,
+        rabbitId: medicalRecord.rabbit_id,
+        transactionDate: medicalRecord.started_at,
+        description: `Лечение: ${medicalRecord.diagnosis || 'без диагноза'}`,
+        userId: req.user.id,
+        transaction: t
+      });
+
       // Automation: Status Update
       const newOutcome = req.body.outcome;
       if (newOutcome && newOutcome !== oldOutcome) {
         if (['died', 'euthanized'].includes(newOutcome)) {
           await medicalRecord.rabbit.update({ status: 'dead', cage_id: null }, { transaction: t });
         } else if (newOutcome === 'recovered') {
-          await medicalRecord.rabbit.update({ status: 'alive' }, { transaction: t });
+          await medicalRecord.rabbit.update({ status: 'healthy' }, { transaction: t });
         } else if (newOutcome === 'ongoing') {
           await medicalRecord.rabbit.update({ status: 'sick' }, { transaction: t });
         }
@@ -308,6 +318,7 @@ class MedicalRecordController {
         where: { id: req.params.id },
         include: [{
           model: Rabbit,
+          as: 'rabbit',
           where: { user_id: req.farmId },
           attributes: ['id']
         }]
@@ -465,8 +476,12 @@ class MedicalRecordController {
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
               user_id: req.farmId, // Filter by user
+              // Перечисление живых статусов пропускало 'active' и
+              // 'quarantine'. Статус 'active' код сам ставит матери после
+              // окрола, поэтому любая окролившаяся самка исчезала из списка
+              // просроченных прививок и из текущих лечений.
               status: {
-                [Op.in]: ['healthy', 'pregnant', 'sick'] // Exclude dead/sold
+                [Op.notIn]: ['dead', 'sold']
               }
             },
             include: [

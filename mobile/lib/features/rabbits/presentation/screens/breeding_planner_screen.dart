@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Экран планирования случек с анализом инбридинга
 ///
@@ -32,9 +34,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Планирование случек'),
-        centerTitle: true,
-        backgroundColor: AppColors.accentViolet,
+        title: Text(context.l10n.plannerTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -52,11 +52,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Выберите самца и самку для автоматического анализа родословной и оценки рисков инбридинга',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.accentOcean,
-                        ),
+                        context.l10n.plannerIntro,
+                        style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                       ),
                     ),
                   ],
@@ -68,7 +65,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
             // Выбор самца
             _buildRabbitSelector(
-              label: 'Самец',
+              label: context.l10n.breedingMale,
               sex: 'male',
               icon: Icons.male,
               color: AppColors.accentOcean,
@@ -89,7 +86,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
             // Выбор самки
             _buildRabbitSelector(
-              label: 'Самка',
+              label: context.l10n.breedingFemale,
               sex: 'female',
               icon: Icons.female,
               color: AppColors.accentRose,
@@ -126,12 +123,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                       Icon(Icons.error_outline, size: 48, color: AppColors.error),
                       const SizedBox(height: 16),
                       Text(
-                        'Ошибка анализа',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.error,
-                        ),
+                        context.l10n.plannerAnalysisFailed,
+                        style: AppTypography.titleLg.copyWith(color: AppColors.error),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -163,7 +156,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
     final selectedRabbit = rabbits.where((r) => r.id == selectedId).firstOrNull;
 
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -175,19 +167,17 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 const SizedBox(width: 8),
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTypography.titleMd,
                 ),
               ],
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               initialValue: selectedId,
-              decoration: const InputDecoration(
-                hintText: 'Выберите кролика',
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: InputDecoration(
+                hintText: context.l10n.rabbitPickerTitle,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
               ),
               items: rabbits.map<DropdownMenuItem<int>>((rabbit) {
                 return DropdownMenuItem(
@@ -234,7 +224,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       children: [
         // Заголовок результатов
         Text(
-          'Результаты анализа',
+          context.l10n.plannerResults,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -244,7 +234,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
         // Карточка с коэффициентом инбридинга
         Card(
           color: color.withValues(alpha: 0.1),
-          elevation: 4,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -256,20 +245,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Коэффициент инбридинга',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  context.l10n.plannerCoefficient,
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _analysis!.coefficientPercent,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                  style: AppTypography.displayLg.copyWith(color: color),
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -280,20 +262,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   ),
                   child: Text(
                     riskLevel.label.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: AppTypography.titleMd.copyWith(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   riskLevel.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -310,16 +285,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.family_restroom),
                       SizedBox(width: 8),
                       Text(
-                        'Общие предки',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        context.l10n.plannerCommonAncestors,
+                        style: AppTypography.titleMd,
                       ),
                     ],
                   ),
@@ -341,15 +313,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                           Expanded(
                             child: Text(
                               ancestor.name,
-                              style: const TextStyle(fontSize: 14),
+                              style: AppTypography.bodyMd,
                             ),
                           ),
                           Text(
-                            '${ancestor.closestGeneration} пок.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            context.l10n.plannerGenerations(ancestor.closestGeneration),
+                            style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -369,16 +338,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.lightbulb_outline),
                     SizedBox(width: 8),
                     Text(
-                      'Рекомендации',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      context.l10n.plannerAdvice,
+                      style: AppTypography.titleMd,
                     ),
                   ],
                 ),
@@ -388,7 +354,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                       recommendation,
-                      style: const TextStyle(fontSize: 14, height: 1.5),
+                      style: AppTypography.bodyMd,
                     ),
                   );
                 }),
@@ -405,11 +371,15 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               final router = GoRouter.of(context);
+              // Тексты снимаются до перехода: экран может закрыться, пока
+              // пользователь заполняет форму случки.
+              final pickBoth = context.l10n.plannerPickBoth;
+              final planned = context.l10n.plannerPlanned;
 
               if (_selectedMaleId == null || _selectedFemaleId == null) {
                 messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Выберите самца и самку'),
+                  SnackBar(
+                    content: Text(pickBoth),
                     backgroundColor: AppColors.warning,
                   ),
                 );
@@ -428,8 +398,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
               if (result == true) {
                 messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Случка успешно запланирована'),
+                  SnackBar(
+                    content: Text(planned),
                     backgroundColor: AppColors.success,
                   ),
                 );
@@ -439,12 +409,11 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),
-              backgroundColor: AppColors.accentViolet,
-            ),
+              ),
             icon: const Icon(Icons.add),
-            label: const Text(
-              'Запланировать случку',
-              style: TextStyle(fontSize: 16),
+            label: Text(
+              context.l10n.plannerPlan,
+              style: AppTypography.titleMd,
             ),
           ),
       ],
@@ -490,21 +459,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Не удалось загрузить родословную: $e';
+        _error = '${context.l10n.plannerPedigreeFailed}: $e';
         _isLoadingPedigrees = false;
       });
     }
   }
 
-  String _formatDate(DateTime date) {
-    try {
-      final months = [
-        'янв', 'фев', 'мар', 'апр', 'май', 'июн',
-        'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (e) {
-      return date.toString();
-    }
-  }
+  /// Форматировщик дат знает сокращения месяцев для каждого языка — своя
+  /// таблица здесь была лишней.
+  String _formatDate(DateTime date) => DateFormat('d MMM y', 'ru').format(date);
 }

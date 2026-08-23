@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../../data/repositories/breeding_repository.dart';
 
 // Breeding Repository provider
 final breedingRepositoryProvider = Provider<BreedingRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return BreedingRepository(apiClient: apiClient);
 });
@@ -13,7 +15,7 @@ final breedingRepositoryProvider = Provider<BreedingRepository>((ref) {
 class BreedingListState {
   final List<BreedingModel> breedings;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int currentPage;
   final int totalPages;
   final int total;
@@ -32,7 +34,7 @@ class BreedingListState {
   BreedingListState copyWith({
     List<BreedingModel>? breedings,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? currentPage,
     int? totalPages,
     int? total,
@@ -90,7 +92,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -129,7 +131,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -149,7 +151,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
       );
     } catch (e) {
       state = state.copyWith(
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }

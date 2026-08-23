@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 
@@ -15,10 +16,10 @@ class CageModel with _$CageModel {
     @IntConverter() required int capacity,
     String? location,
     required String condition, // good, needs_repair, broken
-    @JsonKey(name: 'last_cleaned_at') DateTime? lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at') @NullableDateTimeConverter() DateTime? lastCleanedAt,
     String? notes,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     // Related data
     List<RabbitModel>? rabbits,
     @JsonKey(name: 'current_occupancy') @NullableIntConverter() int? currentOccupancy,

@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Вступление в ферму по коду приглашения.
 ///
@@ -37,6 +39,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final router = GoRouter.of(context);
 
     setState(() => _isSubmitting = true);
@@ -50,7 +53,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(errorText(l10n, e)),
           backgroundColor: AppColors.error,
         ),
       );
@@ -64,7 +67,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Присоединиться к ферме')),
+      appBar: AppBar(title: Text(context.l10n.joinTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -74,8 +77,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Код выдаёт владелец фермы. После входа вы увидите её '
-                  'хозяйство — поголовье, корма и задачи.',
+                  context.l10n.joinIntro,
                   style: AppTypography.bodyMd
                       .copyWith(color: cs.onSurfaceVariant),
                 ),
@@ -83,20 +85,21 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                 TextFormField(
                   controller: _codeController,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Код приглашения',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.joinCode,
                   ),
                   validator: (value) => (value == null || value.trim().isEmpty)
-                      ? 'Введите код, который передал владелец'
+                      ? context.l10n.joinCodeHint
                       : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(labelText: 'Ваше имя'),
+                  decoration:
+                      InputDecoration(labelText: context.l10n.joinName),
                   validator: (value) => (value == null || value.trim().isEmpty)
-                      ? 'Как к вам обращаться?'
+                      ? context.l10n.joinNameHint
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -104,8 +107,8 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: 'Пароль',
-                    helperText: 'Не короче 8 символов',
+                    labelText: context.l10n.joinPassword,
+                    helperText: context.l10n.joinPasswordHint,
                     suffixIcon: IconButton(
                       icon: Icon(_obscurePassword
                           ? Icons.visibility_outlined
@@ -115,7 +118,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                     ),
                   ),
                   validator: (value) => (value == null || value.length < 8)
-                      ? 'Пароль должен быть не короче 8 символов'
+                      ? context.l10n.joinPasswordShort
                       : null,
                 ),
                 const SizedBox(height: 32),
@@ -127,13 +130,13 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Присоединиться'),
+                      : Text(context.l10n.joinSubmit),
                 ),
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed:
                       _isSubmitting ? null : () => context.go('/login'),
-                  child: const Text('У меня уже есть аккаунт'),
+                  child: Text(context.l10n.joinHaveAccount),
                 ),
               ],
             ),

@@ -13,6 +13,8 @@ import 'package:mobile/features/finance/data/models/transaction_model.dart';
 import 'package:mobile/features/finance/presentation/providers/transactions_provider.dart';
 import 'package:mobile/features/finance/presentation/screens/transaction_statistics_screen.dart';
 
+import '../support/test_app.dart';
+
 final _financeStats = FinancialStatistics(
   totalIncome: 184500,
   totalExpenses: 96200,
@@ -139,13 +141,8 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 400));
 }
 
-Widget _wrap(Widget screen, List<Override> overrides) => ProviderScope(
-      overrides: overrides,
-      child: MaterialApp(
-        theme: ThemeData(useMaterial3: true),
-        home: screen,
-      ),
-    );
+Widget _wrap(Widget screen, List<Override> overrides) =>
+    testAppScreen(screen, overrides: overrides);
 
 void main() {
   setUpAll(() => initializeDateFormatting('ru_RU', null));
@@ -162,7 +159,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика финансов'), findsOneWidget);
+      expect(find.text('Финансы в цифрах'), findsOneWidget);
       expect(find.text('184\u00A0500 ₽'), findsOneWidget); // доходы
       expect(find.text('96\u00A0200 ₽'), findsOneWidget); // расходы
       expect(find.text('88\u00A0300 ₽'), findsOneWidget); // прибыль
@@ -214,7 +211,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Ошибка загрузки'), findsOneWidget);
+      expect(find.text('Не удалось загрузить'), findsOneWidget);
       expect(find.text('Повторить'), findsOneWidget);
     });
   });
@@ -228,7 +225,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика склада'), findsOneWidget);
+      expect(find.text('Склад в цифрах'), findsOneWidget);
       expect(find.text('9'), findsOneWidget); // позиций на складе
       expect(find.text('43\u00A0700 ₽'), findsOneWidget); // стоимость запаса
       expect(find.text('СОСТАВ ПО ТИПАМ'), findsOneWidget);
@@ -280,7 +277,7 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Аналитика кормлений'), findsOneWidget);
+      expect(find.text('Кормления в цифрах'), findsOneWidget);
       expect(find.text('214'), findsOneWidget);
       expect(find.text('40\u00A0265 ₽'), findsOneWidget);
       expect(find.text('Выдано'), findsOneWidget);

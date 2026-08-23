@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/vaccination_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Репозиторий для работы с вакцинациями
 class VaccinationsRepository {
@@ -51,23 +52,24 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final data = apiResponse.data!;
       final itemsJson = data['items'];
       if (itemsJson is! List) {
-        throw Exception(
-            'Некорректный формат ответа: items не является списком');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       return itemsJson
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения списка вакцинаций');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -82,14 +84,16 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения вакцинации');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -105,16 +109,18 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения истории вакцинаций');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -132,15 +138,16 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(
-          serverMessage(e) ?? 'Ошибка создания записи о вакцинации');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка создания записи о вакцинации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -159,15 +166,16 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ??
-          'Ошибка обновления записи о вакцинации');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка обновления записи о вакцинации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -182,13 +190,14 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ??
-          'Ошибка удаления записи о вакцинации');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка удаления записи о вакцинации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -203,14 +212,16 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return VaccinationStatistics.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения статистики');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -228,16 +239,18 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения предстоящих вакцинаций');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -252,22 +265,25 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения просроченных вакцинаций');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 }
 
 /// Provider для репозитория вакцинаций
 final vaccinationsRepositoryProvider = Provider<VaccinationsRepository>((ref) {
+  ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return VaccinationsRepository(apiClient: apiClient);
 });

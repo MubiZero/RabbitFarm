@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
 
 part 'staff_models.freezed.dart';
@@ -58,7 +59,7 @@ class FarmInvitation with _$FarmInvitation {
     @IntConverter() required int id,
     required String email,
     required FarmRole role,
-    @JsonKey(name: 'expires_at') required DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _FarmInvitation;
 
   factory FarmInvitation.fromJson(Map<String, dynamic> json) =>
@@ -73,7 +74,7 @@ class CreatedInvitation with _$CreatedInvitation {
     required String email,
     required FarmRole role,
     required String code,
-    @JsonKey(name: 'expires_at') required DateTime expiresAt,
+    @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _CreatedInvitation;
 
   factory CreatedInvitation.fromJson(Map<String, dynamic> json) =>

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
 
-/// Главный экран с bottom navigation (4 tabs: Сегодня, Кролики, Задачи, Меню)
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
+
+/// Каркас с четырьмя вкладками и кнопкой быстрой записи.
 class MainNavigationScreen extends ConsumerWidget {
   final Widget child;
   final String currentPath;
@@ -15,145 +17,133 @@ class MainNavigationScreen extends ConsumerWidget {
     required this.child,
   });
 
+  static const _tabs = [
+    (path: '/today', icon: Icons.today_outlined, active: Icons.today),
+    (path: '/rabbits', icon: Icons.pets_outlined, active: Icons.pets),
+    (path: '/tasks', icon: Icons.checklist_outlined, active: Icons.checklist),
+    (path: '/menu', icon: Icons.menu, active: Icons.menu_open),
+  ];
+
+  List<String> _tabLabels(BuildContext context) => [
+        context.l10n.navToday,
+        context.l10n.navRabbits,
+        context.l10n.navTasks,
+        context.l10n.navMenu,
+      ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = _calculateSelectedIndex(currentPath);
-    final colorScheme = Theme.of(context).colorScheme;
+    final index = _selectedIndex(currentPath);
+    final role = ref.watch(farmRoleProvider);
+    final labels = _tabLabels(context);
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: colorScheme.outline.withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-        ),
-        child: NavigationBar(
-          selectedIndex: currentIndex,
-          onDestinationSelected: (index) => _onItemTapped(index, context),
-          destinations: const [
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: index,
+        onDestinationSelected: (i) => context.go(_tabs[i].path),
+        destinations: [
+          for (var i = 0; i < _tabs.length; i++)
             NavigationDestination(
-              icon: Icon(Icons.today_outlined),
-              selectedIcon: Icon(Icons.today),
-              label: 'Сегодня',
+              icon: Icon(_tabs[i].icon),
+              selectedIcon: Icon(_tabs[i].active),
+              label: labels[i],
             ),
-            NavigationDestination(
-              icon: Icon(Icons.pets_outlined),
-              selectedIcon: Icon(Icons.pets),
-              label: 'Кролики',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.check_box_outline_blank),
-              selectedIcon: Icon(Icons.check_box),
-              label: 'Задачи',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.menu),
-              selectedIcon: Icon(Icons.menu_open),
-              label: 'Меню',
-            ),
-          ],
-        ),
+        ],
       ),
-      floatingActionButton: _buildFab(context, currentIndex),
+      floatingActionButton: _fab(context, index, role),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  int _calculateSelectedIndex(String path) {
-    if (path.startsWith('/today')) return 0;
+  int _selectedIndex(String path) {
     if (path.startsWith('/rabbits')) return 1;
     if (path.startsWith('/tasks')) return 2;
     if (path.startsWith('/menu') || path.startsWith('/more')) return 3;
     return 0;
   }
 
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        context.go('/today');
-      case 1:
-        context.go('/rabbits');
-      case 2:
-        context.go('/tasks');
-      case 3:
-        context.go('/menu');
+  Widget? _fab(BuildContext context, int index, FarmRoleAccess role) {
+    if (index == 3) return null;
+
+    if (index == 2) {
+      return FloatingActionButton(
+        tooltip: context.l10n.navNewTask,
+        onPressed: () => context.push('/tasks/form'),
+        child: const Icon(Icons.add, size: 28),
+      );
     }
+
+    final actions =
+        _quickActions(context, index)
+            .where((a) => role.can(a.capability))
+            .toList();
+    // Работнику нечего создавать на вкладке «Кролики»: поголовье и клетки
+    // заводит управляющий. Кнопка, которая открывает пустой список или
+    // приводит к отказу сервера, хуже её отсутствия.
+    if (actions.isEmpty) return null;
+
+    return FloatingActionButton(
+      tooltip: context.l10n.navQuickEntry,
+      onPressed: () => _showQuickActions(context, actions),
+      child: const Icon(Icons.add, size: 28),
+    );
   }
 
-  Widget? _buildFab(BuildContext context, int currentIndex) {
-    final accent = Theme.of(context).colorScheme.primary;
+  List<_QuickAction> _quickActions(BuildContext context, int index) =>
+      switch (index) {
+        0 => [
+            _QuickAction(
+              icon: Icons.restaurant_outlined,
+              label: context.l10n.quickRecordFeeding,
+              route: '/feeding-records/form',
+              domain: AppDomain.feeding,
+              capability: FarmCapability.recordDailyWork,
+            ),
+            _QuickAction(
+              icon: Icons.vaccines_outlined,
+              label: context.l10n.quickRecordVaccination,
+              route: '/vaccinations/form',
+              domain: AppDomain.health,
+              capability: FarmCapability.recordDailyWork,
+            ),
+            _QuickAction(
+              icon: Icons.add_task,
+              label: context.l10n.quickCreateTask,
+              route: '/tasks/form',
+              domain: AppDomain.tasks,
+              capability: FarmCapability.recordDailyWork,
+            ),
+          ],
+        1 => [
+            _QuickAction(
+              icon: Icons.pets_outlined,
+              label: context.l10n.quickAddRabbit,
+              route: '/rabbits/new',
+              domain: AppDomain.livestock,
+              capability: FarmCapability.manageLivestock,
+            ),
+            _QuickAction(
+              icon: Icons.child_care_outlined,
+              label: context.l10n.quickRecordBirth,
+              route: '/births/new',
+              domain: AppDomain.breeding,
+              capability: FarmCapability.manageLivestock,
+            ),
+            _QuickAction(
+              icon: Icons.grid_view_outlined,
+              label: context.l10n.quickAddCage,
+              route: '/cages/form',
+              domain: AppDomain.livestock,
+              capability: FarmCapability.manageLivestock,
+            ),
+          ],
+        _ => const [],
+      };
 
-    switch (currentIndex) {
-      case 0:
-      case 1:
-        return FloatingActionButton(
-          onPressed: () => _showQuickActions(context, currentIndex),
-          backgroundColor: accent,
-          child: const Icon(Icons.add, size: 28, color: Colors.white),
-        );
-      case 2:
-        return FloatingActionButton(
-          onPressed: () => context.push('/tasks/form'),
-          backgroundColor: accent,
-          child: const Icon(Icons.add, size: 28, color: Colors.white),
-        );
-      default:
-        return null;
-    }
-  }
-
-  void _showQuickActions(BuildContext context, int currentIndex) {
-    final List<_QuickAction> actions = switch (currentIndex) {
-      0 => [
-          _QuickAction(
-            icon: Icons.restaurant,
-            label: 'Записать кормление',
-            route: '/feeding-records/form',
-            color: AppColors.warning,
-          ),
-          _QuickAction(
-            icon: Icons.vaccines,
-            label: 'Записать вакцинацию',
-            route: '/vaccinations/form',
-            color: AppColors.error,
-          ),
-          _QuickAction(
-            icon: Icons.add_task,
-            label: 'Создать задачу',
-            route: '/tasks/form',
-            color: AppColors.accentViolet,
-          ),
-        ],
-      1 => [
-          _QuickAction(
-            icon: Icons.add,
-            label: 'Добавить кролика',
-            route: '/rabbits/new',
-            color: AppColors.accentEmerald,
-          ),
-          _QuickAction(
-            icon: Icons.child_care,
-            label: 'Записать рождение',
-            route: '/births/new',
-            color: AppColors.accentRose,
-          ),
-          _QuickAction(
-            icon: Icons.grid_view,
-            label: 'Добавить клетку',
-            route: '/cages/form',
-            color: AppColors.info,
-          ),
-        ],
-      _ => [],
-    };
-
+  void _showQuickActions(BuildContext context, List<_QuickAction> actions) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
       builder: (context) => _QuickActionsSheet(actions: actions),
     );
   }
@@ -163,13 +153,15 @@ class _QuickAction {
   final IconData icon;
   final String label;
   final String route;
-  final Color color;
+  final AppDomain domain;
+  final FarmCapability capability;
 
   const _QuickAction({
     required this.icon,
     required this.label,
     required this.route,
-    required this.color,
+    required this.domain,
+    required this.capability,
   });
 }
 
@@ -180,91 +172,83 @@ class _QuickActionsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surface;
-    final outline = Theme.of(context).colorScheme.outline;
-    final onSurface = Theme.of(context).colorScheme.onSurface;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
+    return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: outline,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Быстрые действия',
-                style: AppTypography.titleLg.copyWith(color: onSurface),
-              ),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              0,
+              AppSpacing.xl,
+              AppSpacing.lg,
+            ),
+            child: Text(
+              context.l10n.navQuickTitle,
+              style: AppTypography.titleLg
+                  .copyWith(color: context.colors.onSurface),
             ),
           ),
-          const SizedBox(height: 16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: actions.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final action = actions[index];
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(action.route);
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: action.color.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: action.color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(action.icon, color: action.color, size: 22),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            action.label,
-                            style: AppTypography.titleMd.copyWith(color: onSurface),
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, size: 14, color: action.color),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 32),
+          for (final action in actions)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.sm,
+              ),
+              child: _ActionRow(action: action),
+            ),
+          const SizedBox(height: AppSpacing.lg),
         ],
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  final _QuickAction action;
+
+  const _ActionRow({required this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = action.domain.color(context);
+
+    return Material(
+      color: color.withValues(alpha: 0.08),
+      borderRadius: AppRadius.mdAll,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          context.push(action.route);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: AppRadius.smAll,
+                ),
+                child: Icon(action.icon, color: color, size: 22),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Text(
+                  action.label,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ),
+              Icon(Icons.chevron_right, size: 20, color: color),
+            ],
+          ),
+        ),
       ),
     );
   }

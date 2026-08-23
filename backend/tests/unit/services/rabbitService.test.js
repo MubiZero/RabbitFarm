@@ -18,7 +18,7 @@ jest.mock('../../../src/models', () => {
 });
 jest.mock('../../../src/utils/fileHelper', () => ({ deleteFile: jest.fn() }));
 
-const { Rabbit, Breed, Cage, RabbitWeight, sequelize } = require('../../../src/models');
+const { Rabbit, Breed, Cage, sequelize } = require('../../../src/models');
 const rabbitService = require('../../../src/services/rabbitService');
 const { createMockRabbit } = require('../../helpers/mockModels');
 
@@ -26,7 +26,7 @@ describe('RabbitService', () => {
   beforeEach(() => jest.clearAllMocks());
 
   describe('createRabbit', () => {
-    const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+    const mockTransaction = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
 
     beforeEach(() => {
       sequelize.transaction.mockResolvedValue(mockTransaction);

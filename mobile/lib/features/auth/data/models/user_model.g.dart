@@ -6,21 +6,22 @@ part of 'user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
-    _$UserModelImpl(
-      id: (json['id'] as num).toInt(),
-      email: json['email'] as String,
-      fullName: json['full_name'] as String,
-      role: json['role'] as String,
-      phone: json['phone'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      isActive: json['is_active'] as bool,
-      lastLoginAt: json['last_login_at'] == null
-          ? null
-          : DateTime.parse(json['last_login_at'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
+_$UserModelImpl _$$UserModelImplFromJson(
+  Map<String, dynamic> json,
+) => _$UserModelImpl(
+  id: (json['id'] as num).toInt(),
+  email: json['email'] as String,
+  fullName: json['full_name'] as String,
+  role: json['role'] as String,
+  phone: json['phone'] as String?,
+  avatarUrl: json['avatar_url'] as String?,
+  isActive: json['is_active'] as bool,
+  lastLoginAt: const NullableDateTimeConverter().fromJson(
+    json['last_login_at'],
+  ),
+  createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
+  updatedAt: const DateTimeConverter().fromJson(json['updated_at'] as Object),
+);
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
     <String, dynamic>{
@@ -31,7 +32,9 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'phone': instance.phone,
       'avatar_url': instance.avatarUrl,
       'is_active': instance.isActive,
-      'last_login_at': instance.lastLoginAt?.toIso8601String(),
-      'created_at': instance.createdAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
+      'last_login_at': const NullableDateTimeConverter().toJson(
+        instance.lastLoginAt,
+      ),
+      'created_at': const DateTimeConverter().toJson(instance.createdAt),
+      'updated_at': const DateTimeConverter().toJson(instance.updatedAt),
     };

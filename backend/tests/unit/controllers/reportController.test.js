@@ -24,7 +24,7 @@ jest.mock('../../../src/models', () => {
   };
 });
 
-const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transaction, Task, Breeding, Birth, sequelize } = require('../../../src/models');
+const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transaction, Task, Breeding, Birth } = require('../../../src/models');
 const ctrl = require('../../../src/controllers/reportController');
 
 const mockReq = (overrides = {}) => ({

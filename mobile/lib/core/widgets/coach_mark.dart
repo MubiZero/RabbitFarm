@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_typography.dart';
+import '../l10n/l10n_context.dart';
 
 /// A single step in the product tour.
 class CoachMarkStep {
@@ -174,7 +175,7 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
                         TextButton(
                           onPressed: widget.onSkip,
                           child: Text(
-                            'Пропустить',
+                            context.l10n.tourSkip,
                             style: AppTypography.labelLg.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -184,7 +185,7 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
                         ),
                         ElevatedButton(
                           onPressed: widget.onNext,
-                          child: Text(isLast ? 'Готово' : 'Далее'),
+                          child: Text(isLast ? context.l10n.tourDone : context.l10n.tourNext),
                         ),
                       ],
                     ),

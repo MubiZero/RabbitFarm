@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
 import '../utils/feed_labels.dart';
 
-/// Экран списка кормов (склад)
+/// Склад кормов.
 class FeedsListScreen extends ConsumerStatefulWidget {
   const FeedsListScreen({super.key});
 
@@ -17,557 +20,504 @@ class FeedsListScreen extends ConsumerStatefulWidget {
 }
 
 class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
-  FeedType? _selectedType;
-  bool _showLowStockOnly = false;
-
   @override
   void initState() {
     super.initState();
-    // Загружаем список при открытии экрана
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(feedsProvider.notifier).loadFeeds(refresh: true);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final feedsState = ref.watch(feedsProvider);
+    final state = ref.watch(feedsProvider);
+    final notifier = ref.read(feedsProvider.notifier);
+    final canManage = ref.watch(canProvider(FarmCapability.manageStock));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Склад кормов'),
+        title: Text(context.l10n.feedsTitle),
         actions: [
-          // Фильтры
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilters(context),
-          ),
-          // Статистика
-          IconButton(
-            icon: const Icon(Icons.analytics_outlined),
-            onPressed: () => _showStatistics(context),
+            tooltip: context.l10n.commonSummary,
+            icon: const Icon(Icons.insights_outlined),
+            onPressed: () => context.push('/feeds/statistics'),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Быстрые фильтры
-          _buildQuickFilters(),
-
-          // Активные фильтры
-          if (_selectedType != null || _showLowStockOnly)
-            _buildActiveFilters(),
-
-          // Список кормов
-          Expanded(
-            child: _buildFeedsList(context, feedsState),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showFeedForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить корм'),
-      ),
-    );
-  }
-
-  Widget _buildQuickFilters() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildFilterChip('Все', _selectedType == null && !_showLowStockOnly, () {
-            setState(() {
-              _selectedType = null;
-              _showLowStockOnly = false;
-            });
-            _applyFilters();
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Мало на складе', _showLowStockOnly, () {
-            setState(() {
-              _showLowStockOnly = !_showLowStockOnly;
-            });
-            _applyFilters();
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Гранулы', _selectedType == FeedType.pellets, () {
-            _toggleTypeFilter(FeedType.pellets);
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Сено', _selectedType == FeedType.hay, () {
-            _toggleTypeFilter(FeedType.hay);
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Овощи', _selectedType == FeedType.vegetables, () {
-            _toggleTypeFilter(FeedType.vegetables);
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Зерно', _selectedType == FeedType.grain, () {
-            _toggleTypeFilter(FeedType.grain);
-          }),
-          const SizedBox(width: 8),
-          _buildFilterChip('Добавки', _selectedType == FeedType.supplements, () {
-            _toggleTypeFilter(FeedType.supplements);
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      selectedColor: Theme.of(context).colorScheme.primaryContainer,
-    );
-  }
-
-  void _toggleTypeFilter(FeedType type) {
-    setState(() {
-      _selectedType = _selectedType == type ? null : type;
-    });
-    _applyFilters();
-  }
-
-  void _applyFilters() {
-    ref.read(feedsProvider.notifier).loadFeeds(
-          refresh: true,
-          type: _selectedType,
-          lowStockOnly: _showLowStockOnly,
-        );
-  }
-
-  Widget _buildActiveFilters() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          const Text(
-            'Фильтры:',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 8),
-          if (_showLowStockOnly)
-            Chip(
-              label: const Text('Мало на складе'),
-              onDeleted: () {
-                setState(() {
-                  _showLowStockOnly = false;
-                });
-                _applyFilters();
-              },
-            ),
-          if (_selectedType != null)
-            Chip(
-              label: Text(_selectedType!.displayName),
-              onDeleted: () {
-                setState(() {
-                  _selectedType = null;
-                });
-                _applyFilters();
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeedsList(BuildContext context, FeedsState feedsState) {
-    if (feedsState.isLoading && feedsState.feeds.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (feedsState.error != null && feedsState.feeds.isEmpty) {
-      return AppErrorState(
-        message: feedsState.error!,
-        onRetry: () => ref.read(feedsProvider.notifier).refresh(),
-      );
-    }
-
-    if (feedsState.feeds.isEmpty) {
-      return AppEmptyState(
-        icon: Icons.inventory_2_outlined,
-        title: 'Корма не найдены',
-        subtitle: 'Добавьте первый корм',
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(feedsProvider.notifier).refresh(),
-      child: ListView.builder(
-        itemCount: feedsState.feeds.length + (feedsState.hasMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == feedsState.feeds.length) {
-            // Загрузка следующей страницы
-            if (feedsState.hasMore && !feedsState.isLoading) {
-              Future.microtask(
-                  () => ref.read(feedsProvider.notifier).loadMore());
-            }
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
+      body: PagedListView<Feed>(
+        items: state.feeds,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.refresh,
+        onLoadMore: notifier.loadMore,
+        header: _Filters(state: state),
+        empty: state.hasFilters
+            ? AppEmptyState(
+                icon: Icons.filter_alt_off_outlined,
+                title: context.l10n.feedsNoneInView,
+                subtitle: context.l10n.feedsNoneInViewBody,
+                actionLabel: context.l10n.commonReset,
+                onAction: notifier.clearFilters,
+              )
+            : AppEmptyState(
+                icon: Icons.inventory_2_outlined,
+                title: context.l10n.feedsEmptyTitle,
+                subtitle: context.l10n.feedsEmptyBody,
+                actionLabel: canManage ? context.l10n.feedsAdd : null,
+                onAction: canManage ? () => context.push('/feeds/form') : null,
               ),
-            );
-          }
-
-          final feed = feedsState.feeds[index];
-          return _buildFeedCard(context, feed);
-        },
+        itemBuilder: (context, feed, _) => _FeedCard(
+          feed: feed,
+          canManage: canManage,
+          onTap: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => _FeedDetailsSheet(feed: feed),
+          ),
+          onAdjust: (isAddition) =>
+              _adjustStock(context, feed, isAddition: isAddition),
+        ),
       ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/feeds/form'),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.feedsAdd),
+            )
+          : null,
     );
   }
 
-  Widget _buildFeedCard(BuildContext context, Feed feed) {
-    final hasLowStock = ref.watch(feedHasLowStockProvider(feed));
+  Future<void> _adjustStock(
+    BuildContext context,
+    Feed feed, {
+    required bool isAddition,
+  }) async {
+    // Всё, что зависит от контекста, снимается до ожидания: экран может
+    // закрыться, пока идёт запрос.
+    final messenger = ScaffoldMessenger.of(context);
+    final refilled = context.l10n.feedsRefilled;
+    final writtenOff = context.l10n.feedsWrittenOff;
+    final failed = context.l10n.feedsAdjustFailed;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: feed.type.color,
-          child: Icon(feed.type.icon, color: Colors.white),
+    final quantity = await showDialog<double>(
+      context: context,
+      builder: (_) => _StockDialog(feed: feed, isAddition: isAddition),
+    );
+    if (quantity == null) return;
+
+    final amount = formatQuantity(quantity, feed.unit.displayName);
+    final done = isAddition ? refilled(amount) : writtenOff(amount);
+
+    final error = await ref.read(feedsProvider.notifier).adjustStock(
+          feed.id,
+          StockAdjustment(
+            quantity: quantity,
+            operation: isAddition ? 'add' : 'subtract',
+          ),
+        );
+
+    // Сообщение показывается после ответа сервера, а не вместо него: раньше
+    // «склад пополнен» появлялось даже при отказе, и остаток не менялся.
+    messenger.showSnackBar(
+      error == null
+          ? SnackBar(content: Text(done))
+          : SnackBar(
+              content: Text('$failed: $error'),
+              backgroundColor: AppColors.error,
+            ),
+    );
+  }
+}
+
+class _Filters extends ConsumerWidget {
+  final FeedsState state;
+
+  const _Filters({required this.state});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(feedsProvider.notifier);
+
+    return AppFilterBar(
+      chips: [
+        AppFilterChipData(
+          label: context.l10n.feedsFilterAll,
+          isSelected: !state.hasFilters,
+          onTap: notifier.clearFilters,
         ),
-        title: Text(
-          feed.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        AppFilterChipData(
+          label: context.l10n.feedsFilterLowStock,
+          isSelected: state.lowStockOnly,
+          onTap: () => notifier.setFilters(
+            type: state.type,
+            lowStockOnly: !state.lowStockOnly,
+          ),
+          color: AppColors.warning,
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(feed.type.displayName),
-            const SizedBox(height: 4),
+        // Типы берутся из самой модели: раньше пять из них были переписаны в
+        // экране руками и могли разойтись с подписями в других местах.
+        for (final type in FeedType.values)
+          AppFilterChipData(
+            label: type.displayName,
+            isSelected: state.type == type,
+            onTap: () => notifier.setFilters(
+              type: state.type == type ? null : type,
+              lowStockOnly: state.lowStockOnly,
+            ),
+            color: type.color,
+          ),
+      ],
+    );
+  }
+}
+
+class _FeedCard extends StatelessWidget {
+  final Feed feed;
+  final bool canManage;
+  final VoidCallback onTap;
+  final void Function(bool isAddition) onAdjust;
+
+  const _FeedCard({
+    required this.feed,
+    required this.canManage,
+    required this.onTap,
+    required this.onAdjust,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final low = feed.currentStock <= feed.minStock;
+    final stockColor = low ? AppColors.warning : context.colors.onSurface;
+
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: feed.type.color.withValues(alpha: 0.12),
+                  borderRadius: AppRadius.smAll,
+                ),
+                child: Icon(feed.type.icon, color: feed.type.color, size: 20),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      feed.name,
+                      style: AppTypography.titleMd
+                          .copyWith(color: context.colors.onSurface),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      feed.type.displayName,
+                      style: AppTypography.labelSm
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    formatQuantity(feed.currentStock, feed.unit.displayName),
+                    style: AppTypography.titleLg.copyWith(color: stockColor),
+                  ),
+                  Text(
+                    '${context.l10n.feedsMinStock} ${formatQuantity(feed.minStock, feed.unit.displayName)}',
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (low) ...[
+            const SizedBox(height: AppSpacing.md),
             Row(
               children: [
-                Icon(
-                  hasLowStock ? Icons.warning : Icons.inventory,
-                  size: 16,
-                  color: hasLowStock ? AppColors.error : AppColors.success,
-                ),
-                const SizedBox(width: 4),
+                const Icon(Icons.warning_amber_outlined,
+                    size: 16, color: AppColors.warning),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'На складе: ${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
-                  style: TextStyle(
-                    color: hasLowStock ? AppColors.error : null,
-                    fontWeight: hasLowStock ? FontWeight.bold : FontWeight.normal,
+                  context.l10n.feedsLowStockWarning,
+                  style: AppTypography.labelSm
+                      .copyWith(color: AppColors.warning),
+                ),
+              ],
+            ),
+          ],
+          if (canManage) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => onAdjust(true),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(context.l10n.feedsRefill),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 40),
+                      foregroundColor: AppColors.success,
+                      side: const BorderSide(color: AppColors.success),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => onAdjust(false),
+                    icon: const Icon(Icons.remove, size: 18),
+                    label: Text(context.l10n.feedsWriteOff),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 40),
+                      foregroundColor: context.colors.onSurfaceVariant,
+                      side: BorderSide(color: context.colors.outline),
+                    ),
                   ),
                 ),
               ],
             ),
-            if (hasLowStock)
-              Text(
-                'Минимум: ${feed.minStock.toStringAsFixed(1)} ${feed.unit.displayName}',
-                style: const TextStyle(color: AppColors.error, fontSize: 12),
-              ),
           ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: AppColors.success),
-              onPressed: () => _showStockAdjustment(context, feed, true),
-              tooltip: 'Пополнить склад',
-            ),
-            IconButton(
-              icon: const Icon(Icons.remove_circle_outline, color: AppColors.error),
-              onPressed: () => _showStockAdjustment(context, feed, false),
-              tooltip: 'Списать со склада',
-            ),
-          ],
-        ),
-        onTap: () => _showFeedDetail(context, feed),
+        ],
       ),
     );
   }
+}
 
-  void _showFeedDetail(BuildContext context, Feed feed) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+/// Диалог пополнения и списания.
+class _StockDialog extends StatefulWidget {
+  final Feed feed;
+  final bool isAddition;
+
+  const _StockDialog({required this.feed, required this.isAddition});
+
+  @override
+  State<_StockDialog> createState() => _StockDialogState();
+}
+
+class _StockDialogState extends State<_StockDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _quantity = TextEditingController();
+
+  @override
+  void dispose() {
+    _quantity.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+    Navigator.pop(context, parseDecimal(_quantity.text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return AlertDialog(
+      title: Text(
+          widget.isAddition ? l10n.feedsRefillTitle : l10n.feedsWriteOffTitle),
+      content: Form(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: feed.type.color,
-                  child: Icon(feed.type.icon, color: Colors.white),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    feed.name,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _showFeedForm(context, feed);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: AppColors.error),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _deleteFeed(context, feed);
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
             Text(
-              feed.type.displayName,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              widget.feed.name,
+              style: AppTypography.titleMd
+                  .copyWith(color: context.colors.onSurface),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _feedStat(
-                    'На складе',
-                    '${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
-                    feed.currentStock <= feed.minStock
-                        ? AppColors.error
-                        : AppColors.success,
-                  ),
-                ),
-                Expanded(
-                  child: _feedStat(
-                    'Минимум',
-                    '${feed.minStock.toStringAsFixed(1)} ${feed.unit.displayName}',
-                    Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.feedsCurrentStock(formatQuantity(
+                  widget.feed.currentStock, widget.feed.unit.displayName)),
+              style: AppTypography.bodyMd
+                  .copyWith(color: context.colors.onSurfaceVariant),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.lg),
+            TextFormField(
+              controller: _quantity,
+              autofocus: true,
+              // Дробный ввод: мешки и килограммы редко бывают целыми.
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.feedsQuantity,
+                suffixText: widget.feed.unit.displayName,
+              ),
+              onFieldSubmitted: (_) => _submit(),
+              validator: (v) {
+                final value = parseDecimal(v);
+                // Раньше «2,5» молча ничего не делало: кнопка нажималась,
+                // разбор падал, диалог оставался открытым без объяснений.
+                if (value == null) return l10n.commonNumberInvalid;
+                if (value <= 0) return l10n.feedsQuantityPositive;
+                return null;
+              },
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _feedStat(String label, String value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-        Text(value,
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: _submit,
+          child: Text(l10n.commonApply),
+        ),
       ],
     );
   }
+}
 
-  Future<void> _deleteFeed(BuildContext context, Feed feed) async {
-    final messenger = ScaffoldMessenger.of(context);
+class _FeedDetailsSheet extends ConsumerWidget {
+  final Feed feed;
+
+  const _FeedDetailsSheet({required this.feed});
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить корм?'),
-        content: Text('Корм "${feed.name}" будет удален безвозвратно.'),
+        title: Text(context.l10n.feedsDeleteTitle),
+        content: Text(context.l10n.feedsDeleteBody(feed.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true || !context.mounted) return;
 
-    if (confirmed == true && mounted) {
-      try {
-        await ref.read(deleteFeedProvider(feed.id).future);
-        if (mounted) {
-          ref.read(feedsProvider.notifier).refresh();
-        }
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Корм удален')),
-        );
-      } catch (e) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Ошибка удаления: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.feedsDeleted;
+    final failed = context.l10n.feedsDeleteFailed;
+
+    final error = await ref.read(feedsProvider.notifier).deleteFeed(feed.id);
+    if (error == null) {
+      navigator.pop();
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$failed: $error'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
-  void _showFeedForm(BuildContext context, Feed? feed) {
-    context.push('/feeds/form', extra: feed);
-  }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final canManage = ref.watch(canProvider(FarmCapability.manageStock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+    final low = feed.currentStock <= feed.minStock;
 
-  void _showStockAdjustment(BuildContext context, Feed feed, bool isAddition) {
-    final quantityController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isAddition ? 'Пополнить склад' : 'Списать со склада'),
-        content: Column(
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.screenH,
+          0,
+          AppSpacing.screenH,
+          AppSpacing.lg,
+        ),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              feed.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: feed.type.color.withValues(alpha: 0.12),
+                    borderRadius: AppRadius.mdAll,
+                  ),
+                  child: Icon(feed.type.icon, color: feed.type.color),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        feed.name,
+                        style: AppTypography.titleLg
+                            .copyWith(color: context.colors.onSurface),
+                      ),
+                      Text(
+                        feed.type.displayName,
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                if (canManage)
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push('/feeds/form', extra: feed);
+                    },
+                  ),
+                if (canDelete)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    color: AppColors.error,
+                    onPressed: () => _delete(context, ref),
+                  ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Текущий остаток: ${feed.currentStock.toStringAsFixed(1)} ${feed.unit.displayName}',
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Количество',
-                suffixText: feed.unit.displayName,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final quantity = double.tryParse(quantityController.text);
-              if (quantity != null && quantity > 0) {
-                _adjustStock(context, feed.id, quantity, isAddition);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Применить'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _adjustStock(
-      BuildContext context, int feedId, double quantity, bool isAddition) {
-    final adjustment = StockAdjustment(
-      quantity: quantity,
-      operation: isAddition ? 'add' : 'subtract',
-    );
-
-    ref.read(adjustFeedStockProvider((id: feedId, adjustment: adjustment)));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isAddition
-              ? 'Склад пополнен на ${quantity.toStringAsFixed(1)}'
-              : 'Списано со склада ${quantity.toStringAsFixed(1)}',
-        ),
-      ),
-    );
-  }
-
-  void _showFilters(BuildContext context) {
-    FeedType? tempType = _selectedType;
-    bool tempLowStock = _showLowStockOnly;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Фильтры'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<FeedType?>(
-                initialValue: tempType,
-                decoration: const InputDecoration(labelText: 'Тип корма'),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('Все типы')),
-                  ...FeedType.values.map((type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type.displayName),
-                      )),
-                ],
-                onChanged: (value) => setDialogState(() => tempType = value),
-              ),
-              const SizedBox(height: 8),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Только низкий остаток'),
-                value: tempLowStock,
-                onChanged: (value) =>
-                    setDialogState(() => tempLowStock = value),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _selectedType = null;
-                  _showLowStockOnly = false;
-                });
-                _applyFilters();
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Сбросить'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _selectedType = tempType;
-                  _showLowStockOnly = tempLowStock;
-                });
-                _applyFilters();
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Применить'),
+            const SizedBox(height: AppSpacing.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.inventory_2_outlined,
+                    label: context.l10n.feedsInStock,
+                    value: formatQuantity(
+                        feed.currentStock, feed.unit.displayName),
+                    accent: low ? AppColors.warning : AppColors.success,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.low_priority,
+                    label: context.l10n.feedsMinStock,
+                    value:
+                        formatQuantity(feed.minStock, feed.unit.displayName),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _showStatistics(BuildContext context) {
-    context.push('/feeds/statistics');
   }
 }

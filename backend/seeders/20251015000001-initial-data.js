@@ -1,8 +1,28 @@
 'use strict';
 const bcrypt = require('bcrypt');
 
+/**
+ * Демонстрационный набор данных для разработки: три учётные записи с
+ * заранее известными паролями, восемь пород, десять клеток и шесть кормов.
+ *
+ * Это НЕ справочники. В docker-compose и в DEPLOY.md флаг RUN_SEEDS был описан
+ * как «залить справочники», из-за чего его легко включить на боевом стенде — и
+ * получить владельца фермы с паролем, опубликованным в репозитории. Поэтому
+ * сидер жёстко отказывается работать в продакшене.
+ */
+const assertNotProduction = () => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'Демо-данные не заливаются в продакшен: сидер создаёт учётные записи ' +
+      'с общеизвестными паролями. Уберите RUN_SEEDS или смените NODE_ENV.'
+    );
+  }
+};
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    assertNotProduction();
+
     // Hash password for default user
     const passwordHash = await bcrypt.hash('admin123', 10);
 
@@ -127,6 +147,7 @@ module.exports = {
     // Insert cages
     await queryInterface.bulkInsert('cages', [
       {
+        user_id: 1,
         number: 'A1',
         type: 'single',
         size: '60x80x45',
@@ -138,6 +159,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'A2',
         type: 'single',
         size: '60x80x45',
@@ -149,6 +171,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'A3',
         type: 'single',
         size: '60x80x45',
@@ -159,6 +182,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'B1',
         type: 'maternity',
         size: '80x100x50',
@@ -170,6 +194,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'B2',
         type: 'maternity',
         size: '80x100x50',
@@ -181,6 +206,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'C1',
         type: 'group',
         size: '150x120x60',
@@ -192,6 +218,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'C2',
         type: 'group',
         size: '150x120x60',
@@ -203,6 +230,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'D1',
         type: 'single',
         size: '60x80x45',
@@ -214,6 +242,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'E1',
         type: 'single',
         size: '70x90x50',
@@ -225,6 +254,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         number: 'E2',
         type: 'single',
         size: '70x90x50',
@@ -240,6 +270,7 @@ module.exports = {
     // Insert feeds
     await queryInterface.bulkInsert('feeds', [
       {
+        user_id: 1,
         name: 'Комбикорм для кроликов ПК-90',
         type: 'pellets',
         brand: 'Провими',
@@ -252,6 +283,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         name: 'Сено луговое',
         type: 'hay',
         brand: null,
@@ -264,6 +296,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         name: 'Морковь',
         type: 'vegetables',
         brand: null,
@@ -276,6 +309,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         name: 'Овёс',
         type: 'grain',
         brand: null,
@@ -288,6 +322,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         name: 'Витаминная добавка "Ушастик"',
         type: 'supplements',
         brand: 'Агроветзащита',
@@ -300,6 +335,7 @@ module.exports = {
         updated_at: new Date()
       },
       {
+        user_id: 1,
         name: 'Соль-лизунец',
         type: 'supplements',
         brand: null,
@@ -324,6 +360,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    assertNotProduction();
+
     // Delete in reverse order to respect foreign keys
     await queryInterface.bulkDelete('feeds', null, {});
     await queryInterface.bulkDelete('cages', null, {});

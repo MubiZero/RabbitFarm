@@ -15,10 +15,10 @@ _$MedicalRecordImpl _$$MedicalRecordImplFromJson(Map<String, dynamic> json) =>
       treatment: json['treatment'] as String?,
       medication: json['medication'] as String?,
       dosage: json['dosage'] as String?,
-      startedAt: DateTime.parse(json['started_at'] as String),
-      endedAt: json['ended_at'] == null
-          ? null
-          : DateTime.parse(json['ended_at'] as String),
+      startedAt: const DateOnlyConverter().fromJson(
+        json['started_at'] as Object,
+      ),
+      endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
       outcome:
           $enumDecodeNullable(_$MedicalOutcomeEnumMap, json['outcome']) ??
           MedicalOutcome.ongoing,
@@ -28,35 +28,32 @@ _$MedicalRecordImpl _$$MedicalRecordImplFromJson(Map<String, dynamic> json) =>
       ),
       veterinarian: json['veterinarian'] as String?,
       notes: json['notes'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
     );
 
-Map<String, dynamic> _$$MedicalRecordImplToJson(_$MedicalRecordImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'rabbit_id': const IntConverter().toJson(instance.rabbitId),
-      'symptoms': instance.symptoms,
-      'diagnosis': instance.diagnosis,
-      'treatment': instance.treatment,
-      'medication': instance.medication,
-      'dosage': instance.dosage,
-      'started_at': instance.startedAt.toIso8601String(),
-      'ended_at': instance.endedAt?.toIso8601String(),
-      'outcome': _$MedicalOutcomeEnumMap[instance.outcome]!,
-      'cost': _$JsonConverterToJson<Object, double>(
-        instance.cost,
-        const DoubleConverter().toJson,
-      ),
-      'veterinarian': instance.veterinarian,
-      'notes': instance.notes,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$$MedicalRecordImplToJson(
+  _$MedicalRecordImpl instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'rabbit_id': const IntConverter().toJson(instance.rabbitId),
+  'symptoms': instance.symptoms,
+  'diagnosis': instance.diagnosis,
+  'treatment': instance.treatment,
+  'medication': instance.medication,
+  'dosage': instance.dosage,
+  'started_at': const DateOnlyConverter().toJson(instance.startedAt),
+  'ended_at': const NullableDateOnlyConverter().toJson(instance.endedAt),
+  'outcome': _$MedicalOutcomeEnumMap[instance.outcome]!,
+  'cost': _$JsonConverterToJson<Object, double>(
+    instance.cost,
+    const DoubleConverter().toJson,
+  ),
+  'veterinarian': instance.veterinarian,
+  'notes': instance.notes,
+  'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+};
 
 const _$MedicalOutcomeEnumMap = {
   MedicalOutcome.recovered: 'recovered',
@@ -84,10 +81,8 @@ _$MedicalRecordCreateImpl _$$MedicalRecordCreateImplFromJson(
   treatment: json['treatment'] as String?,
   medication: json['medication'] as String?,
   dosage: json['dosage'] as String?,
-  startedAt: DateTime.parse(json['started_at'] as String),
-  endedAt: json['ended_at'] == null
-      ? null
-      : DateTime.parse(json['ended_at'] as String),
+  startedAt: const DateOnlyConverter().fromJson(json['started_at'] as Object),
+  endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
   outcome: json['outcome'] as String? ?? 'ongoing',
   cost: (json['cost'] as num?)?.toDouble(),
   veterinarian: json['veterinarian'] as String?,
@@ -103,8 +98,8 @@ Map<String, dynamic> _$$MedicalRecordCreateImplToJson(
   'treatment': instance.treatment,
   'medication': instance.medication,
   'dosage': instance.dosage,
-  'started_at': instance.startedAt.toIso8601String(),
-  'ended_at': instance.endedAt?.toIso8601String(),
+  'started_at': const DateOnlyConverter().toJson(instance.startedAt),
+  'ended_at': const NullableDateOnlyConverter().toJson(instance.endedAt),
   'outcome': instance.outcome,
   'cost': instance.cost,
   'veterinarian': instance.veterinarian,
@@ -120,12 +115,8 @@ _$MedicalRecordUpdateImpl _$$MedicalRecordUpdateImplFromJson(
   treatment: json['treatment'] as String?,
   medication: json['medication'] as String?,
   dosage: json['dosage'] as String?,
-  startedAt: json['started_at'] == null
-      ? null
-      : DateTime.parse(json['started_at'] as String),
-  endedAt: json['ended_at'] == null
-      ? null
-      : DateTime.parse(json['ended_at'] as String),
+  startedAt: const NullableDateOnlyConverter().fromJson(json['started_at']),
+  endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
   outcome: json['outcome'] as String?,
   cost: (json['cost'] as num?)?.toDouble(),
   veterinarian: json['veterinarian'] as String?,
@@ -141,8 +132,8 @@ Map<String, dynamic> _$$MedicalRecordUpdateImplToJson(
   'treatment': instance.treatment,
   'medication': instance.medication,
   'dosage': instance.dosage,
-  'started_at': instance.startedAt?.toIso8601String(),
-  'ended_at': instance.endedAt?.toIso8601String(),
+  'started_at': const NullableDateOnlyConverter().toJson(instance.startedAt),
+  'ended_at': const NullableDateOnlyConverter().toJson(instance.endedAt),
   'outcome': instance.outcome,
   'cost': instance.cost,
   'veterinarian': instance.veterinarian,
@@ -200,7 +191,7 @@ _$OngoingTreatmentImpl _$$OngoingTreatmentImplFromJson(
   rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
   rabbitName: json['rabbit_name'] as String?,
   diagnosis: json['diagnosis'] as String?,
-  startedAt: DateTime.parse(json['started_at'] as String),
+  startedAt: const DateOnlyConverter().fromJson(json['started_at'] as Object),
   daysOngoing: (json['days_ongoing'] as num).toInt(),
   symptoms: json['symptoms'] as String?,
 );
@@ -212,7 +203,7 @@ Map<String, dynamic> _$$OngoingTreatmentImplToJson(
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),
   'rabbit_name': instance.rabbitName,
   'diagnosis': instance.diagnosis,
-  'started_at': instance.startedAt.toIso8601String(),
+  'started_at': const DateOnlyConverter().toJson(instance.startedAt),
   'days_ongoing': instance.daysOngoing,
   'symptoms': instance.symptoms,
 };
@@ -227,10 +218,8 @@ _$MedicalRecordWithDaysImpl _$$MedicalRecordWithDaysImplFromJson(
   treatment: json['treatment'] as String?,
   medication: json['medication'] as String?,
   dosage: json['dosage'] as String?,
-  startedAt: DateTime.parse(json['started_at'] as String),
-  endedAt: json['ended_at'] == null
-      ? null
-      : DateTime.parse(json['ended_at'] as String),
+  startedAt: const DateOnlyConverter().fromJson(json['started_at'] as Object),
+  endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
   outcome:
       $enumDecodeNullable(_$MedicalOutcomeEnumMap, json['outcome']) ??
       MedicalOutcome.ongoing,
@@ -253,8 +242,8 @@ Map<String, dynamic> _$$MedicalRecordWithDaysImplToJson(
   'treatment': instance.treatment,
   'medication': instance.medication,
   'dosage': instance.dosage,
-  'started_at': instance.startedAt.toIso8601String(),
-  'ended_at': instance.endedAt?.toIso8601String(),
+  'started_at': const DateOnlyConverter().toJson(instance.startedAt),
+  'ended_at': const NullableDateOnlyConverter().toJson(instance.endedAt),
   'outcome': _$MedicalOutcomeEnumMap[instance.outcome]!,
   'cost': _$JsonConverterToJson<Object, double>(
     instance.cost,

@@ -140,10 +140,14 @@ class StaffService {
     }
 
     const temporaryPassword = crypto.randomBytes(9).toString('base64url');
-    await member.update({ password_hash: await PasswordUtil.hash(temporaryPassword) });
 
     // Старые сессии работника перестают действовать: иначе смена пароля
-    // не отбирает доступ у того, кто уже вошёл.
+    // не отбирает доступ у того, кто уже вошёл. Отметка времени закрывает и
+    // уже выданные access-токены, которые живут ещё несколько минут.
+    await member.update({
+      password_hash: await PasswordUtil.hash(temporaryPassword),
+      token_version: (member.token_version || 0) + 1
+    });
     await RefreshToken.destroy({ where: { user_id: member.id } });
 
     logger.info('Staff password reset', { memberId, farmId });

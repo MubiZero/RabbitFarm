@@ -2,17 +2,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/vaccination_model.dart';
 import '../../data/repositories/vaccinations_repository.dart';
 
+/// Что показывает список: всё подряд или выборку.
+///
+/// Раньше «Просроченные» на экране были кнопкой, которая обновляла совсем
+/// другой источник данных: список её не читал, и нажатие ничего не меняло.
+/// Теперь выборка — часть состояния списка, и её видно по подсвеченной кнопке.
+enum VaccinationView { all, upcoming, overdue, last30Days }
+
 /// Состояние списка вакцинаций
 class VaccinationsState {
   final List<Vaccination> vaccinations;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int? rabbitIdFilter;
   final VaccineType? typeFilter;
   final DateTime? fromDateFilter;
   final DateTime? toDateFilter;
+  final VaccinationView view;
 
-  VaccinationsState({
+  const VaccinationsState({
     this.vaccinations = const [],
     this.isLoading = false,
     this.error,
@@ -20,26 +28,42 @@ class VaccinationsState {
     this.typeFilter,
     this.fromDateFilter,
     this.toDateFilter,
+    this.view = VaccinationView.all,
   });
 
+  bool get hasFilters =>
+      typeFilter != null ||
+      fromDateFilter != null ||
+      toDateFilter != null ||
+      view != VaccinationView.all;
+
+  /// Флаги `clear*` нужны, чтобы отличить «параметр не передали» от «передали
+  /// null». Без них снять фильтр было невозможно: `setTypeFilter(null)`
+  /// возвращал прежнее значение, и крестик на ярлыке фильтра не работал.
   VaccinationsState copyWith({
     List<Vaccination>? vaccinations,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? rabbitIdFilter,
+    bool clearRabbitId = false,
     VaccineType? typeFilter,
+    bool clearType = false,
     DateTime? fromDateFilter,
+    bool clearFromDate = false,
     DateTime? toDateFilter,
-    bool clearFilters = false,
+    bool clearToDate = false,
+    VaccinationView? view,
   }) {
     return VaccinationsState(
       vaccinations: vaccinations ?? this.vaccinations,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      rabbitIdFilter: clearFilters ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
-      typeFilter: clearFilters ? null : (typeFilter ?? this.typeFilter),
-      fromDateFilter: clearFilters ? null : (fromDateFilter ?? this.fromDateFilter),
-      toDateFilter: clearFilters ? null : (toDateFilter ?? this.toDateFilter),
+      rabbitIdFilter: clearRabbitId ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
+      typeFilter: clearType ? null : (typeFilter ?? this.typeFilter),
+      fromDateFilter:
+          clearFromDate ? null : (fromDateFilter ?? this.fromDateFilter),
+      toDateFilter: clearToDate ? null : (toDateFilter ?? this.toDateFilter),
+      view: view ?? this.view,
     );
   }
 }
@@ -48,73 +72,75 @@ class VaccinationsState {
 class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
   final VaccinationsRepository _repository;
 
-  VaccinationsNotifier(this._repository) : super(VaccinationsState());
+  VaccinationsNotifier(this._repository) : super(const VaccinationsState()) {
+    load();
+  }
 
-  /// Загрузить список вакцинаций
-  Future<void> loadVaccinations({
-    int page = 1,
-    int limit = 50,
-    int? rabbitId,
-    VaccineType? vaccineType,
-    DateTime? fromDate,
-    DateTime? toDate,
-    bool? upcoming,
-  }) async {
+  /// Загрузить список по текущей выборке и фильтрам.
+  Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final vaccinations = await _repository.getVaccinations(
-        page: page,
-        limit: limit,
-        rabbitId: rabbitId ?? state.rabbitIdFilter,
-        vaccineType: vaccineType ?? state.typeFilter,
-        fromDate: fromDate ?? state.fromDateFilter,
-        toDate: toDate ?? state.toDateFilter,
-        upcoming: upcoming,
-      );
+      final vaccinations = switch (state.view) {
+        VaccinationView.overdue => await _repository.getOverdueVaccinations(),
+        VaccinationView.upcoming => await _repository.getVaccinations(
+            limit: 50,
+            rabbitId: state.rabbitIdFilter,
+            vaccineType: state.typeFilter,
+            upcoming: true,
+          ),
+        VaccinationView.all || VaccinationView.last30Days =>
+          await _repository.getVaccinations(
+            limit: 50,
+            rabbitId: state.rabbitIdFilter,
+            vaccineType: state.typeFilter,
+            fromDate: state.fromDateFilter,
+            toDate: state.toDateFilter,
+          ),
+      };
 
-      state = state.copyWith(
-        vaccinations: vaccinations,
-        isLoading: false,
-        rabbitIdFilter: rabbitId,
-        typeFilter: vaccineType,
-        fromDateFilter: fromDate,
-        toDateFilter: toDate,
-      );
+      state = state.copyWith(vaccinations: vaccinations, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Загрузить вакцинации конкретного кролика
   Future<void> loadRabbitVaccinations(int rabbitId) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(
+      isLoading: true,
+      error: null,
+      rabbitIdFilter: rabbitId,
+      view: VaccinationView.all,
+    );
 
     try {
       final vaccinations = await _repository.getRabbitVaccinations(rabbitId);
-
-      state = state.copyWith(
-        vaccinations: vaccinations,
-        isLoading: false,
-        rabbitIdFilter: rabbitId,
-      );
+      state = state.copyWith(vaccinations: vaccinations, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  /// Создать новую запись о вакцинации
+  /// Переключить выборку списка.
+  Future<void> setView(VaccinationView view) async {
+    final now = DateTime.now();
+    state = state.copyWith(
+      view: view,
+      fromDateFilter: view == VaccinationView.last30Days
+          ? now.subtract(const Duration(days: 30))
+          : null,
+      clearFromDate: view != VaccinationView.last30Days,
+      toDateFilter: view == VaccinationView.last30Days ? now : null,
+      clearToDate: view != VaccinationView.last30Days,
+    );
+    await load();
+  }
+
   Future<bool> createVaccination(VaccinationRequest request) async {
     try {
       await _repository.createVaccination(request);
-      // Обновляем список
-      await loadVaccinations();
+      await load();
       return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -122,12 +148,10 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
     }
   }
 
-  /// Обновить запись о вакцинации
   Future<bool> updateVaccination(int id, VaccinationRequest request) async {
     try {
       await _repository.updateVaccination(id, request);
-      // Обновляем список
-      await loadVaccinations();
+      await load();
       return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -135,11 +159,9 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
     }
   }
 
-  /// Удалить запись о вакцинации
   Future<bool> deleteVaccination(int id) async {
     try {
       await _repository.deleteVaccination(id);
-      // Удаляем из списка
       state = state.copyWith(
         vaccinations: state.vaccinations.where((v) => v.id != id).toList(),
       );
@@ -150,28 +172,32 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
     }
   }
 
-  /// Установить фильтр по типу вакцины
-  void setTypeFilter(VaccineType? type) {
-    state = state.copyWith(typeFilter: type);
-    loadVaccinations();
+  Future<void> setTypeFilter(VaccineType? type) async {
+    state = state.copyWith(typeFilter: type, clearType: type == null);
+    await load();
   }
 
-  /// Установить фильтр по дате
-  void setDateFilter(DateTime? fromDate, DateTime? toDate) {
+  Future<void> setDateFilter(DateTime? fromDate, DateTime? toDate) async {
     state = state.copyWith(
       fromDateFilter: fromDate,
+      clearFromDate: fromDate == null,
       toDateFilter: toDate,
+      clearToDate: toDate == null,
+      view: VaccinationView.all,
     );
-    loadVaccinations();
+    await load();
   }
 
-  /// Очистить все фильтры
-  void clearFilters() {
-    state = state.copyWith(clearFilters: true);
-    loadVaccinations();
+  Future<void> clearFilters() async {
+    state = state.copyWith(
+      clearType: true,
+      clearFromDate: true,
+      clearToDate: true,
+      view: VaccinationView.all,
+    );
+    await load();
   }
 
-  /// Очистить ошибку
   void clearError() {
     state = state.copyWith(error: null);
   }
@@ -196,13 +222,6 @@ final upcomingVaccinationsProvider =
     FutureProvider.family<List<Vaccination>, int>((ref, days) async {
   final repository = ref.watch(vaccinationsRepositoryProvider);
   return await repository.getUpcomingVaccinations(days: days);
-});
-
-/// Provider для просроченных вакцинаций
-final overdueVaccinationsProvider =
-    FutureProvider<List<Vaccination>>((ref) async {
-  final repository = ref.watch(vaccinationsRepositoryProvider);
-  return await repository.getOverdueVaccinations();
 });
 
 /// Provider для истории вакцинаций конкретного кролика

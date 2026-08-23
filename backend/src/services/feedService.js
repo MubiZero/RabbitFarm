@@ -56,15 +56,7 @@ class FeedService {
       order: [[sort_by, sort_order.toUpperCase()]]
     });
 
-    return {
-      rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit)
-      }
-    };
+    return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
   async updateFeed(id, userId, data) {
