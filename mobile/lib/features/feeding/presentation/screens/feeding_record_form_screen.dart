@@ -158,7 +158,7 @@ class _FeedingRecordFormScreenState
             ),
             if (_mode == _FeedingMode.rabbit)
               RabbitPickerField(
-                label: l10n.vaccFormRabbit,
+                label: l10n.fieldRecipient,
                 selected: _rabbit,
                 required: true,
                 onChanged: (rabbit) => setState(() {

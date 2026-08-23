@@ -43,7 +43,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     // Всё, что зависит от контекста, снимается до ожидания: экран может
     // закрыться, пока ответ идёт с сервера.
     final messenger = ScaffoldMessenger.of(context);
-    final failedTemplate = context.l10n.cageActionFailed;
+    final failedTemplate = context.l10n.commonActionFailed;
     try {
       await action();
       ref.invalidate(cagesProvider);

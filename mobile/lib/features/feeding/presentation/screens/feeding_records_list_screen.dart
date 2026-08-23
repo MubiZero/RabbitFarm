@@ -44,12 +44,12 @@ class _FeedingRecordsListScreenState
         title: Text(context.l10n.feedingTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.medStats,
+            tooltip: context.l10n.commonSummary,
             icon: const Icon(Icons.insights_outlined),
             onPressed: () => context.push('/feeding-records/statistics'),
           ),
           IconButton(
-            tooltip: context.l10n.feedingPeriod,
+            tooltip: context.l10n.commonPeriod,
             icon: Icon(state.hasFilters
                 ? Icons.filter_list_alt
                 : Icons.filter_list),
@@ -70,7 +70,7 @@ class _FeedingRecordsListScreenState
                 icon: Icons.event_busy_outlined,
                 title: context.l10n.feedingNoneInView,
                 subtitle: context.l10n.feedingNoneInViewBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: () => notifier.setPeriod(null, null),
               )
             : AppEmptyState(
@@ -150,7 +150,7 @@ class _FeedingRecordsListScreenState
       // Один выбор диапазона вместо двух отдельных календарей: раньше начало
       // и конец периода выбирались в разных диалогах, и перепутать их местами
       // ничего не мешало.
-      helpText: context.l10n.feedingPeriod,
+      helpText: context.l10n.commonPeriod,
     );
     if (range == null) return;
     await ref

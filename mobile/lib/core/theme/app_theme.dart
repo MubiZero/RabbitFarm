@@ -175,7 +175,11 @@ class AppTheme {
         focusElevation: 0,
         hoverElevation: 0,
         highlightElevation: 0,
-        shape: const CircleBorder(),
+        // Круглая форма здесь распространялась и на растянутые кнопки: фон
+        // оставался кружком, а значок с подписью вылезали за него и наезжали
+        // на текст. Скруглённый прямоугольник годится обеим формам и совпадает
+        // со скруглением карточек.
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.lgAll),
         extendedTextStyle: AppTypography.labelLg,
         extendedSizeConstraints: const BoxConstraints.tightFor(height: 52),
       ),

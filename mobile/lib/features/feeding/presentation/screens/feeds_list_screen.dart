@@ -39,7 +39,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
         title: Text(context.l10n.feedsTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.medStats,
+            tooltip: context.l10n.commonSummary,
             icon: const Icon(Icons.insights_outlined),
             onPressed: () => context.push('/feeds/statistics'),
           ),
@@ -58,7 +58,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
                 icon: Icons.filter_alt_off_outlined,
                 title: context.l10n.feedsNoneInView,
                 subtitle: context.l10n.feedsNoneInViewBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: notifier.clearFilters,
               )
             : AppEmptyState(
@@ -378,7 +378,7 @@ class _StockDialogState extends State<_StockDialog> {
         ),
         TextButton(
           onPressed: _submit,
-          child: Text(l10n.tasksFiltersApply),
+          child: Text(l10n.commonApply),
         ),
       ],
     );

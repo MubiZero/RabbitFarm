@@ -172,6 +172,12 @@ abstract class AppLocalizations {
   /// **'Действия'**
   String get commonActions;
 
+  /// No description provided for @commonEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Почта'**
+  String get commonEmail;
+
   /// No description provided for @loginSubtitle.
   ///
   /// In ru, this message translates to:
@@ -700,11 +706,11 @@ abstract class AppLocalizations {
   /// **'Самка'**
   String get breedingFemale;
 
-  /// No description provided for @breedingNameMissing.
+  /// No description provided for @commonNameMissing.
   ///
   /// In ru, this message translates to:
   /// **'Имя не указано'**
-  String get breedingNameMissing;
+  String get commonNameMissing;
 
   /// No description provided for @breedingExpectedBirth.
   ///
@@ -826,11 +832,11 @@ abstract class AppLocalizations {
   /// **'{name} поселён в клетку'**
   String cageSettled(String name);
 
-  /// No description provided for @cageActionFailed.
+  /// No description provided for @commonActionFailed.
   ///
   /// In ru, this message translates to:
   /// **'Не удалось: {reason}'**
-  String cageActionFailed(String reason);
+  String commonActionFailed(String reason);
 
   /// No description provided for @cageResidentMove.
   ///
@@ -891,6 +897,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Освободите место или добавьте новую клетку.'**
   String get cagePickNoFreeCagesBody;
+
+  /// No description provided for @cageFormType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип клетки'**
+  String get cageFormType;
 
   /// No description provided for @cageTypeSingle.
   ///
@@ -970,23 +982,23 @@ abstract class AppLocalizations {
   /// **'Задачи'**
   String get tasksTitle;
 
-  /// No description provided for @tasksFilters.
+  /// No description provided for @commonFilters.
   ///
   /// In ru, this message translates to:
   /// **'Фильтры'**
-  String get tasksFilters;
+  String get commonFilters;
 
-  /// No description provided for @tasksFiltersApply.
+  /// No description provided for @commonApply.
   ///
   /// In ru, this message translates to:
   /// **'Применить'**
-  String get tasksFiltersApply;
+  String get commonApply;
 
-  /// No description provided for @tasksFiltersReset.
+  /// No description provided for @commonReset.
   ///
   /// In ru, this message translates to:
   /// **'Сбросить'**
-  String get tasksFiltersReset;
+  String get commonReset;
 
   /// No description provided for @tasksFilterType.
   ///
@@ -1654,11 +1666,11 @@ abstract class AppLocalizations {
   /// **'Дополнительно'**
   String get vaccFormSectionExtra;
 
-  /// No description provided for @vaccFormRabbit.
+  /// No description provided for @fieldRecipient.
   ///
   /// In ru, this message translates to:
   /// **'Кому'**
-  String get vaccFormRabbit;
+  String get fieldRecipient;
 
   /// No description provided for @vaccFormType.
   ///
@@ -1930,11 +1942,11 @@ abstract class AppLocalizations {
   /// **'По дату'**
   String get medPeriodTo;
 
-  /// No description provided for @medStats.
+  /// No description provided for @commonSummary.
   ///
   /// In ru, this message translates to:
   /// **'Сводка'**
-  String get medStats;
+  String get commonSummary;
 
   /// No description provided for @medStatTotal.
   ///
@@ -2248,11 +2260,11 @@ abstract class AppLocalizations {
   /// **'Корм'**
   String get feedFormEditTitle;
 
-  /// No description provided for @feedFormSectionMain.
+  /// No description provided for @commonSectionMain.
   ///
   /// In ru, this message translates to:
   /// **'Основное'**
-  String get feedFormSectionMain;
+  String get commonSectionMain;
 
   /// No description provided for @feedFormSectionStock.
   ///
@@ -2428,11 +2440,11 @@ abstract class AppLocalizations {
   /// **'Не удалось удалить запись'**
   String get feedingDeleteFailed;
 
-  /// No description provided for @feedingPeriod.
+  /// No description provided for @commonPeriod.
   ///
   /// In ru, this message translates to:
   /// **'Период'**
-  String get feedingPeriod;
+  String get commonPeriod;
 
   /// No description provided for @feedingFormNewTitle.
   ///
@@ -2710,11 +2722,11 @@ abstract class AppLocalizations {
   /// **'Что за операция'**
   String get txFormSectionKind;
 
-  /// No description provided for @txFormSectionDetails.
+  /// No description provided for @commonSectionDetails.
   ///
   /// In ru, this message translates to:
   /// **'Подробности'**
-  String get txFormSectionDetails;
+  String get commonSectionDetails;
 
   /// No description provided for @txFormIncomeSubtitle.
   ///

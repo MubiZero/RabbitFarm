@@ -134,7 +134,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
       isDirty: () => _touched,
       children: [
         AppFormSection(
-          title: l10n.feedFormSectionMain,
+          title: l10n.commonSectionMain,
           children: [
             RabbitPickerField(
               label: l10n.birthFormMother,
@@ -199,7 +199,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
           ],
         ),
         AppFormSection(
-          title: l10n.txFormSectionDetails,
+          title: l10n.commonSectionDetails,
           children: [
             TextFormField(
               controller: _complications,

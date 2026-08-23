@@ -101,7 +101,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
       isDirty: () => _touched,
       children: [
         AppFormSection(
-          title: l10n.feedFormSectionMain,
+          title: l10n.commonSectionMain,
           children: [
             TextFormField(
               controller: _number,
@@ -117,7 +117,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
             DropdownButtonFormField<String>(
               initialValue: _type,
               decoration: InputDecoration(
-                labelText: l10n.feedsFilterType,
+                labelText: l10n.cageFormType,
                 prefixIcon: Icon(cageTypeIcon(_type)),
               ),
               items: [
@@ -168,7 +168,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
           ],
         ),
         AppFormSection(
-          title: l10n.txFormSectionDetails,
+          title: l10n.commonSectionDetails,
           children: [
             TextFormField(
               controller: _size,

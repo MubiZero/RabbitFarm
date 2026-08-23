@@ -93,7 +93,7 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
       isDirty: () => _touched,
       children: [
         AppFormSection(
-          title: l10n.feedFormSectionMain,
+          title: l10n.commonSectionMain,
           children: [
             TextFormField(
               controller: _name,

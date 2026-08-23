@@ -48,6 +48,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonActions => 'Действия';
 
   @override
+  String get commonEmail => 'Почта';
+
+  @override
   String get loginSubtitle => 'Вход в вашу ферму';
 
   @override
@@ -321,7 +324,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get breedingFemale => 'Самка';
 
   @override
-  String get breedingNameMissing => 'Имя не указано';
+  String get commonNameMissing => 'Имя не указано';
 
   @override
   String breedingExpectedBirth(String date) {
@@ -397,7 +400,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String cageActionFailed(String reason) {
+  String commonActionFailed(String reason) {
     return 'Не удалось: $reason';
   }
 
@@ -433,6 +436,9 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get cagePickNoFreeCagesBody =>
       'Освободите место или добавьте новую клетку.';
+
+  @override
+  String get cageFormType => 'Тип клетки';
 
   @override
   String get cageTypeSingle => 'Одиночная';
@@ -534,13 +540,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tasksTitle => 'Задачи';
 
   @override
-  String get tasksFilters => 'Фильтры';
+  String get commonFilters => 'Фильтры';
 
   @override
-  String get tasksFiltersApply => 'Применить';
+  String get commonApply => 'Применить';
 
   @override
-  String get tasksFiltersReset => 'Сбросить';
+  String get commonReset => 'Сбросить';
 
   @override
   String get tasksFilterType => 'Тип';
@@ -915,7 +921,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get vaccFormSectionExtra => 'Дополнительно';
 
   @override
-  String get vaccFormRabbit => 'Кому';
+  String get fieldRecipient => 'Кому';
 
   @override
   String get vaccFormType => 'Тип вакцины';
@@ -1056,7 +1062,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get medPeriodTo => 'По дату';
 
   @override
-  String get medStats => 'Сводка';
+  String get commonSummary => 'Сводка';
 
   @override
   String get medStatTotal => 'Всего карт';
@@ -1236,7 +1242,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedFormEditTitle => 'Корм';
 
   @override
-  String get feedFormSectionMain => 'Основное';
+  String get commonSectionMain => 'Основное';
 
   @override
   String get feedFormSectionStock => 'Склад';
@@ -1334,7 +1340,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedingDeleteFailed => 'Не удалось удалить запись';
 
   @override
-  String get feedingPeriod => 'Период';
+  String get commonPeriod => 'Период';
 
   @override
   String get feedingFormNewTitle => 'Новое кормление';
@@ -1480,7 +1486,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get txFormSectionKind => 'Что за операция';
 
   @override
-  String get txFormSectionDetails => 'Подробности';
+  String get commonSectionDetails => 'Подробности';
 
   @override
   String get txFormIncomeSubtitle => 'Продажа, услуги';

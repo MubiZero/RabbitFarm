@@ -25,7 +25,7 @@ class TasksListScreen extends ConsumerWidget {
         title: Text(context.l10n.tasksTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.tasksFilters,
+            tooltip: context.l10n.commonFilters,
             icon: Icon(filtered ? Icons.filter_list_alt : Icons.filter_list),
             onPressed: () => _showFilters(context, ref),
           ),
@@ -47,7 +47,7 @@ class TasksListScreen extends ConsumerWidget {
                 icon: Icons.filter_alt_off_outlined,
                 title: context.l10n.tasksNothingMatchesTitle,
                 subtitle: context.l10n.tasksNothingMatchesBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: notifier.clearFilters,
               )
             : AppEmptyState(
@@ -204,7 +204,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.l10n.tasksFilters,
+              context.l10n.commonFilters,
               style: AppTypography.titleLg
                   .copyWith(color: context.colors.onSurface),
             ),
@@ -271,7 +271,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       ref.read(tasksListProvider.notifier).clearFilters();
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersReset),
+                    child: Text(context.l10n.commonReset),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -290,7 +290,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                           );
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersApply),
+                    child: Text(context.l10n.commonApply),
                   ),
                 ),
               ],

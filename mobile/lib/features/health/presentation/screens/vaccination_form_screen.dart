@@ -147,7 +147,7 @@ class _VaccinationFormScreenState
             // Кролик выбирается через поиск на сервере: раньше в списке были
             // только те, кто успел подгрузиться на первую страницу.
             RabbitPickerField(
-              label: l10n.vaccFormRabbit,
+              label: l10n.fieldRecipient,
               selected: _rabbit,
               required: true,
               // При правке запись уже привязана к кролику — менять эту связь

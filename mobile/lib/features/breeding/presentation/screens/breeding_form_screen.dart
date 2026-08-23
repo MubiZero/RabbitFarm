@@ -165,7 +165,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
           ],
         ),
         AppFormSection(
-          title: l10n.txFormSectionDetails,
+          title: l10n.commonSectionDetails,
           children: [
             AppDateField(
               label: l10n.breedingDate,

@@ -212,7 +212,7 @@ class _Parent extends StatelessWidget {
           // («ID: 42») — для фермера это не подсказка, а мусор.
           name?.trim().isNotEmpty == true
               ? name!.trim()
-              : context.l10n.breedingNameMissing,
+              : context.l10n.commonNameMissing,
           style: AppTypography.titleMd.copyWith(color: context.colors.onSurface),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

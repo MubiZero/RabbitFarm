@@ -178,7 +178,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
       ],
       children: [
         AppFormSection(
-          title: l10n.feedFormSectionMain,
+          title: l10n.commonSectionMain,
           children: [
             TextFormField(
               controller: _name,

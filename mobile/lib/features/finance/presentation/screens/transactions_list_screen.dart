@@ -42,12 +42,12 @@ class _TransactionsListScreenState
         title: Text(context.l10n.financeTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.medStats,
+            tooltip: context.l10n.commonSummary,
             icon: const Icon(Icons.insights_outlined),
             onPressed: () => context.push('/transactions/statistics'),
           ),
           IconButton(
-            tooltip: context.l10n.tasksFilters,
+            tooltip: context.l10n.commonFilters,
             icon: Icon(state.hasFilters
                 ? Icons.filter_list_alt
                 : Icons.filter_list),
@@ -73,7 +73,7 @@ class _TransactionsListScreenState
                 icon: Icons.filter_alt_off_outlined,
                 title: context.l10n.financeNoneInView,
                 subtitle: context.l10n.financeNoneInViewBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: notifier.clearFilters,
               )
             : AppEmptyState(
@@ -624,7 +624,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
       initialDateRange: _from != null && _to != null
           ? DateTimeRange(start: _from!, end: _to!)
           : null,
-      helpText: context.l10n.feedingPeriod,
+      helpText: context.l10n.commonPeriod,
     );
     if (range == null) return;
     setState(() {
@@ -650,7 +650,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.l10n.tasksFilters,
+              context.l10n.commonFilters,
               style: AppTypography.titleLg
                   .copyWith(color: context.colors.onSurface),
             ),
@@ -676,7 +676,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
               onPressed: _pickRange,
               icon: const Icon(Icons.date_range, size: 18),
               label: Text(_from == null || _to == null
-                  ? context.l10n.feedingPeriod
+                  ? context.l10n.commonPeriod
                   : '${format.format(_from!)} — ${format.format(_to!)}'),
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -688,7 +688,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       ref.read(transactionsProvider.notifier).clearFilters();
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersReset),
+                    child: Text(context.l10n.commonReset),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -703,7 +703,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                           );
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersApply),
+                    child: Text(context.l10n.commonApply),
                   ),
                 ),
               ],

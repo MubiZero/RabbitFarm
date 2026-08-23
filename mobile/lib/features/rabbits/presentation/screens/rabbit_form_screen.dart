@@ -63,8 +63,16 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     } else if (widget.rabbitId != null) {
       Future.microtask(() => _loadRabbitFromProvider());
     } else {
-      _tagIdController.text = 'R-${DateTime.now().millisecondsSinceEpoch}';
+      _tagIdController.text = _suggestedTag();
     }
+  }
+
+  /// Номер бирки человек пишет на ушной бирке от руки, поэтому он должен быть
+  /// коротким. Раньше подставлялась метка времени вида «R-1787510574403»:
+  /// переписать её на бирку невозможно, и её оставляли как есть.
+  String _suggestedTag() {
+    final next = ref.read(rabbitsListProvider).total + 1;
+    return 'R-${next.toString().padLeft(3, '0')}';
   }
 
   Future<void> _loadRabbitFromProvider() async {
@@ -390,7 +398,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             const SizedBox(height: 8),
 
             AppFormSection(
-              title: context.l10n.feedFormSectionMain,
+              title: context.l10n.commonSectionMain,
               children: [
                 TextFormField(
                   controller: _nameController,
@@ -514,7 +522,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             ),
 
             AppFormSection(
-              title: context.l10n.txFormSectionDetails,
+              title: context.l10n.commonSectionDetails,
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: _selectedStatus,

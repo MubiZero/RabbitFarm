@@ -60,7 +60,7 @@ class _MedicalRecordsListScreenState
         title: Text(context.l10n.medTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.medStats,
+            tooltip: context.l10n.commonSummary,
             icon: const Icon(Icons.insights_outlined),
             onPressed: () => showModalBottomSheet(
               context: context,
@@ -69,7 +69,7 @@ class _MedicalRecordsListScreenState
             ),
           ),
           IconButton(
-            tooltip: context.l10n.tasksFilters,
+            tooltip: context.l10n.commonFilters,
             icon: Icon(_from != null || _to != null
                 ? Icons.filter_list_alt
                 : Icons.filter_list),
@@ -132,7 +132,7 @@ class _MedicalRecordsListScreenState
         icon: Icons.filter_alt_off_outlined,
         title: context.l10n.medNoneInView,
         subtitle: context.l10n.medNoneInViewBody,
-        actionLabel: context.l10n.tasksFiltersReset,
+        actionLabel: context.l10n.commonReset,
         onAction: () {
           setState(() {
             _outcome = null;
@@ -232,14 +232,14 @@ class _MedicalRecordsListScreenState
                           });
                           Navigator.pop(sheetContext);
                         },
-                        child: Text(context.l10n.tasksFiltersReset),
+                        child: Text(context.l10n.commonReset),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: FilledButton(
                         onPressed: () => Navigator.pop(sheetContext),
-                        child: Text(context.l10n.tasksFiltersApply),
+                        child: Text(context.l10n.commonApply),
                       ),
                     ),
                   ],
@@ -619,7 +619,7 @@ class _StatisticsSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppSectionTitle(context.l10n.medStats),
+                AppSectionTitle(context.l10n.commonSummary),
                 _StatLine(
                   label: context.l10n.medStatTotal,
                   value: '${stats.totalRecords}',
@@ -672,7 +672,7 @@ class _StatisticsSheet extends ConsumerWidget {
                               children: [
                                 Text(
                                   treatment.rabbitName ??
-                                      context.l10n.breedingNameMissing,
+                                      context.l10n.commonNameMissing,
                                   style: AppTypography.bodyLg.copyWith(
                                       color: context.colors.onSurface),
                                 ),

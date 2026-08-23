@@ -92,7 +92,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                 icon: Icons.search_off,
                 title: context.l10n.rabbitsNothingFound,
                 subtitle: context.l10n.rabbitsNothingFoundBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: () {
                   _search.clear();
                   _setFilter();

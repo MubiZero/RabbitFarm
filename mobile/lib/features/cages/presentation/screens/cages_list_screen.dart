@@ -51,7 +51,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
         title: Text(context.l10n.cagesTitle),
         actions: [
           IconButton(
-            tooltip: context.l10n.tasksFilters,
+            tooltip: context.l10n.commonFilters,
             icon: Icon(state.typeFilter != null || state.conditionFilter != null
                 ? Icons.filter_list_alt
                 : Icons.filter_list),
@@ -76,7 +76,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
                 icon: Icons.search_off,
                 title: context.l10n.cagesNothingFound,
                 subtitle: context.l10n.cagesNothingFoundBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: () {
                   _search.clear();
                   notifier.resetFilters();
@@ -433,12 +433,12 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.l10n.tasksFilters,
+              context.l10n.commonFilters,
               style: AppTypography.titleLg
                   .copyWith(color: context.colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
-            AppGroupLabel(context.l10n.feedsFilterType),
+            AppGroupLabel(context.l10n.cageFormType),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
@@ -478,7 +478,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       ref.read(cagesProvider.notifier).resetFilters();
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersReset),
+                    child: Text(context.l10n.commonReset),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -490,7 +490,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       notifier.setConditionFilter(_condition);
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersApply),
+                    child: Text(context.l10n.commonApply),
                   ),
                 ),
               ],

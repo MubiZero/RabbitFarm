@@ -295,7 +295,7 @@ class StaffScreen extends ConsumerWidget {
                   keyboardType: TextInputType.emailAddress,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: context.l10n.loginEmailLabel,
+                    labelText: context.l10n.commonEmail,
                     hintText: context.l10n.staffInviteEmailHint,
                   ),
                 ),

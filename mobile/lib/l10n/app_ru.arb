@@ -18,6 +18,7 @@
   "commonRetryShort": "Ещё раз",
   "commonNotSpecified": "Не указано",
   "commonActions": "Действия",
+  "commonEmail": "Почта",
 
   "loginSubtitle": "Вход в вашу ферму",
   "loginEmailLabel": "Почта",
@@ -124,7 +125,7 @@
   "breedingEmptyAction": "Записать случку",
   "breedingMale": "Самец",
   "breedingFemale": "Самка",
-  "breedingNameMissing": "Имя не указано",
+  "commonNameMissing": "Имя не указано",
   "breedingExpectedBirth": "Окрол ожидается {date}",
   "@breedingExpectedBirth": {
     "placeholders": {
@@ -177,8 +178,8 @@
       "name": { "type": "String" }
     }
   },
-  "cageActionFailed": "Не удалось: {reason}",
-  "@cageActionFailed": {
+  "commonActionFailed": "Не удалось: {reason}",
+  "@commonActionFailed": {
     "placeholders": {
       "reason": { "type": "String" }
     }
@@ -198,6 +199,7 @@
   "cagePickCageTitle": "Куда переселить",
   "cagePickNoFreeCages": "Свободных клеток нет",
   "cagePickNoFreeCagesBody": "Освободите место или добавьте новую клетку.",
+  "cageFormType": "Тип клетки",
   "cageTypeSingle": "Одиночная",
   "cageTypeGroup": "Групповая",
   "cageTypeMaternity": "Для окрола",
@@ -243,9 +245,9 @@
   },
 
   "tasksTitle": "Задачи",
-  "tasksFilters": "Фильтры",
-  "tasksFiltersApply": "Применить",
-  "tasksFiltersReset": "Сбросить",
+  "commonFilters": "Фильтры",
+  "commonApply": "Применить",
+  "commonReset": "Сбросить",
   "tasksFilterType": "Тип",
   "tasksFilterStatus": "Статус",
   "tasksFilterPriority": "Приоритет",
@@ -385,7 +387,7 @@
   "vaccFormSectionMain": "Основное",
   "vaccFormSectionDates": "Даты",
   "vaccFormSectionExtra": "Дополнительно",
-  "vaccFormRabbit": "Кому",
+  "fieldRecipient": "Кому",
   "vaccFormType": "Тип вакцины",
   "vaccFormName": "Название вакцины",
   "vaccFormNameHint": "Например, Раббивак V",
@@ -432,7 +434,7 @@
   "medDeleteFailed": "Не удалось удалить запись",
   "medPeriodFrom": "С даты",
   "medPeriodTo": "По дату",
-  "medStats": "Сводка",
+  "commonSummary": "Сводка",
   "medStatTotal": "Всего карт",
   "medStatThisYear": "В этом году",
   "medStatLastMonth": "За месяц",
@@ -503,7 +505,7 @@
 
   "feedFormNewTitle": "Новый корм",
   "feedFormEditTitle": "Корм",
-  "feedFormSectionMain": "Основное",
+  "commonSectionMain": "Основное",
   "feedFormSectionStock": "Склад",
   "feedFormName": "Название",
   "feedFormNameEmpty": "Введите название корма",
@@ -540,7 +542,7 @@
   "feedingDeleteBody": "Запись о кормлении будет удалена. Списанный корм на склад не вернётся.",
   "feedingDeleted": "Запись удалена",
   "feedingDeleteFailed": "Не удалось удалить запись",
-  "feedingPeriod": "Период",
+  "commonPeriod": "Период",
 
   "feedingFormNewTitle": "Новое кормление",
   "feedingFormEditTitle": "Кормление",
@@ -593,7 +595,7 @@
   "txFormNewTitle": "Новая операция",
   "txFormEditTitle": "Операция",
   "txFormSectionKind": "Что за операция",
-  "txFormSectionDetails": "Подробности",
+  "commonSectionDetails": "Подробности",
   "txFormIncomeSubtitle": "Продажа, услуги",
   "txFormExpenseSubtitle": "Покупки, лечение, корма",
   "txFormAmount": "Сумма",

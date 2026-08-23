@@ -234,7 +234,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
           ],
         ),
         AppFormSection(
-          title: l10n.txFormSectionDetails,
+          title: l10n.commonSectionDetails,
           children: [
             TextFormField(
               controller: _amount,

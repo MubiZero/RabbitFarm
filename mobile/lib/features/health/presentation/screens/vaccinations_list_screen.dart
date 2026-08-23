@@ -34,7 +34,7 @@ class VaccinationsListScreen extends ConsumerWidget {
             ),
           ),
           IconButton(
-            tooltip: context.l10n.tasksFilters,
+            tooltip: context.l10n.commonFilters,
             icon: Icon(state.typeFilter != null
                 ? Icons.filter_list_alt
                 : Icons.filter_list),
@@ -57,7 +57,7 @@ class VaccinationsListScreen extends ConsumerWidget {
                 icon: Icons.filter_alt_off_outlined,
                 title: context.l10n.vaccinationsNoneInView,
                 subtitle: context.l10n.vaccinationsNoneInViewBody,
-                actionLabel: context.l10n.tasksFiltersReset,
+                actionLabel: context.l10n.commonReset,
                 onAction: notifier.clearFilters,
               )
             : AppEmptyState(
@@ -393,7 +393,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.l10n.tasksFilters,
+              context.l10n.commonFilters,
               style: AppTypography.titleLg
                   .copyWith(color: context.colors.onSurface),
             ),
@@ -456,7 +456,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       ref.read(vaccinationsProvider.notifier).clearFilters();
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersReset),
+                    child: Text(context.l10n.commonReset),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -469,7 +469,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                       notifier.setDateFilter(_from, _to);
                       Navigator.pop(context);
                     },
-                    child: Text(context.l10n.tasksFiltersApply),
+                    child: Text(context.l10n.commonApply),
                   ),
                 ),
               ],

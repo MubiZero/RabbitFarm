@@ -141,7 +141,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           Text(context.l10n.breedingMale, style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
-                            breeding.male?.name ?? context.l10n.breedingNameMissing,
+                            breeding.male?.name ?? context.l10n.commonNameMissing,
                             style: AppTypography.titleMd,
                           ),
                           if (breeding.male?.tagId != null)
@@ -173,7 +173,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           Text(context.l10n.breedingFemale, style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
-                            breeding.female?.name ?? context.l10n.breedingNameMissing,
+                            breeding.female?.name ?? context.l10n.commonNameMissing,
                             style: AppTypography.titleMd,
                           ),
                           if (breeding.female?.tagId != null)
@@ -366,7 +366,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(context.l10n.cageActionFailed(
+                      content: Text(context.l10n.commonActionFailed(
                           e.toString().replaceAll('Exception: ', ''))),
                       backgroundColor: AppColors.error,
                     ),
