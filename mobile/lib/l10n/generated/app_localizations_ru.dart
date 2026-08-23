@@ -1732,6 +1732,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pedigreeTitle => 'Родословная';
 
   @override
+  String get rabbitDetailEdit => 'Изменить';
+
+  @override
+  String get rabbitDetailDeleteTitle => 'Удалить кролика?';
+
+  @override
+  String rabbitDetailDeleteBody(String name) {
+    return 'Вместе с $name исчезнут его взвешивания, прививки и записи о лечении.';
+  }
+
+  @override
+  String get rabbitDetailDeleted => 'Кролик удалён';
+
+  @override
+  String get rabbitDetailDeleteFailed => 'Не удалось удалить кролика';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

@@ -7,10 +7,11 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import 'weight_history_screen.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/status_badge.dart';
 import '../../../../core/utils/age_utils.dart';
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -23,13 +24,15 @@ class RabbitDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final rabbitAsync = ref.watch(rabbitDetailProvider(rabbitId));
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Детали'),
+        title: Text(rabbitAsync.valueOrNull?.name ?? context.l10n.navRabbits),
         actions: [
-          rabbitAsync.whenOrNull(
-            data: (rabbit) => PopupMenuButton<String>(
+          if (canManage)
+            rabbitAsync.whenOrNull(
+              data: (rabbit) => PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'edit') {
                   context.push('/rabbits/${rabbit.id}/edit', extra: rabbit);
@@ -58,29 +61,22 @@ class RabbitDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
-          ) ??
-              const SizedBox(),
+                ],
+              ),
+            ) ??
+                const SizedBox(),
         ],
       ),
-      body: rabbitAsync.when(
-        data: (rabbit) => _buildContent(context, rabbit),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error, size: 64, color: AppColors.error),
-              const SizedBox(height: 16),
-              Text('Ошибка: ${error.toString()}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(rabbitDetailProvider(rabbitId)),
-                child: const Text('Повторить'),
-              ),
-            ],
-          ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(rabbitDetailProvider(rabbitId));
+          await ref.read(rabbitDetailProvider(rabbitId).future);
+        },
+        child: AppAsyncView<RabbitModel>(
+          value: rabbitAsync,
+          onRetry: () => ref.invalidate(rabbitDetailProvider(rabbitId)),
+          skeleton: (_) => const SkeletonList(itemHeight: 120),
+          builder: (rabbit) => _buildContent(context, rabbit),
         ),
       ),
     );
@@ -104,7 +100,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                   GestureDetector(
                     onTap: () => _showPhotoDialog(context, photoUrl),
                     child: Hero(
-                      tag: 'rabbit-photo-${rabbit.id}',
+                      tag: 'rabbit_photo_${rabbit.id}',
                       child: CachedNetworkImage(
                         imageUrl: photoUrl,
                         width: double.infinity,

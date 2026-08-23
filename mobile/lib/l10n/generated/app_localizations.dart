@@ -3190,6 +3190,36 @@ abstract class AppLocalizations {
   /// **'Родословная'**
   String get pedigreeTitle;
 
+  /// No description provided for @rabbitDetailEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get rabbitDetailEdit;
+
+  /// No description provided for @rabbitDetailDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить кролика?'**
+  String get rabbitDetailDeleteTitle;
+
+  /// No description provided for @rabbitDetailDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вместе с {name} исчезнут его взвешивания, прививки и записи о лечении.'**
+  String rabbitDetailDeleteBody(String name);
+
+  /// No description provided for @rabbitDetailDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик удалён'**
+  String get rabbitDetailDeleted;
+
+  /// No description provided for @rabbitDetailDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить кролика'**
+  String get rabbitDetailDeleteFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

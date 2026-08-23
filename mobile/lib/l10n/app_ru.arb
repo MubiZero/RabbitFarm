@@ -692,6 +692,15 @@
   "weightSaveFailed": "Не удалось записать вес",
 
   "pedigreeTitle": "Родословная",
+  "rabbitDetailEdit": "Изменить",
+  "rabbitDetailDeleteTitle": "Удалить кролика?",
+  "rabbitDetailDeleteBody": "Вместе с {name} исчезнут его взвешивания, прививки и записи о лечении.",
+  "@rabbitDetailDeleteBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "rabbitDetailDeleted": "Кролик удалён",
+  "rabbitDetailDeleteFailed": "Не удалось удалить кролика",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }
