@@ -1,14 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
+import '../utils/cage_labels.dart';
 
-/// Экран списка клеток
+/// Список клеток фермы.
 class CagesListScreen extends ConsumerStatefulWidget {
   const CagesListScreen({super.key});
 
@@ -17,584 +22,482 @@ class CagesListScreen extends ConsumerStatefulWidget {
 }
 
 class _CagesListScreenState extends ConsumerState<CagesListScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  final _search = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _debounce?.cancel();
+    _search.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(
+      AppDuration.normal,
+      () => ref.read(cagesProvider.notifier).setSearchQuery(query.trim()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final cagesState = ref.watch(cagesProvider);
+    final state = ref.watch(cagesProvider);
+    final notifier = ref.read(cagesProvider.notifier);
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Клетки'),
+        title: Text(context.l10n.cagesTitle),
         actions: [
-          // Фильтры
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilters(context),
-          ),
-          // Только доступные
-          IconButton(
-            icon: Icon(
-              cagesState.onlyAvailable
-                  ? Icons.check_box
-                  : Icons.check_box_outline_blank,
+            tooltip: context.l10n.tasksFilters,
+            icon: Icon(state.typeFilter != null || state.conditionFilter != null
+                ? Icons.filter_list_alt
+                : Icons.filter_list),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => const _FiltersSheet(),
             ),
-            tooltip: 'Только доступные',
-            onPressed: () {
-              ref.read(cagesProvider.notifier).toggleOnlyAvailable();
-            },
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Поиск
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Поиск клеток...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          ref.read(cagesProvider.notifier).updateSearchQuery('');
-                        },
-                      )
-                    : null,
+      body: PagedListView<CageModel>(
+        items: state.cages,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.loadCages,
+        onLoadMore: notifier.loadMore,
+        header: _Header(state: state, controller: _search, onSearch: _onSearchChanged),
+        empty: state.hasFilters
+            ? AppEmptyState(
+                icon: Icons.search_off,
+                title: context.l10n.cagesNothingFound,
+                subtitle: context.l10n.cagesNothingFoundBody,
+                actionLabel: context.l10n.tasksFiltersReset,
+                onAction: () {
+                  _search.clear();
+                  notifier.resetFilters();
+                },
+              )
+            : AppEmptyState(
+                icon: Icons.grid_view_outlined,
+                title: context.l10n.cagesEmptyTitle,
+                subtitle: context.l10n.cagesEmptyBody,
+                actionLabel: canManage ? context.l10n.cagesAdd : null,
+                onAction: canManage ? () => context.push('/cages/form') : null,
               ),
-              onChanged: (value) {
-                ref.read(cagesProvider.notifier).updateSearchQuery(value);
-              },
-            ),
-          ),
-
-          // Активные фильтры
-          if (cagesState.typeFilter != null ||
-              cagesState.conditionFilter != null ||
-              cagesState.locationFilter != null)
-            _buildActiveFilters(cagesState),
-
-          // Список клеток
-          Expanded(
-            child: _buildCagesList(context, cagesState),
-          ),
-        ],
+        itemBuilder: (context, cage, _) => _CageCard(
+          cage: cage,
+          canManage: canManage,
+          onTap: () => context.push('/cages/${cage.id}'),
+          onEdit: () => context.push('/cages/form', extra: cage),
+          onClean: () => _markCleaned(cage),
+          onDelete: () => _delete(cage),
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCageForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить клетку'),
-      ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/cages/form'),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.cagesAdd),
+            )
+          : null,
     );
   }
 
-  Widget _buildActiveFilters(CagesState state) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+  Future<void> _markCleaned(CageModel cage) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final done = context.l10n.cagesCleaned;
+    final failed = context.l10n.cagesCleanFailed;
+
+    final ok = await ref.read(cagesProvider.notifier).markCleaned(cage.id);
+    messenger.showSnackBar(
+      ok
+          ? SnackBar(content: Text(done))
+          : SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+    );
+  }
+
+  Future<void> _delete(CageModel cage) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final done = context.l10n.cagesDeleted;
+    final failed = context.l10n.cagesDeleteFailed;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.cagesDeleteTitle),
+        content: Text(context.l10n.cagesDeleteBody(cage.number)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(context.l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final ok = await ref.read(cagesProvider.notifier).deleteCage(cage.id);
+    messenger.showSnackBar(
+      ok
+          ? SnackBar(content: Text(done))
+          : SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+    );
+  }
+}
+
+class _Header extends ConsumerWidget {
+  final CagesState state;
+  final TextEditingController controller;
+  final ValueChanged<String> onSearch;
+
+  const _Header({
+    required this.state,
+    required this.controller,
+    required this.onSearch,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(cagesProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenH,
+            AppSpacing.md,
+            AppSpacing.screenH,
+            AppSpacing.sm,
+          ),
+          child: TextField(
+            controller: controller,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: context.l10n.cagesSearchHint,
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: state.searchQuery.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        controller.clear();
+                        notifier.setSearchQuery('');
+                      },
+                    ),
+            ),
+            // Поиск уходит на сервер, а не фильтрует загруженную страницу:
+            // иначе клетка со второй страницы «не находилась».
+            onChanged: onSearch,
+            onSubmitted: (v) => notifier.setSearchQuery(v.trim()),
+          ),
+        ),
+        AppFilterBar(
+          chips: [
+            AppFilterChipData(
+              label: context.l10n.cagesOnlyAvailable,
+              isSelected: state.onlyAvailable,
+              onTap: notifier.toggleOnlyAvailable,
+              color: AppColors.success,
+            ),
+            if (state.typeFilter != null)
+              AppFilterChipData(
+                label: cageTypeLabel(context, state.typeFilter!),
+                isSelected: true,
+                onTap: () => notifier.setTypeFilter(null),
+              ),
+            if (state.conditionFilter != null)
+              AppFilterChipData(
+                label: cageConditionLabel(context, state.conditionFilter!),
+                isSelected: true,
+                onTap: () => notifier.setConditionFilter(null),
+                color: cageConditionColor(context, state.conditionFilter!),
+              ),
+            if (state.locationFilter != null)
+              AppFilterChipData(
+                label: state.locationFilter!,
+                isSelected: true,
+                onTap: () => notifier.setLocationFilter(null),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+enum _CageAction { edit, clean, delete }
+
+class _CageCard extends StatelessWidget {
+  final CageModel cage;
+  final bool canManage;
+  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onClean;
+  final VoidCallback onDelete;
+
+  const _CageCard({
+    required this.cage,
+    required this.canManage,
+    required this.onTap,
+    required this.onEdit,
+    required this.onClean,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final occupied = cage.currentOccupancy ?? cage.rabbits?.length ?? 0;
+    final ratio =
+        cage.capacity > 0 ? (occupied / cage.capacity).clamp(0.0, 1.0) : 0.0;
+
+    // Цвет говорит о состоянии клетки, а не о её заполненности: полная
+    // исправная клетка — это норма, а не повод для тревожного цвета.
+    final conditionColor = cageConditionColor(context, cage.condition);
+    final fillColor = ratio >= 1 ? AppColors.warning : AppColors.success;
+
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (state.typeFilter != null)
-            Chip(
-              label: Text(_getTypeText(state.typeFilter!)),
-              deleteIcon: const Icon(Icons.close, size: 18),
-              onDeleted: () {
-                ref.read(cagesProvider.notifier).setTypeFilter(null);
-              },
-            ),
-          if (state.conditionFilter != null)
-            Chip(
-              label: Text(_getConditionText(state.conditionFilter!)),
-              deleteIcon: const Icon(Icons.close, size: 18),
-              onDeleted: () {
-                ref.read(cagesProvider.notifier).setConditionFilter(null);
-              },
-            ),
-          if (state.locationFilter != null)
-            Chip(
-              label: Text(state.locationFilter!),
-              deleteIcon: const Icon(Icons.close, size: 18),
-              onDeleted: () {
-                ref.read(cagesProvider.notifier).setLocationFilter(null);
-              },
-            ),
-          TextButton.icon(
-            onPressed: () {
-              ref.read(cagesProvider.notifier).resetFilters();
-            },
-            icon: const Icon(Icons.clear_all, size: 18),
-            label: const Text('Сбросить все'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCagesList(BuildContext context, CagesState state) {
-    if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (state.error != null) {
-      return AppErrorState(
-        message: state.error!,
-        onRetry: () => ref.read(cagesProvider.notifier).loadCages(),
-      );
-    }
-
-    final cages = state.filteredCages;
-
-    if (cages.isEmpty) {
-      return AppEmptyState(
-        icon: state.searchQuery.isNotEmpty ? Icons.search_off : Icons.home_work,
-        title: state.searchQuery.isNotEmpty ? 'Клетки не найдены' : 'Нет клеток',
-        subtitle: state.searchQuery.isNotEmpty
-            ? 'Попробуйте изменить запрос'
-            : 'Добавьте первую клетку',
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(cagesProvider.notifier).loadCages(),
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: cages.length,
-        itemBuilder: (context, index) {
-          final cage = cages[index];
-          return _buildCageCard(context, cage);
-        },
-      ),
-    );
-  }
-
-  Widget _buildCageCard(BuildContext context, CageModel cage) {
-    final occupancyRate = cage.capacity > 0
-        ? (cage.currentOccupancy ?? 0) / cage.capacity
-        : 0.0;
-
-    Color statusColor = Colors.green;
-    if (cage.condition == 'broken') {
-      statusColor = Colors.red;
-    } else if (cage.condition == 'needs_repair') {
-      statusColor = Colors.orange;
-    } else if (cage.isFull ?? false) {
-      statusColor = Colors.blue;
-    }
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: AppCard(
-        onTap: () => _showCageDetails(context, cage),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Заголовок
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _getCageIcon(cage.type),
-                    color: statusColor,
-                    size: 28,
-                  ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: conditionColor.withValues(alpha: 0.12),
+                  borderRadius: AppRadius.mdAll,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Клетка ${cage.number}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (cage.location != null)
-                        Text(
-                          cage.location!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Действия
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      _showCageForm(context, cage);
-                    } else if (value == 'clean') {
-                      _markCleaned(context, cage);
-                    } else if (value == 'delete') {
-                      _confirmDelete(context, cage);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, size: 20),
-                          SizedBox(width: 8),
-                          Text('Редактировать'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'clean',
-                      child: Row(
-                        children: [
-                          Icon(Icons.cleaning_services, size: 20),
-                          SizedBox(width: 8),
-                          Text('Отметить уборку'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, size: 20, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('Удалить', style: TextStyle(color: Colors.red)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Прогресс заполненности
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Icon(cageTypeIcon(cage.type),
+                    color: conditionColor, size: 22),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Заполненность: ${cage.currentOccupancy ?? 0}/${cage.capacity}',
-                      style: const TextStyle(fontSize: 13),
+                      context.l10n.cageTitleNumbered(cage.number),
+                      style: AppTypography.titleMd
+                          .copyWith(color: context.colors.onSurface),
                     ),
                     Text(
-                      '${(occupancyRate * 100).toInt()}%',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
+                      [
+                        cageTypeLabel(context, cage.type),
+                        if (cage.location?.trim().isNotEmpty == true)
+                          cage.location!.trim(),
+                      ].join(' · '),
+                      style: AppTypography.labelSm
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              if (canManage)
+                PopupMenuButton<_CageAction>(
+                  tooltip: context.l10n.commonActions,
+                  onSelected: (action) => switch (action) {
+                    _CageAction.edit => onEdit(),
+                    _CageAction.clean => onClean(),
+                    _CageAction.delete => onDelete(),
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _CageAction.edit,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.edit_outlined),
+                        title: Text(context.l10n.cageEdit),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: _CageAction.clean,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.cleaning_services_outlined),
+                        title: Text(context.l10n.cagesMarkCleaned),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: _CageAction.delete,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading:
+                            const Icon(Icons.delete_outline, color: AppColors.error),
+                        title: Text(
+                          context.l10n.commonDelete,
+                          style: AppTypography.bodyLg
+                              .copyWith(color: AppColors.error),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                LinearProgressIndicator(
-                  value: occupancyRate,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(statusColor),
-                  minHeight: 6,
-                  borderRadius: BorderRadius.circular(3),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.l10n.cagesOccupancy(occupied, cage.capacity),
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+              ),
+              Text(
+                cageConditionLabel(context, cage.condition),
+                style: AppTypography.labelSm.copyWith(color: conditionColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: ratio,
+              backgroundColor: context.colors.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(fillColor),
+              minHeight: 6,
+            ),
+          ),
+          if (cage.lastCleanedAt != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Icon(Icons.cleaning_services_outlined,
+                    size: 14, color: context.colors.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  context.l10n.cagesLastCleaned(
+                      DateFormat('d MMMM', 'ru').format(cage.lastCleanedAt!)),
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
                 ),
               ],
             ),
+          ],
+        ],
+      ),
+    );
+  }
+}
 
-            const SizedBox(height: 12),
+class _FiltersSheet extends ConsumerStatefulWidget {
+  const _FiltersSheet();
 
-            // Характеристики
+  @override
+  ConsumerState<_FiltersSheet> createState() => _FiltersSheetState();
+}
+
+class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
+  static const _types = ['single', 'group', 'maternity'];
+  static const _conditions = ['good', 'needs_repair', 'broken'];
+
+  String? _type;
+  String? _condition;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(cagesProvider);
+    _type = state.typeFilter;
+    _condition = state.conditionFilter;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.screenH,
+          0,
+          AppSpacing.screenH,
+          AppSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.tasksFilters,
+              style: AppTypography.titleLg
+                  .copyWith(color: context.colors.onSurface),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            AppGroupLabel(context.l10n.feedsFilterType),
+            const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: [
-                _buildInfoChip(
-                  Icons.category,
-                  _getTypeText(cage.type),
-                  Colors.blue,
-                ),
-                _buildInfoChip(
-                  Icons.build,
-                  _getConditionText(cage.condition),
-                  _getConditionColor(cage.condition),
-                ),
-                if (cage.size != null)
-                  _buildInfoChip(
-                    Icons.straighten,
-                    cage.size!,
-                    Colors.purple,
+                for (final type in _types)
+                  ChoiceChip(
+                    label: Text(cageTypeLabel(context, type)),
+                    selected: _type == type,
+                    onSelected: (selected) =>
+                        setState(() => _type = selected ? type : null),
                   ),
-                if (cage.lastCleanedAt != null)
-                  _buildInfoChip(
-                    Icons.cleaning_services,
-                    'Уборка: ${DateFormat('dd.MM').format(cage.lastCleanedAt!)}',
-                    Colors.teal,
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            AppGroupLabel(context.l10n.cagesFilterCondition),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final condition in _conditions)
+                  ChoiceChip(
+                    label: Text(cageConditionLabel(context, condition)),
+                    selected: _condition == condition,
+                    onSelected: (selected) => setState(
+                        () => _condition = selected ? condition : null),
                   ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      ref.read(cagesProvider.notifier).resetFilters();
+                      Navigator.pop(context);
+                    },
+                    child: Text(context.l10n.tasksFiltersReset),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      final notifier = ref.read(cagesProvider.notifier);
+                      notifier.setTypeFilter(_type);
+                      notifier.setConditionFilter(_condition);
+                      Navigator.pop(context);
+                    },
+                    child: Text(context.l10n.tasksFiltersApply),
+                  ),
+                ),
               ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildInfoChip(IconData icon, String label, Color color) {
-    return Chip(
-      avatar: Icon(icon, size: 16, color: color),
-      label: Text(
-        label,
-        style: const TextStyle(fontSize: 12),
-      ),
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      visualDensity: VisualDensity.compact,
-    );
-  }
-
-  IconData _getCageIcon(String type) {
-    switch (type) {
-      case 'single':
-        return Icons.home;
-      case 'group':
-        return Icons.home_work;
-      case 'maternity':
-        return Icons.child_care;
-      default:
-        return Icons.home;
-    }
-  }
-
-  String _getTypeText(String type) {
-    switch (type) {
-      case 'single':
-        return 'Одиночная';
-      case 'group':
-        return 'Групповая';
-      case 'maternity':
-        return 'Для окрола';
-      default:
-        return type;
-    }
-  }
-
-  String _getConditionText(String condition) {
-    switch (condition) {
-      case 'good':
-        return 'Хорошее';
-      case 'needs_repair':
-        return 'Нужен ремонт';
-      case 'broken':
-        return 'Сломана';
-      default:
-        return condition;
-    }
-  }
-
-  Color _getConditionColor(String condition) {
-    switch (condition) {
-      case 'good':
-        return Colors.green;
-      case 'needs_repair':
-        return Colors.orange;
-      case 'broken':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  void _showFilters(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        final state = ref.watch(cagesProvider);
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Фильтры',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              // Фильтр по типу
-              Text('Тип клетки:', style: Theme.of(context).textTheme.titleSmall),
-              Wrap(
-                spacing: 8,
-                children: [
-                  FilterChip(
-                    label: const Text('Все'),
-                    selected: state.typeFilter == null,
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setTypeFilter(null);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Одиночная'),
-                    selected: state.typeFilter == 'single',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setTypeFilter('single');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Групповая'),
-                    selected: state.typeFilter == 'group',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setTypeFilter('group');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Для окрола'),
-                    selected: state.typeFilter == 'maternity',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setTypeFilter('maternity');
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Фильтр по состоянию
-              Text('Состояние:', style: Theme.of(context).textTheme.titleSmall),
-              Wrap(
-                spacing: 8,
-                children: [
-                  FilterChip(
-                    label: const Text('Все'),
-                    selected: state.conditionFilter == null,
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setConditionFilter(null);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Хорошее'),
-                    selected: state.conditionFilter == 'good',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setConditionFilter('good');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Нужен ремонт'),
-                    selected: state.conditionFilter == 'needs_repair',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setConditionFilter('needs_repair');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Сломана'),
-                    selected: state.conditionFilter == 'broken',
-                    onSelected: (_) {
-                      ref.read(cagesProvider.notifier).setConditionFilter('broken');
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showCageForm(BuildContext context, CageModel? cage) {
-    context.push('/cages/form', extra: cage);
-  }
-
-  void _showCageDetails(BuildContext context, CageModel cage) {
-    context.push('/cages/${cage.id}');
-  }
-
-  Future<void> _markCleaned(BuildContext context, CageModel cage) async {
-    final success = await ref.read(cagesProvider.notifier).markCleaned(cage.id);
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success
-                ? 'Клетка "${cage.number}" отмечена как убранная'
-                : 'Ошибка при отметке уборки',
-          ),
-          backgroundColor: success ? Colors.green : Colors.red,
-        ),
-      );
-    }
-  }
-
-  Future<void> _confirmDelete(BuildContext context, CageModel cage) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Удалить клетку?'),
-        content: Text(
-          'Вы уверены, что хотите удалить клетку "${cage.number}"?\n\n'
-          'Это действие нельзя отменить.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Удалить'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      final success = await ref.read(cagesProvider.notifier).deleteCage(cage.id);
-
-      if (context.mounted) {
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Клетка "${cage.number}" удалена'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                ref.read(cagesProvider).error ?? 'Ошибка удаления клетки',
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
   }
 }

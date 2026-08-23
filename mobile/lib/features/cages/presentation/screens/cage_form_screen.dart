@@ -1,273 +1,204 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_form_section.dart';
+import '../utils/cage_labels.dart';
 
-/// Экран формы добавления/редактирования клетки
+/// Клетка: номер, тип, вместимость и состояние.
 class CageFormScreen extends ConsumerStatefulWidget {
   final CageModel? cage;
 
-  const CageFormScreen({
-    super.key,
-    this.cage,
-  });
+  const CageFormScreen({super.key, this.cage});
 
   @override
   ConsumerState<CageFormScreen> createState() => _CageFormScreenState();
 }
 
 class _CageFormScreenState extends ConsumerState<CageFormScreen> {
+  static const _types = ['single', 'group', 'maternity'];
+  static const _conditions = ['good', 'needs_repair', 'broken'];
+
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _numberController;
-  late TextEditingController _sizeController;
-  late TextEditingController _capacityController;
-  late TextEditingController _locationController;
-  late TextEditingController _notesController;
+  late final TextEditingController _number;
+  late final TextEditingController _size;
+  late final TextEditingController _capacity;
+  late final TextEditingController _location;
+  late final TextEditingController _notes;
 
-  String _selectedType = 'single';
-  String _selectedCondition = 'good';
-  bool _isSubmitting = false;
+  late String _type;
+  late String _condition;
+  bool _touched = false;
 
-  final List<Map<String, String>> _types = [
-    {'value': 'single', 'label': 'Одиночная'},
-    {'value': 'group', 'label': 'Групповая'},
-    {'value': 'maternity', 'label': 'Для окрола'},
-  ];
-
-  final List<Map<String, String>> _conditions = [
-    {'value': 'good', 'label': 'Хорошее'},
-    {'value': 'needs_repair', 'label': 'Нужен ремонт'},
-    {'value': 'broken', 'label': 'Сломана'},
-  ];
+  CageModel? get _cage => widget.cage;
+  bool get _isEditing => _cage != null;
 
   @override
   void initState() {
     super.initState();
-    _numberController = TextEditingController(text: widget.cage?.number ?? '');
-    _sizeController = TextEditingController(text: widget.cage?.size ?? '');
-    _capacityController = TextEditingController(
-      text: widget.cage?.capacity.toString() ?? '1',
-    );
-    _locationController = TextEditingController(text: widget.cage?.location ?? '');
-    _notesController = TextEditingController(text: widget.cage?.notes ?? '');
+    _number = TextEditingController(text: _cage?.number ?? '');
+    _size = TextEditingController(text: _cage?.size ?? '');
+    _capacity = TextEditingController(text: _cage?.capacity.toString() ?? '1');
+    _location = TextEditingController(text: _cage?.location ?? '');
+    _notes = TextEditingController(text: _cage?.notes ?? '');
 
-    if (widget.cage != null) {
-      _selectedType = widget.cage!.type;
-      _selectedCondition = widget.cage!.condition;
+    _type = _cage?.type ?? 'single';
+    _condition = _cage?.condition ?? 'good';
+
+    for (final c in _controllers) {
+      c.addListener(() => _touched = true);
     }
   }
 
+  List<TextEditingController> get _controllers =>
+      [_number, _size, _capacity, _location, _notes];
+
   @override
   void dispose() {
-    _numberController.dispose();
-    _sizeController.dispose();
-    _capacityController.dispose();
-    _locationController.dispose();
-    _notesController.dispose();
+    for (final c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  Future<String?> _save() async {
+    final failed = context.l10n.cageFormFailed;
+    final notifier = ref.read(cagesProvider.notifier);
+
+    final data = <String, dynamic>{
+      'number': _number.text.trim(),
+      'type': _type,
+      'capacity': int.parse(_capacity.text.trim()),
+      'condition': _condition,
+      if (_size.text.trim().isNotEmpty) 'size': _size.text.trim(),
+      if (_location.text.trim().isNotEmpty) 'location': _location.text.trim(),
+      if (_notes.text.trim().isNotEmpty) 'notes': _notes.text.trim(),
+    };
+
+    final ok = _isEditing
+        ? await notifier.updateCage(_cage!.id, data)
+        : await notifier.createCage(data);
+
+    if (ok) return null;
+    return ref.read(cagesProvider).error ?? failed;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.cage != null;
+    final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Редактировать клетку' : 'Добавить клетку'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+    return AppFormScaffold(
+      title: _isEditing ? l10n.cageFormEditTitle : l10n.cageFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage:
+          _isEditing ? l10n.cageFormUpdated : l10n.cageFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      children: [
+        AppFormSection(
+          title: l10n.feedFormSectionMain,
           children: [
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                TextFormField(
-                  controller: _numberController,
-                  decoration: const InputDecoration(
-                    labelText: 'Номер клетки *',
-                    hintText: 'Например: A-1',
-                    prefixIcon: Icon(Icons.tag),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите номер клетки';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedType,
-                  decoration: const InputDecoration(
-                    labelText: 'Тип клетки *',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: _types.map((type) {
-                    return DropdownMenuItem(
-                      value: type['value'],
-                      child: Text(type['label']!),
-                    );
-                  }).toList(),
-                  onChanged: (value) => setState(() => _selectedType = value!),
-                ),
-                TextFormField(
-                  controller: _capacityController,
-                  decoration: const InputDecoration(
-                    labelText: 'Вместимость *',
-                    hintText: 'Количество кроликов',
-                    prefixIcon: Icon(Icons.people),
-                    suffixText: 'кроликов',
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите вместимость';
-                    }
-                    final capacity = int.tryParse(value);
-                    if (capacity == null || capacity < 1) {
-                      return 'Вместимость должна быть минимум 1';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+            TextFormField(
+              controller: _number,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: l10n.cageFormNumber,
+                prefixIcon: const Icon(Icons.tag),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.cageFormNumberEmpty
+                  : null,
             ),
-            AppFormSection(
-              title: 'Дополнительно',
-              children: [
-                TextFormField(
-                  controller: _sizeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Размер',
-                    hintText: 'Например: 60x80x45',
-                    prefixIcon: Icon(Icons.straighten),
-                    suffixText: 'см',
+            DropdownButtonFormField<String>(
+              initialValue: _type,
+              decoration: InputDecoration(
+                labelText: l10n.feedsFilterType,
+                prefixIcon: Icon(cageTypeIcon(_type)),
+              ),
+              items: [
+                for (final type in _types)
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(cageTypeLabel(context, type)),
                   ),
-                ),
-                TextFormField(
-                  controller: _locationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Расположение',
-                    hintText: 'Например: Сарай 1, Ряд A',
-                    prefixIcon: Icon(Icons.location_on),
-                  ),
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedCondition,
-                  decoration: const InputDecoration(
-                    labelText: 'Состояние *',
-                    prefixIcon: Icon(Icons.build),
-                  ),
-                  items: _conditions.map((condition) {
-                    return DropdownMenuItem(
-                      value: condition['value'],
-                      child: Text(condition['label']!),
-                    );
-                  }).toList(),
-                  onChanged: (value) => setState(() => _selectedCondition = value!),
-                ),
               ],
+              onChanged: (v) => setState(() {
+                if (v != null) _type = v;
+                _touched = true;
+              }),
             ),
-            AppFormSection(
-              title: 'Заметки',
-              children: [
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Заметки',
-                    hintText: 'Дополнительная информация',
-                    prefixIcon: Icon(Icons.notes),
+            TextFormField(
+              controller: _capacity,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: l10n.cageFormCapacity,
+                prefixIcon: const Icon(Icons.groups_outlined),
+              ),
+              validator: (v) {
+                final value = int.tryParse(v?.trim() ?? '');
+                return (value == null || value <= 0)
+                    ? l10n.cageFormCapacityInvalid
+                    : null;
+              },
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: _condition,
+              decoration: InputDecoration(
+                labelText: l10n.cagesFilterCondition,
+                prefixIcon: const Icon(Icons.handyman_outlined),
+              ),
+              items: [
+                for (final condition in _conditions)
+                  DropdownMenuItem(
+                    value: condition,
+                    child: Text(cageConditionLabel(context, condition)),
                   ),
-                  maxLines: 4,
-                ),
               ],
+              onChanged: (v) => setState(() {
+                if (v != null) _condition = v;
+                _touched = true;
+              }),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitForm,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(isEditing ? 'Сохранить' : 'Добавить'),
+        AppFormSection(
+          title: l10n.txFormSectionDetails,
+          children: [
+            TextFormField(
+              controller: _size,
+              decoration: InputDecoration(
+                labelText: l10n.cageFormSize,
+                hintText: l10n.cageFormSizeHint,
+                prefixIcon: const Icon(Icons.straighten),
+              ),
             ),
-          ),
+            TextFormField(
+              controller: _location,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.cageFormLocation,
+                hintText: l10n.cageFormLocationHint,
+                prefixIcon: const Icon(Icons.place_outlined),
+              ),
+            ),
+            TextFormField(
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.cageFormNotes,
+                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+              ),
+            ),
+          ],
         ),
-      ),
+      ],
     );
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    final cageData = {
-      'number': _numberController.text.trim(),
-      'type': _selectedType,
-      'capacity': int.parse(_capacityController.text),
-      'condition': _selectedCondition,
-      if (_sizeController.text.trim().isNotEmpty)
-        'size': _sizeController.text.trim(),
-      if (_locationController.text.trim().isNotEmpty)
-        'location': _locationController.text.trim(),
-      if (_notesController.text.trim().isNotEmpty)
-        'notes': _notesController.text.trim(),
-    };
-
-    final isEditing = widget.cage != null;
-    bool success;
-
-    if (isEditing) {
-      success = await ref
-          .read(cagesProvider.notifier)
-          .updateCage(widget.cage!.id, cageData);
-    } else {
-      success = await ref.read(cagesProvider.notifier).createCage(cageData);
-    }
-
-    setState(() => _isSubmitting = false);
-
-    if (mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isEditing
-                  ? 'Клетка "${_numberController.text}" обновлена'
-                  : 'Клетка "${_numberController.text}" добавлена',
-            ),
-          ),
-        );
-        context.pop();
-      } else {
-        final error = ref.read(cagesProvider).error;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error ?? 'Ошибка сохранения клетки'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
   }
 }

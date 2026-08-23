@@ -2788,6 +2788,198 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить операцию'**
   String get txFormFailed;
 
+  /// No description provided for @cagesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетки'**
+  String get cagesTitle;
+
+  /// No description provided for @cagesAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить клетку'**
+  String get cagesAdd;
+
+  /// No description provided for @cagesSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер или место'**
+  String get cagesSearchHint;
+
+  /// No description provided for @cagesOnlyAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только свободные'**
+  String get cagesOnlyAvailable;
+
+  /// No description provided for @cagesEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клеток пока нет'**
+  String get cagesEmptyTitle;
+
+  /// No description provided for @cagesEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите клетки — по ним будет видно, куда селить кроликов и где есть место.'**
+  String get cagesEmptyBody;
+
+  /// No description provided for @cagesNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не нашлось'**
+  String get cagesNothingFound;
+
+  /// No description provided for @cagesNothingFoundBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте запрос или снимите фильтры.'**
+  String get cagesNothingFoundBody;
+
+  /// No description provided for @cagesOccupancy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Занято {occupied} из {capacity}'**
+  String cagesOccupancy(int occupied, int capacity);
+
+  /// No description provided for @cagesLastCleaned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрана {date}'**
+  String cagesLastCleaned(String date);
+
+  /// No description provided for @cagesMarkCleaned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить уборку'**
+  String get cagesMarkCleaned;
+
+  /// No description provided for @cagesCleaned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уборка отмечена'**
+  String get cagesCleaned;
+
+  /// No description provided for @cagesCleanFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось отметить уборку'**
+  String get cagesCleanFailed;
+
+  /// No description provided for @cagesDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить клетку?'**
+  String get cagesDeleteTitle;
+
+  /// No description provided for @cagesDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка {number} исчезнет из списка. Кролики из неё останутся без клетки.'**
+  String cagesDeleteBody(String number);
+
+  /// No description provided for @cagesDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка удалена'**
+  String get cagesDeleted;
+
+  /// No description provided for @cagesDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить клетку'**
+  String get cagesDeleteFailed;
+
+  /// No description provided for @cagesFilterCondition.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состояние'**
+  String get cagesFilterCondition;
+
+  /// No description provided for @cageFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая клетка'**
+  String get cageFormNewTitle;
+
+  /// No description provided for @cageFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка'**
+  String get cageFormEditTitle;
+
+  /// No description provided for @cageFormNumber.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер'**
+  String get cageFormNumber;
+
+  /// No description provided for @cageFormNumberEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите номер клетки'**
+  String get cageFormNumberEmpty;
+
+  /// No description provided for @cageFormCapacity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько кроликов помещается'**
+  String get cageFormCapacity;
+
+  /// No description provided for @cageFormCapacityInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите число больше нуля'**
+  String get cageFormCapacityInvalid;
+
+  /// No description provided for @cageFormSize.
+  ///
+  /// In ru, this message translates to:
+  /// **'Размер'**
+  String get cageFormSize;
+
+  /// No description provided for @cageFormSizeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, 100×60×45 см'**
+  String get cageFormSizeHint;
+
+  /// No description provided for @cageFormLocation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Место'**
+  String get cageFormLocation;
+
+  /// No description provided for @cageFormLocationHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, сарай, левый ряд'**
+  String get cageFormLocationHint;
+
+  /// No description provided for @cageFormNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get cageFormNotes;
+
+  /// No description provided for @cageFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка добавлена'**
+  String get cageFormCreated;
+
+  /// No description provided for @cageFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка обновлена'**
+  String get cageFormUpdated;
+
+  /// No description provided for @cageFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить клетку'**
+  String get cageFormFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

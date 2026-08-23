@@ -607,6 +607,51 @@
   "txFormUpdated": "Операция обновлена",
   "txFormFailed": "Не удалось сохранить операцию",
 
+  "cagesTitle": "Клетки",
+  "cagesAdd": "Добавить клетку",
+  "cagesSearchHint": "Номер или место",
+  "cagesOnlyAvailable": "Только свободные",
+  "cagesEmptyTitle": "Клеток пока нет",
+  "cagesEmptyBody": "Заведите клетки — по ним будет видно, куда селить кроликов и где есть место.",
+  "cagesNothingFound": "Ничего не нашлось",
+  "cagesNothingFoundBody": "Проверьте запрос или снимите фильтры.",
+  "cagesOccupancy": "Занято {occupied} из {capacity}",
+  "@cagesOccupancy": {
+    "placeholders": {
+      "occupied": { "type": "int" },
+      "capacity": { "type": "int" }
+    }
+  },
+  "cagesLastCleaned": "Убрана {date}",
+  "@cagesLastCleaned": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "cagesMarkCleaned": "Отметить уборку",
+  "cagesCleaned": "Уборка отмечена",
+  "cagesCleanFailed": "Не удалось отметить уборку",
+  "cagesDeleteTitle": "Удалить клетку?",
+  "cagesDeleteBody": "Клетка {number} исчезнет из списка. Кролики из неё останутся без клетки.",
+  "@cagesDeleteBody": {
+    "placeholders": { "number": { "type": "String" } }
+  },
+  "cagesDeleted": "Клетка удалена",
+  "cagesDeleteFailed": "Не удалось удалить клетку",
+  "cagesFilterCondition": "Состояние",
+  "cageFormNewTitle": "Новая клетка",
+  "cageFormEditTitle": "Клетка",
+  "cageFormNumber": "Номер",
+  "cageFormNumberEmpty": "Введите номер клетки",
+  "cageFormCapacity": "Сколько кроликов помещается",
+  "cageFormCapacityInvalid": "Введите число больше нуля",
+  "cageFormSize": "Размер",
+  "cageFormSizeHint": "Например, 100×60×45 см",
+  "cageFormLocation": "Место",
+  "cageFormLocationHint": "Например, сарай, левый ряд",
+  "cageFormNotes": "Заметки",
+  "cageFormCreated": "Клетка добавлена",
+  "cageFormUpdated": "Клетка обновлена",
+  "cageFormFailed": "Не удалось сохранить клетку",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

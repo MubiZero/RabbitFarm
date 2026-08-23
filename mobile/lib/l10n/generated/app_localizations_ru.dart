@@ -1520,6 +1520,109 @@ class AppLocalizationsRu extends AppLocalizations {
   String get txFormFailed => 'Не удалось сохранить операцию';
 
   @override
+  String get cagesTitle => 'Клетки';
+
+  @override
+  String get cagesAdd => 'Добавить клетку';
+
+  @override
+  String get cagesSearchHint => 'Номер или место';
+
+  @override
+  String get cagesOnlyAvailable => 'Только свободные';
+
+  @override
+  String get cagesEmptyTitle => 'Клеток пока нет';
+
+  @override
+  String get cagesEmptyBody =>
+      'Заведите клетки — по ним будет видно, куда селить кроликов и где есть место.';
+
+  @override
+  String get cagesNothingFound => 'Ничего не нашлось';
+
+  @override
+  String get cagesNothingFoundBody => 'Проверьте запрос или снимите фильтры.';
+
+  @override
+  String cagesOccupancy(int occupied, int capacity) {
+    return 'Занято $occupied из $capacity';
+  }
+
+  @override
+  String cagesLastCleaned(String date) {
+    return 'Убрана $date';
+  }
+
+  @override
+  String get cagesMarkCleaned => 'Отметить уборку';
+
+  @override
+  String get cagesCleaned => 'Уборка отмечена';
+
+  @override
+  String get cagesCleanFailed => 'Не удалось отметить уборку';
+
+  @override
+  String get cagesDeleteTitle => 'Удалить клетку?';
+
+  @override
+  String cagesDeleteBody(String number) {
+    return 'Клетка $number исчезнет из списка. Кролики из неё останутся без клетки.';
+  }
+
+  @override
+  String get cagesDeleted => 'Клетка удалена';
+
+  @override
+  String get cagesDeleteFailed => 'Не удалось удалить клетку';
+
+  @override
+  String get cagesFilterCondition => 'Состояние';
+
+  @override
+  String get cageFormNewTitle => 'Новая клетка';
+
+  @override
+  String get cageFormEditTitle => 'Клетка';
+
+  @override
+  String get cageFormNumber => 'Номер';
+
+  @override
+  String get cageFormNumberEmpty => 'Введите номер клетки';
+
+  @override
+  String get cageFormCapacity => 'Сколько кроликов помещается';
+
+  @override
+  String get cageFormCapacityInvalid => 'Введите число больше нуля';
+
+  @override
+  String get cageFormSize => 'Размер';
+
+  @override
+  String get cageFormSizeHint => 'Например, 100×60×45 см';
+
+  @override
+  String get cageFormLocation => 'Место';
+
+  @override
+  String get cageFormLocationHint => 'Например, сарай, левый ряд';
+
+  @override
+  String get cageFormNotes => 'Заметки';
+
+  @override
+  String get cageFormCreated => 'Клетка добавлена';
+
+  @override
+  String get cageFormUpdated => 'Клетка обновлена';
+
+  @override
+  String get cageFormFailed => 'Не удалось сохранить клетку';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override
