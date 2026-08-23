@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import '../l10n/l10n_context.dart';
 
 /// Экран с ошибкой загрузки.
 ///
@@ -27,14 +28,14 @@ class AppErrorState extends StatelessWidget {
             const Icon(Icons.error_outline, size: 72, color: AppColors.error),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'Не удалось загрузить',
+              context.l10n.commonLoadFailed,
               style: AppTypography.titleMd
                   .copyWith(color: context.colors.onSurface),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              _humanize(message),
+              _humanize(context, message),
               style: AppTypography.bodyMd
                   .copyWith(color: context.colors.onSurfaceVariant),
               textAlign: TextAlign.center,
@@ -49,7 +50,7 @@ class AppErrorState extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 ),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Повторить'),
+                label: Text(context.l10n.commonRetry),
               ),
             ],
           ],
@@ -63,11 +64,11 @@ class AppErrorState extends StatelessWidget {
   /// Ошибки приезжают сюда через `toString()` исключения, поэтому фермеру
   /// показывалось «Exception: Нет связи с сервером». Слово `Exception`
   /// ничего ему не сообщает и выглядит как сбой приложения.
-  static String _humanize(String message) {
+  static String _humanize(BuildContext context, String message) {
     var text = message.trim();
     for (final prefix in const ['Exception: ', 'DioException: ', 'Error: ']) {
       if (text.startsWith(prefix)) text = text.substring(prefix.length);
     }
-    return text.isEmpty ? 'Неизвестная ошибка' : text;
+    return text.isEmpty ? context.l10n.commonUnknownError : text;
   }
 }

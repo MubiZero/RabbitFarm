@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import '../l10n/l10n_context.dart';
 
 /// Полоса «данные устарели».
 ///
@@ -29,7 +30,7 @@ class StaleDataBanner extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
-                'Не удалось обновить, показаны прежние данные',
+                context.l10n.commonStaleData,
                 style: AppTypography.labelSm.copyWith(color: AppColors.warning),
               ),
             ),
@@ -42,7 +43,7 @@ class StaleDataBanner extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                 ),
-                child: const Text('Ещё раз'),
+                child: Text(context.l10n.commonRetryShort),
               ),
           ],
         ),

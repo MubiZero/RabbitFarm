@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import '../l10n/l10n_context.dart';
 
 /// Каркас экрана-формы: заголовок, прокручиваемые поля и кнопка сохранения,
 /// закреплённая внизу.
@@ -88,17 +89,17 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Выйти без сохранения?'),
-        content: const Text('Заполненные поля будут потеряны.'),
+        title: Text(context.l10n.formDiscardTitle),
+        content: Text(context.l10n.formDiscardBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Продолжить ввод'),
+            child: Text(context.l10n.formDiscardStay),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Выйти'),
+            child: Text(context.l10n.formDiscardLeave),
           ),
         ],
       ),

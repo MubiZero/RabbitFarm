@@ -16,6 +16,7 @@ import '../../../../core/widgets/stats_period.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Аналитика финансов: доходы, расходы, прибыль и структура по категориям.
 class TransactionStatisticsScreen extends ConsumerStatefulWidget {
@@ -137,7 +138,7 @@ class _TransactionStatisticsScreenState
                   ),
                 ),
                 Text(
-                  formatOperations(stats.totalTransactions),
+                  context.l10n.countOperations(stats.totalTransactions),
                   style: AppTypography.labelSm.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),

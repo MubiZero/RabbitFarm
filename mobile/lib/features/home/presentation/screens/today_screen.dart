@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/coach_mark.dart';
@@ -32,30 +33,26 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   final _alertsKey = GlobalKey();
   final _statsKey = GlobalKey();
 
-  late final List<CoachMarkStep> _tourSteps;
-
   @override
   void initState() {
     super.initState();
-    _tourSteps = [
-      CoachMarkStep(
-        targetKey: _alertsKey,
-        title: 'Что требует внимания',
-        description:
-            'Просроченные задачи, вакцинация и заканчивающийся корм — всё '
-            'срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.',
-      ),
-      CoachMarkStep(
-        targetKey: _statsKey,
-        title: 'Состояние фермы',
-        description:
-            'Поголовье, незакрытые задачи и свободные клетки. Потяните экран '
-            'вниз, чтобы обновить цифры.',
-      ),
-    ];
-
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartTour());
   }
+
+  /// Шаги обучения собираются в build, а не в initState: переводы берутся из
+  /// дерева виджетов и в initState ещё недоступны.
+  List<CoachMarkStep> _tourSteps(BuildContext context) => [
+        CoachMarkStep(
+          targetKey: _alertsKey,
+          title: context.l10n.todayTourAlertsTitle,
+          description: context.l10n.todayTourAlertsBody,
+        ),
+        CoachMarkStep(
+          targetKey: _statsKey,
+          title: context.l10n.todayTourStatsTitle,
+          description: context.l10n.todayTourStatsBody,
+        ),
+      ];
 
   Future<void> _maybeStartTour() async {
     final onboarding = await ref.read(onboardingProvider.future);
@@ -73,6 +70,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   Widget build(BuildContext context) {
     final dashboardAsync = ref.watch(dashboardReportProvider);
     final tourState = ref.watch(tourProvider);
+    final tourSteps = _tourSteps(context);
 
     return Scaffold(
       body: Stack(
@@ -88,13 +86,13 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               ),
             ),
           ),
-          if (tourState.isActive && tourState.step < _tourSteps.length)
+          if (tourState.isActive && tourState.step < tourSteps.length)
             Positioned.fill(
               child: CoachMarkOverlay(
-                steps: _tourSteps,
+                steps: tourSteps,
                 currentStep: tourState.step,
                 onNext: () =>
-                    ref.read(tourProvider.notifier).advance(_tourSteps.length),
+                    ref.read(tourProvider.notifier).advance(tourSteps.length),
                 onSkip: () => ref.read(tourProvider.notifier).skip(),
               ),
             ),
@@ -126,7 +124,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
             if (alerts.isEmpty)
               const _AllClearCard()
             else ...[
-              const AppSectionTitle('Требует внимания'),
+              AppSectionTitle(context.l10n.todayNeedsAttention),
               for (var i = 0; i < alerts.length; i++) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.sm),
                 alerts[i],
@@ -141,13 +139,13 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           key: _statsKey,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppSectionTitle('Ферма сейчас'),
+            AppSectionTitle(context.l10n.todayFarmNow),
             Row(
               children: [
                 Expanded(
                   child: StatTile(
                     icon: Icons.pets_outlined,
-                    label: 'Поголовье',
+                    label: context.l10n.todayStatLivestock,
                     value: '${d.rabbits.total}',
                     accent: AppColors.domainLivestock,
                   ),
@@ -156,7 +154,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 Expanded(
                   child: StatTile(
                     icon: Icons.check_circle_outline,
-                    label: 'Задачи в работе',
+                    label: context.l10n.todayStatTasks,
                     value: '${d.tasks.pending}',
                     accent: AppColors.domainTasks,
                   ),
@@ -165,7 +163,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 Expanded(
                   child: StatTile(
                     icon: Icons.grid_view_outlined,
-                    label: 'Клеток свободно',
+                    label: context.l10n.todayStatFreeCages,
                     value: '${d.cages.available}',
                     accent: AppColors.domainLivestock,
                   ),
@@ -177,13 +175,13 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
         const SizedBox(height: AppSpacing.xl),
 
-        const AppSectionTitle('За 30 дней'),
+        AppSectionTitle(context.l10n.todayLast30Days),
         Row(
           children: [
             Expanded(
               child: StatTile(
                 icon: Icons.child_care_outlined,
-                label: 'Родилось',
+                label: context.l10n.todayStatBirths,
                 value: '${d.breeding.recentBirths}',
                 accent: AppColors.domainBreeding,
               ),
@@ -192,7 +190,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
             Expanded(
               child: StatTile(
                 icon: Icons.trending_up,
-                label: 'Доход',
+                label: context.l10n.todayStatIncome,
                 value: formatMoney(d.finance.income30days),
                 accent: AppColors.success,
               ),
@@ -201,7 +199,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
             Expanded(
               child: StatTile(
                 icon: Icons.trending_down,
-                label: 'Расход',
+                label: context.l10n.todayStatExpenses,
                 value: formatMoney(d.finance.expenses30days),
                 accent: AppColors.error,
               ),
@@ -218,40 +216,43 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     return [
       if (d.tasks.overdue > 0)
         AlertCard(
-          title: 'Просроченные задачи',
-          description: formatTasks(d.tasks.overdue),
+          title: context.l10n.todayAlertOverdueTasks,
+          description: context.l10n.countTasks(d.tasks.overdue),
           icon: Icons.event_busy_outlined,
           color: AppColors.error,
           onTap: () => context.go('/tasks'),
         ),
       if (d.health.overdueVaccinations > 0)
         AlertCard(
-          title: 'Вакцинация просрочена',
-          description: formatVaccinations(d.health.overdueVaccinations),
+          title: context.l10n.todayAlertOverdueVaccination,
+          description:
+              context.l10n.countVaccinations(d.health.overdueVaccinations),
           icon: Icons.vaccines_outlined,
           color: AppColors.error,
           onTap: () => context.push('/vaccinations'),
         ),
       if (d.tasks.urgent > 0)
         AlertCard(
-          title: 'Срочные задачи',
-          description: formatTasks(d.tasks.urgent),
+          title: context.l10n.todayAlertUrgentTasks,
+          description: context.l10n.countTasks(d.tasks.urgent),
           icon: Icons.priority_high,
           color: AppColors.warning,
           onTap: () => context.go('/tasks'),
         ),
       if (d.inventory.lowStockFeeds > 0)
         AlertCard(
-          title: 'Заканчивается корм',
-          description: formatFeedKinds(d.inventory.lowStockFeeds),
+          title: context.l10n.todayAlertLowFeed,
+          description:
+              context.l10n.countFeedKinds(d.inventory.lowStockFeeds),
           icon: Icons.inventory_2_outlined,
           color: AppColors.warning,
           onTap: () => context.push('/feeds'),
         ),
       if (d.health.upcomingVaccinations > 0)
         AlertCard(
-          title: 'Скоро вакцинация',
-          description: formatVaccinations(d.health.upcomingVaccinations),
+          title: context.l10n.todayAlertUpcomingVaccination,
+          description:
+              context.l10n.countVaccinations(d.health.upcomingVaccinations),
           icon: Icons.event_available_outlined,
           color: AppColors.info,
           onTap: () => context.push('/vaccinations'),
@@ -272,7 +273,7 @@ class _Greeting extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _greeting(now.hour, name),
+          _greeting(context, now.hour, name),
           style:
               AppTypography.displayMd.copyWith(color: context.colors.onSurface),
         ),
@@ -286,17 +287,18 @@ class _Greeting extends ConsumerWidget {
     );
   }
 
-  String _greeting(int hour, String? name) {
+  String _greeting(BuildContext context, int hour, String? name) {
+    final l10n = context.l10n;
     final base = switch (hour) {
-      >= 6 && < 12 => 'Доброе утро',
-      >= 12 && < 18 => 'Добрый день',
-      >= 18 && < 23 => 'Добрый вечер',
-      _ => 'Доброй ночи',
+      >= 6 && < 12 => l10n.todayGreetingMorning,
+      >= 12 && < 18 => l10n.todayGreetingDay,
+      >= 18 && < 23 => l10n.todayGreetingEvening,
+      _ => l10n.todayGreetingNight,
     };
     final firstName = name?.trim().split(' ').first;
     return firstName == null || firstName.isEmpty
-        ? '$base!'
-        : '$base, $firstName!';
+        ? l10n.todayGreetingPlain(base)
+        : l10n.todayGreetingNamed(base, firstName);
   }
 }
 
@@ -313,7 +315,7 @@ class _AllClearCard extends StatelessWidget {
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
-              'Всё под контролем — срочного нет',
+              context.l10n.todayAllClear,
               style: AppTypography.bodyLg
                   .copyWith(color: context.colors.onSurface),
             ),

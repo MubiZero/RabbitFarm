@@ -13,6 +13,8 @@ import 'package:mobile/features/finance/data/models/transaction_model.dart';
 import 'package:mobile/features/finance/presentation/providers/transactions_provider.dart';
 import 'package:mobile/features/finance/presentation/screens/transaction_statistics_screen.dart';
 
+import '../support/test_app.dart';
+
 final _financeStats = FinancialStatistics(
   totalIncome: 184500,
   totalExpenses: 96200,
@@ -139,13 +141,8 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 400));
 }
 
-Widget _wrap(Widget screen, List<Override> overrides) => ProviderScope(
-      overrides: overrides,
-      child: MaterialApp(
-        theme: ThemeData(useMaterial3: true),
-        home: screen,
-      ),
-    );
+Widget _wrap(Widget screen, List<Override> overrides) =>
+    testAppScreen(screen, overrides: overrides);
 
 void main() {
   setUpAll(() => initializeDateFormatting('ru_RU', null));

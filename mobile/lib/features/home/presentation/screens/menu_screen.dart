@@ -7,6 +7,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Меню: всё, до чего не дотянуться с четырёх основных вкладок.
 ///
@@ -38,7 +39,7 @@ class MenuScreen extends ConsumerWidget {
                 bottom: AppSpacing.lg,
               ),
               child: Text(
-                'Меню',
+                context.l10n.menuTitle,
                 style: AppTypography.displayMd
                     .copyWith(color: context.colors.onSurface),
               ),
@@ -47,68 +48,72 @@ class MenuScreen extends ConsumerWidget {
             _ProfileCard(
               name: user?.fullName,
               email: user?.email,
-              roleLabel: _roleLabel(role),
+              roleLabel: _roleLabel(context, role),
               onTap: () => context.push('/settings'),
             ),
 
             _Section(
-              title: 'Поголовье',
+              title: context.l10n.menuSectionLivestock,
               domain: AppDomain.livestock,
               items: [
-                _Item(Icons.grid_view_outlined, 'Клетки', '/cages'),
-                _Item(Icons.category_outlined, 'Породы', '/breeds'),
+                _Item(Icons.grid_view_outlined, context.l10n.menuCages, '/cages'),
+                _Item(Icons.category_outlined, context.l10n.menuBreeds, '/breeds'),
               ],
             ),
 
             _Section(
-              title: 'Разведение',
+              title: context.l10n.menuSectionBreeding,
               domain: AppDomain.breeding,
               items: [
-                _Item(Icons.favorite_outline, 'Случки', '/breeding'),
-                _Item(Icons.child_care_outlined, 'Роды', '/births'),
+                _Item(Icons.favorite_outline, context.l10n.menuBreedings, '/breeding'),
+                _Item(Icons.child_care_outlined, context.l10n.menuBirths, '/births'),
                 // Подбор пар с проверкой на родство был написан, но не был
                 // связан ни с одним экраном: попасть в него из приложения
                 // было невозможно.
-                _Item(Icons.hub_outlined, 'Подбор пар', '/breeding/planner'),
+                _Item(Icons.hub_outlined, context.l10n.menuPairPlanner,
+                    '/breeding/planner'),
               ],
             ),
 
             _Section(
-              title: 'Здоровье',
+              title: context.l10n.menuSectionHealth,
               domain: AppDomain.health,
               items: [
-                _Item(Icons.vaccines_outlined, 'Вакцинации', '/vaccinations'),
-                _Item(Icons.medical_services_outlined, 'Лечение',
-                    '/medical-records'),
+                _Item(Icons.vaccines_outlined, context.l10n.menuVaccinations,
+                    '/vaccinations'),
+                _Item(Icons.medical_services_outlined,
+                    context.l10n.menuMedicalRecords, '/medical-records'),
               ],
             ),
 
             _Section(
-              title: 'Корма',
+              title: context.l10n.menuSectionFeeding,
               domain: AppDomain.feeding,
               items: [
-                _Item(Icons.inventory_2_outlined, 'Запасы', '/feeds'),
-                _Item(Icons.restaurant_outlined, 'Кормления',
-                    '/feeding-records'),
+                _Item(Icons.inventory_2_outlined, context.l10n.menuFeedStock,
+                    '/feeds'),
+                _Item(Icons.restaurant_outlined,
+                    context.l10n.menuFeedingRecords, '/feeding-records'),
               ],
             ),
 
             _Section(
-              title: 'Учёт',
+              title: context.l10n.menuSectionLedger,
               domain: AppDomain.admin,
               items: [
-                _Item(Icons.account_balance_wallet_outlined, 'Финансы',
-                    '/transactions'),
+                _Item(Icons.account_balance_wallet_outlined,
+                    context.l10n.menuFinance, '/transactions'),
                 if (role.can(FarmCapability.manageStaff))
-                  _Item(Icons.groups_outlined, 'Работники', '/staff'),
+                  _Item(Icons.groups_outlined, context.l10n.menuStaff, '/staff'),
               ],
             ),
 
             _Section(
-              title: 'Приложение',
+              title: context.l10n.menuSectionApp,
               domain: AppDomain.admin,
               items: [
-                _Item(Icons.settings_outlined, 'Настройки', '/settings'),
+                _Item(Icons.settings_outlined, context.l10n.menuSettings,
+                    '/settings'),
               ],
               extra: _AboutTile(),
             ),
@@ -121,10 +126,11 @@ class MenuScreen extends ConsumerWidget {
     );
   }
 
-  String _roleLabel(FarmRoleAccess role) => switch (role) {
-        FarmRoleAccess.owner => 'Владелец фермы',
-        FarmRoleAccess.manager => 'Управляющий',
-        FarmRoleAccess.worker => 'Работник',
+  String _roleLabel(BuildContext context, FarmRoleAccess role) =>
+      switch (role) {
+        FarmRoleAccess.owner => context.l10n.roleOwner,
+        FarmRoleAccess.manager => context.l10n.roleManager,
+        FarmRoleAccess.worker => context.l10n.roleWorker,
       };
 }
 
@@ -175,7 +181,7 @@ class _ProfileCard extends StatelessWidget {
                     Text(
                       name?.trim().isNotEmpty == true
                           ? name!.trim()
-                          : 'Профиль',
+                          : context.l10n.menuProfile,
                       style: AppTypography.titleMd
                           .copyWith(color: context.colors.onSurface),
                       maxLines: 1,
@@ -335,16 +341,14 @@ class _AboutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return _MenuRow(
       icon: Icons.info_outline,
-      label: 'О приложении',
+      label: context.l10n.menuAbout,
       color: AppDomain.admin.color(context),
       onTap: () => showAboutDialog(
         context: context,
-        applicationName: 'RabbitFarm',
+        applicationName: context.l10n.appName,
         applicationVersion: '1.0.0',
         applicationIcon: Icon(Icons.pets, size: 40, color: context.accent),
-        children: const [
-          Text('Учёт поголовья, кормов, здоровья и денег кроличьей фермы.'),
-        ],
+        children: [Text(context.l10n.menuAboutBody)],
       ),
     );
   }
@@ -371,7 +375,7 @@ class _LogoutButton extends StatelessWidget {
               const Icon(Icons.logout, color: AppColors.error, size: 20),
               const SizedBox(width: AppSpacing.md),
               Text(
-                'Выйти',
+                context.l10n.menuLogout,
                 style:
                     AppTypography.titleMd.copyWith(color: AppColors.error),
               ),

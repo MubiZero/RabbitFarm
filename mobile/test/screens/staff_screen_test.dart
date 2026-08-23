@@ -7,6 +7,8 @@ import 'package:mobile/features/staff/data/models/staff_models.dart';
 import 'package:mobile/features/staff/presentation/providers/staff_provider.dart';
 import 'package:mobile/features/staff/presentation/screens/staff_screen.dart';
 
+import '../support/test_app.dart';
+
 const _owner = FarmMember(
   id: 1,
   email: 'owner@example.com',
@@ -38,13 +40,8 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 400));
 }
 
-Widget _wrap(List<Override> overrides) => ProviderScope(
-      overrides: overrides,
-      child: MaterialApp(
-        theme: ThemeData(useMaterial3: true),
-        home: const StaffScreen(),
-      ),
-    );
+Widget _wrap(List<Override> overrides) =>
+    testAppScreen(const StaffScreen(), overrides: overrides);
 
 void main() {
   setUpAll(() => initializeDateFormatting('ru_RU', null));

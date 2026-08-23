@@ -1,0 +1,247 @@
+{
+  "@@locale": "ru",
+
+  "appName": "RabbitFarm",
+  "@appName": {
+    "description": "Название приложения"
+  },
+
+  "commonRetry": "Повторить",
+  "commonCancel": "Отмена",
+  "commonSave": "Сохранить",
+  "commonAdd": "Добавить",
+  "commonDelete": "Удалить",
+  "commonClose": "Закрыть",
+  "commonLoadFailed": "Не удалось загрузить",
+  "commonUnknownError": "Неизвестная ошибка",
+  "commonStaleData": "Не удалось обновить, показаны прежние данные",
+  "commonRetryShort": "Ещё раз",
+  "commonNotSpecified": "Не указано",
+  "commonActions": "Действия",
+
+  "loginSubtitle": "Вход в вашу ферму",
+  "loginEmailLabel": "Почта",
+  "loginEmailHint": "name@example.com",
+  "loginEmailEmpty": "Введите почту",
+  "loginEmailInvalid": "Похоже, в адресе опечатка",
+  "loginPasswordLabel": "Пароль",
+  "loginPasswordEmpty": "Введите пароль",
+  "loginPasswordShow": "Показать пароль",
+  "loginPasswordHide": "Скрыть пароль",
+  "loginSubmit": "Войти",
+  "loginFailed": "Не удалось войти",
+  "loginHasInvite": "У меня есть код приглашения",
+  "loginCreateFarm": "Завести свою ферму",
+  "loginForgotPassword": "Забыли пароль? Его сбрасывает владелец фермы — писем сервис не отправляет.",
+
+  "todayGreetingMorning": "Доброе утро",
+  "todayGreetingDay": "Добрый день",
+  "todayGreetingEvening": "Добрый вечер",
+  "todayGreetingNight": "Доброй ночи",
+  "todayGreetingNamed": "{greeting}, {name}!",
+  "@todayGreetingNamed": {
+    "placeholders": {
+      "greeting": { "type": "String" },
+      "name": { "type": "String" }
+    }
+  },
+  "todayGreetingPlain": "{greeting}!",
+  "@todayGreetingPlain": {
+    "placeholders": {
+      "greeting": { "type": "String" }
+    }
+  },
+  "todayNeedsAttention": "Требует внимания",
+  "todayAllClear": "Всё под контролем — срочного нет",
+  "todayFarmNow": "Ферма сейчас",
+  "todayLast30Days": "За 30 дней",
+  "todayStatLivestock": "Поголовье",
+  "todayStatTasks": "Задачи в работе",
+  "todayStatFreeCages": "Клеток свободно",
+  "todayStatBirths": "Родилось",
+  "todayStatIncome": "Доход",
+  "todayStatExpenses": "Расход",
+  "todayAlertOverdueTasks": "Просроченные задачи",
+  "todayAlertOverdueVaccination": "Вакцинация просрочена",
+  "todayAlertUrgentTasks": "Срочные задачи",
+  "todayAlertLowFeed": "Заканчивается корм",
+  "todayAlertUpcomingVaccination": "Скоро вакцинация",
+  "todayTourAlertsTitle": "Что требует внимания",
+  "todayTourAlertsBody": "Просроченные задачи, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.",
+  "todayTourStatsTitle": "Состояние фермы",
+  "todayTourStatsBody": "Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.",
+
+  "menuTitle": "Меню",
+  "menuProfile": "Профиль",
+  "menuSectionLivestock": "Поголовье",
+  "menuSectionBreeding": "Разведение",
+  "menuSectionHealth": "Здоровье",
+  "menuSectionFeeding": "Корма",
+  "menuSectionLedger": "Учёт",
+  "menuSectionApp": "Приложение",
+  "menuCages": "Клетки",
+  "menuBreeds": "Породы",
+  "menuBreedings": "Случки",
+  "menuBirths": "Роды",
+  "menuPairPlanner": "Подбор пар",
+  "menuVaccinations": "Вакцинации",
+  "menuMedicalRecords": "Лечение",
+  "menuFeedStock": "Запасы",
+  "menuFeedingRecords": "Кормления",
+  "menuFinance": "Финансы",
+  "menuStaff": "Работники",
+  "menuSettings": "Настройки",
+  "menuAbout": "О приложении",
+  "menuAboutBody": "Учёт поголовья, кормов, здоровья и денег кроличьей фермы.",
+  "menuLogout": "Выйти",
+
+  "roleOwner": "Владелец фермы",
+  "roleManager": "Управляющий",
+  "roleWorker": "Работник",
+
+  "navToday": "Сегодня",
+  "navRabbits": "Кролики",
+  "navTasks": "Задачи",
+  "navMenu": "Меню",
+  "navNewTask": "Новая задача",
+  "navQuickEntry": "Быстрая запись",
+  "navQuickTitle": "Что записать",
+  "quickRecordFeeding": "Записать кормление",
+  "quickRecordVaccination": "Записать вакцинацию",
+  "quickCreateTask": "Создать задачу",
+  "quickAddRabbit": "Добавить кролика",
+  "quickRecordBirth": "Записать окрол",
+  "quickAddCage": "Добавить клетку",
+
+  "formDiscardTitle": "Выйти без сохранения?",
+  "formDiscardBody": "Заполненные поля будут потеряны.",
+  "formDiscardStay": "Продолжить ввод",
+  "formDiscardLeave": "Выйти",
+
+  "breedingListTitle": "Случки",
+  "breedingEmptyTitle": "Случек пока нет",
+  "breedingEmptyBody": "Запишите случку, и приложение подскажет ожидаемую дату окрола.",
+  "breedingEmptyAction": "Записать случку",
+  "breedingMale": "Самец",
+  "breedingFemale": "Самка",
+  "breedingNameMissing": "Имя не указано",
+  "breedingExpectedBirth": "Окрол ожидается {date}",
+  "@breedingExpectedBirth": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "breedingStatusPlanned": "Запланирована",
+  "breedingStatusCompleted": "Завершена",
+  "breedingStatusFailed": "Неудачная",
+  "breedingStatusCancelled": "Отменена",
+
+  "cageTitle": "Клетка",
+  "cageTitleNumbered": "Клетка {number}",
+  "@cageTitleNumbered": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "cageEdit": "Изменить клетку",
+  "cageResidents": "Жители",
+  "cageEmptyManaged": "Клетка пустая. Поселите кролика кнопкой внизу.",
+  "cageEmptyReadOnly": "Клетка пустая.",
+  "cageFull": "Клетка заполнена",
+  "cageAddRabbit": "Поселить кролика",
+  "cageNoLocation": "Место не указано",
+  "cageRemoveTitle": "Убрать из клетки?",
+  "cageRemoveBody": "{name} перейдёт в список кроликов без клетки.",
+  "@cageRemoveBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "cageRemoveConfirm": "Убрать",
+  "cageRemoved": "{name} убран из клетки",
+  "@cageRemoved": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "cageMoved": "{name} переехал в клетку {number}",
+  "@cageMoved": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "number": { "type": "String" }
+    }
+  },
+  "cageSettled": "{name} поселён в клетку",
+  "@cageSettled": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "cageActionFailed": "Не удалось: {reason}",
+  "@cageActionFailed": {
+    "placeholders": {
+      "reason": { "type": "String" }
+    }
+  },
+  "cageResidentMove": "Переселить",
+  "cagePickRabbitTitle": "Кого поселить",
+  "cagePickRabbitHint": "Кличка или номер бирки",
+  "cagePickNothingFound": "Никого не нашлось",
+  "cagePickNothingFoundBody": "Проверьте кличку или номер бирки.",
+  "cagePickCurrentCage": "Сейчас в клетке {number}",
+  "@cagePickCurrentCage": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "cagePickNoCage": "Без клетки",
+  "cagePickCageTitle": "Куда переселить",
+  "cagePickNoFreeCages": "Свободных клеток нет",
+  "cagePickNoFreeCagesBody": "Освободите место или добавьте новую клетку.",
+  "cageTypeSingle": "Одиночная",
+  "cageTypeGroup": "Групповая",
+  "cageTypeMaternity": "Для окрола",
+  "cageConditionGood": "В порядке",
+  "cageConditionNeedsRepair": "Нужен ремонт",
+  "cageConditionBroken": "Сломана",
+
+  "countTasks": "{count, plural, one{{count} задача} few{{count} задачи} many{{count} задач} other{{count} задачи}}",
+  "@countTasks": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countVaccinations": "{count, plural, one{{count} прививка} few{{count} прививки} many{{count} прививок} other{{count} прививки}}",
+  "@countVaccinations": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countFeedKinds": "{count, plural, one{{count} вид корма} few{{count} вида корма} many{{count} видов корма} other{{count} вида корма}}",
+  "@countFeedKinds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countRabbits": "{count, plural, one{{count} кролик} few{{count} кролика} many{{count} кроликов} other{{count} кролика}}",
+  "@countRabbits": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countRecords": "{count, plural, one{{count} запись} few{{count} записи} many{{count} записей} other{{count} записи}}",
+  "@countRecords": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countOperations": "{count, plural, one{{count} операция} few{{count} операции} many{{count} операций} other{{count} операции}}",
+  "@countOperations": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "emptyNoRecordsTitle": "Записей нет",
+  "emptyNoRecordsBody": "Добавьте первую."
+}

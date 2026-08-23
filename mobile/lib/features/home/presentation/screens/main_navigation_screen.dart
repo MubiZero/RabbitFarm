@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Каркас с четырьмя вкладками и кнопкой быстрой записи.
 class MainNavigationScreen extends ConsumerWidget {
@@ -17,16 +18,24 @@ class MainNavigationScreen extends ConsumerWidget {
   });
 
   static const _tabs = [
-    (path: '/today', icon: Icons.today_outlined, active: Icons.today, label: 'Сегодня'),
-    (path: '/rabbits', icon: Icons.pets_outlined, active: Icons.pets, label: 'Кролики'),
-    (path: '/tasks', icon: Icons.checklist_outlined, active: Icons.checklist, label: 'Задачи'),
-    (path: '/menu', icon: Icons.menu, active: Icons.menu_open, label: 'Меню'),
+    (path: '/today', icon: Icons.today_outlined, active: Icons.today),
+    (path: '/rabbits', icon: Icons.pets_outlined, active: Icons.pets),
+    (path: '/tasks', icon: Icons.checklist_outlined, active: Icons.checklist),
+    (path: '/menu', icon: Icons.menu, active: Icons.menu_open),
   ];
+
+  List<String> _tabLabels(BuildContext context) => [
+        context.l10n.navToday,
+        context.l10n.navRabbits,
+        context.l10n.navTasks,
+        context.l10n.navMenu,
+      ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = _selectedIndex(currentPath);
     final role = ref.watch(farmRoleProvider);
+    final labels = _tabLabels(context);
 
     return Scaffold(
       body: child,
@@ -34,11 +43,11 @@ class MainNavigationScreen extends ConsumerWidget {
         selectedIndex: index,
         onDestinationSelected: (i) => context.go(_tabs[i].path),
         destinations: [
-          for (final tab in _tabs)
+          for (var i = 0; i < _tabs.length; i++)
             NavigationDestination(
-              icon: Icon(tab.icon),
-              selectedIcon: Icon(tab.active),
-              label: tab.label,
+              icon: Icon(_tabs[i].icon),
+              selectedIcon: Icon(_tabs[i].active),
+              label: labels[i],
             ),
         ],
       ),
@@ -59,68 +68,71 @@ class MainNavigationScreen extends ConsumerWidget {
 
     if (index == 2) {
       return FloatingActionButton(
-        tooltip: 'Новая задача',
+        tooltip: context.l10n.navNewTask,
         onPressed: () => context.push('/tasks/form'),
         child: const Icon(Icons.add, size: 28),
       );
     }
 
     final actions =
-        _quickActions(index).where((a) => role.can(a.capability)).toList();
+        _quickActions(context, index)
+            .where((a) => role.can(a.capability))
+            .toList();
     // Работнику нечего создавать на вкладке «Кролики»: поголовье и клетки
     // заводит управляющий. Кнопка, которая открывает пустой список или
     // приводит к отказу сервера, хуже её отсутствия.
     if (actions.isEmpty) return null;
 
     return FloatingActionButton(
-      tooltip: 'Быстрая запись',
+      tooltip: context.l10n.navQuickEntry,
       onPressed: () => _showQuickActions(context, actions),
       child: const Icon(Icons.add, size: 28),
     );
   }
 
-  List<_QuickAction> _quickActions(int index) => switch (index) {
-        0 => const [
+  List<_QuickAction> _quickActions(BuildContext context, int index) =>
+      switch (index) {
+        0 => [
             _QuickAction(
               icon: Icons.restaurant_outlined,
-              label: 'Записать кормление',
+              label: context.l10n.quickRecordFeeding,
               route: '/feeding-records/form',
               domain: AppDomain.feeding,
               capability: FarmCapability.recordDailyWork,
             ),
             _QuickAction(
               icon: Icons.vaccines_outlined,
-              label: 'Записать вакцинацию',
+              label: context.l10n.quickRecordVaccination,
               route: '/vaccinations/form',
               domain: AppDomain.health,
               capability: FarmCapability.recordDailyWork,
             ),
             _QuickAction(
               icon: Icons.add_task,
-              label: 'Создать задачу',
+              label: context.l10n.quickCreateTask,
               route: '/tasks/form',
               domain: AppDomain.tasks,
               capability: FarmCapability.recordDailyWork,
             ),
           ],
-        1 => const [
+        1 => [
             _QuickAction(
               icon: Icons.pets_outlined,
-              label: 'Добавить кролика',
+              label: context.l10n.quickAddRabbit,
               route: '/rabbits/new',
               domain: AppDomain.livestock,
               capability: FarmCapability.manageLivestock,
             ),
             _QuickAction(
               icon: Icons.child_care_outlined,
-              label: 'Записать окрол',
+              label: context.l10n.quickRecordBirth,
               route: '/births/new',
               domain: AppDomain.breeding,
               capability: FarmCapability.manageLivestock,
             ),
             _QuickAction(
               icon: Icons.grid_view_outlined,
-              label: 'Добавить клетку',
+              label: context.l10n.quickAddCage,
               route: '/cages/form',
               domain: AppDomain.livestock,
               capability: FarmCapability.manageLivestock,
@@ -173,7 +185,7 @@ class _QuickActionsSheet extends StatelessWidget {
               AppSpacing.lg,
             ),
             child: Text(
-              'Что записать',
+              context.l10n.navQuickTitle,
               style: AppTypography.titleLg
                   .copyWith(color: context.colors.onSurface),
             ),

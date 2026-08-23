@@ -7,6 +7,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../providers/breeding_provider.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Список случек.
 ///
@@ -23,7 +24,7 @@ class BreedingListScreen extends ConsumerWidget {
     final notifier = ref.read(breedingListProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Случки')),
+      appBar: AppBar(title: Text(context.l10n.breedingListTitle)),
       body: PagedListView<BreedingModel>(
         items: state.breedings,
         isLoading: state.isLoading,
@@ -33,10 +34,9 @@ class BreedingListScreen extends ConsumerWidget {
         onLoadMore: notifier.loadMore,
         empty: AppEmptyState(
           icon: Icons.favorite_border,
-          title: 'Случек пока нет',
-          subtitle: 'Запишите случку, и приложение подскажет ожидаемую '
-              'дату окрола.',
-          actionLabel: 'Записать случку',
+          title: context.l10n.breedingEmptyTitle,
+          subtitle: context.l10n.breedingEmptyBody,
+          actionLabel: context.l10n.breedingEmptyAction,
           onAction: () => context.push('/breeding/new'),
         ),
         itemBuilder: (context, breeding, _) => _BreedingCard(
@@ -85,7 +85,7 @@ class _BreedingCard extends StatelessWidget {
                 child: _Parent(
                   icon: Icons.male,
                   color: AppColors.info,
-                  role: 'Самец',
+                  role: context.l10n.breedingMale,
                   name: breeding.male?.name,
                 ),
               ),
@@ -98,7 +98,7 @@ class _BreedingCard extends StatelessWidget {
                 child: _Parent(
                   icon: Icons.female,
                   color: AppColors.domainBreeding,
-                  role: 'Самка',
+                  role: context.l10n.breedingFemale,
                   name: breeding.female?.name,
                   alignEnd: true,
                 ),
@@ -113,7 +113,8 @@ class _BreedingCard extends StatelessWidget {
                     size: 16, color: context.colors.onSurfaceVariant),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'Окрол ожидается ${_formatDate(breeding.expectedBirthDate!)}',
+                  context.l10n.breedingExpectedBirth(
+                      _formatDate(breeding.expectedBirthDate!)),
                   style: AppTypography.bodyMd
                       .copyWith(color: context.colors.onSurface),
                 ),
@@ -136,6 +137,13 @@ class _StatusChip extends StatelessWidget {
 
   const _StatusChip({required this.status});
 
+  String _label(BuildContext context, BreedingStatus status) => switch (status) {
+        BreedingStatus.planned => context.l10n.breedingStatusPlanned,
+        BreedingStatus.completed => context.l10n.breedingStatusCompleted,
+        BreedingStatus.failed => context.l10n.breedingStatusFailed,
+        BreedingStatus.cancelled => context.l10n.breedingStatusCancelled,
+      };
+
   @override
   Widget build(BuildContext context) {
     final color = switch (status) {
@@ -155,7 +163,7 @@ class _StatusChip extends StatelessWidget {
         borderRadius: AppRadius.pillAll,
       ),
       child: Text(
-        status.label,
+        _label(context, status),
         style: AppTypography.labelSm.copyWith(color: color),
       ),
     );
@@ -202,7 +210,9 @@ class _Parent extends StatelessWidget {
         Text(
           // Раньше вместо неизвестного имени показывался номер записи в базе
           // («ID: 42») — для фермера это не подсказка, а мусор.
-          name?.trim().isNotEmpty == true ? name!.trim() : 'Имя не указано',
+          name?.trim().isNotEmpty == true
+              ? name!.trim()
+              : context.l10n.breedingNameMissing,
           style: AppTypography.titleMd.copyWith(color: context.colors.onSurface),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

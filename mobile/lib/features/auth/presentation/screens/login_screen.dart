@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme.dart';
 import '../providers/auth_provider.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -40,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (!mounted) return;
       final message = e is DioException
-          ? (e.message ?? 'Не удалось войти')
+          ? (e.message ?? context.l10n.loginFailed)
           : e.toString().replaceAll('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: AppColors.error),
@@ -81,14 +82,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     Text(
-                      'RabbitFarm',
+                      context.l10n.appName,
                       style: AppTypography.displayMd
                           .copyWith(color: context.colors.onSurface),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Вход в вашу ферму',
+                      context.l10n.loginSubtitle,
                       style: AppTypography.bodyMd
                           .copyWith(color: context.colors.onSurfaceVariant),
                       textAlign: TextAlign.center,
@@ -106,17 +107,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       autofillHints: const [AutofillHints.username],
                       autocorrect: false,
                       enabled: !busy,
-                      decoration: const InputDecoration(
-                        labelText: 'Почта',
-                        hintText: 'name@example.com',
-                        prefixIcon: Icon(Icons.alternate_email),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.loginEmailLabel,
+                        hintText: context.l10n.loginEmailHint,
+                        prefixIcon: const Icon(Icons.alternate_email),
                       ),
                       onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
                       validator: (value) {
                         final email = value?.trim() ?? '';
-                        if (email.isEmpty) return 'Введите почту';
+                        if (email.isEmpty) return context.l10n.loginEmailEmpty;
                         if (!email.contains('@') || !email.contains('.')) {
-                          return 'Похоже, в адресе опечатка';
+                          return context.l10n.loginEmailInvalid;
                         }
                         return null;
                       },
@@ -130,12 +131,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       autofillHints: const [AutofillHints.password],
                       enabled: !busy,
                       decoration: InputDecoration(
-                        labelText: 'Пароль',
+                        labelText: context.l10n.loginPasswordLabel,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           tooltip: _obscurePassword
-                              ? 'Показать пароль'
-                              : 'Скрыть пароль',
+                              ? context.l10n.loginPasswordShow
+                              : context.l10n.loginPasswordHide,
                           icon: Icon(
                             _obscurePassword
                                 ? Icons.visibility_outlined
@@ -147,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       onFieldSubmitted: (_) => _handleLogin(),
                       validator: (value) => (value == null || value.isEmpty)
-                          ? 'Введите пароль'
+                          ? context.l10n.loginPasswordEmpty
                           : null,
                     ),
                     const SizedBox(height: AppSpacing.xl),
@@ -162,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Войти'),
+                          : Text(context.l10n.loginSubmit),
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
@@ -170,16 +171,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // регистрация на ферме закрыта, аккаунт выдаёт владелец.
                     TextButton(
                       onPressed: busy ? null : () => context.go('/join'),
-                      child: const Text('У меня есть код приглашения'),
+                      child: Text(context.l10n.loginHasInvite),
                     ),
                     TextButton(
                       onPressed: busy ? null : () => context.go('/register'),
-                      child: const Text('Завести свою ферму'),
+                      child: Text(context.l10n.loginCreateFarm),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'Забыли пароль? Его сбрасывает владелец фермы — '
-                      'писем сервис не отправляет.',
+                      context.l10n.loginForgotPassword,
                       textAlign: TextAlign.center,
                       style: AppTypography.labelSm
                           .copyWith(color: context.colors.onSurfaceVariant),

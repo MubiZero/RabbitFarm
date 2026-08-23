@@ -2,22 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/core/widgets/widgets.dart';
+
+import '../support/test_app.dart';
 
 /// Ради этих проверок каркасы и появились: пустой экран без объяснения был
 /// самым частым дефектом интерфейса, и повторялся он ровно потому, что
 /// сочетания «загрузка», «ошибка» и «пусто» каждый экран разбирал заново.
 
-Widget _host(Widget child) => ProviderScope(
-      child: MaterialApp(
-        theme: AppTheme.build(
-          brightness: Brightness.light,
-          accent: const Color(0xFF10B981),
-        ),
-        home: Scaffold(body: child),
-      ),
-    );
+Widget _host(Widget child) => testApp(child);
 
 void main() {
   group('PagedListView', () {

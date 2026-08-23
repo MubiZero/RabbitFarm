@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
@@ -15,6 +14,7 @@ import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
+import '../../../../core/l10n/l10n_context.dart';
 
 /// Карточка клетки: состояние, заполненность и кто в ней живёт.
 class CageDetailScreen extends ConsumerStatefulWidget {
@@ -41,7 +41,10 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
   /// экрана и сообщение о результате.
   Future<void> _run(Future<void> Function() action, String success) async {
     setState(() => _busy = true);
+    // Всё, что зависит от контекста, снимается до ожидания: экран может
+    // закрыться, пока ответ идёт с сервера.
     final messenger = ScaffoldMessenger.of(context);
+    final failedTemplate = context.l10n.cageActionFailed;
     try {
       await action();
       ref.invalidate(cagesProvider);
@@ -50,7 +53,8 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Не удалось: ${e.toString().replaceAll('Exception: ', '')}'),
+          content: Text(
+              failedTemplate(e.toString().replaceAll('Exception: ', ''))),
           backgroundColor: AppColors.error,
         ),
       );
@@ -63,19 +67,17 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Убрать из клетки?'),
-        content: Text(
-          '${rabbit.name} перейдёт в список кроликов без клетки.',
-        ),
+        title: Text(context.l10n.cageRemoveTitle),
+        content: Text(context.l10n.cageRemoveBody(rabbit.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Убрать'),
+            child: Text(context.l10n.cageRemoveConfirm),
           ),
         ],
       ),
@@ -86,7 +88,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': null}),
-      '${rabbit.name} убран из клетки',
+      context.l10n.cageRemoved(rabbit.name),
     );
   }
 
@@ -102,7 +104,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': target.id}),
-      '${rabbit.name} переехал в клетку ${target.number}',
+      context.l10n.cageMoved(rabbit.name, target.number),
     );
   }
 
@@ -118,7 +120,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': widget.cageId}),
-      '${rabbit.name} поселён в клетку',
+      context.l10n.cageSettled(rabbit.name),
     );
   }
 
@@ -130,11 +132,13 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(cage == null ? 'Клетка' : 'Клетка ${cage.number}'),
+        title: Text(cage == null
+            ? context.l10n.cageTitle
+            : context.l10n.cageTitleNumbered(cage.number)),
         actions: [
           if (canManage && cage != null)
             IconButton(
-              tooltip: 'Изменить клетку',
+              tooltip: context.l10n.cageEdit,
               icon: const Icon(Icons.edit_outlined),
               onPressed: () => context.push('/cages/form', extra: cage),
             ),
@@ -171,7 +175,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       // месте и прямо говорит, почему не работает.
       onPressed: full || _busy ? null : _addRabbit,
       icon: Icon(full ? Icons.do_not_disturb_on_outlined : Icons.add),
-      label: Text(full ? 'Клетка заполнена' : 'Поселить кролика'),
+      label: Text(full ? context.l10n.cageFull : context.l10n.cageAddRabbit),
     );
   }
 
@@ -190,8 +194,8 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
         _CageSummary(cage: cage),
         const SizedBox(height: AppSpacing.xl),
         AppSectionTitle(
-          'Жители',
-          subtitle: formatRabbits(rabbits.length),
+          context.l10n.cageResidents,
+          subtitle: context.l10n.countRabbits(rabbits.length),
         ),
         if (rabbits.isEmpty)
           AppCard(
@@ -203,8 +207,8 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
                 Expanded(
                   child: Text(
                     canManage
-                        ? 'Клетка пустая. Поселите кролика кнопкой внизу.'
-                        : 'Клетка пустая.',
+                        ? context.l10n.cageEmptyManaged
+                        : context.l10n.cageEmptyReadOnly,
                     style: AppTypography.bodyMd
                         .copyWith(color: context.colors.onSurfaceVariant),
                   ),
@@ -249,13 +253,13 @@ class _CageSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      cageTypeLabel(cage.type),
+                      cageTypeLabel(context, cage.type),
                       style: AppTypography.titleMd
                           .copyWith(color: context.colors.onSurface),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      cageConditionLabel(cage.condition),
+                      cageConditionLabel(context, cage.condition),
                       style:
                           AppTypography.labelLg.copyWith(color: conditionColor),
                     ),
@@ -275,7 +279,7 @@ class _CageSummary extends StatelessWidget {
                 child: Text(
                   cage.location?.trim().isNotEmpty == true
                       ? cage.location!.trim()
-                      : 'Место не указано',
+                      : context.l10n.cageNoLocation,
                   style: AppTypography.bodyMd
                       .copyWith(color: context.colors.onSurface),
                 ),
@@ -369,18 +373,18 @@ class _ResidentTile extends StatelessWidget {
           ),
           if (canManage)
             PopupMenuButton<_ResidentAction>(
-              tooltip: 'Действия',
+              tooltip: context.l10n.commonActions,
               onSelected: (action) => switch (action) {
                 _ResidentAction.move => onMove(),
                 _ResidentAction.remove => onRemove(),
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: _ResidentAction.move,
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.swap_horiz),
-                    title: Text('Переселить'),
+                    leading: const Icon(Icons.swap_horiz),
+                    title: Text(context.l10n.cageResidentMove),
                   ),
                 ),
                 PopupMenuItem(
@@ -514,7 +518,7 @@ class _RabbitPickerSheetState extends ConsumerState<_RabbitPickerSheet> {
   @override
   Widget build(BuildContext context) {
     return _PickerSheet(
-      title: 'Кого поселить',
+      title: context.l10n.cagePickRabbitTitle,
       child: Column(
         children: [
           Padding(
@@ -523,9 +527,9 @@ class _RabbitPickerSheetState extends ConsumerState<_RabbitPickerSheet> {
               controller: _controller,
               autofocus: false,
               textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                hintText: 'Кличка или номер бирки',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                hintText: context.l10n.cagePickRabbitHint,
+                prefixIcon: const Icon(Icons.search),
               ),
               onChanged: _onQueryChanged,
               onSubmitted: _search,
@@ -547,10 +551,10 @@ class _RabbitPickerSheetState extends ConsumerState<_RabbitPickerSheet> {
       );
     }
     if (_results.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.search_off,
-        title: 'Никого не нашлось',
-        subtitle: 'Проверьте кличку или номер бирки.',
+        title: context.l10n.cagePickNothingFound,
+        subtitle: context.l10n.cagePickNothingFoundBody,
       );
     }
 
@@ -593,8 +597,8 @@ class _RabbitPickerSheetState extends ConsumerState<_RabbitPickerSheet> {
                     ),
                     Text(
                       currentCage != null
-                          ? 'Сейчас в клетке $currentCage'
-                          : 'Без клетки',
+                          ? context.l10n.cagePickCurrentCage(currentCage)
+                          : context.l10n.cagePickNoCage,
                       style: AppTypography.labelSm.copyWith(
                         color: currentCage != null
                             ? AppColors.warning
@@ -631,12 +635,12 @@ class _CagePickerSheet extends ConsumerWidget {
         .toList();
 
     return _PickerSheet(
-      title: 'Куда переселить',
+      title: context.l10n.cagePickCageTitle,
       child: available.isEmpty
-          ? const AppEmptyState(
+          ? AppEmptyState(
               icon: Icons.grid_off_outlined,
-              title: 'Свободных клеток нет',
-              subtitle: 'Освободите место или добавьте новую клетку.',
+              title: context.l10n.cagePickNoFreeCages,
+              subtitle: context.l10n.cagePickNoFreeCagesBody,
             )
           : ListView.separated(
               padding: const EdgeInsets.fromLTRB(
@@ -662,13 +666,13 @@ class _CagePickerSheet extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Клетка ${cage.number}',
+                              context.l10n.cageTitleNumbered(cage.number),
                               style: AppTypography.titleMd
                                   .copyWith(color: context.colors.onSurface),
                             ),
                             Text(
                               [
-                                cageTypeLabel(cage.type),
+                                cageTypeLabel(context, cage.type),
                                 if (cage.location?.trim().isNotEmpty == true)
                                   cage.location!.trim(),
                               ].join(' · '),
