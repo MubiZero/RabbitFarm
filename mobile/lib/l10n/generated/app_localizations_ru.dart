@@ -2163,6 +2163,92 @@ class AppLocalizationsRu extends AppLocalizations {
   String get breedFormFailed => 'Не удалось сохранить породу';
 
   @override
+  String get breedingDetailTitle => 'Случка';
+
+  @override
+  String get breedingStatus => 'Статус';
+
+  @override
+  String get breedingParents => 'Пара';
+
+  @override
+  String breedingTag(String tag) {
+    return 'Бирка $tag';
+  }
+
+  @override
+  String get breedingDates => 'Даты';
+
+  @override
+  String get breedingDate => 'Дата случки';
+
+  @override
+  String get breedingExpected => 'Ожидаемый окрол';
+
+  @override
+  String get breedingPalpation => 'Дата прощупывания';
+
+  @override
+  String get breedingPregnancy => 'Беременность';
+
+  @override
+  String get breedingPregnancyYes => 'Подтверждена';
+
+  @override
+  String get breedingPregnancyNo => 'Не подтверждена';
+
+  @override
+  String get breedingNotes => 'Заметки';
+
+  @override
+  String get breedingRegisterBirth => 'Записать окрол';
+
+  @override
+  String get breedingDeleteTitle => 'Удалить запись о случке?';
+
+  @override
+  String get breedingDeleteBody => 'Вернуть её будет нельзя.';
+
+  @override
+  String get breedingDeleted => 'Запись удалена';
+
+  @override
+  String get breedingDeleteFailed => 'Не удалось удалить запись';
+
+  @override
+  String get breedingFormNewTitle => 'Новая случка';
+
+  @override
+  String get breedingFormEditTitle => 'Случка';
+
+  @override
+  String get breedingFormPrefilled => 'Пара подставлена из подбора пар';
+
+  @override
+  String get breedingFormMale => 'Самец';
+
+  @override
+  String get breedingFormFemale => 'Самка';
+
+  @override
+  String get breedingFormMaleRequired => 'Выберите самца';
+
+  @override
+  String get breedingFormFemaleRequired => 'Выберите самку';
+
+  @override
+  String get breedingFormNotesHint => 'Что стоит запомнить об этой случке';
+
+  @override
+  String get breedingFormCreated => 'Случка записана';
+
+  @override
+  String get breedingFormUpdated => 'Запись обновлена';
+
+  @override
+  String get breedingFormFailed => 'Не удалось сохранить запись';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../providers/breeding_provider.dart';
-import '../../../rabbits/presentation/providers/rabbits_provider.dart';
-import '../../../rabbits/data/models/breeding_model.dart';
-import '../../../../core/widgets/app_date_field.dart';
-import '../../../../core/widgets/app_form_section.dart';
-import '../../../../core/theme/theme.dart';
 
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../../rabbits/data/models/breeding_model.dart';
+import '../../../rabbits/data/models/rabbit_model.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
+import '../providers/breeding_provider.dart';
+
+/// Запись о случке.
 class BreedingFormScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
   final BreedingModel? breeding;
@@ -20,232 +22,198 @@ class BreedingFormScreen extends ConsumerStatefulWidget {
 
 class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _notes = TextEditingController();
 
-  int? _selectedMaleId;
-  int? _selectedFemaleId;
-  DateTime _breedingDate = DateTime.now();
-  String _status = 'planned';
-  String _notes = '';
-  bool _isSubmitting = false;
+  RabbitModel? _male;
+  RabbitModel? _female;
+  int? _maleId;
+  int? _femaleId;
+  late DateTime _breedingDate;
+  late String _status;
+  bool _touched = false;
 
-  bool get _isEditing => widget.breeding != null;
+  BreedingModel? get _record => widget.breeding;
+  bool get _isEditing => _record != null;
+  bool get _fromPlanner => widget.initialData?['analysis'] != null;
 
   @override
   void initState() {
     super.initState();
-    if (widget.breeding != null) {
-      _selectedMaleId = widget.breeding!.maleId;
-      _selectedFemaleId = widget.breeding!.femaleId;
-      assert(
-        widget.breeding!.breedingDate.isNotEmpty,
-        'breeding.breedingDate is empty — date will default to today',
-      );
-      final parsedDate = widget.breeding!.breedingDate.isNotEmpty
-          ? DateTime.tryParse(widget.breeding!.breedingDate)
-          : null;
-      _breedingDate = parsedDate ?? DateTime.now();
-      _status = widget.breeding!.status;
-      _notes = widget.breeding!.notes ?? '';
-    } else if (widget.initialData != null) {
-      _selectedMaleId = widget.initialData!['male_id'] as int?;
-      _selectedFemaleId = widget.initialData!['female_id'] as int?;
+    final record = _record;
+    if (record != null) {
+      _maleId = record.maleId;
+      _femaleId = record.femaleId;
+      _male = record.male;
+      _female = record.female;
+      _breedingDate =
+          DateTime.tryParse(record.breedingDate) ?? DateTime.now();
+      _status = record.status;
+      _notes.text = record.notes ?? '';
+    } else {
+      _maleId = widget.initialData?['male_id'] as int?;
+      _femaleId = widget.initialData?['female_id'] as int?;
+      _breedingDate = DateTime.now();
+      _status = 'planned';
     }
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    _formKey.currentState!.save();
-
-    setState(() => _isSubmitting = true);
-
-    try {
-      final repository = ref.read(breedingRepositoryProvider);
-
-      final data = {
-        'male_id': _selectedMaleId,
-        'female_id': _selectedFemaleId,
-        'breeding_date': _breedingDate.toIso8601String().split('T')[0],
-        'status': _status,
-        'notes': _notes.isNotEmpty ? _notes : null,
-      };
-
-      if (_isEditing) {
-        await repository.updateBreeding(widget.breeding!.id, data);
-        if (mounted) {
-          ref.invalidate(breedingDetailProvider(widget.breeding!.id));
-          ref.invalidate(breedingListProvider);
-          context.pop(true);
-        }
-      } else {
-        await repository.createBreeding(data);
-        if (mounted) {
-          ref.invalidate(breedingListProvider);
-          context.pop(true);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Ошибка: ${e.toString().replaceAll('Exception: ', '')}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
+    _notes.addListener(() => _touched = true);
   }
 
   @override
+  void dispose() {
+    _notes.dispose();
+    super.dispose();
+  }
+
+  Future<String?> _save() async {
+    final l10n = context.l10n;
+    if (_maleId == null) return l10n.breedingFormMaleRequired;
+    if (_femaleId == null) return l10n.breedingFormFemaleRequired;
+    final failed = l10n.breedingFormFailed;
+
+    final repository = ref.read(breedingRepositoryProvider);
+    final data = <String, dynamic>{
+      'male_id': _maleId,
+      'female_id': _femaleId,
+      'breeding_date': _breedingDate.toIso8601String().split('T').first,
+      'status': _status,
+      'notes': _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+    };
+
+    try {
+      if (_isEditing) {
+        await repository.updateBreeding(_record!.id, data);
+        ref.invalidate(breedingDetailProvider(_record!.id));
+      } else {
+        await repository.createBreeding(data);
+      }
+      ref.invalidate(breedingListProvider);
+      await ref.read(breedingListProvider.notifier).refresh();
+      return null;
+    } catch (e) {
+      final message = e.toString().replaceAll('Exception: ', '').trim();
+      return message.isEmpty ? failed : message;
+    }
+  }
+
+  String _statusLabel(String status) => switch (status) {
+        'planned' => context.l10n.breedingStatusPlanned,
+        'completed' => context.l10n.breedingStatusCompleted,
+        'failed' => context.l10n.breedingStatusFailed,
+        _ => context.l10n.breedingStatusCancelled,
+      };
+
+  @override
   Widget build(BuildContext context) {
-    final rabbitsState = ref.watch(rabbitsListProvider);
-    final males = rabbitsState.rabbits.where((r) => r.sex == 'male').toList();
-    final females =
-        rabbitsState.rabbits.where((r) => r.sex == 'female').toList();
+    final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Редактирование случки' : 'Новая случка'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+    return AppFormScaffold(
+      title:
+          _isEditing ? l10n.breedingFormEditTitle : l10n.breedingFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage:
+          _isEditing ? l10n.breedingFormUpdated : l10n.breedingFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      children: [
+        if (_fromPlanner)
+          AppCard(
+            borderColor: AppColors.info,
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: AppColors.info),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    l10n.breedingFormPrefilled,
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurface),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        AppFormSection(
+          title: l10n.breedingParents,
           children: [
-            if (widget.initialData?['analysis'] != null)
-              Card(
-                color: AppColors.accentOcean.withValues(alpha: 0.08),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: AppColors.accentOcean),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Данные предзаполнены из планировщика случек',
-                          style: AppTypography.labelSm,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            if (widget.initialData?['analysis'] != null)
-              const SizedBox(height: 8),
-
-            AppFormSection(
-              title: 'Пара',
-              children: [
-                DropdownButtonFormField<int>(
-                  initialValue: _selectedMaleId,
-                  decoration: const InputDecoration(
-                    labelText: 'Самец *',
-                    prefixIcon: Icon(Icons.male, color: AppColors.accentOcean),
-                  ),
-                  items: males.map((rabbit) {
-                    return DropdownMenuItem(
-                      value: rabbit.id,
-                      child: Text('${rabbit.name} (${rabbit.tagId})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) => setState(() => _selectedMaleId = value),
-                  validator: (value) =>
-                      value == null ? 'Выберите самца' : null,
-                ),
-                DropdownButtonFormField<int>(
-                  initialValue: _selectedFemaleId,
-                  decoration: const InputDecoration(
-                    labelText: 'Самка *',
-                    prefixIcon: Icon(Icons.female, color: AppColors.accentRose),
-                  ),
-                  items: females.map((rabbit) {
-                    return DropdownMenuItem(
-                      value: rabbit.id,
-                      child: Text('${rabbit.name} (${rabbit.tagId})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) =>
-                      setState(() => _selectedFemaleId = value),
-                  validator: (value) =>
-                      value == null ? 'Выберите самку' : null,
-                ),
-              ],
+            // Раньше пару выбирали из подгруженной страницы списка кроликов:
+            // на большой ферме половину животных выбрать было нельзя.
+            RabbitPickerField(
+              label: l10n.breedingFormMale,
+              icon: Icons.male,
+              sex: 'male',
+              selected: _male,
+              required: true,
+              onChanged: (rabbit) => setState(() {
+                _male = rabbit;
+                _maleId = rabbit?.id;
+                _touched = true;
+              }),
             ),
-
-            AppFormSection(
-              title: 'Детали',
-              children: [
-                AppDateField(
-                  label: 'Дата случки *',
-                  value: _breedingDate,
-                  onChanged: (date) => setState(() => _breedingDate = date),
-                  prefixIcon: Icons.calendar_today,
-                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: _status,
-                  decoration: const InputDecoration(
-                    labelText: 'Статус *',
-                    prefixIcon: Icon(Icons.flag_outlined),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                        value: 'planned', child: Text('Запланирована')),
-                    DropdownMenuItem(
-                        value: 'completed', child: Text('Завершена')),
-                    DropdownMenuItem(
-                        value: 'failed', child: Text('Неудачная')),
-                    DropdownMenuItem(
-                        value: 'cancelled', child: Text('Отменена')),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _status = value);
-                  },
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Заметки',
-              children: [
-                TextFormField(
-                  initialValue: _notes,
-                  decoration: const InputDecoration(
-                    labelText: 'Заметки',
-                    hintText: 'Дополнительная информация...',
-                    prefixIcon: Icon(Icons.notes),
-                  ),
-                  maxLines: 3,
-                  onSaved: (value) => _notes = value ?? '',
-                ),
-              ],
+            RabbitPickerField(
+              label: l10n.breedingFormFemale,
+              icon: Icons.female,
+              sex: 'female',
+              selected: _female,
+              required: true,
+              onChanged: (rabbit) => setState(() {
+                _female = rabbit;
+                _femaleId = rabbit?.id;
+                _touched = true;
+              }),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitForm,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Сохранить'),
+        AppFormSection(
+          title: l10n.txFormSectionDetails,
+          children: [
+            AppDateField(
+              label: l10n.breedingDate,
+              value: _breedingDate,
+              onChanged: (date) => setState(() {
+                _breedingDate = date;
+                _touched = true;
+              }),
+              prefixIcon: Icons.event_outlined,
+              firstDate: DateTime.now().subtract(const Duration(days: 365)),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
             ),
-          ),
+            DropdownButtonFormField<String>(
+              initialValue: _status,
+              decoration: InputDecoration(
+                labelText: l10n.breedingStatus,
+                prefixIcon: const Icon(Icons.flag_outlined),
+              ),
+              items: [
+                for (final status in const [
+                  'planned',
+                  'completed',
+                  'failed',
+                  'cancelled'
+                ])
+                  DropdownMenuItem(
+                    value: status,
+                    child: Text(_statusLabel(status)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _status = v;
+                _touched = true;
+              }),
+            ),
+            TextFormField(
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.breedingNotes,
+                hintText: l10n.breedingFormNotesHint,
+                prefixIcon: const Icon(Icons.notes),
+              ),
+            ),
+          ],
         ),
-      ),
+      ],
     );
   }
 }

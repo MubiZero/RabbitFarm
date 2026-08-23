@@ -852,6 +852,38 @@
   "breedFormUpdated": "Порода обновлена",
   "breedFormFailed": "Не удалось сохранить породу",
 
+  "breedingDetailTitle": "Случка",
+  "breedingStatus": "Статус",
+  "breedingParents": "Пара",
+  "breedingTag": "Бирка {tag}",
+  "@breedingTag": {
+    "placeholders": { "tag": { "type": "String" } }
+  },
+  "breedingDates": "Даты",
+  "breedingDate": "Дата случки",
+  "breedingExpected": "Ожидаемый окрол",
+  "breedingPalpation": "Дата прощупывания",
+  "breedingPregnancy": "Беременность",
+  "breedingPregnancyYes": "Подтверждена",
+  "breedingPregnancyNo": "Не подтверждена",
+  "breedingNotes": "Заметки",
+  "breedingRegisterBirth": "Записать окрол",
+  "breedingDeleteTitle": "Удалить запись о случке?",
+  "breedingDeleteBody": "Вернуть её будет нельзя.",
+  "breedingDeleted": "Запись удалена",
+  "breedingDeleteFailed": "Не удалось удалить запись",
+  "breedingFormNewTitle": "Новая случка",
+  "breedingFormEditTitle": "Случка",
+  "breedingFormPrefilled": "Пара подставлена из подбора пар",
+  "breedingFormMale": "Самец",
+  "breedingFormFemale": "Самка",
+  "breedingFormMaleRequired": "Выберите самца",
+  "breedingFormFemaleRequired": "Выберите самку",
+  "breedingFormNotesHint": "Что стоит запомнить об этой случке",
+  "breedingFormCreated": "Случка записана",
+  "breedingFormUpdated": "Запись обновлена",
+  "breedingFormFailed": "Не удалось сохранить запись",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

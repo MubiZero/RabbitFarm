@@ -3982,6 +3982,174 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить породу'**
   String get breedFormFailed;
 
+  /// No description provided for @breedingDetailTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка'**
+  String get breedingDetailTitle;
+
+  /// No description provided for @breedingStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статус'**
+  String get breedingStatus;
+
+  /// No description provided for @breedingParents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пара'**
+  String get breedingParents;
+
+  /// No description provided for @breedingTag.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бирка {tag}'**
+  String breedingTag(String tag);
+
+  /// No description provided for @breedingDates.
+  ///
+  /// In ru, this message translates to:
+  /// **'Даты'**
+  String get breedingDates;
+
+  /// No description provided for @breedingDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата случки'**
+  String get breedingDate;
+
+  /// No description provided for @breedingExpected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидаемый окрол'**
+  String get breedingExpected;
+
+  /// No description provided for @breedingPalpation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата прощупывания'**
+  String get breedingPalpation;
+
+  /// No description provided for @breedingPregnancy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Беременность'**
+  String get breedingPregnancy;
+
+  /// No description provided for @breedingPregnancyYes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтверждена'**
+  String get breedingPregnancyYes;
+
+  /// No description provided for @breedingPregnancyNo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не подтверждена'**
+  String get breedingPregnancyNo;
+
+  /// No description provided for @breedingNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get breedingNotes;
+
+  /// No description provided for @breedingRegisterBirth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать окрол'**
+  String get breedingRegisterBirth;
+
+  /// No description provided for @breedingDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить запись о случке?'**
+  String get breedingDeleteTitle;
+
+  /// No description provided for @breedingDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть её будет нельзя.'**
+  String get breedingDeleteBody;
+
+  /// No description provided for @breedingDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись удалена'**
+  String get breedingDeleted;
+
+  /// No description provided for @breedingDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить запись'**
+  String get breedingDeleteFailed;
+
+  /// No description provided for @breedingFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая случка'**
+  String get breedingFormNewTitle;
+
+  /// No description provided for @breedingFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка'**
+  String get breedingFormEditTitle;
+
+  /// No description provided for @breedingFormPrefilled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пара подставлена из подбора пар'**
+  String get breedingFormPrefilled;
+
+  /// No description provided for @breedingFormMale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самец'**
+  String get breedingFormMale;
+
+  /// No description provided for @breedingFormFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка'**
+  String get breedingFormFemale;
+
+  /// No description provided for @breedingFormMaleRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите самца'**
+  String get breedingFormMaleRequired;
+
+  /// No description provided for @breedingFormFemaleRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите самку'**
+  String get breedingFormFemaleRequired;
+
+  /// No description provided for @breedingFormNotesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что стоит запомнить об этой случке'**
+  String get breedingFormNotesHint;
+
+  /// No description provided for @breedingFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка записана'**
+  String get breedingFormCreated;
+
+  /// No description provided for @breedingFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись обновлена'**
+  String get breedingFormUpdated;
+
+  /// No description provided for @breedingFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить запись'**
+  String get breedingFormFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:
