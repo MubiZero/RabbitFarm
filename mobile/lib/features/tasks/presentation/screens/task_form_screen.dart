@@ -8,6 +8,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
 import '../utils/task_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Правило повторения задачи.
 ///
@@ -106,6 +107,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       c.text.trim().isEmpty ? null : c.text.trim();
 
   Future<String?> _save() async {
+    final l10n = context.l10n;
     final actions = ref.read(taskActionsProvider);
     try {
       if (_isEditing) {
@@ -143,7 +145,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       }
       return null;
     } catch (e) {
-      return e.toString().replaceAll('Exception: ', '');
+      return errorText(l10n, e);
     }
   }
 

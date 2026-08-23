@@ -65,8 +65,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
-    final failed = context.l10n.cageFormFailed;
+  Future<Object?> _save() async {
     final notifier = ref.read(cagesProvider.notifier);
 
     final data = <String, dynamic>{
@@ -84,7 +83,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
         : await notifier.createCage(data);
 
     if (ok) return null;
-    return ref.read(cagesProvider).error ?? failed;
+    return ref.read(cagesProvider).error;
   }
 
   @override

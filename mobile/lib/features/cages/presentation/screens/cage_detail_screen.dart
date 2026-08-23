@@ -14,6 +14,7 @@ import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Карточка клетки: состояние, заполненность и кто в ней живёт.
 class CageDetailScreen extends ConsumerStatefulWidget {
@@ -43,6 +44,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     // Всё, что зависит от контекста, снимается до ожидания: экран может
     // закрыться, пока ответ идёт с сервера.
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final failedTemplate = context.l10n.commonActionFailed;
     try {
       await action();
@@ -53,7 +55,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-              failedTemplate(e.toString().replaceAll('Exception: ', ''))),
+              failedTemplate(errorText(l10n, e))),
           backgroundColor: AppColors.error,
         ),
       );

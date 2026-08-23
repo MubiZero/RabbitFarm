@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
+import '../../../../core/api/api_failure.dart';
 
 class BreedingRepository {
   final ApiClient _apiClient;
@@ -34,7 +35,7 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final paginatedData = apiResponse.data!;
@@ -73,7 +74,7 @@ class BreedingRepository {
         totalPages: totalPages,
       );
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки списка случек');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -87,12 +88,12 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки данных случки');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -106,12 +107,12 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка создания записи о случке');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -125,12 +126,12 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка обновления записи о случке');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -138,7 +139,7 @@ class BreedingRepository {
     try {
       await _apiClient.deleteBreeding(id);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка удаления записи о случке');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -152,12 +153,12 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!;
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка загрузки статистики');
+      throw ApiFailure.from(e);
     }
   }
 }

@@ -11,6 +11,7 @@ import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -80,8 +81,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
-    final failed = context.l10n.txFormFailed;
+  Future<Object?> _save() async {
     final amount = parseDecimal(_amount.text) ?? 0;
     final description =
         _description.text.trim().isEmpty ? null : _description.text.trim();
@@ -116,8 +116,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       await ref.read(transactionsProvider.notifier).refresh();
       return null;
     } catch (e) {
-      final message = e.toString().replaceAll('Exception: ', '').trim();
-      return message.isEmpty ? failed : message;
+      return e;
     }
   }
 
@@ -146,6 +145,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     final navigator = Navigator.of(context);
     final done = context.l10n.financeDeleted;
     final failed = context.l10n.financeDeleteFailed;
+    final l10n = context.l10n;
 
     try {
       await ref.read(deleteTransactionProvider(_record!.id).future);
@@ -156,7 +156,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       messenger.showSnackBar(
         SnackBar(
           content:
-              Text('$failed: ${e.toString().replaceAll('Exception: ', '')}'),
+              Text('$failed: ${errorText(l10n, e)}'),
           backgroundColor: AppColors.error,
         ),
       );

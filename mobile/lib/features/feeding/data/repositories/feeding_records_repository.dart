@@ -3,7 +3,7 @@ import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/feeding_record_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Repository for feeding records operations
 class FeedingRecordsRepository {
@@ -54,7 +54,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить записи кормлений');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -69,9 +69,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить запись кормления');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить запись кормления');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -89,7 +89,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить кормления кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -106,9 +106,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось сохранить кормление');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось сохранить кормление');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -125,9 +125,9 @@ class FeedingRecordsRepository {
         return FeedingRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось обновить кормление');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось обновить кормление');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -139,10 +139,10 @@ class FeedingRecordsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Не удалось удалить кормление');
+        throw const ApiFailure(ApiFailureKind.server);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось удалить кормление');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -170,9 +170,9 @@ class FeedingRecordsRepository {
         return FeedingStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить статистику кормлений');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику кормлений');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -194,7 +194,7 @@ class FeedingRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить последние кормления');
+      throw ApiFailure.from(e);
     }
   }
 }

@@ -15,7 +15,7 @@ final transactionsRepositoryProvider = Provider<TransactionsRepository>((ref) {
 class TransactionsState {
   final List<Transaction> transactions;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool hasMore;
   final int currentPage;
 
@@ -45,7 +45,7 @@ class TransactionsState {
   TransactionsState copyWith({
     List<Transaction>? transactions,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? hasMore,
     int? currentPage,
     TransactionType? type,

@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -35,6 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _handleRegister() async {
+    final l10n = context.l10n;
     if (_formKey.currentState!.validate()) {
       try {
         await ref.read(authProvider.notifier).register(
@@ -51,7 +53,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
-          String message = e.toString().replaceAll('Exception: ', '');
+          String message = errorText(l10n, e);
           bool userExists = false;
 
           if (e is DioException) {

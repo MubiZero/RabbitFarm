@@ -15,6 +15,7 @@ import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -88,7 +89,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                '${context.l10n.rabbitFormLoadFailed}: ${e.toString().replaceAll('Exception: ', '')}'),
+                '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -310,7 +311,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+            content: Text(errorText(context.l10n, e)),
             backgroundColor: AppColors.error,
           ),
         );

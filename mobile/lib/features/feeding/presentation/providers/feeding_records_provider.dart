@@ -15,7 +15,7 @@ final feedingRecordsRepositoryProvider = Provider<FeedingRecordsRepository>((ref
 class FeedingRecordsState {
   final List<FeedingRecord> records;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool hasMore;
   final int currentPage;
 
@@ -40,7 +40,7 @@ class FeedingRecordsState {
   FeedingRecordsState copyWith({
     List<FeedingRecord>? records,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? hasMore,
     int? currentPage,
     DateTime? fromDate,
@@ -176,7 +176,7 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
   }
 
   /// Удалить запись о кормлении. Возвращает текст ошибки или `null`.
-  Future<String?> deleteRecord(int id) async {
+  Future<Object?> deleteRecord(int id) async {
     try {
       await _repository.deleteFeedingRecord(id);
       state = state.copyWith(
@@ -184,7 +184,7 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
       );
       return null;
     } catch (e) {
-      return e.toString().replaceAll('Exception: ', '');
+      return e;
     }
   }
 

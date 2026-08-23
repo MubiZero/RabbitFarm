@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
 import '../l10n/l10n_context.dart';
+import '../l10n/error_text.dart';
 
 /// Каркас экрана-формы: заголовок, прокручиваемые поля и кнопка сохранения,
 /// закреплённая внизу.
@@ -22,11 +23,14 @@ class AppFormScaffold extends StatefulWidget {
   /// строку и кнопка выглядит сломанной.
   final String submitLabel;
 
-  /// Сохранение. Возвращает текст ошибки или `null`, если всё получилось.
+  /// Сохранение. Возвращает причину неудачи или `null`, если всё получилось.
+  ///
+  /// Именно причину, а не готовую фразу: текст для человека собирается здесь,
+  /// из переводов, а форма о языке интерфейса не знает.
   ///
   /// При ошибке экран остаётся открытым — заполненные поля не должны
   /// пропадать вместе с сообщением об ошибке.
-  final Future<String?> Function() onSubmit;
+  final Future<Object?> Function() onSubmit;
 
   /// Что сказать после успешного сохранения.
   final String successMessage;
@@ -60,7 +64,7 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
     if (!(widget.formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _submitting = true);
-    String? error;
+    Object? error;
     try {
       error = await widget.onSubmit();
     } finally {
@@ -74,7 +78,7 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
     if (error != null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(error),
+          content: Text(errorText(context.l10n, error)),
           backgroundColor: AppColors.error,
         ),
       );

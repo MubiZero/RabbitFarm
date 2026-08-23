@@ -6,7 +6,7 @@ import '../../data/repositories/cages_repository.dart';
 class CagesState {
   final List<CageModel> cages;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final String searchQuery;
   final String? typeFilter;
   final String? conditionFilter;
@@ -45,7 +45,7 @@ class CagesState {
   CagesState copyWith({
     List<CageModel>? cages,
     bool? isLoading,
-    String? error,
+    Object? error,
     String? searchQuery,
     String? typeFilter,
     bool clearType = false,

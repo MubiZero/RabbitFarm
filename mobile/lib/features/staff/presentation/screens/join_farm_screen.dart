@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Вступление в ферму по коду приглашения.
 ///
@@ -38,6 +39,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final router = GoRouter.of(context);
 
     setState(() => _isSubmitting = true);
@@ -51,7 +53,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(errorText(l10n, e)),
           backgroundColor: AppColors.error,
         ),
       );

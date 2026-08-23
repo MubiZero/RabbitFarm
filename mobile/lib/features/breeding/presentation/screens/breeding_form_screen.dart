@@ -64,11 +64,10 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
+  Future<Object?> _save() async {
     final l10n = context.l10n;
     if (_maleId == null) return l10n.breedingFormMaleRequired;
     if (_femaleId == null) return l10n.breedingFormFemaleRequired;
-    final failed = l10n.breedingFormFailed;
 
     final repository = ref.read(breedingRepositoryProvider);
     final data = <String, dynamic>{
@@ -90,8 +89,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
       await ref.read(breedingListProvider.notifier).refresh();
       return null;
     } catch (e) {
-      final message = e.toString().replaceAll('Exception: ', '').trim();
-      return message.isEmpty ? failed : message;
+      return e;
     }
   }
 

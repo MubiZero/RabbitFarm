@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../models/transaction_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Repository for financial transactions operations
 class TransactionsRepository {
@@ -59,7 +59,7 @@ class TransactionsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакции');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -74,9 +74,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить транзакцию');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакцию');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -91,9 +91,9 @@ class TransactionsRepository {
         return RabbitTransactionsSummary.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить транзакции кролика');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить транзакции кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -109,9 +109,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось создать транзакцию');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось создать транзакцию');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -128,9 +128,9 @@ class TransactionsRepository {
         return Transaction.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось обновить транзакцию');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось обновить транзакцию');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -142,10 +142,10 @@ class TransactionsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Не удалось удалить транзакцию');
+        throw const ApiFailure(ApiFailureKind.server);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось удалить транзакцию');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -173,9 +173,9 @@ class TransactionsRepository {
         return FinancialStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить статистику финансов');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику финансов');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -199,9 +199,9 @@ class TransactionsRepository {
         return MonthlyReport.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить отчёт за месяц');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить отчёт за месяц');
+      throw ApiFailure.from(e);
     }
   }
 

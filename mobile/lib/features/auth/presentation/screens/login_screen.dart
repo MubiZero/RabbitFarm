@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -30,6 +31,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    final l10n = context.l10n;
     if (!_formKey.currentState!.validate()) return;
 
     try {
@@ -42,7 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       final message = e is DioException
           ? (e.message ?? context.l10n.loginFailed)
-          : e.toString().replaceAll('Exception: ', '');
+          : errorText(l10n, e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: AppColors.error),
       );

@@ -15,7 +15,7 @@ final feedsRepositoryProvider = Provider<FeedsRepository>((ref) {
 class FeedsState {
   final List<Feed> feeds;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool hasMore;
   final int currentPage;
 
@@ -42,7 +42,7 @@ class FeedsState {
   FeedsState copyWith({
     List<Feed>? feeds,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? hasMore,
     int? currentPage,
     FeedType? type,
@@ -180,24 +180,24 @@ class FeedsNotifier extends StateNotifier<FeedsState> {
   /// запрос через `ref.read` одноразового провайдера и сразу сообщал об
   /// успехе, не дожидаясь ответа: сообщение появлялось даже когда сервер
   /// отказывал, а число на складе не менялось.
-  Future<String?> adjustStock(int feedId, StockAdjustment adjustment) async {
+  Future<Object?> adjustStock(int feedId, StockAdjustment adjustment) async {
     try {
       final feed = await _repository.adjustStock(feedId, adjustment);
       updateFeed(feed);
       return null;
     } catch (e) {
-      return e.toString().replaceAll('Exception: ', '');
+      return e;
     }
   }
 
   /// Удалить корм со склада.
-  Future<String?> deleteFeed(int feedId) async {
+  Future<Object?> deleteFeed(int feedId) async {
     try {
       await _repository.deleteFeed(feedId);
       removeFeed(feedId);
       return null;
     } catch (e) {
-      return e.toString().replaceAll('Exception: ', '');
+      return e;
     }
   }
 

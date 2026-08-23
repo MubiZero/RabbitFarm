@@ -3,7 +3,7 @@ import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/medical_record_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Repository for medical records operations
 class MedicalRecordsRepository {
@@ -54,7 +54,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарты');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -69,9 +69,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить медкарту');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарту');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -89,7 +89,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить медкарты кролика');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -106,9 +106,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось создать медзапись');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось создать медзапись');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -125,9 +125,9 @@ class MedicalRecordsRepository {
         return MedicalRecord.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось обновить медзапись');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось обновить медзапись');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -139,10 +139,10 @@ class MedicalRecordsRepository {
       );
 
       if (response.data['success'] != true) {
-        throw Exception('Не удалось удалить медзапись');
+        throw const ApiFailure(ApiFailureKind.server);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось удалить медзапись');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -157,9 +157,9 @@ class MedicalRecordsRepository {
         return MedicalStatistics.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить статистику лечения');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить статистику лечения');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -179,7 +179,7 @@ class MedicalRecordsRepository {
 
       return [];
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить текущие лечения');
+      throw ApiFailure.from(e);
     }
   }
 
@@ -207,9 +207,9 @@ class MedicalRecordsRepository {
         return CostReport.fromJson(response.data['data']);
       }
 
-      throw Exception('Не удалось загрузить отчёт по расходам на лечение');
+      throw const ApiFailure(ApiFailureKind.server);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Не удалось загрузить отчёт по расходам на лечение');
+      throw ApiFailure.from(e);
     }
   }
 }

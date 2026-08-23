@@ -6,6 +6,7 @@ import '../../../rabbits/data/models/breeding_model.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class BreedingDetailScreen extends ConsumerWidget {
   final int breedingId;
@@ -367,7 +368,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(context.l10n.commonActionFailed(
-                          e.toString().replaceAll('Exception: ', ''))),
+                          errorText(context.l10n, e))),
                       backgroundColor: AppColors.error,
                     ),
                   );

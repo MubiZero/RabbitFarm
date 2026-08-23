@@ -15,7 +15,7 @@ final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
 class TasksListState {
   final List<Task> tasks;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int currentPage;
   final int totalPages;
   final int total;
@@ -44,7 +44,7 @@ class TasksListState {
   TasksListState copyWith({
     List<Task>? tasks,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? currentPage,
     int? totalPages,
     int? total,
@@ -117,7 +117,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -158,7 +158,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }

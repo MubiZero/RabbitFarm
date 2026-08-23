@@ -67,7 +67,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
+  Future<Object?> _save() async {
     final noMother = context.l10n.rabbitPickerRequired;
     final failed = context.l10n.birthFormFailed;
     if (_motherId == null) return noMother;

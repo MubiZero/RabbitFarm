@@ -9,6 +9,7 @@ import '../../data/models/staff_models.dart';
 import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -138,6 +139,7 @@ class StaffScreen extends ConsumerWidget {
     bool? isActive,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     // Тексты снимаются до запроса: экран может закрыться, пока идёт ответ.
     final closed = context.l10n.staffAccessClosed(member.fullName);
     final saved = context.l10n.staffSaved;
@@ -152,7 +154,7 @@ class StaffScreen extends ConsumerWidget {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(errorText(l10n, e)),
           backgroundColor: AppColors.error,
         ),
       );
@@ -167,6 +169,7 @@ class StaffScreen extends ConsumerWidget {
     FarmMember member,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -200,7 +203,7 @@ class StaffScreen extends ConsumerWidget {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(errorText(l10n, e)),
           backgroundColor: AppColors.error,
         ),
       );
@@ -213,6 +216,7 @@ class StaffScreen extends ConsumerWidget {
     FarmInvitation invitation,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final revoked = context.l10n.staffRevoked;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -242,7 +246,7 @@ class StaffScreen extends ConsumerWidget {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(errorText(l10n, e)),
           backgroundColor: AppColors.error,
         ),
       );
@@ -266,6 +270,7 @@ class StaffScreen extends ConsumerWidget {
             // Берём до отправки: после await диалог может быть уже закрыт.
             final messenger = ScaffoldMessenger.of(dialogContext);
             final navigator = Navigator.of(dialogContext);
+            final l10n = context.l10n;
 
             setDialogState(() => isSending = true);
             try {
@@ -277,7 +282,7 @@ class StaffScreen extends ConsumerWidget {
               setDialogState(() => isSending = false);
               messenger.showSnackBar(
                 SnackBar(
-                  content: Text(e.toString().replaceAll('Exception: ', '')),
+                  content: Text(errorText(l10n, e)),
                   backgroundColor: AppColors.error,
                 ),
               );

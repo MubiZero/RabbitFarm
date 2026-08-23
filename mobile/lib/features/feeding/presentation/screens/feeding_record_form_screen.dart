@@ -73,8 +73,7 @@ class _FeedingRecordFormScreenState
     super.dispose();
   }
 
-  Future<String?> _save() async {
-    final failed = context.l10n.feedingFormFailed;
+  Future<Object?> _save() async {
     final repository = ref.read(feedingRecordsRepositoryProvider);
     final notifier = ref.read(feedingRecordsProvider.notifier);
 
@@ -113,8 +112,7 @@ class _FeedingRecordFormScreenState
       ref.invalidate(feedOptionsProvider);
       return null;
     } catch (e) {
-      final message = e.toString().replaceAll('Exception: ', '').trim();
-      return message.isEmpty ? failed : message;
+      return e;
     }
   }
 

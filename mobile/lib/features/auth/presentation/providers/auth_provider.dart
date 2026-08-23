@@ -16,7 +16,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 class AuthState {
   final UserModel? user;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool isAuthenticated;
 
   AuthState({
@@ -29,7 +29,7 @@ class AuthState {
   AuthState copyWith({
     UserModel? user,
     bool? isLoading,
-    String? error,
+    Object? error,
     bool? isAuthenticated,
   }) {
     return AuthState(
@@ -131,7 +131,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -162,7 +162,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }
@@ -191,7 +191,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }

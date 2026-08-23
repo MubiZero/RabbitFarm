@@ -36,6 +36,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonUnknownError => 'Неизвестная ошибка';
 
   @override
+  String get errorOffline => 'Нет связи — проверьте интернет';
+
+  @override
+  String get errorTimeout => 'Сервер не ответил, попробуйте ещё раз';
+
+  @override
+  String get errorUnauthorized => 'Нужно войти заново';
+
+  @override
+  String get errorForbidden => 'У вашей роли нет доступа к этому';
+
+  @override
+  String get errorNotFound => 'Запись не найдена — возможно, её удалили';
+
+  @override
+  String get errorInvalid => 'Сервер не принял данные';
+
+  @override
+  String get errorServer => 'На сервере сбой, попробуйте позже';
+
+  @override
   String get commonStaleData => 'Не удалось обновить, показаны прежние данные';
 
   @override

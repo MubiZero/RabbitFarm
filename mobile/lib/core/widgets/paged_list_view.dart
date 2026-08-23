@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n_context.dart';
 import 'app_error_state.dart';
 import 'skeleton.dart';
 import 'stale_data_banner.dart';
@@ -30,7 +32,7 @@ import 'stale_data_banner.dart';
 class PagedListView<T> extends StatelessWidget {
   final List<T> items;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final bool hasMore;
 
   final Future<void> Function() onRefresh;
@@ -112,7 +114,10 @@ class PagedListView<T> extends StatelessWidget {
         SliverFillRemaining(
           hasScrollBody: false,
           child: error != null
-              ? AppErrorState(message: error!, onRetry: onRefresh)
+              ? AppErrorState(
+                  message: errorText(context.l10n, error),
+                  onRetry: onRefresh,
+                )
               : empty,
         ),
       ];

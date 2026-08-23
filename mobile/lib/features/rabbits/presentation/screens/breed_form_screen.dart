@@ -56,8 +56,7 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
-    final failed = context.l10n.breedFormFailed;
+  Future<Object?> _save() async {
     final notifier = ref.read(breedsProvider.notifier);
 
     final data = <String, dynamic>{
@@ -76,7 +75,7 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
         : await notifier.createBreed(data);
 
     if (ok) return null;
-    return ref.read(breedsProvider).error ?? failed;
+    return ref.read(breedsProvider).error;
   }
 
   @override

@@ -13,7 +13,7 @@ enum VaccinationView { all, upcoming, overdue, last30Days }
 class VaccinationsState {
   final List<Vaccination> vaccinations;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int? rabbitIdFilter;
   final VaccineType? typeFilter;
   final DateTime? fromDateFilter;
@@ -43,7 +43,7 @@ class VaccinationsState {
   VaccinationsState copyWith({
     List<Vaccination>? vaccinations,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? rabbitIdFilter,
     bool clearRabbitId = false,
     VaccineType? typeFilter,

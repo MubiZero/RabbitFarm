@@ -5,7 +5,7 @@ import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/cage_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Репозиторий для работы с клетками
 class CagesRepository {
@@ -46,22 +46,24 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final data = apiResponse.data!;
       final itemsJson = data['items'];
       if (itemsJson is! List) {
-        throw Exception('Некорректный формат ответа: items не является списком');
+        throw const ApiFailure(ApiFailureKind.server);
       }
 
       return itemsJson
           .map((item) => CageModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения списка клеток');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -76,14 +78,16 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения клетки');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -101,14 +105,16 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка создания клетки');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка создания клетки: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -126,14 +132,16 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка обновления клетки');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка обновления клетки: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -148,12 +156,14 @@ class CagesRepository {
       );
 
       if (!apiResponse.success) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка удаления клетки');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка удаления клетки: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -168,14 +178,16 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return CageStatistics.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения статистики');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -190,7 +202,7 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       final Map<String, List<CageModel>> layout = {};
@@ -205,9 +217,11 @@ class CagesRepository {
 
       return layout;
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения схемы размещения');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -222,14 +236,16 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка отметки об уборке');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка отметки об уборке: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 }

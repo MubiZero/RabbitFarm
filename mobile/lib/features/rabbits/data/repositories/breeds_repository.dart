@@ -5,7 +5,7 @@ import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/breed_model.dart';
-import '../../../../core/api/api_error.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Репозиторий для работы с породами кроликов
 class BreedsRepository {
@@ -24,16 +24,18 @@ class BreedsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return apiResponse.data!
           .map((item) => BreedModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения списка пород');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -48,14 +50,16 @@ class BreedsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(e.message ?? 'Ошибка получения породы');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -73,14 +77,16 @@ class BreedsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка создания породы');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка создания породы: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -98,14 +104,16 @@ class BreedsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return BreedModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка обновления породы');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка обновления породы: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 
@@ -120,12 +128,14 @@ class BreedsRepository {
       );
 
       if (!apiResponse.success) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
     } on DioException catch (e) {
-      throw Exception(serverMessage(e) ?? 'Ошибка удаления породы');
+      throw ApiFailure.from(e);
+    } on ApiFailure {
+      rethrow;
     } catch (e) {
-      throw Exception('Ошибка удаления породы: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 }

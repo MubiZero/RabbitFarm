@@ -15,7 +15,7 @@ final breedingRepositoryProvider = Provider<BreedingRepository>((ref) {
 class BreedingListState {
   final List<BreedingModel> breedings;
   final bool isLoading;
-  final String? error;
+  final Object? error;
   final int currentPage;
   final int totalPages;
   final int total;
@@ -34,7 +34,7 @@ class BreedingListState {
   BreedingListState copyWith({
     List<BreedingModel>? breedings,
     bool? isLoading,
-    String? error,
+    Object? error,
     int? currentPage,
     int? totalPages,
     int? total,
@@ -92,7 +92,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -131,7 +131,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
     }
   }
@@ -151,7 +151,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
       );
     } catch (e) {
       state = state.copyWith(
-        error: e.toString().replaceAll('Exception: ', ''),
+        error: e,
       );
       rethrow;
     }

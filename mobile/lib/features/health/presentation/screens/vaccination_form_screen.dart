@@ -81,7 +81,7 @@ class _VaccinationFormScreenState
   String? _optional(TextEditingController c) =>
       c.text.trim().isEmpty ? null : c.text.trim();
 
-  Future<String?> _save() async {
+  Future<Object?> _save() async {
     // Тексты снимаются до ожидания: экран может закрыться, пока идёт запрос.
     final noRabbit = context.l10n.rabbitPickerRequired;
     final failed = context.l10n.vaccFormFailed;

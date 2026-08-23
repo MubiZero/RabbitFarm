@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/error_text.dart';
+import '../l10n/l10n_context.dart';
 import 'app_error_state.dart';
 import 'delayed_spinner.dart';
 import 'stale_data_banner.dart';
@@ -47,7 +49,7 @@ class AppAsyncView<T> extends StatelessWidget {
 
     if (value.hasError && data == null) {
       return AppErrorState(
-        message: value.error.toString(),
+        message: errorText(context.l10n, value.error),
         onRetry: onRetry,
       );
     }

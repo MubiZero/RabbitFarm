@@ -12,6 +12,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/create_kits_dialog.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Список окролов.
 class BirthsListScreen extends ConsumerWidget {
@@ -57,8 +58,8 @@ class BirthsListScreen extends ConsumerWidget {
   Future<void> _delete(
       BuildContext context, WidgetRef ref, BirthModel birth) async {
     final messenger = ScaffoldMessenger.of(context);
-    final done = context.l10n.birthsDeleted;
-    final failed = context.l10n.birthsDeleteFailed;
+    final l10n = context.l10n;
+    final done = l10n.birthsDeleted;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -85,7 +86,7 @@ class BirthsListScreen extends ConsumerWidget {
       ok
           ? SnackBar(content: Text(done))
           : SnackBar(
-              content: Text(ref.read(birthsProvider).error ?? failed),
+              content: Text(errorText(l10n, ref.read(birthsProvider).error)),
               backgroundColor: AppColors.error,
             ),
     );

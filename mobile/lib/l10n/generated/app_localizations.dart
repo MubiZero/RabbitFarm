@@ -148,6 +148,48 @@ abstract class AppLocalizations {
   /// **'Неизвестная ошибка'**
   String get commonUnknownError;
 
+  /// No description provided for @errorOffline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет связи — проверьте интернет'**
+  String get errorOffline;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер не ответил, попробуйте ещё раз'**
+  String get errorTimeout;
+
+  /// No description provided for @errorUnauthorized.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужно войти заново'**
+  String get errorUnauthorized;
+
+  /// No description provided for @errorForbidden.
+  ///
+  /// In ru, this message translates to:
+  /// **'У вашей роли нет доступа к этому'**
+  String get errorForbidden;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись не найдена — возможно, её удалили'**
+  String get errorNotFound;
+
+  /// No description provided for @errorInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер не принял данные'**
+  String get errorInvalid;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'На сервере сбой, попробуйте позже'**
+  String get errorServer;
+
   /// No description provided for @commonStaleData.
   ///
   /// In ru, this message translates to:

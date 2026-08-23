@@ -101,8 +101,11 @@ class MenuScreen extends ConsumerWidget {
               title: context.l10n.menuSectionLedger,
               domain: AppDomain.admin,
               items: [
-                _Item(Icons.account_balance_wallet_outlined,
-                    context.l10n.menuFinance, '/transactions'),
+                // Книга доходов и расходов работнику не открывается — пункт
+                // без доступа привёл бы его к отказу сервера.
+                if (role.can(FarmCapability.manageFinance))
+                  _Item(Icons.account_balance_wallet_outlined,
+                      context.l10n.menuFinance, '/transactions'),
                 if (role.can(FarmCapability.manageStaff))
                   _Item(Icons.groups_outlined, context.l10n.menuStaff, '/staff'),
               ],
@@ -245,6 +248,10 @@ class _Section extends StatelessWidget {
         ),
       if (extra != null) extra!,
     ];
+
+    // Разделы собираются из пунктов, доступных роли. У работника «Учёт»
+    // остаётся пустым, и заголовок над пустотой выглядел бы поломкой.
+    if (rows.isEmpty) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.xl),

@@ -14,6 +14,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../utils/rabbit_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -567,6 +568,7 @@ class RabbitDetailScreen extends ConsumerWidget {
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref, RabbitModel rabbit) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -595,7 +597,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(e.toString().replaceAll('Exception: ', '')),
+                      content: Text(errorText(l10n, e)),
                       backgroundColor: AppColors.error,
                     ),
                   );

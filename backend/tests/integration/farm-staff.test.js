@@ -201,6 +201,32 @@ describe('Ферма и работники', () => {
       expect(res.status).toBe(403);
     });
 
+    // Записывать расходы работник не мог, а читать книгу целиком — мог:
+    // выручка, закупочные цены и баланс хозяйства были открыты всем.
+    it('работнику не видна книга доходов и расходов', async () => {
+      const res = await request(app)
+        .get('/api/v1/transactions')
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('работнику не видна финансовая сводка', async () => {
+      const res = await request(app)
+        .get('/api/v1/transactions/statistics')
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('управляющему книга открыта', async () => {
+      const res = await request(app)
+        .get('/api/v1/transactions')
+        .set('Authorization', `Bearer ${managerToken}`);
+
+      expect(res.status).toBe(200);
+    });
+
     it('работнику не разрешено удалять финансовые записи', async () => {
       const res = await request(app)
         .delete(`/api/v1/transactions/${transactionId}`)

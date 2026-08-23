@@ -11,6 +11,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Ведомость доходов и расходов.
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -445,6 +446,7 @@ class _DetailsSheet extends ConsumerWidget {
     final navigator = Navigator.of(context);
     final done = context.l10n.financeDeleted;
     final failed = context.l10n.financeDeleteFailed;
+    final l10n = context.l10n;
 
     try {
       await ref.read(deleteTransactionProvider(transaction.id).future);
@@ -456,7 +458,7 @@ class _DetailsSheet extends ConsumerWidget {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('$failed: ${e.toString().replaceAll('Exception: ', '')}'),
+          content: Text('$failed: ${errorText(l10n, e)}'),
           backgroundColor: AppColors.error,
         ),
       );

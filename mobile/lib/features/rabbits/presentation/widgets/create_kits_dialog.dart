@@ -6,6 +6,7 @@ import '../../../../core/theme/theme.dart';
 import '../../data/models/birth_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Заводит карточки на крольчат из записи об окроле.
 ///
@@ -50,8 +51,8 @@ class _CreateKitsDialogState extends ConsumerState<CreateKitsDialog> {
   Future<void> _create() async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
     final created = context.l10n.birthsKitsCreated;
-    final failed = context.l10n.birthsKitsFailed;
 
     setState(() => _busy = true);
     final kits = await ref.read(birthsProvider.notifier).createKitsFromBirth(
@@ -68,7 +69,7 @@ class _CreateKitsDialogState extends ConsumerState<CreateKitsDialog> {
     if (kits == null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(ref.read(birthsProvider).error ?? failed),
+          content: Text(errorText(l10n, ref.read(birthsProvider).error)),
           backgroundColor: AppColors.error,
         ),
       );

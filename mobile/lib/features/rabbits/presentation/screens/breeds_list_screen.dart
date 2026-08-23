@@ -9,6 +9,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../utils/breed_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Экран списка пород кроликов
 class BreedsListScreen extends ConsumerStatefulWidget {
@@ -85,7 +86,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
 
     if (state.error != null) {
       return AppErrorState(
-        message: state.error!,
+        message: errorText(context.l10n, state.error),
         onRetry: () => ref.read(breedsProvider.notifier).loadBreeds(),
       );
     }
@@ -271,6 +272,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     );
 
     if (confirmed == true && context.mounted) {
+      final l10n = context.l10n;
       final success = await ref.read(breedsProvider.notifier).deleteBreed(breed.id);
 
       if (context.mounted) {
@@ -285,7 +287,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                ref.read(breedsProvider).error ?? context.l10n.breedsDeleteFailed,
+                errorText(l10n, ref.read(breedsProvider).error),
               ),
               backgroundColor: AppColors.error,
             ),

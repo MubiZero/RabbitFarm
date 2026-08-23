@@ -93,9 +93,8 @@ class _MedicalRecordFormScreenState
   String? _optional(TextEditingController c) =>
       c.text.trim().isEmpty ? null : c.text.trim();
 
-  Future<String?> _save() async {
+  Future<Object?> _save() async {
     final noRabbit = context.l10n.rabbitPickerRequired;
-    final failed = context.l10n.medFormFailed;
     if (_rabbitId == null) return noRabbit;
 
     final notifier = ref.read(medicalRecordsProvider.notifier);
@@ -141,8 +140,7 @@ class _MedicalRecordFormScreenState
       }
       return null;
     } catch (e) {
-      final message = e.toString().replaceAll('Exception: ', '').trim();
-      return message.isEmpty ? failed : message;
+      return e;
     }
   }
 

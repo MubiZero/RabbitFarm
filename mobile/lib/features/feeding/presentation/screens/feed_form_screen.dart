@@ -60,8 +60,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     super.dispose();
   }
 
-  Future<String?> _save() async {
-    final failed = context.l10n.feedFormFailed;
+  Future<Object?> _save() async {
     final repository = ref.read(feedsRepositoryProvider);
     final notifier = ref.read(feedsProvider.notifier);
 
@@ -98,8 +97,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
       }
       return null;
     } catch (e) {
-      final message = e.toString().replaceAll('Exception: ', '').trim();
-      return message.isEmpty ? failed : message;
+      return e;
     }
   }
 

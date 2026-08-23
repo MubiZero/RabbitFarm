@@ -6,6 +6,7 @@ import '../../../../shared/models/api_response.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../models/pedigree_model.dart';
+import '../../../../core/api/api_failure.dart';
 
 /// Репозиторий для работы с родословной кроликов
 class PedigreeRepository {
@@ -30,17 +31,17 @@ class PedigreeRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
       return PedigreeModel.fromJson(apiResponse.data!);
     } on DioException catch (e) {
       debugPrint('DioException in getPedigree: ${e.message}');
-      throw Exception(e.message ?? 'Ошибка получения родословной');
+      throw ApiFailure.from(e);
     } catch (e, stackTrace) {
       debugPrint('Error in getPedigree: $e');
       debugPrint('StackTrace: $stackTrace');
-      throw Exception('Ошибка десериализации: $e');
+      throw const ApiFailure(ApiFailureKind.server);
     }
   }
 }
