@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../../../rabbits/data/models/rabbit_model.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
-import '../../../rabbits/presentation/providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_date_field.dart';
-import '../../../../core/widgets/app_form_section.dart';
 import '../utils/transaction_labels.dart';
 
-/// Экран создания/редактирования транзакции
+/// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
   final Transaction? transaction;
 
@@ -22,23 +25,24 @@ class TransactionFormScreen extends ConsumerStatefulWidget {
 
 class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _amountController;
-  late TextEditingController _descriptionController;
+  final _amount = TextEditingController();
+  final _description = TextEditingController();
 
-  TransactionType _selectedType = TransactionType.expense;
-  TransactionCategory _selectedCategory = TransactionCategory.feed;
-  DateTime _selectedDate = DateTime.now();
-  int? _selectedRabbitId;
-  bool _isLoading = false;
+  late TransactionType _type;
+  late TransactionCategory _category;
+  late DateTime _date;
+  RabbitModel? _rabbit;
+  int? _rabbitId;
+  bool _touched = false;
 
-  final List<TransactionCategory> _incomeCategories = [
+  static const _incomeCategories = [
     TransactionCategory.saleRabbit,
     TransactionCategory.saleMeat,
     TransactionCategory.saleFur,
     TransactionCategory.breedingFee,
   ];
 
-  final List<TransactionCategory> _expenseCategories = [
+  static const _expenseCategories = [
     TransactionCategory.feed,
     TransactionCategory.veterinary,
     TransactionCategory.equipment,
@@ -46,317 +50,242 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     TransactionCategory.other,
   ];
 
+  Transaction? get _record => widget.transaction;
+  bool get _isEditing => _record != null;
+
+  List<TransactionCategory> get _categories =>
+      _type == TransactionType.income ? _incomeCategories : _expenseCategories;
+
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(
-      text: widget.transaction?.amount.toString() ?? '',
-    );
-    _descriptionController = TextEditingController(
-      text: widget.transaction?.description ?? '',
-    );
+    final record = _record;
+    _type = record?.type ?? TransactionType.expense;
+    _category = record?.category ?? _expenseCategories.first;
+    _date = record?.transactionDate ?? DateTime.now();
+    _rabbitId = record?.rabbitId;
+    _rabbit = record?.rabbit;
+    _amount.text = record?.amount.toString() ?? '';
+    _description.text = record?.description ?? '';
 
-    if (widget.transaction != null) {
-      _selectedType = widget.transaction!.type;
-      _selectedCategory = widget.transaction!.category;
-      _selectedDate = widget.transaction!.transactionDate;
-      _selectedRabbitId = widget.transaction!.rabbitId;
+    for (final c in [_amount, _description]) {
+      c.addListener(() => _touched = true);
     }
-
-    Future.microtask(() {
-      ref.read(rabbitsListProvider.notifier).loadRabbits();
-    });
   }
 
   @override
   void dispose() {
-    _amountController.dispose();
-    _descriptionController.dispose();
+    _amount.dispose();
+    _description.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final rabbitsState = ref.watch(rabbitsListProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.transaction == null
-            ? 'Новая транзакция'
-            : 'Редактировать транзакцию'),
-        actions: [
-          if (widget.transaction != null)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              color: AppColors.error,
-              onPressed: _confirmDelete,
-            ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          children: [
-            AppFormSection(
-              title: 'Тип транзакции',
-              children: [
-                RadioGroup<TransactionType>(
-                  groupValue: _selectedType,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _selectedType = value;
-                      _selectedCategory = value == TransactionType.income
-                          ? _incomeCategories.first
-                          : _expenseCategories.first;
-                    });
-                  },
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile<TransactionType>(
-                          title: Text('Доход'),
-                          subtitle: Text('Продажа, услуги'),
-                          value: TransactionType.income,
-                        ),
-                      ),
-                      Expanded(
-                        child: RadioListTile<TransactionType>(
-                          title: Text('Расход'),
-                          subtitle: Text('Покупки, услуги'),
-                          value: TransactionType.expense,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Детали',
-              children: [
-                DropdownButtonFormField<TransactionCategory>(
-                  initialValue: _selectedCategory,
-                  decoration: const InputDecoration(
-                    labelText: 'Категория *',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: (_selectedType == TransactionType.income
-                          ? _incomeCategories
-                          : _expenseCategories)
-                      .map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category.label),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _selectedCategory = value);
-                  },
-                ),
-                TextFormField(
-                  controller: _amountController,
-                  decoration: const InputDecoration(
-                    labelText: 'Сумма *',
-                    prefixIcon: Icon(Icons.attach_money),
-                    suffixText: '₽',
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите сумму';
-                    }
-                    final number = double.tryParse(value);
-                    if (number == null || number <= 0) {
-                      return 'Введите корректную сумму';
-                    }
-                    return null;
-                  },
-                ),
-                AppDateField(
-                  label: 'Дата транзакции *',
-                  value: _selectedDate,
-                  onChanged: (date) => setState(() => _selectedDate = date),
-                  prefixIcon: Icons.calendar_today,
-                  lastDate: DateTime.now(),
-                ),
-                if (rabbitsState.rabbits.isNotEmpty)
-                  DropdownButtonFormField<int>(
-                    initialValue: _selectedRabbitId,
-                    decoration: const InputDecoration(
-                      labelText: 'Кролик (опционально)',
-                      prefixIcon: Icon(Icons.pets),
-                      helperText: 'Привязать транзакцию к кролику',
-                    ),
-                    items: [
-                      const DropdownMenuItem<int>(
-                        value: null,
-                        child: Text('Не выбран'),
-                      ),
-                      ...rabbitsState.rabbits.map((rabbit) {
-                        return DropdownMenuItem(
-                          value: rabbit.id,
-                          child: Text(
-                              '${rabbit.name} (${rabbit.tagId.isEmpty ? "без бирки" : rabbit.tagId})'),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) =>
-                        setState(() => _selectedRabbitId = value),
-                  ),
-              ],
-            ),
-            AppFormSection(
-              title: 'Описание',
-              children: [
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Описание',
-                    prefixIcon: Icon(Icons.description_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _saveTransaction,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.transaction == null ? 'Создать' : 'Сохранить'),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _saveTransaction() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
+  Future<String?> _save() async {
+    final failed = context.l10n.txFormFailed;
+    final amount = parseDecimal(_amount.text) ?? 0;
+    final description =
+        _description.text.trim().isEmpty ? null : _description.text.trim();
 
     try {
-      final amount = double.parse(_amountController.text);
-
-      if (widget.transaction == null) {
-        final transactionCreate = TransactionCreate(
-          type: _selectedType,
-          category: _selectedCategory,
-          amount: amount,
-          transactionDate: _selectedDate,
-          rabbitId: _selectedRabbitId,
-          description: _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
-        );
-
-        await ref.read(createTransactionProvider(transactionCreate).future);
-
-        if (mounted) {
-          ref.read(transactionsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Транзакция успешно создана')),
-          );
-          context.pop();
-        }
-      } else {
-        final transactionUpdate = TransactionUpdate(
-          type: _selectedType,
-          category: _selectedCategory,
-          amount: amount,
-          transactionDate: _selectedDate,
-          rabbitId: _selectedRabbitId,
-          description: _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
-        );
-
+      if (_isEditing) {
         await ref.read(
-          updateTransactionProvider(
-            (id: widget.transaction!.id, update: transactionUpdate),
-          ).future,
+          updateTransactionProvider((
+            id: _record!.id,
+            update: TransactionUpdate(
+              type: _type,
+              category: _category,
+              amount: amount,
+              transactionDate: _date,
+              rabbitId: _rabbitId,
+              description: description,
+            ),
+          )).future,
         );
-
-        if (mounted) {
-          ref.read(transactionsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Транзакция успешно обновлена')),
-          );
-          context.pop();
-        }
+      } else {
+        await ref.read(
+          createTransactionProvider(TransactionCreate(
+            type: _type,
+            category: _category,
+            amount: amount,
+            transactionDate: _date,
+            rabbitId: _rabbitId,
+            description: description,
+          )).future,
+        );
       }
+      await ref.read(transactionsProvider.notifier).refresh();
+      return null;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      final message = e.toString().replaceAll('Exception: ', '').trim();
+      return message.isEmpty ? failed : message;
     }
   }
 
-  Future<void> _confirmDelete() async {
+  Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить транзакцию?'),
-        content:
-            const Text('Вы уверены, что хотите удалить эту транзакцию?'),
+        title: Text(context.l10n.financeDeleteTitle),
+        content: Text(context.l10n.financeDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true || !mounted) return;
 
-    if (confirmed == true && mounted) {
-      try {
-        await ref
-            .read(deleteTransactionProvider(widget.transaction!.id).future);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.financeDeleted;
+    final failed = context.l10n.financeDeleteFailed;
 
-        if (mounted) {
-          ref.read(transactionsProvider.notifier).refresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Транзакция успешно удалена')),
-          );
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка при удалении: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
+    try {
+      await ref.read(deleteTransactionProvider(_record!.id).future);
+      ref.read(transactionsProvider.notifier).removeTransaction(_record!.id);
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+      if (navigator.canPop()) navigator.pop();
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content:
+              Text('$failed: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+
+    return AppFormScaffold(
+      title: _isEditing ? l10n.txFormEditTitle : l10n.txFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage: _isEditing ? l10n.txFormUpdated : l10n.txFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      actions: [
+        if (_isEditing && canDelete)
+          IconButton(
+            tooltip: l10n.commonDelete,
+            icon: const Icon(Icons.delete_outline),
+            color: AppColors.error,
+            onPressed: _delete,
+          ),
+      ],
+      children: [
+        AppFormSection(
+          title: l10n.txFormSectionKind,
+          children: [
+            SegmentedButton<TransactionType>(
+              segments: [
+                ButtonSegment(
+                  value: TransactionType.income,
+                  icon: const Icon(Icons.arrow_upward),
+                  label: Text(l10n.financeTypeIncome),
+                ),
+                ButtonSegment(
+                  value: TransactionType.expense,
+                  icon: const Icon(Icons.arrow_downward),
+                  label: Text(l10n.financeTypeExpense),
+                ),
+              ],
+              selected: {_type},
+              onSelectionChanged: (selection) => setState(() {
+                _type = selection.first;
+                _touched = true;
+                // Категории дохода и расхода не пересекаются, поэтому при
+                // смене типа выбранная категория заменяется на подходящую.
+                if (!_categories.contains(_category)) {
+                  _category = _categories.first;
+                }
+              }),
+            ),
+            DropdownButtonFormField<TransactionCategory>(
+              initialValue: _category,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: l10n.financeCategory,
+                prefixIcon: const Icon(Icons.category_outlined),
+              ),
+              items: [
+                for (final category in _categories)
+                  DropdownMenuItem(
+                    value: category,
+                    child: Text(category.label),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                if (v != null) _category = v;
+                _touched = true;
+              }),
+            ),
+          ],
+        ),
+        AppFormSection(
+          title: l10n.txFormSectionDetails,
+          children: [
+            TextFormField(
+              controller: _amount,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.txFormAmount,
+                prefixIcon: const Icon(Icons.payments_outlined),
+                suffixText: '₽',
+              ),
+              validator: (v) {
+                final value = parseDecimal(v);
+                if (value == null) return l10n.txFormAmountEmpty;
+                if (value <= 0) return l10n.txFormAmountPositive;
+                return null;
+              },
+            ),
+            AppDateField(
+              label: l10n.txFormDate,
+              value: _date,
+              onChanged: (date) => setState(() {
+                _date = date;
+                _touched = true;
+              }),
+              prefixIcon: Icons.event_outlined,
+              lastDate: DateTime.now(),
+            ),
+            // Поле было спрятано целиком, если список кроликов ещё не
+            // загрузился: привязать операцию к животному было нельзя,
+            // и причина этого нигде не объяснялась.
+            RabbitPickerField(
+              label: l10n.txFormRabbit,
+              selected: _rabbit,
+              onChanged: (rabbit) => setState(() {
+                _rabbit = rabbit;
+                _rabbitId = rabbit?.id;
+                _touched = true;
+              }),
+            ),
+            TextFormField(
+              controller: _description,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.txFormDescription,
+                prefixIcon: const Icon(Icons.notes),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

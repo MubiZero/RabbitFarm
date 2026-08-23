@@ -2548,6 +2548,246 @@ abstract class AppLocalizations {
   /// **'Указанное количество спишется со склада.'**
   String get feedingFormStockNote;
 
+  /// No description provided for @financeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Финансы'**
+  String get financeTitle;
+
+  /// No description provided for @financeAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить операцию'**
+  String get financeAdd;
+
+  /// No description provided for @financeEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операций пока нет'**
+  String get financeEmptyTitle;
+
+  /// No description provided for @financeEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записывайте доходы и расходы — приложение само посчитает прибыль фермы.'**
+  String get financeEmptyBody;
+
+  /// No description provided for @financeNoneInView.
+  ///
+  /// In ru, this message translates to:
+  /// **'Под фильтры ничего не подошло'**
+  String get financeNoneInView;
+
+  /// No description provided for @financeNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимите условия, чтобы увидеть всю ведомость.'**
+  String get financeNoneInViewBody;
+
+  /// No description provided for @financeIncome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы'**
+  String get financeIncome;
+
+  /// No description provided for @financeExpenses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расходы'**
+  String get financeExpenses;
+
+  /// No description provided for @financeBalance.
+  ///
+  /// In ru, this message translates to:
+  /// **'Баланс'**
+  String get financeBalance;
+
+  /// No description provided for @financeSummaryPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'За весь период'**
+  String get financeSummaryPeriod;
+
+  /// No description provided for @financeSummaryFiltered.
+  ///
+  /// In ru, this message translates to:
+  /// **'За выбранный период'**
+  String get financeSummaryFiltered;
+
+  /// No description provided for @financeAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get financeAll;
+
+  /// No description provided for @financeOnlyIncome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы'**
+  String get financeOnlyIncome;
+
+  /// No description provided for @financeOnlyExpenses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расходы'**
+  String get financeOnlyExpenses;
+
+  /// No description provided for @financeCategory.
+  ///
+  /// In ru, this message translates to:
+  /// **'Категория'**
+  String get financeCategory;
+
+  /// No description provided for @financeType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип'**
+  String get financeType;
+
+  /// No description provided for @financeDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата'**
+  String get financeDate;
+
+  /// No description provided for @financeDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание'**
+  String get financeDescription;
+
+  /// No description provided for @financeTypeIncome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доход'**
+  String get financeTypeIncome;
+
+  /// No description provided for @financeTypeExpense.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расход'**
+  String get financeTypeExpense;
+
+  /// No description provided for @financeDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить операцию?'**
+  String get financeDeleteTitle;
+
+  /// No description provided for @financeDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция исчезнет из ведомости без возможности вернуть.'**
+  String get financeDeleteBody;
+
+  /// No description provided for @financeDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция удалена'**
+  String get financeDeleted;
+
+  /// No description provided for @financeDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить операцию'**
+  String get financeDeleteFailed;
+
+  /// No description provided for @txFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая операция'**
+  String get txFormNewTitle;
+
+  /// No description provided for @txFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция'**
+  String get txFormEditTitle;
+
+  /// No description provided for @txFormSectionKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что за операция'**
+  String get txFormSectionKind;
+
+  /// No description provided for @txFormSectionDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подробности'**
+  String get txFormSectionDetails;
+
+  /// No description provided for @txFormIncomeSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа, услуги'**
+  String get txFormIncomeSubtitle;
+
+  /// No description provided for @txFormExpenseSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Покупки, лечение, корма'**
+  String get txFormExpenseSubtitle;
+
+  /// No description provided for @txFormAmount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сумма'**
+  String get txFormAmount;
+
+  /// No description provided for @txFormAmountEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите сумму'**
+  String get txFormAmountEmpty;
+
+  /// No description provided for @txFormAmountPositive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сумма должна быть больше нуля'**
+  String get txFormAmountPositive;
+
+  /// No description provided for @txFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда'**
+  String get txFormDate;
+
+  /// No description provided for @txFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Связать с кроликом'**
+  String get txFormRabbit;
+
+  /// No description provided for @txFormRabbitHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Необязательно. Нужно, чтобы видеть доход и расходы по конкретному животному.'**
+  String get txFormRabbitHelp;
+
+  /// No description provided for @txFormDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание'**
+  String get txFormDescription;
+
+  /// No description provided for @txFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция записана'**
+  String get txFormCreated;
+
+  /// No description provided for @txFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция обновлена'**
+  String get txFormUpdated;
+
+  /// No description provided for @txFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить операцию'**
+  String get txFormFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

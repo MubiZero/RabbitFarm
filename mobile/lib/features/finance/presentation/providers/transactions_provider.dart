@@ -19,13 +19,28 @@ class TransactionsState {
   final bool hasMore;
   final int currentPage;
 
+  /// Фильтры списка. Живут в состоянии, а не в экране: обновление жестом и
+  /// подгрузка следующей страницы вызывали загрузку без них, и отфильтрованная
+  /// ведомость незаметно смешивалась с остальными операциями.
+  final TransactionType? type;
+  final TransactionCategory? category;
+  final DateTime? fromDate;
+  final DateTime? toDate;
+
   const TransactionsState({
     this.transactions = const [],
     this.isLoading = false,
     this.error,
     this.hasMore = true,
     this.currentPage = 1,
+    this.type,
+    this.category,
+    this.fromDate,
+    this.toDate,
   });
+
+  bool get hasFilters =>
+      type != null || category != null || fromDate != null || toDate != null;
 
   TransactionsState copyWith({
     List<Transaction>? transactions,
@@ -33,6 +48,14 @@ class TransactionsState {
     String? error,
     bool? hasMore,
     int? currentPage,
+    TransactionType? type,
+    bool clearType = false,
+    TransactionCategory? category,
+    bool clearCategory = false,
+    DateTime? fromDate,
+    bool clearFromDate = false,
+    DateTime? toDate,
+    bool clearToDate = false,
   }) {
     // clearError передаёт сюда null, а «?? this.error» его игнорировал —
     // сообщение об ошибке залипало в состоянии до перезапуска приложения,
@@ -44,6 +67,10 @@ class TransactionsState {
       error: error,
       hasMore: hasMore ?? this.hasMore,
       currentPage: currentPage ?? this.currentPage,
+      type: clearType ? null : (type ?? this.type),
+      category: clearCategory ? null : (category ?? this.category),
+      fromDate: clearFromDate ? null : (fromDate ?? this.fromDate),
+      toDate: clearToDate ? null : (toDate ?? this.toDate),
     );
   }
 }
@@ -60,17 +87,19 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
     int? limit,
     String? sortBy,
     String? sortOrder,
-    TransactionType? type,
-    TransactionCategory? category,
     int? rabbitId,
-    DateTime? fromDate,
-    DateTime? toDate,
     bool refresh = false,
   }) async {
     if (state.isLoading) return;
 
     if (refresh) {
-      state = const TransactionsState(isLoading: true);
+      state = TransactionsState(
+        isLoading: true,
+        type: state.type,
+        category: state.category,
+        fromDate: state.fromDate,
+        toDate: state.toDate,
+      );
     } else {
       state = state.copyWith(isLoading: true, error: null);
     }
@@ -81,11 +110,11 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
         limit: limit,
         sortBy: sortBy,
         sortOrder: sortOrder,
-        type: type,
-        category: category,
+        type: state.type,
+        category: state.category,
         rabbitId: rabbitId,
-        fromDate: fromDate,
-        toDate: toDate,
+        fromDate: state.fromDate,
+        toDate: state.toDate,
       );
 
       if (refresh) {
@@ -94,6 +123,10 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
           isLoading: false,
           hasMore: transactions.length >= (limit ?? 10),
           currentPage: page ?? 1,
+          type: state.type,
+          category: state.category,
+          fromDate: state.fromDate,
+          toDate: state.toDate,
         );
       } else {
         state = state.copyWith(
@@ -143,6 +176,36 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
     final updatedTransactions =
         state.transactions.where((t) => t.id != transactionId).toList();
     state = state.copyWith(transactions: updatedTransactions);
+  }
+
+  /// Задать фильтры и перезагрузить ведомость.
+  Future<void> setFilters({
+    TransactionType? type,
+    TransactionCategory? category,
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) async {
+    state = state.copyWith(
+      type: type,
+      clearType: type == null,
+      category: category,
+      clearCategory: category == null,
+      fromDate: fromDate,
+      clearFromDate: fromDate == null,
+      toDate: toDate,
+      clearToDate: toDate == null,
+    );
+    await loadTransactions(refresh: true);
+  }
+
+  Future<void> clearFilters() async {
+    state = state.copyWith(
+      clearType: true,
+      clearCategory: true,
+      clearFromDate: true,
+      clearToDate: true,
+    );
+    await loadTransactions(refresh: true);
   }
 
   /// Clear error

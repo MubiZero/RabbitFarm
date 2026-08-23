@@ -1396,6 +1396,130 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedingFormStockNote => 'Указанное количество спишется со склада.';
 
   @override
+  String get financeTitle => 'Финансы';
+
+  @override
+  String get financeAdd => 'Добавить операцию';
+
+  @override
+  String get financeEmptyTitle => 'Операций пока нет';
+
+  @override
+  String get financeEmptyBody =>
+      'Записывайте доходы и расходы — приложение само посчитает прибыль фермы.';
+
+  @override
+  String get financeNoneInView => 'Под фильтры ничего не подошло';
+
+  @override
+  String get financeNoneInViewBody =>
+      'Снимите условия, чтобы увидеть всю ведомость.';
+
+  @override
+  String get financeIncome => 'Доходы';
+
+  @override
+  String get financeExpenses => 'Расходы';
+
+  @override
+  String get financeBalance => 'Баланс';
+
+  @override
+  String get financeSummaryPeriod => 'За весь период';
+
+  @override
+  String get financeSummaryFiltered => 'За выбранный период';
+
+  @override
+  String get financeAll => 'Все';
+
+  @override
+  String get financeOnlyIncome => 'Доходы';
+
+  @override
+  String get financeOnlyExpenses => 'Расходы';
+
+  @override
+  String get financeCategory => 'Категория';
+
+  @override
+  String get financeType => 'Тип';
+
+  @override
+  String get financeDate => 'Дата';
+
+  @override
+  String get financeDescription => 'Описание';
+
+  @override
+  String get financeTypeIncome => 'Доход';
+
+  @override
+  String get financeTypeExpense => 'Расход';
+
+  @override
+  String get financeDeleteTitle => 'Удалить операцию?';
+
+  @override
+  String get financeDeleteBody =>
+      'Операция исчезнет из ведомости без возможности вернуть.';
+
+  @override
+  String get financeDeleted => 'Операция удалена';
+
+  @override
+  String get financeDeleteFailed => 'Не удалось удалить операцию';
+
+  @override
+  String get txFormNewTitle => 'Новая операция';
+
+  @override
+  String get txFormEditTitle => 'Операция';
+
+  @override
+  String get txFormSectionKind => 'Что за операция';
+
+  @override
+  String get txFormSectionDetails => 'Подробности';
+
+  @override
+  String get txFormIncomeSubtitle => 'Продажа, услуги';
+
+  @override
+  String get txFormExpenseSubtitle => 'Покупки, лечение, корма';
+
+  @override
+  String get txFormAmount => 'Сумма';
+
+  @override
+  String get txFormAmountEmpty => 'Введите сумму';
+
+  @override
+  String get txFormAmountPositive => 'Сумма должна быть больше нуля';
+
+  @override
+  String get txFormDate => 'Когда';
+
+  @override
+  String get txFormRabbit => 'Связать с кроликом';
+
+  @override
+  String get txFormRabbitHelp =>
+      'Необязательно. Нужно, чтобы видеть доход и расходы по конкретному животному.';
+
+  @override
+  String get txFormDescription => 'Описание';
+
+  @override
+  String get txFormCreated => 'Операция записана';
+
+  @override
+  String get txFormUpdated => 'Операция обновлена';
+
+  @override
+  String get txFormFailed => 'Не удалось сохранить операцию';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

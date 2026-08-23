@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/app_filter_bar.dart';
 import '../utils/transaction_labels.dart';
 
-/// Экран списка финансовых транзакций
+/// Ведомость доходов и расходов.
 class TransactionsListScreen extends ConsumerStatefulWidget {
   const TransactionsListScreen({super.key});
 
@@ -22,381 +23,461 @@ class TransactionsListScreen extends ConsumerStatefulWidget {
 
 class _TransactionsListScreenState
     extends ConsumerState<TransactionsListScreen> {
-  TransactionType? _selectedType;
-  TransactionCategory? _selectedCategory;
-  DateTime? _fromDate;
-  DateTime? _toDate;
-
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(transactionsProvider.notifier).loadTransactions(refresh: true);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final transactionsState = ref.watch(transactionsProvider);
+    final state = ref.watch(transactionsProvider);
+    final notifier = ref.read(transactionsProvider.notifier);
+    final canManage = ref.watch(canProvider(FarmCapability.manageFinance));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Финансы'),
+        title: Text(context.l10n.financeTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilters(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.analytics_outlined),
+            tooltip: context.l10n.medStats,
+            icon: const Icon(Icons.insights_outlined),
             onPressed: () => context.push('/transactions/statistics'),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Summary banner
-          if (transactionsState.transactions.isNotEmpty)
-            _buildSummaryBanner(context, transactionsState.transactions),
-
-          // Quick filters
-          _buildQuickFilters(),
-
-          // Active filters
-          if (_selectedType != null ||
-              _selectedCategory != null ||
-              _fromDate != null ||
-              _toDate != null)
-            _buildActiveFilters(),
-
-          // List
-          Expanded(
-            child: _buildTransactionsList(context, transactionsState),
+          IconButton(
+            tooltip: context.l10n.tasksFilters,
+            icon: Icon(state.hasFilters
+                ? Icons.filter_list_alt
+                : Icons.filter_list),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => const _FiltersSheet(),
+            ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showTransactionForm(context, null),
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить'),
+      body: PagedListView<Transaction>(
+        items: state.transactions,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.refresh,
+        onLoadMore: notifier.loadMore,
+        header: _Header(state: state),
+        separator: AppSpacing.sm,
+        empty: state.hasFilters
+            ? AppEmptyState(
+                icon: Icons.filter_alt_off_outlined,
+                title: context.l10n.financeNoneInView,
+                subtitle: context.l10n.financeNoneInViewBody,
+                actionLabel: context.l10n.tasksFiltersReset,
+                onAction: notifier.clearFilters,
+              )
+            : AppEmptyState(
+                icon: Icons.account_balance_wallet_outlined,
+                title: context.l10n.financeEmptyTitle,
+                subtitle: context.l10n.financeEmptyBody,
+                actionLabel: canManage ? context.l10n.financeAdd : null,
+                onAction:
+                    canManage ? () => context.push('/transactions/form') : null,
+              ),
+        itemBuilder: (context, transaction, _) => _TransactionCard(
+          transaction: transaction,
+          onTap: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => _DetailsSheet(transaction: transaction),
+          ),
+        ),
       ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/transactions/form'),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.commonAdd),
+            )
+          : null,
     );
   }
+}
 
-  Widget _buildSummaryBanner(BuildContext context, List<Transaction> txs) {
-    double income = 0;
-    double expense = 0;
-    for (final t in txs) {
-      if (t.type == TransactionType.income) {
-        income += t.amount;
-      } else {
-        expense += t.amount;
-      }
-    }
-    final balance = income - expense;
+class _Header extends ConsumerWidget {
+  final TransactionsState state;
+
+  const _Header({required this.state});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(transactionsProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Summary(state: state),
+        AppFilterBar(
+          chips: [
+            AppFilterChipData(
+              label: context.l10n.financeAll,
+              isSelected: state.type == null,
+              onTap: () => notifier.setFilters(
+                category: state.category,
+                fromDate: state.fromDate,
+                toDate: state.toDate,
+              ),
+            ),
+            AppFilterChipData(
+              label: context.l10n.financeOnlyIncome,
+              isSelected: state.type == TransactionType.income,
+              onTap: () => notifier.setFilters(
+                type: TransactionType.income,
+                category: state.category,
+                fromDate: state.fromDate,
+                toDate: state.toDate,
+              ),
+              color: AppColors.success,
+            ),
+            AppFilterChipData(
+              label: context.l10n.financeOnlyExpenses,
+              isSelected: state.type == TransactionType.expense,
+              onTap: () => notifier.setFilters(
+                type: TransactionType.expense,
+                category: state.category,
+                fromDate: state.fromDate,
+                toDate: state.toDate,
+              ),
+              color: AppColors.error,
+            ),
+          ],
+        ),
+        if (state.category != null ||
+            state.fromDate != null ||
+            state.toDate != null)
+          _ActiveFilters(state: state),
+      ],
+    );
+  }
+}
+
+/// Сводка за период.
+///
+/// Считается на сервере по тем же условиям, что и список. Раньше здесь
+/// складывались только загруженные операции: при постраничной выдаче «Баланс»
+/// показывал итог первого десятка записей, выдавая его за итог фермы.
+class _Summary extends ConsumerWidget {
+  final TransactionsState state;
+
+  const _Summary({required this.state});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(financialStatisticsProvider(
+      (fromDate: state.fromDate, toDate: state.toDate),
+    ));
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.md,
+        AppSpacing.screenH,
+        0,
+      ),
       child: AppCard(
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSummaryItem(
-              context,
-              label: 'Доходы',
-              amount: income,
-              color: AppColors.success,
-              icon: Icons.arrow_upward,
+            Text(
+              state.fromDate != null || state.toDate != null
+                  ? context.l10n.financeSummaryFiltered
+                  : context.l10n.financeSummaryPeriod,
+              style: AppTypography.labelSm
+                  .copyWith(color: context.colors.onSurfaceVariant),
             ),
-            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.outlineVariant),
-            _buildSummaryItem(
-              context,
-              label: 'Расходы',
-              amount: expense,
-              color: AppColors.error,
-              icon: Icons.arrow_downward,
-            ),
-            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.outlineVariant),
-            _buildSummaryItem(
-              context,
-              label: 'Баланс',
-              amount: balance,
-              color: balance >= 0 ? AppColors.success : AppColors.error,
-              icon: Icons.account_balance_wallet_outlined,
+            const SizedBox(height: AppSpacing.md),
+            statsAsync.when(
+              data: (stats) => _SummaryRow(
+                income: stats.totalIncome,
+                expenses: stats.totalExpenses,
+                profit: stats.netProfit,
+              ),
+              loading: () => const SkeletonBox(height: 44),
+              error: (_, __) => Text(
+                context.l10n.commonLoadFailed,
+                style: AppTypography.bodyMd
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildSummaryItem(
-    BuildContext context, {
-    required String label,
-    required double amount,
-    required Color color,
-    required IconData icon,
-  }) {
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(height: 4),
-          Text(
-            '${amount.toStringAsFixed(0)} ₽',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class _SummaryRow extends StatelessWidget {
+  final double income;
+  final double expenses;
+  final double profit;
 
-  Widget _buildQuickFilters() {
-    return AppFilterBar(
-      chips: [
-        AppFilterChipData(
-          label: 'Все',
-          isSelected: _selectedType == null,
-          onTap: () {
-            setState(() => _selectedType = null);
-            _applyFilters();
-          },
-        ),
-        AppFilterChipData(
-          label: 'Доходы',
-          isSelected: _selectedType == TransactionType.income,
-          onTap: () {
-            setState(() {
-              _selectedType = _selectedType == TransactionType.income
-                  ? null
-                  : TransactionType.income;
-            });
-            _applyFilters();
-          },
+  const _SummaryRow({
+    required this.income,
+    required this.expenses,
+    required this.profit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _SummaryItem(
+          label: context.l10n.financeIncome,
+          amount: income,
           color: AppColors.success,
         ),
-        AppFilterChipData(
-          label: 'Расходы',
-          isSelected: _selectedType == TransactionType.expense,
-          onTap: () {
-            setState(() {
-              _selectedType = _selectedType == TransactionType.expense
-                  ? null
-                  : TransactionType.expense;
-            });
-            _applyFilters();
-          },
+        _Divider(),
+        _SummaryItem(
+          label: context.l10n.financeExpenses,
+          amount: expenses,
           color: AppColors.error,
+        ),
+        _Divider(),
+        _SummaryItem(
+          label: context.l10n.financeBalance,
+          amount: profit,
+          color: profit >= 0 ? AppColors.success : AppColors.error,
         ),
       ],
     );
   }
+}
 
-  void _applyFilters() {
-    ref.read(transactionsProvider.notifier).loadTransactions(
-          refresh: true,
-          type: _selectedType,
-          category: _selectedCategory,
-          fromDate: _fromDate,
-          toDate: _toDate,
-        );
-  }
+class _Divider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 36,
+        color: context.colors.outlineVariant,
+      );
+}
 
-  Widget _buildActiveFilters() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Wrap(
-        spacing: 8,
+class _SummaryItem extends StatelessWidget {
+  final String label;
+  final double amount;
+  final Color color;
+
+  const _SummaryItem({
+    required this.label,
+    required this.amount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
         children: [
-          if (_selectedType != null)
-            Chip(
-              label: Text(_selectedType!.label),
-              onDeleted: () {
-                setState(() => _selectedType = null);
-                _applyFilters();
-              },
+          Text(
+            label,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              formatMoney(amount),
+              style: AppTypography.titleMd.copyWith(color: color),
             ),
-          if (_selectedCategory != null)
-            Chip(
-              label: Text(_selectedCategory!.label),
-              onDeleted: () {
-                setState(() => _selectedCategory = null);
-                _applyFilters();
-              },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActiveFilters extends ConsumerWidget {
+  final TransactionsState state;
+
+  const _ActiveFilters({required this.state});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(transactionsProvider.notifier);
+    final format = DateFormat('d MMM y', 'ru');
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        0,
+        AppSpacing.screenH,
+        AppSpacing.sm,
+      ),
+      child: Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: [
+          if (state.category != null)
+            InputChip(
+              label: Text(state.category!.label),
+              deleteIcon: const Icon(Icons.close, size: 16),
+              onDeleted: () => notifier.setFilters(
+                type: state.type,
+                fromDate: state.fromDate,
+                toDate: state.toDate,
+              ),
             ),
-          if (_fromDate != null)
-            Chip(
-              label: Text('С ${DateFormat('dd.MM.yyyy').format(_fromDate!)}'),
-              onDeleted: () {
-                setState(() => _fromDate = null);
-                _applyFilters();
-              },
-            ),
-          if (_toDate != null)
-            Chip(
-              label: Text('До ${DateFormat('dd.MM.yyyy').format(_toDate!)}'),
-              onDeleted: () {
-                setState(() => _toDate = null);
-                _applyFilters();
-              },
+          if (state.fromDate != null || state.toDate != null)
+            InputChip(
+              label: Text([
+                if (state.fromDate != null) format.format(state.fromDate!),
+                if (state.toDate != null) format.format(state.toDate!),
+              ].join(' — ')),
+              deleteIcon: const Icon(Icons.close, size: 16),
+              onDeleted: () => notifier.setFilters(
+                type: state.type,
+                category: state.category,
+              ),
             ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTransactionsList(
-      BuildContext context, TransactionsState transactionsState) {
-    if (transactionsState.isLoading && transactionsState.transactions.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+class _TransactionCard extends StatelessWidget {
+  final Transaction transaction;
+  final VoidCallback onTap;
 
-    if (transactionsState.error != null &&
-        transactionsState.transactions.isEmpty) {
-      return AppErrorState(
-        message: transactionsState.error!,
-        onRetry: () => ref.read(transactionsProvider.notifier).refresh(),
-      );
-    }
+  const _TransactionCard({required this.transaction, required this.onTap});
 
-    if (transactionsState.transactions.isEmpty) {
-      return const AppEmptyState(
-        icon: Icons.account_balance_wallet_outlined,
-        title: 'Транзакций не найдено',
-        subtitle: 'Добавьте первую транзакцию',
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(transactionsProvider.notifier).refresh(),
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemCount: transactionsState.transactions.length +
-            (transactionsState.hasMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == transactionsState.transactions.length) {
-            if (transactionsState.hasMore && !transactionsState.isLoading) {
-              Future.microtask(
-                  () => ref.read(transactionsProvider.notifier).loadMore());
-            }
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-          return _buildTransactionCard(
-              context, transactionsState.transactions[index]);
-        },
-      ),
-    );
-  }
-
-  Widget _buildTransactionCard(BuildContext context, Transaction transaction) {
+  @override
+  Widget build(BuildContext context) {
     final isIncome = transaction.type == TransactionType.income;
     final color = isIncome ? AppColors.success : AppColors.error;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: AppCard(
-        onTap: () => _showTransactionDetail(context, transaction),
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Type icon
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isIncome ? Icons.arrow_upward : Icons.arrow_downward,
-                color: color,
-                size: 22,
-              ),
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 12),
-            // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            child: Icon(
+              isIncome ? Icons.arrow_upward : Icons.arrow_downward,
+              color: color,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.category.label,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  DateFormat('d MMMM y', 'ru')
+                      .format(transaction.transactionDate),
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                if (transaction.description?.trim().isNotEmpty == true)
                   Text(
-                    transaction.category.label,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                    transaction.description!.trim(),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    DateFormat('dd MMM yyyy', 'ru_RU')
-                        .format(transaction.transactionDate),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  if (transaction.description != null &&
-                      transaction.description!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        transaction.description!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                ],
-              ),
+              ],
             ),
-            // Amount
-            Text(
-              '${isIncome ? '+' : '−'}${transaction.amount.toStringAsFixed(2)} ₽',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(
+            '${isIncome ? '+' : '−'}${formatMoney(transaction.amount)}',
+            style: AppTypography.titleMd.copyWith(color: color),
+          ),
+        ],
       ),
     );
   }
+}
 
-  void _showTransactionDetail(BuildContext context, Transaction transaction) {
-    final isIncome = transaction.type == TransactionType.income;
-    final color = isIncome ? AppColors.success : AppColors.error;
+class _DetailsSheet extends ConsumerWidget {
+  final Transaction transaction;
 
-    showModalBottomSheet(
+  const _DetailsSheet({required this.transaction});
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.financeDeleteTitle),
+        content: Text(context.l10n.financeDeleteBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(context.l10n.commonDelete),
+          ),
+        ],
       ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.financeDeleted;
+    final failed = context.l10n.financeDeleteFailed;
+
+    try {
+      await ref.read(deleteTransactionProvider(transaction.id).future);
+      ref
+          .read(transactionsProvider.notifier)
+          .removeTransaction(transaction.id);
+      navigator.pop();
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$failed: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isIncome = transaction.type == TransactionType.income;
+    final color = isIncome ? AppColors.success : AppColors.error;
+    final canManage = ref.watch(canProvider(FarmCapability.manageFinance));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.screenH,
+          0,
+          AppSpacing.screenH,
+          AppSpacing.lg,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,206 +496,220 @@ class _TransactionsListScreenState
                     color: color,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
-                    '${isIncome ? '+' : '−'}${transaction.amount.toStringAsFixed(2)} ₽',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
+                    '${isIncome ? '+' : '−'}${formatMoney(transaction.amount)}',
+                    style: AppTypography.displayMd.copyWith(color: color),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _showTransactionForm(context, transaction);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: AppColors.error),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _deleteTransaction(context, transaction);
-                  },
-                ),
+                if (canManage)
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push('/transactions/form', extra: transaction);
+                    },
+                  ),
+                if (canDelete)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    color: AppColors.error,
+                    onPressed: () => _delete(context, ref),
+                  ),
               ],
             ),
-            const SizedBox(height: 16),
-            _txDetailRow(Icons.category_outlined, 'Категория', transaction.category.label),
-            _txDetailRow(Icons.swap_horiz, 'Тип', isIncome ? 'Доход' : 'Расход'),
-            _txDetailRow(
-              Icons.calendar_today,
-              'Дата',
-              DateFormat('dd MMM yyyy', 'ru_RU').format(transaction.transactionDate),
+            const SizedBox(height: AppSpacing.lg),
+            _Row(
+              icon: Icons.category_outlined,
+              label: context.l10n.financeCategory,
+              value: transaction.category.label,
             ),
-            if (transaction.description != null && transaction.description!.isNotEmpty)
-              _txDetailRow(Icons.notes, 'Описание', transaction.description!),
-            const SizedBox(height: 8),
+            _Row(
+              icon: Icons.swap_horiz,
+              label: context.l10n.financeType,
+              value: isIncome
+                  ? context.l10n.financeTypeIncome
+                  : context.l10n.financeTypeExpense,
+            ),
+            _Row(
+              icon: Icons.event_outlined,
+              label: context.l10n.financeDate,
+              value: DateFormat('d MMMM y', 'ru')
+                  .format(transaction.transactionDate),
+            ),
+            if (transaction.description?.trim().isNotEmpty == true)
+              _Row(
+                icon: Icons.notes,
+                label: context.l10n.financeDescription,
+                value: transaction.description!.trim(),
+              ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _txDetailRow(IconData icon, String label, String value) {
+class _Row extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _Row({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          const SizedBox(width: 12),
-          Text(
-            '$label: ',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              fontSize: 14,
-            ),
-          ),
+          Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  value,
+                  style: AppTypography.bodyLg
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Future<void> _deleteTransaction(
-      BuildContext context, Transaction transaction) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final confirmed = await showDialog<bool>(
+class _FiltersSheet extends ConsumerStatefulWidget {
+  const _FiltersSheet();
+
+  @override
+  ConsumerState<_FiltersSheet> createState() => _FiltersSheetState();
+}
+
+class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
+  TransactionCategory? _category;
+  DateTime? _from;
+  DateTime? _to;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(transactionsProvider);
+    _category = state.category;
+    _from = state.fromDate;
+    _to = state.toDate;
+  }
+
+  Future<void> _pickRange() async {
+    final range = await showDateRangePicker(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Удалить транзакцию?'),
-        content: const Text('Транзакция будет удалена безвозвратно.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
-          ),
-        ],
-      ),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _from != null && _to != null
+          ? DateTimeRange(start: _from!, end: _to!)
+          : null,
+      helpText: context.l10n.feedingPeriod,
     );
-
-    if (confirmed == true && mounted) {
-      try {
-        await ref.read(deleteTransactionProvider(transaction.id).future);
-        if (mounted) {
-          ref.read(transactionsProvider.notifier).removeTransaction(transaction.id);
-        }
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Транзакция удалена')),
-        );
-      } catch (e) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Ошибка удаления: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
+    if (range == null) return;
+    setState(() {
+      _from = range.start;
+      _to = range.end;
+    });
   }
 
-  void _showTransactionForm(BuildContext context, Transaction? transaction) {
-    context.push('/transactions/form', extra: transaction);
-  }
+  @override
+  Widget build(BuildContext context) {
+    final format = DateFormat('d MMM y', 'ru');
 
-  void _showFilters(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Фильтры'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<TransactionCategory>(
-                initialValue: _selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: 'Категория',
-                ),
-                items: TransactionCategory.values.map((category) {
-                  return DropdownMenuItem(
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.screenH,
+          0,
+          AppSpacing.screenH,
+          AppSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.tasksFilters,
+              style: AppTypography.titleLg
+                  .copyWith(color: context.colors.onSurface),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            DropdownButtonFormField<TransactionCategory>(
+              initialValue: _category,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: context.l10n.financeCategory,
+                prefixIcon: const Icon(Icons.category_outlined),
+              ),
+              items: [
+                for (final category in TransactionCategory.values)
+                  DropdownMenuItem(
                     value: category,
                     child: Text(category.label),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() => _selectedCategory = value);
-                },
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Дата начала'),
-                subtitle: Text(
-                  _fromDate != null
-                      ? DateFormat('dd.MM.yyyy').format(_fromDate!)
-                      : 'Не выбрана',
+                  ),
+              ],
+              onChanged: (v) => setState(() => _category = v),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            OutlinedButton.icon(
+              onPressed: _pickRange,
+              icon: const Icon(Icons.date_range, size: 18),
+              label: Text(_from == null || _to == null
+                  ? context.l10n.feedingPeriod
+                  : '${format.format(_from!)} — ${format.format(_to!)}'),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      ref.read(transactionsProvider.notifier).clearFilters();
+                      Navigator.pop(context);
+                    },
+                    child: Text(context.l10n.tasksFiltersReset),
+                  ),
                 ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _fromDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) setState(() => _fromDate = date);
-                },
-              ),
-              ListTile(
-                title: const Text('Дата окончания'),
-                subtitle: Text(
-                  _toDate != null
-                      ? DateFormat('dd.MM.yyyy').format(_toDate!)
-                      : 'Не выбрана',
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      ref.read(transactionsProvider.notifier).setFilters(
+                            type: ref.read(transactionsProvider).type,
+                            category: _category,
+                            fromDate: _from,
+                            toDate: _to,
+                          );
+                      Navigator.pop(context);
+                    },
+                    child: Text(context.l10n.tasksFiltersApply),
+                  ),
                 ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _toDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) setState(() => _toDate = date);
-                },
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedCategory = null;
-                _fromDate = null;
-                _toDate = null;
-              });
-              Navigator.pop(context);
-              _applyFilters();
-            },
-            child: const Text('Сбросить'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _applyFilters();
-            },
-            child: const Text('Применить'),
-          ),
-        ],
       ),
     );
   }
