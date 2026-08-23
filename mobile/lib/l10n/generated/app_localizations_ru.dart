@@ -2668,9 +2668,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get periodAll => 'Всё время';
 
   @override
-  String get statusActive => 'Активен';
-
-  @override
   String get statusInactive => 'Неактивен';
 
   @override

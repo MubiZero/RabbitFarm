@@ -4894,12 +4894,6 @@ abstract class AppLocalizations {
   /// **'Всё время'**
   String get periodAll;
 
-  /// No description provided for @statusActive.
-  ///
-  /// In ru, this message translates to:
-  /// **'Активен'**
-  String get statusActive;
-
   /// No description provided for @statusInactive.
   ///
   /// In ru, this message translates to:
