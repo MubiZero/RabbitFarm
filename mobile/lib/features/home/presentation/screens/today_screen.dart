@@ -2,17 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/alert_card.dart';
-import '../../../../core/widgets/app_card.dart';
+
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/coach_mark.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../onboarding/presentation/providers/tour_provider.dart';
+import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 
-/// Экран "Сегодня" — основной рабочий экран
+/// Экран «Сегодня» — с чего начинается рабочий день.
+///
+/// Отвечает ровно на два вопроса: что горит прямо сейчас и в каком состоянии
+/// ферма. Раньше экран показывал одни и те же три числа по три раза — в
+/// сводке, в уведомлении и в «быстрых действиях», — а два из трёх «быстрых
+/// действий» вели на вкладки, до которых можно дотянуться внизу этого же
+/// экрана. Зато число просроченных задач, самое важное для фермы, не
+/// показывалось нигде.
 class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
@@ -21,10 +29,8 @@ class TodayScreen extends ConsumerStatefulWidget {
 }
 
 class _TodayScreenState extends ConsumerState<TodayScreen> {
-  // Tour target keys
-  final _summaryKey = GlobalKey();
   final _alertsKey = GlobalKey();
-  final _quickActionsKey = GlobalKey();
+  final _statsKey = GlobalKey();
 
   late final List<CoachMarkStep> _tourSteps;
 
@@ -33,26 +39,21 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     super.initState();
     _tourSteps = [
       CoachMarkStep(
-        targetKey: _summaryKey,
-        title: 'Сводка дня',
-        description:
-            'Здесь вы видите количество ожидающих задач и состояние запасов корма.',
-      ),
-      CoachMarkStep(
         targetKey: _alertsKey,
-        title: 'Важные уведомления',
+        title: 'Что требует внимания',
         description:
-            'Здесь отображаются срочные события: просроченные вакцинации, роды и нехватка корма.',
+            'Просроченные задачи, вакцинация и заканчивающийся корм — всё '
+            'срочное собирается здесь. Нажмите на строку, чтобы перейти к делу.',
       ),
       CoachMarkStep(
-        targetKey: _quickActionsKey,
-        title: 'Быстрые действия',
+        targetKey: _statsKey,
+        title: 'Состояние фермы',
         description:
-            'Отсюда можно быстро перейти к задачам, кроликам и управлению кормами.',
+            'Поголовье, незакрытые задачи и свободные клетки. Потяните экран '
+            'вниз, чтобы обновить цифры.',
       ),
     ];
 
-    // Start tour after first frame if not yet done
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartTour());
   }
 
@@ -63,257 +64,30 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     }
   }
 
+  Future<void> _refresh() async {
+    ref.invalidate(dashboardReportProvider);
+    await ref.read(dashboardReportProvider.future);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final dateFormat = DateFormat('d MMMM, EEEE', 'ru');
     final dashboardAsync = ref.watch(dashboardReportProvider);
-    final authState = ref.watch(authProvider);
     final tourState = ref.watch(tourProvider);
-    final greeting = _greeting(now, authState.user?.fullName);
 
     return Scaffold(
       body: Stack(
         children: [
-          // Main content
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                // Header — flat, no gradient
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          greeting,
-                          style: AppTypography.displayMd.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          dateFormat.format(now),
-                          style: AppTypography.bodyMd.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Summary cards row
-                SliverToBoxAdapter(
-                  child: dashboardAsync.when(
-                    data: (dashboard) => Padding(
-                      key: _summaryKey,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Задачи',
-                              value: '${dashboard.tasks.pending}',
-                              sublabel: 'ожидают',
-                              icon: Icons.check_circle_outline,
-                              color: AppColors.accentViolet,
-                              onTap: () => context.go('/tasks'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Низкий запас',
-                              value: '${dashboard.inventory.lowStockFeeds}',
-                              sublabel: 'видов корма',
-                              icon: Icons.inventory_2_outlined,
-                              color: AppColors.warning,
-                              onTap: () => context.push('/feeds'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    loading: () => const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                    error: (_, __) => const SizedBox(),
-                  ),
-                ),
-
-                // Alerts section
-                SliverToBoxAdapter(
-                  child: dashboardAsync.when(
-                    data: (dashboard) {
-                      final alerts = <Widget>[];
-
-                      if (dashboard.tasks.urgent > 0) {
-                        alerts.add(AlertCard(
-                          title: 'Срочные задачи',
-                          description:
-                              'Срочных задач: ${dashboard.tasks.urgent}',
-                          icon: Icons.priority_high,
-                          color: AppColors.error,
-                          onTap: () => context.go('/tasks'),
-                        ));
-                      }
-                      if (dashboard.health.overdueVaccinations > 0) {
-                        alerts.add(AlertCard(
-                          title: 'Вакцинация',
-                          description:
-                              'Просрочено: ${dashboard.health.overdueVaccinations}',
-                          icon: Icons.vaccines,
-                          color: AppColors.error,
-                          onTap: () => context.push('/vaccinations'),
-                        ));
-                      }
-                      if (dashboard.breeding.recentBirths > 0) {
-                        alerts.add(AlertCard(
-                          title: 'Роды',
-                          description:
-                              'Рождений за 30 дней: ${dashboard.breeding.recentBirths}',
-                          icon: Icons.child_care,
-                          color: AppColors.accentRose,
-                          onTap: () => context.push('/births'),
-                        ));
-                      }
-                      if (dashboard.inventory.lowStockFeeds > 0) {
-                        alerts.add(AlertCard(
-                          title: 'Запас корма',
-                          description:
-                              'Низкий запас: ${dashboard.inventory.lowStockFeeds} видов',
-                          icon: Icons.inventory_2_outlined,
-                          color: AppColors.warning,
-                          onTap: () => context.push('/feeds'),
-                        ));
-                      }
-
-                      if (alerts.isEmpty) {
-                        return Padding(
-                          key: _alertsKey,
-                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-                          child: AppCard(
-                            child: Row(
-                              children: [
-                                const Icon(Icons.check_circle,
-                                    color: AppColors.success, size: 28),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    'Всё под контролем — срочных задач нет',
-                                    style: AppTypography.bodyMd.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                        child: Column(
-                          key: _alertsKey,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Требует внимания',
-                              style: AppTypography.titleLg.copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            ...alerts.map((w) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: w,
-                                )),
-                          ],
-                        ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const SizedBox(),
-                  ),
-                ),
-
-                // Quick actions
-                SliverToBoxAdapter(
-                  child: dashboardAsync.when(
-                    data: (dashboard) => Padding(
-                      key: _quickActionsKey,
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Быстрые действия',
-                                style: AppTypography.titleLg.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface,
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () => context.go('/tasks'),
-                                child: const Text('Все задачи'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          _QuickActionRow(
-                            title: 'Задачи',
-                            description: 'Просмотреть и управлять задачами',
-                            badge: '${dashboard.tasks.pending} ожидают',
-                            icon: Icons.check_circle_outline,
-                            color: AppColors.accentViolet,
-                            onTap: () => context.go('/tasks'),
-                          ),
-                          const SizedBox(height: 8),
-                          _QuickActionRow(
-                            title: 'Кролики',
-                            description: 'Управление поголовьем',
-                            badge: 'Всего: ${dashboard.rabbits.total}',
-                            icon: Icons.pets_outlined,
-                            color: AppColors.accentEmerald,
-                            onTap: () => context.push('/rabbits'),
-                          ),
-                          const SizedBox(height: 8),
-                          _QuickActionRow(
-                            title: 'Корма',
-                            description: 'Управление запасами',
-                            badge:
-                                'Низкий запас: ${dashboard.inventory.lowStockFeeds}',
-                            icon: Icons.inventory_2_outlined,
-                            color: AppColors.warning,
-                            onTap: () => context.push('/feeds'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const SizedBox(),
-                  ),
-                ),
-              ],
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child: AppAsyncView<DashboardReport>(
+                value: dashboardAsync,
+                onRetry: _refresh,
+                skeleton: (_) => const _TodaySkeleton(),
+                builder: (dashboard) => _content(dashboard),
+              ),
             ),
           ),
-
-          // CoachMark overlay (shown during product tour)
           if (tourState.isActive && tourState.step < _tourSteps.length)
             Positioned.fill(
               child: CoachMarkOverlay(
@@ -329,88 +103,220 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     );
   }
 
-  String _greeting(DateTime now, String? name) {
-    final hour = now.hour;
-    final String base;
-    if (hour >= 6 && hour < 12) {
-      base = 'Доброе утро';
-    } else if (hour >= 12 && hour < 18) {
-      base = 'Добрый день';
-    } else if (hour >= 18 && hour < 23) {
-      base = 'Добрый вечер';
-    } else {
-      base = 'Доброй ночи';
-    }
-    if (name != null && name.isNotEmpty) {
-      final firstName = name.trim().split(' ').first;
-      return '$base, $firstName!';
-    }
-    return '$base!';
+  Widget _content(DashboardReport d) {
+    final alerts = _alerts(d);
+
+    return ListView(
+      // Тянуть для обновления нужно и на коротком содержимом.
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.xl,
+        AppSpacing.screenH,
+        AppSpacing.fabSafeBottom,
+      ),
+      children: [
+        const _Greeting(),
+        const SizedBox(height: AppSpacing.xl),
+
+        Column(
+          key: _alertsKey,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (alerts.isEmpty)
+              const _AllClearCard()
+            else ...[
+              const AppSectionTitle('Требует внимания'),
+              for (var i = 0; i < alerts.length; i++) ...[
+                if (i > 0) const SizedBox(height: AppSpacing.sm),
+                alerts[i],
+              ],
+            ],
+          ],
+        ),
+
+        const SizedBox(height: AppSpacing.xl),
+
+        Column(
+          key: _statsKey,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AppSectionTitle('Ферма сейчас'),
+            Row(
+              children: [
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.pets_outlined,
+                    label: 'Поголовье',
+                    value: '${d.rabbits.total}',
+                    accent: AppColors.domainLivestock,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.check_circle_outline,
+                    label: 'Задачи в работе',
+                    value: '${d.tasks.pending}',
+                    accent: AppColors.domainTasks,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.grid_view_outlined,
+                    label: 'Клеток свободно',
+                    value: '${d.cages.available}',
+                    accent: AppColors.domainLivestock,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        const SizedBox(height: AppSpacing.xl),
+
+        const AppSectionTitle('За 30 дней'),
+        Row(
+          children: [
+            Expanded(
+              child: StatTile(
+                icon: Icons.child_care_outlined,
+                label: 'Родилось',
+                value: '${d.breeding.recentBirths}',
+                accent: AppColors.domainBreeding,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: StatTile(
+                icon: Icons.trending_up,
+                label: 'Доход',
+                value: formatMoney(d.finance.income30days),
+                accent: AppColors.success,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: StatTile(
+                icon: Icons.trending_down,
+                label: 'Расход',
+                value: formatMoney(d.finance.expenses30days),
+                accent: AppColors.error,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Срочное — сверху. Просроченное важнее предстоящего, поэтому порядок
+  /// здесь фиксированный, а не «в каком порядке пришли поля».
+  List<Widget> _alerts(DashboardReport d) {
+    return [
+      if (d.tasks.overdue > 0)
+        AlertCard(
+          title: 'Просроченные задачи',
+          description: formatTasks(d.tasks.overdue),
+          icon: Icons.event_busy_outlined,
+          color: AppColors.error,
+          onTap: () => context.go('/tasks'),
+        ),
+      if (d.health.overdueVaccinations > 0)
+        AlertCard(
+          title: 'Вакцинация просрочена',
+          description: formatVaccinations(d.health.overdueVaccinations),
+          icon: Icons.vaccines_outlined,
+          color: AppColors.error,
+          onTap: () => context.push('/vaccinations'),
+        ),
+      if (d.tasks.urgent > 0)
+        AlertCard(
+          title: 'Срочные задачи',
+          description: formatTasks(d.tasks.urgent),
+          icon: Icons.priority_high,
+          color: AppColors.warning,
+          onTap: () => context.go('/tasks'),
+        ),
+      if (d.inventory.lowStockFeeds > 0)
+        AlertCard(
+          title: 'Заканчивается корм',
+          description: formatFeedKinds(d.inventory.lowStockFeeds),
+          icon: Icons.inventory_2_outlined,
+          color: AppColors.warning,
+          onTap: () => context.push('/feeds'),
+        ),
+      if (d.health.upcomingVaccinations > 0)
+        AlertCard(
+          title: 'Скоро вакцинация',
+          description: formatVaccinations(d.health.upcomingVaccinations),
+          icon: Icons.event_available_outlined,
+          color: AppColors.info,
+          onTap: () => context.push('/vaccinations'),
+        ),
+    ];
   }
 }
 
-// ─── Reusable card widgets ──────────────────────────────────────────────────
+class _Greeting extends ConsumerWidget {
+  const _Greeting();
 
-class _SummaryCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String sublabel;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now = DateTime.now();
+    final name = ref.watch(authProvider).user?.fullName;
 
-  const _SummaryCard({
-    required this.label,
-    required this.value,
-    required this.sublabel,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _greeting(now.hour, name),
+          style:
+              AppTypography.displayMd.copyWith(color: context.colors.onSurface),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          DateFormat('d MMMM, EEEE', 'ru').format(now),
+          style: AppTypography.bodyMd
+              .copyWith(color: context.colors.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+
+  String _greeting(int hour, String? name) {
+    final base = switch (hour) {
+      >= 6 && < 12 => 'Доброе утро',
+      >= 12 && < 18 => 'Добрый день',
+      >= 18 && < 23 => 'Добрый вечер',
+      _ => 'Доброй ночи',
+    };
+    final firstName = name?.trim().split(' ').first;
+    return firstName == null || firstName.isEmpty
+        ? '$base!'
+        : '$base, $firstName!';
+  }
+}
+
+class _AllClearCard extends StatelessWidget {
+  const _AllClearCard();
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
+          const Icon(Icons.check_circle_outline,
+              color: AppColors.success, size: 28),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              'Всё под контролем — срочного нет',
+              style: AppTypography.bodyLg
+                  .copyWith(color: context.colors.onSurface),
             ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: AppTypography.labelSm.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: AppTypography.displayMd.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 3),
-                child: Text(
-                  sublabel,
-                  style: AppTypography.labelSm.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -418,69 +324,36 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-class _QuickActionRow extends StatelessWidget {
-  final String title;
-  final String description;
-  final String badge;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionRow({
-    required this.title,
-    required this.description,
-    required this.badge,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
+/// Заглушка в геометрии готового экрана: заголовок, блок уведомлений и две
+/// строки плиток. Когда данные приезжают, ничего не подпрыгивает.
+class _TodaySkeleton extends StatelessWidget {
+  const _TodaySkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.titleMd.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: AppTypography.bodyMd.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  badge,
-                  style: AppTypography.labelSm.copyWith(color: color),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            size: 14,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ],
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.xl,
+        AppSpacing.screenH,
+        AppSpacing.fabSafeBottom,
       ),
+      children: const [
+        SkeletonBox(width: 220, height: 28),
+        SizedBox(height: AppSpacing.sm),
+        SkeletonBox(width: 140, height: 16),
+        SizedBox(height: AppSpacing.xl),
+        SkeletonCard(height: 76),
+        SizedBox(height: AppSpacing.xl),
+        SkeletonBox(width: 160, height: 20),
+        SizedBox(height: AppSpacing.md),
+        SkeletonStatRow(count: 3),
+        SizedBox(height: AppSpacing.xl),
+        SkeletonBox(width: 120, height: 20),
+        SizedBox(height: AppSpacing.md),
+        SkeletonStatRow(count: 3),
+      ],
     );
   }
 }

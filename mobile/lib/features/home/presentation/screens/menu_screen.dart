@@ -1,369 +1,384 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
+/// Меню: всё, до чего не дотянуться с четырёх основных вкладок.
+///
+/// Разделы сгруппированы по областям работы, и цвет значка помечает область
+/// целиком. Раньше цвет выбирался у каждой строки отдельно — восемь разных
+/// оттенков подряд, включая тревожный красный на обычном пункте «Вакцинации»,
+/// — и подсказкой это быть переставало.
 class MenuScreen extends ConsumerWidget {
   const MenuScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final user = authState.user;
+    final user = ref.watch(authProvider).user;
+    final role = ref.watch(farmRoleProvider);
 
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                child: Text(
-                  'Меню',
-                  style: AppTypography.displayMd.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenH,
+            AppSpacing.xl,
+            AppSpacing.screenH,
+            AppSpacing.xxl,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.xs,
+                bottom: AppSpacing.lg,
+              ),
+              child: Text(
+                'Меню',
+                style: AppTypography.displayMd
+                    .copyWith(color: context.colors.onSurface),
               ),
             ),
 
-            // Profile card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  child: InkWell(
-                    onTap: () => context.push('/settings'),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                initials(user?.fullName),
-                                style: AppTypography.titleLg.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user?.fullName ?? 'Пользователь',
-                                  style: AppTypography.titleMd.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ),
-                                if (user?.email != null)
-                                  Text(
-                                    user!.email,
-                                    style: AppTypography.bodyMd.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            _ProfileCard(
+              name: user?.fullName,
+              email: user?.email,
+              roleLabel: _roleLabel(role),
+              onTap: () => context.push('/settings'),
             ),
 
-            // Здоровье
-            _SectionHeader(title: 'Здоровье'),
-            _SectionList(items: [
-              _MenuItem(
-                icon: Icons.vaccines,
-                label: 'Вакцинации',
-                color: AppColors.error,
-                onTap: () => context.push('/vaccinations'),
-              ),
-              _MenuItem(
-                icon: Icons.medical_services_outlined,
-                label: 'Мед. карты',
-                color: const Color(0xFFF97316),
-                onTap: () => context.push('/medical-records'),
-              ),
-            ]),
-
-            // Разведение
-            _SectionHeader(title: 'Разведение'),
-            _SectionList(items: [
-              _MenuItem(
-                icon: Icons.favorite_outline,
-                label: 'Вязки',
-                color: AppColors.accentRose,
-                onTap: () => context.push('/breeding'),
-              ),
-              _MenuItem(
-                icon: Icons.child_care,
-                label: 'Роды',
-                color: AppColors.accentRose,
-                onTap: () => context.push('/births'),
-              ),
-              _MenuItem(
-                icon: Icons.pets,
-                label: 'Породы',
-                color: const Color(0xFF84CC16),
-                onTap: () => context.push('/breeds'),
-              ),
-              _MenuItem(
-                icon: Icons.grid_view_outlined,
-                label: 'Клетки',
-                color: AppColors.info,
-                onTap: () => context.push('/cages'),
-              ),
-            ]),
-
-            // Управление
-            _SectionHeader(title: 'Управление'),
-            _SectionList(items: [
-              _MenuItem(
-                icon: Icons.inventory_2_outlined,
-                label: 'Корма',
-                color: AppColors.warning,
-                onTap: () => context.push('/feeds'),
-              ),
-              _MenuItem(
-                icon: Icons.restaurant_outlined,
-                label: 'Кормления',
-                color: AppColors.warning,
-                onTap: () => context.push('/feeding-records'),
-              ),
-              _MenuItem(
-                icon: Icons.attach_money,
-                label: 'Финансы',
-                color: AppColors.accentEmerald,
-                onTap: () => context.push('/transactions'),
-              ),
-            ]),
-
-            // Настройки
-            _SectionHeader(title: 'Ферма'),
-            _SectionList(items: [
-              _MenuItem(
-                icon: Icons.groups_outlined,
-                label: 'Работники',
-                color: AppColors.accentOcean,
-                onTap: () => context.push('/staff'),
-              ),
-            ]),
-
-            _SectionHeader(title: 'Настройки'),
-            _SectionList(items: [
-              _MenuItem(
-                icon: Icons.settings_outlined,
-                label: 'Настройки приложения',
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                onTap: () => context.push('/settings'),
-              ),
-              _MenuItem(
-                icon: Icons.info_outline,
-                label: 'О приложении',
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                onTap: () => _showAboutDialog(context),
-              ),
-            ]),
-
-            // Logout
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                child: Material(
-                  color: AppColors.error.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  child: InkWell(
-                    onTap: () => showLogoutDialog(context, ref),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Icon(Icons.logout, color: AppColors.error, size: 22),
-                          const SizedBox(width: 16),
-                          Text(
-                            'Выйти',
-                            style: AppTypography.titleMd.copyWith(
-                              color: AppColors.error,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            _Section(
+              title: 'Поголовье',
+              domain: AppDomain.livestock,
+              items: [
+                _Item(Icons.grid_view_outlined, 'Клетки', '/cages'),
+                _Item(Icons.category_outlined, 'Породы', '/breeds'),
+              ],
             ),
+
+            _Section(
+              title: 'Разведение',
+              domain: AppDomain.breeding,
+              items: [
+                _Item(Icons.favorite_outline, 'Случки', '/breeding'),
+                _Item(Icons.child_care_outlined, 'Роды', '/births'),
+                // Подбор пар с проверкой на родство был написан, но не был
+                // связан ни с одним экраном: попасть в него из приложения
+                // было невозможно.
+                _Item(Icons.hub_outlined, 'Подбор пар', '/breeding/planner'),
+              ],
+            ),
+
+            _Section(
+              title: 'Здоровье',
+              domain: AppDomain.health,
+              items: [
+                _Item(Icons.vaccines_outlined, 'Вакцинации', '/vaccinations'),
+                _Item(Icons.medical_services_outlined, 'Лечение',
+                    '/medical-records'),
+              ],
+            ),
+
+            _Section(
+              title: 'Корма',
+              domain: AppDomain.feeding,
+              items: [
+                _Item(Icons.inventory_2_outlined, 'Запасы', '/feeds'),
+                _Item(Icons.restaurant_outlined, 'Кормления',
+                    '/feeding-records'),
+              ],
+            ),
+
+            _Section(
+              title: 'Учёт',
+              domain: AppDomain.admin,
+              items: [
+                _Item(Icons.account_balance_wallet_outlined, 'Финансы',
+                    '/transactions'),
+                if (role.can(FarmCapability.manageStaff))
+                  _Item(Icons.groups_outlined, 'Работники', '/staff'),
+              ],
+            ),
+
+            _Section(
+              title: 'Приложение',
+              domain: AppDomain.admin,
+              items: [
+                _Item(Icons.settings_outlined, 'Настройки', '/settings'),
+              ],
+              extra: _AboutTile(),
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+            _LogoutButton(onTap: () => showLogoutDialog(context, ref)),
           ],
         ),
       ),
     );
   }
 
-  void _showAboutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('О приложении'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('RabbitFarm', style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text('Версия: 1.0.0'),
-            SizedBox(height: 16),
-            Text('Профессиональная система управления кролиководческой фермой.'),
-          ],
+  String _roleLabel(FarmRoleAccess role) => switch (role) {
+        FarmRoleAccess.owner => 'Владелец фермы',
+        FarmRoleAccess.manager => 'Управляющий',
+        FarmRoleAccess.worker => 'Работник',
+      };
+}
+
+class _ProfileCard extends StatelessWidget {
+  final String? name;
+  final String? email;
+  final String roleLabel;
+  final VoidCallback onTap;
+
+  const _ProfileCard({
+    required this.name,
+    required this.email,
+    required this.roleLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: context.colors.surface,
+      borderRadius: AppRadius.lgAll,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    initials(name),
+                    style: AppTypography.titleLg.copyWith(color: context.accent),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name?.trim().isNotEmpty == true
+                          ? name!.trim()
+                          : 'Профиль',
+                      style: AppTypography.titleMd
+                          .copyWith(color: context.colors.onSurface),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    // Роль показана рядом с именем: от неё зависит, какие
+                    // действия человеку доступны, и это стоит видеть сразу.
+                    Text(
+                      email?.trim().isNotEmpty == true
+                          ? '$roleLabel · ${email!.trim()}'
+                          : roleLabel,
+                      style: AppTypography.bodyMd
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: context.colors.onSurfaceVariant),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Закрыть'),
+      ),
+    );
+  }
+}
+
+class _Item {
+  final IconData icon;
+  final String label;
+  final String route;
+
+  const _Item(this.icon, this.label, this.route);
+}
+
+class _Section extends StatelessWidget {
+  final String title;
+  final AppDomain domain;
+  final List<_Item> items;
+
+  /// Строка, которая ведёт не по маршруту, а открывает диалог.
+  final Widget? extra;
+
+  const _Section({
+    required this.title,
+    required this.domain,
+    required this.items,
+    this.extra,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <Widget>[
+      for (final item in items)
+        _MenuRow(
+          icon: item.icon,
+          label: item.label,
+          color: domain.color(context),
+          onTap: () => context.push(item.route),
+        ),
+      if (extra != null) extra!,
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.xs,
+              bottom: AppSpacing.sm,
+            ),
+            child: Text(
+              title,
+              style: AppTypography.labelLg
+                  .copyWith(color: context.colors.onSurfaceVariant),
+            ),
+          ),
+          Material(
+            color: context.colors.surface,
+            borderRadius: AppRadius.lgAll,
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (var i = 0; i < rows.length; i++) ...[
+                  if (i > 0)
+                    Divider(
+                      height: 1,
+                      indent: 68,
+                      color: context.colors.outline.withValues(alpha: 0.4),
+                    ),
+                  rows[i],
+                ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
-
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-
-  const _SectionHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-        child: Text(
-          title,
-          style: AppTypography.labelLg.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionList extends StatelessWidget {
-  final List<_MenuItem> items;
-
-  const _SectionList({required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surface;
-    final outline = Theme.of(context).colorScheme.outline;
-
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Material(
-          color: surface,
-          borderRadius: BorderRadius.circular(12),
-          child: Column(
-            children: items.asMap().entries.map((entry) {
-              final i = entry.key;
-              final item = entry.value;
-              return Column(
-                children: [
-                  InkWell(
-                    onTap: item.onTap,
-                    borderRadius: BorderRadius.vertical(
-                      top: i == 0 ? const Radius.circular(12) : Radius.zero,
-                      bottom: i == items.length - 1
-                          ? const Radius.circular(12)
-                          : Radius.zero,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: item.color.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(item.icon, color: item.color, size: 20),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Text(
-                              item.label,
-                              style: AppTypography.bodyLg.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (i < items.length - 1)
-                    Divider(
-                      height: 1,
-                      indent: 66,
-                      color: outline.withValues(alpha: 0.4),
-                    ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MenuItem {
+class _MenuRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
 
-  const _MenuItem({
+  const _MenuRow({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: AppRadius.smAll,
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Text(
+                label,
+                style: AppTypography.bodyLg
+                    .copyWith(color: context.colors.onSurface),
+              ),
+            ),
+            Icon(Icons.chevron_right,
+                size: 20, color: context.colors.onSurfaceVariant),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AboutTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _MenuRow(
+      icon: Icons.info_outline,
+      label: 'О приложении',
+      color: AppDomain.admin.color(context),
+      onTap: () => showAboutDialog(
+        context: context,
+        applicationName: 'RabbitFarm',
+        applicationVersion: '1.0.0',
+        applicationIcon: Icon(Icons.pets, size: 40, color: context.accent),
+        children: const [
+          Text('Учёт поголовья, кормов, здоровья и денег кроличьей фермы.'),
+        ],
+      ),
+    );
+  }
+}
+
+class _LogoutButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _LogoutButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.error.withValues(alpha: 0.08),
+      borderRadius: AppRadius.mdAll,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.logout, color: AppColors.error, size: 20),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                'Выйти',
+                style:
+                    AppTypography.titleMd.copyWith(color: AppColors.error),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

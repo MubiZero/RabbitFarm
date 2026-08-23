@@ -236,6 +236,18 @@ final cagesProvider = StateNotifierProvider<CagesNotifier, CagesState>((ref) {
   return CagesNotifier(repository);
 });
 
+/// Одна клетка со списком жителей.
+///
+/// Экран клетки раньше искал её в уже загруженной странице списка, а если не
+/// находил — рисовал выдуманную клетку с номером «...» и вместимостью ноль.
+/// Так выглядел переход по ссылке и открытие клетки со второй страницы:
+/// пользователь видел правдоподобный, но полностью ложный экран.
+final cageDetailProvider =
+    FutureProvider.autoDispose.family<CageModel, int>((ref, id) async {
+  final repository = ref.watch(cagesRepositoryProvider);
+  return repository.getCageById(id);
+});
+
 /// Provider для статистики клеток
 final cageStatisticsProvider = FutureProvider<CageStatistics>((ref) async {
   final repository = ref.watch(cagesRepositoryProvider);

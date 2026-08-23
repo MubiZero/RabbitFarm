@@ -23,3 +23,53 @@ String formatOperations(int count) => Intl.plural(
       other: '$count операции',
       locale: 'ru',
     );
+
+/// «1 задача» / «3 задачи» / «12 задач».
+String formatTasks(int count) => Intl.plural(
+      count,
+      one: '$count задача',
+      few: '$count задачи',
+      many: '$count задач',
+      other: '$count задачи',
+      locale: 'ru',
+    );
+
+/// «1 прививка» / «2 прививки» / «5 прививок».
+String formatVaccinations(int count) => Intl.plural(
+      count,
+      one: '$count прививка',
+      few: '$count прививки',
+      many: '$count прививок',
+      other: '$count прививки',
+      locale: 'ru',
+    );
+
+/// «1 вид корма» / «2 вида корма» / «5 видов корма».
+String formatFeedKinds(int count) => Intl.plural(
+      count,
+      one: '$count вид корма',
+      few: '$count вида корма',
+      many: '$count видов корма',
+      other: '$count вида корма',
+      locale: 'ru',
+    );
+
+/// «1 кролик» / «2 кролика» / «7 кроликов».
+String formatRabbits(int count) => Intl.plural(
+      count,
+      one: '$count кролик',
+      few: '$count кролика',
+      many: '$count кроликов',
+      other: '$count кролика',
+      locale: 'ru',
+    );
+
+/// «1 запись» / «2 записи» / «9 записей».
+String formatRecords(int count) => Intl.plural(
+      count,
+      one: '$count запись',
+      few: '$count записи',
+      many: '$count записей',
+      other: '$count записи',
+      locale: 'ru',
+    );
