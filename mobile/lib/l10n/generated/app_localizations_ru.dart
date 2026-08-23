@@ -287,6 +287,66 @@ class AppLocalizationsRu extends AppLocalizations {
   String get navMenu => 'Меню';
 
   @override
+  String get navHerd => 'Стадо';
+
+  @override
+  String get navBreeding => 'Разведение';
+
+  @override
+  String get navFarm => 'Хозяйство';
+
+  @override
+  String get navJournal => 'Журнал';
+
+  @override
+  String get navProfile => 'Профиль';
+
+  @override
+  String get navRecord => 'Записать';
+
+  @override
+  String get quickRecordTreatment => 'Лечение';
+
+  @override
+  String get quickRecordBreeding => 'Случка';
+
+  @override
+  String get quickAddFeed => 'Приход корма';
+
+  @override
+  String get quickRecordTransaction => 'Приход или расход';
+
+  @override
+  String get quickGroupDaily => 'Каждый день';
+
+  @override
+  String get quickGroupHerd => 'Стадо';
+
+  @override
+  String get quickGroupFarm => 'Хозяйство';
+
+  @override
+  String get herdTitle => 'Стадо';
+
+  @override
+  String get herdTabCages => 'Клетки';
+
+  @override
+  String get herdTabRabbits => 'Кролики';
+
+  @override
+  String get breedingCycleTitle => 'Разведение';
+
+  @override
+  String get journalTitle => 'Журнал';
+
+  @override
+  String get reportsTitle => 'Отчёты';
+
+  @override
+  String get farmTitle => 'Хозяйство';
+
+  @override
   String get navNewTask => 'Новая задача';
 
   @override

@@ -634,6 +634,126 @@ abstract class AppLocalizations {
   /// **'Меню'**
   String get navMenu;
 
+  /// No description provided for @navHerd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стадо'**
+  String get navHerd;
+
+  /// No description provided for @navBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разведение'**
+  String get navBreeding;
+
+  /// No description provided for @navFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство'**
+  String get navFarm;
+
+  /// No description provided for @navJournal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал'**
+  String get navJournal;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль'**
+  String get navProfile;
+
+  /// No description provided for @navRecord.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать'**
+  String get navRecord;
+
+  /// No description provided for @quickRecordTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get quickRecordTreatment;
+
+  /// No description provided for @quickRecordBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка'**
+  String get quickRecordBreeding;
+
+  /// No description provided for @quickAddFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приход корма'**
+  String get quickAddFeed;
+
+  /// No description provided for @quickRecordTransaction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приход или расход'**
+  String get quickRecordTransaction;
+
+  /// No description provided for @quickGroupDaily.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый день'**
+  String get quickGroupDaily;
+
+  /// No description provided for @quickGroupHerd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стадо'**
+  String get quickGroupHerd;
+
+  /// No description provided for @quickGroupFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство'**
+  String get quickGroupFarm;
+
+  /// No description provided for @herdTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стадо'**
+  String get herdTitle;
+
+  /// No description provided for @herdTabCages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетки'**
+  String get herdTabCages;
+
+  /// No description provided for @herdTabRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get herdTabRabbits;
+
+  /// No description provided for @breedingCycleTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разведение'**
+  String get breedingCycleTitle;
+
+  /// No description provided for @journalTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал'**
+  String get journalTitle;
+
+  /// No description provided for @reportsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отчёты'**
+  String get reportsTitle;
+
+  /// No description provided for @farmTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство'**
+  String get farmTitle;
+
   /// No description provided for @navNewTask.
   ///
   /// In ru, this message translates to:

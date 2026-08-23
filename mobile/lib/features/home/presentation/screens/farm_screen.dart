@@ -15,8 +15,8 @@ import '../../../../core/l10n/l10n_context.dart';
 /// целиком. Раньше цвет выбирался у каждой строки отдельно — восемь разных
 /// оттенков подряд, включая тревожный красный на обычном пункте «Вакцинации»,
 /// — и подсказкой это быть переставало.
-class MenuScreen extends ConsumerWidget {
-  const MenuScreen({super.key});
+class FarmScreen extends ConsumerWidget {
+  const FarmScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

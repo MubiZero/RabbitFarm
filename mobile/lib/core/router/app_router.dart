@@ -11,7 +11,6 @@ import '../../features/rabbits/presentation/screens/pedigree_screen.dart';
 import '../../features/rabbits/presentation/screens/breeds_list_screen.dart';
 import '../../features/rabbits/presentation/screens/breed_form_screen.dart';
 import '../../features/rabbits/presentation/screens/breeding_planner_screen.dart';
-import '../../features/breeding/presentation/screens/breeding_list_screen.dart';
 import '../../features/breeding/presentation/screens/breeding_form_screen.dart';
 import '../../features/breeding/presentation/screens/breeding_detail_screen.dart';
 import '../../features/rabbits/presentation/screens/birth_form_screen.dart';
@@ -47,7 +46,11 @@ import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
-import '../../features/home/presentation/screens/menu_screen.dart';
+import '../../features/home/presentation/screens/farm_screen.dart';
+import '../../features/home/presentation/screens/journal_screen.dart';
+import '../../features/rabbits/presentation/screens/herd_screen.dart';
+import '../../features/breeding/presentation/screens/breeding_cycle_screen.dart';
+import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/staff/presentation/screens/join_farm_screen.dart';
@@ -178,6 +181,37 @@ final routerProvider = Provider<GoRouter>((ref) {
         redirect: (context, state) => '/today',
       ),
 
+      // Прежние адреса вкладок: ссылки из старых экранов и уведомлений
+      // не должны упираться в «страница не найдена».
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/menu',
+        redirect: (context, state) => '/farm',
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/more',
+        redirect: (context, state) => '/farm',
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/rabbits',
+        name: 'rabbits',
+        builder: (context, state) => const RabbitsListScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/tasks',
+        name: 'tasks',
+        builder: (context, state) => const TasksListScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/reports',
+        name: 'reports',
+        builder: (context, state) => const ReportsScreen(),
+      ),
+
       // Main shell route with bottom navigation
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -195,32 +229,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const TodayScreen(),
           ),
 
-          // Rabbits
+          // Стадо: клетки и кролики — два взгляда на одно поголовье.
           GoRoute(
-            path: '/rabbits',
-            name: 'rabbits',
-            builder: (context, state) => const RabbitsListScreen(),
+            path: '/herd',
+            name: 'herd',
+            builder: (context, state) => const HerdScreen(),
           ),
 
-          // Tasks
+          // Разведение: линия цикла от случки до отсадки.
           GoRoute(
-            path: '/tasks',
-            name: 'tasks',
-            builder: (context, state) => const TasksListScreen(),
+            path: '/breeding',
+            name: 'breeding',
+            builder: (context, state) => const BreedingCycleScreen(),
           ),
 
-          // Menu screen (4th tab)
+          // Хозяйство: деньги, корма, здоровье, отчёты, люди, настройки.
           GoRoute(
-            path: '/menu',
-            name: 'menu',
-            builder: (context, state) => const MenuScreen(),
+            path: '/farm',
+            name: 'farm',
+            builder: (context, state) => const FarmScreen(),
           ),
 
-          // More route (alias for /menu for backward compat)
+          // Журнал смены — вкладка работника.
           GoRoute(
-            path: '/more',
-            name: 'more',
-            builder: (context, state) => const MenuScreen(),
+            path: '/journal',
+            name: 'journal',
+            builder: (context, state) => const JournalScreen(),
           ),
         ],
       ),
@@ -291,12 +325,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/breeding/planner',
         name: 'breeding-planner',
         builder: (context, state) => const BreedingPlannerScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: '/breeding',
-        name: 'breeding-list',
-        builder: (context, state) => const BreedingListScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

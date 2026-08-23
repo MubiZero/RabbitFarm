@@ -3,10 +3,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
-import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../widgets/quick_entry_sheet.dart';
 
-/// Каркас с четырьмя вкладками и кнопкой быстрой записи.
+/// Вкладка нижнего меню.
+class NavTab {
+  final String path;
+  final IconData icon;
+  final IconData active;
+  final String Function(BuildContext) label;
+
+  const NavTab({
+    required this.path,
+    required this.icon,
+    required this.active,
+    required this.label,
+  });
+}
+
+/// Каркас с вкладками и кнопкой записи.
+///
+/// Вкладки собираются по роли: у работника нет ни стада, ни разведения —
+/// заводить их ему нечем, а «Хозяйство» это деньги и люди, куда его и так
+/// не пускает сервер. Показывать вкладку, за которой для человека пусто,
+/// хуже, чем не показывать её вовсе.
 class MainNavigationScreen extends ConsumerWidget {
   final Widget child;
   final String currentPath;
@@ -17,239 +37,89 @@ class MainNavigationScreen extends ConsumerWidget {
     required this.child,
   });
 
-  static const _tabs = [
-    (path: '/today', icon: Icons.today_outlined, active: Icons.today),
-    (path: '/rabbits', icon: Icons.pets_outlined, active: Icons.pets),
-    (path: '/tasks', icon: Icons.checklist_outlined, active: Icons.checklist),
-    (path: '/menu', icon: Icons.menu, active: Icons.menu_open),
-  ];
+  static final _today = NavTab(
+    path: '/today',
+    icon: Icons.today_outlined,
+    active: Icons.today,
+    label: (c) => c.l10n.navToday,
+  );
 
-  List<String> _tabLabels(BuildContext context) => [
-        context.l10n.navToday,
-        context.l10n.navRabbits,
-        context.l10n.navTasks,
-        context.l10n.navMenu,
-      ];
+  static final _herd = NavTab(
+    path: '/herd',
+    icon: Icons.pets_outlined,
+    active: Icons.pets,
+    label: (c) => c.l10n.navHerd,
+  );
+
+  static final _breeding = NavTab(
+    path: '/breeding',
+    icon: Icons.favorite_outline,
+    active: Icons.favorite,
+    label: (c) => c.l10n.navBreeding,
+  );
+
+  static final _farm = NavTab(
+    path: '/farm',
+    icon: Icons.inventory_outlined,
+    active: Icons.inventory,
+    label: (c) => c.l10n.navFarm,
+  );
+
+  static final _journal = NavTab(
+    path: '/journal',
+    icon: Icons.assignment_outlined,
+    active: Icons.assignment,
+    label: (c) => c.l10n.navJournal,
+  );
+
+  static final _profile = NavTab(
+    path: '/farm',
+    icon: Icons.person_outline,
+    active: Icons.person,
+    label: (c) => c.l10n.navProfile,
+  );
+
+  /// Работнику — три вкладки: смена, что он записал, и он сам.
+  static List<NavTab> tabsFor(FarmRoleAccess role) =>
+      role == FarmRoleAccess.worker
+          ? [_today, _journal, _profile]
+          : [_today, _herd, _breeding, _farm];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final index = _selectedIndex(currentPath);
     final role = ref.watch(farmRoleProvider);
-    final labels = _tabLabels(context);
+    final tabs = tabsFor(role);
+    final index = selectedIndex(tabs, currentPath);
 
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
-        onDestinationSelected: (i) => context.go(_tabs[i].path),
+        onDestinationSelected: (i) => context.go(tabs[i].path),
         destinations: [
-          for (var i = 0; i < _tabs.length; i++)
+          for (final tab in tabs)
             NavigationDestination(
-              icon: Icon(_tabs[i].icon),
-              selectedIcon: Icon(_tabs[i].active),
-              label: labels[i],
+              icon: Icon(tab.icon),
+              selectedIcon: Icon(tab.active),
+              label: tab.label(context),
             ),
         ],
       ),
-      floatingActionButton: _fab(context, index, role),
+      floatingActionButton: FloatingActionButton(
+        tooltip: context.l10n.navRecord,
+        onPressed: () => showQuickEntrySheet(context, role),
+        child: const Icon(Icons.add, size: 28),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  int _selectedIndex(String path) {
-    if (path.startsWith('/rabbits')) return 1;
-    if (path.startsWith('/tasks')) return 2;
-    if (path.startsWith('/menu') || path.startsWith('/more')) return 3;
-    return 0;
-  }
-
-  Widget? _fab(BuildContext context, int index, FarmRoleAccess role) {
-    if (index == 3) return null;
-
-    if (index == 2) {
-      return FloatingActionButton(
-        tooltip: context.l10n.navNewTask,
-        onPressed: () => context.push('/tasks/form'),
-        child: const Icon(Icons.add, size: 28),
-      );
+  /// Совпадение по началу пути: карточки и формы лежат под теми же
+  /// префиксами, и подсветка вкладки не должна с них слетать.
+  static int selectedIndex(List<NavTab> tabs, String path) {
+    for (var i = tabs.length - 1; i >= 0; i--) {
+      if (path.startsWith(tabs[i].path)) return i;
     }
-
-    final actions =
-        _quickActions(context, index)
-            .where((a) => role.can(a.capability))
-            .toList();
-    // Работнику нечего создавать на вкладке «Кролики»: поголовье и клетки
-    // заводит управляющий. Кнопка, которая открывает пустой список или
-    // приводит к отказу сервера, хуже её отсутствия.
-    if (actions.isEmpty) return null;
-
-    return FloatingActionButton(
-      tooltip: context.l10n.navQuickEntry,
-      onPressed: () => _showQuickActions(context, actions),
-      child: const Icon(Icons.add, size: 28),
-    );
-  }
-
-  List<_QuickAction> _quickActions(BuildContext context, int index) =>
-      switch (index) {
-        0 => [
-            _QuickAction(
-              icon: Icons.restaurant_outlined,
-              label: context.l10n.quickRecordFeeding,
-              route: '/feeding-records/form',
-              domain: AppDomain.feeding,
-              capability: FarmCapability.recordDailyWork,
-            ),
-            _QuickAction(
-              icon: Icons.vaccines_outlined,
-              label: context.l10n.quickRecordVaccination,
-              route: '/vaccinations/form',
-              domain: AppDomain.health,
-              capability: FarmCapability.recordDailyWork,
-            ),
-            _QuickAction(
-              icon: Icons.add_task,
-              label: context.l10n.quickCreateTask,
-              route: '/tasks/form',
-              domain: AppDomain.tasks,
-              capability: FarmCapability.recordDailyWork,
-            ),
-          ],
-        1 => [
-            _QuickAction(
-              icon: Icons.pets_outlined,
-              label: context.l10n.quickAddRabbit,
-              route: '/rabbits/new',
-              domain: AppDomain.livestock,
-              capability: FarmCapability.manageLivestock,
-            ),
-            _QuickAction(
-              icon: Icons.child_care_outlined,
-              label: context.l10n.quickRecordBirth,
-              route: '/births/new',
-              domain: AppDomain.breeding,
-              capability: FarmCapability.manageLivestock,
-            ),
-            _QuickAction(
-              icon: Icons.grid_view_outlined,
-              label: context.l10n.quickAddCage,
-              route: '/cages/form',
-              domain: AppDomain.livestock,
-              capability: FarmCapability.manageLivestock,
-            ),
-          ],
-        _ => const [],
-      };
-
-  void _showQuickActions(BuildContext context, List<_QuickAction> actions) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => _QuickActionsSheet(actions: actions),
-    );
-  }
-}
-
-class _QuickAction {
-  final IconData icon;
-  final String label;
-  final String route;
-  final AppDomain domain;
-  final FarmCapability capability;
-
-  const _QuickAction({
-    required this.icon,
-    required this.label,
-    required this.route,
-    required this.domain,
-    required this.capability,
-  });
-}
-
-class _QuickActionsSheet extends StatelessWidget {
-  final List<_QuickAction> actions;
-
-  const _QuickActionsSheet({required this.actions});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              0,
-              AppSpacing.xl,
-              AppSpacing.lg,
-            ),
-            child: Text(
-              context.l10n.navQuickTitle,
-              style: AppTypography.titleLg
-                  .copyWith(color: context.colors.onSurface),
-            ),
-          ),
-          for (final action in actions)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                0,
-                AppSpacing.xl,
-                AppSpacing.sm,
-              ),
-              child: _ActionRow(action: action),
-            ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  final _QuickAction action;
-
-  const _ActionRow({required this.action});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = action.domain.color(context);
-
-    return Material(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: AppRadius.mdAll,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-          context.push(action.route);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: AppRadius.smAll,
-                ),
-                child: Icon(action.icon, color: color, size: 22),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Text(
-                  action.label,
-                  style: AppTypography.titleMd
-                      .copyWith(color: context.colors.onSurface),
-                ),
-              ),
-              Icon(Icons.chevron_right, size: 20, color: color),
-            ],
-          ),
-        ),
-      ),
-    );
+    return 0;
   }
 }
