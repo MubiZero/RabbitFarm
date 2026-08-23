@@ -12,9 +12,10 @@ class OnboardingReadyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final onboarding = ref.watch(onboardingProvider).valueOrNull;
-    final farmName = onboarding?.farmName.isNotEmpty == true
-        ? onboarding!.farmName
-        : context.l10n.onboardReadyFarm;
+    // Без названия фраза не должна изображать название: «"ваша ферма"
+    // готова к работе!» читалось так, будто ферму действительно так зовут.
+    final farmName =
+        onboarding?.farmName.trim().isNotEmpty == true ? onboarding!.farmName.trim() : null;
 
     return Scaffold(
       body: SafeArea(
@@ -41,7 +42,9 @@ class OnboardingReadyScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                '"$farmName"\nготова к работе!',
+                farmName == null
+                    ? context.l10n.onboardReadyPlain
+                    : context.l10n.onboardReadyNamed(farmName),
                 style: AppTypography.displayMd.copyWith(
                   color: cs.onSurface,
                 ),

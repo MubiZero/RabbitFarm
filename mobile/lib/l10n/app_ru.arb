@@ -737,7 +737,11 @@
   "onboardSoloBody": "Веду ферму сам",
   "onboardTeamTitle": "Я и работники",
   "onboardTeamBody": "У каждого своя роль и свой доступ",
-  "onboardReadyFarm": "ваша ферма",
+  "onboardReadyNamed": "«{name}»\nготова к работе!",
+  "@onboardReadyNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "onboardReadyPlain": "Ферма готова к работе!",
   "onboardReadyBody": "Остальное настроим по ходу — приложение подскажет, что делать дальше",
   "onboardRegister": "Зарегистрироваться",
   "splashTagline": "Управление фермой",

@@ -1853,7 +1853,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardTeamBody => 'У каждого своя роль и свой доступ';
 
   @override
-  String get onboardReadyFarm => 'ваша ферма';
+  String onboardReadyNamed(String name) {
+    return '«$name»\nготова к работе!';
+  }
+
+  @override
+  String get onboardReadyPlain => 'Ферма готова к работе!';
 
   @override
   String get onboardReadyBody =>

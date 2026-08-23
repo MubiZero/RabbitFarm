@@ -3424,11 +3424,17 @@ abstract class AppLocalizations {
   /// **'У каждого своя роль и свой доступ'**
   String get onboardTeamBody;
 
-  /// No description provided for @onboardReadyFarm.
+  /// No description provided for @onboardReadyNamed.
   ///
   /// In ru, this message translates to:
-  /// **'ваша ферма'**
-  String get onboardReadyFarm;
+  /// **'«{name}»\nготова к работе!'**
+  String onboardReadyNamed(String name);
+
+  /// No description provided for @onboardReadyPlain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма готова к работе!'**
+  String get onboardReadyPlain;
 
   /// No description provided for @onboardReadyBody.
   ///
