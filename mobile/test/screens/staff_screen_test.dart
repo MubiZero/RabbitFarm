@@ -111,7 +111,7 @@ void main() {
     ]));
     await _settle(tester);
 
-    expect(find.text('Ошибка загрузки'), findsOneWidget);
+    expect(find.text('Не удалось загрузить'), findsOneWidget);
     expect(find.text('Повторить'), findsOneWidget);
   });
 }
