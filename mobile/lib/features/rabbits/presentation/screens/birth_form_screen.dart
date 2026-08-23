@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/birth_model.dart';
 import '../../data/models/breeding_model.dart';
+import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
-import '../providers/rabbits_provider.dart';
-import '../../../../core/widgets/app_date_field.dart';
-import '../../../../core/widgets/app_form_section.dart';
-import '../../../../core/theme/theme.dart';
+import '../widgets/create_kits_dialog.dart';
+import '../widgets/rabbit_picker.dart';
 
-/// Экран формы регистрации окрола
+/// Запись об окроле.
 class BirthFormScreen extends ConsumerStatefulWidget {
   final BirthModel? birth;
   final BreedingModel? breeding;
 
-  const BirthFormScreen({
-    super.key,
-    this.birth,
-    this.breeding,
-  });
+  const BirthFormScreen({super.key, this.birth, this.breeding});
 
   @override
   ConsumerState<BirthFormScreen> createState() => _BirthFormScreenState();
@@ -28,409 +25,204 @@ class BirthFormScreen extends ConsumerStatefulWidget {
 class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _kitsBornAliveController;
-  late TextEditingController _kitsBornDeadController;
-  late TextEditingController _complicationsController;
-  late TextEditingController _notesController;
+  final _alive = TextEditingController();
+  final _dead = TextEditingController();
+  final _complications = TextEditingController();
+  final _notes = TextEditingController();
 
-  int? _selectedMotherId;
-  DateTime _birthDate = DateTime.now();
-  bool _isSubmitting = false;
+  RabbitModel? _mother;
+  int? _motherId;
+  late DateTime _birthDate;
   bool _createKits = true;
+  bool _touched = false;
+
+  BirthModel? get _record => widget.birth;
+  bool get _isEditing => _record != null;
 
   @override
   void initState() {
     super.initState();
-    _kitsBornAliveController = TextEditingController(
-      text: widget.birth?.kitsBornAlive.toString() ?? '',
-    );
-    _kitsBornDeadController = TextEditingController(
-      text: widget.birth?.kitsBornDead.toString() ?? '',
-    );
-    _complicationsController = TextEditingController(
-      text: widget.birth?.complications ?? '',
-    );
-    _notesController = TextEditingController(
-      text: widget.birth?.notes ?? '',
-    );
+    final record = _record;
+    _alive.text = record?.kitsBornAlive.toString() ?? '';
+    _dead.text = record?.kitsBornDead.toString() ?? '';
+    _complications.text = record?.complications ?? '';
+    _notes.text = record?.notes ?? '';
 
-    _selectedMotherId = widget.birth?.motherId ?? widget.breeding?.femaleId;
-    if (widget.birth?.birthDate != null) {
-      _birthDate = DateTime.parse(widget.birth!.birthDate);
+    _mother = record?.mother ?? widget.breeding?.female;
+    _motherId = record?.motherId ?? widget.breeding?.femaleId;
+    _birthDate = record?.birthDate != null
+        ? DateTime.tryParse(record!.birthDate) ?? DateTime.now()
+        : DateTime.now();
+
+    for (final c in [_alive, _dead, _complications, _notes]) {
+      c.addListener(() => _touched = true);
     }
   }
 
   @override
   void dispose() {
-    _kitsBornAliveController.dispose();
-    _kitsBornDeadController.dispose();
-    _complicationsController.dispose();
-    _notesController.dispose();
+    for (final c in [_alive, _dead, _complications, _notes]) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  Future<String?> _save() async {
+    final noMother = context.l10n.rabbitPickerRequired;
+    final failed = context.l10n.birthFormFailed;
+    if (_motherId == null) return noMother;
+
+    final notifier = ref.read(birthsProvider.notifier);
+    final breedingId = widget.breeding?.id ?? _record?.breedingId;
+
+    final data = <String, dynamic>{
+      'mother_id': _motherId,
+      if (breedingId != null) 'breeding_id': breedingId,
+      'birth_date': _birthDate.toIso8601String().split('T').first,
+      'kits_born_alive': int.parse(_alive.text.trim()),
+      'kits_born_dead':
+          _dead.text.trim().isEmpty ? 0 : int.parse(_dead.text.trim()),
+      if (_complications.text.trim().isNotEmpty)
+        'complications': _complications.text.trim(),
+      if (_notes.text.trim().isNotEmpty) 'notes': _notes.text.trim(),
+    };
+
+    if (_isEditing) {
+      final ok = await notifier.updateBirth(_record!.id, data);
+      if (!ok) return ref.read(birthsProvider).error ?? failed;
+      await notifier.loadBirths();
+      return null;
+    }
+
+    final created = await notifier.createBirth(data);
+    if (created == null) return ref.read(birthsProvider).error ?? failed;
+    await notifier.loadBirths();
+
+    // Карточки крольчат заводятся тем же общим диалогом, что и из списка
+    // окролов: раньше здесь лежала его вторая копия.
+    if (_createKits && created.kitsBornAlive > 0 && mounted) {
+      await showDialog<bool>(
+        context: context,
+        builder: (_) => CreateKitsDialog(
+          birth: created,
+          defaultPrefix: _mother == null ? '' : '${_mother!.name}-',
+          breedId: _mother?.breedId,
+        ),
+      );
+    }
+    return null;
+  }
+
+  String? _validateCount(String? value, {required bool required}) {
+    final l10n = context.l10n;
+    if (value == null || value.trim().isEmpty) {
+      return required ? l10n.birthFormAliveEmpty : null;
+    }
+    return int.tryParse(value.trim()) == null ? l10n.commonNumberInvalid : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.birth != null;
-    final rabbitsState = ref.watch(rabbitsListProvider);
-    final females =
-        rabbitsState.rabbits.where((r) => r.sex == 'female').toList();
+    final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text(isEditing ? 'Редактировать окрол' : 'Зарегистрировать окрол'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+    return AppFormScaffold(
+      title: _isEditing ? l10n.birthFormEditTitle : l10n.birthFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage: _isEditing ? l10n.birthFormUpdated : l10n.birthFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      children: [
+        AppFormSection(
+          title: l10n.feedFormSectionMain,
           children: [
-            // Info card
-            Card(
-              color: AppColors.accentOcean.withValues(alpha: 0.08),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: AppColors.accentOcean),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Зарегистрируйте окрол и автоматически создайте карточки для крольчат',
-                        style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            RabbitPickerField(
+              label: l10n.birthFormMother,
+              icon: Icons.female,
+              sex: 'female',
+              selected: _mother,
+              required: true,
+              // Мать окрола менять нельзя: запись уже привязана к животному,
+              // и подмена превратила бы её в чужую историю.
+              enabled: !_isEditing,
+              onChanged: (rabbit) => setState(() {
+                _mother = rabbit;
+                _motherId = rabbit?.id;
+                _touched = true;
+              }),
             ),
-            const SizedBox(height: 8),
-
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                DropdownButtonFormField<int>(
-                  initialValue: _selectedMotherId,
-                  decoration: const InputDecoration(
-                    labelText: 'Самка (мать) *',
-                    prefixIcon: Icon(Icons.female),
-                  ),
-                  items: females.map((rabbit) {
-                    return DropdownMenuItem(
-                      value: rabbit.id,
-                      child: Text('${rabbit.name} (${rabbit.tagId})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) =>
-                      setState(() => _selectedMotherId = value),
-                  validator: (value) =>
-                      value == null ? 'Выберите самку' : null,
-                ),
-                AppDateField(
-                  label: 'Дата окрола *',
-                  value: _birthDate,
-                  onChanged: (date) => setState(() => _birthDate = date),
-                  prefixIcon: Icons.calendar_today,
-                  lastDate: DateTime.now(),
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Статистика помёта',
-              children: [
-                TextFormField(
-                  controller: _kitsBornAliveController,
-                  decoration: InputDecoration(
-                    labelText: 'Родилось живыми *',
-                    hintText: 'Количество',
-                    prefixIcon:
-                        Icon(Icons.child_care, color: AppColors.success),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  onChanged: (_) => setState(() {}),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите количество';
-                    }
-                    final num = int.tryParse(value);
-                    if (num == null || num < 0) {
-                      return 'Введите корректное число';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _kitsBornDeadController,
-                  decoration: InputDecoration(
-                    labelText: 'Родилось мертвыми',
-                    hintText: 'Количество (опционально)',
-                    prefixIcon: Icon(Icons.close, color: AppColors.error),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Введите корректное число';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-
-            AppFormSection(
-              title: 'Дополнительно',
-              children: [
-                TextFormField(
-                  controller: _complicationsController,
-                  decoration: const InputDecoration(
-                    labelText: 'Осложнения',
-                    hintText: 'Опишите, если были осложнения',
-                    prefixIcon: Icon(Icons.warning_amber_outlined),
-                  ),
-                  maxLines: 2,
-                ),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Заметки',
-                    hintText: 'Дополнительная информация',
-                    prefixIcon: Icon(Icons.notes),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-
-            if (!isEditing)
-              Card(
-                color: AppColors.success.withValues(alpha: 0.08),
-                child: CheckboxListTile(
-                  title: const Text(
-                    'Автоматически создать карточки крольчат',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Builder(
-                    builder: (context) => Text(
-                      'Будет создано ${_kitsBornAliveController.text.isNotEmpty ? _kitsBornAliveController.text : "0"} карточек',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    ),
-                  ),
-                  value: _createKits,
-                  onChanged: (value) =>
-                      setState(() => _createKits = value ?? false),
-                  secondary: Icon(Icons.auto_awesome, color: AppColors.success),
-                ),
-              ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitForm,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(isEditing ? 'Сохранить' : 'Зарегистрировать'),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSubmitting = true);
-
-    final birthData = {
-      'mother_id': _selectedMotherId,
-      if (widget.breeding != null) 'breeding_id': widget.breeding!.id,
-      if (widget.birth?.breedingId != null) 'breeding_id': widget.birth!.breedingId,
-      'birth_date': _birthDate.toIso8601String().split('T')[0],
-      'kits_born_alive': int.parse(_kitsBornAliveController.text),
-      'kits_born_dead': _kitsBornDeadController.text.isNotEmpty
-          ? int.parse(_kitsBornDeadController.text)
-          : 0,
-      if (_complicationsController.text.isNotEmpty)
-        'complications': _complicationsController.text,
-      if (_notesController.text.isNotEmpty) 'notes': _notesController.text,
-    };
-
-    final isEditing = widget.birth != null;
-    BirthModel? birth;
-
-    if (isEditing) {
-      final success = await ref
-          .read(birthsProvider.notifier)
-          .updateBirth(widget.birth!.id, birthData);
-
-      if (mounted) {
-        if (success) {
-          ref.read(birthsProvider.notifier).loadBirths();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Окрол обновлен')),
-          );
-          context.pop();
-        } else {
-          setState(() => _isSubmitting = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  ref.read(birthsProvider).error ?? 'Ошибка обновления окрола'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
-    } else {
-      birth = await ref.read(birthsProvider.notifier).createBirth(birthData);
-
-      if (mounted) {
-        if (birth != null) {
-          if (_createKits && int.parse(_kitsBornAliveController.text) > 0) {
-            try {
-              await _createKitsDialog(context, birth);
-            } catch (e) {
-              if (mounted) {
-                setState(() => _isSubmitting = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Ошибка: ${e.toString()}'),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-              }
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Окрол зарегистрирован')),
-            );
-            context.pop();
-          }
-        } else {
-          setState(() => _isSubmitting = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(ref.read(birthsProvider).error ??
-                  'Ошибка регистрации окрола'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> _createKitsDialog(
-      BuildContext context, BirthModel birth) async {
-    final cs = Theme.of(context).colorScheme;
-    final messenger = ScaffoldMessenger.of(context);
-    final router = GoRouter.of(context);
-    final mother = ref.read(rabbitsListProvider).rabbits.firstWhere(
-          (r) => r.id == birth.motherId,
-        );
-
-    final namePrefixController = TextEditingController(
-      text: '${mother.name}-',
-    );
-
-    final shouldCreate = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Создать карточки крольчат?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Будет создано ${birth.kitsBornAlive} карточек кроликов',
-              style: AppTypography.titleMd,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: namePrefixController,
-              decoration: const InputDecoration(
-                labelText: 'Префикс имени',
-                hintText: 'Например: Белка-',
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Крольчата будут названы: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
-              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+            AppDateField(
+              label: l10n.birthFormDate,
+              value: _birthDate,
+              onChanged: (date) => setState(() {
+                _birthDate = date;
+                _touched = true;
+              }),
+              prefixIcon: Icons.event_outlined,
+              lastDate: DateTime.now(),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.success,
+        AppFormSection(
+          title: l10n.birthFormSectionLitter,
+          children: [
+            TextFormField(
+              controller: _alive,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: l10n.birthFormAliveLabel,
+                prefixIcon: const Icon(Icons.child_care_outlined),
+              ),
+              validator: (v) => _validateCount(v, required: true),
             ),
-            icon: const Icon(Icons.auto_awesome),
-            label: const Text('Создать'),
-          ),
-        ],
-      ),
+            TextFormField(
+              controller: _dead,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: l10n.birthFormDeadLabel,
+                prefixIcon: const Icon(Icons.remove_circle_outline),
+              ),
+              validator: (v) => _validateCount(v, required: false),
+            ),
+            if (!_isEditing)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.birthFormAutoKits),
+                value: _createKits,
+                onChanged: (v) => setState(() {
+                  _createKits = v;
+                  _touched = true;
+                }),
+              ),
+          ],
+        ),
+        AppFormSection(
+          title: l10n.txFormSectionDetails,
+          children: [
+            TextFormField(
+              controller: _complications,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: l10n.birthFormComplications,
+                hintText: l10n.birthFormComplicationsHint,
+                prefixIcon: const Icon(Icons.warning_amber_outlined),
+              ),
+            ),
+            TextFormField(
+              controller: _notes,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.birthFormNotes,
+                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
-
-    if (shouldCreate == true && mounted) {
-      final kits = await ref.read(birthsProvider.notifier).createKitsFromBirth(
-            birthId: birth.id,
-            motherId: birth.motherId,
-            fatherId: widget.breeding?.maleId,
-            breedId: mother.breedId,
-            birthDate: birth.birthDate,
-            count: birth.kitsBornAlive,
-            namePrefix: namePrefixController.text,
-          );
-
-      if (kits != null) {
-        await ref.read(rabbitsListProvider.notifier).refresh();
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(
-                'Окрол зарегистрирован! Создано ${kits.length} крольчат'),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-        router.pop();
-      } else {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(
-                ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
-            backgroundColor: AppColors.warning,
-          ),
-        );
-      }
-    } else {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Окрол зарегистрирован')),
-      );
-      router.pop();
-    }
-
-    if (mounted) setState(() => _isSubmitting = false);
   }
 }

@@ -103,7 +103,7 @@ class BirthsNotifier extends StateNotifier<BirthsState> {
     required int birthId,
     required int motherId,
     required int? fatherId,
-    required int breedId,
+    int? breedId,
     required String birthDate,
     required int count,
     String? namePrefix,

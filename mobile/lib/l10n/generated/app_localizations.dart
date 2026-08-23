@@ -3556,6 +3556,240 @@ abstract class AppLocalizations {
   /// **'Не удалось зарегистрироваться'**
   String get registerFailed;
 
+  /// No description provided for @birthsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окролы'**
+  String get birthsTitle;
+
+  /// No description provided for @birthsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окролов пока нет'**
+  String get birthsEmptyTitle;
+
+  /// No description provided for @birthsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запишите окрол — приложение само заведёт карточки на крольчат.'**
+  String get birthsEmptyBody;
+
+  /// No description provided for @birthsAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать окрол'**
+  String get birthsAdd;
+
+  /// No description provided for @birthsMotherUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать не указана'**
+  String get birthsMotherUnknown;
+
+  /// No description provided for @birthsMotherLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать: {name}'**
+  String birthsMotherLine(String name);
+
+  /// No description provided for @birthsFromBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'По записи о случке'**
+  String get birthsFromBreeding;
+
+  /// No description provided for @birthsAlive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Живых'**
+  String get birthsAlive;
+
+  /// No description provided for @birthsDead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мёртвых'**
+  String get birthsDead;
+
+  /// No description provided for @birthsWeaned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отсажено'**
+  String get birthsWeaned;
+
+  /// No description provided for @birthsSurvival.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выживаемость'**
+  String get birthsSurvival;
+
+  /// No description provided for @birthsComplications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осложнения'**
+  String get birthsComplications;
+
+  /// No description provided for @birthsDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить запись об окроле?'**
+  String get birthsDeleteTitle;
+
+  /// No description provided for @birthsDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточки крольчат останутся — исчезнет только запись о самом окроле.'**
+  String get birthsDeleteBody;
+
+  /// No description provided for @birthsDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись удалена'**
+  String get birthsDeleted;
+
+  /// No description provided for @birthsDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить запись'**
+  String get birthsDeleteFailed;
+
+  /// No description provided for @birthsCreateKits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести крольчат'**
+  String get birthsCreateKits;
+
+  /// No description provided for @birthsKitsDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести карточки крольчат?'**
+  String get birthsKitsDialogTitle;
+
+  /// No description provided for @birthsKitsDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Будет заведена {count} карточка} few{Будет заведено {count} карточки} many{Будет заведено {count} карточек} other{Будет заведено {count} карточки}}'**
+  String birthsKitsDialogBody(int count);
+
+  /// No description provided for @birthsNamePrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начало клички'**
+  String get birthsNamePrefix;
+
+  /// No description provided for @birthsNamePrefixHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, Белка-'**
+  String get birthsNamePrefixHint;
+
+  /// No description provided for @birthsNamePreview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получится: {first}, {second}, …'**
+  String birthsNamePreview(String first, String second);
+
+  /// No description provided for @birthsKitsCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Заведена {count} карточка} few{Заведено {count} карточки} many{Заведено {count} карточек} other{Заведено {count} карточки}}'**
+  String birthsKitsCreated(int count);
+
+  /// No description provided for @birthsKitsFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось завести карточки'**
+  String get birthsKitsFailed;
+
+  /// No description provided for @birthFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый окрол'**
+  String get birthFormNewTitle;
+
+  /// No description provided for @birthFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрол'**
+  String get birthFormEditTitle;
+
+  /// No description provided for @birthFormMother.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать'**
+  String get birthFormMother;
+
+  /// No description provided for @birthFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда окотилась'**
+  String get birthFormDate;
+
+  /// No description provided for @birthFormSectionLitter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Помёт'**
+  String get birthFormSectionLitter;
+
+  /// No description provided for @birthFormAliveLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родилось живыми'**
+  String get birthFormAliveLabel;
+
+  /// No description provided for @birthFormDeadLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родилось мёртвыми'**
+  String get birthFormDeadLabel;
+
+  /// No description provided for @birthFormAliveEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите количество'**
+  String get birthFormAliveEmpty;
+
+  /// No description provided for @birthFormComplications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осложнения'**
+  String get birthFormComplications;
+
+  /// No description provided for @birthFormComplicationsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите, если что-то пошло не так'**
+  String get birthFormComplicationsHint;
+
+  /// No description provided for @birthFormNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get birthFormNotes;
+
+  /// No description provided for @birthFormAutoKits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сразу завести карточки крольчат'**
+  String get birthFormAutoKits;
+
+  /// No description provided for @birthFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрол записан'**
+  String get birthFormCreated;
+
+  /// No description provided for @birthFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись обновлена'**
+  String get birthFormUpdated;
+
+  /// No description provided for @birthFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить запись'**
+  String get birthFormFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

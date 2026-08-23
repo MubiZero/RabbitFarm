@@ -2,473 +2,280 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/birth_model.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/theme/theme.dart';
+import '../widgets/create_kits_dialog.dart';
 
-/// Экран списка окролов
-class BirthsListScreen extends ConsumerStatefulWidget {
+/// Список окролов.
+class BirthsListScreen extends ConsumerWidget {
   const BirthsListScreen({super.key});
 
   @override
-  ConsumerState<BirthsListScreen> createState() => _BirthsListScreenState();
-}
-
-class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
-  final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
-
-  @override
-  Widget build(BuildContext context) {
-    final birthsState = ref.watch(birthsProvider);
-    final rabbitsState = ref.watch(rabbitsListProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(birthsProvider);
+    final notifier = ref.read(birthsProvider.notifier);
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Окролы'),
+      appBar: AppBar(title: Text(context.l10n.birthsTitle)),
+      body: PagedListView<BirthModel>(
+        items: state.births,
+        isLoading: state.isLoading,
+        error: state.error,
+        onRefresh: notifier.loadBirths,
+        empty: AppEmptyState(
+          icon: Icons.child_care_outlined,
+          title: context.l10n.birthsEmptyTitle,
+          subtitle: context.l10n.birthsEmptyBody,
+          actionLabel: canManage ? context.l10n.birthsAdd : null,
+          onAction: canManage ? () => context.push('/births/new') : null,
+        ),
+        itemBuilder: (context, birth, _) => _BirthCard(
+          birth: birth,
+          canManage: canManage,
+          onDelete: () => _delete(context, ref, birth),
+          onCreateKits: () => _createKits(context, ref, birth),
+        ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await ref.read(birthsProvider.notifier).loadBirths();
-        },
-        child: birthsState.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : birthsState.error != null
-                ? AppErrorState(
-                    message: birthsState.error!,
-                    onRetry: () => ref.read(birthsProvider.notifier).loadBirths(),
-                  )
-                : birthsState.births.isEmpty
-                    ? AppEmptyState(
-                        icon: Icons.child_care,
-                        title: 'Окролов пока нет',
-                        subtitle: 'Зарегистрируйте первый окрол',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: birthsState.births.length,
-                        itemBuilder: (context, index) {
-                          final birth = birthsState.births[index];
-                          final mother = rabbitsState.rabbits.where(
-                            (r) => r.id == birth.motherId,
-                          ).firstOrNull;
-
-                          return _BirthCard(
-                            birth: birth,
-                            motherName: mother?.name ?? 'Мать не найдена',
-                            dateFormat: _dateFormat,
-                            onDelete: () => _deleteBirth(birth),
-                            onTap: () => _showBirthDetail(birth, mother),
-                          );
-                        },
-                      ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push('/births/new');
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить окрол'),
-      ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/births/new'),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.birthsAdd),
+            )
+          : null,
     );
   }
 
-  Future<void> _deleteBirth(BirthModel birth) async {
+  Future<void> _delete(
+      BuildContext context, WidgetRef ref, BirthModel birth) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final done = context.l10n.birthsDeleted;
+    final failed = context.l10n.birthsDeleteFailed;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить окрол?'),
-        content: const Text(
-          'Это действие нельзя отменить. Карточки крольчат останутся в базе.',
-        ),
+        title: Text(context.l10n.birthsDeleteTitle),
+        content: Text(context.l10n.birthsDeleteBody),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Отмена'),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
     );
+    if (confirmed != true) return;
 
-    if (confirmed == true && mounted) {
-      final success = await ref.read(birthsProvider.notifier).deleteBirth(birth.id);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success ? 'Окрол удален' : 'Ошибка удаления окрола',
+    final ok = await ref.read(birthsProvider.notifier).deleteBirth(birth.id);
+    messenger.showSnackBar(
+      ok
+          ? SnackBar(content: Text(done))
+          : SnackBar(
+              content: Text(ref.read(birthsProvider).error ?? failed),
+              backgroundColor: AppColors.error,
             ),
-            backgroundColor: success ? AppColors.success : AppColors.error,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showBirthDetail(BirthModel birth, RabbitModel? mother) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Handle bar
-            Text('Окрол ${_dateFormat.format(DateTime.parse(birth.birthDate))}',
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text('Мать: ${mother?.name ?? "Не найдена"}',
-                style: Theme.of(context).textTheme.bodyLarge),
-            if (birth.breedingId != null)
-              Text('Случка #${birth.breedingId}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            const SizedBox(height: 16),
-            // Stats row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _DetailStat(label: 'Живых', value: birth.kitsBornAlive.toString(), color: AppColors.success),
-                _DetailStat(label: 'Мёртвых', value: birth.kitsBornDead.toString(), color: AppColors.error),
-                if (birth.kitsWeaned != null)
-                  _DetailStat(label: 'Отсажено', value: birth.kitsWeaned!.toString(), color: AppColors.info),
-              ],
-            ),
-            if (birth.complications != null && birth.complications!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text('Осложнения: ${birth.complications}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.warning)),
-            ],
-            if (birth.notes != null && birth.notes!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(birth.notes!, style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            ],
-            const SizedBox(height: 24),
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      context.push('/births/new', extra: birth);
-                    },
-                    icon: const Icon(Icons.edit_outlined),
-                    label: const Text('Редактировать'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _deleteBirth(birth);
-                    },
-                    icon: Icon(Icons.delete_outline, color: AppColors.error),
-                    label: Text('Удалить', style: TextStyle(color: AppColors.error)),
-                  ),
-                ),
-              ],
-            ),
-            if (birth.kitsBornAlive > 0) ...[
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _createKitsForBirth(birth, mother);
-                  },
-                  icon: const Icon(Icons.auto_awesome),
-                  label: const Text('Создать крольчат'),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
-                ),
-              ),
-            ],
-            SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 8),
-          ],
-        ),
-      ),
     );
   }
 
-  Future<void> _createKitsForBirth(BirthModel birth, RabbitModel? mother) async {
-    if (mother == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Мать не найдена в списке')),
-      );
-      return;
-    }
+  Future<void> _createKits(
+      BuildContext context, WidgetRef ref, BirthModel birth) async {
+    // Мать берётся из самой записи об окроле. Раньше её искали в загруженной
+    // странице списка кроликов, и для окрола постарше кнопка отвечала
+    // «мать не найдена в списке» — хотя мать, разумеется, существовала.
+    final mother = birth.mother ??
+        ref
+            .read(rabbitsListProvider)
+            .rabbits
+            .where((r) => r.id == birth.motherId)
+            .firstOrNull;
 
-    final messenger = ScaffoldMessenger.of(context);
-    final namePrefixController = TextEditingController(text: '${mother.name}-');
-
-    final shouldCreate = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Создать карточки крольчат?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Будет создано ${birth.kitsBornAlive} карточек кроликов',
-              style: AppTypography.titleMd,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: namePrefixController,
-              decoration: const InputDecoration(
-                labelText: 'Префикс имени',
-                hintText: 'Например: Белка-',
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Крольчата: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
-              style: AppTypography.labelSm.copyWith(color: Theme.of(dialogContext).colorScheme.onSurfaceVariant),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Отмена'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
-            icon: const Icon(Icons.auto_awesome),
-            label: const Text('Создать'),
-          ),
-        ],
+      builder: (_) => CreateKitsDialog(
+        birth: birth,
+        defaultPrefix: mother == null ? '' : '${mother.name}-',
+        breedId: mother?.breedId,
       ),
     );
-
-    if (shouldCreate == true && mounted) {
-      final kits = await ref.read(birthsProvider.notifier).createKitsFromBirth(
-            birthId: birth.id,
-            motherId: birth.motherId,
-            fatherId: null,
-            breedId: mother.breedId,
-            birthDate: birth.birthDate,
-            count: birth.kitsBornAlive,
-            namePrefix: namePrefixController.text,
-          );
-
-      if (kits != null) {
-        await ref.read(rabbitsListProvider.notifier).refresh();
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Создано ${kits.length} крольчат'),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      } else {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              ref.read(birthsProvider).error ?? 'Ошибка создания крольчат'),
-            backgroundColor: AppColors.warning,
-          ),
-        );
-      }
-    }
   }
 }
 
-/// Карточка окрола
-class _BirthCard extends StatelessWidget {
+class _BirthCard extends ConsumerWidget {
   final BirthModel birth;
-  final String motherName;
-  final DateFormat dateFormat;
+  final bool canManage;
   final VoidCallback onDelete;
-  final VoidCallback? onTap;
+  final VoidCallback onCreateKits;
 
   const _BirthCard({
     required this.birth,
-    required this.motherName,
-    required this.dateFormat,
+    required this.canManage,
     required this.onDelete,
-    this.onTap,
+    required this.onCreateKits,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final totalKits = birth.kitsBornAlive + birth.kitsBornDead;
-    final survivalRate = totalKits > 0
-        ? (birth.kitsBornAlive / totalKits * 100).toStringAsFixed(0)
-        : '0';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final total = birth.kitsBornAlive + birth.kitsBornDead;
+    final survival =
+        total > 0 ? (birth.kitsBornAlive / total * 100).round() : 0;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    final mother = birth.mother ??
+        ref
+            .read(rabbitsListProvider)
+            .rabbits
+            .where((r) => r.id == birth.motherId)
+            .firstOrNull;
+    final date = DateTime.tryParse(birth.birthDate);
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              // Header: Date and actions
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_today, size: 16, color: Theme.of(context).colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Text(
-                        dateFormat.format(DateTime.parse(birth.birthDate)),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete_outline),
-                    color: AppColors.error,
-                    tooltip: 'Удалить окрол',
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Mother info
-              Row(
-                children: [
-                  Icon(Icons.female, size: 16, color: Theme.of(context).colorScheme.tertiary),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Мать: $motherName',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Stats
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _StatItem(
-                      icon: Icons.child_care,
-                      label: 'Живых',
-                      value: birth.kitsBornAlive.toString(),
-                      color: AppColors.success,
-                    ),
-                    _StatItem(
-                      icon: Icons.close,
-                      label: 'Мёртвых',
-                      value: birth.kitsBornDead.toString(),
-                      color: AppColors.error,
-                    ),
-                    _StatItem(
-                      icon: Icons.percent,
-                      label: 'Выживаемость',
-                      value: '$survivalRate%',
-                      color: AppColors.info,
-                    ),
-                  ],
+              Icon(Icons.event_outlined,
+                  size: 16, color: context.colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  date == null
+                      ? birth.birthDate
+                      : DateFormat('d MMMM y', 'ru').format(date),
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
                 ),
               ),
-
-              // Weaned info
-              if (birth.kitsWeaned != null) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.check_circle, size: 16, color: AppColors.success),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Отсажено: ${birth.kitsWeaned} крольчат',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.success,
-                          ),
-                    ),
-                  ],
+              if (canManage)
+                IconButton(
+                  tooltip: l10n.commonDelete,
+                  icon: const Icon(Icons.delete_outline),
+                  color: context.colors.onSurfaceVariant,
+                  onPressed: onDelete,
                 ),
-              ],
-
-              // Complications
-              if (birth.complications != null && birth.complications!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.warning_amber, size: 16, color: AppColors.warning),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          birth.complications!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.warning,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
-              // Notes
-              if (birth.notes != null && birth.notes!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(
-                  birth.notes!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              const Icon(Icons.female,
+                  size: 16, color: AppColors.domainBreeding),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.birthsMotherLine(mother?.name ?? l10n.birthsMotherUnknown),
+                  style: AppTypography.bodyLg
+                      .copyWith(color: context.colors.onSurface),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainerHighest,
+              borderRadius: AppRadius.smAll,
+            ),
+            child: Row(
+              children: [
+                _Stat(
+                  label: l10n.birthsAlive,
+                  value: '${birth.kitsBornAlive}',
+                  color: AppColors.success,
+                ),
+                _Stat(
+                  label: l10n.birthsDead,
+                  value: '${birth.kitsBornDead}',
+                  color: birth.kitsBornDead > 0
+                      ? AppColors.warning
+                      : context.colors.onSurfaceVariant,
+                ),
+                _Stat(
+                  label: l10n.birthsSurvival,
+                  value: '$survival%',
+                  color: context.colors.onSurface,
+                ),
+                if (birth.kitsWeaned != null)
+                  _Stat(
+                    label: l10n.birthsWeaned,
+                    value: '${birth.kitsWeaned}',
+                    color: context.colors.onSurface,
+                  ),
+              ],
+            ),
+          ),
+          if (birth.complications?.trim().isNotEmpty == true) ...[
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.08),
+                borderRadius: AppRadius.smAll,
+                border:
+                    Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_outlined,
+                      size: 16, color: AppColors.warning),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      birth.complications!.trim(),
+                      style: AppTypography.labelSm
+                          .copyWith(color: AppColors.warning),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (birth.notes?.trim().isNotEmpty == true) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              birth.notes!.trim(),
+              style: AppTypography.bodyMd
+                  .copyWith(color: context.colors.onSurfaceVariant),
+            ),
+          ],
+          if (canManage && birth.kitsBornAlive > 0) ...[
+            const SizedBox(height: AppSpacing.md),
+            OutlinedButton.icon(
+              onPressed: onCreateKits,
+              icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+              label: Text(l10n.birthsCreateKits),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
-/// Статистическая метрика
-class _StatItem extends StatelessWidget {
-  final IconData icon;
+class _Stat extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
 
-  const _StatItem({
-    required this.icon,
+  const _Stat({
     required this.label,
     required this.value,
     required this.color,
@@ -476,44 +283,22 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-        ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value, style: AppTypography.titleLg.copyWith(color: color)),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            label,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
 
-/// Статистика для bottom sheet деталей окрола
-class _DetailStat extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  const _DetailStat({required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant)),
-      ],
-    );
-  }
-}
+/// Оставлено для совместимости с формой окрола: она передаёт модель кролика.
+typedef BirthMother = RabbitModel;

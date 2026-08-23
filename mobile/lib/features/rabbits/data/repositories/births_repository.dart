@@ -166,7 +166,8 @@ class BirthsRepository {
     required int birthId,
     required int motherId,
     required int? fatherId,
-    required int breedId,
+    // Порода необязательна: сервер берёт её у матери, если не передана.
+    int? breedId,
     required String birthDate,
     required int count,
     String? namePrefix,
@@ -177,7 +178,7 @@ class BirthsRepository {
         data: {
           'mother_id': motherId,
           if (fatherId != null) 'father_id': fatherId,
-          'breed_id': breedId,
+          if (breedId != null) 'breed_id': breedId,
           'birth_date': birthDate,
           'count': count,
           if (namePrefix != null) 'name_prefix': namePrefix,

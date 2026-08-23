@@ -761,6 +761,61 @@
   "registerHaveAccount": "Уже есть аккаунт?",
   "registerFailed": "Не удалось зарегистрироваться",
 
+  "birthsTitle": "Окролы",
+  "birthsEmptyTitle": "Окролов пока нет",
+  "birthsEmptyBody": "Запишите окрол — приложение само заведёт карточки на крольчат.",
+  "birthsAdd": "Записать окрол",
+  "birthsMotherUnknown": "Мать не указана",
+  "birthsMotherLine": "Мать: {name}",
+  "@birthsMotherLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "birthsFromBreeding": "По записи о случке",
+  "birthsAlive": "Живых",
+  "birthsDead": "Мёртвых",
+  "birthsWeaned": "Отсажено",
+  "birthsSurvival": "Выживаемость",
+  "birthsComplications": "Осложнения",
+  "birthsDeleteTitle": "Удалить запись об окроле?",
+  "birthsDeleteBody": "Карточки крольчат останутся — исчезнет только запись о самом окроле.",
+  "birthsDeleted": "Запись удалена",
+  "birthsDeleteFailed": "Не удалось удалить запись",
+  "birthsCreateKits": "Завести крольчат",
+  "birthsKitsDialogTitle": "Завести карточки крольчат?",
+  "birthsKitsDialogBody": "{count, plural, one{Будет заведена {count} карточка} few{Будет заведено {count} карточки} many{Будет заведено {count} карточек} other{Будет заведено {count} карточки}}",
+  "@birthsKitsDialogBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "birthsNamePrefix": "Начало клички",
+  "birthsNamePrefixHint": "Например, Белка-",
+  "birthsNamePreview": "Получится: {first}, {second}, …",
+  "@birthsNamePreview": {
+    "placeholders": {
+      "first": { "type": "String" },
+      "second": { "type": "String" }
+    }
+  },
+  "birthsKitsCreated": "{count, plural, one{Заведена {count} карточка} few{Заведено {count} карточки} many{Заведено {count} карточек} other{Заведено {count} карточки}}",
+  "@birthsKitsCreated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "birthsKitsFailed": "Не удалось завести карточки",
+  "birthFormNewTitle": "Новый окрол",
+  "birthFormEditTitle": "Окрол",
+  "birthFormMother": "Мать",
+  "birthFormDate": "Когда окотилась",
+  "birthFormSectionLitter": "Помёт",
+  "birthFormAliveLabel": "Родилось живыми",
+  "birthFormDeadLabel": "Родилось мёртвыми",
+  "birthFormAliveEmpty": "Введите количество",
+  "birthFormComplications": "Осложнения",
+  "birthFormComplicationsHint": "Опишите, если что-то пошло не так",
+  "birthFormNotes": "Заметки",
+  "birthFormAutoKits": "Сразу завести карточки крольчат",
+  "birthFormCreated": "Окрол записан",
+  "birthFormUpdated": "Запись обновлена",
+  "birthFormFailed": "Не удалось сохранить запись",
+
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

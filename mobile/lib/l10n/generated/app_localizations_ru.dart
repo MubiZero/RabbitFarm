@@ -1921,6 +1921,149 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registerFailed => 'Не удалось зарегистрироваться';
 
   @override
+  String get birthsTitle => 'Окролы';
+
+  @override
+  String get birthsEmptyTitle => 'Окролов пока нет';
+
+  @override
+  String get birthsEmptyBody =>
+      'Запишите окрол — приложение само заведёт карточки на крольчат.';
+
+  @override
+  String get birthsAdd => 'Записать окрол';
+
+  @override
+  String get birthsMotherUnknown => 'Мать не указана';
+
+  @override
+  String birthsMotherLine(String name) {
+    return 'Мать: $name';
+  }
+
+  @override
+  String get birthsFromBreeding => 'По записи о случке';
+
+  @override
+  String get birthsAlive => 'Живых';
+
+  @override
+  String get birthsDead => 'Мёртвых';
+
+  @override
+  String get birthsWeaned => 'Отсажено';
+
+  @override
+  String get birthsSurvival => 'Выживаемость';
+
+  @override
+  String get birthsComplications => 'Осложнения';
+
+  @override
+  String get birthsDeleteTitle => 'Удалить запись об окроле?';
+
+  @override
+  String get birthsDeleteBody =>
+      'Карточки крольчат останутся — исчезнет только запись о самом окроле.';
+
+  @override
+  String get birthsDeleted => 'Запись удалена';
+
+  @override
+  String get birthsDeleteFailed => 'Не удалось удалить запись';
+
+  @override
+  String get birthsCreateKits => 'Завести крольчат';
+
+  @override
+  String get birthsKitsDialogTitle => 'Завести карточки крольчат?';
+
+  @override
+  String birthsKitsDialogBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Будет заведено $count карточки',
+      many: 'Будет заведено $count карточек',
+      few: 'Будет заведено $count карточки',
+      one: 'Будет заведена $count карточка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get birthsNamePrefix => 'Начало клички';
+
+  @override
+  String get birthsNamePrefixHint => 'Например, Белка-';
+
+  @override
+  String birthsNamePreview(String first, String second) {
+    return 'Получится: $first, $second, …';
+  }
+
+  @override
+  String birthsKitsCreated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Заведено $count карточки',
+      many: 'Заведено $count карточек',
+      few: 'Заведено $count карточки',
+      one: 'Заведена $count карточка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get birthsKitsFailed => 'Не удалось завести карточки';
+
+  @override
+  String get birthFormNewTitle => 'Новый окрол';
+
+  @override
+  String get birthFormEditTitle => 'Окрол';
+
+  @override
+  String get birthFormMother => 'Мать';
+
+  @override
+  String get birthFormDate => 'Когда окотилась';
+
+  @override
+  String get birthFormSectionLitter => 'Помёт';
+
+  @override
+  String get birthFormAliveLabel => 'Родилось живыми';
+
+  @override
+  String get birthFormDeadLabel => 'Родилось мёртвыми';
+
+  @override
+  String get birthFormAliveEmpty => 'Введите количество';
+
+  @override
+  String get birthFormComplications => 'Осложнения';
+
+  @override
+  String get birthFormComplicationsHint => 'Опишите, если что-то пошло не так';
+
+  @override
+  String get birthFormNotes => 'Заметки';
+
+  @override
+  String get birthFormAutoKits => 'Сразу завести карточки крольчат';
+
+  @override
+  String get birthFormCreated => 'Окрол записан';
+
+  @override
+  String get birthFormUpdated => 'Запись обновлена';
+
+  @override
+  String get birthFormFailed => 'Не удалось сохранить запись';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override
