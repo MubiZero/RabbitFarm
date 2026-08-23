@@ -691,6 +691,7 @@
   "weightSaved": "Вес записан",
   "weightSaveFailed": "Не удалось записать вес",
 
+  "pedigreeTitle": "Родословная",
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
 }

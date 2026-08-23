@@ -3184,6 +3184,12 @@ abstract class AppLocalizations {
   /// **'Не удалось записать вес'**
   String get weightSaveFailed;
 
+  /// No description provided for @pedigreeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родословная'**
+  String get pedigreeTitle;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

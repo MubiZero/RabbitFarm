@@ -3,7 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/pedigree_model.dart';
 import '../providers/pedigree_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/widgets.dart';
+import '../utils/rabbit_labels.dart';
 
 /// Экран отображения родословной кролика
 ///
@@ -24,57 +28,32 @@ class PedigreeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Родословная: $rabbitName'),
-        centerTitle: true,
-        backgroundColor: AppColors.success,
+        title: Text(context.l10n.pedigreeTitle),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(24),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.screenH,
+              bottom: AppSpacing.sm,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                rabbitName,
+                style: AppTypography.bodyMd
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+            ),
+          ),
+        ),
       ),
       body: pedigreeAsync.when(
         data: (pedigree) => _buildPedigreeContent(context, pedigree),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stack) => _buildErrorWidget(context, error, stack),
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(BuildContext context, Object error, StackTrace? stack) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 80,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Ошибка загрузки родословной',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              error.toString(),
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Вернуться назад'),
-            ),
-          ],
+        loading: () => const SkeletonList(itemHeight: 96),
+        // Раньше здесь был тупик: сообщение и кнопка «назад», без повтора.
+        error: (error, _) => AppErrorState(
+          message: error.toString(),
+          onRetry: () => ref.invalidate(pedigreeProvider(rabbitId)),
         ),
       ),
     );
@@ -153,10 +132,7 @@ class PedigreeScreen extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     'Нажмите на карточку кролика, чтобы открыть его детали',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.accentOcean,
-                    ),
+                    style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                   ),
                 ),
               ],
@@ -182,10 +158,12 @@ class PedigreeScreen extends ConsumerWidget {
   }
 
   Widget _buildGenerationHeader(String title, int generation) {
-    final colors = [
-      AppColors.success,
-      AppColors.accentOcean,
-      AppColors.accentViolet,
+    // Поколения различаются оттенком одного семейства, а не тремя разными
+    // цветами: цвет здесь — порядок, а не смысл.
+    const colors = [
+      AppColors.domainLivestock,
+      AppColors.info,
+      AppColors.domainBreeding,
     ];
 
     return Row(
@@ -201,11 +179,8 @@ class PedigreeScreen extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: colors[generation % colors.length],
-          ),
+          style: AppTypography.titleLg
+              .copyWith(color: colors[generation % colors.length]),
         ),
       ],
     );
@@ -224,11 +199,8 @@ class PedigreeScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(left: 8, bottom: 8),
           child: Text(
             groupTitle,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+            style: AppTypography.labelLg
+                .copyWith(color: context.colors.onSurfaceVariant),
           ),
         ),
         if (father != null)
@@ -250,23 +222,14 @@ class PedigreeScreen extends ConsumerWidget {
     bool isSmall = false,
   }) {
     // Цвет в зависимости от пола
-    Color? cardColor;
-    Color? borderColor;
+    Color cardColor;
+    Color borderColor;
     IconData sexIcon;
 
-    if (rabbit.sex == 'male') {
-      cardColor = AppColors.accentOcean.withValues(alpha: 0.08);
-      borderColor = AppColors.accentOcean.withValues(alpha: 0.5);
-      sexIcon = Icons.male;
-    } else if (rabbit.sex == 'female') {
-      cardColor = AppColors.accentRose.withValues(alpha: 0.08);
-      borderColor = AppColors.accentRose.withValues(alpha: 0.5);
-      sexIcon = Icons.female;
-    } else {
-      cardColor = Theme.of(context).colorScheme.surfaceContainerLow;
-      borderColor = Theme.of(context).colorScheme.outlineVariant;
-      sexIcon = Icons.help_outline;
-    }
+    final accent = sexColor(context, rabbit.sex);
+    cardColor = accent.withValues(alpha: 0.06);
+    borderColor = accent.withValues(alpha: 0.4);
+    sexIcon = rabbitSexIcon(rabbit.sex);
 
     return InkWell(
       onTap: () {
@@ -277,7 +240,7 @@ class PedigreeScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: cardColor,
           border: Border.all(
-            color: isPrimary ? AppColors.success : borderColor,
+            color: isPrimary ? AppColors.domainLivestock : borderColor,
             width: isPrimary ? 3 : 2,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -289,21 +252,13 @@ class PedigreeScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: rabbit.sex == 'male'
-                    ? AppColors.accentOcean.withValues(alpha: 0.15)
-                    : rabbit.sex == 'female'
-                        ? AppColors.accentRose.withValues(alpha: 0.15)
-                        : Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: accent.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 sexIcon,
                 size: isSmall ? 24 : 32,
-                color: rabbit.sex == 'male'
-                    ? AppColors.accentOcean
-                    : rabbit.sex == 'female'
-                        ? AppColors.accentRose
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: accent,
               ),
             ),
 
@@ -320,21 +275,18 @@ class PedigreeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Text(
                         label,
-                        style: TextStyle(
-                          fontSize: isSmall ? 11 : 12,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.colors.onSurfaceVariant),
                       ),
                     ),
 
                   // Имя
                   Text(
                     rabbit.name,
-                    style: TextStyle(
-                      fontSize: isSmall ? 15 : 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: (isSmall
+                            ? AppTypography.titleMd
+                            : AppTypography.titleLg)
+                        .copyWith(color: context.colors.onSurface),
                   ),
 
                   const SizedBox(height: 4),
@@ -351,10 +303,8 @@ class PedigreeScreen extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           rabbit.tagId!,
-                          style: TextStyle(
-                            fontSize: isSmall ? 12 : 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style: AppTypography.bodyMd.copyWith(
+                              color: context.colors.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -374,10 +324,8 @@ class PedigreeScreen extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               rabbit.breed!,
-                              style: TextStyle(
-                                fontSize: isSmall ? 12 : 14,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                              style: AppTypography.bodyMd.copyWith(
+                                  color: context.colors.onSurfaceVariant),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -400,10 +348,8 @@ class PedigreeScreen extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Text(
                             _formatDate(rabbit.birthDate!),
-                            style: TextStyle(
-                              fontSize: isSmall ? 11 : 13,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            style: AppTypography.labelSm.copyWith(
+                                color: context.colors.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -424,16 +370,10 @@ class PedigreeScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(String dateStr) {
-    try {
-      final date = DateTime.parse(dateStr);
-      final months = [
-        'янв', 'фев', 'мар', 'апр', 'май', 'июн',
-        'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (e) {
-      return dateStr;
-    }
+  /// Раньше здесь была собственная таблица сокращений месяцев — при живом
+  /// форматировщике дат, который знает их для каждого языка.
+  String _formatDate(String raw) {
+    final date = DateTime.tryParse(raw);
+    return date == null ? raw : DateFormat('d MMM y', 'ru').format(date);
   }
 }

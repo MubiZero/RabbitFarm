@@ -6,9 +6,9 @@ import '../../data/models/birth_model.dart';
 import '../../data/models/breeding_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/theme/theme.dart';
 
 /// Экран формы регистрации окрола
 class BirthFormScreen extends ConsumerStatefulWidget {
@@ -98,10 +98,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
                     Expanded(
                       child: Text(
                         'Зарегистрируйте окрол и автоматически создайте карточки для крольчат',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.accentOcean,
-                        ),
+                        style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                       ),
                     ),
                   ],
@@ -236,7 +233,6 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SizedBox(
@@ -364,7 +360,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
           children: [
             Text(
               'Будет создано ${birth.kitsBornAlive} карточек кроликов',
-              style: const TextStyle(fontSize: 16),
+              style: AppTypography.titleMd,
             ),
             const SizedBox(height: 16),
             TextField(
@@ -377,10 +373,7 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
             const SizedBox(height: 8),
             Text(
               'Крольчата будут названы: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
-              style: TextStyle(
-                fontSize: 12,
-                color: cs.onSurfaceVariant,
-              ),
+              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ),

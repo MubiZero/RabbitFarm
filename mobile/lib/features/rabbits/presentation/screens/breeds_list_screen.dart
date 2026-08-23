@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/theme/theme.dart';
 
 /// Экран списка пород кроликов
 class BreedsListScreen extends ConsumerStatefulWidget {
@@ -117,10 +117,6 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
   Widget _buildBreedCard(BuildContext context, BreedModel breed) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: InkWell(
         onTap: () => _showBreedForm(context, breed),
         borderRadius: BorderRadius.circular(12),
@@ -151,18 +147,12 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                       children: [
                         Text(
                           breed.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTypography.titleLg,
                         ),
                         if (breed.purpose != null)
                           Text(
                             _getPurposeText(breed.purpose!),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                       ],
                     ),
@@ -207,10 +197,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                 const SizedBox(height: 12),
                 Text(
                   breed.description!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -248,7 +235,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
       avatar: Icon(icon, size: 16, color: color),
       label: Text(
         label,
-        style: const TextStyle(fontSize: 12),
+        style: AppTypography.labelSm,
       ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,

@@ -14,7 +14,7 @@ String sexLabel(BuildContext context, String? sex) => switch (sex) {
       _ => context.l10n.sexUnknown,
     };
 
-IconData sexIcon(String? sex) => switch (sex) {
+IconData rabbitSexIcon(String? sex) => switch (sex) {
       'male' => Icons.male,
       'female' => Icons.female,
       _ => Icons.help_outline,

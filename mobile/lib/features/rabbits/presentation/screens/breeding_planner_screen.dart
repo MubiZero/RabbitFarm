@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/repositories/pedigree_repository.dart';
 import '../../domain/services/inbreeding_analyzer.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme.dart';
 
 /// Экран планирования случек с анализом инбридинга
 ///
@@ -53,10 +53,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     Expanded(
                       child: Text(
                         'Выберите самца и самку для автоматического анализа родословной и оценки рисков инбридинга',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.accentOcean,
-                        ),
+                        style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
                       ),
                     ),
                   ],
@@ -127,11 +124,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'Ошибка анализа',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.error,
-                        ),
+                        style: AppTypography.titleLg.copyWith(color: AppColors.error),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -163,7 +156,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
     final selectedRabbit = rabbits.where((r) => r.id == selectedId).firstOrNull;
 
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -175,10 +167,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 const SizedBox(width: 8),
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTypography.titleMd,
                 ),
               ],
             ),
@@ -244,7 +233,6 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
         // Карточка с коэффициентом инбридинга
         Card(
           color: color.withValues(alpha: 0.1),
-          elevation: 4,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -257,19 +245,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Коэффициент инбридинга',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _analysis!.coefficientPercent,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                  style: AppTypography.displayLg.copyWith(color: color),
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -280,20 +261,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   ),
                   child: Text(
                     riskLevel.label.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: AppTypography.titleMd.copyWith(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   riskLevel.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -316,10 +290,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                       SizedBox(width: 8),
                       Text(
                         'Общие предки',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTypography.titleMd,
                       ),
                     ],
                   ),
@@ -341,15 +312,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                           Expanded(
                             child: Text(
                               ancestor.name,
-                              style: const TextStyle(fontSize: 14),
+                              style: AppTypography.bodyMd,
                             ),
                           ),
                           Text(
                             '${ancestor.closestGeneration} пок.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -375,10 +343,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     SizedBox(width: 8),
                     Text(
                       'Рекомендации',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTypography.titleMd,
                     ),
                   ],
                 ),
@@ -388,7 +353,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                       recommendation,
-                      style: const TextStyle(fontSize: 14, height: 1.5),
+                      style: AppTypography.bodyMd,
                     ),
                   );
                 }),
@@ -444,7 +409,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             icon: const Icon(Icons.add),
             label: const Text(
               'Запланировать случку',
-              style: TextStyle(fontSize: 16),
+              style: AppTypography.titleMd,
             ),
           ),
       ],

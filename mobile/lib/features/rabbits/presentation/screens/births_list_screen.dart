@@ -6,9 +6,9 @@ import '../../data/models/birth_model.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/theme/theme.dart';
 
 /// Экран списка окролов
 class BirthsListScreen extends ConsumerStatefulWidget {
@@ -228,7 +228,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
           children: [
             Text(
               'Будет создано ${birth.kitsBornAlive} карточек кроликов',
-              style: const TextStyle(fontSize: 16),
+              style: AppTypography.titleMd,
             ),
             const SizedBox(height: 16),
             TextField(
@@ -241,10 +241,7 @@ class _BirthsListScreenState extends ConsumerState<BirthsListScreen> {
             const SizedBox(height: 8),
             Text(
               'Крольчата: ${namePrefixController.text}1, ${namePrefixController.text}2, ...',
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
-              ),
+              style: AppTypography.labelSm.copyWith(color: Theme.of(dialogContext).colorScheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -319,11 +316,7 @@ class _BirthCard extends StatelessWidget {
         : '0';
 
     return Card(
-      elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,

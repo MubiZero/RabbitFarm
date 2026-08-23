@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme.dart';
 
 class BreedingDetailScreen extends ConsumerWidget {
   final int breedingId;
@@ -103,16 +103,13 @@ class BreedingDetailScreen extends ConsumerWidget {
                     children: [
                       Text(
                         'Статус',
-                        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                        style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         statusText,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: statusColor,
-                        ),
+                        style: AppTypography.displayMd
+                            .copyWith(color: statusColor),
                       ),
                     ],
                   ),
@@ -133,7 +130,7 @@ class BreedingDetailScreen extends ConsumerWidget {
               children: [
                 const Text(
                   'Родители',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: AppTypography.titleLg,
                 ),
                 const Divider(height: 24),
                 
@@ -146,16 +143,16 @@ class BreedingDetailScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Самец', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                          Text('Самец', style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
                             breeding.male?.name ?? 'ID: ${breeding.maleId}',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                            style: AppTypography.titleMd,
                           ),
                           if (breeding.male?.tagId != null)
                             Text(
                               'Бирка: ${breeding.male!.tagId}',
-                              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -178,16 +175,16 @@ class BreedingDetailScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Самка', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                          Text('Самка', style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
                           const SizedBox(height: 4),
                           Text(
                             breeding.female?.name ?? 'ID: ${breeding.femaleId}',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                            style: AppTypography.titleMd,
                           ),
                           if (breeding.female?.tagId != null)
                             Text(
                               'Бирка: ${breeding.female!.tagId}',
-                              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -214,7 +211,7 @@ class BreedingDetailScreen extends ConsumerWidget {
               children: [
                 const Text(
                   'Даты',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: AppTypography.titleLg,
                 ),
                 const Divider(height: 24),
                 
@@ -274,12 +271,12 @@ class BreedingDetailScreen extends ConsumerWidget {
                       children: [
                         Text(
                           'Беременность',
-                          style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                          style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           breeding.isPregnant! ? 'Подтверждена' : 'Не подтверждена',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: AppTypography.titleMd,
                         ),
                       ],
                     ),
@@ -304,7 +301,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                       SizedBox(width: 8),
                       Text(
                         'Заметки',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: AppTypography.titleLg,
                       ),
                     ],
                   ),
@@ -331,7 +328,7 @@ class BreedingDetailScreen extends ConsumerWidget {
             icon: const Icon(Icons.child_care),
             label: const Text(
               'Зарегистрировать окрол',
-              style: TextStyle(fontSize: 16),
+              style: AppTypography.titleMd,
             ),
           ),
 
@@ -413,12 +410,11 @@ class BreedingDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
-              ),
+                style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
               const SizedBox(height: 2),
               Text(
                 _formatDate(date),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: AppTypography.labelLg,
               ),
             ],
           ),

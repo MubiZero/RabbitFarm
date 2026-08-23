@@ -1729,6 +1729,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get weightSaveFailed => 'Не удалось записать вес';
 
   @override
+  String get pedigreeTitle => 'Родословная';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

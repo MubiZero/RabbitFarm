@@ -250,7 +250,7 @@ class _RabbitCard extends StatelessWidget {
                   runSpacing: AppSpacing.xs,
                   children: [
                     _Badge(
-                      icon: sexIcon(rabbit.sex),
+                      icon: rabbitSexIcon(rabbit.sex),
                       label: sexLabel(context, rabbit.sex),
                       color: sexColor(context, rabbit.sex),
                     ),

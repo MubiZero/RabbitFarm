@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/theme/theme.dart';
 
 class BreedingFormScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -124,10 +124,10 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
                     children: [
                       Icon(Icons.info_outline, color: AppColors.accentOcean),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Данные предзаполнены из планировщика случек',
-                          style: TextStyle(fontSize: 13),
+                          style: AppTypography.labelSm,
                         ),
                       ),
                     ],
@@ -229,7 +229,6 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SizedBox(
