@@ -2064,6 +2064,105 @@ class AppLocalizationsRu extends AppLocalizations {
   String get birthFormFailed => 'Не удалось сохранить запись';
 
   @override
+  String get breedsTitle => 'Породы';
+
+  @override
+  String get breedsSearchHint => 'Название породы';
+
+  @override
+  String get breedsAdd => 'Добавить породу';
+
+  @override
+  String get breedsEmptyTitle => 'Пород пока нет';
+
+  @override
+  String get breedsEmptyBody =>
+      'Заведите породы — по ним удобно подбирать пары и сравнивать привесы.';
+
+  @override
+  String get breedsNothingFound => 'Ничего не нашлось';
+
+  @override
+  String get breedsNothingFoundBody => 'Проверьте запрос.';
+
+  @override
+  String get breedsDeleteTitle => 'Удалить породу?';
+
+  @override
+  String breedsDeleteBody(String name) {
+    return '«$name» исчезнет из справочника. Кролики этой породы останутся, но без неё.';
+  }
+
+  @override
+  String get breedsDeleted => 'Порода удалена';
+
+  @override
+  String get breedsDeleteFailed => 'Не удалось удалить породу';
+
+  @override
+  String get breedPurposeMeat => 'Мясная';
+
+  @override
+  String get breedPurposeFur => 'Пуховая';
+
+  @override
+  String get breedPurposeDecorative => 'Декоративная';
+
+  @override
+  String get breedPurposeCombined => 'Мясо-шкурковая';
+
+  @override
+  String get breedFormNewTitle => 'Новая порода';
+
+  @override
+  String get breedFormEditTitle => 'Порода';
+
+  @override
+  String get breedFormName => 'Название';
+
+  @override
+  String get breedFormNameHint => 'Например, Калифорнийский';
+
+  @override
+  String get breedFormNameEmpty => 'Введите название породы';
+
+  @override
+  String get breedFormPurpose => 'Для чего разводят';
+
+  @override
+  String get breedFormDescription => 'Описание';
+
+  @override
+  String get breedFormDescriptionHint => 'Чем эта порода отличается';
+
+  @override
+  String get breedFormSectionTraits => 'Характеристики';
+
+  @override
+  String get breedFormWeight => 'Средний вес, кг';
+
+  @override
+  String get breedFormWeightHint => 'Например, 4,5';
+
+  @override
+  String get breedFormLitter => 'Обычный размер помёта';
+
+  @override
+  String get breedFormLitterHint => 'Например, 8';
+
+  @override
+  String get breedFormLitterSuffix => 'крольчат';
+
+  @override
+  String get breedFormCreated => 'Порода добавлена';
+
+  @override
+  String get breedFormUpdated => 'Порода обновлена';
+
+  @override
+  String get breedFormFailed => 'Не удалось сохранить породу';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

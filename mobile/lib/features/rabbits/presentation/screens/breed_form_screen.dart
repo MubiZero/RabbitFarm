@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_form_section.dart';
+import '../utils/breed_labels.dart';
 
-/// Экран формы добавления/редактирования породы
+/// Карточка породы.
 class BreedFormScreen extends ConsumerStatefulWidget {
   final BreedModel? breed;
 
-  const BreedFormScreen({
-    super.key,
-    this.breed,
-  });
+  const BreedFormScreen({super.key, this.breed});
 
   @override
   ConsumerState<BreedFormScreen> createState() => _BreedFormScreenState();
@@ -23,224 +22,162 @@ class BreedFormScreen extends ConsumerStatefulWidget {
 class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _averageWeightController;
-  late TextEditingController _averageLitterSizeController;
+  final _name = TextEditingController();
+  final _description = TextEditingController();
+  final _weight = TextEditingController();
+  final _litterSize = TextEditingController();
 
-  String? _selectedPurpose;
-  bool _isSubmitting = false;
+  String? _purpose;
+  bool _touched = false;
 
-  final List<Map<String, String>> _purposes = [
-    {'value': 'meat', 'label': 'Мясная'},
-    {'value': 'fur', 'label': 'Пуховая'},
-    {'value': 'decorative', 'label': 'Декоративная'},
-    {'value': 'combined', 'label': 'Мясо-шкурковая'},
-  ];
+  BreedModel? get _breed => widget.breed;
+  bool get _isEditing => _breed != null;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.breed?.name ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.breed?.description ?? '');
-    _averageWeightController = TextEditingController(
-      text: widget.breed?.averageWeight?.toString() ?? '',
-    );
-    _averageLitterSizeController = TextEditingController(
-      text: widget.breed?.averageLitterSize?.toString() ?? '',
-    );
-    _selectedPurpose = widget.breed?.purpose;
+    final breed = _breed;
+    _name.text = breed?.name ?? '';
+    _description.text = breed?.description ?? '';
+    _weight.text = breed?.averageWeight?.toString() ?? '';
+    _litterSize.text = breed?.averageLitterSize?.toString() ?? '';
+    _purpose = breed?.purpose;
+
+    for (final c in [_name, _description, _weight, _litterSize]) {
+      c.addListener(() => _touched = true);
+    }
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _averageWeightController.dispose();
-    _averageLitterSizeController.dispose();
+    for (final c in [_name, _description, _weight, _litterSize]) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  Future<String?> _save() async {
+    final failed = context.l10n.breedFormFailed;
+    final notifier = ref.read(breedsProvider.notifier);
+
+    final data = <String, dynamic>{
+      'name': _name.text.trim(),
+      if (_description.text.trim().isNotEmpty)
+        'description': _description.text.trim(),
+      if (_purpose != null) 'purpose': _purpose,
+      if (parseDecimal(_weight.text) != null)
+        'average_weight': parseDecimal(_weight.text),
+      if (_litterSize.text.trim().isNotEmpty)
+        'average_litter_size': int.parse(_litterSize.text.trim()),
+    };
+
+    final ok = _isEditing
+        ? await notifier.updateBreed(_breed!.id, data)
+        : await notifier.createBreed(data);
+
+    if (ok) return null;
+    return ref.read(breedsProvider).error ?? failed;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.breed != null;
+    final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Редактировать породу' : 'Добавить породу'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+    return AppFormScaffold(
+      title: _isEditing ? l10n.breedFormEditTitle : l10n.breedFormNewTitle,
+      formKey: _formKey,
+      submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      successMessage:
+          _isEditing ? l10n.breedFormUpdated : l10n.breedFormCreated,
+      onSubmit: _save,
+      isDirty: () => _touched,
+      children: [
+        AppFormSection(
+          title: l10n.feedFormSectionMain,
           children: [
-            AppFormSection(
-              title: 'Основное',
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Название породы *',
-                    hintText: 'Например: Калифорнийский',
-                    prefixIcon: Icon(Icons.pets),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите название породы';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedPurpose,
-                  decoration: const InputDecoration(
-                    labelText: 'Назначение',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: _purposes.map((purpose) {
-                    return DropdownMenuItem(
-                      value: purpose['value'],
-                      child: Text(purpose['label']!),
-                    );
-                  }).toList(),
-                  onChanged: (value) => setState(() => _selectedPurpose = value),
-                ),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Описание',
-                    hintText: 'Краткое описание породы',
-                    prefixIcon: Icon(Icons.description_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
+            TextFormField(
+              controller: _name,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.breedFormName,
+                hintText: l10n.breedFormNameHint,
+                prefixIcon: const Icon(Icons.label_outline),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.breedFormNameEmpty
+                  : null,
             ),
-            AppFormSection(
-              title: 'Характеристики',
-              children: [
-                TextFormField(
-                  controller: _averageWeightController,
-                  decoration: const InputDecoration(
-                    labelText: 'Средний вес',
-                    hintText: 'Например: 4.5',
-                    prefixIcon: Icon(Icons.monitor_weight_outlined),
-                    suffixText: 'кг',
+            DropdownButtonFormField<String>(
+              initialValue: _purpose,
+              decoration: InputDecoration(
+                labelText: l10n.breedFormPurpose,
+                prefixIcon: const Icon(Icons.category_outlined),
+              ),
+              items: [
+                for (final purpose in breedPurposes)
+                  DropdownMenuItem(
+                    value: purpose,
+                    child: Text(breedPurposeLabel(context, purpose)),
                   ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                  ],
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final weight = double.tryParse(value);
-                      if (weight == null || weight <= 0) {
-                        return 'Введите корректный вес';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _averageLitterSizeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Средний размер помёта',
-                    hintText: 'Например: 8',
-                    prefixIcon: Icon(Icons.family_restroom),
-                    suffixText: 'крольчат',
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final size = int.tryParse(value);
-                      if (size == null || size <= 0) {
-                        return 'Введите корректное число';
-                      }
-                    }
-                    return null;
-                  },
-                ),
               ],
+              onChanged: (v) => setState(() {
+                _purpose = v;
+                _touched = true;
+              }),
+            ),
+            TextFormField(
+              controller: _description,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: l10n.breedFormDescription,
+                hintText: l10n.breedFormDescriptionHint,
+                prefixIcon: const Icon(Icons.notes),
+              ),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitForm,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(isEditing ? 'Сохранить' : 'Добавить'),
+        AppFormSection(
+          title: l10n.breedFormSectionTraits,
+          children: [
+            TextFormField(
+              controller: _weight,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.breedFormWeight,
+                hintText: l10n.breedFormWeightHint,
+                prefixIcon: const Icon(Icons.monitor_weight_outlined),
+              ),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                final value = parseDecimal(v);
+                return (value == null || value <= 0)
+                    ? l10n.commonNumberInvalid
+                    : null;
+              },
             ),
-          ),
+            TextFormField(
+              controller: _litterSize,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: l10n.breedFormLitter,
+                hintText: l10n.breedFormLitterHint,
+                prefixIcon: const Icon(Icons.family_restroom),
+                suffixText: l10n.breedFormLitterSuffix,
+              ),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                final value = int.tryParse(v.trim());
+                return (value == null || value <= 0)
+                    ? l10n.commonNumberInvalid
+                    : null;
+              },
+            ),
+          ],
         ),
-      ),
+      ],
     );
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSubmitting = true);
-
-    final breedData = {
-      'name': _nameController.text.trim(),
-      if (_descriptionController.text.trim().isNotEmpty)
-        'description': _descriptionController.text.trim(),
-      if (_selectedPurpose != null) 'purpose': _selectedPurpose,
-      if (_averageWeightController.text.isNotEmpty)
-        'average_weight': double.parse(_averageWeightController.text),
-      if (_averageLitterSizeController.text.isNotEmpty)
-        'average_litter_size': int.parse(_averageLitterSizeController.text),
-    };
-
-    final isEditing = widget.breed != null;
-    bool success;
-
-    if (isEditing) {
-      success = await ref
-          .read(breedsProvider.notifier)
-          .updateBreed(widget.breed!.id, breedData);
-    } else {
-      success =
-          await ref.read(breedsProvider.notifier).createBreed(breedData);
-    }
-
-    setState(() => _isSubmitting = false);
-
-    if (mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isEditing
-                  ? 'Порода "${_nameController.text}" обновлена'
-                  : 'Порода "${_nameController.text}" добавлена',
-            ),
-          ),
-        );
-        context.pop();
-      } else {
-        final error = ref.read(breedsProvider).error;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error ?? 'Ошибка сохранения породы'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
   }
 }

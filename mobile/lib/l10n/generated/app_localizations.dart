@@ -3790,6 +3790,198 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить запись'**
   String get birthFormFailed;
 
+  /// No description provided for @breedsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Породы'**
+  String get breedsTitle;
+
+  /// No description provided for @breedsSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название породы'**
+  String get breedsSearchHint;
+
+  /// No description provided for @breedsAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить породу'**
+  String get breedsAdd;
+
+  /// No description provided for @breedsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пород пока нет'**
+  String get breedsEmptyTitle;
+
+  /// No description provided for @breedsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите породы — по ним удобно подбирать пары и сравнивать привесы.'**
+  String get breedsEmptyBody;
+
+  /// No description provided for @breedsNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не нашлось'**
+  String get breedsNothingFound;
+
+  /// No description provided for @breedsNothingFoundBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте запрос.'**
+  String get breedsNothingFoundBody;
+
+  /// No description provided for @breedsDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить породу?'**
+  String get breedsDeleteTitle;
+
+  /// No description provided for @breedsDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'«{name}» исчезнет из справочника. Кролики этой породы останутся, но без неё.'**
+  String breedsDeleteBody(String name);
+
+  /// No description provided for @breedsDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода удалена'**
+  String get breedsDeleted;
+
+  /// No description provided for @breedsDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить породу'**
+  String get breedsDeleteFailed;
+
+  /// No description provided for @breedPurposeMeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мясная'**
+  String get breedPurposeMeat;
+
+  /// No description provided for @breedPurposeFur.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пуховая'**
+  String get breedPurposeFur;
+
+  /// No description provided for @breedPurposeDecorative.
+  ///
+  /// In ru, this message translates to:
+  /// **'Декоративная'**
+  String get breedPurposeDecorative;
+
+  /// No description provided for @breedPurposeCombined.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мясо-шкурковая'**
+  String get breedPurposeCombined;
+
+  /// No description provided for @breedFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая порода'**
+  String get breedFormNewTitle;
+
+  /// No description provided for @breedFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода'**
+  String get breedFormEditTitle;
+
+  /// No description provided for @breedFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get breedFormName;
+
+  /// No description provided for @breedFormNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, Калифорнийский'**
+  String get breedFormNameHint;
+
+  /// No description provided for @breedFormNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название породы'**
+  String get breedFormNameEmpty;
+
+  /// No description provided for @breedFormPurpose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для чего разводят'**
+  String get breedFormPurpose;
+
+  /// No description provided for @breedFormDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание'**
+  String get breedFormDescription;
+
+  /// No description provided for @breedFormDescriptionHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чем эта порода отличается'**
+  String get breedFormDescriptionHint;
+
+  /// No description provided for @breedFormSectionTraits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Характеристики'**
+  String get breedFormSectionTraits;
+
+  /// No description provided for @breedFormWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Средний вес, кг'**
+  String get breedFormWeight;
+
+  /// No description provided for @breedFormWeightHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, 4,5'**
+  String get breedFormWeightHint;
+
+  /// No description provided for @breedFormLitter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обычный размер помёта'**
+  String get breedFormLitter;
+
+  /// No description provided for @breedFormLitterHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, 8'**
+  String get breedFormLitterHint;
+
+  /// No description provided for @breedFormLitterSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **'крольчат'**
+  String get breedFormLitterSuffix;
+
+  /// No description provided for @breedFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода добавлена'**
+  String get breedFormCreated;
+
+  /// No description provided for @breedFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода обновлена'**
+  String get breedFormUpdated;
+
+  /// No description provided for @breedFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить породу'**
+  String get breedFormFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:
