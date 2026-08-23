@@ -531,6 +531,220 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get tasksTitle => 'Задачи';
+
+  @override
+  String get tasksFilters => 'Фильтры';
+
+  @override
+  String get tasksFiltersApply => 'Применить';
+
+  @override
+  String get tasksFiltersReset => 'Сбросить';
+
+  @override
+  String get tasksFilterType => 'Тип';
+
+  @override
+  String get tasksFilterStatus => 'Статус';
+
+  @override
+  String get tasksFilterPriority => 'Приоритет';
+
+  @override
+  String get tasksFilterOverdueOnly => 'Только просроченные';
+
+  @override
+  String get tasksFilterTodayOnly => 'Только на сегодня';
+
+  @override
+  String get tasksEmptyTitle => 'Задач пока нет';
+
+  @override
+  String get tasksEmptyBody =>
+      'Создайте задачу — приложение напомнит о ней в день срока.';
+
+  @override
+  String get tasksEmptyAction => 'Создать задачу';
+
+  @override
+  String get tasksNothingMatchesTitle => 'Под фильтры ничего не подошло';
+
+  @override
+  String get tasksNothingMatchesBody =>
+      'Снимите часть условий, чтобы увидеть больше.';
+
+  @override
+  String get tasksComplete => 'Отметить выполненной';
+
+  @override
+  String get tasksCompleted => 'Задача выполнена';
+
+  @override
+  String get tasksCompleteFailed => 'Не удалось отметить задачу';
+
+  @override
+  String get tasksOverdueChip => 'Просроченные';
+
+  @override
+  String get tasksTodayChip => 'На сегодня';
+
+  @override
+  String get taskTypeFeeding => 'Кормление';
+
+  @override
+  String get taskTypeCleaning => 'Уборка';
+
+  @override
+  String get taskTypeVaccination => 'Вакцинация';
+
+  @override
+  String get taskTypeCheckup => 'Осмотр';
+
+  @override
+  String get taskTypeBreeding => 'Разведение';
+
+  @override
+  String get taskTypeOther => 'Другое';
+
+  @override
+  String get taskStatusPending => 'Ожидает';
+
+  @override
+  String get taskStatusInProgress => 'В работе';
+
+  @override
+  String get taskStatusCompleted => 'Выполнена';
+
+  @override
+  String get taskStatusCancelled => 'Отменена';
+
+  @override
+  String get taskPriorityLow => 'Низкий';
+
+  @override
+  String get taskPriorityMedium => 'Средний';
+
+  @override
+  String get taskPriorityHigh => 'Высокий';
+
+  @override
+  String get taskPriorityUrgent => 'Срочный';
+
+  @override
+  String dueToday(String time) {
+    return 'Сегодня в $time';
+  }
+
+  @override
+  String dueTomorrow(String time) {
+    return 'Завтра в $time';
+  }
+
+  @override
+  String dueOn(String date) {
+    return '$date';
+  }
+
+  @override
+  String overdueByDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Просрочена на $count дня',
+      many: 'Просрочена на $count дней',
+      few: 'Просрочена на $count дня',
+      one: 'Просрочена на $count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dueTodayPlain => 'Сегодня';
+
+  @override
+  String get dueTomorrowPlain => 'Завтра';
+
+  @override
+  String get taskFormNewTitle => 'Новая задача';
+
+  @override
+  String get taskFormEditTitle => 'Задача';
+
+  @override
+  String get taskFormSectionMain => 'Основное';
+
+  @override
+  String get taskFormSectionParams => 'Параметры';
+
+  @override
+  String get taskFormSectionNotes => 'Заметки';
+
+  @override
+  String get taskFormTitleLabel => 'Что нужно сделать';
+
+  @override
+  String get taskFormTitleEmpty => 'Опишите задачу одной строкой';
+
+  @override
+  String get taskFormDescriptionLabel => 'Подробности';
+
+  @override
+  String get taskFormDueLabel => 'Срок';
+
+  @override
+  String get taskFormRepeat => 'Повторять';
+
+  @override
+  String get taskFormRepeatNever => 'Не повторять';
+
+  @override
+  String get taskFormRepeatHelp =>
+      'Когда задачу отметят выполненной, следующая создастся сама.';
+
+  @override
+  String get taskFormNotesLabel => 'Примечания';
+
+  @override
+  String get taskFormCreate => 'Создать';
+
+  @override
+  String get taskFormCreated => 'Задача создана';
+
+  @override
+  String get taskFormUpdated => 'Задача обновлена';
+
+  @override
+  String get taskFormDeleteTitle => 'Удалить задачу?';
+
+  @override
+  String get taskFormDeleteBody => 'Восстановить её будет нельзя.';
+
+  @override
+  String get taskFormDeleted => 'Задача удалена';
+
+  @override
+  String get taskFormDeleteFailed => 'Не удалось удалить задачу';
+
+  @override
+  String get repeatDaily => 'Каждый день';
+
+  @override
+  String get repeatWeekly => 'Раз в неделю';
+
+  @override
+  String get repeatBiweekly => 'Раз в две недели';
+
+  @override
+  String get repeatMonthly => 'Раз в месяц';
+
+  @override
+  String get repeatQuarterly => 'Раз в квартал';
+
+  @override
+  String get repeatYearly => 'Раз в год';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

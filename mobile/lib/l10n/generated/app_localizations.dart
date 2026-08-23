@@ -964,6 +964,396 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} операция} few{{count} операции} many{{count} операций} other{{count} операции}}'**
   String countOperations(int count);
 
+  /// No description provided for @tasksTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задачи'**
+  String get tasksTitle;
+
+  /// No description provided for @tasksFilters.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фильтры'**
+  String get tasksFilters;
+
+  /// No description provided for @tasksFiltersApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить'**
+  String get tasksFiltersApply;
+
+  /// No description provided for @tasksFiltersReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить'**
+  String get tasksFiltersReset;
+
+  /// No description provided for @tasksFilterType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип'**
+  String get tasksFilterType;
+
+  /// No description provided for @tasksFilterStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статус'**
+  String get tasksFilterStatus;
+
+  /// No description provided for @tasksFilterPriority.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приоритет'**
+  String get tasksFilterPriority;
+
+  /// No description provided for @tasksFilterOverdueOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только просроченные'**
+  String get tasksFilterOverdueOnly;
+
+  /// No description provided for @tasksFilterTodayOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только на сегодня'**
+  String get tasksFilterTodayOnly;
+
+  /// No description provided for @tasksEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задач пока нет'**
+  String get tasksEmptyTitle;
+
+  /// No description provided for @tasksEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте задачу — приложение напомнит о ней в день срока.'**
+  String get tasksEmptyBody;
+
+  /// No description provided for @tasksEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать задачу'**
+  String get tasksEmptyAction;
+
+  /// No description provided for @tasksNothingMatchesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Под фильтры ничего не подошло'**
+  String get tasksNothingMatchesTitle;
+
+  /// No description provided for @tasksNothingMatchesBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимите часть условий, чтобы увидеть больше.'**
+  String get tasksNothingMatchesBody;
+
+  /// No description provided for @tasksComplete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить выполненной'**
+  String get tasksComplete;
+
+  /// No description provided for @tasksCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача выполнена'**
+  String get tasksCompleted;
+
+  /// No description provided for @tasksCompleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось отметить задачу'**
+  String get tasksCompleteFailed;
+
+  /// No description provided for @tasksOverdueChip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просроченные'**
+  String get tasksOverdueChip;
+
+  /// No description provided for @tasksTodayChip.
+  ///
+  /// In ru, this message translates to:
+  /// **'На сегодня'**
+  String get tasksTodayChip;
+
+  /// No description provided for @taskTypeFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление'**
+  String get taskTypeFeeding;
+
+  /// No description provided for @taskTypeCleaning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уборка'**
+  String get taskTypeCleaning;
+
+  /// No description provided for @taskTypeVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинация'**
+  String get taskTypeVaccination;
+
+  /// No description provided for @taskTypeCheckup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осмотр'**
+  String get taskTypeCheckup;
+
+  /// No description provided for @taskTypeBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разведение'**
+  String get taskTypeBreeding;
+
+  /// No description provided for @taskTypeOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get taskTypeOther;
+
+  /// No description provided for @taskStatusPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидает'**
+  String get taskStatusPending;
+
+  /// No description provided for @taskStatusInProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'В работе'**
+  String get taskStatusInProgress;
+
+  /// No description provided for @taskStatusCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнена'**
+  String get taskStatusCompleted;
+
+  /// No description provided for @taskStatusCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменена'**
+  String get taskStatusCancelled;
+
+  /// No description provided for @taskPriorityLow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Низкий'**
+  String get taskPriorityLow;
+
+  /// No description provided for @taskPriorityMedium.
+  ///
+  /// In ru, this message translates to:
+  /// **'Средний'**
+  String get taskPriorityMedium;
+
+  /// No description provided for @taskPriorityHigh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Высокий'**
+  String get taskPriorityHigh;
+
+  /// No description provided for @taskPriorityUrgent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срочный'**
+  String get taskPriorityUrgent;
+
+  /// No description provided for @dueToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня в {time}'**
+  String dueToday(String time);
+
+  /// No description provided for @dueTomorrow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завтра в {time}'**
+  String dueTomorrow(String time);
+
+  /// No description provided for @dueOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date}'**
+  String dueOn(String date);
+
+  /// No description provided for @overdueByDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Просрочена на {count} день} few{Просрочена на {count} дня} many{Просрочена на {count} дней} other{Просрочена на {count} дня}}'**
+  String overdueByDays(int count);
+
+  /// No description provided for @dueTodayPlain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get dueTodayPlain;
+
+  /// No description provided for @dueTomorrowPlain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завтра'**
+  String get dueTomorrowPlain;
+
+  /// No description provided for @taskFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая задача'**
+  String get taskFormNewTitle;
+
+  /// No description provided for @taskFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача'**
+  String get taskFormEditTitle;
+
+  /// No description provided for @taskFormSectionMain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основное'**
+  String get taskFormSectionMain;
+
+  /// No description provided for @taskFormSectionParams.
+  ///
+  /// In ru, this message translates to:
+  /// **'Параметры'**
+  String get taskFormSectionParams;
+
+  /// No description provided for @taskFormSectionNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get taskFormSectionNotes;
+
+  /// No description provided for @taskFormTitleLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что нужно сделать'**
+  String get taskFormTitleLabel;
+
+  /// No description provided for @taskFormTitleEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите задачу одной строкой'**
+  String get taskFormTitleEmpty;
+
+  /// No description provided for @taskFormDescriptionLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подробности'**
+  String get taskFormDescriptionLabel;
+
+  /// No description provided for @taskFormDueLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок'**
+  String get taskFormDueLabel;
+
+  /// No description provided for @taskFormRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторять'**
+  String get taskFormRepeat;
+
+  /// No description provided for @taskFormRepeatNever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не повторять'**
+  String get taskFormRepeatNever;
+
+  /// No description provided for @taskFormRepeatHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда задачу отметят выполненной, следующая создастся сама.'**
+  String get taskFormRepeatHelp;
+
+  /// No description provided for @taskFormNotesLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Примечания'**
+  String get taskFormNotesLabel;
+
+  /// No description provided for @taskFormCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать'**
+  String get taskFormCreate;
+
+  /// No description provided for @taskFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача создана'**
+  String get taskFormCreated;
+
+  /// No description provided for @taskFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача обновлена'**
+  String get taskFormUpdated;
+
+  /// No description provided for @taskFormDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить задачу?'**
+  String get taskFormDeleteTitle;
+
+  /// No description provided for @taskFormDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить её будет нельзя.'**
+  String get taskFormDeleteBody;
+
+  /// No description provided for @taskFormDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача удалена'**
+  String get taskFormDeleted;
+
+  /// No description provided for @taskFormDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить задачу'**
+  String get taskFormDeleteFailed;
+
+  /// No description provided for @repeatDaily.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый день'**
+  String get repeatDaily;
+
+  /// No description provided for @repeatWeekly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в неделю'**
+  String get repeatWeekly;
+
+  /// No description provided for @repeatBiweekly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в две недели'**
+  String get repeatBiweekly;
+
+  /// No description provided for @repeatMonthly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в месяц'**
+  String get repeatMonthly;
+
+  /// No description provided for @repeatQuarterly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в квартал'**
+  String get repeatQuarterly;
+
+  /// No description provided for @repeatYearly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в год'**
+  String get repeatYearly;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:
