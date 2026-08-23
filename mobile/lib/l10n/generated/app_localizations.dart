@@ -2986,6 +2986,12 @@ abstract class AppLocalizations {
   /// **'Введите число больше нуля'**
   String get cageFormCapacityInvalid;
 
+  /// No description provided for @cageFormCapacityGroup.
+  ///
+  /// In ru, this message translates to:
+  /// **'В групповой клетке минимум два места'**
+  String get cageFormCapacityGroup;
+
   /// No description provided for @cageFormSize.
   ///
   /// In ru, this message translates to:

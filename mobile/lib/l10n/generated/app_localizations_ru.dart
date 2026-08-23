@@ -1626,6 +1626,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cageFormCapacityInvalid => 'Введите число больше нуля';
 
   @override
+  String get cageFormCapacityGroup => 'В групповой клетке минимум два места';
+
+  @override
   String get cageFormSize => 'Размер';
 
   @override

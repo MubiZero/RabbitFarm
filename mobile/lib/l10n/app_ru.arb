@@ -652,6 +652,7 @@
   "cageFormNumberEmpty": "Введите номер клетки",
   "cageFormCapacity": "Сколько кроликов помещается",
   "cageFormCapacityInvalid": "Введите число больше нуля",
+  "cageFormCapacityGroup": "В групповой клетке минимум два места",
   "cageFormSize": "Размер",
   "cageFormSizeHint": "Например, 100×60×45 см",
   "cageFormLocation": "Место",

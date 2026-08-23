@@ -34,6 +34,21 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
   late String _condition;
   bool _touched = false;
 
+  /// Тип клетки — только подпись, вся логика занятости считается по числу
+  /// мест. Из-за этого «Групповая» спокойно сохранялась с одним местом:
+  /// подпись противоречила числу рядом с ней.
+  void _typeChanged(String type) {
+    final wasGroup = _type == 'group';
+    _type = type;
+
+    final places = int.tryParse(_capacity.text.trim()) ?? 0;
+    if (type == 'group' && places < 2) {
+      _capacity.text = '4';
+    } else if (wasGroup && type != 'group' && places > 1) {
+      _capacity.text = '1';
+    }
+  }
+
   CageModel? get _cage => widget.cage;
   bool get _isEditing => _cage != null;
 
@@ -127,7 +142,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                   ),
               ],
               onChanged: (v) => setState(() {
-                if (v != null) _type = v;
+                if (v != null) _typeChanged(v);
                 _touched = true;
               }),
             ),
@@ -141,9 +156,13 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
               ),
               validator: (v) {
                 final value = int.tryParse(v?.trim() ?? '');
-                return (value == null || value <= 0)
-                    ? l10n.cageFormCapacityInvalid
-                    : null;
+                if (value == null || value <= 0) {
+                  return l10n.cageFormCapacityInvalid;
+                }
+                if (_type == 'group' && value < 2) {
+                  return l10n.cageFormCapacityGroup;
+                }
+                return null;
               },
             ),
             DropdownButtonFormField<String>(
