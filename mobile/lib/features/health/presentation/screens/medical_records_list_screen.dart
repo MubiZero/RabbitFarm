@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_error_state.dart';
+import '../utils/medical_labels.dart';
 
+/// Карты лечения.
 class MedicalRecordsListScreen extends ConsumerStatefulWidget {
   const MedicalRecordsListScreen({super.key});
 
@@ -18,347 +23,563 @@ class MedicalRecordsListScreen extends ConsumerStatefulWidget {
 
 class _MedicalRecordsListScreenState
     extends ConsumerState<MedicalRecordsListScreen> {
-  String? _selectedOutcome;
-  DateTime? _fromDate;
-  DateTime? _toDate;
+  MedicalOutcome? _outcome;
+  DateTime? _from;
+  DateTime? _to;
+
+  bool get _hasFilters => _outcome != null || _from != null || _to != null;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadRecords();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  void _loadRecords() {
-    ref.read(medicalRecordsProvider.notifier).loadMedicalRecords(
-          outcome: _selectedOutcome,
-          fromDate: _fromDate,
-          toDate: _toDate,
-          sortBy: 'started_at',
-          sortOrder: 'DESC',
-        );
+  Future<void> _load() => ref
+      .read(medicalRecordsProvider.notifier)
+      .loadMedicalRecords(
+        outcome: _outcome == null ? null : medicalOutcomeValue(_outcome!),
+        fromDate: _from,
+        toDate: _to,
+        sortBy: 'started_at',
+        sortOrder: 'DESC',
+      );
+
+  void _setOutcome(MedicalOutcome? outcome) {
+    setState(() => _outcome = outcome);
+    _load();
   }
 
   @override
   Widget build(BuildContext context) {
-    final medicalRecordsState = ref.watch(medicalRecordsProvider);
+    final recordsAsync = ref.watch(medicalRecordsProvider);
+    final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Медицинские карты'),
+        title: Text(context.l10n.medTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: _showFilterDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.analytics_outlined),
-            onPressed: _showStatistics,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Quick filter tabs
-          _buildQuickFilters(),
-
-          // Medical records list
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                _loadRecords();
-              },
-              child: medicalRecordsState.when(
-                data: (records) {
-                  if (records.isEmpty) {
-                    return const AppEmptyState(
-                      icon: Icons.medical_information_outlined,
-                      title: 'Нет медицинских записей',
-                      subtitle: 'Добавьте первую медицинскую запись',
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: records.length,
-                    itemBuilder: (context, index) {
-                      return _buildMedicalRecordCard(records[index]);
-                    },
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => AppErrorState(
-                  message: error.toString(),
-                  onRetry: _loadRecords,
-                ),
-              ),
+            tooltip: context.l10n.medStats,
+            icon: const Icon(Icons.insights_outlined),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => const _StatisticsSheet(),
             ),
           ),
+          IconButton(
+            tooltip: context.l10n.tasksFilters,
+            icon: Icon(_from != null || _to != null
+                ? Icons.filter_list_alt
+                : Icons.filter_list),
+            onPressed: _showPeriodFilter,
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push('/medical-records/form');
-        },
-        child: const Icon(Icons.add),
+      body: RefreshIndicator(
+        onRefresh: _load,
+        child: Column(
+          children: [
+            _OutcomeTabs(selected: _outcome, onSelect: _setOutcome),
+            Expanded(
+              child: AppAsyncView<List<MedicalRecord>>(
+                value: recordsAsync,
+                onRetry: _load,
+                skeleton: (_) => const SkeletonList(itemHeight: 130),
+                builder: (records) => records.isEmpty
+                    ? _empty(canRecord)
+                    : ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.screenH,
+                          AppSpacing.md,
+                          AppSpacing.screenH,
+                          AppSpacing.fabSafeBottom,
+                        ),
+                        itemCount: records.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, i) => _RecordCard(
+                          record: records[i],
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => _DetailsSheet(record: records[i]),
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
+      floatingActionButton: canRecord
+          ? FloatingActionButton(
+              tooltip: context.l10n.medEmptyAction,
+              onPressed: () => context.push('/medical-records/form'),
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
-  Widget _buildQuickFilters() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        children: [
-          _buildQuickFilterChip('Все', null),
-          _buildQuickFilterChip('Лечение', 'ongoing'),
-          _buildQuickFilterChip('Выздоровел', 'recovered'),
-          _buildQuickFilterChip('Умер', 'died'),
-          _buildQuickFilterChip('Эвтаназия', 'euthanized'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickFilterChip(String label, String? outcome) {
-    final isSelected = _selectedOutcome == outcome;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (selected) {
+  Widget _empty(bool canRecord) {
+    // Отсутствие записей на новой ферме и пустая выборка под фильтром — разные
+    // ситуации, и подсказка в них нужна разная.
+    if (_hasFilters) {
+      return AppEmptyState(
+        icon: Icons.filter_alt_off_outlined,
+        title: context.l10n.medNoneInView,
+        subtitle: context.l10n.medNoneInViewBody,
+        actionLabel: context.l10n.tasksFiltersReset,
+        onAction: () {
           setState(() {
-            _selectedOutcome = selected ? outcome : null;
-            _loadRecords();
+            _outcome = null;
+            _from = null;
+            _to = null;
           });
+          _load();
         },
-      ),
+      );
+    }
+    return AppEmptyState(
+      icon: Icons.medical_information_outlined,
+      title: context.l10n.medEmptyTitle,
+      subtitle: context.l10n.medEmptyBody,
+      actionLabel: canRecord ? context.l10n.medEmptyAction : null,
+      onAction:
+          canRecord ? () => context.push('/medical-records/form') : null,
     );
   }
 
-  Widget _buildMedicalRecordCard(MedicalRecord record) {
-    final outcomeColor = _getOutcomeColor(record.outcome);
-    final dateFormat = DateFormat('dd.MM.yyyy');
+  Future<void> _showPeriodFilter() async {
+    final format = DateFormat('d MMM y', 'ru');
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () => _showRecordDetail(record),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: outcomeColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: outcomeColor),
-                    ),
-                    child: Text(
-                      record.outcome.displayName,
-                      style: TextStyle(
-                        color: outcomeColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              0,
+              AppSpacing.screenH,
+              AppSpacing.lg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.vaccinationsFilterPeriod,
+                  style: AppTypography.titleLg
+                      .copyWith(color: context.colors.onSurface),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: sheetContext,
+                            initialDate: _from ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setSheetState(() => _from = picked);
+                          }
+                        },
+                        icon: const Icon(Icons.calendar_today, size: 18),
+                        label: Text(_from == null
+                            ? context.l10n.medPeriodFrom
+                            : format.format(_from!)),
                       ),
                     ),
-                  ),
-                  const Spacer(),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: sheetContext,
+                            initialDate: _to ?? DateTime.now(),
+                            firstDate: _from ?? DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setSheetState(() => _to = picked);
+                          }
+                        },
+                        icon: const Icon(Icons.calendar_today, size: 18),
+                        label: Text(_to == null
+                            ? context.l10n.medPeriodTo
+                            : format.format(_to!)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setSheetState(() {
+                            _from = null;
+                            _to = null;
+                          });
+                          Navigator.pop(sheetContext);
+                        },
+                        child: Text(context.l10n.tasksFiltersReset),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(sheetContext),
+                        child: Text(context.l10n.tasksFiltersApply),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (mounted) {
+      setState(() {});
+      await _load();
+    }
+  }
+}
+
+class _OutcomeTabs extends StatelessWidget {
+  final MedicalOutcome? selected;
+  final ValueChanged<MedicalOutcome?> onSelect;
+
+  const _OutcomeTabs({required this.selected, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppFilterBar(
+      chips: [
+        AppFilterChipData(
+          label: context.l10n.medViewAll,
+          isSelected: selected == null,
+          onTap: () => onSelect(null),
+        ),
+        for (final outcome in MedicalOutcome.values)
+          AppFilterChipData(
+            label: medicalOutcomeLabel(context, outcome),
+            isSelected: selected == outcome,
+            onTap: () => onSelect(outcome),
+            color: medicalOutcomeColor(context, outcome),
+          ),
+      ],
+    );
+  }
+}
+
+class _RecordCard extends StatelessWidget {
+  final MedicalRecord record;
+  final VoidCallback onTap;
+
+  const _RecordCard({required this.record, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = medicalOutcomeColor(context, record.outcome);
+
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(medicalOutcomeIcon(record.outcome), size: 18, color: color),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                medicalOutcomeLabel(context, record.outcome),
+                style: AppTypography.labelSm.copyWith(color: color),
+              ),
+              const Spacer(),
+              Text(
+                DateFormat('d MMM y', 'ru').format(record.startedAt),
+                style: AppTypography.labelSm
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          if (record.rabbit != null)
+            Text(
+              record.rabbit!.name,
+              style: AppTypography.titleMd
+                  .copyWith(color: context.colors.onSurface),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            record.diagnosis?.trim().isNotEmpty == true
+                ? record.diagnosis!.trim()
+                : context.l10n.medNoDiagnosis,
+            style: AppTypography.bodyLg.copyWith(
+              color: record.diagnosis?.trim().isNotEmpty == true
+                  ? context.colors.onSurface
+                  : context.colors.onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            record.symptoms,
+            style: AppTypography.bodyMd
+                .copyWith(color: context.colors.onSurfaceVariant),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (record.cost != null || record.veterinarian != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                if (record.cost != null) ...[
+                  Icon(Icons.payments_outlined,
+                      size: 16, color: context.colors.onSurfaceVariant),
+                  const SizedBox(width: AppSpacing.xs),
                   Text(
-                    dateFormat.format(record.startedAt),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
+                    formatMoney(record.cost!),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                  ),
+                  const SizedBox(width: AppSpacing.lg),
+                ],
+                if (record.veterinarian?.trim().isNotEmpty == true) ...[
+                  Icon(Icons.person_outline,
+                      size: 16, color: context.colors.onSurfaceVariant),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      record.veterinarian!.trim(),
+                      style: AppTypography.labelSm
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailsSheet extends ConsumerWidget {
+  final MedicalRecord record;
+
+  const _DetailsSheet({required this.record});
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.medDeleteTitle),
+        content: Text(context.l10n.medDeleteBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(context.l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final done = context.l10n.medDeleted;
+    final failed = context.l10n.medDeleteFailed;
+
+    try {
+      await ref
+          .read(medicalRecordsProvider.notifier)
+          .deleteMedicalRecord(record.id);
+      navigator.pop();
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final format = DateFormat('d MMMM y', 'ru');
+    final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.8,
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenH,
+            0,
+            AppSpacing.screenH,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      record.rabbit?.name ?? context.l10n.navRabbits,
+                      style: AppTypography.displayMd
+                          .copyWith(color: context.colors.onSurface),
+                    ),
+                  ),
+                  if (canRecord)
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.push('/medical-records/form', extra: record);
+                      },
+                    ),
+                  if (canDelete)
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      color: AppColors.error,
+                      onPressed: () => _delete(context, ref),
+                    ),
+                ],
               ),
-              const SizedBox(height: 8),
-              if (record.rabbit != null) ...[
-                Text(
-                  record.rabbit!.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-              ],
-              if (record.diagnosis != null && record.diagnosis!.isNotEmpty)
-                Text(
-                  'Диагноз: ${record.diagnosis}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-              const SizedBox(height: 4),
-              Text(
-                'Симптомы: ${record.symptoms}',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 13,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(height: AppSpacing.md),
+              _Row(
+                icon: medicalOutcomeIcon(record.outcome),
+                label: context.l10n.medFormOutcome,
+                value: medicalOutcomeLabel(context, record.outcome),
+                color: medicalOutcomeColor(context, record.outcome),
               ),
-              if (record.treatment != null && record.treatment!.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Лечение: ${record.treatment}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 13,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              if (record.diagnosis?.trim().isNotEmpty == true)
+                _Row(
+                  icon: Icons.medical_information_outlined,
+                  label: context.l10n.medDiagnosis,
+                  value: record.diagnosis!.trim(),
                 ),
-              ],
-              if (record.cost != null) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.attach_money,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${record.cost!.toStringAsFixed(2)} руб.',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+              _Row(
+                icon: Icons.sick_outlined,
+                label: context.l10n.medSymptoms,
+                value: record.symptoms,
+              ),
+              if (record.treatment?.trim().isNotEmpty == true)
+                _Row(
+                  icon: Icons.healing_outlined,
+                  label: context.l10n.medTreatment,
+                  value: record.treatment!.trim(),
                 ),
-              ],
-              if (record.veterinarian != null &&
-                  record.veterinarian!.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      record.veterinarian!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
+              if (record.medication?.trim().isNotEmpty == true)
+                _Row(
+                  icon: Icons.medication_outlined,
+                  label: context.l10n.medMedication,
+                  value: record.medication!.trim(),
                 ),
-              ],
+              _Row(
+                icon: Icons.event_available_outlined,
+                label: context.l10n.medStarted,
+                value: format.format(record.startedAt),
+              ),
+              if (record.endedAt != null)
+                _Row(
+                  icon: Icons.event_outlined,
+                  label: context.l10n.medEnded,
+                  value: format.format(record.endedAt!),
+                ),
+              if (record.cost != null)
+                _Row(
+                  icon: Icons.payments_outlined,
+                  label: context.l10n.medCost,
+                  value: formatMoney(record.cost!),
+                ),
+              if (record.veterinarian?.trim().isNotEmpty == true)
+                _Row(
+                  icon: Icons.person_outline,
+                  label: context.l10n.medVet,
+                  value: record.veterinarian!.trim(),
+                ),
+              if (record.notes?.trim().isNotEmpty == true)
+                _Row(
+                  icon: Icons.sticky_note_2_outlined,
+                  label: context.l10n.medNotes,
+                  value: record.notes!.trim(),
+                ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  void _showRecordDetail(MedicalRecord record) {
-    final dateFormat = DateFormat('dd.MM.yyyy');
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    record.rabbit?.name ?? 'Кролик',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    context.push('/medical-records/form', extra: record);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: AppColors.error),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _deleteMedicalRecord(record);
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            if (record.diagnosis != null && record.diagnosis!.isNotEmpty)
-              _detailRow(Icons.medical_information_outlined, 'Диагноз', record.diagnosis!),
-            _detailRow(Icons.sick_outlined, 'Симптомы', record.symptoms),
-            if (record.treatment != null && record.treatment!.isNotEmpty)
-              _detailRow(Icons.healing_outlined, 'Лечение', record.treatment!),
-            if (record.medication != null && record.medication!.isNotEmpty)
-              _detailRow(Icons.medication_outlined, 'Препараты', record.medication!),
-            _detailRow(Icons.calendar_today, 'Начало', dateFormat.format(record.startedAt)),
-            if (record.endedAt != null)
-              _detailRow(Icons.event_available, 'Окончание', dateFormat.format(record.endedAt!)),
-            if (record.cost != null)
-              _detailRow(Icons.attach_money, 'Стоимость', '${record.cost!.toStringAsFixed(2)} руб.'),
-            if (record.veterinarian != null && record.veterinarian!.isNotEmpty)
-              _detailRow(Icons.person_outline, 'Ветеринар', record.veterinarian!),
-            if (record.notes != null && record.notes!.isNotEmpty)
-              _detailRow(Icons.notes, 'Заметки', record.notes!),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
+class _Row extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? color;
 
-  Widget _detailRow(IconData icon, String label, String value) {
+  const _Row({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          const SizedBox(width: 12),
+          Icon(icon, size: 20, color: color ?? context.colors.onSurfaceVariant),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
                 ),
-                Text(value, style: const TextStyle(fontSize: 15)),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  value,
+                  style: AppTypography.bodyLg
+                      .copyWith(color: color ?? context.colors.onSurface),
+                ),
               ],
             ),
           ),
@@ -366,244 +587,146 @@ class _MedicalRecordsListScreenState
       ),
     );
   }
+}
 
-  Future<void> _deleteMedicalRecord(MedicalRecord record) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Удалить запись?'),
-        content: const Text('Медицинская запись будет удалена безвозвратно.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Удалить'),
-          ),
-        ],
-      ),
-    );
+class _StatisticsSheet extends ConsumerWidget {
+  const _StatisticsSheet();
 
-    if (confirmed == true && mounted) {
-      try {
-        await ref
-            .read(medicalRecordsProvider.notifier)
-            .deleteMedicalRecord(record.id);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Запись удалена')),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка удаления: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
-    }
-  }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(medicalStatisticsProvider);
 
-  Color _getOutcomeColor(MedicalOutcome outcome) {
-    switch (outcome) {
-      case MedicalOutcome.recovered:
-        return AppColors.success;
-      case MedicalOutcome.ongoing:
-        return AppColors.warning;
-      case MedicalOutcome.died:
-        return AppColors.error;
-      case MedicalOutcome.euthanized:
-        return AppColors.accentViolet;
-    }
-  }
-
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Фильтры'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('С даты'),
-              subtitle: Text(
-                _fromDate != null
-                    ? DateFormat('dd.MM.yyyy').format(_fromDate!)
-                    : 'Не выбрано',
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _fromDate ?? DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _fromDate = date;
-                  });
-                }
-              },
-            ),
-            ListTile(
-              title: const Text('По дату'),
-              subtitle: Text(
-                _toDate != null
-                    ? DateFormat('dd.MM.yyyy').format(_toDate!)
-                    : 'Не выбрано',
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: _toDate ?? DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _toDate = date;
-                  });
-                }
-              },
-            ),
-          ],
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.8,
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _fromDate = null;
-                _toDate = null;
-              });
-              Navigator.pop(context);
-              _loadRecords();
-            },
-            child: const Text('Сбросить'),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenH,
+            0,
+            AppSpacing.screenH,
+            AppSpacing.lg,
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _loadRecords();
-            },
-            child: const Text('Применить'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showStatistics() {
-    showModalBottomSheet(
-      context: context,
-      // Consumer, а не снимок через ref.read: у модального окна свой контекст,
-      // и снятое значение не обновлялось. При первом открытии провайдер ещё
-      // грузился, поэтому пользователь видел вечный индикатор, пока не закроет
-      // и не откроет окно заново.
-      builder: (context) => Consumer(
-        builder: (context, ref, _) {
-          final statisticsAsync = ref.watch(medicalStatisticsProvider);
-          return Container(
-        padding: const EdgeInsets.all(16),
-        child: statisticsAsync.when(
-          data: (stats) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Статистика',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          child: AppAsyncView<MedicalStatistics>(
+            value: statsAsync,
+            onRetry: () => ref.invalidate(medicalStatisticsProvider),
+            skeleton: (_) => const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              child: SkeletonStatRow(count: 3, height: 64),
+            ),
+            builder: (stats) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppSectionTitle(context.l10n.medStats),
+                _StatLine(
+                  label: context.l10n.medStatTotal,
+                  value: '${stats.totalRecords}',
                 ),
-              ),
-              const SizedBox(height: 16),
-              _buildStatRow('Всего записей', stats.totalRecords.toString()),
-              const Divider(),
-              _buildStatRow(
-                  'Выздоровело', stats.byOutcome.recovered.toString(),
-                  color: AppColors.success),
-              _buildStatRow('Лечение', stats.byOutcome.ongoing.toString(),
-                  color: AppColors.warning),
-              _buildStatRow('Умерло', stats.byOutcome.died.toString(),
-                  color: AppColors.error),
-              _buildStatRow(
-                  'Эвтаназия', stats.byOutcome.euthanized.toString(),
-                  color: AppColors.accentViolet),
-              const Divider(),
-              _buildStatRow('Затраты',
-                  '${stats.totalCost.toStringAsFixed(2)} руб.',
-                  color: AppColors.info),
-              _buildStatRow('За этот год', stats.thisYear.toString()),
-              _buildStatRow('За последний месяц', stats.lastMonth.toString()),
-              if (stats.ongoingTreatments.isNotEmpty) ...[
-                const Divider(),
-                const Text(
-                  'Текущие лечения',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                _StatLine(
+                  label: medicalOutcomeLabel(context, MedicalOutcome.ongoing),
+                  value: '${stats.byOutcome.ongoing}',
+                  color: AppColors.warning,
                 ),
-                const SizedBox(height: 8),
-                ...stats.ongoingTreatments.take(5).map((treatment) {
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(treatment.rabbitName ?? 'Кролик'),
-                    subtitle: Text(treatment.diagnosis ?? 'Без диагноза'),
-                    trailing: Text(
-                      '${treatment.daysOngoing} дн.',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                _StatLine(
+                  label:
+                      medicalOutcomeLabel(context, MedicalOutcome.recovered),
+                  value: '${stats.byOutcome.recovered}',
+                  color: AppColors.success,
+                ),
+                _StatLine(
+                  label: medicalOutcomeLabel(context, MedicalOutcome.died),
+                  value: '${stats.byOutcome.died}',
+                  color: AppColors.error,
+                ),
+                _StatLine(
+                  label:
+                      medicalOutcomeLabel(context, MedicalOutcome.euthanized),
+                  value: '${stats.byOutcome.euthanized}',
+                ),
+                const Divider(height: AppSpacing.xxl),
+                _StatLine(
+                  label: context.l10n.medStatCost,
+                  value: formatMoney(stats.totalCost),
+                ),
+                _StatLine(
+                  label: context.l10n.medStatThisYear,
+                  value: '${stats.thisYear}',
+                ),
+                _StatLine(
+                  label: context.l10n.medStatLastMonth,
+                  value: '${stats.lastMonth}',
+                ),
+                if (stats.ongoingTreatments.isNotEmpty) ...[
+                  const Divider(height: AppSpacing.xxl),
+                  AppSectionTitle(context.l10n.medStatOngoing),
+                  for (final treatment in stats.ongoingTreatments.take(5))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  treatment.rabbitName ??
+                                      context.l10n.breedingNameMissing,
+                                  style: AppTypography.bodyLg.copyWith(
+                                      color: context.colors.onSurface),
+                                ),
+                                Text(
+                                  treatment.diagnosis?.trim().isNotEmpty == true
+                                      ? treatment.diagnosis!.trim()
+                                      : context.l10n.medNoDiagnosis,
+                                  style: AppTypography.labelSm.copyWith(
+                                      color: context.colors.onSurfaceVariant),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            context.l10n.medDaysOngoing(treatment.daysOngoing),
+                            style: AppTypography.labelLg
+                                .copyWith(color: AppColors.warning),
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                }),
+                ],
               ],
-            ],
-          ),
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (error, stack) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Text('Ошибка: ${error.toString()}'),
             ),
           ),
         ),
-          );
-        },
       ),
     );
   }
+}
 
-  Widget _buildStatRow(String label, String value, {Color? color}) {
+class _StatLine extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? color;
+
+  const _StatLine({required this.label, required this.value, this.color});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14),
+            style: AppTypography.bodyMd
+                .copyWith(color: context.colors.onSurface),
           ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            style: AppTypography.labelLg
+                .copyWith(color: color ?? context.colors.onSurface),
           ),
         ],
       ),

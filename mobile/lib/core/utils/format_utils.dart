@@ -17,3 +17,19 @@ String formatQuantity(num value, [String? unit]) {
 // окончания зависят от языка, и в приложении для них есть ICU-плюрал —
 // `context.l10n.countTasks(n)`. Держать их здесь значило бы вести
 // собственную таблицу окончаний параллельно готовому механизму.
+
+/// Разбирает число, введённое человеком.
+///
+/// На русской раскладке дробную часть отделяют запятой, и `double.parse`
+/// на «150,50» падал: форма отвечала «введите корректное число» на совершенно
+/// нормальный ввод. Пробелы-разделители разрядов тоже допустимы.
+double? parseDecimal(String? raw) {
+  if (raw == null) return null;
+  final normalized = raw
+      .replaceAll('\u00A0', '')
+      .replaceAll(' ', '')
+      .replaceAll(',', '.')
+      .trim();
+  if (normalized.isEmpty) return null;
+  return double.tryParse(normalized);
+}

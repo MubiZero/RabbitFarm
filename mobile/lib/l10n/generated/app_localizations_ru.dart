@@ -745,6 +745,400 @@ class AppLocalizationsRu extends AppLocalizations {
   String get repeatYearly => 'Раз в год';
 
   @override
+  String get vaccinationsTitle => 'Вакцинации';
+
+  @override
+  String get vaccinationsStats => 'Сводка';
+
+  @override
+  String get vaccinationsViewAll => 'Все';
+
+  @override
+  String get vaccinationsViewUpcoming => 'Предстоящие';
+
+  @override
+  String get vaccinationsViewOverdue => 'Просроченные';
+
+  @override
+  String get vaccinationsViewLast30 => 'За 30 дней';
+
+  @override
+  String get vaccinationsEmptyTitle => 'Записей о вакцинации нет';
+
+  @override
+  String get vaccinationsEmptyBody =>
+      'Отметьте прививку — приложение напомнит, когда придёт срок следующей.';
+
+  @override
+  String get vaccinationsEmptyAction => 'Записать вакцинацию';
+
+  @override
+  String get vaccinationsNoneInView => 'В этой выборке пусто';
+
+  @override
+  String get vaccinationsNoneInViewBody =>
+      'Выберите другую вкладку или снимите фильтры.';
+
+  @override
+  String get vaccinationsFilterType => 'Тип вакцины';
+
+  @override
+  String get vaccinationsFilterPeriod => 'Период';
+
+  @override
+  String get vaccinationsFrom => 'От';
+
+  @override
+  String get vaccinationsTo => 'До';
+
+  @override
+  String get vaccinationsResetAll => 'Сбросить всё';
+
+  @override
+  String vaccinationsNext(String date) {
+    return 'Следующая $date';
+  }
+
+  @override
+  String get vaccinationsOverdueBadge => 'Просрочено';
+
+  @override
+  String vaccinationsInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'через $count дня',
+      many: 'через $count дней',
+      few: 'через $count дня',
+      one: 'через $count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vaccinationsBatch(String number) {
+    return 'Партия $number';
+  }
+
+  @override
+  String get vaccinationsVet => 'Ветеринар';
+
+  @override
+  String get vaccinationsDate => 'Дата прививки';
+
+  @override
+  String get vaccinationsNextLabel => 'Следующая прививка';
+
+  @override
+  String get vaccinationsBatchLabel => 'Номер партии';
+
+  @override
+  String get vaccinationsTypeLabel => 'Тип';
+
+  @override
+  String get vaccinationsNotesLabel => 'Заметки';
+
+  @override
+  String get vaccinationsDeleteTitle => 'Удалить запись?';
+
+  @override
+  String get vaccinationsDeleteBody =>
+      'Запись о прививке будет удалена без возможности вернуть.';
+
+  @override
+  String get vaccinationsDeleted => 'Запись удалена';
+
+  @override
+  String get vaccinationsDeleteFailed => 'Не удалось удалить запись';
+
+  @override
+  String get vaccinationsStatTotal => 'Всего прививок';
+
+  @override
+  String get vaccinationsStatThisYear => 'В этом году';
+
+  @override
+  String get vaccinationsStatLast30 => 'За 30 дней';
+
+  @override
+  String get vaccinationsStatUpcoming => 'Предстоящие';
+
+  @override
+  String get vaccinationsStatNext30 => 'В ближайшие 30 дней';
+
+  @override
+  String get vaccinationsStatOverdue => 'Просрочено';
+
+  @override
+  String get rabbitPickerTitle => 'Выберите кролика';
+
+  @override
+  String get rabbitPickerHint => 'Кличка или номер бирки';
+
+  @override
+  String get rabbitPickerEmpty => 'Не выбран';
+
+  @override
+  String get rabbitPickerNothingFound => 'Никого не нашлось';
+
+  @override
+  String get rabbitPickerNothingFoundBody =>
+      'Проверьте кличку или номер бирки.';
+
+  @override
+  String get rabbitPickerClear => 'Очистить';
+
+  @override
+  String get rabbitPickerRequired => 'Выберите кролика';
+
+  @override
+  String rabbitPickerInCage(String number) {
+    return 'Клетка $number';
+  }
+
+  @override
+  String get rabbitPickerNoCage => 'Без клетки';
+
+  @override
+  String get vaccFormNewTitle => 'Новая прививка';
+
+  @override
+  String get vaccFormEditTitle => 'Прививка';
+
+  @override
+  String get vaccFormSectionMain => 'Основное';
+
+  @override
+  String get vaccFormSectionDates => 'Даты';
+
+  @override
+  String get vaccFormSectionExtra => 'Дополнительно';
+
+  @override
+  String get vaccFormRabbit => 'Кому';
+
+  @override
+  String get vaccFormType => 'Тип вакцины';
+
+  @override
+  String get vaccFormName => 'Название вакцины';
+
+  @override
+  String get vaccFormNameHint => 'Например, Раббивак V';
+
+  @override
+  String get vaccFormNameEmpty => 'Введите название вакцины';
+
+  @override
+  String get vaccFormDate => 'Дата прививки';
+
+  @override
+  String get vaccFormNextDate => 'Следующая прививка';
+
+  @override
+  String get vaccFormNextNotSet => 'Не запланирована';
+
+  @override
+  String get vaccFormPlus3m => 'через 3 месяца';
+
+  @override
+  String get vaccFormPlus6m => 'через полгода';
+
+  @override
+  String get vaccFormPlus1y => 'через год';
+
+  @override
+  String get vaccFormBatch => 'Номер партии';
+
+  @override
+  String get vaccFormBatchHint => 'Например, 12345-67';
+
+  @override
+  String get vaccFormVet => 'Ветеринар';
+
+  @override
+  String get vaccFormVetHint => 'Кто делал прививку';
+
+  @override
+  String get vaccFormNotes => 'Заметки';
+
+  @override
+  String get vaccFormCreated => 'Прививка записана';
+
+  @override
+  String get vaccFormUpdated => 'Запись обновлена';
+
+  @override
+  String get vaccFormFailed => 'Не удалось сохранить';
+
+  @override
+  String get medTitle => 'Лечение';
+
+  @override
+  String get medEmptyTitle => 'Записей о лечении нет';
+
+  @override
+  String get medEmptyBody =>
+      'Заведите карту болезни — она соберёт симптомы, лечение и затраты в одном месте.';
+
+  @override
+  String get medEmptyAction => 'Завести карту';
+
+  @override
+  String get medNoneInView => 'В этой выборке пусто';
+
+  @override
+  String get medNoneInViewBody =>
+      'Выберите другую вкладку или снимите фильтры.';
+
+  @override
+  String get medViewAll => 'Все';
+
+  @override
+  String get medOutcomeOngoing => 'Лечится';
+
+  @override
+  String get medOutcomeRecovered => 'Выздоровел';
+
+  @override
+  String get medOutcomeDied => 'Погиб';
+
+  @override
+  String get medOutcomeEuthanized => 'Усыплён';
+
+  @override
+  String get medDiagnosis => 'Диагноз';
+
+  @override
+  String get medSymptoms => 'Симптомы';
+
+  @override
+  String get medTreatment => 'Лечение';
+
+  @override
+  String get medMedication => 'Препараты';
+
+  @override
+  String get medStarted => 'Начало';
+
+  @override
+  String get medEnded => 'Окончание';
+
+  @override
+  String get medCost => 'Затраты';
+
+  @override
+  String get medVet => 'Ветеринар';
+
+  @override
+  String get medNotes => 'Заметки';
+
+  @override
+  String get medNoDiagnosis => 'Диагноз не поставлен';
+
+  @override
+  String get medDeleteTitle => 'Удалить карту?';
+
+  @override
+  String get medDeleteBody =>
+      'Запись о лечении будет удалена без возможности вернуть.';
+
+  @override
+  String get medDeleted => 'Запись удалена';
+
+  @override
+  String get medDeleteFailed => 'Не удалось удалить запись';
+
+  @override
+  String get medPeriodFrom => 'С даты';
+
+  @override
+  String get medPeriodTo => 'По дату';
+
+  @override
+  String get medStats => 'Сводка';
+
+  @override
+  String get medStatTotal => 'Всего карт';
+
+  @override
+  String get medStatThisYear => 'В этом году';
+
+  @override
+  String get medStatLastMonth => 'За месяц';
+
+  @override
+  String get medStatCost => 'Потрачено';
+
+  @override
+  String get medStatOngoing => 'Лечатся сейчас';
+
+  @override
+  String medDaysOngoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дня',
+      many: '$count дней',
+      few: '$count дня',
+      one: '$count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get medFormNewTitle => 'Новая карта';
+
+  @override
+  String get medFormEditTitle => 'Карта лечения';
+
+  @override
+  String get medFormRabbit => 'Кому';
+
+  @override
+  String get medFormSectionCase => 'Что случилось';
+
+  @override
+  String get medFormSectionTreatment => 'Лечение';
+
+  @override
+  String get medFormSectionDates => 'Сроки и деньги';
+
+  @override
+  String get medFormSymptomsEmpty => 'Опишите симптомы';
+
+  @override
+  String get medFormOutcome => 'Исход';
+
+  @override
+  String get medFormCreated => 'Карта заведена';
+
+  @override
+  String get medFormUpdated => 'Карта обновлена';
+
+  @override
+  String get medFormFailed => 'Не удалось сохранить';
+
+  @override
+  String get medFormCostHelp =>
+      'Сумма попадёт в расходы фермы отдельной операцией.';
+
+  @override
+  String get medFormDosage => 'Дозировка';
+
+  @override
+  String get medFormEndedDate => 'Дата окончания';
+
+  @override
+  String get medFormNotSet => 'Не указана';
+
+  @override
+  String get medFormCostLabel => 'Затраты, ₽';
+
+  @override
+  String get commonNumberInvalid => 'Введите число';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override

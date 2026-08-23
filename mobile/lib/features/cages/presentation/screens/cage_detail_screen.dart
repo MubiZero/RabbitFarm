@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
@@ -112,7 +111,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     final rabbit = await showModalBottomSheet<RabbitModel>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _RabbitPickerSheet(cageId: widget.cageId),
+      builder: (_) => RabbitPickerSheet(excludeCageId: widget.cageId),
     );
     if (rabbit == null || !mounted) return;
 
@@ -410,216 +409,6 @@ class _ResidentTile extends StatelessWidget {
 }
 
 enum _ResidentAction { move, remove }
-
-/// Кружок с фотографией кролика или значком-заглушкой.
-class RabbitAvatar extends StatelessWidget {
-  final String? photoUrl;
-  final double size;
-
-  const RabbitAvatar({super.key, this.photoUrl, this.size = 40});
-
-  @override
-  Widget build(BuildContext context) {
-    final url = ImageUrlHelper.getFullImageUrl(photoUrl);
-
-    return ClipOval(
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: url == null
-            ? _placeholder(context)
-            // Фото грузится через кэш: список жителей открывают по многу раз
-            // за день, и каждый раз тянуть картинку заново незачем.
-            : CachedNetworkImage(
-                imageUrl: url,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => _placeholder(context),
-                errorWidget: (_, __, ___) => _placeholder(context),
-              ),
-      ),
-    );
-  }
-
-  Widget _placeholder(BuildContext context) => ColoredBox(
-        color: AppColors.domainLivestock.withValues(alpha: 0.12),
-        child: Icon(
-          Icons.pets,
-          size: size * 0.5,
-          color: AppColors.domainLivestock,
-        ),
-      );
-}
-
-/// Выбор кролика для подселения.
-///
-/// Поиск идёт на сервере. Прежний вариант загружал первые сто кроликов и искал
-/// среди них на устройстве: на ферме из трёхсот голов часть животных просто
-/// невозможно было найти, и выглядело это как «кролика нет в системе».
-class _RabbitPickerSheet extends ConsumerStatefulWidget {
-  final int cageId;
-
-  const _RabbitPickerSheet({required this.cageId});
-
-  @override
-  ConsumerState<_RabbitPickerSheet> createState() => _RabbitPickerSheetState();
-}
-
-class _RabbitPickerSheetState extends ConsumerState<_RabbitPickerSheet> {
-  final _controller = TextEditingController();
-  Timer? _debounce;
-
-  List<RabbitModel> _results = const [];
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _search('');
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onQueryChanged(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(AppDuration.normal, () => _search(query));
-  }
-
-  Future<void> _search(String query) async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final page = await ref.read(rabbitsRepositoryProvider).getRabbits(
-            limit: 30,
-            search: query.trim().isEmpty ? null : query.trim(),
-          );
-      if (!mounted) return;
-      setState(() {
-        _results =
-            page.items.where((r) => r.cageId != widget.cageId).toList();
-        _loading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _loading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _PickerSheet(
-      title: context.l10n.cagePickRabbitTitle,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
-            child: TextField(
-              controller: _controller,
-              autofocus: false,
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                hintText: context.l10n.cagePickRabbitHint,
-                prefixIcon: const Icon(Icons.search),
-              ),
-              onChanged: _onQueryChanged,
-              onSubmitted: _search,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Expanded(child: _resultsView(context)),
-        ],
-      ),
-    );
-  }
-
-  Widget _resultsView(BuildContext context) {
-    if (_loading) return const DelayedSpinner();
-    if (_error != null) {
-      return AppErrorState(
-        message: _error!,
-        onRetry: () => _search(_controller.text),
-      );
-    }
-    if (_results.isEmpty) {
-      return AppEmptyState(
-        icon: Icons.search_off,
-        title: context.l10n.cagePickNothingFound,
-        subtitle: context.l10n.cagePickNothingFoundBody,
-      );
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenH,
-        0,
-        AppSpacing.screenH,
-        AppSpacing.xl,
-      ),
-      itemCount: _results.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-      itemBuilder: (context, i) {
-        final rabbit = _results[i];
-        // Кролик уже где-то живёт — это не запрет, а предупреждение: выбор
-        // означает переезд. Раньше такие строки просто гасились, и было
-        // непонятно, почему по ним нельзя нажать.
-        final currentCage = rabbit.cage?.number;
-
-        return AppCard(
-          onTap: () => Navigator.pop(context, rabbit),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              RabbitAvatar(photoUrl: rabbit.photoUrl),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      rabbit.name,
-                      style: AppTypography.titleMd
-                          .copyWith(color: context.colors.onSurface),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      currentCage != null
-                          ? context.l10n.cagePickCurrentCage(currentCage)
-                          : context.l10n.cagePickNoCage,
-                      style: AppTypography.labelSm.copyWith(
-                        color: currentCage != null
-                            ? AppColors.warning
-                            : context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                rabbit.tagId,
-                style: AppTypography.labelSm
-                    .copyWith(color: context.colors.onSurfaceVariant),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 /// Выбор клетки для переезда.
 class _CagePickerSheet extends ConsumerWidget {

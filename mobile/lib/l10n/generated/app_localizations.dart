@@ -1354,6 +1354,726 @@ abstract class AppLocalizations {
   /// **'Раз в год'**
   String get repeatYearly;
 
+  /// No description provided for @vaccinationsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинации'**
+  String get vaccinationsTitle;
+
+  /// No description provided for @vaccinationsStats.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка'**
+  String get vaccinationsStats;
+
+  /// No description provided for @vaccinationsViewAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get vaccinationsViewAll;
+
+  /// No description provided for @vaccinationsViewUpcoming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предстоящие'**
+  String get vaccinationsViewUpcoming;
+
+  /// No description provided for @vaccinationsViewOverdue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просроченные'**
+  String get vaccinationsViewOverdue;
+
+  /// No description provided for @vaccinationsViewLast30.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 30 дней'**
+  String get vaccinationsViewLast30;
+
+  /// No description provided for @vaccinationsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей о вакцинации нет'**
+  String get vaccinationsEmptyTitle;
+
+  /// No description provided for @vaccinationsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметьте прививку — приложение напомнит, когда придёт срок следующей.'**
+  String get vaccinationsEmptyBody;
+
+  /// No description provided for @vaccinationsEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать вакцинацию'**
+  String get vaccinationsEmptyAction;
+
+  /// No description provided for @vaccinationsNoneInView.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этой выборке пусто'**
+  String get vaccinationsNoneInView;
+
+  /// No description provided for @vaccinationsNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите другую вкладку или снимите фильтры.'**
+  String get vaccinationsNoneInViewBody;
+
+  /// No description provided for @vaccinationsFilterType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип вакцины'**
+  String get vaccinationsFilterType;
+
+  /// No description provided for @vaccinationsFilterPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Период'**
+  String get vaccinationsFilterPeriod;
+
+  /// No description provided for @vaccinationsFrom.
+  ///
+  /// In ru, this message translates to:
+  /// **'От'**
+  String get vaccinationsFrom;
+
+  /// No description provided for @vaccinationsTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'До'**
+  String get vaccinationsTo;
+
+  /// No description provided for @vaccinationsResetAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить всё'**
+  String get vaccinationsResetAll;
+
+  /// No description provided for @vaccinationsNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая {date}'**
+  String vaccinationsNext(String date);
+
+  /// No description provided for @vaccinationsOverdueBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просрочено'**
+  String get vaccinationsOverdueBadge;
+
+  /// No description provided for @vaccinationsInDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{через {count} день} few{через {count} дня} many{через {count} дней} other{через {count} дня}}'**
+  String vaccinationsInDays(int count);
+
+  /// No description provided for @vaccinationsBatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Партия {number}'**
+  String vaccinationsBatch(String number);
+
+  /// No description provided for @vaccinationsVet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ветеринар'**
+  String get vaccinationsVet;
+
+  /// No description provided for @vaccinationsDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата прививки'**
+  String get vaccinationsDate;
+
+  /// No description provided for @vaccinationsNextLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая прививка'**
+  String get vaccinationsNextLabel;
+
+  /// No description provided for @vaccinationsBatchLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер партии'**
+  String get vaccinationsBatchLabel;
+
+  /// No description provided for @vaccinationsTypeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип'**
+  String get vaccinationsTypeLabel;
+
+  /// No description provided for @vaccinationsNotesLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get vaccinationsNotesLabel;
+
+  /// No description provided for @vaccinationsDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить запись?'**
+  String get vaccinationsDeleteTitle;
+
+  /// No description provided for @vaccinationsDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о прививке будет удалена без возможности вернуть.'**
+  String get vaccinationsDeleteBody;
+
+  /// No description provided for @vaccinationsDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись удалена'**
+  String get vaccinationsDeleted;
+
+  /// No description provided for @vaccinationsDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить запись'**
+  String get vaccinationsDeleteFailed;
+
+  /// No description provided for @vaccinationsStatTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всего прививок'**
+  String get vaccinationsStatTotal;
+
+  /// No description provided for @vaccinationsStatThisYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом году'**
+  String get vaccinationsStatThisYear;
+
+  /// No description provided for @vaccinationsStatLast30.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 30 дней'**
+  String get vaccinationsStatLast30;
+
+  /// No description provided for @vaccinationsStatUpcoming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предстоящие'**
+  String get vaccinationsStatUpcoming;
+
+  /// No description provided for @vaccinationsStatNext30.
+  ///
+  /// In ru, this message translates to:
+  /// **'В ближайшие 30 дней'**
+  String get vaccinationsStatNext30;
+
+  /// No description provided for @vaccinationsStatOverdue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просрочено'**
+  String get vaccinationsStatOverdue;
+
+  /// No description provided for @rabbitPickerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите кролика'**
+  String get rabbitPickerTitle;
+
+  /// No description provided for @rabbitPickerHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кличка или номер бирки'**
+  String get rabbitPickerHint;
+
+  /// No description provided for @rabbitPickerEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не выбран'**
+  String get rabbitPickerEmpty;
+
+  /// No description provided for @rabbitPickerNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никого не нашлось'**
+  String get rabbitPickerNothingFound;
+
+  /// No description provided for @rabbitPickerNothingFoundBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте кличку или номер бирки.'**
+  String get rabbitPickerNothingFoundBody;
+
+  /// No description provided for @rabbitPickerClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистить'**
+  String get rabbitPickerClear;
+
+  /// No description provided for @rabbitPickerRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите кролика'**
+  String get rabbitPickerRequired;
+
+  /// No description provided for @rabbitPickerInCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка {number}'**
+  String rabbitPickerInCage(String number);
+
+  /// No description provided for @rabbitPickerNoCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без клетки'**
+  String get rabbitPickerNoCage;
+
+  /// No description provided for @vaccFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая прививка'**
+  String get vaccFormNewTitle;
+
+  /// No description provided for @vaccFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививка'**
+  String get vaccFormEditTitle;
+
+  /// No description provided for @vaccFormSectionMain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основное'**
+  String get vaccFormSectionMain;
+
+  /// No description provided for @vaccFormSectionDates.
+  ///
+  /// In ru, this message translates to:
+  /// **'Даты'**
+  String get vaccFormSectionDates;
+
+  /// No description provided for @vaccFormSectionExtra.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дополнительно'**
+  String get vaccFormSectionExtra;
+
+  /// No description provided for @vaccFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому'**
+  String get vaccFormRabbit;
+
+  /// No description provided for @vaccFormType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип вакцины'**
+  String get vaccFormType;
+
+  /// No description provided for @vaccFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название вакцины'**
+  String get vaccFormName;
+
+  /// No description provided for @vaccFormNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, Раббивак V'**
+  String get vaccFormNameHint;
+
+  /// No description provided for @vaccFormNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название вакцины'**
+  String get vaccFormNameEmpty;
+
+  /// No description provided for @vaccFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата прививки'**
+  String get vaccFormDate;
+
+  /// No description provided for @vaccFormNextDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая прививка'**
+  String get vaccFormNextDate;
+
+  /// No description provided for @vaccFormNextNotSet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не запланирована'**
+  String get vaccFormNextNotSet;
+
+  /// No description provided for @vaccFormPlus3m.
+  ///
+  /// In ru, this message translates to:
+  /// **'через 3 месяца'**
+  String get vaccFormPlus3m;
+
+  /// No description provided for @vaccFormPlus6m.
+  ///
+  /// In ru, this message translates to:
+  /// **'через полгода'**
+  String get vaccFormPlus6m;
+
+  /// No description provided for @vaccFormPlus1y.
+  ///
+  /// In ru, this message translates to:
+  /// **'через год'**
+  String get vaccFormPlus1y;
+
+  /// No description provided for @vaccFormBatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер партии'**
+  String get vaccFormBatch;
+
+  /// No description provided for @vaccFormBatchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, 12345-67'**
+  String get vaccFormBatchHint;
+
+  /// No description provided for @vaccFormVet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ветеринар'**
+  String get vaccFormVet;
+
+  /// No description provided for @vaccFormVetHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто делал прививку'**
+  String get vaccFormVetHint;
+
+  /// No description provided for @vaccFormNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get vaccFormNotes;
+
+  /// No description provided for @vaccFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививка записана'**
+  String get vaccFormCreated;
+
+  /// No description provided for @vaccFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись обновлена'**
+  String get vaccFormUpdated;
+
+  /// No description provided for @vaccFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить'**
+  String get vaccFormFailed;
+
+  /// No description provided for @medTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get medTitle;
+
+  /// No description provided for @medEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей о лечении нет'**
+  String get medEmptyTitle;
+
+  /// No description provided for @medEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите карту болезни — она соберёт симптомы, лечение и затраты в одном месте.'**
+  String get medEmptyBody;
+
+  /// No description provided for @medEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести карту'**
+  String get medEmptyAction;
+
+  /// No description provided for @medNoneInView.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этой выборке пусто'**
+  String get medNoneInView;
+
+  /// No description provided for @medNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите другую вкладку или снимите фильтры.'**
+  String get medNoneInViewBody;
+
+  /// No description provided for @medViewAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get medViewAll;
+
+  /// No description provided for @medOutcomeOngoing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечится'**
+  String get medOutcomeOngoing;
+
+  /// No description provided for @medOutcomeRecovered.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выздоровел'**
+  String get medOutcomeRecovered;
+
+  /// No description provided for @medOutcomeDied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Погиб'**
+  String get medOutcomeDied;
+
+  /// No description provided for @medOutcomeEuthanized.
+  ///
+  /// In ru, this message translates to:
+  /// **'Усыплён'**
+  String get medOutcomeEuthanized;
+
+  /// No description provided for @medDiagnosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Диагноз'**
+  String get medDiagnosis;
+
+  /// No description provided for @medSymptoms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Симптомы'**
+  String get medSymptoms;
+
+  /// No description provided for @medTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get medTreatment;
+
+  /// No description provided for @medMedication.
+  ///
+  /// In ru, this message translates to:
+  /// **'Препараты'**
+  String get medMedication;
+
+  /// No description provided for @medStarted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начало'**
+  String get medStarted;
+
+  /// No description provided for @medEnded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окончание'**
+  String get medEnded;
+
+  /// No description provided for @medCost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Затраты'**
+  String get medCost;
+
+  /// No description provided for @medVet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ветеринар'**
+  String get medVet;
+
+  /// No description provided for @medNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get medNotes;
+
+  /// No description provided for @medNoDiagnosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Диагноз не поставлен'**
+  String get medNoDiagnosis;
+
+  /// No description provided for @medDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить карту?'**
+  String get medDeleteTitle;
+
+  /// No description provided for @medDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о лечении будет удалена без возможности вернуть.'**
+  String get medDeleteBody;
+
+  /// No description provided for @medDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись удалена'**
+  String get medDeleted;
+
+  /// No description provided for @medDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить запись'**
+  String get medDeleteFailed;
+
+  /// No description provided for @medPeriodFrom.
+  ///
+  /// In ru, this message translates to:
+  /// **'С даты'**
+  String get medPeriodFrom;
+
+  /// No description provided for @medPeriodTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'По дату'**
+  String get medPeriodTo;
+
+  /// No description provided for @medStats.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка'**
+  String get medStats;
+
+  /// No description provided for @medStatTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всего карт'**
+  String get medStatTotal;
+
+  /// No description provided for @medStatThisYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом году'**
+  String get medStatThisYear;
+
+  /// No description provided for @medStatLastMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'За месяц'**
+  String get medStatLastMonth;
+
+  /// No description provided for @medStatCost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Потрачено'**
+  String get medStatCost;
+
+  /// No description provided for @medStatOngoing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечатся сейчас'**
+  String get medStatOngoing;
+
+  /// No description provided for @medDaysOngoing.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}'**
+  String medDaysOngoing(int count);
+
+  /// No description provided for @medFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая карта'**
+  String get medFormNewTitle;
+
+  /// No description provided for @medFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта лечения'**
+  String get medFormEditTitle;
+
+  /// No description provided for @medFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому'**
+  String get medFormRabbit;
+
+  /// No description provided for @medFormSectionCase.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что случилось'**
+  String get medFormSectionCase;
+
+  /// No description provided for @medFormSectionTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get medFormSectionTreatment;
+
+  /// No description provided for @medFormSectionDates.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сроки и деньги'**
+  String get medFormSectionDates;
+
+  /// No description provided for @medFormSymptomsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите симптомы'**
+  String get medFormSymptomsEmpty;
+
+  /// No description provided for @medFormOutcome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исход'**
+  String get medFormOutcome;
+
+  /// No description provided for @medFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта заведена'**
+  String get medFormCreated;
+
+  /// No description provided for @medFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта обновлена'**
+  String get medFormUpdated;
+
+  /// No description provided for @medFormFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить'**
+  String get medFormFailed;
+
+  /// No description provided for @medFormCostHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сумма попадёт в расходы фермы отдельной операцией.'**
+  String get medFormCostHelp;
+
+  /// No description provided for @medFormDosage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дозировка'**
+  String get medFormDosage;
+
+  /// No description provided for @medFormEndedDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата окончания'**
+  String get medFormEndedDate;
+
+  /// No description provided for @medFormNotSet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не указана'**
+  String get medFormNotSet;
+
+  /// No description provided for @medFormCostLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Затраты, ₽'**
+  String get medFormCostLabel;
+
+  /// No description provided for @commonNumberInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите число'**
+  String get commonNumberInvalid;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:
