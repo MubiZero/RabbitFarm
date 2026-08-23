@@ -2980,6 +2980,210 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить клетку'**
   String get cageFormFailed;
 
+  /// No description provided for @rabbitsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get rabbitsTitle;
+
+  /// No description provided for @rabbitsSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кличка или номер бирки'**
+  String get rabbitsSearchHint;
+
+  /// No description provided for @rabbitsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кроликов пока нет'**
+  String get rabbitsEmptyTitle;
+
+  /// No description provided for @rabbitsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите первого кролика — от него пойдёт весь учёт: родословная, здоровье и приплод.'**
+  String get rabbitsEmptyBody;
+
+  /// No description provided for @rabbitsEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить кролика'**
+  String get rabbitsEmptyAction;
+
+  /// No description provided for @rabbitsNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никого не нашлось'**
+  String get rabbitsNothingFound;
+
+  /// No description provided for @rabbitsNothingFoundBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте запрос или снимите фильтры.'**
+  String get rabbitsNothingFoundBody;
+
+  /// No description provided for @rabbitsFilterAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get rabbitsFilterAll;
+
+  /// No description provided for @rabbitsFilterMales.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самцы'**
+  String get rabbitsFilterMales;
+
+  /// No description provided for @rabbitsFilterFemales.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самки'**
+  String get rabbitsFilterFemales;
+
+  /// No description provided for @rabbitsFilterActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'В работе'**
+  String get rabbitsFilterActive;
+
+  /// No description provided for @rabbitsFilterSold.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проданы'**
+  String get rabbitsFilterSold;
+
+  /// No description provided for @sexMale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самец'**
+  String get sexMale;
+
+  /// No description provided for @sexFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка'**
+  String get sexFemale;
+
+  /// No description provided for @sexUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пол не указан'**
+  String get sexUnknown;
+
+  /// No description provided for @rabbitNoTag.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без бирки'**
+  String get rabbitNoTag;
+
+  /// No description provided for @weightTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Взвешивания'**
+  String get weightTitle;
+
+  /// No description provided for @weightSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'{name}'**
+  String weightSubtitle(String name);
+
+  /// No description provided for @weightEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Взвешиваний пока нет'**
+  String get weightEmptyTitle;
+
+  /// No description provided for @weightEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записывайте вес — по нему видно, растёт кролик или что-то не так.'**
+  String get weightEmptyBody;
+
+  /// No description provided for @weightAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать вес'**
+  String get weightAdd;
+
+  /// No description provided for @weightSummary.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка'**
+  String get weightSummary;
+
+  /// No description provided for @weightCurrent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сейчас'**
+  String get weightCurrent;
+
+  /// No description provided for @weightTrend.
+  ///
+  /// In ru, this message translates to:
+  /// **'С прошлого раза'**
+  String get weightTrend;
+
+  /// No description provided for @weightTotalChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'За всё время'**
+  String get weightTotalChange;
+
+  /// No description provided for @weightHistory.
+  ///
+  /// In ru, this message translates to:
+  /// **'История'**
+  String get weightHistory;
+
+  /// No description provided for @weightValue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес, кг'**
+  String get weightValue;
+
+  /// No description provided for @weightValueHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, 3,5'**
+  String get weightValueHint;
+
+  /// No description provided for @weightValueEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите вес'**
+  String get weightValueEmpty;
+
+  /// No description provided for @weightValuePositive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес должен быть больше нуля'**
+  String get weightValuePositive;
+
+  /// No description provided for @weightWhen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда взвесили'**
+  String get weightWhen;
+
+  /// No description provided for @weightNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки'**
+  String get weightNotes;
+
+  /// No description provided for @weightSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес записан'**
+  String get weightSaved;
+
+  /// No description provided for @weightSaveFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось записать вес'**
+  String get weightSaveFailed;
+
   /// No description provided for @emptyNoRecordsTitle.
   ///
   /// In ru, this message translates to:

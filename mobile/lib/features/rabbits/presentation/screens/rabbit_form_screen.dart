@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
-import '../widgets/parent_selector.dart';
+import '../widgets/rabbit_picker.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
@@ -40,6 +40,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   int? _selectedBreedId;
   int? _selectedFatherId;
   int? _selectedMotherId;
+  RabbitModel? _father;
+  RabbitModel? _mother;
+  String? _fatherLabel;
+  String? _motherLabel;
   String _selectedSex = 'male';
   String _selectedStatus = 'healthy';
   String _selectedPurpose = 'breeding';
@@ -91,6 +95,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     _selectedBreedId = rabbit.breedId;
     _selectedFatherId = rabbit.fatherId;
     _selectedMotherId = rabbit.motherId;
+    _fatherLabel = rabbit.father?.name;
+    _motherLabel = rabbit.mother?.name;
     _selectedSex = rabbit.sex;
     _selectedStatus = rabbit.status;
     _selectedPurpose = rabbit.purpose;
@@ -227,8 +233,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         'birth_date': _birthDate.toIso8601String(),
         'status': _selectedStatus,
         'purpose': _selectedPurpose,
-        if (_selectedFatherId != null) 'father_id': _selectedFatherId,
-        if (_selectedMotherId != null) 'mother_id': _selectedMotherId,
+        // Ключи отправляются всегда, включая null: раньше убранный родитель
+        // просто не попадал в запрос, и сервер оставлял прежнего.
+        'father_id': _selectedFatherId,
+        'mother_id': _selectedMotherId,
         if (_colorController.text.isNotEmpty)
           'color': _colorController.text.trim(),
         if (_weightController.text.isNotEmpty)
@@ -468,21 +476,34 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             AppFormSection(
               title: 'Родословная',
               children: [
-                ParentSelector(
+                // Родитель выбирается поиском по серверу: прежний виджет
+                // предлагал только тех кроликов, что успели подгрузиться в
+                // постраничный список.
+                RabbitPickerField(
                   label: 'Отец',
+                  icon: Icons.male,
                   sex: 'male',
-                  selectedParentId: _selectedFatherId,
-                  excludeRabbitId: widget.rabbitId ?? widget.rabbit?.id,
-                  onChanged: (value) =>
-                      setState(() => _selectedFatherId = value),
+                  selected: _father,
+                  selectedLabel: _fatherLabel,
+                  excludeId: widget.rabbitId ?? widget.rabbit?.id,
+                  onChanged: (rabbit) => setState(() {
+                    _father = rabbit;
+                    _fatherLabel = null;
+                    _selectedFatherId = rabbit?.id;
+                  }),
                 ),
-                ParentSelector(
+                RabbitPickerField(
                   label: 'Мать',
+                  icon: Icons.female,
                   sex: 'female',
-                  selectedParentId: _selectedMotherId,
-                  excludeRabbitId: widget.rabbitId ?? widget.rabbit?.id,
-                  onChanged: (value) =>
-                      setState(() => _selectedMotherId = value),
+                  selected: _mother,
+                  selectedLabel: _motherLabel,
+                  excludeId: widget.rabbitId ?? widget.rabbit?.id,
+                  onChanged: (rabbit) => setState(() {
+                    _mother = rabbit;
+                    _motherLabel = null;
+                    _selectedMotherId = rabbit?.id;
+                  }),
                 ),
               ],
             ),

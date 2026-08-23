@@ -61,6 +61,10 @@ class RabbitPickerField extends ConsumerWidget {
   final RabbitModel? selected;
   final ValueChanged<RabbitModel?> onChanged;
 
+  /// Что показать, когда сама запись выбрана, но её модель недоступна.
+  /// Так бывает при правке: с сервера приходят только имя и номер родителя.
+  final String? selectedLabel;
+
   /// Показать только самцов (`male`) или только самок (`female`).
   final String? sex;
 
@@ -76,6 +80,7 @@ class RabbitPickerField extends ConsumerWidget {
     required this.label,
     required this.selected,
     required this.onChanged,
+    this.selectedLabel,
     this.sex,
     this.excludeId,
     this.enabled = true,
@@ -83,11 +88,15 @@ class RabbitPickerField extends ConsumerWidget {
     this.icon = Icons.pets_outlined,
   });
 
+  String? get _text => selected != null
+      ? '${selected!.name} · ${selected!.tagId}'
+      : selectedLabel;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FormField<RabbitModel>(
       initialValue: selected,
-      validator: (_) => required && selected == null
+      validator: (_) => required && _text == null
           ? context.l10n.rabbitPickerRequired
           : null,
       builder: (field) => InkWell(
@@ -107,13 +116,13 @@ class RabbitPickerField extends ConsumerWidget {
               }
             : null,
         child: InputDecorator(
-          isEmpty: selected == null,
+          isEmpty: _text == null,
           decoration: InputDecoration(
             labelText: label,
             enabled: enabled,
             errorText: field.errorText,
             prefixIcon: Icon(icon),
-            suffixIcon: selected != null && enabled
+            suffixIcon: _text != null && enabled
                 ? IconButton(
                     tooltip: context.l10n.rabbitPickerClear,
                     icon: const Icon(Icons.clear),
@@ -124,10 +133,10 @@ class RabbitPickerField extends ConsumerWidget {
                   )
                 : const Icon(Icons.arrow_drop_down),
           ),
-          child: selected == null
+          child: _text == null
               ? null
               : Text(
-                  '${selected!.name} · ${selected!.tagId}',
+                  _text!,
                   style: AppTypography.bodyLg
                       .copyWith(color: context.colors.onSurface),
                   maxLines: 1,

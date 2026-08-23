@@ -1623,6 +1623,112 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cageFormFailed => 'Не удалось сохранить клетку';
 
   @override
+  String get rabbitsTitle => 'Кролики';
+
+  @override
+  String get rabbitsSearchHint => 'Кличка или номер бирки';
+
+  @override
+  String get rabbitsEmptyTitle => 'Кроликов пока нет';
+
+  @override
+  String get rabbitsEmptyBody =>
+      'Заведите первого кролика — от него пойдёт весь учёт: родословная, здоровье и приплод.';
+
+  @override
+  String get rabbitsEmptyAction => 'Добавить кролика';
+
+  @override
+  String get rabbitsNothingFound => 'Никого не нашлось';
+
+  @override
+  String get rabbitsNothingFoundBody => 'Проверьте запрос или снимите фильтры.';
+
+  @override
+  String get rabbitsFilterAll => 'Все';
+
+  @override
+  String get rabbitsFilterMales => 'Самцы';
+
+  @override
+  String get rabbitsFilterFemales => 'Самки';
+
+  @override
+  String get rabbitsFilterActive => 'В работе';
+
+  @override
+  String get rabbitsFilterSold => 'Проданы';
+
+  @override
+  String get sexMale => 'Самец';
+
+  @override
+  String get sexFemale => 'Самка';
+
+  @override
+  String get sexUnknown => 'Пол не указан';
+
+  @override
+  String get rabbitNoTag => 'Без бирки';
+
+  @override
+  String get weightTitle => 'Взвешивания';
+
+  @override
+  String weightSubtitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String get weightEmptyTitle => 'Взвешиваний пока нет';
+
+  @override
+  String get weightEmptyBody =>
+      'Записывайте вес — по нему видно, растёт кролик или что-то не так.';
+
+  @override
+  String get weightAdd => 'Записать вес';
+
+  @override
+  String get weightSummary => 'Сводка';
+
+  @override
+  String get weightCurrent => 'Сейчас';
+
+  @override
+  String get weightTrend => 'С прошлого раза';
+
+  @override
+  String get weightTotalChange => 'За всё время';
+
+  @override
+  String get weightHistory => 'История';
+
+  @override
+  String get weightValue => 'Вес, кг';
+
+  @override
+  String get weightValueHint => 'Например, 3,5';
+
+  @override
+  String get weightValueEmpty => 'Введите вес';
+
+  @override
+  String get weightValuePositive => 'Вес должен быть больше нуля';
+
+  @override
+  String get weightWhen => 'Когда взвесили';
+
+  @override
+  String get weightNotes => 'Заметки';
+
+  @override
+  String get weightSaved => 'Вес записан';
+
+  @override
+  String get weightSaveFailed => 'Не удалось записать вес';
+
+  @override
   String get emptyNoRecordsTitle => 'Записей нет';
 
   @override
