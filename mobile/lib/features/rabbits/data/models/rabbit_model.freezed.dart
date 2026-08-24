@@ -23,9 +23,15 @@ RabbitModel _$RabbitModelFromJson(Map<String, dynamic> json) {
 mixin _$RabbitModel {
   @IntConverter()
   int get id => throw _privateConstructorUsedError;
+
+  /// Клеймо и кличка необязательны: в базе оба столбца допускают пустоту,
+  /// и сервер прямо разрешает завести кролика без них
+  /// (`rabbitValidator.js`: `.allow(null, '')`). Пока модель требовала обе,
+  /// один такой кролик ронял разбор всей страницы списка — вместе со
+  /// «Стадом», выпадающими полями форм и подбором пар.
   @JsonKey(name: 'tag_id')
-  String get tagId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  String? get tagId => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'breed_id')
   @IntConverter()
   int get breedId => throw _privateConstructorUsedError;
@@ -73,9 +79,9 @@ mixin _$RabbitModel {
   @JsonKey(name: 'Cage')
   CageInfo? get cage => throw _privateConstructorUsedError;
   @JsonKey(name: 'father')
-  ParentInfo? get father => throw _privateConstructorUsedError;
+  RabbitRef? get father => throw _privateConstructorUsedError;
   @JsonKey(name: 'mother')
-  ParentInfo? get mother => throw _privateConstructorUsedError;
+  RabbitRef? get mother => throw _privateConstructorUsedError;
 
   /// Serializes this RabbitModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -96,8 +102,8 @@ abstract class $RabbitModelCopyWith<$Res> {
   @useResult
   $Res call({
     @IntConverter() int id,
-    @JsonKey(name: 'tag_id') String tagId,
-    String name,
+    @JsonKey(name: 'tag_id') String? tagId,
+    String? name,
     @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
     @JsonKey(name: 'birth_date') @DateOnlyConverter() DateTime birthDate,
@@ -123,14 +129,14 @@ abstract class $RabbitModelCopyWith<$Res> {
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
     @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
-    @JsonKey(name: 'father') ParentInfo? father,
-    @JsonKey(name: 'mother') ParentInfo? mother,
+    @JsonKey(name: 'father') RabbitRef? father,
+    @JsonKey(name: 'mother') RabbitRef? mother,
   });
 
   $BreedModelCopyWith<$Res>? get breed;
   $CageInfoCopyWith<$Res>? get cage;
-  $ParentInfoCopyWith<$Res>? get father;
-  $ParentInfoCopyWith<$Res>? get mother;
+  $RabbitRefCopyWith<$Res>? get father;
+  $RabbitRefCopyWith<$Res>? get mother;
 }
 
 /// @nodoc
@@ -149,8 +155,8 @@ class _$RabbitModelCopyWithImpl<$Res, $Val extends RabbitModel>
   @override
   $Res call({
     Object? id = null,
-    Object? tagId = null,
-    Object? name = null,
+    Object? tagId = freezed,
+    Object? name = freezed,
     Object? breedId = null,
     Object? sex = null,
     Object? birthDate = null,
@@ -181,14 +187,14 @@ class _$RabbitModelCopyWithImpl<$Res, $Val extends RabbitModel>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as int,
-            tagId: null == tagId
+            tagId: freezed == tagId
                 ? _value.tagId
                 : tagId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
+                      as String?,
+            name: freezed == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             breedId: null == breedId
                 ? _value.breedId
                 : breedId // ignore: cast_nullable_to_non_nullable
@@ -276,11 +282,11 @@ class _$RabbitModelCopyWithImpl<$Res, $Val extends RabbitModel>
             father: freezed == father
                 ? _value.father
                 : father // ignore: cast_nullable_to_non_nullable
-                      as ParentInfo?,
+                      as RabbitRef?,
             mother: freezed == mother
                 ? _value.mother
                 : mother // ignore: cast_nullable_to_non_nullable
-                      as ParentInfo?,
+                      as RabbitRef?,
           )
           as $Val,
     );
@@ -318,12 +324,12 @@ class _$RabbitModelCopyWithImpl<$Res, $Val extends RabbitModel>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $ParentInfoCopyWith<$Res>? get father {
+  $RabbitRefCopyWith<$Res>? get father {
     if (_value.father == null) {
       return null;
     }
 
-    return $ParentInfoCopyWith<$Res>(_value.father!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.father!, (value) {
       return _then(_value.copyWith(father: value) as $Val);
     });
   }
@@ -332,12 +338,12 @@ class _$RabbitModelCopyWithImpl<$Res, $Val extends RabbitModel>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $ParentInfoCopyWith<$Res>? get mother {
+  $RabbitRefCopyWith<$Res>? get mother {
     if (_value.mother == null) {
       return null;
     }
 
-    return $ParentInfoCopyWith<$Res>(_value.mother!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.mother!, (value) {
       return _then(_value.copyWith(mother: value) as $Val);
     });
   }
@@ -354,8 +360,8 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
   @useResult
   $Res call({
     @IntConverter() int id,
-    @JsonKey(name: 'tag_id') String tagId,
-    String name,
+    @JsonKey(name: 'tag_id') String? tagId,
+    String? name,
     @JsonKey(name: 'breed_id') @IntConverter() int breedId,
     String sex,
     @JsonKey(name: 'birth_date') @DateOnlyConverter() DateTime birthDate,
@@ -381,8 +387,8 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
     @JsonKey(name: 'updated_at') @DateTimeConverter() DateTime updatedAt,
     @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
-    @JsonKey(name: 'father') ParentInfo? father,
-    @JsonKey(name: 'mother') ParentInfo? mother,
+    @JsonKey(name: 'father') RabbitRef? father,
+    @JsonKey(name: 'mother') RabbitRef? mother,
   });
 
   @override
@@ -390,9 +396,9 @@ abstract class _$$RabbitModelImplCopyWith<$Res>
   @override
   $CageInfoCopyWith<$Res>? get cage;
   @override
-  $ParentInfoCopyWith<$Res>? get father;
+  $RabbitRefCopyWith<$Res>? get father;
   @override
-  $ParentInfoCopyWith<$Res>? get mother;
+  $RabbitRefCopyWith<$Res>? get mother;
 }
 
 /// @nodoc
@@ -410,8 +416,8 @@ class __$$RabbitModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? tagId = null,
-    Object? name = null,
+    Object? tagId = freezed,
+    Object? name = freezed,
     Object? breedId = null,
     Object? sex = null,
     Object? birthDate = null,
@@ -442,14 +448,14 @@ class __$$RabbitModelImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as int,
-        tagId: null == tagId
+        tagId: freezed == tagId
             ? _value.tagId
             : tagId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
+                  as String?,
+        name: freezed == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         breedId: null == breedId
             ? _value.breedId
             : breedId // ignore: cast_nullable_to_non_nullable
@@ -537,11 +543,11 @@ class __$$RabbitModelImplCopyWithImpl<$Res>
         father: freezed == father
             ? _value.father
             : father // ignore: cast_nullable_to_non_nullable
-                  as ParentInfo?,
+                  as RabbitRef?,
         mother: freezed == mother
             ? _value.mother
             : mother // ignore: cast_nullable_to_non_nullable
-                  as ParentInfo?,
+                  as RabbitRef?,
       ),
     );
   }
@@ -549,11 +555,11 @@ class __$$RabbitModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RabbitModelImpl implements _RabbitModel {
+class _$RabbitModelImpl extends _RabbitModel {
   const _$RabbitModelImpl({
     @IntConverter() required this.id,
-    @JsonKey(name: 'tag_id') required this.tagId,
-    required this.name,
+    @JsonKey(name: 'tag_id') this.tagId,
+    this.name,
     @JsonKey(name: 'breed_id') @IntConverter() required this.breedId,
     required this.sex,
     @JsonKey(name: 'birth_date') @DateOnlyConverter() required this.birthDate,
@@ -579,7 +585,7 @@ class _$RabbitModelImpl implements _RabbitModel {
     @JsonKey(name: 'Cage') this.cage,
     @JsonKey(name: 'father') this.father,
     @JsonKey(name: 'mother') this.mother,
-  });
+  }) : super._();
 
   factory _$RabbitModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$RabbitModelImplFromJson(json);
@@ -587,11 +593,17 @@ class _$RabbitModelImpl implements _RabbitModel {
   @override
   @IntConverter()
   final int id;
+
+  /// Клеймо и кличка необязательны: в базе оба столбца допускают пустоту,
+  /// и сервер прямо разрешает завести кролика без них
+  /// (`rabbitValidator.js`: `.allow(null, '')`). Пока модель требовала обе,
+  /// один такой кролик ронял разбор всей страницы списка — вместе со
+  /// «Стадом», выпадающими полями форм и подбором пар.
   @override
   @JsonKey(name: 'tag_id')
-  final String tagId;
+  final String? tagId;
   @override
-  final String name;
+  final String? name;
   @override
   @JsonKey(name: 'breed_id')
   @IntConverter()
@@ -662,10 +674,10 @@ class _$RabbitModelImpl implements _RabbitModel {
   final CageInfo? cage;
   @override
   @JsonKey(name: 'father')
-  final ParentInfo? father;
+  final RabbitRef? father;
   @override
   @JsonKey(name: 'mother')
-  final ParentInfo? mother;
+  final RabbitRef? mother;
 
   @override
   String toString() {
@@ -763,11 +775,11 @@ class _$RabbitModelImpl implements _RabbitModel {
   }
 }
 
-abstract class _RabbitModel implements RabbitModel {
+abstract class _RabbitModel extends RabbitModel {
   const factory _RabbitModel({
     @IntConverter() required final int id,
-    @JsonKey(name: 'tag_id') required final String tagId,
-    required final String name,
+    @JsonKey(name: 'tag_id') final String? tagId,
+    final String? name,
     @JsonKey(name: 'breed_id') @IntConverter() required final int breedId,
     required final String sex,
     @JsonKey(name: 'birth_date')
@@ -801,9 +813,10 @@ abstract class _RabbitModel implements RabbitModel {
     required final DateTime updatedAt,
     @JsonKey(name: 'breed') final BreedModel? breed,
     @JsonKey(name: 'Cage') final CageInfo? cage,
-    @JsonKey(name: 'father') final ParentInfo? father,
-    @JsonKey(name: 'mother') final ParentInfo? mother,
+    @JsonKey(name: 'father') final RabbitRef? father,
+    @JsonKey(name: 'mother') final RabbitRef? mother,
   }) = _$RabbitModelImpl;
+  const _RabbitModel._() : super._();
 
   factory _RabbitModel.fromJson(Map<String, dynamic> json) =
       _$RabbitModelImpl.fromJson;
@@ -811,11 +824,17 @@ abstract class _RabbitModel implements RabbitModel {
   @override
   @IntConverter()
   int get id;
+
+  /// Клеймо и кличка необязательны: в базе оба столбца допускают пустоту,
+  /// и сервер прямо разрешает завести кролика без них
+  /// (`rabbitValidator.js`: `.allow(null, '')`). Пока модель требовала обе,
+  /// один такой кролик ронял разбор всей страницы списка — вместе со
+  /// «Стадом», выпадающими полями форм и подбором пар.
   @override
   @JsonKey(name: 'tag_id')
-  String get tagId;
+  String? get tagId;
   @override
-  String get name;
+  String? get name;
   @override
   @JsonKey(name: 'breed_id')
   @IntConverter()
@@ -885,10 +904,10 @@ abstract class _RabbitModel implements RabbitModel {
   CageInfo? get cage;
   @override
   @JsonKey(name: 'father')
-  ParentInfo? get father;
+  RabbitRef? get father;
   @override
   @JsonKey(name: 'mother')
-  ParentInfo? get mother;
+  RabbitRef? get mother;
 
   /// Create a copy of RabbitModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1123,71 +1142,73 @@ abstract class _CageInfo implements CageInfo {
       throw _privateConstructorUsedError;
 }
 
-ParentInfo _$ParentInfoFromJson(Map<String, dynamic> json) {
-  return _ParentInfo.fromJson(json);
+RabbitRef _$RabbitRefFromJson(Map<String, dynamic> json) {
+  return _RabbitRef.fromJson(json);
 }
 
 /// @nodoc
-mixin _$ParentInfo {
+mixin _$RabbitRef {
   @IntConverter()
   int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'tag_id')
-  String get tagId => throw _privateConstructorUsedError;
+  String? get tagId => throw _privateConstructorUsedError;
 
-  /// Serializes this ParentInfo to a JSON map.
+  /// Serializes this RabbitRef to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of ParentInfo
+  /// Create a copy of RabbitRef
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ParentInfoCopyWith<ParentInfo> get copyWith =>
+  $RabbitRefCopyWith<RabbitRef> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ParentInfoCopyWith<$Res> {
-  factory $ParentInfoCopyWith(
-    ParentInfo value,
-    $Res Function(ParentInfo) then,
-  ) = _$ParentInfoCopyWithImpl<$Res, ParentInfo>;
+abstract class $RabbitRefCopyWith<$Res> {
+  factory $RabbitRefCopyWith(RabbitRef value, $Res Function(RabbitRef) then) =
+      _$RabbitRefCopyWithImpl<$Res, RabbitRef>;
   @useResult
   $Res call({
     @IntConverter() int id,
-    String name,
-    @JsonKey(name: 'tag_id') String tagId,
+    String? name,
+    @JsonKey(name: 'tag_id') String? tagId,
   });
 }
 
 /// @nodoc
-class _$ParentInfoCopyWithImpl<$Res, $Val extends ParentInfo>
-    implements $ParentInfoCopyWith<$Res> {
-  _$ParentInfoCopyWithImpl(this._value, this._then);
+class _$RabbitRefCopyWithImpl<$Res, $Val extends RabbitRef>
+    implements $RabbitRefCopyWith<$Res> {
+  _$RabbitRefCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ParentInfo
+  /// Create a copy of RabbitRef
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? id = null, Object? name = null, Object? tagId = null}) {
+  $Res call({
+    Object? id = null,
+    Object? name = freezed,
+    Object? tagId = freezed,
+  }) {
     return _then(
       _value.copyWith(
             id: null == id
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as int,
-            name: null == name
+            name: freezed == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-            tagId: null == tagId
+                      as String?,
+            tagId: freezed == tagId
                 ? _value.tagId
                 : tagId // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -1195,49 +1216,53 @@ class _$ParentInfoCopyWithImpl<$Res, $Val extends ParentInfo>
 }
 
 /// @nodoc
-abstract class _$$ParentInfoImplCopyWith<$Res>
-    implements $ParentInfoCopyWith<$Res> {
-  factory _$$ParentInfoImplCopyWith(
-    _$ParentInfoImpl value,
-    $Res Function(_$ParentInfoImpl) then,
-  ) = __$$ParentInfoImplCopyWithImpl<$Res>;
+abstract class _$$RabbitRefImplCopyWith<$Res>
+    implements $RabbitRefCopyWith<$Res> {
+  factory _$$RabbitRefImplCopyWith(
+    _$RabbitRefImpl value,
+    $Res Function(_$RabbitRefImpl) then,
+  ) = __$$RabbitRefImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
     @IntConverter() int id,
-    String name,
-    @JsonKey(name: 'tag_id') String tagId,
+    String? name,
+    @JsonKey(name: 'tag_id') String? tagId,
   });
 }
 
 /// @nodoc
-class __$$ParentInfoImplCopyWithImpl<$Res>
-    extends _$ParentInfoCopyWithImpl<$Res, _$ParentInfoImpl>
-    implements _$$ParentInfoImplCopyWith<$Res> {
-  __$$ParentInfoImplCopyWithImpl(
-    _$ParentInfoImpl _value,
-    $Res Function(_$ParentInfoImpl) _then,
+class __$$RabbitRefImplCopyWithImpl<$Res>
+    extends _$RabbitRefCopyWithImpl<$Res, _$RabbitRefImpl>
+    implements _$$RabbitRefImplCopyWith<$Res> {
+  __$$RabbitRefImplCopyWithImpl(
+    _$RabbitRefImpl _value,
+    $Res Function(_$RabbitRefImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of ParentInfo
+  /// Create a copy of RabbitRef
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? id = null, Object? name = null, Object? tagId = null}) {
+  $Res call({
+    Object? id = null,
+    Object? name = freezed,
+    Object? tagId = freezed,
+  }) {
     return _then(
-      _$ParentInfoImpl(
+      _$RabbitRefImpl(
         id: null == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as int,
-        name: null == name
+        name: freezed == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-        tagId: null == tagId
+                  as String?,
+        tagId: freezed == tagId
             ? _value.tagId
             : tagId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -1245,35 +1270,35 @@ class __$$ParentInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ParentInfoImpl implements _ParentInfo {
-  const _$ParentInfoImpl({
+class _$RabbitRefImpl extends _RabbitRef {
+  const _$RabbitRefImpl({
     @IntConverter() required this.id,
-    required this.name,
-    @JsonKey(name: 'tag_id') required this.tagId,
-  });
+    this.name,
+    @JsonKey(name: 'tag_id') this.tagId,
+  }) : super._();
 
-  factory _$ParentInfoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ParentInfoImplFromJson(json);
+  factory _$RabbitRefImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RabbitRefImplFromJson(json);
 
   @override
   @IntConverter()
   final int id;
   @override
-  final String name;
+  final String? name;
   @override
   @JsonKey(name: 'tag_id')
-  final String tagId;
+  final String? tagId;
 
   @override
   String toString() {
-    return 'ParentInfo(id: $id, name: $name, tagId: $tagId)';
+    return 'RabbitRef(id: $id, name: $name, tagId: $tagId)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ParentInfoImpl &&
+            other is _$RabbitRefImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.tagId, tagId) || other.tagId == tagId));
@@ -1283,43 +1308,44 @@ class _$ParentInfoImpl implements _ParentInfo {
   @override
   int get hashCode => Object.hash(runtimeType, id, name, tagId);
 
-  /// Create a copy of ParentInfo
+  /// Create a copy of RabbitRef
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ParentInfoImplCopyWith<_$ParentInfoImpl> get copyWith =>
-      __$$ParentInfoImplCopyWithImpl<_$ParentInfoImpl>(this, _$identity);
+  _$$RabbitRefImplCopyWith<_$RabbitRefImpl> get copyWith =>
+      __$$RabbitRefImplCopyWithImpl<_$RabbitRefImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ParentInfoImplToJson(this);
+    return _$$RabbitRefImplToJson(this);
   }
 }
 
-abstract class _ParentInfo implements ParentInfo {
-  const factory _ParentInfo({
+abstract class _RabbitRef extends RabbitRef {
+  const factory _RabbitRef({
     @IntConverter() required final int id,
-    required final String name,
-    @JsonKey(name: 'tag_id') required final String tagId,
-  }) = _$ParentInfoImpl;
+    final String? name,
+    @JsonKey(name: 'tag_id') final String? tagId,
+  }) = _$RabbitRefImpl;
+  const _RabbitRef._() : super._();
 
-  factory _ParentInfo.fromJson(Map<String, dynamic> json) =
-      _$ParentInfoImpl.fromJson;
+  factory _RabbitRef.fromJson(Map<String, dynamic> json) =
+      _$RabbitRefImpl.fromJson;
 
   @override
   @IntConverter()
   int get id;
   @override
-  String get name;
+  String? get name;
   @override
   @JsonKey(name: 'tag_id')
-  String get tagId;
+  String? get tagId;
 
-  /// Create a copy of ParentInfo
+  /// Create a copy of RabbitRef
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ParentInfoImplCopyWith<_$ParentInfoImpl> get copyWith =>
+  _$$RabbitRefImplCopyWith<_$RabbitRefImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

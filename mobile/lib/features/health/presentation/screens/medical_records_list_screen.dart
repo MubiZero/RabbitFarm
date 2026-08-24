@@ -319,7 +319,7 @@ class _RecordCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           if (record.rabbit != null)
             Text(
-              record.rabbit!.name,
+              record.rabbit!.label,
               style: AppTypography.titleMd
                   .copyWith(color: context.colors.onSurface),
               maxLines: 1,
@@ -455,7 +455,7 @@ class _DetailsSheet extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      record.rabbit?.name ?? context.l10n.navRabbits,
+                      record.rabbit?.label ?? context.l10n.navRabbits,
                       style: AppTypography.displayMd
                           .copyWith(color: context.colors.onSurface),
                     ),

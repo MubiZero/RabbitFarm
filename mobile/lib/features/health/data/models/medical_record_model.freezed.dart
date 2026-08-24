@@ -49,8 +49,15 @@ mixin _$MedicalRecord {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit => throw _privateConstructorUsedError;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this MedicalRecord to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -89,10 +96,10 @@ abstract class $MedicalRecordCopyWith<$Res> {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -192,7 +199,7 @@ class _$MedicalRecordCopyWithImpl<$Res, $Val extends MedicalRecord>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as RabbitModel?,
+                      as RabbitRef?,
           )
           as $Val,
     );
@@ -202,12 +209,12 @@ class _$MedicalRecordCopyWithImpl<$Res, $Val extends MedicalRecord>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $RabbitModelCopyWith<$Res>? get rabbit {
+  $RabbitRefCopyWith<$Res>? get rabbit {
     if (_value.rabbit == null) {
       return null;
     }
 
-    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
       return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
@@ -242,11 +249,11 @@ abstract class _$$MedicalRecordImplCopyWith<$Res>
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
   @override
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -345,7 +352,7 @@ class __$$MedicalRecordImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as RabbitModel?,
+                  as RabbitRef?,
       ),
     );
   }
@@ -370,7 +377,7 @@ class _$MedicalRecordImpl implements _MedicalRecord {
     this.notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
+    @JsonKey(name: 'rabbit') this.rabbit,
   });
 
   factory _$MedicalRecordImpl.fromJson(Map<String, dynamic> json) =>
@@ -419,9 +426,16 @@ class _$MedicalRecordImpl implements _MedicalRecord {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   final DateTime? updatedAt;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final RabbitModel? rabbit;
+  @JsonKey(name: 'rabbit')
+  final RabbitRef? rabbit;
 
   @override
   String toString() {
@@ -522,8 +536,7 @@ abstract class _MedicalRecord implements MedicalRecord {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') final RabbitRef? rabbit,
   }) = _$MedicalRecordImpl;
 
   factory _MedicalRecord.fromJson(Map<String, dynamic> json) =
@@ -572,9 +585,16 @@ abstract class _MedicalRecord implements MedicalRecord {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   DateTime? get updatedAt;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit;
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit;
 
   /// Create a copy of MedicalRecord
   /// with the given fields replaced by the non-null parameter values.
@@ -2367,8 +2387,15 @@ mixin _$MedicalRecordWithDays {
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'days_ongoing')
   int get daysOngoing => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit => throw _privateConstructorUsedError;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this MedicalRecordWithDays to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2402,10 +2429,10 @@ abstract class $MedicalRecordWithDaysCopyWith<$Res> {
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -2503,7 +2530,7 @@ class _$MedicalRecordWithDaysCopyWithImpl<
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as RabbitModel?,
+                      as RabbitRef?,
           )
           as $Val,
     );
@@ -2513,12 +2540,12 @@ class _$MedicalRecordWithDaysCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $RabbitModelCopyWith<$Res>? get rabbit {
+  $RabbitRefCopyWith<$Res>? get rabbit {
     if (_value.rabbit == null) {
       return null;
     }
 
-    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
       return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
@@ -2548,11 +2575,11 @@ abstract class _$$MedicalRecordWithDaysImplCopyWith<$Res>
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
   @override
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -2647,7 +2674,7 @@ class __$$MedicalRecordWithDaysImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as RabbitModel?,
+                  as RabbitRef?,
       ),
     );
   }
@@ -2671,7 +2698,7 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
     this.veterinarian,
     this.notes,
     @JsonKey(name: 'days_ongoing') required this.daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
+    @JsonKey(name: 'rabbit') this.rabbit,
   });
 
   factory _$MedicalRecordWithDaysImpl.fromJson(Map<String, dynamic> json) =>
@@ -2715,9 +2742,16 @@ class _$MedicalRecordWithDaysImpl implements _MedicalRecordWithDays {
   @override
   @JsonKey(name: 'days_ongoing')
   final int daysOngoing;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final RabbitModel? rabbit;
+  @JsonKey(name: 'rabbit')
+  final RabbitRef? rabbit;
 
   @override
   String toString() {
@@ -2814,8 +2848,7 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
     final String? veterinarian,
     final String? notes,
     @JsonKey(name: 'days_ongoing') required final int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') final RabbitRef? rabbit,
   }) = _$MedicalRecordWithDaysImpl;
 
   factory _MedicalRecordWithDays.fromJson(Map<String, dynamic> json) =
@@ -2859,9 +2892,16 @@ abstract class _MedicalRecordWithDays implements MedicalRecordWithDays {
   @override
   @JsonKey(name: 'days_ongoing')
   int get daysOngoing;
+
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit;
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit;
 
   /// Create a copy of MedicalRecordWithDays
   /// with the given fields replaced by the non-null parameter values.

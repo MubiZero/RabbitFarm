@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const feedingRecordController = require('../controllers/feedingRecordController');
-const { createFeedingRecordSchema, updateFeedingRecordSchema, listFeedingRecordsQuerySchema } = require('../validators/feedingRecordValidator');
+const {
+  createFeedingRecordSchema,
+  bulkCreateFeedingRecordsSchema,
+  updateFeedingRecordSchema,
+  listFeedingRecordsQuerySchema
+} = require('../validators/feedingRecordValidator');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
@@ -47,6 +52,52 @@ const validate = require('../middleware/validation');
  *     responses:
  *       201:
  *         description: Запись кормления создана
+ *
+ * /feeding-records/bulk:
+ *   post:
+ *     summary: Записать кормление сразу нескольким получателям
+ *     description: >
+ *       Одна раздача корма нескольким получателям одним запросом.
+ *       quantity — норма на ОДНОГО получателя; со склада списывается
+ *       quantity, умноженное на число получателей, один раз.
+ *       Пачка либо создаётся целиком, либо не создаётся вовсе.
+ *     tags: [FeedingRecords]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [feed_id, quantity, fed_at]
+ *             properties:
+ *               feed_id: { type: integer }
+ *               quantity: { type: number, description: На одного получателя }
+ *               fed_at: { type: string, format: date-time }
+ *               notes: { type: string }
+ *               rabbit_ids:
+ *                 type: array
+ *                 items: { type: integer }
+ *               cage_ids:
+ *                 type: array
+ *                 items: { type: integer }
+ *     responses:
+ *       201:
+ *         description: Записи созданы
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     created: { type: integer }
+ *                     quantity_per_recipient: { type: number }
+ *                     total_quantity: { type: number }
+ *       400:
+ *         description: Недостаточно корма на складе
+ *       404:
+ *         description: Получатель или корм не найден на этой ферме
  *
  * /feeding-records/{id}:
  *   get:
@@ -111,6 +162,9 @@ router.get('/recent', feedingRecordController.getRecent);
 
 // CRUD routes
 router.post('/', validate(createFeedingRecordSchema), feedingRecordController.create);
+// Пачка объявлена до маршрутов с :id — иначе /bulk был бы прочитан как id.
+// Прав нужно столько же, сколько на одиночную запись: кормит работник.
+router.post('/bulk', validate(bulkCreateFeedingRecordsSchema), feedingRecordController.createBulk);
 router.get('/', validate(listFeedingRecordsQuerySchema, 'query'), feedingRecordController.list);
 router.get('/:id', feedingRecordController.getById);
 router.put('/:id', validate(updateFeedingRecordSchema), feedingRecordController.update);

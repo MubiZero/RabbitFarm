@@ -39,6 +39,13 @@ mixin _$BreedingModel {
   String? get updatedAt => throw _privateConstructorUsedError; // Связанные объекты (если включены в ответ)
   RabbitModel? get male => throw _privateConstructorUsedError;
   RabbitModel? get female =>
+      throw _privateConstructorUsedError; // Настоящий окрол по этой случке: сервер кладёт его в список случек
+  // вложенным объектом `birth`. От этого дня считают отсадку молодняка —
+  // ожидаемая дата окрола для такого счёта годится только пока настоящей
+  // нет. У старых сборок сервера объекта нет вовсе, поэтому оба поля
+  // необязательные.
+  String? get actualBirthDate => throw _privateConstructorUsedError;
+  String? get weaningDate =>
       throw _privateConstructorUsedError; // Информация об инбридинге
   @JsonKey(name: 'inbreeding_coefficient')
   double? get inbreedingCoefficient => throw _privateConstructorUsedError;
@@ -73,6 +80,8 @@ abstract class $BreedingModelCopyWith<$Res> {
     @JsonKey(name: 'updated_at') String? updatedAt,
     RabbitModel? male,
     RabbitModel? female,
+    String? actualBirthDate,
+    String? weaningDate,
     @JsonKey(name: 'inbreeding_coefficient') double? inbreedingCoefficient,
     @JsonKey(name: 'common_ancestors') List<String>? commonAncestors,
   });
@@ -109,6 +118,8 @@ class _$BreedingModelCopyWithImpl<$Res, $Val extends BreedingModel>
     Object? updatedAt = freezed,
     Object? male = freezed,
     Object? female = freezed,
+    Object? actualBirthDate = freezed,
+    Object? weaningDate = freezed,
     Object? inbreedingCoefficient = freezed,
     Object? commonAncestors = freezed,
   }) {
@@ -166,6 +177,14 @@ class _$BreedingModelCopyWithImpl<$Res, $Val extends BreedingModel>
                 ? _value.female
                 : female // ignore: cast_nullable_to_non_nullable
                       as RabbitModel?,
+            actualBirthDate: freezed == actualBirthDate
+                ? _value.actualBirthDate
+                : actualBirthDate // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            weaningDate: freezed == weaningDate
+                ? _value.weaningDate
+                : weaningDate // ignore: cast_nullable_to_non_nullable
+                      as String?,
             inbreedingCoefficient: freezed == inbreedingCoefficient
                 ? _value.inbreedingCoefficient
                 : inbreedingCoefficient // ignore: cast_nullable_to_non_nullable
@@ -231,6 +250,8 @@ abstract class _$$BreedingModelImplCopyWith<$Res>
     @JsonKey(name: 'updated_at') String? updatedAt,
     RabbitModel? male,
     RabbitModel? female,
+    String? actualBirthDate,
+    String? weaningDate,
     @JsonKey(name: 'inbreeding_coefficient') double? inbreedingCoefficient,
     @JsonKey(name: 'common_ancestors') List<String>? commonAncestors,
   });
@@ -268,6 +289,8 @@ class __$$BreedingModelImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? male = freezed,
     Object? female = freezed,
+    Object? actualBirthDate = freezed,
+    Object? weaningDate = freezed,
     Object? inbreedingCoefficient = freezed,
     Object? commonAncestors = freezed,
   }) {
@@ -325,6 +348,14 @@ class __$$BreedingModelImplCopyWithImpl<$Res>
             ? _value.female
             : female // ignore: cast_nullable_to_non_nullable
                   as RabbitModel?,
+        actualBirthDate: freezed == actualBirthDate
+            ? _value.actualBirthDate
+            : actualBirthDate // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        weaningDate: freezed == weaningDate
+            ? _value.weaningDate
+            : weaningDate // ignore: cast_nullable_to_non_nullable
+                  as String?,
         inbreedingCoefficient: freezed == inbreedingCoefficient
             ? _value.inbreedingCoefficient
             : inbreedingCoefficient // ignore: cast_nullable_to_non_nullable
@@ -355,6 +386,8 @@ class _$BreedingModelImpl implements _BreedingModel {
     @JsonKey(name: 'updated_at') this.updatedAt,
     this.male,
     this.female,
+    this.actualBirthDate,
+    this.weaningDate,
     @JsonKey(name: 'inbreeding_coefficient') this.inbreedingCoefficient,
     @JsonKey(name: 'common_ancestors') final List<String>? commonAncestors,
   }) : _commonAncestors = commonAncestors;
@@ -395,6 +428,15 @@ class _$BreedingModelImpl implements _BreedingModel {
   final RabbitModel? male;
   @override
   final RabbitModel? female;
+  // Настоящий окрол по этой случке: сервер кладёт его в список случек
+  // вложенным объектом `birth`. От этого дня считают отсадку молодняка —
+  // ожидаемая дата окрола для такого счёта годится только пока настоящей
+  // нет. У старых сборок сервера объекта нет вовсе, поэтому оба поля
+  // необязательные.
+  @override
+  final String? actualBirthDate;
+  @override
+  final String? weaningDate;
   // Информация об инбридинге
   @override
   @JsonKey(name: 'inbreeding_coefficient')
@@ -412,7 +454,7 @@ class _$BreedingModelImpl implements _BreedingModel {
 
   @override
   String toString() {
-    return 'BreedingModel(id: $id, maleId: $maleId, femaleId: $femaleId, breedingDate: $breedingDate, status: $status, palpationDate: $palpationDate, isPregnant: $isPregnant, expectedBirthDate: $expectedBirthDate, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, male: $male, female: $female, inbreedingCoefficient: $inbreedingCoefficient, commonAncestors: $commonAncestors)';
+    return 'BreedingModel(id: $id, maleId: $maleId, femaleId: $femaleId, breedingDate: $breedingDate, status: $status, palpationDate: $palpationDate, isPregnant: $isPregnant, expectedBirthDate: $expectedBirthDate, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, male: $male, female: $female, actualBirthDate: $actualBirthDate, weaningDate: $weaningDate, inbreedingCoefficient: $inbreedingCoefficient, commonAncestors: $commonAncestors)';
   }
 
   @override
@@ -440,6 +482,10 @@ class _$BreedingModelImpl implements _BreedingModel {
                 other.updatedAt == updatedAt) &&
             (identical(other.male, male) || other.male == male) &&
             (identical(other.female, female) || other.female == female) &&
+            (identical(other.actualBirthDate, actualBirthDate) ||
+                other.actualBirthDate == actualBirthDate) &&
+            (identical(other.weaningDate, weaningDate) ||
+                other.weaningDate == weaningDate) &&
             (identical(other.inbreedingCoefficient, inbreedingCoefficient) ||
                 other.inbreedingCoefficient == inbreedingCoefficient) &&
             const DeepCollectionEquality().equals(
@@ -464,6 +510,8 @@ class _$BreedingModelImpl implements _BreedingModel {
     updatedAt,
     male,
     female,
+    actualBirthDate,
+    weaningDate,
     inbreedingCoefficient,
     const DeepCollectionEquality().hash(_commonAncestors),
   );
@@ -492,6 +540,8 @@ abstract class _BreedingModel implements BreedingModel {
     @JsonKey(name: 'updated_at') final String? updatedAt,
     final RabbitModel? male,
     final RabbitModel? female,
+    final String? actualBirthDate,
+    final String? weaningDate,
     @JsonKey(name: 'inbreeding_coefficient')
     final double? inbreedingCoefficient,
     @JsonKey(name: 'common_ancestors') final List<String>? commonAncestors,
@@ -530,7 +580,15 @@ abstract class _BreedingModel implements BreedingModel {
   @override
   RabbitModel? get male;
   @override
-  RabbitModel? get female; // Информация об инбридинге
+  RabbitModel? get female; // Настоящий окрол по этой случке: сервер кладёт его в список случек
+  // вложенным объектом `birth`. От этого дня считают отсадку молодняка —
+  // ожидаемая дата окрола для такого счёта годится только пока настоящей
+  // нет. У старых сборок сервера объекта нет вовсе, поэтому оба поля
+  // необязательные.
+  @override
+  String? get actualBirthDate;
+  @override
+  String? get weaningDate; // Информация об инбридинге
   @override
   @JsonKey(name: 'inbreeding_coefficient')
   double? get inbreedingCoefficient;

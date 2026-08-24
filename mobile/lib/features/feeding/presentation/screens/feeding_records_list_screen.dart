@@ -209,13 +209,14 @@ class _RecordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Раньше при отсутствии связанного корма показывался номер записи в базе
-    // («Корм #17») — для фермера это не подсказка.
+    // Заглушка остаётся только для записи, у которой корм и правда не приехал:
+    // раньше её видели на каждой строке, потому что модель выбрасывала корм из
+    // ответа сервера.
     final feedName = record.feed?.name ?? context.l10n.feedingUnknownFeed;
     final unit = record.feed?.unit.displayName;
 
     final target = record.rabbit != null
-        ? context.l10n.feedingForRabbit(record.rabbit!.name)
+        ? context.l10n.feedingForRabbit(record.rabbit!.label)
         : record.cage != null
             ? context.l10n.feedingForCage(record.cage!.number)
             : context.l10n.feedingForFarm;
@@ -267,13 +268,28 @@ class _RecordCard extends StatelessWidget {
                     Icon(Icons.schedule,
                         size: 14, color: context.colors.onSurfaceVariant),
                     const SizedBox(width: AppSpacing.xs),
-                    Expanded(
-                      child: Text(
-                        DateFormat('d MMM, HH:mm', 'ru').format(record.fedAt),
-                        style: AppTypography.labelSm
-                            .copyWith(color: context.colors.onSurfaceVariant),
-                      ),
+                    Text(
+                      DateFormat('d MMM, HH:mm', 'ru').format(record.fedAt),
+                      style: AppTypography.labelSm
+                          .copyWith(color: context.colors.onSurfaceVariant),
                     ),
+                    // Кто кормил — на ферме с работниками это первый вопрос к
+                    // строке журнала. Сервер имя присылает, показываем.
+                    if (record.author != null) ...[
+                      const SizedBox(width: AppSpacing.lg),
+                      Icon(Icons.person_outline,
+                          size: 14, color: context.colors.onSurfaceVariant),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          record.author!.fullName,
+                          style: AppTypography.labelSm
+                              .copyWith(color: context.colors.onSurfaceVariant),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
                 if (record.notes?.trim().isNotEmpty == true) ...[

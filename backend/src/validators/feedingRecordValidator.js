@@ -77,6 +77,90 @@ const createFeedingRecordSchema = Joi.object({
   });
 
 /**
+ * За один обход кормят ферму целиком: несколько сотен клеток — это верхняя
+ * оценка реального хозяйства, а не запас «на будущее». Ограничение защищает
+ * от запроса на десятки тысяч строк в одной транзакции.
+ */
+const MAX_BULK_RECIPIENTS = 200;
+
+const bulkRecipientIds = (label) => Joi.array()
+  .items(Joi.number().integer().positive())
+  .unique()
+  .default([])
+  .messages({
+    'array.base': `Список ${label} должен быть массивом`,
+    'array.unique': `Один и тот же получатель указан дважды (${label})`,
+    'number.base': `ID в списке ${label} должен быть числом`,
+    'number.positive': `ID в списке ${label} должен быть положительным`
+  });
+
+/**
+ * Кормление пачкой: общая шапка и списки получателей.
+ *
+ * quantity здесь — норма на одного получателя, а не на всю пачку: работник
+ * отмеряет ковш на клетку. Со склада спишется quantity × число получателей.
+ */
+const bulkCreateFeedingRecordsSchema = Joi.object({
+  feed_id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      'number.base': 'ID корма должен быть числом',
+      'number.positive': 'ID корма должен быть положительным',
+      'any.required': 'ID корма обязателен'
+    }),
+
+  quantity: Joi.number()
+    .precision(2)
+    .positive()
+    .required()
+    .messages({
+      'number.base': 'Количество должно быть числом',
+      'number.positive': 'Количество должно быть положительным',
+      'number.precision': 'Количество может иметь до 2 знаков после запятой',
+      'any.required': 'Количество обязательно'
+    }),
+
+  fed_at: Joi.date()
+    .max('now')
+    .required()
+    .messages({
+      'date.base': 'Дата кормления должна быть корректной датой',
+      'date.max': 'Дата кормления не может быть в будущем',
+      'any.required': 'Дата кормления обязательна'
+    }),
+
+  notes: Joi.string()
+    .max(1000)
+    .allow(null, '')
+    .messages({
+      'string.base': 'Примечания должны быть строкой',
+      'string.max': 'Примечания не могут превышать 1000 символов'
+    }),
+
+  rabbit_ids: bulkRecipientIds('кроликов'),
+  cage_ids: bulkRecipientIds('клеток')
+})
+  // Проверять пустоту через .or() нельзя: он смотрит только на наличие ключа,
+  // и запрос с rabbit_ids: [] прошёл бы как «получатели указаны».
+  .custom((value, helpers) => {
+    const count = value.rabbit_ids.length + value.cage_ids.length;
+
+    if (count === 0) return helpers.error('feedingBulk.noRecipients');
+    if (count > MAX_BULK_RECIPIENTS) {
+      return helpers.error('feedingBulk.tooManyRecipients', { limit: MAX_BULK_RECIPIENTS });
+    }
+
+    return value;
+  })
+  .messages({
+    'feedingBulk.noRecipients': 'Укажите хотя бы одного получателя: кролика или клетку',
+    'feedingBulk.tooManyRecipients':
+      'За один раз можно записать не больше {{#limit}} получателей'
+  });
+
+/**
  * Update feeding record validation schema
  * All fields are optional for update
  */
@@ -150,6 +234,7 @@ const listFeedingRecordsQuerySchema = Joi.object({
 
 module.exports = {
   createFeedingRecordSchema,
+  bulkCreateFeedingRecordsSchema,
   updateFeedingRecordSchema
 ,
   listFeedingRecordsQuerySchema

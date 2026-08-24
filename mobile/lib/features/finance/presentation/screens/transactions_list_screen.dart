@@ -394,6 +394,17 @@ class _TransactionCard extends StatelessWidget {
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
                 ),
+                // Кролик, за которого прошли деньги. Сервер присылал его
+                // всегда, а в книге стояла безликая «Продажа кролика»:
+                // конкретика была на руках и не доезжала до строки.
+                if (transaction.rabbit != null)
+                  Text(
+                    context.l10n.feedingForRabbit(transaction.rabbit!.label),
+                    style:
+                        AppTypography.labelSm.copyWith(color: context.accent),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 if (transaction.description?.trim().isNotEmpty == true)
                   Text(
                     transaction.description!.trim(),
@@ -540,6 +551,12 @@ class _DetailsSheet extends ConsumerWidget {
               value: DateFormat('d MMMM y', 'ru')
                   .format(transaction.transactionDate),
             ),
+            if (transaction.rabbit != null)
+              _Row(
+                icon: Icons.pets_outlined,
+                label: context.l10n.txFormRabbit,
+                value: transaction.rabbit!.label,
+              ),
             if (transaction.description?.trim().isNotEmpty == true)
               _Row(
                 icon: Icons.notes,

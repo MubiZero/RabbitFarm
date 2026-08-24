@@ -536,6 +536,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cageFormType => 'Тип клетки';
 
   @override
+  String get cycleStageWeaned => 'Молодняк отсажен';
+
+  @override
   String get cageTypeSingle => 'Одиночная';
 
   @override
@@ -1281,6 +1284,86 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedsFilterType => 'Тип корма';
 
   @override
+  String get feedingBulkModeRabbits => 'Кролики';
+
+  @override
+  String get feedingBulkModeCages => 'Клетки';
+
+  @override
+  String get feedingBulkAddRabbit => 'Добавить кролика';
+
+  @override
+  String get feedingBulkRabbitsRequired => 'Выберите хотя бы одного кролика';
+
+  @override
+  String get feedingBulkRemove => 'Убрать из списка';
+
+  @override
+  String get feedingBulkCagesField => 'Какие клетки';
+
+  @override
+  String get feedingBulkCagesRequired => 'Выберите хотя бы одну клетку';
+
+  @override
+  String get feedingBulkCagesPickTitle => 'Какие клетки кормим';
+
+  @override
+  String feedingBulkCagesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count клетки',
+      many: '$count клеток',
+      few: '$count клетки',
+      one: '$count клетка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedingBulkWholeFarm => 'Вся ферма';
+
+  @override
+  String get feedingBulkClearSelection => 'Снять выбор';
+
+  @override
+  String get feedingBulkRowUnnamed => 'Без ряда';
+
+  @override
+  String get feedingBulkDone => 'Готово';
+
+  @override
+  String get feedingBulkNoCagesTitle => 'Клеток пока нет';
+
+  @override
+  String get feedingBulkNoCagesBody =>
+      'Заведите клетки — тогда кормление можно будет записать сразу на ряд или на всю ферму.';
+
+  @override
+  String get feedingBulkQuantityEach => 'Сколько на каждого';
+
+  @override
+  String get feedingBulkQuantityEachHint => 'Число — на одного получателя.';
+
+  @override
+  String feedingBulkQuantityEachNote(String amount) {
+    return 'Число — на одного получателя. Всего спишется $amount.';
+  }
+
+  @override
+  String feedingBulkCreated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Записано $count кормления',
+      many: 'Записано $count кормлений',
+      few: 'Записано $count кормления',
+      one: 'Записано $count кормление',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedsFilterAllTypes => 'Все типы';
 
   @override
@@ -1495,9 +1578,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String feedingFormStockLeft(String amount) {
     return 'осталось $amount';
   }
-
-  @override
-  String get feedingFormCreated => 'Кормление записано';
 
   @override
   String get feedingFormUpdated => 'Запись обновлена';
@@ -1871,6 +1951,58 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsTitle => 'Настройки';
 
   @override
+  String get healthTitle => 'Здоровье';
+
+  @override
+  String get healthMenuLabel => 'Прививки и лечение';
+
+  @override
+  String get healthKindAll => 'Всё';
+
+  @override
+  String get healthKindVaccination => 'Прививки';
+
+  @override
+  String get healthKindTreatment => 'Лечение';
+
+  @override
+  String get healthEntryVaccination => 'Прививка';
+
+  @override
+  String get healthEntryTreatment => 'Лечение';
+
+  @override
+  String get healthPickRabbit => 'История одного кролика';
+
+  @override
+  String get healthEmptyTitle => 'Здоровье стада ещё не записано';
+
+  @override
+  String get healthEmptyBody =>
+      'Отмечайте прививки и лечение — и будет видно, что было с каждым кроликом и когда прививать снова.';
+
+  @override
+  String get healthNoneInViewTitle => 'В этой выборке пусто';
+
+  @override
+  String healthNoneForRabbitTitle(String name) {
+    return 'У $name записей о здоровье нет';
+  }
+
+  @override
+  String get healthNoneInViewBody =>
+      'Снимите фильтр — остальные записи никуда не делись.';
+
+  @override
+  String get healthRecordTitle => 'Что записать?';
+
+  @override
+  String get healthRecordVaccination => 'Прививку';
+
+  @override
+  String get healthRecordTreatment => 'Лечение';
+
+  @override
   String get farmSectionMoney => 'Деньги';
 
   @override
@@ -1887,12 +2019,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get farmSectionHealth => 'Здоровье';
-
-  @override
-  String get farmVaccinations => 'Вакцинации';
-
-  @override
-  String get farmMedicalRecords => 'Лечение';
 
   @override
   String get farmSectionReports => 'Отчёты';

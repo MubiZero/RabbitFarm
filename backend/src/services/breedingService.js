@@ -1,6 +1,34 @@
-const { Breeding, Rabbit, Task } = require('../models');
+const { Breeding, Rabbit, Task, Birth } = require('../models');
 const { Op } = require('sequelize');
 const logger = require('../utils/logger');
+
+/** Ассоциация Breeding.hasMany(Birth) объявлена без псевдонима. */
+const BIRTHS_ALIAS = 'Births';
+
+/**
+ * Строка списка случек: прежние поля плюс связанный окрол.
+ *
+ * Отсадку молодняка отсчитывают от настоящего дня окрола, а не от ожидаемого,
+ * — иначе срок уезжает на столько же, на сколько окрол случился раньше или
+ * позже ожидания. Формально окролов у случки много, поэтому Sequelize отдаёт
+ * их массивом `Births`; наружу уходит один окрол под понятным именем `birth`,
+ * а прежние поля остаются на своих местах — старые сборки приложения читают
+ * ответ как раньше и про `birth` просто не знают.
+ */
+const withLinkedBirth = (breeding) => {
+    const row = breeding.toJSON ? breeding.toJSON() : { ...breeding };
+    const births = Array.isArray(row[BIRTHS_ALIAS]) ? row[BIRTHS_ALIAS] : [];
+    delete row[BIRTHS_ALIAS];
+
+    // Окрол на случку бывает один. Если их всё же несколько, берём самый
+    // ранний: именно от него считают отсадку.
+    const [earliest] = [...births].sort(
+        (a, b) => String(a.birth_date).localeCompare(String(b.birth_date))
+    );
+
+    row.birth = earliest || null;
+    return row;
+};
 
 /**
  * Breeding service
@@ -219,6 +247,15 @@ class BreedingService {
                         as: 'female',
                         where: { user_id: userId },
                         required: false
+                    },
+                    {
+                        // Списку нужен один вопрос к окролу — когда он был и
+                        // отсадили ли уже молодняк, — поэтому тянем четыре
+                        // поля, а не окрол целиком.
+                        model: Birth,
+                        as: BIRTHS_ALIAS,
+                        required: false,
+                        attributes: ['id', 'breeding_id', 'birth_date', 'weaning_date']
                     }
                 ],
                 order: [[sort_by, sort_order.toUpperCase()]],
@@ -227,7 +264,7 @@ class BreedingService {
             });
 
             return {
-                items,
+                items: items.map(withLinkedBirth),
                 pagination: {
                     page: parseInt(page),
                     limit: parseInt(limit),

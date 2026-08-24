@@ -27,6 +27,15 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
   notes: json['notes'] as String?,
   createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
   updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+  rabbit: json['rabbit'] == null
+      ? null
+      : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
+  cage: json['cage'] == null
+      ? null
+      : CageInfo.fromJson(json['cage'] as Map<String, dynamic>),
+  author: json['creator'] == null
+      ? null
+      : UserRef.fromJson(json['creator'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$TaskImplToJson(
@@ -54,6 +63,9 @@ Map<String, dynamic> _$$TaskImplToJson(
   'notes': instance.notes,
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+  'rabbit': instance.rabbit,
+  'cage': instance.cage,
+  'creator': instance.author,
 };
 
 const _$TaskTypeEnumMap = {

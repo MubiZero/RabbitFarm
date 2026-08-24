@@ -97,8 +97,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   }
 
   void _loadRabbitDataFromModel(RabbitModel rabbit) {
-    _nameController.text = rabbit.name;
-    _tagIdController.text = rabbit.tagId;
+    _nameController.text = rabbit.name ?? '';
+    _tagIdController.text = rabbit.tagId ?? '';
     _colorController.text = rabbit.color ?? '';
     _weightController.text = rabbit.currentWeight?.toString() ?? '';
     _notesController.text = rabbit.notes ?? '';

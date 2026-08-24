@@ -226,7 +226,7 @@ class RabbitListCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        rabbit.name,
+                        rabbit.label,
                         style: AppTypography.titleMd
                             .copyWith(color: context.colors.onSurface),
                         maxLines: 1,
@@ -243,7 +243,7 @@ class RabbitListCard extends StatelessWidget {
                 // назначению: по ним стадо делят и в списке ищут.
                 Text(
                   [
-                    rabbit.tagId.trim().isEmpty
+                    rabbit.tagId?.trim().isEmpty != false
                         ? context.l10n.rabbitNoTag
                         : rabbit.tagId,
                     if (rabbit.breed?.name != null) rabbit.breed!.name,

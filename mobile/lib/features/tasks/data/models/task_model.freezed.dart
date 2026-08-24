@@ -59,11 +59,20 @@ mixin _$Task {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
-  DateTime? get updatedAt => throw _privateConstructorUsedError; // Relationships
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  CageModel? get cage => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError; // Связи, которые сервер кладёт в ответ.
+  //
+  // Кролика и клетку задачи отдают урезанными — `['id','name','tag_id']` и
+  // `['id','number','location']`, — поэтому здесь лёгкие модели. Полные
+  // `RabbitModel` и `CageModel` на таком объекте не разберутся: они требуют
+  // породу, пол, дату рождения, вместимость и состояние, которых в ответе
+  // нет. Раньше связи из-за этого отбрасывались целиком, и задача не могла
+  // сказать, к какому кролику она относится.
+  RabbitRef? get rabbit => throw _privateConstructorUsedError;
+  CageInfo? get cage =>
+      throw _privateConstructorUsedError; // Постановщик задачи. Приходит не отовсюду: в списке и в карточке есть,
+  // а «ближайшие» и «отметить выполненной» его не прикладывают.
+  @JsonKey(name: 'creator')
+  UserRef? get author => throw _privateConstructorUsedError;
 
   /// Serializes this Task to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -106,12 +115,14 @@ abstract class $TaskCopyWith<$Res> {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    RabbitRef? rabbit,
+    CageInfo? cage,
+    @JsonKey(name: 'creator') UserRef? author,
   });
 
-  $RabbitModelCopyWith<$Res>? get rabbit;
-  $CageModelCopyWith<$Res>? get cage;
+  $RabbitRefCopyWith<$Res>? get rabbit;
+  $CageInfoCopyWith<$Res>? get cage;
+  $UserRefCopyWith<$Res>? get author;
 }
 
 /// @nodoc
@@ -149,6 +160,7 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
     Object? updatedAt = freezed,
     Object? rabbit = freezed,
     Object? cage = freezed,
+    Object? author = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -227,11 +239,15 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as RabbitModel?,
+                      as RabbitRef?,
             cage: freezed == cage
                 ? _value.cage
                 : cage // ignore: cast_nullable_to_non_nullable
-                      as CageModel?,
+                      as CageInfo?,
+            author: freezed == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                      as UserRef?,
           )
           as $Val,
     );
@@ -241,12 +257,12 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $RabbitModelCopyWith<$Res>? get rabbit {
+  $RabbitRefCopyWith<$Res>? get rabbit {
     if (_value.rabbit == null) {
       return null;
     }
 
-    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
       return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
@@ -255,13 +271,27 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $CageModelCopyWith<$Res>? get cage {
+  $CageInfoCopyWith<$Res>? get cage {
     if (_value.cage == null) {
       return null;
     }
 
-    return $CageModelCopyWith<$Res>(_value.cage!, (value) {
+    return $CageInfoCopyWith<$Res>(_value.cage!, (value) {
       return _then(_value.copyWith(cage: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Task
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserRefCopyWith<$Res>? get author {
+    if (_value.author == null) {
+      return null;
+    }
+
+    return $UserRefCopyWith<$Res>(_value.author!, (value) {
+      return _then(_value.copyWith(author: value) as $Val);
     });
   }
 }
@@ -301,14 +331,17 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    RabbitRef? rabbit,
+    CageInfo? cage,
+    @JsonKey(name: 'creator') UserRef? author,
   });
 
   @override
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
   @override
-  $CageModelCopyWith<$Res>? get cage;
+  $CageInfoCopyWith<$Res>? get cage;
+  @override
+  $UserRefCopyWith<$Res>? get author;
 }
 
 /// @nodoc
@@ -343,6 +376,7 @@ class __$$TaskImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? rabbit = freezed,
     Object? cage = freezed,
+    Object? author = freezed,
   }) {
     return _then(
       _$TaskImpl(
@@ -421,11 +455,15 @@ class __$$TaskImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as RabbitModel?,
+                  as RabbitRef?,
         cage: freezed == cage
             ? _value.cage
             : cage // ignore: cast_nullable_to_non_nullable
-                  as CageModel?,
+                  as CageInfo?,
+        author: freezed == author
+            ? _value.author
+            : author // ignore: cast_nullable_to_non_nullable
+                  as UserRef?,
       ),
     );
   }
@@ -457,8 +495,9 @@ class _$TaskImpl implements _Task {
     this.notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.cage,
+    this.rabbit,
+    this.cage,
+    @JsonKey(name: 'creator') this.author,
   });
 
   factory _$TaskImpl.fromJson(Map<String, dynamic> json) =>
@@ -521,17 +560,27 @@ class _$TaskImpl implements _Task {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   final DateTime? updatedAt;
-  // Relationships
+  // Связи, которые сервер кладёт в ответ.
+  //
+  // Кролика и клетку задачи отдают урезанными — `['id','name','tag_id']` и
+  // `['id','number','location']`, — поэтому здесь лёгкие модели. Полные
+  // `RabbitModel` и `CageModel` на таком объекте не разберутся: они требуют
+  // породу, пол, дату рождения, вместимость и состояние, которых в ответе
+  // нет. Раньше связи из-за этого отбрасывались целиком, и задача не могла
+  // сказать, к какому кролику она относится.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final RabbitModel? rabbit;
+  final RabbitRef? rabbit;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final CageModel? cage;
+  final CageInfo? cage;
+  // Постановщик задачи. Приходит не отовсюду: в списке и в карточке есть,
+  // а «ближайшие» и «отметить выполненной» его не прикладывают.
+  @override
+  @JsonKey(name: 'creator')
+  final UserRef? author;
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, description: $description, type: $type, status: $status, priority: $priority, dueDate: $dueDate, completedAt: $completedAt, rabbitId: $rabbitId, cageId: $cageId, assignedTo: $assignedTo, createdBy: $createdBy, isRecurring: $isRecurring, recurrenceRule: $recurrenceRule, reminderBefore: $reminderBefore, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, cage: $cage)';
+    return 'Task(id: $id, title: $title, description: $description, type: $type, status: $status, priority: $priority, dueDate: $dueDate, completedAt: $completedAt, rabbitId: $rabbitId, cageId: $cageId, assignedTo: $assignedTo, createdBy: $createdBy, isRecurring: $isRecurring, recurrenceRule: $recurrenceRule, reminderBefore: $reminderBefore, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, cage: $cage, author: $author)';
   }
 
   @override
@@ -569,7 +618,8 @@ class _$TaskImpl implements _Task {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.rabbit, rabbit) || other.rabbit == rabbit) &&
-            (identical(other.cage, cage) || other.cage == cage));
+            (identical(other.cage, cage) || other.cage == cage) &&
+            (identical(other.author, author) || other.author == author));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -596,6 +646,7 @@ class _$TaskImpl implements _Task {
     updatedAt,
     rabbit,
     cage,
+    author,
   ]);
 
   /// Create a copy of Task
@@ -642,10 +693,9 @@ abstract class _Task implements Task {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final CageModel? cage,
+    final RabbitRef? rabbit,
+    final CageInfo? cage,
+    @JsonKey(name: 'creator') final UserRef? author,
   }) = _$TaskImpl;
 
   factory _Task.fromJson(Map<String, dynamic> json) = _$TaskImpl.fromJson;
@@ -706,13 +756,22 @@ abstract class _Task implements Task {
   @override
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
-  DateTime? get updatedAt; // Relationships
+  DateTime? get updatedAt; // Связи, которые сервер кладёт в ответ.
+  //
+  // Кролика и клетку задачи отдают урезанными — `['id','name','tag_id']` и
+  // `['id','number','location']`, — поэтому здесь лёгкие модели. Полные
+  // `RabbitModel` и `CageModel` на таком объекте не разберутся: они требуют
+  // породу, пол, дату рождения, вместимость и состояние, которых в ответе
+  // нет. Раньше связи из-за этого отбрасывались целиком, и задача не могла
+  // сказать, к какому кролику она относится.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit;
+  RabbitRef? get rabbit;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  CageModel? get cage;
+  CageInfo? get cage; // Постановщик задачи. Приходит не отовсюду: в списке и в карточке есть,
+  // а «ближайшие» и «отметить выполненной» его не прикладывают.
+  @override
+  @JsonKey(name: 'creator')
+  UserRef? get author;
 
   /// Create a copy of Task
   /// with the given fields replaced by the non-null parameter values.

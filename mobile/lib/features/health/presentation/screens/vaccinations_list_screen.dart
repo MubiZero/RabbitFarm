@@ -223,7 +223,7 @@ class _VaccinationCard extends StatelessWidget {
           if (vaccination.rabbit != null)
             _Line(
               icon: Icons.pets_outlined,
-              text: vaccination.rabbit!.name,
+              text: vaccination.rabbit!.label,
               strong: true,
             ),
           _Line(
@@ -693,7 +693,7 @@ class _DetailsSheet extends ConsumerWidget {
                 _DetailRow(
                   icon: Icons.pets_outlined,
                   label: context.l10n.navRabbits,
-                  value: vaccination.rabbit!.name,
+                  value: vaccination.rabbit!.label,
                 ),
               _DetailRow(
                 icon: Icons.event_available_outlined,

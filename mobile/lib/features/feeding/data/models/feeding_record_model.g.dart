@@ -17,6 +17,18 @@ _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
       fedBy: const NullableIntConverter().fromJson(json['fed_by']),
       notes: json['notes'] as String?,
       createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+      feed: json['feed'] == null
+          ? null
+          : Feed.fromJson(json['feed'] as Map<String, dynamic>),
+      rabbit: json['rabbit'] == null
+          ? null
+          : RabbitModel.fromJson(json['rabbit'] as Map<String, dynamic>),
+      cage: json['cage'] == null
+          ? null
+          : CageModel.fromJson(json['cage'] as Map<String, dynamic>),
+      author: json['fedBy'] == null
+          ? null
+          : UserRef.fromJson(json['fedBy'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$FeedingRecordImplToJson(
@@ -31,6 +43,10 @@ Map<String, dynamic> _$$FeedingRecordImplToJson(
   'fed_by': const NullableIntConverter().toJson(instance.fedBy),
   'notes': instance.notes,
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
+  'feed': instance.feed,
+  'rabbit': instance.rabbit,
+  'cage': instance.cage,
+  'fedBy': instance.author,
 };
 
 _$FeedingRecordCreateImpl _$$FeedingRecordCreateImplFromJson(

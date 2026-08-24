@@ -147,7 +147,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           ),
                           if (breeding.male?.tagId != null)
                             Text(
-                              context.l10n.breedingTag(breeding.male!.tagId),
+                              context.l10n.breedingTag(breeding.male!.tagId!),
                               style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                             ),
                         ],
@@ -179,7 +179,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                           ),
                           if (breeding.female?.tagId != null)
                             Text(
-                              context.l10n.breedingTag(breeding.female!.tagId),
+                              context.l10n.breedingTag(breeding.female!.tagId!),
                               style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
                             ),
                         ],

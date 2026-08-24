@@ -69,8 +69,13 @@ class Transaction with _$Transaction {
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
-    // Relationships (not included in JSON serialization by default)
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    /// Кролик, к которому привязана операция.
+    ///
+    /// Сервер шлёт его урезанным — `id`, кличка и бирка (`TRANSACTION_INCLUDE`
+    /// в transactionService.js), — и разбор в полную модель упал бы. Раньше
+    /// связь просто выбрасывали: продажа конкретного кролика приходила с его
+    /// именем, а в книге стояла безликая строка «Продажа кролика».
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   }) = _Transaction;
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>

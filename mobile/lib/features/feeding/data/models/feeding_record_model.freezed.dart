@@ -43,13 +43,18 @@ mixin _$FeedingRecord {
   String? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   @NullableDateTimeConverter()
-  DateTime? get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  DateTime? get createdAt => throw _privateConstructorUsedError; // Связи, которые сервер кладёт в ответ. Раньше все три отбрасывались
+  // (`includeFromJson: false`), и список кормлений на каждой строке писал
+  // «Корм не указан», хотя название корма приходило в том же ответе.
+  //
+  // Корм, кролика и клетку кормления отдают целиком — без выборки полей, —
+  // поэтому здесь полные модели. Автор записи приходит урезанным, только
+  // именем и почтой, для него есть [UserRef].
   Feed? get feed => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
   CageModel? get cage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'fedBy')
+  UserRef? get author => throw _privateConstructorUsedError;
 
   /// Serializes this FeedingRecord to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -80,14 +85,16 @@ abstract class $FeedingRecordCopyWith<$Res> {
     @JsonKey(name: 'created_at')
     @NullableDateTimeConverter()
     DateTime? createdAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    Feed? feed,
+    RabbitModel? rabbit,
+    CageModel? cage,
+    @JsonKey(name: 'fedBy') UserRef? author,
   });
 
   $FeedCopyWith<$Res>? get feed;
   $RabbitModelCopyWith<$Res>? get rabbit;
   $CageModelCopyWith<$Res>? get cage;
+  $UserRefCopyWith<$Res>? get author;
 }
 
 /// @nodoc
@@ -117,6 +124,7 @@ class _$FeedingRecordCopyWithImpl<$Res, $Val extends FeedingRecord>
     Object? feed = freezed,
     Object? rabbit = freezed,
     Object? cage = freezed,
+    Object? author = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -168,6 +176,10 @@ class _$FeedingRecordCopyWithImpl<$Res, $Val extends FeedingRecord>
                 ? _value.cage
                 : cage // ignore: cast_nullable_to_non_nullable
                       as CageModel?,
+            author: freezed == author
+                ? _value.author
+                : author // ignore: cast_nullable_to_non_nullable
+                      as UserRef?,
           )
           as $Val,
     );
@@ -214,6 +226,20 @@ class _$FeedingRecordCopyWithImpl<$Res, $Val extends FeedingRecord>
       return _then(_value.copyWith(cage: value) as $Val);
     });
   }
+
+  /// Create a copy of FeedingRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserRefCopyWith<$Res>? get author {
+    if (_value.author == null) {
+      return null;
+    }
+
+    return $UserRefCopyWith<$Res>(_value.author!, (value) {
+      return _then(_value.copyWith(author: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -237,9 +263,10 @@ abstract class _$$FeedingRecordImplCopyWith<$Res>
     @JsonKey(name: 'created_at')
     @NullableDateTimeConverter()
     DateTime? createdAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    Feed? feed,
+    RabbitModel? rabbit,
+    CageModel? cage,
+    @JsonKey(name: 'fedBy') UserRef? author,
   });
 
   @override
@@ -248,6 +275,8 @@ abstract class _$$FeedingRecordImplCopyWith<$Res>
   $RabbitModelCopyWith<$Res>? get rabbit;
   @override
   $CageModelCopyWith<$Res>? get cage;
+  @override
+  $UserRefCopyWith<$Res>? get author;
 }
 
 /// @nodoc
@@ -276,6 +305,7 @@ class __$$FeedingRecordImplCopyWithImpl<$Res>
     Object? feed = freezed,
     Object? rabbit = freezed,
     Object? cage = freezed,
+    Object? author = freezed,
   }) {
     return _then(
       _$FeedingRecordImpl(
@@ -327,6 +357,10 @@ class __$$FeedingRecordImplCopyWithImpl<$Res>
             ? _value.cage
             : cage // ignore: cast_nullable_to_non_nullable
                   as CageModel?,
+        author: freezed == author
+            ? _value.author
+            : author // ignore: cast_nullable_to_non_nullable
+                  as UserRef?,
       ),
     );
   }
@@ -345,9 +379,10 @@ class _$FeedingRecordImpl implements _FeedingRecord {
     @JsonKey(name: 'fed_by') @NullableIntConverter() this.fedBy,
     this.notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.cage,
+    this.feed,
+    this.rabbit,
+    this.cage,
+    @JsonKey(name: 'fedBy') this.author,
   });
 
   factory _$FeedingRecordImpl.fromJson(Map<String, dynamic> json) =>
@@ -385,19 +420,26 @@ class _$FeedingRecordImpl implements _FeedingRecord {
   @JsonKey(name: 'created_at')
   @NullableDateTimeConverter()
   final DateTime? createdAt;
+  // Связи, которые сервер кладёт в ответ. Раньше все три отбрасывались
+  // (`includeFromJson: false`), и список кормлений на каждой строке писал
+  // «Корм не указан», хотя название корма приходило в том же ответе.
+  //
+  // Корм, кролика и клетку кормления отдают целиком — без выборки полей, —
+  // поэтому здесь полные модели. Автор записи приходит урезанным, только
+  // именем и почтой, для него есть [UserRef].
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final Feed? feed;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final RabbitModel? rabbit;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final CageModel? cage;
+  @override
+  @JsonKey(name: 'fedBy')
+  final UserRef? author;
 
   @override
   String toString() {
-    return 'FeedingRecord(id: $id, rabbitId: $rabbitId, feedId: $feedId, cageId: $cageId, quantity: $quantity, fedAt: $fedAt, fedBy: $fedBy, notes: $notes, createdAt: $createdAt, feed: $feed, rabbit: $rabbit, cage: $cage)';
+    return 'FeedingRecord(id: $id, rabbitId: $rabbitId, feedId: $feedId, cageId: $cageId, quantity: $quantity, fedAt: $fedAt, fedBy: $fedBy, notes: $notes, createdAt: $createdAt, feed: $feed, rabbit: $rabbit, cage: $cage, author: $author)';
   }
 
   @override
@@ -419,7 +461,8 @@ class _$FeedingRecordImpl implements _FeedingRecord {
                 other.createdAt == createdAt) &&
             (identical(other.feed, feed) || other.feed == feed) &&
             (identical(other.rabbit, rabbit) || other.rabbit == rabbit) &&
-            (identical(other.cage, cage) || other.cage == cage));
+            (identical(other.cage, cage) || other.cage == cage) &&
+            (identical(other.author, author) || other.author == author));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -438,6 +481,7 @@ class _$FeedingRecordImpl implements _FeedingRecord {
     feed,
     rabbit,
     cage,
+    author,
   );
 
   /// Create a copy of FeedingRecord
@@ -467,11 +511,10 @@ abstract class _FeedingRecord implements FeedingRecord {
     @JsonKey(name: 'created_at')
     @NullableDateTimeConverter()
     final DateTime? createdAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) final Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false)
+    final Feed? feed,
     final RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false)
     final CageModel? cage,
+    @JsonKey(name: 'fedBy') final UserRef? author,
   }) = _$FeedingRecordImpl;
 
   factory _FeedingRecord.fromJson(Map<String, dynamic> json) =
@@ -508,16 +551,22 @@ abstract class _FeedingRecord implements FeedingRecord {
   @override
   @JsonKey(name: 'created_at')
   @NullableDateTimeConverter()
-  DateTime? get createdAt;
+  DateTime? get createdAt; // Связи, которые сервер кладёт в ответ. Раньше все три отбрасывались
+  // (`includeFromJson: false`), и список кормлений на каждой строке писал
+  // «Корм не указан», хотя название корма приходило в том же ответе.
+  //
+  // Корм, кролика и клетку кормления отдают целиком — без выборки полей, —
+  // поэтому здесь полные модели. Автор записи приходит урезанным, только
+  // именем и почтой, для него есть [UserRef].
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   Feed? get feed;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   RabbitModel? get rabbit;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   CageModel? get cage;
+  @override
+  @JsonKey(name: 'fedBy')
+  UserRef? get author;
 
   /// Create a copy of FeedingRecord
   /// with the given fields replaced by the non-null parameter values.

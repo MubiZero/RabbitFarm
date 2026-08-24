@@ -88,9 +88,18 @@ class RabbitPickerField extends ConsumerWidget {
     this.icon = Icons.pets_outlined,
   });
 
-  String? get _text => selected != null
-      ? '${selected!.name} · ${selected!.tagId}'
-      : selectedLabel;
+  /// Кличка и клеймо необязательны, поэтому подпись собирается из того, что
+  /// есть: «Белка · R-001», просто «Белка» или просто клеймо.
+  String? get _text {
+    final rabbit = selected;
+    if (rabbit == null) return selectedLabel;
+    final tag = rabbit.tagId?.trim();
+    final name = rabbit.name?.trim();
+    if (name != null && name.isNotEmpty && tag != null && tag.isNotEmpty) {
+      return '$name · $tag';
+    }
+    return rabbit.label;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -311,7 +320,7 @@ class _RabbitPickerSheetState extends ConsumerState<RabbitPickerSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      rabbit.name,
+                      rabbit.label,
                       style: AppTypography.titleMd
                           .copyWith(color: context.colors.onSurface),
                       maxLines: 1,
@@ -327,11 +336,12 @@ class _RabbitPickerSheetState extends ConsumerState<RabbitPickerSheet> {
                   ],
                 ),
               ),
-              Text(
-                rabbit.tagId,
-                style: AppTypography.labelSm
-                    .copyWith(color: context.colors.onSurfaceVariant),
-              ),
+              if (rabbit.tagId?.trim().isNotEmpty == true)
+                Text(
+                  rabbit.tagId!,
+                  style: AppTypography.labelSm
+                      .copyWith(color: context.colors.onSurfaceVariant),
+                ),
             ],
           ),
         );

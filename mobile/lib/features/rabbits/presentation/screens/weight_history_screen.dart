@@ -41,7 +41,7 @@ class WeightHistoryScreen extends ConsumerWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                rabbit.name,
+                rabbit.label,
                 style: AppTypography.bodyMd
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),

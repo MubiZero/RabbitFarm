@@ -691,13 +691,15 @@ describe('RabbitService - uncovered lines', () => {
       expect(result.father.mother.id).toBe(4);
     });
 
-    it('should use default name when rabbit has no name', async () => {
+    it('should leave name empty when rabbit has no name', async () => {
       const rabbit = { id: 1, name: null, sex: 'male', tag_id: null, birth_date: null, breed: null, father_id: null, mother_id: null };
       Rabbit.findOne.mockResolvedValueOnce(rabbit);
 
       const result = await rabbitService.getPedigree(1, 1, 3);
 
-      expect(result.name).toBe('\u0411\u0435\u0437 \u0438\u043c\u0435\u043d\u0438');
+      // Подпись для безымянного кролика собирает приложение: русский текст с
+      // сервера нельзя ни перевести, ни поменять без выката бэкенда.
+      expect(result.name).toBeNull();
       expect(result.tag_id).toBeNull();
       expect(result.sex).toBe('male');
       expect(result.breed).toBeNull();

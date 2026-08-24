@@ -49,9 +49,20 @@ const fromDate = Joi.date().optional().messages({
   'date.base': 'Неверная дата начала периода'
 });
 
-const toDate = Joi.date().min(Joi.ref('from_date')).optional().messages({
-  'date.base': 'Неверная дата окончания периода',
-  'date.min': 'Дата окончания должна быть после даты начала'
-});
+/**
+ * Ограничение «конец не раньше начала» имеет смысл только когда начало задано.
+ * Безусловный min(ref('from_date')) ронял Joi ошибкой any.ref на запросах вида
+ * ?to_date=2026-08-01 — то есть «покажи всё по 1 августа» было невозможно.
+ */
+const toDate = Joi.date()
+  .when('from_date', {
+    is: Joi.exist(),
+    then: Joi.date().min(Joi.ref('from_date'))
+  })
+  .optional()
+  .messages({
+    'date.base': 'Неверная дата окончания периода',
+    'date.min': 'Дата окончания должна быть после даты начала'
+  });
 
 module.exports = { page, limit, sortOrder, sortBy, fromDate, toDate };

@@ -137,7 +137,9 @@ class MedicalRecordController {
       // Filters
       if (rabbit_id) where.rabbit_id = rabbit_id;
       if (outcome) where.outcome = outcome;
-      if (ongoing === 'true') {
+      // Та же ошибка, что была в клетках и задачах: Joi отдаёт булево, а
+      // сравнение шло со строкой — «текущие лечения» не отбирались никогда.
+      if (ongoing === true || ongoing === 'true') {
         where.outcome = 'ongoing';
       }
       if (from_date) {

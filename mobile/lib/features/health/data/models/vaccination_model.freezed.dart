@@ -46,8 +46,14 @@ mixin _$Vaccination {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   DateTime? get updatedAt => throw _privateConstructorUsedError; // Related rabbit info (from API) - не сериализуем, создаем вручную
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit => throw _privateConstructorUsedError; // Calculated fields
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit => throw _privateConstructorUsedError; // Calculated fields
   @JsonKey(name: 'days_until')
   int? get daysUntil => throw _privateConstructorUsedError;
   @JsonKey(name: 'days_overdue')
@@ -92,13 +98,13 @@ abstract class $VaccinationCopyWith<$Res> {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
 
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -181,7 +187,7 @@ class _$VaccinationCopyWithImpl<$Res, $Val extends Vaccination>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as RabbitModel?,
+                      as RabbitRef?,
             daysUntil: freezed == daysUntil
                 ? _value.daysUntil
                 : daysUntil // ignore: cast_nullable_to_non_nullable
@@ -203,12 +209,12 @@ class _$VaccinationCopyWithImpl<$Res, $Val extends Vaccination>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $RabbitModelCopyWith<$Res>? get rabbit {
+  $RabbitRefCopyWith<$Res>? get rabbit {
     if (_value.rabbit == null) {
       return null;
     }
 
-    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
       return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
@@ -243,14 +249,14 @@ abstract class _$$VaccinationImplCopyWith<$Res>
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   });
 
   @override
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -332,7 +338,7 @@ class __$$VaccinationImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as RabbitModel?,
+                  as RabbitRef?,
         daysUntil: freezed == daysUntil
             ? _value.daysUntil
             : daysUntil // ignore: cast_nullable_to_non_nullable
@@ -369,7 +375,7 @@ class _$VaccinationImpl implements _Vaccination {
     this.notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
+    @JsonKey(name: 'rabbit') this.rabbit,
     @JsonKey(name: 'days_until') this.daysUntil,
     @JsonKey(name: 'days_overdue') this.daysOverdue,
     @JsonKey(name: 'is_overdue') this.isOverdue,
@@ -415,9 +421,15 @@ class _$VaccinationImpl implements _Vaccination {
   @NullableDateTimeConverter()
   final DateTime? updatedAt;
   // Related rabbit info (from API) - не сериализуем, создаем вручную
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final RabbitModel? rabbit;
+  @JsonKey(name: 'rabbit')
+  final RabbitRef? rabbit;
   // Calculated fields
   @override
   @JsonKey(name: 'days_until')
@@ -524,8 +536,7 @@ abstract class _Vaccination implements Vaccination {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') final RabbitRef? rabbit,
     @JsonKey(name: 'days_until') final int? daysUntil,
     @JsonKey(name: 'days_overdue') final int? daysOverdue,
     @JsonKey(name: 'is_overdue') final bool? isOverdue,
@@ -570,9 +581,15 @@ abstract class _Vaccination implements Vaccination {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   DateTime? get updatedAt; // Related rabbit info (from API) - не сериализуем, создаем вручную
+  /// Кролик, которого лечили или прививали.
+  ///
+  /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+  /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+  /// В списках при этом стояла ветка «показать кличку», которая не
+  /// выполнялась никогда: данные приходили и не доезжали до экрана.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit; // Calculated fields
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit; // Calculated fields
   @override
   @JsonKey(name: 'days_until')
   int? get daysUntil;

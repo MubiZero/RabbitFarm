@@ -78,12 +78,17 @@ BreedingModel breeding({
   bool? isPregnant,
   String femaleName = 'Зорька',
   String maleName = 'Буран',
+  int? bornDaysAgo,
+  int? weanedDaysAgo,
 }) {
   final today = DateTime.now();
   // Сдвиг делается конструктором, а не Duration: на переводе часов сутки не
   // равны 24 часам, и тест начал бы падать раз в полгода.
   final bred = DateTime(today.year, today.month, today.day - bredDaysAgo);
   final expected = DateTime(bred.year, bred.month, bred.day + 31);
+  String? daysAgo(int? days) => days == null
+      ? null
+      : _iso(DateTime(today.year, today.month, today.day - days));
 
   return BreedingModel(
     id: id,
@@ -93,6 +98,8 @@ BreedingModel breeding({
     status: status,
     isPregnant: isPregnant,
     expectedBirthDate: _iso(expected),
+    actualBirthDate: daysAgo(bornDaysAgo),
+    weaningDate: daysAgo(weanedDaysAgo),
     male: rabbit(10 + id, maleName, 'male'),
     female: rabbit(20 + id, femaleName, 'female'),
   );
@@ -163,6 +170,35 @@ void main() {
 
     expect(find.text('Отсадка молодняка'), findsOneWidget);
     expect(find.textContaining('примерно'), findsOneWidget);
+  });
+
+  testWidgets('с настоящей датой окрола срок точный, без «примерно»',
+      (tester) async {
+    await tester.pumpWidget(_wrap(items: [
+      breeding(id: 1, bredDaysAgo: 40, status: 'completed', bornDaysAgo: 5),
+    ]));
+    await _settle(tester);
+
+    expect(find.text('Отсадка молодняка'), findsOneWidget);
+    expect(find.textContaining('через 40 дней'), findsOneWidget);
+    expect(find.textContaining('примерно'), findsNothing);
+  });
+
+  testWidgets('отсадка записана — молодняк отсажен, а не просрочен',
+      (tester) async {
+    await tester.pumpWidget(_wrap(items: [
+      breeding(
+        id: 1,
+        bredDaysAgo: 120,
+        status: 'completed',
+        bornDaysAgo: 85,
+        weanedDaysAgo: 30,
+      ),
+    ]));
+    await _settle(tester);
+
+    expect(find.text('Молодняк отсажен'), findsOneWidget);
+    expect(find.textContaining('просрочено'), findsNothing);
   });
 
   testWidgets('управляющему доступны подбор пары и запись окрола',

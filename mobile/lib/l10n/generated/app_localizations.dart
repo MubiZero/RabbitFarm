@@ -1042,6 +1042,12 @@ abstract class AppLocalizations {
   /// **'Тип клетки'**
   String get cageFormType;
 
+  /// No description provided for @cycleStageWeaned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Молодняк отсажен'**
+  String get cycleStageWeaned;
+
   /// No description provided for @cageTypeSingle.
   ///
   /// In ru, this message translates to:
@@ -2302,6 +2308,120 @@ abstract class AppLocalizations {
   /// **'Тип корма'**
   String get feedsFilterType;
 
+  /// No description provided for @feedingBulkModeRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get feedingBulkModeRabbits;
+
+  /// No description provided for @feedingBulkModeCages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетки'**
+  String get feedingBulkModeCages;
+
+  /// No description provided for @feedingBulkAddRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить кролика'**
+  String get feedingBulkAddRabbit;
+
+  /// No description provided for @feedingBulkRabbitsRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите хотя бы одного кролика'**
+  String get feedingBulkRabbitsRequired;
+
+  /// No description provided for @feedingBulkRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать из списка'**
+  String get feedingBulkRemove;
+
+  /// No description provided for @feedingBulkCagesField.
+  ///
+  /// In ru, this message translates to:
+  /// **'Какие клетки'**
+  String get feedingBulkCagesField;
+
+  /// No description provided for @feedingBulkCagesRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите хотя бы одну клетку'**
+  String get feedingBulkCagesRequired;
+
+  /// No description provided for @feedingBulkCagesPickTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Какие клетки кормим'**
+  String get feedingBulkCagesPickTitle;
+
+  /// No description provided for @feedingBulkCagesSelected.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} клетка} few{{count} клетки} many{{count} клеток} other{{count} клетки}}'**
+  String feedingBulkCagesSelected(int count);
+
+  /// No description provided for @feedingBulkWholeFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вся ферма'**
+  String get feedingBulkWholeFarm;
+
+  /// No description provided for @feedingBulkClearSelection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять выбор'**
+  String get feedingBulkClearSelection;
+
+  /// No description provided for @feedingBulkRowUnnamed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без ряда'**
+  String get feedingBulkRowUnnamed;
+
+  /// No description provided for @feedingBulkDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get feedingBulkDone;
+
+  /// No description provided for @feedingBulkNoCagesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клеток пока нет'**
+  String get feedingBulkNoCagesTitle;
+
+  /// No description provided for @feedingBulkNoCagesBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите клетки — тогда кормление можно будет записать сразу на ряд или на всю ферму.'**
+  String get feedingBulkNoCagesBody;
+
+  /// No description provided for @feedingBulkQuantityEach.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько на каждого'**
+  String get feedingBulkQuantityEach;
+
+  /// No description provided for @feedingBulkQuantityEachHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Число — на одного получателя.'**
+  String get feedingBulkQuantityEachHint;
+
+  /// No description provided for @feedingBulkQuantityEachNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Число — на одного получателя. Всего спишется {amount}.'**
+  String feedingBulkQuantityEachNote(String amount);
+
+  /// No description provided for @feedingBulkCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Записано {count} кормление} few{Записано {count} кормления} many{Записано {count} кормлений} other{Записано {count} кормления}}'**
+  String feedingBulkCreated(int count);
+
   /// No description provided for @feedsFilterAllTypes.
   ///
   /// In ru, this message translates to:
@@ -2697,12 +2817,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'осталось {amount}'**
   String feedingFormStockLeft(String amount);
-
-  /// No description provided for @feedingFormCreated.
-  ///
-  /// In ru, this message translates to:
-  /// **'Кормление записано'**
-  String get feedingFormCreated;
 
   /// No description provided for @feedingFormUpdated.
   ///
@@ -3412,6 +3526,102 @@ abstract class AppLocalizations {
   /// **'Настройки'**
   String get settingsTitle;
 
+  /// No description provided for @healthTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоровье'**
+  String get healthTitle;
+
+  /// No description provided for @healthMenuLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививки и лечение'**
+  String get healthMenuLabel;
+
+  /// No description provided for @healthKindAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всё'**
+  String get healthKindAll;
+
+  /// No description provided for @healthKindVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививки'**
+  String get healthKindVaccination;
+
+  /// No description provided for @healthKindTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get healthKindTreatment;
+
+  /// No description provided for @healthEntryVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививка'**
+  String get healthEntryVaccination;
+
+  /// No description provided for @healthEntryTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get healthEntryTreatment;
+
+  /// No description provided for @healthPickRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'История одного кролика'**
+  String get healthPickRabbit;
+
+  /// No description provided for @healthEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоровье стада ещё не записано'**
+  String get healthEmptyTitle;
+
+  /// No description provided for @healthEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмечайте прививки и лечение — и будет видно, что было с каждым кроликом и когда прививать снова.'**
+  String get healthEmptyBody;
+
+  /// No description provided for @healthNoneInViewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этой выборке пусто'**
+  String get healthNoneInViewTitle;
+
+  /// No description provided for @healthNoneForRabbitTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'У {name} записей о здоровье нет'**
+  String healthNoneForRabbitTitle(String name);
+
+  /// No description provided for @healthNoneInViewBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимите фильтр — остальные записи никуда не делись.'**
+  String get healthNoneInViewBody;
+
+  /// No description provided for @healthRecordTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что записать?'**
+  String get healthRecordTitle;
+
+  /// No description provided for @healthRecordVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививку'**
+  String get healthRecordVaccination;
+
+  /// No description provided for @healthRecordTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечение'**
+  String get healthRecordTreatment;
+
   /// No description provided for @farmSectionMoney.
   ///
   /// In ru, this message translates to:
@@ -3447,18 +3657,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Здоровье'**
   String get farmSectionHealth;
-
-  /// No description provided for @farmVaccinations.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вакцинации'**
-  String get farmVaccinations;
-
-  /// No description provided for @farmMedicalRecords.
-  ///
-  /// In ru, this message translates to:
-  /// **'Лечение'**
-  String get farmMedicalRecords;
 
   /// No description provided for @farmSectionReports.
   ///

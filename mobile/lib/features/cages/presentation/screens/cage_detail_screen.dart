@@ -69,7 +69,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.cageRemoveTitle),
-        content: Text(context.l10n.cageRemoveBody(rabbit.name)),
+        content: Text(context.l10n.cageRemoveBody(rabbit.label)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -89,7 +89,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': null}),
-      context.l10n.cageRemoved(rabbit.name),
+      context.l10n.cageRemoved(rabbit.label),
     );
   }
 
@@ -105,7 +105,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': target.id}),
-      context.l10n.cageMoved(rabbit.name, target.number),
+      context.l10n.cageMoved(rabbit.label, target.number),
     );
   }
 
@@ -121,7 +121,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       () => ref
           .read(rabbitsRepositoryProvider)
           .updateRabbit(rabbit.id, {'cage_id': widget.cageId}),
-      context.l10n.cageSettled(rabbit.name),
+      context.l10n.cageSettled(rabbit.label),
     );
   }
 
@@ -358,14 +358,14 @@ class _ResidentTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  rabbit.name,
+                  rabbit.label,
                   style: AppTypography.titleMd
                       .copyWith(color: context.colors.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  rabbit.tagId,
+                  rabbit.tagId ?? '',
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
                 ),

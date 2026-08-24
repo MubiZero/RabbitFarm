@@ -62,7 +62,13 @@ class Vaccination with _$Vaccination {
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
     // Related rabbit info (from API) - не сериализуем, создаем вручную
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    /// Кролик, которого лечили или прививали.
+    ///
+    /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+    /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+    /// В списках при этом стояла ветка «показать кличку», которая не
+    /// выполнялась никогда: данные приходили и не доезжали до экрана.
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
     // Calculated fields
     @JsonKey(name: 'days_until') int? daysUntil,
     @JsonKey(name: 'days_overdue') int? daysOverdue,

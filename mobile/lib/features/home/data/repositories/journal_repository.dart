@@ -16,10 +16,11 @@ import '../models/journal_entry.dart';
 /// прививки и задачи лежат по разным адресам, поэтому четыре списка тянутся
 /// параллельно и склеиваются по времени здесь.
 ///
-/// Ответы разбираются не готовыми моделями фич, а прямо из JSON. Списки уже
-/// привозят связанные корм, кролика, клетку и автора записи, но модели
-/// кормления и задачи эти поля отбрасывают — а без имён строка журнала
-/// превращается в «Корм #17 кролику #4», то есть ни в что.
+/// Кормления и задачи разбираются своими моделями: те теперь забирают из
+/// ответа связанные корм, кролика, клетку и автора записи. А вот модели
+/// лечения и прививок связанного кролика всё ещё отбрасывают, поэтому его имя
+/// достаётся из сырого JSON — иначе строка журнала превратилась бы в «Ушной
+/// клещ кролику #4», то есть ни во что.
 class JournalRepository {
   JournalRepository(this._api);
 
@@ -74,10 +75,10 @@ class JournalRepository {
       kind: JournalKind.feeding,
       at: record.fedAt,
       hasTime: true,
-      title: _text(item['feed'], 'name'),
-      rabbitName: _text(item['rabbit'], 'name'),
-      cageNumber: _text(item['cage'], 'number'),
-      author: _text(item['fedBy'], 'full_name'),
+      title: record.feed?.name,
+      rabbitName: record.rabbit?.name,
+      cageNumber: record.cage?.number,
+      author: record.author?.fullName,
       formArgs: record,
     );
   }
@@ -166,9 +167,9 @@ class JournalRepository {
         at: completedAt,
         hasTime: true,
         title: task.title,
-        rabbitName: _text(item['rabbit'], 'name'),
-        cageNumber: _text(item['cage'], 'number'),
-        author: _text(item['creator'], 'full_name'),
+        rabbitName: task.rabbit?.label,
+        cageNumber: task.cage?.number,
+        author: task.author?.fullName,
         formArgs: task,
       ));
     }
@@ -193,8 +194,8 @@ class JournalRepository {
     }
   }
 
-  /// Значение вложенной связи, если сервер её привёз. Номер клетки приходит
-  /// числом, имя — строкой, поэтому приводим к тексту здесь.
+  /// Значение вложенной связи, если сервер её привёз. Нужно там, где модель
+  /// фичи связь ещё выбрасывает, — в лечении и прививках.
   static String? _text(dynamic node, String key) {
     if (node is! Map) return null;
     final value = node[key]?.toString().trim();

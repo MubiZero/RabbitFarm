@@ -194,12 +194,12 @@ class RabbitDetailScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          rabbit.name,
+                          rabbit.label,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          context.l10n.rabbitTagLine(rabbit.tagId),
+                          context.l10n.rabbitTagLine(rabbit.tagId!),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -274,7 +274,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         context.push(
-                          '/rabbits/${rabbit.id}/pedigree?name=${Uri.encodeComponent(rabbit.name)}',
+                          '/rabbits/${rabbit.id}/pedigree?name=${Uri.encodeComponent(rabbit.label)}',
                         );
                       },
                       icon: const Icon(Icons.account_tree),
@@ -448,7 +448,7 @@ class RabbitDetailScreen extends ConsumerWidget {
 
   Widget _buildParentCard(
     BuildContext context,
-    ParentInfo parent,
+    RabbitRef parent,
     String label,
     IconData icon,
     Color color,
@@ -488,17 +488,21 @@ class RabbitDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    parent.name,
+                    parent.label,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-                  Text(
-                    context.l10n.rabbitTagLine(parent.tagId),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
+                  // Клеймо есть не у всех: у кролика без клейма строка с ним
+                  // пустая, а не «Клеймо: null».
+                  if (parent.tagId != null)
+                    Text(
+                      context.l10n.rabbitTagLine(parent.tagId!),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
                 ],
               ),
             ),
@@ -573,7 +577,7 @@ class RabbitDetailScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.rabbitDetailDeleteTitle),
-        content: Text(context.l10n.rabbitDetailDeleteBody(rabbit.name)),
+        content: Text(context.l10n.rabbitDetailDeleteBody(rabbit.label)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

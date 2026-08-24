@@ -24,6 +24,11 @@ abstract class BreedingCycleDays {
 
   /// Отсадка молодняка от самки — считается от дня окрола.
   static const weaning = 45;
+
+  /// Позже 50-го дня от окрола отсаживать уже поздно: молодняк съедает корм
+  /// самки, а её пора крыть заново. До этого дня дело держим в ленте, чтобы
+  /// просроченная отсадка не исчезала на следующий день после срока.
+  static const weaningLatest = 50;
 }
 
 /// Где случка находится прямо сейчас.
@@ -37,6 +42,9 @@ enum BreedingCycleStage {
   /// Окрол записан, впереди отсадка молодняка.
   weaning,
 
+  /// Молодняк отсажен — по этой случке всё сделано.
+  weaned,
+
   /// Прощупывание показало, что самка пустая.
   notPregnant,
 
@@ -46,7 +54,7 @@ enum BreedingCycleStage {
   /// Случку отменили.
   cancelled,
 
-  /// Цикл отработан: молодняк пора было отсадить, делать больше нечего.
+  /// Цикл отработан: срок отсадки прошёл, отметки о ней нет и ждать нечего.
   closed,
 }
 
@@ -62,10 +70,17 @@ class BreedingCycleStatus {
   /// `null` — дата случки не разобралась.
   final int? dayOfCycle;
 
+  /// Дата посчитана от события, которое ещё не случилось (от ожидаемого
+  /// окрола), а значит уедет вместе с ним. Такую дату показывают с оговоркой:
+  /// выдать оценку за точный срок — соврать фермеру о том самом дне, ради
+  /// которого он открывает приложение.
+  final bool isEstimated;
+
   const BreedingCycleStatus({
     required this.stage,
     this.actionDate,
     this.dayOfCycle,
+    this.isEstimated = false,
   });
 
   /// Срок прошёл — с точностью до дня.
@@ -109,21 +124,50 @@ BreedingCycleStatus breedingCycleStatus(
       );
 
     case BreedingStatus.completed:
-      // «Завершена» сервер ставит в момент записи окрола. Настоящей даты
-      // окрола в записи о случке нет, поэтому отсадку считаем от ожидаемой
-      // даты — отсюда и приблизительность этого срока в интерфейсе.
+      // «Завершена» сервер ставит в момент записи окрола. Дата отсадки
+      // отсчитывается от дня окрола, поэтому берём настоящую, когда она
+      // приехала со списком. Ожидаемая — запасной вариант для старых серверов
+      // и для окролов, которых в ответе нет: срок тогда честно приблизительный.
+      final born = _dayOfString(breeding.actualBirthDate);
+      final weaned = _dayOfString(breeding.weaningDate);
+
+      if (weaned != null) {
+        return BreedingCycleStatus(
+          stage: BreedingCycleStage.weaned,
+          dayOfCycle: day,
+        );
+      }
+
+      final countFrom = born ?? expected;
       final weaning =
-          expected?.add(const Duration(days: BreedingCycleDays.weaning));
-      if (weaning == null || weaning.isBefore(today)) {
+          countFrom?.add(const Duration(days: BreedingCycleDays.weaning));
+      if (weaning == null) {
         return BreedingCycleStatus(
           stage: BreedingCycleStage.closed,
           dayOfCycle: day,
         );
       }
+
+      // Настоящий день окрола известен — можно честно показать просрочку до
+      // последнего разумного дня отсадки. Оценка такого права не даёт: гнать
+      // «просрочено» по выдуманной дате хуже, чем промолчать, поэтому от
+      // ожидаемого окрола цикл закрывается сразу за расчётным днём.
+      final lastCall = born?.add(
+            const Duration(days: BreedingCycleDays.weaningLatest),
+          ) ??
+          weaning;
+      if (lastCall.isBefore(today)) {
+        return BreedingCycleStatus(
+          stage: BreedingCycleStage.closed,
+          dayOfCycle: day,
+        );
+      }
+
       return BreedingCycleStatus(
         stage: BreedingCycleStage.weaning,
         actionDate: weaning,
         dayOfCycle: day,
+        isEstimated: born == null,
       );
 
     case BreedingStatus.planned:

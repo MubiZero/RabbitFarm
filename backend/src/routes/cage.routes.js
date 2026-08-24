@@ -105,9 +105,6 @@ router.use(authenticate);
 // Statistics (before :id to avoid conflict)
 router.get('/statistics', cageController.getStatistics);
 
-// Layout/map
-router.get('/layout', cageController.getLayout);
-
 // CRUD operations
 router.post('/', authorize(['manager', 'owner']), validate(createCageSchema), cageController.create);
 router.get('/', validate(listCagesQuerySchema, 'query'), cageController.list);

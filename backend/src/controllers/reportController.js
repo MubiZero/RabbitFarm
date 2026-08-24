@@ -13,6 +13,7 @@ const {
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
 const { farmMemberIds } = require('../utils/farm');
+const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
 // Живым считается всё, кроме проданных и павших. Перечислять живые
 // статусы поимённо опасно: список уже расходился с моделью.
@@ -311,6 +312,16 @@ exports.getFarmReport = async (req, res, next) => {
     const memberIds = await farmMemberIds(req.farmId);
     const period = { [Op.gte]: effectiveFromDate, [Op.lte]: effectiveToDate };
 
+    // Отдельная граница для колонок со временем. Остальные даты в отчёте —
+    // DATEONLY, там сравнение идёт день с днём. А fed_at хранит момент, и
+    // `<= '2026-08-24'` означало «не позже полуночи», то есть отсекало весь
+    // последний день периода. Период по умолчанию заканчивается сегодняшним
+    // днём — сегодняшние кормления не попадали в отчёт никогда.
+    const feedingPeriod = {
+      [Op.gte]: startOfDayUtc(effectiveFromDate),
+      [Op.lt]: nextDayUtc(effectiveToDate)
+    };
+
     // Rabbit population dynamics
     const rabbitsByBreed = await Rabbit.findAll({
       where: { user_id: req.farmId },
@@ -362,14 +373,14 @@ exports.getFarmReport = async (req, res, next) => {
     });
 
     const feedingRecordsCount = await FeedingRecord.count({
-      where: { fed_by: { [Op.in]: memberIds }, fed_at: period }
+      where: { fed_by: { [Op.in]: memberIds }, fed_at: feedingPeriod }
     });
 
     // Расход разбит по единицам измерения. Общая сумма складывала килограммы
     // комбикорма со штуками моркови — получалось число, которое невозможно
     // истолковать.
     const consumptionByUnit = await FeedingRecord.findAll({
-      where: { fed_by: { [Op.in]: memberIds }, fed_at: period },
+      where: { fed_by: { [Op.in]: memberIds }, fed_at: feedingPeriod },
       attributes: [
         [Sequelize.col('feed.unit'), 'unit'],
         [Sequelize.fn('SUM', Sequelize.col('FeedingRecord.quantity')), 'total']

@@ -236,12 +236,12 @@ class _CycleTile extends StatelessWidget {
   }
 
   String _rabbitLabel(BuildContext context, RabbitModel? rabbit) {
-    final name = rabbit?.name.trim();
+    final name = rabbit?.name?.trim();
     if (name != null && name.isNotEmpty) return name;
 
     // Имени может не быть, а бирка есть почти всегда — по ней кролика и
     // находят в крольчатнике.
-    final tag = rabbit?.tagId.trim();
+    final tag = rabbit?.tagId?.trim();
     if (tag != null && tag.isNotEmpty) return context.l10n.breedingTag(tag);
 
     return context.l10n.commonNameMissing;
@@ -251,6 +251,7 @@ class _CycleTile extends StatelessWidget {
         BreedingCycleStage.pregnancyCheck => context.l10n.cycleStageCheck,
         BreedingCycleStage.birthExpected => context.l10n.cycleStageBirth,
         BreedingCycleStage.weaning => context.l10n.cycleStageWeaning,
+        BreedingCycleStage.weaned => context.l10n.cycleStageWeaned,
         BreedingCycleStage.notPregnant => context.l10n.cycleStageNotPregnant,
         BreedingCycleStage.failed => context.l10n.cycleStageFailed,
         BreedingCycleStage.cancelled => context.l10n.cycleStageCancelled,
@@ -261,6 +262,7 @@ class _CycleTile extends StatelessWidget {
         BreedingCycleStage.pregnancyCheck => Icons.fact_check_outlined,
         BreedingCycleStage.birthExpected => Icons.child_care_outlined,
         BreedingCycleStage.weaning => Icons.pets_outlined,
+        BreedingCycleStage.weaned => Icons.task_alt,
         BreedingCycleStage.notPregnant => Icons.remove_circle_outline,
         BreedingCycleStage.failed => Icons.error_outline,
         BreedingCycleStage.cancelled => Icons.cancel_outlined,
@@ -271,6 +273,9 @@ class _CycleTile extends StatelessWidget {
         BreedingCycleStage.pregnancyCheck => AppColors.info,
         BreedingCycleStage.birthExpected => AppColors.domainBreeding,
         BreedingCycleStage.weaning => AppColors.domainLivestock,
+        // Отсаженный молодняк — единственный по-настоящему хороший исход
+        // цикла, и в ленте он должен читаться иначе, чем «ничего не вышло».
+        BreedingCycleStage.weaned => AppColors.success,
         BreedingCycleStage.notPregnant => AppColors.warning,
         BreedingCycleStage.failed => AppColors.error,
         BreedingCycleStage.cancelled ||
@@ -293,11 +298,11 @@ class _CycleTile extends StatelessWidget {
                 : l10n.cycleInDays(days);
 
     final formatted = DateFormat('d MMMM', 'ru').format(date);
-    // Отсадку считаем от ожидаемого окрола: настоящей даты окрола в записи о
-    // случке нет, и выдавать оценку за точный срок нечестно.
-    final dateText = status.stage == BreedingCycleStage.weaning
-        ? l10n.cycleApproxDate(formatted)
-        : formatted;
+    // «Примерно» стоит ровно там, где дата и правда посчитана от события,
+    // которое ещё не случилось. Рядом с точным сроком это слово так же врёт,
+    // как его отсутствие рядом с оценкой.
+    final dateText =
+        status.isEstimated ? l10n.cycleApproxDate(formatted) : formatted;
 
     return l10n.cycleActionWhen(dateText, relative);
   }

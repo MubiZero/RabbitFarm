@@ -10,8 +10,14 @@ part 'rabbit_model.g.dart';
 class RabbitModel with _$RabbitModel {
   const factory RabbitModel({
     @IntConverter() required int id,
-    @JsonKey(name: 'tag_id') required String tagId,
-    required String name,
+
+    /// Клеймо и кличка необязательны: в базе оба столбца допускают пустоту,
+    /// и сервер прямо разрешает завести кролика без них
+    /// (`rabbitValidator.js`: `.allow(null, '')`). Пока модель требовала обе,
+    /// один такой кролик ронял разбор всей страницы списка — вместе со
+    /// «Стадом», выпадающими полями форм и подбором пар.
+    @JsonKey(name: 'tag_id') String? tagId,
+    String? name,
     @JsonKey(name: 'breed_id') @IntConverter() required int breedId,
     required String sex,
     @JsonKey(name: 'birth_date') @DateOnlyConverter() required DateTime birthDate,
@@ -34,9 +40,22 @@ class RabbitModel with _$RabbitModel {
     // Relations
     @JsonKey(name: 'breed') BreedModel? breed,
     @JsonKey(name: 'Cage') CageInfo? cage,
-    @JsonKey(name: 'father') ParentInfo? father,
-    @JsonKey(name: 'mother') ParentInfo? mother,
+    @JsonKey(name: 'father') RabbitRef? father,
+    @JsonKey(name: 'mother') RabbitRef? mother,
   }) = _RabbitModel;
+
+  const RabbitModel._();
+
+  /// Чем назвать кролика в интерфейсе: кличка, иначе клеймо, иначе номер.
+  /// Тот же порядок, что у [RabbitRef], — чтобы один кролик не назывался
+  /// в списке иначе, чем в задаче или в книге доходов.
+  String get label {
+    final byName = name?.trim();
+    if (byName != null && byName.isNotEmpty) return byName;
+    final byTag = tagId?.trim();
+    if (byTag != null && byTag.isNotEmpty) return byTag;
+    return '#$id';
+  }
 
   factory RabbitModel.fromJson(Map<String, dynamic> json) =>
       _$RabbitModelFromJson(json);
@@ -55,14 +74,34 @@ class CageInfo with _$CageInfo {
       _$CageInfoFromJson(json);
 }
 
+/// Ссылка на кролика: id и то, чем его называют.
+///
+/// Раньше называлась `ParentInfo`, потому что первым её завели в родословной.
+/// Форма же у неё не «родительская», а «краткая»: тем же тремя полями сервер
+/// отдаёт кролика и в задачах, и в других списках, где полная карточка не
+/// нужна. Имя по назначению, а не по месту первой прописки.
+///
+/// Имя и клеймо в базе необязательны, поэтому оба поля могут не приехать —
+/// строку для показа собирает [label], чтобы каждый экран не выдумывал свою.
 @freezed
-class ParentInfo with _$ParentInfo {
-  const factory ParentInfo({
+class RabbitRef with _$RabbitRef {
+  const factory RabbitRef({
     @IntConverter() required int id,
-    required String name,
-    @JsonKey(name: 'tag_id') required String tagId,
-  }) = _ParentInfo;
+    String? name,
+    @JsonKey(name: 'tag_id') String? tagId,
+  }) = _RabbitRef;
 
-  factory ParentInfo.fromJson(Map<String, dynamic> json) =>
-      _$ParentInfoFromJson(json);
+  const RabbitRef._();
+
+  /// Чем назвать кролика в строке списка: имя, иначе клеймо, иначе номер.
+  String get label {
+    final byName = name?.trim();
+    if (byName != null && byName.isNotEmpty) return byName;
+    final byTag = tagId?.trim();
+    if (byTag != null && byTag.isNotEmpty) return byTag;
+    return '#$id';
+  }
+
+  factory RabbitRef.fromJson(Map<String, dynamic> json) =>
+      _$RabbitRefFromJson(json);
 }

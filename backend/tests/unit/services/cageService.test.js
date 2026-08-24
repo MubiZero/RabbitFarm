@@ -299,43 +299,4 @@ describe('CageService', () => {
       await expect(cageService.markCleaned(999, 1)).rejects.toThrow('CAGE_NOT_FOUND');
     });
   });
-
-  // ─── getLayout ────────────────────────────────────────────────────────────
-
-  describe('getLayout', () => {
-    it('should group cages by location', async () => {
-      const cages = [
-        createMockCage({ location: 'Building A', rabbits: [] }),
-        createMockCage({ id: 2, location: 'Building A', rabbits: [] }),
-        createMockCage({ id: 3, location: 'Building B', rabbits: [] })
-      ];
-      Cage.findAll.mockResolvedValue(cages);
-
-      const result = await cageService.getLayout(1);
-
-      expect(Object.keys(result)).toContain('Building A');
-      expect(Object.keys(result)).toContain('Building B');
-      expect(result['Building A']).toHaveLength(2);
-      expect(result['Building B']).toHaveLength(1);
-    });
-
-    it('should use "Без локации" as fallback when location is null', async () => {
-      const cages = [
-        createMockCage({ location: null, rabbits: [] })
-      ];
-      Cage.findAll.mockResolvedValue(cages);
-
-      const result = await cageService.getLayout(1);
-
-      expect(Object.keys(result)).toContain('Без локации');
-    });
-
-    it('should return empty layout when user has no cages', async () => {
-      Cage.findAll.mockResolvedValue([]);
-
-      const result = await cageService.getLayout(1);
-
-      expect(result).toEqual({});
-    });
-  });
 });

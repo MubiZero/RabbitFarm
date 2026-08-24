@@ -187,22 +187,6 @@ class CageService {
     return cage;
   }
 
-  async getLayout(userId) {
-    const cages = await Cage.findAll({
-      where: { user_id: userId },
-      include: [{ ...RABBIT_INCLUDE, where: { user_id: userId } }],
-      order: [['location', 'ASC'], ['number', 'ASC']]
-    });
-
-    const layout = {};
-    cages.forEach(cage => {
-      const loc = cage.location || 'Без локации';
-      if (!layout[loc]) layout[loc] = [];
-      layout[loc].push(addOccupancy(cage));
-    });
-
-    return layout;
-  }
 }
 
 module.exports = new CageService();

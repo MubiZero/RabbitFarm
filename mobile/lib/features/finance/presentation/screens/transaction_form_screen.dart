@@ -33,6 +33,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
   late TransactionCategory _category;
   late DateTime _date;
   RabbitModel? _rabbit;
+  String? _rabbitLabel;
   int? _rabbitId;
   bool _touched = false;
 
@@ -65,7 +66,10 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     _category = record?.category ?? _expenseCategories.first;
     _date = record?.transactionDate ?? DateTime.now();
     _rabbitId = record?.rabbitId;
-    _rabbit = record?.rabbit;
+    // Пикеру нужна полная модель, а в записи лежит краткая ссылка. Пока
+    // человек не выбрал кролика заново, показываем подпись из неё — иначе
+    // при правке операции поле выглядело бы пустым.
+    _rabbitLabel = record?.rabbit?.label;
     _amount.text = record?.amount.toString() ?? '';
     _description.text = record?.description ?? '';
 
@@ -268,8 +272,10 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
             RabbitPickerField(
               label: l10n.txFormRabbit,
               selected: _rabbit,
+              selectedLabel: _rabbitId != null ? _rabbitLabel : null,
               onChanged: (rabbit) => setState(() {
                 _rabbit = rabbit;
+                _rabbitLabel = null;
                 _rabbitId = rabbit?.id;
                 _touched = true;
               }),

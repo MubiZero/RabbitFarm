@@ -313,30 +313,4 @@ describe('CageController', () => {
       expect(mockNext).toHaveBeenCalledWith(err);
     });
   });
-
-  describe('getLayout', () => {
-    it('should return layout with 200', async () => {
-      const layout = [{ row: 1, cages: [] }];
-      cageService.getLayout.mockResolvedValue(layout);
-      const req = mockReq({});
-      const res = mockRes();
-
-      await cageController.getLayout(req, res, mockNext);
-
-      expect(cageService.getLayout).toHaveBeenCalledWith(1);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: layout }));
-    });
-
-    it('should call next for unexpected errors', async () => {
-      const err = new Error('DB error');
-      cageService.getLayout.mockRejectedValue(err);
-      const req = mockReq({});
-      const res = mockRes();
-
-      await cageController.getLayout(req, res, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith(err);
-    });
-  });
 });

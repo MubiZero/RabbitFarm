@@ -319,6 +319,14 @@ class _TaskCard extends StatelessWidget {
     final overdue = !done && isOverdue(task.dueDate);
     final priorityColor = taskPriorityColor(context, task.priority);
 
+    final rabbit = task.rabbit;
+    final cage = task.cage;
+    final target = rabbit != null
+        ? context.l10n.feedingForRabbit(rabbit.label)
+        : cage != null
+            ? context.l10n.feedingForCage(cage.number)
+            : null;
+
     return AppCard(
       onTap: onTap,
       child: Row(
@@ -370,6 +378,20 @@ class _TaskCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                // К кому относится дело. Сервер присылает кролика и клетку
+                // вместе с задачей, но модель их отбрасывала — и «Осмотр»
+                // в списке не говорил, кого осматривать. Подписи те же, что
+                // в журнале и кормлениях: строка читается одинаково везде.
+                if (target != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    target,
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [

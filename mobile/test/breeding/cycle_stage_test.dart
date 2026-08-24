@@ -13,6 +13,8 @@ BreedingModel breeding({
   String? expected,
   String? palpation,
   bool? isPregnant,
+  String? born,
+  String? weaned,
 }) =>
     BreedingModel(
       id: id,
@@ -23,6 +25,8 @@ BreedingModel breeding({
       expectedBirthDate: expected,
       palpationDate: palpation,
       isPregnant: isPregnant,
+      actualBirthDate: born,
+      weaningDate: weaned,
     );
 
 DateTime day(int year, int month, int dayOfMonth) =>
@@ -196,6 +200,124 @@ void main() {
 
       expect(status.stage, BreedingCycleStage.closed);
       expect(status.actionDate, isNull);
+    });
+
+    test('без настоящего окрола срок отсадки — оценка', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+        ),
+        now: day(2026, 4, 10),
+      );
+
+      expect(status.isEstimated, isTrue);
+    });
+  });
+
+  group('Настоящая дата окрола известна', () {
+    // Отсадку отсчитывают от дня, когда самка окролилась. Пока в списке
+    // случек была только ожидаемая дата, срок уезжал ровно на столько, на
+    // сколько окрол разошёлся с ожиданием — а это и есть тот единственный
+    // день, ради которого приложение открывают.
+    test('отсадка считается от дня окрола, а не от ожидаемого', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+          born: '2026-03-25',
+        ),
+        now: day(2026, 4, 10),
+      );
+
+      expect(status.stage, BreedingCycleStage.weaning);
+      expect(status.actionDate, day(2026, 5, 9));
+      expect(status.isEstimated, isFalse);
+    });
+
+    test('окрол на неделю раньше — отсадка съезжает вместе с ним', () {
+      const bred = '2026-03-01';
+      const expected = '2026-04-01';
+
+      final byEstimate = breedingCycleStatus(
+        breeding(bred: bred, status: 'completed', expected: expected),
+        now: day(2026, 4, 10),
+      );
+      final byFact = breedingCycleStatus(
+        breeding(
+          bred: bred,
+          status: 'completed',
+          expected: expected,
+          born: '2026-03-25',
+        ),
+        now: day(2026, 4, 10),
+      );
+
+      expect(byEstimate.actionDate, day(2026, 5, 16));
+      expect(byFact.actionDate, day(2026, 5, 9));
+    });
+
+    test('известный день отсадки позволяет показать просрочку', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+          born: '2026-03-25',
+        ),
+        now: day(2026, 5, 12),
+      );
+
+      expect(status.stage, BreedingCycleStage.weaning);
+      expect(status.isOverdue(now: day(2026, 5, 12)), isTrue);
+    });
+
+    test('на 50-й день от окрола отсадка ещё в ленте', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+          born: '2026-03-25',
+        ),
+        now: day(2026, 5, 14),
+      );
+
+      expect(status.stage, BreedingCycleStage.weaning);
+    });
+
+    test('позже отсаживать поздно — цикл отработан', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+          born: '2026-03-25',
+        ),
+        now: day(2026, 5, 15),
+      );
+
+      expect(status.stage, BreedingCycleStage.closed);
+      expect(status.actionDate, isNull);
+    });
+
+    test('отсадка записана — молодняк отсажен, а не просрочен навсегда', () {
+      final status = breedingCycleStatus(
+        breeding(
+          bred: '2026-03-01',
+          status: 'completed',
+          expected: '2026-04-01',
+          born: '2026-03-25',
+          weaned: '2026-05-08',
+        ),
+        now: day(2026, 6, 20),
+      );
+
+      expect(status.stage, BreedingCycleStage.weaned);
+      expect(status.actionDate, isNull);
+      expect(status.isOverdue(now: day(2026, 6, 20)), isFalse);
     });
   });
 

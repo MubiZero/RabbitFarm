@@ -18,7 +18,11 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$PedigreeModel {
   int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+
+  /// Кличка необязательна: в базе столбец допускает пустоту, и подставлять
+  /// за неё готовую фразу здесь значило бы прятать переводимую подпись
+  /// в слое данных.
+  String? get name => throw _privateConstructorUsedError;
   String? get tagId => throw _privateConstructorUsedError;
   String get sex => throw _privateConstructorUsedError;
   String? get birthDate => throw _privateConstructorUsedError;
@@ -42,7 +46,7 @@ abstract class $PedigreeModelCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    String name,
+    String? name,
     String? tagId,
     String sex,
     String? birthDate,
@@ -71,7 +75,7 @@ class _$PedigreeModelCopyWithImpl<$Res, $Val extends PedigreeModel>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? name = freezed,
     Object? tagId = freezed,
     Object? sex = null,
     Object? birthDate = freezed,
@@ -85,10 +89,10 @@ class _$PedigreeModelCopyWithImpl<$Res, $Val extends PedigreeModel>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as int,
-            name: null == name
+            name: freezed == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             tagId: freezed == tagId
                 ? _value.tagId
                 : tagId // ignore: cast_nullable_to_non_nullable
@@ -158,7 +162,7 @@ abstract class _$$PedigreeModelImplCopyWith<$Res>
   @useResult
   $Res call({
     int id,
-    String name,
+    String? name,
     String? tagId,
     String sex,
     String? birthDate,
@@ -188,7 +192,7 @@ class __$$PedigreeModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? name = freezed,
     Object? tagId = freezed,
     Object? sex = null,
     Object? birthDate = freezed,
@@ -202,10 +206,10 @@ class __$$PedigreeModelImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as int,
-        name: null == name
+        name: freezed == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         tagId: freezed == tagId
             ? _value.tagId
             : tagId // ignore: cast_nullable_to_non_nullable
@@ -240,7 +244,7 @@ class __$$PedigreeModelImplCopyWithImpl<$Res>
 class _$PedigreeModelImpl implements _PedigreeModel {
   const _$PedigreeModelImpl({
     required this.id,
-    required this.name,
+    this.name,
     this.tagId,
     required this.sex,
     this.birthDate,
@@ -251,8 +255,12 @@ class _$PedigreeModelImpl implements _PedigreeModel {
 
   @override
   final int id;
+
+  /// Кличка необязательна: в базе столбец допускает пустоту, и подставлять
+  /// за неё готовую фразу здесь значило бы прятать переводимую подпись
+  /// в слое данных.
   @override
-  final String name;
+  final String? name;
   @override
   final String? tagId;
   @override
@@ -312,7 +320,7 @@ class _$PedigreeModelImpl implements _PedigreeModel {
 abstract class _PedigreeModel implements PedigreeModel {
   const factory _PedigreeModel({
     required final int id,
-    required final String name,
+    final String? name,
     final String? tagId,
     required final String sex,
     final String? birthDate,
@@ -323,8 +331,12 @@ abstract class _PedigreeModel implements PedigreeModel {
 
   @override
   int get id;
+
+  /// Кличка необязательна: в базе столбец допускает пустоту, и подставлять
+  /// за неё готовую фразу здесь значило бы прятать переводимую подпись
+  /// в слое данных.
   @override
-  String get name;
+  String? get name;
   @override
   String? get tagId;
   @override

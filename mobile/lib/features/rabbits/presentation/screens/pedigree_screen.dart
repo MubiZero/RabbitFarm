@@ -14,12 +14,14 @@ import '../utils/rabbit_labels.dart';
 /// Показывает древо предков в вертикальном списке по поколениям
 class PedigreeScreen extends ConsumerWidget {
   final int rabbitId;
-  final String rabbitName;
+  /// Кличка для подзаголовка. Может отсутствовать: экран открывают и по
+  /// прямой ссылке, где её негде взять.
+  final String? rabbitName;
 
   const PedigreeScreen({
     super.key,
     required this.rabbitId,
-    required this.rabbitName,
+    this.rabbitName,
   });
 
   @override
@@ -39,7 +41,9 @@ class PedigreeScreen extends ConsumerWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                rabbitName,
+                rabbitName?.trim().isNotEmpty == true
+                    ? rabbitName!
+                    : context.l10n.commonNameMissing,
                 style: AppTypography.bodyMd
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),
@@ -282,7 +286,9 @@ class PedigreeScreen extends ConsumerWidget {
 
                   // Имя
                   Text(
-                    rabbit.name,
+                    rabbit.name?.trim().isNotEmpty == true
+                        ? rabbit.name!
+                        : context.l10n.commonNameMissing,
                     style: (isSmall
                             ? AppTypography.titleMd
                             : AppTypography.titleLg)

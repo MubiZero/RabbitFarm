@@ -23,6 +23,9 @@ _$VaccinationImpl _$$VaccinationImplFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
       createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
       updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+      rabbit: json['rabbit'] == null
+          ? null
+          : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
       daysUntil: (json['days_until'] as num?)?.toInt(),
       daysOverdue: (json['days_overdue'] as num?)?.toInt(),
       isOverdue: json['is_overdue'] as bool?,
@@ -46,6 +49,7 @@ Map<String, dynamic> _$$VaccinationImplToJson(
   'notes': instance.notes,
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+  'rabbit': instance.rabbit,
   'days_until': instance.daysUntil,
   'days_overdue': instance.daysOverdue,
   'is_overdue': instance.isOverdue,

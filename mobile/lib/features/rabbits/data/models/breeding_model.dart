@@ -25,6 +25,13 @@ class BreedingModel with _$BreedingModel {
     // Связанные объекты (если включены в ответ)
     RabbitModel? male,
     RabbitModel? female,
+    // Настоящий окрол по этой случке: сервер кладёт его в список случек
+    // вложенным объектом `birth`. От этого дня считают отсадку молодняка —
+    // ожидаемая дата окрола для такого счёта годится только пока настоящей
+    // нет. У старых сборок сервера объекта нет вовсе, поэтому оба поля
+    // необязательные.
+    String? actualBirthDate,
+    String? weaningDate,
     // Информация об инбридинге
     @JsonKey(name: 'inbreeding_coefficient') double? inbreedingCoefficient,
     @JsonKey(name: 'common_ancestors') List<String>? commonAncestors,
@@ -51,6 +58,8 @@ class BreedingModel with _$BreedingModel {
                 _hasFullRabbitPayload(json['female'] as Map<String, dynamic>))
           ? RabbitModel.fromJson(json['female'] as Map<String, dynamic>)
           : null,
+      actualBirthDate: _birthField(json['birth'], 'birth_date'),
+      weaningDate: _birthField(json['birth'], 'weaning_date'),
       inbreedingCoefficient: json['inbreeding_coefficient'] != null
           ? (json['inbreeding_coefficient'] as num).toDouble()
           : null,
@@ -58,6 +67,16 @@ class BreedingModel with _$BreedingModel {
           ? List<String>.from(json['common_ancestors'] as List)
           : null,
     );
+  }
+
+  /// Поле связанного окрола, если он вообще приехал в ответе.
+  ///
+  /// Приложение должно открываться и на сервере, который про окрол в списке
+  /// случек ещё не знает: там `birth` просто нет, и это не ошибка данных.
+  static String? _birthField(Object? birth, String key) {
+    if (birth is! Map<String, dynamic>) return null;
+    final value = birth[key]?.toString();
+    return (value == null || value.isEmpty) ? null : value;
   }
 
   /// Проверяет что вложенный объект кролика содержит полный набор

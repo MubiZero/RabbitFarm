@@ -94,12 +94,14 @@ class FarmScreen extends ConsumerWidget {
               items: [
                 // История прививок и лечения по всему стаду — это взгляд
                 // управляющего; работник свои записи вносит из «Записать».
-                if (role.can(FarmCapability.manageLivestock)) ...[
-                  _Item(Icons.vaccines_outlined, context.l10n.farmVaccinations,
-                      '/vaccinations'),
-                  _Item(Icons.medical_services_outlined,
-                      context.l10n.farmMedicalRecords, '/medical-records'),
-                ],
+                // Строка одна: фермер помнит «что было с этим кроликом», а не
+                // «мне нужен раздел Вакцинации», и разделять эти две записи по
+                // разным экранам значило бы заставлять его сводить историю в
+                // голове. Названа она, как «Деньги» и «Отчёты», по содержимому,
+                // а не повторяет слово из заголовка раздела.
+                if (role.can(FarmCapability.manageLivestock))
+                  _Item(Icons.medical_information_outlined,
+                      context.l10n.healthMenuLabel, '/health'),
               ],
             ),
 

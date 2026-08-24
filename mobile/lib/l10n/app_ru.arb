@@ -241,6 +241,7 @@
   "cagePickNoFreeCages": "Свободных клеток нет",
   "cagePickNoFreeCagesBody": "Освободите место или добавьте новую клетку.",
   "cageFormType": "Тип клетки",
+  "cycleStageWeaned": "Молодняк отсажен",
   "cageTypeSingle": "Одиночная",
   "cageTypeGroup": "Групповая",
   "cageTypeMaternity": "Для окрола",
@@ -517,6 +518,34 @@
   "feedsFilterAll": "Все",
   "feedsFilterLowStock": "На исходе",
   "feedsFilterType": "Тип корма",
+  "feedingBulkModeRabbits": "Кролики",
+  "feedingBulkModeCages": "Клетки",
+  "feedingBulkAddRabbit": "Добавить кролика",
+  "feedingBulkRabbitsRequired": "Выберите хотя бы одного кролика",
+  "feedingBulkRemove": "Убрать из списка",
+  "feedingBulkCagesField": "Какие клетки",
+  "feedingBulkCagesRequired": "Выберите хотя бы одну клетку",
+  "feedingBulkCagesPickTitle": "Какие клетки кормим",
+  "feedingBulkCagesSelected": "{count, plural, one{{count} клетка} few{{count} клетки} many{{count} клеток} other{{count} клетки}}",
+  "@feedingBulkCagesSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "feedingBulkWholeFarm": "Вся ферма",
+  "feedingBulkClearSelection": "Снять выбор",
+  "feedingBulkRowUnnamed": "Без ряда",
+  "feedingBulkDone": "Готово",
+  "feedingBulkNoCagesTitle": "Клеток пока нет",
+  "feedingBulkNoCagesBody": "Заведите клетки — тогда кормление можно будет записать сразу на ряд или на всю ферму.",
+  "feedingBulkQuantityEach": "Сколько на каждого",
+  "feedingBulkQuantityEachHint": "Число — на одного получателя.",
+  "feedingBulkQuantityEachNote": "Число — на одного получателя. Всего спишется {amount}.",
+  "@feedingBulkQuantityEachNote": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "feedingBulkCreated": "{count, plural, one{Записано {count} кормление} few{Записано {count} кормления} many{Записано {count} кормлений} other{Записано {count} кормления}}",
+  "@feedingBulkCreated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "feedsFilterAllTypes": "Все типы",
   "feedsInStock": "На складе",
   "feedsMinStock": "Минимум",
@@ -607,7 +636,6 @@
   "@feedingFormStockLeft": {
     "placeholders": { "amount": { "type": "String" } }
   },
-  "feedingFormCreated": "Кормление записано",
   "feedingFormUpdated": "Запись обновлена",
   "feedingFormFailed": "Не удалось сохранить запись",
   "feedingFormStockNote": "Указанное количество спишется со склада.",
@@ -752,14 +780,34 @@
 
   "settingsTitle": "Настройки",
 
+  "healthTitle": "Здоровье",
+  "healthMenuLabel": "Прививки и лечение",
+  "healthKindAll": "Всё",
+  "healthKindVaccination": "Прививки",
+  "healthKindTreatment": "Лечение",
+  "healthEntryVaccination": "Прививка",
+  "healthEntryTreatment": "Лечение",
+  "healthPickRabbit": "История одного кролика",
+  "healthEmptyTitle": "Здоровье стада ещё не записано",
+  "healthEmptyBody": "Отмечайте прививки и лечение — и будет видно, что было с каждым кроликом и когда прививать снова.",
+  "healthNoneInViewTitle": "В этой выборке пусто",
+  "healthNoneForRabbitTitle": "У {name} записей о здоровье нет",
+  "@healthNoneForRabbitTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "healthNoneInViewBody": "Снимите фильтр — остальные записи никуда не делись.",
+  "healthRecordTitle": "Что записать?",
+  "healthRecordVaccination": "Прививку",
+  "healthRecordTreatment": "Лечение",
+
   "farmSectionMoney": "Деньги",
   "farmTransactions": "Доходы и расходы",
   "farmSectionFeed": "Корма",
   "farmFeedStock": "Запас корма",
   "farmFeedingRecords": "Кормления",
   "farmSectionHealth": "Здоровье",
-  "farmVaccinations": "Вакцинации",
-  "farmMedicalRecords": "Лечение",
   "farmSectionReports": "Отчёты",
   "farmReports": "Сводка по ферме",
   "farmSectionPeople": "Люди",

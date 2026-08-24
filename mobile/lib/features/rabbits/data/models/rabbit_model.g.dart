@@ -10,8 +10,8 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
   Map<String, dynamic> json,
 ) => _$RabbitModelImpl(
   id: const IntConverter().fromJson(json['id'] as Object),
-  tagId: json['tag_id'] as String,
-  name: json['name'] as String,
+  tagId: json['tag_id'] as String?,
+  name: json['name'] as String?,
   breedId: const IntConverter().fromJson(json['breed_id'] as Object),
   sex: json['sex'] as String,
   birthDate: const DateOnlyConverter().fromJson(json['birth_date'] as Object),
@@ -41,10 +41,10 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
       : CageInfo.fromJson(json['Cage'] as Map<String, dynamic>),
   father: json['father'] == null
       ? null
-      : ParentInfo.fromJson(json['father'] as Map<String, dynamic>),
+      : RabbitRef.fromJson(json['father'] as Map<String, dynamic>),
   mother: json['mother'] == null
       ? null
-      : ParentInfo.fromJson(json['mother'] as Map<String, dynamic>),
+      : RabbitRef.fromJson(json['mother'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$RabbitModelImplToJson(
@@ -96,14 +96,14 @@ Map<String, dynamic> _$$CageInfoImplToJson(_$CageInfoImpl instance) =>
       'location': instance.location,
     };
 
-_$ParentInfoImpl _$$ParentInfoImplFromJson(Map<String, dynamic> json) =>
-    _$ParentInfoImpl(
+_$RabbitRefImpl _$$RabbitRefImplFromJson(Map<String, dynamic> json) =>
+    _$RabbitRefImpl(
       id: const IntConverter().fromJson(json['id'] as Object),
-      name: json['name'] as String,
-      tagId: json['tag_id'] as String,
+      name: json['name'] as String?,
+      tagId: json['tag_id'] as String?,
     );
 
-Map<String, dynamic> _$$ParentInfoImplToJson(_$ParentInfoImpl instance) =>
+Map<String, dynamic> _$$RabbitRefImplToJson(_$RabbitRefImpl instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'name': instance.name,

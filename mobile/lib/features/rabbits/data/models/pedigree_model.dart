@@ -11,7 +11,11 @@ part 'pedigree_model.freezed.dart';
 class PedigreeModel with _$PedigreeModel {
   const factory PedigreeModel({
     required int id,
-    required String name,
+
+    /// Кличка необязательна: в базе столбец допускает пустоту, и подставлять
+    /// за неё готовую фразу здесь значило бы прятать переводимую подпись
+    /// в слое данных.
+    String? name,
     String? tagId,
     required String sex,
     String? birthDate,
@@ -24,7 +28,7 @@ class PedigreeModel with _$PedigreeModel {
   factory PedigreeModel.fromJson(Map<String, dynamic> json) {
     return PedigreeModel(
       id: intFromJson(json['id']),
-      name: json['name']?.toString() ?? 'Без имени',
+      name: json['name']?.toString(),
       tagId: json['tag_id']?.toString(),
       sex: json['sex']?.toString() ?? 'unknown',
       birthDate: json['birth_date']?.toString(),

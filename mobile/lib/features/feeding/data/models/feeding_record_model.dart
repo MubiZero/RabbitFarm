@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/models/user_ref.dart';
 import 'feed_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../cages/data/models/cage_model.dart';
@@ -22,9 +23,17 @@ class FeedingRecord with _$FeedingRecord {
     @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) Feed? feed,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    // Связи, которые сервер кладёт в ответ. Раньше все три отбрасывались
+    // (`includeFromJson: false`), и список кормлений на каждой строке писал
+    // «Корм не указан», хотя название корма приходило в том же ответе.
+    //
+    // Корм, кролика и клетку кормления отдают целиком — без выборки полей, —
+    // поэтому здесь полные модели. Автор записи приходит урезанным, только
+    // именем и почтой, для него есть [UserRef].
+    Feed? feed,
+    RabbitModel? rabbit,
+    CageModel? cage,
+    @JsonKey(name: 'fedBy') UserRef? author,
   }) = _FeedingRecord;
 
   factory FeedingRecord.fromJson(Map<String, dynamic> json) =>

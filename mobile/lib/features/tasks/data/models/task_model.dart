@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/models/user_ref.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
-import '../../../cages/data/models/cage_model.dart';
 import '../../../../core/json/int_converter.dart';
 
 part 'task_model.freezed.dart';
@@ -69,9 +69,19 @@ class Task with _$Task {
     String? notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
-    // Relationships
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
-    @JsonKey(includeFromJson: false, includeToJson: false) CageModel? cage,
+    // Связи, которые сервер кладёт в ответ.
+    //
+    // Кролика и клетку задачи отдают урезанными — `['id','name','tag_id']` и
+    // `['id','number','location']`, — поэтому здесь лёгкие модели. Полные
+    // `RabbitModel` и `CageModel` на таком объекте не разберутся: они требуют
+    // породу, пол, дату рождения, вместимость и состояние, которых в ответе
+    // нет. Раньше связи из-за этого отбрасывались целиком, и задача не могла
+    // сказать, к какому кролику она относится.
+    RabbitRef? rabbit,
+    CageInfo? cage,
+    // Постановщик задачи. Приходит не отовсюду: в списке и в карточке есть,
+    // а «ближайшие» и «отметить выполненной» его не прикладывают.
+    @JsonKey(name: 'creator') UserRef? author,
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);

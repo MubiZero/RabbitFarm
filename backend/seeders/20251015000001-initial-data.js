@@ -1,5 +1,6 @@
 'use strict';
 const bcrypt = require('bcrypt');
+const { QueryTypes } = require('sequelize');
 
 /**
  * Демонстрационный набор данных для разработки: три учётные записи с
@@ -19,258 +20,254 @@ const assertNotProduction = () => {
   }
 };
 
+const OWNER_EMAIL = 'admin@rabbitfarm.com';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     assertNotProduction();
 
-    // Hash password for default user
-    const passwordHash = await bcrypt.hash('admin123', 10);
+    const now = () => new Date();
 
-    // Insert users
-    await queryInterface.bulkInsert('users', [
-      {
-        email: 'admin@rabbitfarm.com',
-        password_hash: passwordHash,
-        full_name: 'Администратор',
-        role: 'owner',
-        phone: '+79991234567',
-        is_active: true,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        email: 'manager@rabbitfarm.com',
-        password_hash: await bcrypt.hash('manager123', 10),
-        full_name: 'Менеджер фермы',
-        role: 'manager',
-        phone: '+79991234568',
-        is_active: true,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        email: 'worker@rabbitfarm.com',
-        password_hash: await bcrypt.hash('worker123', 10),
-        full_name: 'Работник',
-        role: 'worker',
-        phone: '+79991234569',
-        is_active: true,
-        created_at: new Date(),
-        updated_at: new Date()
+    const findUserIdByEmail = async (email) => {
+      const [row] = await queryInterface.sequelize.query(
+        'SELECT id FROM users WHERE email = :email LIMIT 1',
+        { replacements: { email }, type: QueryTypes.SELECT }
+      );
+      return row ? row.id : null;
+    };
+
+    /**
+     * Заводит демо-пользователя, если его ещё нет.
+     *
+     * Сидер запускают повторно — на уже залитом стенде (RUN_SEEDS=true при
+     * каждом старте контейнера) вторая попытка не должна падать на уникальном
+     * email и плодить дубли. Поэтому существующая запись не пересоздаётся,
+     * а только доводится до нужной фермы: на стендах, залитых старой версией
+     * сидера, менеджер и работник остались владельцами собственных пустых ферм.
+     */
+    const ensureUser = async ({ email, password, fullName, role, phone, ownerId = null }) => {
+      const existingId = await findUserIdByEmail(email);
+
+      if (existingId) {
+        if (ownerId !== null) {
+          await queryInterface.bulkUpdate('users', { owner_id: ownerId, updated_at: now() }, { id: existingId });
+        }
+        return existingId;
       }
-    ], {});
 
-    // Insert breeds
-    await queryInterface.bulkInsert('breeds', [
+      await queryInterface.bulkInsert('users', [{
+        email,
+        password_hash: await bcrypt.hash(password, 10),
+        full_name: fullName,
+        role,
+        phone,
+        owner_id: ownerId,
+        is_active: true,
+        created_at: now(),
+        updated_at: now()
+      }], {});
+
+      return findUserIdByEmail(email);
+    };
+
+    /** Демо-справочник фермы заливается один раз: ферма с записями не трогается. */
+    const seedFarmTable = async (table, rows) => {
+      const [{ count }] = await queryInterface.sequelize.query(
+        `SELECT COUNT(*) AS count FROM ${table} WHERE user_id = :userId`,
+        { replacements: { userId: ownerId }, type: QueryTypes.SELECT }
+      );
+      if (Number(count) > 0) return 0;
+
+      await queryInterface.bulkInsert(
+        table,
+        rows.map((row) => ({ ...row, user_id: ownerId, created_at: now(), updated_at: now() })),
+        {}
+      );
+      return rows.length;
+    };
+
+    // Владелец — это и есть ферма: у него owner_id пустой, а данные ниже
+    // принадлежат его id. Менеджер и работник получают owner_id владельца,
+    // иначе роли не проверить: каждый входил в собственную пустую ферму.
+    const ownerId = await ensureUser({
+      email: OWNER_EMAIL,
+      password: 'admin123',
+      fullName: 'Администратор',
+      role: 'owner',
+      phone: '+79991234567'
+    });
+
+    await ensureUser({
+      email: 'manager@rabbitfarm.com',
+      password: 'manager123',
+      fullName: 'Менеджер фермы',
+      role: 'manager',
+      phone: '+79991234568',
+      ownerId
+    });
+
+    await ensureUser({
+      email: 'worker@rabbitfarm.com',
+      password: 'worker123',
+      fullName: 'Работник',
+      role: 'worker',
+      phone: '+79991234569',
+      ownerId
+    });
+
+    const breedsInserted = await seedFarmTable('breeds', [
       {
         name: 'Калифорнийская',
-        user_id: 1,
         description: 'Мясная порода кроликов с белым окрасом и темными ушами, лапами и носом. Отличается быстрым набором веса.',
         average_weight: 4.5,
         average_litter_size: 8,
-        purpose: 'meat',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'meat'
       },
       {
         name: 'Новозеландская белая',
-        user_id: 1,
         description: 'Популярная мясная порода с чисто белым окрасом. Быстро растет и дает хорошее мясо.',
         average_weight: 5.0,
         average_litter_size: 9,
-        purpose: 'meat',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'meat'
       },
       {
         name: 'Советская шиншилла',
-        user_id: 1,
         description: 'Мясо-шкурковая порода с серебристо-голубым окрасом. Ценится за качественный мех.',
         average_weight: 5.0,
         average_litter_size: 8,
-        purpose: 'combined',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'combined'
       },
       {
         name: 'Серый великан',
-        user_id: 1,
         description: 'Крупная порода кроликов серого окраса. Вынослива и неприхотлива в содержании.',
         average_weight: 6.0,
         average_litter_size: 8,
-        purpose: 'combined',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'combined'
       },
       {
         name: 'Фландр (Бельгийский великан)',
-        user_id: 1,
         description: 'Одна из самых крупных пород кроликов. Спокойный темперамент, крупное телосложение.',
         average_weight: 7.0,
         average_litter_size: 7,
-        purpose: 'meat',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'meat'
       },
       {
         name: 'Рекс',
-        user_id: 1,
         description: 'Порода с уникальным велюровым мехом. Среднего размера, спокойный характер.',
         average_weight: 4.0,
         average_litter_size: 6,
-        purpose: 'fur',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'fur'
       },
       {
         name: 'Венский голубой',
-        user_id: 1,
         description: 'Мясо-шкурковая порода с красивым серо-голубым окрасом. Качественный мех и вкусное мясо.',
         average_weight: 4.5,
         average_litter_size: 8,
-        purpose: 'combined',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'combined'
       },
       {
         name: 'Белый великан',
-        user_id: 1,
         description: 'Крупная порода белого цвета. Альбиносы с красными глазами. Хорошие мясные качества.',
         average_weight: 5.5,
         average_litter_size: 7,
-        purpose: 'combined',
-        created_at: new Date(),
-        updated_at: new Date()
+        purpose: 'combined'
       }
-    ], {});
+    ]);
 
-    // Insert cages
-    await queryInterface.bulkInsert('cages', [
+    const cagesInserted = await seedFarmTable('cages', [
       {
-        user_id: 1,
         number: 'A1',
         type: 'single',
         size: '60x80x45',
         capacity: 1,
         location: 'Секция А, ряд 1',
         condition: 'good',
-        last_cleaned_at: new Date(),
-        created_at: new Date(),
-        updated_at: new Date()
+        last_cleaned_at: now()
       },
       {
-        user_id: 1,
         number: 'A2',
         type: 'single',
         size: '60x80x45',
         capacity: 1,
         location: 'Секция А, ряд 1',
         condition: 'good',
-        last_cleaned_at: new Date(),
-        created_at: new Date(),
-        updated_at: new Date()
+        last_cleaned_at: now()
       },
       {
-        user_id: 1,
         number: 'A3',
         type: 'single',
         size: '60x80x45',
         capacity: 1,
         location: 'Секция А, ряд 1',
-        condition: 'good',
-        created_at: new Date(),
-        updated_at: new Date()
+        condition: 'good'
       },
       {
-        user_id: 1,
         number: 'B1',
         type: 'maternity',
         size: '80x100x50',
         capacity: 1,
         location: 'Секция Б, ряд 1',
         condition: 'good',
-        notes: 'Маточник для окролов',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Маточник для окролов'
       },
       {
-        user_id: 1,
         number: 'B2',
         type: 'maternity',
         size: '80x100x50',
         capacity: 1,
         location: 'Секция Б, ряд 1',
         condition: 'good',
-        notes: 'Маточник для окролов',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Маточник для окролов'
       },
       {
-        user_id: 1,
         number: 'C1',
         type: 'group',
         size: '150x120x60',
         capacity: 5,
         location: 'Секция В, ряд 1',
         condition: 'good',
-        notes: 'Для молодняка после отсадки',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Для молодняка после отсадки'
       },
       {
-        user_id: 1,
         number: 'C2',
         type: 'group',
         size: '150x120x60',
         capacity: 5,
         location: 'Секция В, ряд 1',
         condition: 'good',
-        notes: 'Для молодняка после отсадки',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Для молодняка после отсадки'
       },
       {
-        user_id: 1,
         number: 'D1',
         type: 'single',
         size: '60x80x45',
         capacity: 1,
         location: 'Секция Г, ряд 1',
         condition: 'needs_repair',
-        notes: 'Требуется ремонт дверцы',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Требуется ремонт дверцы'
       },
       {
-        user_id: 1,
         number: 'E1',
         type: 'single',
         size: '70x90x50',
         capacity: 1,
         location: 'Секция Д, ряд 1',
         condition: 'good',
-        notes: 'Увеличенная клетка для крупных пород',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Увеличенная клетка для крупных пород'
       },
       {
-        user_id: 1,
         number: 'E2',
         type: 'single',
         size: '70x90x50',
         capacity: 1,
         location: 'Секция Д, ряд 1',
         condition: 'good',
-        notes: 'Увеличенная клетка для крупных пород',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Увеличенная клетка для крупных пород'
       }
-    ], {});
+    ]);
 
-    // Insert feeds
-    await queryInterface.bulkInsert('feeds', [
+    const feedsInserted = await seedFarmTable('feeds', [
       {
-        user_id: 1,
         name: 'Комбикорм для кроликов ПК-90',
         type: 'pellets',
         brand: 'Провими',
@@ -278,12 +275,9 @@ module.exports = {
         current_stock: 150.00,
         min_stock: 50.00,
         cost_per_unit: 45.00,
-        notes: 'Основной комбикорм для взрослых кроликов',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Основной комбикорм для взрослых кроликов'
       },
       {
-        user_id: 1,
         name: 'Сено луговое',
         type: 'hay',
         brand: null,
@@ -291,12 +285,9 @@ module.exports = {
         current_stock: 200.00,
         min_stock: 80.00,
         cost_per_unit: 15.00,
-        notes: 'Качественное сено с лугов',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Качественное сено с лугов'
       },
       {
-        user_id: 1,
         name: 'Морковь',
         type: 'vegetables',
         brand: null,
@@ -304,12 +295,9 @@ module.exports = {
         current_stock: 30.00,
         min_stock: 10.00,
         cost_per_unit: 25.00,
-        notes: 'Сочный корм',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Сочный корм'
       },
       {
-        user_id: 1,
         name: 'Овёс',
         type: 'grain',
         brand: null,
@@ -317,12 +305,9 @@ module.exports = {
         current_stock: 50.00,
         min_stock: 20.00,
         cost_per_unit: 18.00,
-        notes: 'Зерновая подкормка',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Зерновая подкормка'
       },
       {
-        user_id: 1,
         name: 'Витаминная добавка "Ушастик"',
         type: 'supplements',
         brand: 'Агроветзащита',
@@ -330,12 +315,9 @@ module.exports = {
         current_stock: 5.00,
         min_stock: 2.00,
         cost_per_unit: 350.00,
-        notes: 'Витаминно-минеральная добавка',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Витаминно-минеральная добавка'
       },
       {
-        user_id: 1,
         name: 'Соль-лизунец',
         type: 'supplements',
         brand: null,
@@ -343,20 +325,18 @@ module.exports = {
         current_stock: 10.00,
         min_stock: 5.00,
         cost_per_unit: 50.00,
-        notes: 'Минеральная подкормка',
-        created_at: new Date(),
-        updated_at: new Date()
+        notes: 'Минеральная подкормка'
       }
-    ], {});
+    ]);
 
     console.log('✅ Seed data inserted successfully!');
     console.log('📧 Default users:');
     console.log('   - admin@rabbitfarm.com / admin123 (Owner)');
-    console.log('   - manager@rabbitfarm.com / manager123 (Manager)');
-    console.log('   - worker@rabbitfarm.com / worker123 (Worker)');
-    console.log('🐰 8 breeds inserted');
-    console.log('🏠 10 cages inserted');
-    console.log('🌾 6 feed types inserted');
+    console.log('   - manager@rabbitfarm.com / manager123 (Manager, сотрудник фермы владельца)');
+    console.log('   - worker@rabbitfarm.com / worker123 (Worker, сотрудник фермы владельца)');
+    console.log(`🐰 ${breedsInserted} breeds inserted`);
+    console.log(`🏠 ${cagesInserted} cages inserted`);
+    console.log(`🌾 ${feedsInserted} feed types inserted`);
   },
 
   down: async (queryInterface, Sequelize) => {

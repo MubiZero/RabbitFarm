@@ -30,6 +30,9 @@ _$MedicalRecordImpl _$$MedicalRecordImplFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
       createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
       updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+      rabbit: json['rabbit'] == null
+          ? null
+          : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$MedicalRecordImplToJson(
@@ -53,6 +56,7 @@ Map<String, dynamic> _$$MedicalRecordImplToJson(
   'notes': instance.notes,
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
+  'rabbit': instance.rabbit,
 };
 
 const _$MedicalOutcomeEnumMap = {
@@ -230,6 +234,9 @@ _$MedicalRecordWithDaysImpl _$$MedicalRecordWithDaysImplFromJson(
   veterinarian: json['veterinarian'] as String?,
   notes: json['notes'] as String?,
   daysOngoing: (json['days_ongoing'] as num).toInt(),
+  rabbit: json['rabbit'] == null
+      ? null
+      : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$MedicalRecordWithDaysImplToJson(
@@ -252,6 +259,7 @@ Map<String, dynamic> _$$MedicalRecordWithDaysImplToJson(
   'veterinarian': instance.veterinarian,
   'notes': instance.notes,
   'days_ongoing': instance.daysOngoing,
+  'rabbit': instance.rabbit,
 };
 
 _$CostReportImpl _$$CostReportImplFromJson(Map<String, dynamic> json) =>

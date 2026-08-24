@@ -564,7 +564,10 @@ class RabbitService {
 
         const result = {
           id: currentRabbit.id,
-          name: currentRabbit.name || 'Без имени',
+          // Подпись для безымянного кролика собирает приложение: готовый
+          // русский текст с сервера нельзя ни перевести, ни поменять без
+          // выката бэкенда.
+          name: currentRabbit.name || null,
           tag_id: currentRabbit.tag_id || null,
           sex: currentRabbit.sex || 'unknown',
           birth_date: currentRabbit.birth_date || null,

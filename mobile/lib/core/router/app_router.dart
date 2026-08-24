@@ -23,6 +23,7 @@ import '../../features/cages/presentation/screens/cages_list_screen.dart';
 import '../../features/cages/presentation/screens/cage_form_screen.dart';
 import '../../features/cages/presentation/screens/cage_detail_screen.dart';
 import '../../features/cages/data/models/cage_model.dart';
+import '../../features/health/presentation/screens/health_journal_screen.dart';
 import '../../features/health/presentation/screens/vaccinations_list_screen.dart';
 import '../../features/health/presentation/screens/vaccination_form_screen.dart';
 import '../../features/health/data/models/vaccination_model.dart';
@@ -294,7 +295,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'rabbit-pedigree',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          final name = state.uri.queryParameters['name'] ?? 'Кролик';
+          // Подпись собирает экран: русское слово в роутере не переводится
+          // и живёт мимо словаря приложения.
+          final name = state.uri.queryParameters['name'];
           return PedigreeScreen(
             rabbitId: id,
             rabbitName: name,
@@ -377,6 +380,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           final breeding = extra is BreedingModel ? extra : null;
           return BirthFormScreen(breeding: breeding);
         },
+      ),
+
+      // Здоровье — общий журнал прививок и лечения. Прежние адреса ниже
+      // остаются: на них ведут ссылки с «Сегодня» и из пустых состояний.
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/health',
+        name: 'health',
+        builder: (context, state) => const HealthJournalScreen(),
       ),
 
       // Vaccinations routes

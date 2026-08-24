@@ -191,39 +191,6 @@ class CagesRepository {
     }
   }
 
-  /// Получить схему размещения клеток (группировка по локации)
-  Future<Map<String, List<CageModel>>> getLayout() async {
-    try {
-      final response = await _apiClient.dio.get('/cages/layout');
-
-      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-        response.data,
-        (json) => json as Map<String, dynamic>,
-      );
-
-      if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
-      }
-
-      final Map<String, List<CageModel>> layout = {};
-
-      apiResponse.data!.forEach((location, cagesJson) {
-        if (cagesJson is List) {
-          layout[location] = cagesJson
-              .map((item) => CageModel.fromJson(item as Map<String, dynamic>))
-              .toList();
-        }
-      });
-
-      return layout;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    } on ApiFailure {
-      rethrow;
-    } catch (e) {
-      throw const ApiFailure(ApiFailureKind.server);
-    }
-  }
 
   /// Отметить клетку как убранную
   Future<CageModel> markCleaned(int id) async {

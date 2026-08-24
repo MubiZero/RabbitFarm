@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
 const { farmMemberIds } = require('../utils/farm');
+const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
 /**
  * Feeding Record Controller
@@ -15,7 +16,11 @@ const { farmMemberIds } = require('../utils/farm');
 exports.create = async (req, res, next) => {
   try {
     const { feed_id, quantity, rabbit_id, cage_id } = req.body;
-    const fed_by = req.farmId;
+    // Кто кормил, тот и записан. Раньше сюда шёл req.farmId, то есть владелец
+    // фермы: любая работа работника доставалась в журнале хозяину. Выборки
+    // всё равно идут по всей ферме (farmMemberIds), поэтому владелец видит
+    // записи работника и после этого.
+    const fed_by = req.user.id;
 
     // Validate rabbit_id if provided
     if (rabbit_id) {
@@ -77,6 +82,110 @@ exports.create = async (req, res, next) => {
 
     return ApiResponse.success(res, result, 'Запись о кормлении создана', 201);
   } catch (error) {
+    if (error.message === 'FEED_NOT_FOUND') {
+      return ApiResponse.error(res, 'Корм не найден', 404);
+    }
+    if (error.message === 'INSUFFICIENT_STOCK') {
+      return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+    }
+    next(error);
+  }
+};
+
+/**
+ * Create feeding records in bulk
+ * POST /feeding-records/bulk
+ *
+ * Форма запроса — общая шапка кормления и списки получателей:
+ *
+ *   { feed_id, quantity, fed_at, notes, rabbit_ids: [1, 2], cage_ids: [7, 8] }
+ *
+ * Почему так, а не массив готовых записей:
+ *  - за один обход работник раздаёт один корм в одно время, поэтому корм,
+ *    время и примечание в пачке общие — повторять их в каждом элементе
+ *    незачем, а возможность прислать в одной пачке разный корм и разное
+ *    время означала бы, что «пачка» — это просто несколько разных кормлений;
+ *  - `quantity` — норма НА ОДНОГО получателя, а не на всю пачку. Работник
+ *    отмеряет ковш на клетку; при общем количестве его пришлось бы делить
+ *    на N и записывать каждому выдуманную дробь. Со склада списывается
+ *    quantity × число получателей;
+ *  - прежний POST / не тронут: старые сборки приложения продолжают слать
+ *    по одной записи и работают как раньше.
+ */
+exports.createBulk = async (req, res, next) => {
+  try {
+    const { feed_id, quantity, fed_at, notes = null, rabbit_ids = [], cage_ids = [] } = req.body;
+    const fed_by = req.user.id;
+
+    const recipientCount = rabbit_ids.length + cage_ids.length;
+    // Копейки количества хранятся как DECIMAL(10,2); округляем сразу, чтобы
+    // из умножения дробей не уехал остаток на складе.
+    const totalQuantity = Number((quantity * recipientCount).toFixed(2));
+
+    const created = await sequelize.transaction(async (t) => {
+      // Принадлежность ферме проверяется до записи: чужая клетка в пачке
+      // должна оборвать её целиком, не оставив ни одной строки.
+      if (rabbit_ids.length) {
+        const owned = await Rabbit.count({
+          where: { id: { [Op.in]: rabbit_ids }, user_id: req.farmId },
+          transaction: t
+        });
+        if (owned !== rabbit_ids.length) throw new Error('RABBIT_NOT_FOUND');
+      }
+
+      if (cage_ids.length) {
+        const owned = await Cage.count({
+          where: { id: { [Op.in]: cage_ids }, user_id: req.farmId },
+          transaction: t
+        });
+        if (owned !== cage_ids.length) throw new Error('CAGE_NOT_FOUND');
+      }
+
+      const feedToUpdate = await Feed.findOne({
+        where: { id: feed_id, user_id: req.farmId },
+        lock: t.LOCK.UPDATE,
+        transaction: t
+      });
+
+      if (!feedToUpdate) throw new Error('FEED_NOT_FOUND');
+
+      const currentStock = parseFloat(feedToUpdate.current_stock);
+      if (currentStock < totalQuantity) {
+        throw new Error('INSUFFICIENT_STOCK');
+      }
+
+      // Остаток уменьшается один раз на всю пачку — так же, как одиночное
+      // создание уменьшает его один раз на свою запись.
+      await feedToUpdate.update({
+        current_stock: currentStock - totalQuantity
+      }, { transaction: t });
+
+      const rows = [
+        ...rabbit_ids.map((rabbit_id) => ({
+          rabbit_id, cage_id: null, feed_id, quantity, fed_at, notes, fed_by
+        })),
+        ...cage_ids.map((cage_id) => ({
+          rabbit_id: null, cage_id, feed_id, quantity, fed_at, notes, fed_by
+        }))
+      ];
+
+      await FeedingRecord.bulkCreate(rows, { transaction: t });
+
+      return rows.length;
+    });
+
+    return ApiResponse.success(res, {
+      created,
+      quantity_per_recipient: quantity,
+      total_quantity: totalQuantity
+    }, `Записей о кормлении создано: ${created}`, 201);
+  } catch (error) {
+    if (error.message === 'RABBIT_NOT_FOUND') {
+      return ApiResponse.error(res, 'Кролик не найден', 404);
+    }
+    if (error.message === 'CAGE_NOT_FOUND') {
+      return ApiResponse.error(res, 'Клетка не найдена', 404);
+    }
     if (error.message === 'FEED_NOT_FOUND') {
       return ApiResponse.error(res, 'Корм не найден', 404);
     }
@@ -158,10 +267,14 @@ exports.list = async (req, res, next) => {
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
-        where.fed_at[Op.gte] = new Date(from_date);
+        where.fed_at[Op.gte] = startOfDayUtc(from_date);
       }
+      // fed_at хранит момент времени, а период задан календарной датой.
+      // Сравнение `<= to_date` означало «не позже полуночи последнего дня»,
+      // поэтому всё, накормленное в этот день, из выборки выпадало — а по
+      // умолчанию период заканчивается сегодняшним днём.
       if (to_date) {
-        where.fed_at[Op.lte] = new Date(to_date);
+        where.fed_at[Op.lt] = nextDayUtc(to_date);
       }
     }
 
@@ -380,10 +493,11 @@ exports.getStatistics = async (req, res, next) => {
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
-        where.fed_at[Op.gte] = new Date(from_date);
+        where.fed_at[Op.gte] = startOfDayUtc(from_date);
       }
+      // Та же граница, что и в списке: конец периода — начало следующего дня.
       if (to_date) {
-        where.fed_at[Op.lte] = new Date(to_date);
+        where.fed_at[Op.lt] = nextDayUtc(to_date);
       }
     }
 

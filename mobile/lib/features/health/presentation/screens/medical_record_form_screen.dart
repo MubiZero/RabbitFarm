@@ -37,6 +37,7 @@ class _MedicalRecordFormScreenState
   final _notes = TextEditingController();
 
   RabbitModel? _rabbit;
+  String? _rabbitLabel;
   int? _rabbitId;
   DateTime _startedAt = DateTime.now();
   DateTime? _endedAt;
@@ -52,7 +53,9 @@ class _MedicalRecordFormScreenState
     final record = _record;
     if (record != null) {
       _rabbitId = record.rabbitId;
-      _rabbit = record.rabbit;
+      // В записи лежит краткая ссылка, а пикеру нужна полная модель: пока
+      // кролика не выбрали заново, показываем подпись из ссылки.
+      _rabbitLabel = record.rabbit?.label;
       _symptoms.text = record.symptoms;
       _diagnosis.text = record.diagnosis ?? '';
       _treatment.text = record.treatment ?? '';
@@ -177,9 +180,11 @@ class _MedicalRecordFormScreenState
             RabbitPickerField(
               label: l10n.medFormRabbit,
               selected: _rabbit,
+              selectedLabel: _rabbitId != null ? _rabbitLabel : null,
               required: true,
               onChanged: (rabbit) => setState(() {
                 _rabbit = rabbit;
+                _rabbitLabel = null;
                 _rabbitId = rabbit?.id;
                 _touched = true;
               }),

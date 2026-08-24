@@ -2,6 +2,7 @@ const { Task, Rabbit, Cage, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
 const logger = require('../utils/logger');
 const { farmMemberIds } = require('../utils/farm');
+const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
 const TASK_INCLUDE = [
   { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
@@ -132,23 +133,31 @@ class TaskService {
     if (cage_id) where.cage_id = cage_id;
     if (assigned_to) where.assigned_to = assigned_to;
 
+    // `tasks.due_date` хранит момент времени, а период задаётся календарной
+    // датой: `due_date <= '2026-08-24'` означает «не позже полуночи», и задачи
+    // с сегодняшним сроком выпадали из выборки. Верхняя граница — строгое
+    // «раньше следующего дня», в UTC, как лежат сами записи.
     if (from_date || to_date) {
       where.due_date = {};
-      if (from_date) where.due_date[Op.gte] = from_date;
-      if (to_date) where.due_date[Op.lte] = to_date;
+      if (from_date) where.due_date[Op.gte] = startOfDayUtc(from_date);
+      if (to_date) where.due_date[Op.lt] = nextDayUtc(to_date);
     }
 
-    if (overdue_only === 'true') {
+    // Флаг приходит из validate(listTasksQuerySchema, 'query'): Joi.boolean()
+    // подменяет строку 'true' на булево true, поэтому сравнение только со
+    // строкой не срабатывало НИКОГДА — чип фильтра горел, а список не менялся.
+    // Сравниваем с обоими видами: сервис зовут и в обход валидатора.
+    if (overdue_only === true || overdue_only === 'true') {
       where.due_date = { [Op.lt]: new Date() };
       where.status = { [Op.in]: ['pending', 'in_progress'] };
     }
 
-    if (today_only === 'true') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      where.due_date = { [Op.gte]: today, [Op.lt]: tomorrow };
+    if (today_only === true || today_only === 'true') {
+      // «Сегодня» считается в UTC по той же причине: в поясе процесса граница
+      // разъезжается с тем, как лежат записи, и вечерние задачи уезжают в
+      // соседние сутки.
+      const now = new Date();
+      where.due_date = { [Op.gte]: startOfDayUtc(now), [Op.lt]: nextDayUtc(now) };
     }
 
     const { count, rows } = await Task.findAndCountAll({

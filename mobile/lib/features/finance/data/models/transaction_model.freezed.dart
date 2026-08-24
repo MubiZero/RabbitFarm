@@ -44,9 +44,16 @@ mixin _$Transaction {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
-  DateTime? get updatedAt => throw _privateConstructorUsedError; // Relationships (not included in JSON serialization by default)
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+
+  /// Кролик, к которому привязана операция.
+  ///
+  /// Сервер шлёт его урезанным — `id`, кличка и бирка (`TRANSACTION_INCLUDE`
+  /// в transactionService.js), — и разбор в полную модель упал бы. Раньше
+  /// связь просто выбрасывали: продажа конкретного кролика приходила с его
+  /// именем, а в книге стояла безликая строка «Продажа кролика».
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this Transaction to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -83,10 +90,10 @@ abstract class $TransactionCopyWith<$Res> {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -166,7 +173,7 @@ class _$TransactionCopyWithImpl<$Res, $Val extends Transaction>
             rabbit: freezed == rabbit
                 ? _value.rabbit
                 : rabbit // ignore: cast_nullable_to_non_nullable
-                      as RabbitModel?,
+                      as RabbitRef?,
           )
           as $Val,
     );
@@ -176,12 +183,12 @@ class _$TransactionCopyWithImpl<$Res, $Val extends Transaction>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $RabbitModelCopyWith<$Res>? get rabbit {
+  $RabbitRefCopyWith<$Res>? get rabbit {
     if (_value.rabbit == null) {
       return null;
     }
 
-    return $RabbitModelCopyWith<$Res>(_value.rabbit!, (value) {
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
       return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
@@ -214,11 +221,11 @@ abstract class _$$TransactionImplCopyWith<$Res>
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   });
 
   @override
-  $RabbitModelCopyWith<$Res>? get rabbit;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -297,7 +304,7 @@ class __$$TransactionImplCopyWithImpl<$Res>
         rabbit: freezed == rabbit
             ? _value.rabbit
             : rabbit // ignore: cast_nullable_to_non_nullable
-                  as RabbitModel?,
+                  as RabbitRef?,
       ),
     );
   }
@@ -320,7 +327,7 @@ class _$TransactionImpl implements _Transaction {
     @JsonKey(name: 'created_by') @NullableIntConverter() this.createdBy,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() this.updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) this.rabbit,
+    @JsonKey(name: 'rabbit') this.rabbit,
   });
 
   factory _$TransactionImpl.fromJson(Map<String, dynamic> json) =>
@@ -361,10 +368,16 @@ class _$TransactionImpl implements _Transaction {
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
   final DateTime? updatedAt;
-  // Relationships (not included in JSON serialization by default)
+
+  /// Кролик, к которому привязана операция.
+  ///
+  /// Сервер шлёт его урезанным — `id`, кличка и бирка (`TRANSACTION_INCLUDE`
+  /// в transactionService.js), — и разбор в полную модель упал бы. Раньше
+  /// связь просто выбрасывали: продажа конкретного кролика приходила с его
+  /// именем, а в книге стояла безликая строка «Продажа кролика».
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final RabbitModel? rabbit;
+  @JsonKey(name: 'rabbit')
+  final RabbitRef? rabbit;
 
   @override
   String toString() {
@@ -449,8 +462,7 @@ abstract class _Transaction implements Transaction {
     @JsonKey(name: 'updated_at')
     @NullableDateTimeConverter()
     final DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    final RabbitModel? rabbit,
+    @JsonKey(name: 'rabbit') final RabbitRef? rabbit,
   }) = _$TransactionImpl;
 
   factory _Transaction.fromJson(Map<String, dynamic> json) =
@@ -490,10 +502,17 @@ abstract class _Transaction implements Transaction {
   @override
   @JsonKey(name: 'updated_at')
   @NullableDateTimeConverter()
-  DateTime? get updatedAt; // Relationships (not included in JSON serialization by default)
+  DateTime? get updatedAt;
+
+  /// Кролик, к которому привязана операция.
+  ///
+  /// Сервер шлёт его урезанным — `id`, кличка и бирка (`TRANSACTION_INCLUDE`
+  /// в transactionService.js), — и разбор в полную модель упал бы. Раньше
+  /// связь просто выбрасывали: продажа конкретного кролика приходила с его
+  /// именем, а в книге стояла безликая строка «Продажа кролика».
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  RabbitModel? get rabbit;
+  @JsonKey(name: 'rabbit')
+  RabbitRef? get rabbit;
 
   /// Create a copy of Transaction
   /// with the given fields replaced by the non-null parameter values.

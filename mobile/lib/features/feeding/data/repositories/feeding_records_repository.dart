@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../models/feeding_record_model.dart';
 import '../../../../core/api/api_failure.dart';
 
@@ -104,6 +105,46 @@ class FeedingRecordsRepository {
 
       if (response.data['success'] == true) {
         return FeedingRecord.fromJson(response.data['data']);
+      }
+
+      throw const ApiFailure(ApiFailureKind.server);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Записать одно кормление сразу нескольким получателям.
+  ///
+  /// Работник кормит сорок клеток за обход, и раньше это были сорок запросов,
+  /// каждый из которых мог оборваться посреди раздачи. Здесь запрос один, и
+  /// сервер записывает пачку целиком или не записывает вовсе.
+  ///
+  /// [quantityPerRecipient] — норма НА ОДНОГО получателя: столько попадёт в
+  /// каждую запись, а со склада спишется это число, умноженное на количество
+  /// получателей. Возвращает, сколько записей создано.
+  Future<int> createFeedingRecordsBulk({
+    required int feedId,
+    required double quantityPerRecipient,
+    required DateTime fedAt,
+    List<int> rabbitIds = const [],
+    List<int> cageIds = const [],
+    String? notes,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '${ApiEndpoints.feedingRecords}/bulk',
+        data: {
+          'feed_id': feedId,
+          'quantity': quantityPerRecipient,
+          'fed_at': const DateTimeConverter().toJson(fedAt),
+          if (notes != null) 'notes': notes,
+          if (rabbitIds.isNotEmpty) 'rabbit_ids': rabbitIds,
+          if (cageIds.isNotEmpty) 'cage_ids': cageIds,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        return (response.data['data']['created'] as num).toInt();
       }
 
       throw const ApiFailure(ApiFailureKind.server);

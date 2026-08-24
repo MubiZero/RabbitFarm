@@ -39,7 +39,10 @@ class FeedService {
     const where = { user_id: userId };
 
     if (type) where.type = type;
-    if (low_stock === 'true') {
+    // Joi приводит значение к булеву, поэтому сравнение со строкой не
+    // срабатывало: фильтр «мало на складе» подсвечивался и не фильтровал.
+    // Строку тоже принимаем — сервис зовут и в обход валидатора.
+    if (low_stock === true || low_stock === 'true') {
       where[Op.and] = [{ current_stock: { [Op.lte]: col('min_stock') } }];
     }
     if (search) {

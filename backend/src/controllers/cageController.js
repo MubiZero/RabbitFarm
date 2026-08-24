@@ -82,15 +82,6 @@ class CageController {
       next(error);
     }
   }
-
-  async getLayout(req, res, next) {
-    try {
-      const layout = await cageService.getLayout(req.farmId);
-      return ApiResponse.success(res, layout, 'Схема размещения получена успешно');
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 module.exports = new CageController();

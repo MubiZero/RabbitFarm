@@ -137,7 +137,7 @@ class InbreedingAnalyzer {
       // хотя по материнской линии он совсем близкий.
       if (known == null || generation < known.generation) {
         ancestors[current.id] = AncestorInfo(
-          name: current.name,
+          name: current.name ?? '#${current.id}',
           generation: generation,
         );
       } else {

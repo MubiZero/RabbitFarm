@@ -54,7 +54,13 @@ class MedicalRecord with _$MedicalRecord {
     String? notes,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
     @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    /// Кролик, которого лечили или прививали.
+    ///
+    /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+    /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+    /// В списках при этом стояла ветка «показать кличку», которая не
+    /// выполнялась никогда: данные приходили и не доезжали до экрана.
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   }) = _MedicalRecord;
 
   factory MedicalRecord.fromJson(Map<String, dynamic> json) =>
@@ -170,7 +176,13 @@ class MedicalRecordWithDays with _$MedicalRecordWithDays {
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') required int daysOngoing,
-    @JsonKey(includeFromJson: false, includeToJson: false) RabbitModel? rabbit,
+    /// Кролик, которого лечили или прививали.
+    ///
+    /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
+    /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
+    /// В списках при этом стояла ветка «показать кличку», которая не
+    /// выполнялась никогда: данные приходили и не доезжали до экрана.
+    @JsonKey(name: 'rabbit') RabbitRef? rabbit,
   }) = _MedicalRecordWithDays;
 
   factory MedicalRecordWithDays.fromJson(Map<String, dynamic> json) =>
