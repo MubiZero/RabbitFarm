@@ -58,6 +58,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void _handleSessionExpired() {
     if (!mounted) return;
     state = AuthState();
+    // Профиль уезжает вместе с сессией: токены клиент уже стёр, а имя и роль
+    // прошлого пользователя оставлять на устройстве незачем.
+    _authRepository.clearCachedProfile();
     resetSessionData(_ref);
   }
 
@@ -87,9 +90,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
           );
         } on DioException catch (e) {
           if (_isNetworkError(e)) {
-            // No network, but token exists — keep user authenticated
-            // user == null, app continues to work
+            // Сети нет, но токен есть — работаем дальше. Профиль при этом
+            // берём из хранилища: без него роль неизвестна, а неизвестная
+            // роль трактуется как самая узкая, и владелец в сарае без связи
+            // получал интерфейс работника.
             state = state.copyWith(
+              user: await _authRepository.cachedProfile(),
               isAuthenticated: true,
               isLoading: false,
             );

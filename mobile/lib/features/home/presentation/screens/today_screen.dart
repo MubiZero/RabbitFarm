@@ -406,8 +406,13 @@ class _TaskRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.xs),
+                // У закрытой задачи срок больше не значит ничего: «просрочена
+                // на три дня» под зачёркнутой строкой читается как упрёк за
+                // только что сделанную работу.
                 Text(
-                  humanDueDate(context, task.dueDate),
+                  done
+                      ? context.l10n.todayTaskDone
+                      : humanDueDate(context, task.dueDate),
                   style: AppTypography.labelSm.copyWith(
                     color: overdue
                         ? AppColors.error

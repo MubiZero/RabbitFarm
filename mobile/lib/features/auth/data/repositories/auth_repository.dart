@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/api/api_client.dart';
@@ -44,6 +46,7 @@ class AuthRepository {
         key: 'refresh_token',
         value: authResponse.refreshToken,
       );
+      await _cacheProfile(authResponse.user.toJson());
 
       return authResponse;
     } on DioException catch (e) {
@@ -86,6 +89,7 @@ class AuthRepository {
         key: 'refresh_token',
         value: authResponse.refreshToken,
       );
+      await _cacheProfile(authResponse.user.toJson());
 
       return authResponse;
     } on DioException catch (e) {
@@ -126,6 +130,7 @@ class AuthRepository {
         key: 'refresh_token',
         value: authResponse.refreshToken,
       );
+      await _cacheProfile(authResponse.user.toJson());
 
       return authResponse;
     } on DioException catch (e) {
@@ -147,8 +152,38 @@ class AuthRepository {
       throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
     }
 
-    return UserModel.fromJson(apiResponse.data!);
+    final user = UserModel.fromJson(apiResponse.data!);
+    await _cacheProfile(apiResponse.data!);
+    return user;
   }
+
+  /// Профиль хранится рядом с токенами, чтобы приложение знало роль человека
+  /// и без сети.
+  ///
+  /// Без него роль вычислялась из пустоты, а неизвестное значение трактуется
+  /// как самая узкая роль: владелец, открывший приложение в сарае без связи,
+  /// получал интерфейс работника — без стада, разведения и хозяйства.
+  /// «Роль неизвестна» и «роль — работник» это разные вещи.
+  static const _profileKey = 'profile';
+
+  Future<void> _cacheProfile(Map<String, dynamic> json) async {
+    await _storage.write(key: _profileKey, value: jsonEncode(json));
+  }
+
+  /// Последний известный профиль. Возвращает null, если его нет или он
+  /// испорчен — гадать по обломкам хуже, чем честно не знать.
+  Future<UserModel?> cachedProfile() async {
+    final raw = await _storage.read(key: _profileKey);
+    if (raw == null) return null;
+    try {
+      return UserModel.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      await clearCachedProfile();
+      return null;
+    }
+  }
+
+  Future<void> clearCachedProfile() => _storage.delete(key: _profileKey);
 
   // Logout
   Future<void> logout() async {
@@ -166,6 +201,9 @@ class AuthRepository {
       // Always clear tokens
       await _storage.delete(key: 'access_token');
       await _storage.delete(key: 'refresh_token');
+      // На общем планшете фермы профиль предыдущего работника не должен
+      // пережить выход — как и его токены.
+      await clearCachedProfile();
     }
   }
 

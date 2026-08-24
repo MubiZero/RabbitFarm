@@ -215,7 +215,7 @@ class RabbitListCard extends StatelessWidget {
             tag: 'rabbit_photo_${rabbit.id}',
             // Раньше фото подставлялось в NetworkImage напрямую, а адрес с
             // сервера приходит относительный — картинка не грузилась никогда.
-            child: RabbitAvatar(photoUrl: rabbit.photoUrl, size: 72),
+            child: RabbitAvatar(photoUrl: rabbit.photoUrl, size: 56),
           ),
           const SizedBox(width: AppSpacing.lg),
           Expanded(
@@ -238,12 +238,20 @@ class RabbitListCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
+                // Бирка и порода — справочная строка, её читают глазами по
+                // порядку, а не выхватывают. Ярлыки оставлены полу и
+                // назначению: по ним стадо делят и в списке ищут.
                 Text(
-                  rabbit.tagId.trim().isEmpty
-                      ? context.l10n.rabbitNoTag
-                      : rabbit.tagId,
+                  [
+                    rabbit.tagId.trim().isEmpty
+                        ? context.l10n.rabbitNoTag
+                        : rabbit.tagId,
+                    if (rabbit.breed?.name != null) rabbit.breed!.name,
+                  ].join(' · '),
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Wrap(
@@ -258,19 +266,11 @@ class RabbitListCard extends StatelessWidget {
                     // Назначение — главное деление стада: по нему решают,
                     // кого случать, а кого ставить на откорм. В карточке его
                     // не было видно вовсе, хотя в базе поле обязательное.
-                    // Значок и цвет нейтральные: пол и порода уже цветные,
-                    // третья краска в строке превратила бы её в пестроту.
                     _Badge(
                       icon: Icons.label_outline,
                       label: rabbitPurposeLabel(context, rabbit.purpose),
                       color: context.colors.onSurfaceVariant,
                     ),
-                    if (rabbit.breed?.name != null)
-                      _Badge(
-                        icon: Icons.category_outlined,
-                        label: rabbit.breed!.name,
-                        color: AppColors.domainLivestock,
-                      ),
                   ],
                 ),
               ],

@@ -398,7 +398,11 @@ class _CageTile extends StatelessWidget {
     final condition = cageConditionColor(context, cage.condition);
     final isFine = cage.condition == 'good';
     final border = isFine ? context.colors.outline : condition;
-    final fill = ratio >= 1 ? AppColors.warning : AppColors.success;
+    // Полоса показывает занятость, и только её. Полная клетка — это норма,
+    // а не тревога, поэтому оранжевого здесь быть не должно: на ферме он
+    // означает ровно одно — с клеткой что-то не так. Делить один цвет между
+    // «занята целиком» и «нужен ремонт» значит обесценить сигнал.
+    final fill = context.accent;
 
     return SizedBox(
       width: 92,

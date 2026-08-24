@@ -1132,6 +1132,12 @@ abstract class AppLocalizations {
   /// **'Все задачи'**
   String get todayTasksAll;
 
+  /// No description provided for @todayTaskDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыта'**
+  String get todayTaskDone;
+
   /// No description provided for @todayTasksNone.
   ///
   /// In ru, this message translates to:

@@ -288,6 +288,7 @@
   "tasksTitle": "Задачи",
   "todayTasksTitle": "Задачи на сегодня",
   "todayTasksAll": "Все задачи",
+  "todayTaskDone": "Закрыта",
   "todayTasksNone": "На сегодня задач нет",
   "commonFilters": "Фильтры",
   "commonApply": "Применить",

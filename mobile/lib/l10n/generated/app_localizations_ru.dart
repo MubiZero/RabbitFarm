@@ -641,6 +641,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayTasksAll => 'Все задачи';
 
   @override
+  String get todayTaskDone => 'Закрыта';
+
+  @override
   String get todayTasksNone => 'На сегодня задач нет';
 
   @override
