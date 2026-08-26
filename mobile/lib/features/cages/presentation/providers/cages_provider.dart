@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/api/load_all_pages.dart';
 import '../../data/models/cage_model.dart';
 import '../../data/repositories/cages_repository.dart';
 
@@ -287,5 +289,8 @@ final cageStatisticsProvider = FutureProvider<CageStatistics>((ref) async {
 /// Полный список клеток для выпадающих полей в формах.
 final cageOptionsProvider = FutureProvider<List<CageModel>>((ref) async {
   final repository = ref.watch(cagesRepositoryProvider);
-  return repository.getCages(limit: 200);
+  return loadAllPages<CageModel>(
+    ({required page, required limit}) =>
+        repository.getCages(page: page, limit: limit),
+  );
 });

@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/api/load_all_pages.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/feed_model.dart';
@@ -289,8 +291,13 @@ final feedHasLowStockProvider = Provider.autoDispose.family<bool, Feed>((ref, fe
 ///
 /// Обычный список склада постраничный, и форма кормления показывала только
 /// первую страницу: корм, заведённый одиннадцатым, выбрать было нельзя.
-/// Видов корма на ферме десятки, а не тысячи, поэтому здесь берётся всё сразу.
+/// Видов корма на ферме десятки, а не тысячи, поэтому страницы
+/// перебираются до конца — но именно страницами: сервер ограничивает
+/// размер страницы, и просьба «дай сразу всё» возвращала 422.
 final feedOptionsProvider = FutureProvider<List<Feed>>((ref) async {
   final repository = ref.watch(feedsRepositoryProvider);
-  return repository.getFeeds(limit: 200);
+  return loadAllPages<Feed>(
+    ({required page, required limit}) =>
+        repository.getFeeds(page: page, limit: limit),
+  );
 });

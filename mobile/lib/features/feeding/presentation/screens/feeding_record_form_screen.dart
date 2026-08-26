@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
@@ -439,7 +440,11 @@ class _CagesField extends StatelessWidget {
               context: context,
               isScrollControlled: true,
               builder: (_) =>
-                  _CagePickerSheet(cages: cages, selected: selected),
+                  _CagePickerSheet(
+                cages: cages,
+                selected: selected,
+                error: cagesAsync.error,
+              ),
             );
             if (picked != null) onChanged(picked);
           },
@@ -484,7 +489,14 @@ class _CagePickerSheet extends StatefulWidget {
   final List<CageModel> cages;
   final Set<int> selected;
 
-  const _CagePickerSheet({required this.cages, required this.selected});
+  /// Ошибка загрузки списка, если он не приехал.
+  final Object? error;
+
+  const _CagePickerSheet({
+    required this.cages,
+    required this.selected,
+    this.error,
+  });
 
   @override
   State<_CagePickerSheet> createState() => _CagePickerSheetState();
@@ -571,12 +583,21 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
               ),
             ),
             Expanded(
-              child: widget.cages.isEmpty
+              // «Клеток нет» и «клетки не загрузились» — разные вещи. Пока
+              // они выглядели одинаково, отказ сервера читался как пустая
+              // ферма, и искать было нечего.
+              child: widget.error != null
                   ? AppEmptyState(
-                      icon: Icons.grid_view_outlined,
-                      title: l10n.feedingBulkNoCagesTitle,
-                      subtitle: l10n.feedingBulkNoCagesBody,
+                      icon: Icons.cloud_off_outlined,
+                      title: l10n.commonLoadFailed,
+                      subtitle: errorText(l10n, widget.error),
                     )
+                  : widget.cages.isEmpty
+                      ? AppEmptyState(
+                          icon: Icons.grid_view_outlined,
+                          title: l10n.feedingBulkNoCagesTitle,
+                          subtitle: l10n.feedingBulkNoCagesBody,
+                        )
                   : ListView(
                       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                       children: [
