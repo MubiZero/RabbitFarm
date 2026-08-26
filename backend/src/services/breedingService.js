@@ -148,7 +148,12 @@ class BreedingService {
             logger.info('Breeding created', { breedingId: breeding.id });
             return createdBreeding;
         } catch (error) {
-            if (transaction) await transaction.rollback();
+            // Откат ровно один и здесь. Раньше каждая ветка отказа
+            // откатывала транзакцию сама, а потом её откатывал этот же
+            // обработчик — Sequelize бросал «transaction has been finished»,
+            // и эта ошибка подменяла осмысленную. Наружу вместо «некорректный
+            // самец» уходила «внутренняя ошибка сервера».
+            if (transaction && !transaction.finished) await transaction.rollback();
             logger.error('Create breeding error', { error: error.message });
             throw error;
         }
@@ -293,7 +298,6 @@ class BreedingService {
             });
 
             if (!breeding) {
-                await transaction.rollback();
                 throw new Error('BREEDING_NOT_FOUND');
             }
 
@@ -304,13 +308,11 @@ class BreedingService {
                     transaction
                 });
                 if (!male) {
-                    await transaction.rollback();
                     throw new Error('INVALID_MALE');
                 }
             }
             if (data.female_id) {
                 if (data.female_id === (data.male_id || breeding.male_id)) {
-                    await transaction.rollback();
                     throw new Error('CANNOT_BREED_SAME_RABBIT');
                 }
                 const female = await Rabbit.findOne({
@@ -318,11 +320,9 @@ class BreedingService {
                     transaction
                 });
                 if (!female) {
-                    await transaction.rollback();
                     throw new Error('INVALID_FEMALE');
                 }
                 if (['dead', 'sold'].includes(female.status)) {
-                    await transaction.rollback();
                     throw new Error('FEMALE_NOT_AVAILABLE');
                 }
             }
@@ -348,7 +348,12 @@ class BreedingService {
             logger.info('Breeding updated', { breedingId: id });
             return updated;
         } catch (error) {
-            if (transaction) await transaction.rollback();
+            // Откат ровно один и здесь. Раньше каждая ветка отказа
+            // откатывала транзакцию сама, а потом её откатывал этот же
+            // обработчик — Sequelize бросал «transaction has been finished»,
+            // и эта ошибка подменяла осмысленную. Наружу вместо «некорректный
+            // самец» уходила «внутренняя ошибка сервера».
+            if (transaction && !transaction.finished) await transaction.rollback();
             logger.error('Update breeding error', { error: error.message, id });
             throw error;
         }

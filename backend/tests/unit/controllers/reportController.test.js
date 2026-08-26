@@ -28,7 +28,9 @@ const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transacti
 const ctrl = require('../../../src/controllers/reportController');
 
 const mockReq = (overrides = {}) => ({
-  body: {}, params: {}, query: {}, user: { id: 1 }, farmId: 1, ...overrides
+  // Роль нужна отчётам: денежный блок работнику не отдаётся вовсе, поэтому
+  // без роли сводка приходила бы без денег и тесты про суммы разъезжались.
+  body: {}, params: {}, query: {}, user: { id: 1, role: 'owner' }, farmId: 1, ...overrides
 });
 const mockRes = () => {
   const res = {};

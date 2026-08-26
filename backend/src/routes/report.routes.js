@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/reportController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -98,6 +98,8 @@ router.get('/health', reportController.getHealthReport);
  * @query   from_date, to_date, groupBy
  * @access  Private
  */
-router.get('/financial', reportController.getFinancialReport);
+// Отчёт по деньгам — та же книга фермы, только в сумме. Закрывать книгу и
+// оставлять открытой её сводку значит не закрыть ничего.
+router.get('/financial', authorize(['manager']), reportController.getFinancialReport);
 
 module.exports = router;

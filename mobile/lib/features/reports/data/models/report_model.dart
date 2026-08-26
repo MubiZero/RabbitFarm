@@ -12,7 +12,10 @@ class DashboardReport with _$DashboardReport {
     required RabbitStats rabbits,
     required CageStats cages,
     required HealthStats health,
-    required FinanceStats finance,
+    /// Деньги фермы приходят не всем: работнику сервер их не отдаёт вовсе.
+    /// Пусто здесь означает «не для этой роли», а не «на ферме ноль» — нули
+    /// читались бы как пустая касса.
+    FinanceStats? finance,
     required TaskStats tasks,
     required InventoryStats inventory,
     required BreedingStats breeding,
@@ -111,7 +114,8 @@ class FarmReport with _$FarmReport {
   const factory FarmReport({
     required ReportPeriod period,
     required PopulationData population,
-    required FinancialData financial,
+    /// Как и в сводке «Сегодня»: работнику денежный блок не приходит.
+    FinancialData? financial,
     required HealthData health,
     required BreedingData breeding,
     required FeedingData feeding,

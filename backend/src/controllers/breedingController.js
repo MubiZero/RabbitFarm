@@ -87,6 +87,15 @@ class BreedingController {
             if (error.message === 'INVALID_MALE' || error.message === 'INVALID_FEMALE') {
                 return ApiResponse.badRequest(res, 'Некорректный ID самца или самки');
             }
+            // Отказы, которых обработчик не знал, уходили общей пятисоткой:
+            // человек видел «внутреннюю ошибку сервера» там, где сервер как
+            // раз всё понял и отказал по делу.
+            if (error.message === 'CANNOT_BREED_SAME_RABBIT') {
+                return ApiResponse.badRequest(res, 'Нельзя случить кролика с самим собой');
+            }
+            if (error.message === 'FEMALE_NOT_AVAILABLE') {
+                return ApiResponse.badRequest(res, 'Самка недоступна для случки');
+            }
             next(error);
         }
     }

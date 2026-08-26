@@ -1,64 +1,90 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { User } = require('../../src/models');
 
 /**
- * Публичная регистрация закрыта: первый зарегистрировавшийся поднимает ферму
- * и становится её владельцем, дальше посторонний завести аккаунт не может.
+ * Ферм в сервисе много, и регистрация заводит новую: каждый
+ * зарегистрировавшийся становится владельцем собственного хозяйства.
+ *
+ * Раньше владельцем был только самый первый пользователь системы, а всем
+ * следующим доставалась роль работника без фермы — пустой экран и ни одной
+ * доступной кнопки. Флаг `ALLOW_REGISTRATION` остался выключателем на случай
+ * закрытого стенда, но теперь он именно выключатель: закрывает только когда
+ * выставлен явно.
  */
 describe('Регистрация', () => {
-  const openByDefault = process.env.ALLOW_REGISTRATION;
+  const initialFlag = process.env.ALLOW_REGISTRATION;
 
   beforeAll(async () => {
     await syncTestDb();
   });
 
   afterAll(async () => {
-    process.env.ALLOW_REGISTRATION = openByDefault;
+    process.env.ALLOW_REGISTRATION = initialFlag;
     await closeTestDb();
   });
 
-  it('первый зарегистрированный становится владельцем', async () => {
+  beforeEach(() => {
     delete process.env.ALLOW_REGISTRATION;
+  });
 
-    const res = await request(app)
+  const register = (email, name) =>
+    request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'first@example.com', password: 'Password123!', full_name: 'Первый' });
+      .send({ email, password: 'Password123!', full_name: name });
+
+  it('первый зарегистрированный становится владельцем', async () => {
+    const res = await register('first@example.com', 'Первый');
 
     expect(res.status).toBe(201);
     expect(res.body.data.user.role).toBe('owner');
   });
 
-  it('второму регистрация закрыта', async () => {
-    delete process.env.ALLOW_REGISTRATION;
+  it('второй тоже владелец — своей фермы, а не работник чужой', async () => {
+    const res = await register('second@example.com', 'Второй');
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'stranger@example.com', password: 'Password123!', full_name: 'Посторонний' });
+    expect(res.status).toBe(201);
+    expect(res.body.data.user.role).toBe('owner');
+
+    // Пустой `owner_id` и есть признак собственной фермы: `req.farmId`
+    // считается как `owner_id || id`.
+    const user = await User.findByPk(res.body.data.user.id);
+    expect(user.owner_id).toBeNull();
+  });
+
+  it('фермы разные: у второго свой farmId, не первого', async () => {
+    const first = await User.findOne({ where: { email: 'first@example.com' } });
+    const second = await User.findOne({ where: { email: 'second@example.com' } });
+
+    const farmOf = (user) => user.owner_id || user.id;
+
+    expect(farmOf(second)).not.toBe(farmOf(first));
+  });
+
+  it('занятая почта отвергается', async () => {
+    const res = await register('first@example.com', 'Первый');
+
+    expect(res.status).toBe(409);
+  });
+
+  it('выключатель закрывает регистрацию', async () => {
+    process.env.ALLOW_REGISTRATION = 'false';
+
+    const res = await register('stranger@example.com', 'Посторонний');
 
     expect(res.status).toBe(403);
-    expect(res.body.error.message).toBe('Регистрация закрыта. Учётную запись выдаёт владелец фермы.');
+    expect(res.body.error.message).toBe(
+      'Регистрация закрыта. Учётную запись выдаёт владелец фермы.'
+    );
   });
 
   it('закрытая регистрация не выдаёт, занят ли email', async () => {
-    delete process.env.ALLOW_REGISTRATION;
+    process.env.ALLOW_REGISTRATION = 'false';
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'first@example.com', password: 'Password123!', full_name: 'Первый' });
+    const res = await register('first@example.com', 'Первый');
 
     // Тот же 403, что и для нового адреса: перебирать почты бессмысленно.
     expect(res.status).toBe(403);
-  });
-
-  it('при явно открытой регистрации новый пользователь получает роль работника', async () => {
-    process.env.ALLOW_REGISTRATION = 'true';
-
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'worker@example.com', password: 'Password123!', full_name: 'Работник' });
-
-    expect(res.status).toBe(201);
-    expect(res.body.data.user.role).toBe('worker');
   });
 });

@@ -262,6 +262,8 @@ router.get('/:rabbitId/feeding-records', feedingRecordController.getByRabbit);
  * @desc    Get rabbit financial transactions
  * @access  Private
  */
-router.get('/:rabbitId/transactions', transactionController.getRabbitTransactions);
+// Деньги по кролику — часть книги фермы, а книга работнику закрыта.
+// Закрывать книгу и оставлять открытой выборку из неё значит не закрыть ничего.
+router.get('/:rabbitId/transactions', authorize(['manager']), transactionController.getRabbitTransactions);
 
 module.exports = router;

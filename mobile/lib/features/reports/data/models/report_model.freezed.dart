@@ -24,7 +24,11 @@ mixin _$DashboardReport {
   RabbitStats get rabbits => throw _privateConstructorUsedError;
   CageStats get cages => throw _privateConstructorUsedError;
   HealthStats get health => throw _privateConstructorUsedError;
-  FinanceStats get finance => throw _privateConstructorUsedError;
+
+  /// Деньги фермы приходят не всем: работнику сервер их не отдаёт вовсе.
+  /// Пусто здесь означает «не для этой роли», а не «на ферме ноль» — нули
+  /// читались бы как пустая касса.
+  FinanceStats? get finance => throw _privateConstructorUsedError;
   TaskStats get tasks => throw _privateConstructorUsedError;
   InventoryStats get inventory => throw _privateConstructorUsedError;
   BreedingStats get breeding => throw _privateConstructorUsedError;
@@ -50,7 +54,7 @@ abstract class $DashboardReportCopyWith<$Res> {
     RabbitStats rabbits,
     CageStats cages,
     HealthStats health,
-    FinanceStats finance,
+    FinanceStats? finance,
     TaskStats tasks,
     InventoryStats inventory,
     BreedingStats breeding,
@@ -59,7 +63,7 @@ abstract class $DashboardReportCopyWith<$Res> {
   $RabbitStatsCopyWith<$Res> get rabbits;
   $CageStatsCopyWith<$Res> get cages;
   $HealthStatsCopyWith<$Res> get health;
-  $FinanceStatsCopyWith<$Res> get finance;
+  $FinanceStatsCopyWith<$Res>? get finance;
   $TaskStatsCopyWith<$Res> get tasks;
   $InventoryStatsCopyWith<$Res> get inventory;
   $BreedingStatsCopyWith<$Res> get breeding;
@@ -83,7 +87,7 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
     Object? rabbits = null,
     Object? cages = null,
     Object? health = null,
-    Object? finance = null,
+    Object? finance = freezed,
     Object? tasks = null,
     Object? inventory = null,
     Object? breeding = null,
@@ -102,10 +106,10 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
                 ? _value.health
                 : health // ignore: cast_nullable_to_non_nullable
                       as HealthStats,
-            finance: null == finance
+            finance: freezed == finance
                 ? _value.finance
                 : finance // ignore: cast_nullable_to_non_nullable
-                      as FinanceStats,
+                      as FinanceStats?,
             tasks: null == tasks
                 ? _value.tasks
                 : tasks // ignore: cast_nullable_to_non_nullable
@@ -157,8 +161,12 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $FinanceStatsCopyWith<$Res> get finance {
-    return $FinanceStatsCopyWith<$Res>(_value.finance, (value) {
+  $FinanceStatsCopyWith<$Res>? get finance {
+    if (_value.finance == null) {
+      return null;
+    }
+
+    return $FinanceStatsCopyWith<$Res>(_value.finance!, (value) {
       return _then(_value.copyWith(finance: value) as $Val);
     });
   }
@@ -207,7 +215,7 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
     RabbitStats rabbits,
     CageStats cages,
     HealthStats health,
-    FinanceStats finance,
+    FinanceStats? finance,
     TaskStats tasks,
     InventoryStats inventory,
     BreedingStats breeding,
@@ -220,7 +228,7 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
   @override
   $HealthStatsCopyWith<$Res> get health;
   @override
-  $FinanceStatsCopyWith<$Res> get finance;
+  $FinanceStatsCopyWith<$Res>? get finance;
   @override
   $TaskStatsCopyWith<$Res> get tasks;
   @override
@@ -246,7 +254,7 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
     Object? rabbits = null,
     Object? cages = null,
     Object? health = null,
-    Object? finance = null,
+    Object? finance = freezed,
     Object? tasks = null,
     Object? inventory = null,
     Object? breeding = null,
@@ -265,10 +273,10 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
             ? _value.health
             : health // ignore: cast_nullable_to_non_nullable
                   as HealthStats,
-        finance: null == finance
+        finance: freezed == finance
             ? _value.finance
             : finance // ignore: cast_nullable_to_non_nullable
-                  as FinanceStats,
+                  as FinanceStats?,
         tasks: null == tasks
             ? _value.tasks
             : tasks // ignore: cast_nullable_to_non_nullable
@@ -293,7 +301,7 @@ class _$DashboardReportImpl implements _DashboardReport {
     required this.rabbits,
     required this.cages,
     required this.health,
-    required this.finance,
+    this.finance,
     required this.tasks,
     required this.inventory,
     required this.breeding,
@@ -308,8 +316,12 @@ class _$DashboardReportImpl implements _DashboardReport {
   final CageStats cages;
   @override
   final HealthStats health;
+
+  /// Деньги фермы приходят не всем: работнику сервер их не отдаёт вовсе.
+  /// Пусто здесь означает «не для этой роли», а не «на ферме ноль» — нули
+  /// читались бы как пустая касса.
   @override
-  final FinanceStats finance;
+  final FinanceStats? finance;
   @override
   final TaskStats tasks;
   @override
@@ -373,7 +385,7 @@ abstract class _DashboardReport implements DashboardReport {
     required final RabbitStats rabbits,
     required final CageStats cages,
     required final HealthStats health,
-    required final FinanceStats finance,
+    final FinanceStats? finance,
     required final TaskStats tasks,
     required final InventoryStats inventory,
     required final BreedingStats breeding,
@@ -388,8 +400,12 @@ abstract class _DashboardReport implements DashboardReport {
   CageStats get cages;
   @override
   HealthStats get health;
+
+  /// Деньги фермы приходят не всем: работнику сервер их не отдаёт вовсе.
+  /// Пусто здесь означает «не для этой роли», а не «на ферме ноль» — нули
+  /// читались бы как пустая касса.
   @override
-  FinanceStats get finance;
+  FinanceStats? get finance;
   @override
   TaskStats get tasks;
   @override
@@ -1832,7 +1848,9 @@ FarmReport _$FarmReportFromJson(Map<String, dynamic> json) {
 mixin _$FarmReport {
   ReportPeriod get period => throw _privateConstructorUsedError;
   PopulationData get population => throw _privateConstructorUsedError;
-  FinancialData get financial => throw _privateConstructorUsedError;
+
+  /// Как и в сводке «Сегодня»: работнику денежный блок не приходит.
+  FinancialData? get financial => throw _privateConstructorUsedError;
   HealthData get health => throw _privateConstructorUsedError;
   BreedingData get breeding => throw _privateConstructorUsedError;
   FeedingData get feeding => throw _privateConstructorUsedError;
@@ -1857,7 +1875,7 @@ abstract class $FarmReportCopyWith<$Res> {
   $Res call({
     ReportPeriod period,
     PopulationData population,
-    FinancialData financial,
+    FinancialData? financial,
     HealthData health,
     BreedingData breeding,
     FeedingData feeding,
@@ -1865,7 +1883,7 @@ abstract class $FarmReportCopyWith<$Res> {
 
   $ReportPeriodCopyWith<$Res> get period;
   $PopulationDataCopyWith<$Res> get population;
-  $FinancialDataCopyWith<$Res> get financial;
+  $FinancialDataCopyWith<$Res>? get financial;
   $HealthDataCopyWith<$Res> get health;
   $BreedingDataCopyWith<$Res> get breeding;
   $FeedingDataCopyWith<$Res> get feeding;
@@ -1888,7 +1906,7 @@ class _$FarmReportCopyWithImpl<$Res, $Val extends FarmReport>
   $Res call({
     Object? period = null,
     Object? population = null,
-    Object? financial = null,
+    Object? financial = freezed,
     Object? health = null,
     Object? breeding = null,
     Object? feeding = null,
@@ -1903,10 +1921,10 @@ class _$FarmReportCopyWithImpl<$Res, $Val extends FarmReport>
                 ? _value.population
                 : population // ignore: cast_nullable_to_non_nullable
                       as PopulationData,
-            financial: null == financial
+            financial: freezed == financial
                 ? _value.financial
                 : financial // ignore: cast_nullable_to_non_nullable
-                      as FinancialData,
+                      as FinancialData?,
             health: null == health
                 ? _value.health
                 : health // ignore: cast_nullable_to_non_nullable
@@ -1948,8 +1966,12 @@ class _$FarmReportCopyWithImpl<$Res, $Val extends FarmReport>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $FinancialDataCopyWith<$Res> get financial {
-    return $FinancialDataCopyWith<$Res>(_value.financial, (value) {
+  $FinancialDataCopyWith<$Res>? get financial {
+    if (_value.financial == null) {
+      return null;
+    }
+
+    return $FinancialDataCopyWith<$Res>(_value.financial!, (value) {
       return _then(_value.copyWith(financial: value) as $Val);
     });
   }
@@ -1997,7 +2019,7 @@ abstract class _$$FarmReportImplCopyWith<$Res>
   $Res call({
     ReportPeriod period,
     PopulationData population,
-    FinancialData financial,
+    FinancialData? financial,
     HealthData health,
     BreedingData breeding,
     FeedingData feeding,
@@ -2008,7 +2030,7 @@ abstract class _$$FarmReportImplCopyWith<$Res>
   @override
   $PopulationDataCopyWith<$Res> get population;
   @override
-  $FinancialDataCopyWith<$Res> get financial;
+  $FinancialDataCopyWith<$Res>? get financial;
   @override
   $HealthDataCopyWith<$Res> get health;
   @override
@@ -2033,7 +2055,7 @@ class __$$FarmReportImplCopyWithImpl<$Res>
   $Res call({
     Object? period = null,
     Object? population = null,
-    Object? financial = null,
+    Object? financial = freezed,
     Object? health = null,
     Object? breeding = null,
     Object? feeding = null,
@@ -2048,10 +2070,10 @@ class __$$FarmReportImplCopyWithImpl<$Res>
             ? _value.population
             : population // ignore: cast_nullable_to_non_nullable
                   as PopulationData,
-        financial: null == financial
+        financial: freezed == financial
             ? _value.financial
             : financial // ignore: cast_nullable_to_non_nullable
-                  as FinancialData,
+                  as FinancialData?,
         health: null == health
             ? _value.health
             : health // ignore: cast_nullable_to_non_nullable
@@ -2075,7 +2097,7 @@ class _$FarmReportImpl implements _FarmReport {
   const _$FarmReportImpl({
     required this.period,
     required this.population,
-    required this.financial,
+    this.financial,
     required this.health,
     required this.breeding,
     required this.feeding,
@@ -2088,8 +2110,10 @@ class _$FarmReportImpl implements _FarmReport {
   final ReportPeriod period;
   @override
   final PopulationData population;
+
+  /// Как и в сводке «Сегодня»: работнику денежный блок не приходит.
   @override
-  final FinancialData financial;
+  final FinancialData? financial;
   @override
   final HealthData health;
   @override
@@ -2148,7 +2172,7 @@ abstract class _FarmReport implements FarmReport {
   const factory _FarmReport({
     required final ReportPeriod period,
     required final PopulationData population,
-    required final FinancialData financial,
+    final FinancialData? financial,
     required final HealthData health,
     required final BreedingData breeding,
     required final FeedingData feeding,
@@ -2161,8 +2185,10 @@ abstract class _FarmReport implements FarmReport {
   ReportPeriod get period;
   @override
   PopulationData get population;
+
+  /// Как и в сводке «Сегодня»: работнику денежный блок не приходит.
   @override
-  FinancialData get financial;
+  FinancialData? get financial;
   @override
   HealthData get health;
   @override

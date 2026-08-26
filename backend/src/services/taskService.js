@@ -4,6 +4,23 @@ const logger = require('../utils/logger');
 const { farmMemberIds } = require('../utils/farm');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
+/**
+ * Задача принадлежит ферме, а не одному человеку.
+ *
+ * У таблицы своей колонки фермы нет, поэтому принадлежность выражается через
+ * участников: кто завёл или на кого назначено. Раньше сравнение шло с
+ * `farmId`, то есть с владельцем, и держалось это только на том, что автором
+ * ЛЮБОЙ задачи записывался владелец — кто бы её ни создал. В журнале смены
+ * из-за этого каждая задача значилась заведённой хозяином, а править и
+ * удалять задачу управляющего не мог никто, включая её автора.
+ */
+const farmScope = (farm) => ({
+  [Op.or]: [
+    { created_by: { [Op.in]: farm.memberIds } },
+    { assigned_to: { [Op.in]: farm.memberIds } }
+  ]
+});
+
 const TASK_INCLUDE = [
   { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
   { model: Cage, as: 'cage', attributes: ['id', 'number', 'location'] },
@@ -41,7 +58,8 @@ const RECURRENCE_OFFSETS = {
  */
 class TaskService {
   async createTask(data) {
-    const { rabbit_id, cage_id, assigned_to, user_id } = data;
+    const { rabbit_id, cage_id, assigned_to, farm, author_id } = data;
+    const user_id = farm.id;
 
     if (rabbit_id) {
       const rabbit = await Rabbit.findOne({ where: { id: rabbit_id, user_id } });
@@ -71,7 +89,7 @@ class TaskService {
       rabbit_id,
       cage_id,
       assigned_to,
-      created_by: user_id,
+      created_by: author_id,
       is_recurring: data.is_recurring || false,
       recurrence_rule: data.recurrence_rule,
       reminder_before: data.reminder_before,
@@ -91,11 +109,11 @@ class TaskService {
     return created;
   }
 
-  async getTaskById(id, userId) {
+  async getTaskById(id, farm) {
     const task = await Task.findOne({
       where: {
         id,
-        [Op.or]: [{ created_by: userId }, { assigned_to: userId }]
+        ...farmScope(farm)
       },
       include: TASK_INCLUDE
     });
@@ -103,7 +121,7 @@ class TaskService {
     return task;
   }
 
-  async listTasks(userId, filters = {}) {
+  async listTasks(farm, filters = {}) {
     const {
       page = 1,
       limit = 10,
@@ -123,7 +141,7 @@ class TaskService {
 
     const offset = (page - 1) * limit;
     const where = {
-      [Op.or]: [{ created_by: userId }, { assigned_to: userId }]
+      ...farmScope(farm)
     };
 
     if (type) where.type = type;
@@ -172,24 +190,24 @@ class TaskService {
     return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
-  async updateTask(id, userId, data) {
-    const task = await Task.findOne({ where: { id, created_by: userId } });
+  async updateTask(id, farm, data) {
+    const task = await Task.findOne({ where: { id, ...farmScope(farm) } });
     if (!task) throw new Error('TASK_NOT_FOUND');
 
     const { rabbit_id, cage_id, assigned_to, status, completed_at } = data;
 
     if (rabbit_id && rabbit_id !== task.rabbit_id) {
-      const rabbit = await Rabbit.findOne({ where: { id: rabbit_id, user_id: userId } });
+      const rabbit = await Rabbit.findOne({ where: { id: rabbit_id, user_id: farm.id } });
       if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
     }
 
     if (cage_id && cage_id !== task.cage_id) {
-      const cage = await Cage.findOne({ where: { id: cage_id, user_id: userId } });
+      const cage = await Cage.findOne({ where: { id: cage_id, user_id: farm.id } });
       if (!cage) throw new Error('CAGE_NOT_FOUND');
     }
 
     if (assigned_to) {
-      await assertAssigneeBelongsToFarm(assigned_to, userId);
+      await assertAssigneeBelongsToFarm(assigned_to, farm.id);
     }
 
     const updateData = { ...data };
@@ -206,17 +224,17 @@ class TaskService {
     return updated;
   }
 
-  async deleteTask(id, userId) {
-    const task = await Task.findOne({ where: { id, created_by: userId } });
+  async deleteTask(id, farm) {
+    const task = await Task.findOne({ where: { id, ...farmScope(farm) } });
     if (!task) throw new Error('TASK_NOT_FOUND');
     await task.destroy();
     logger.info('Task deleted', { taskId: id });
     return { success: true };
   }
 
-  async getStatistics(userId) {
+  async getStatistics(farm) {
     const where = {
-      [Op.or]: [{ created_by: userId }, { assigned_to: userId }]
+      ...farmScope(farm)
     };
 
     const today = new Date();
@@ -248,7 +266,7 @@ class TaskService {
     };
   }
 
-  async getUpcoming(userId, days = 7) {
+  async getUpcoming(farm, days = 7) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const futureDate = new Date(today);
@@ -256,7 +274,7 @@ class TaskService {
 
     return Task.findAll({
       where: {
-        [Op.or]: [{ created_by: userId }, { assigned_to: userId }],
+        ...farmScope(farm),
         due_date: { [Op.gte]: today, [Op.lt]: futureDate },
         status: { [Op.in]: ['pending', 'in_progress'] }
       },
@@ -265,9 +283,9 @@ class TaskService {
     });
   }
 
-  async completeTask(id, userId) {
+  async completeTask(id, farm) {
     const task = await Task.findOne({
-      where: { id, [Op.or]: [{ created_by: userId }, { assigned_to: userId }] }
+      where: { id, ...farmScope(farm) }
     });
     if (!task) throw new Error('TASK_NOT_FOUND');
 

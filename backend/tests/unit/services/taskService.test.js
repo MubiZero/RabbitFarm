@@ -64,7 +64,7 @@ describe('TaskService', () => {
       const result = await taskService.createTask({
         title: 'Feed rabbits',
         type: 'feeding',
-        user_id: 1
+        farm: { id: 1, memberIds: [1] }, author_id: 1
       });
 
       expect(Task.create).toHaveBeenCalled();
@@ -75,7 +75,7 @@ describe('TaskService', () => {
       Rabbit.findOne.mockResolvedValue(null);
 
       await expect(
-        taskService.createTask({ title: 'Check rabbit', rabbit_id: 99, user_id: 1 })
+        taskService.createTask({ title: 'Check rabbit', rabbit_id: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
       ).rejects.toThrow('RABBIT_NOT_FOUND');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe('TaskService', () => {
       Cage.findOne.mockResolvedValue(null);
 
       await expect(
-        taskService.createTask({ title: 'Clean cage', cage_id: 99, user_id: 1 })
+        taskService.createTask({ title: 'Clean cage', cage_id: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
       ).rejects.toThrow('CAGE_NOT_FOUND');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ describe('TaskService', () => {
       User.findAll.mockResolvedValue([{ id: 1 }, { id: 3 }]);
 
       await expect(
-        taskService.createTask({ title: 'Task', assigned_to: 99, user_id: 1 })
+        taskService.createTask({ title: 'Task', assigned_to: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
       ).rejects.toThrow('ASSIGNEE_NOT_FOUND');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('TaskService', () => {
 
     it('should throw INVALID_RECURRENCE_RULE when recurrence_rule is not a valid option', async () => {
       await expect(
-        taskService.createTask({ title: 'Bad recurrence', recurrence_rule: 'every_full_moon', user_id: 1 })
+        taskService.createTask({ title: 'Bad recurrence', recurrence_rule: 'every_full_moon', farm: { id: 1, memberIds: [1] }, author_id: 1 })
       ).rejects.toThrow('INVALID_RECURRENCE_RULE');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -120,7 +120,7 @@ describe('TaskService', () => {
         title: 'Daily feeding',
         recurrence_rule: 'daily',
         is_recurring: true,
-        user_id: 1
+        farm: { id: 1, memberIds: [1] }, author_id: 1
       });
 
       expect(Task.create).toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('TaskService', () => {
 
       const result = await taskService.createTask({
         title: 'One-time task',
-        user_id: 1
+        farm: { id: 1, memberIds: [1] }, author_id: 1
       });
 
       expect(Task.create).toHaveBeenCalled();
@@ -155,7 +155,7 @@ describe('TaskService', () => {
         rabbit_id: 1,
         cage_id: 2,
         assigned_to: 3,
-        user_id: 1
+        farm: { id: 1, memberIds: [1] }, author_id: 1
       });
 
       expect(result).toBeDefined();

@@ -12,7 +12,9 @@ _$DashboardReportImpl _$$DashboardReportImplFromJson(
   rabbits: RabbitStats.fromJson(json['rabbits'] as Map<String, dynamic>),
   cages: CageStats.fromJson(json['cages'] as Map<String, dynamic>),
   health: HealthStats.fromJson(json['health'] as Map<String, dynamic>),
-  finance: FinanceStats.fromJson(json['finance'] as Map<String, dynamic>),
+  finance: json['finance'] == null
+      ? null
+      : FinanceStats.fromJson(json['finance'] as Map<String, dynamic>),
   tasks: TaskStats.fromJson(json['tasks'] as Map<String, dynamic>),
   inventory: InventoryStats.fromJson(json['inventory'] as Map<String, dynamic>),
   breeding: BreedingStats.fromJson(json['breeding'] as Map<String, dynamic>),
@@ -155,9 +157,9 @@ _$FarmReportImpl _$$FarmReportImplFromJson(Map<String, dynamic> json) =>
       population: PopulationData.fromJson(
         json['population'] as Map<String, dynamic>,
       ),
-      financial: FinancialData.fromJson(
-        json['financial'] as Map<String, dynamic>,
-      ),
+      financial: json['financial'] == null
+          ? null
+          : FinancialData.fromJson(json['financial'] as Map<String, dynamic>),
       health: HealthData.fromJson(json['health'] as Map<String, dynamic>),
       breeding: BreedingData.fromJson(json['breeding'] as Map<String, dynamic>),
       feeding: FeedingData.fromJson(json['feeding'] as Map<String, dynamic>),

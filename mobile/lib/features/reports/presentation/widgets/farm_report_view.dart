@@ -47,8 +47,9 @@ class FarmReportView extends ConsumerWidget {
     final canFinance = ref.watch(canProvider(FarmCapability.manageFinance));
     final breedNames = ref.watch(reportBreedNamesProvider);
 
-    final money = report.financial.summary;
-    final hasMoney = money.totalIncome != 0 || money.totalExpenses != 0;
+    final money = report.financial?.summary;
+    final hasMoney =
+        money != null && (money.totalIncome != 0 || money.totalExpenses != 0);
     final activity = [
       report.breeding.breedings,
       report.breeding.births,
@@ -166,7 +167,10 @@ class FarmReportView extends ConsumerWidget {
             ],
           ),
         ],
-        if (canFinance) ...[
+        // Право проверяется и здесь, и на сервере: сервер денежный блок
+        // работнику просто не присылает, поэтому его может не быть и у того,
+        // кому право показалось выданным — например пока роль не подтянулась.
+        if (canFinance && money != null) ...[
           const SizedBox(height: AppSpacing.xl),
           AppGroupLabel(context.l10n.reportsMoney),
           const SizedBox(height: AppSpacing.md),

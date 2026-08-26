@@ -27,8 +27,13 @@ class RabbitService {
   async createRabbit(rabbitData) {
     const transaction = await sequelize.transaction();
     try {
-      // Check if breed exists (breeds are global in this app)
-      const breed = await Breed.findByPk(rabbitData.breed_id);
+      // Порода принадлежит ферме, а не сервису: без фильтра по user_id
+      // сюда проходил идентификатор чужой породы, и в карточке кролика
+      // показывалось её название — данные соседней фермы.
+      const breed = await Breed.findOne({
+        where: { id: rabbitData.breed_id, user_id: rabbitData.user_id },
+        transaction
+      });
       if (!breed) {
         throw new Error('BREED_NOT_FOUND');
       }
@@ -134,11 +139,14 @@ class RabbitService {
           id: rabbitId,
           user_id: userId
         },
+        // Ветки карточки фильтруем так же, как корень: связи проверяются
+        // при записи, но записи бывают старше проверок. `required: false`
+        // оставляет кролика в ответе — чужая связь просто не раскрывается.
         include: [
-          { model: Breed, as: 'breed' },
-          { model: Cage },
-          { model: Rabbit, as: 'father' },
-          { model: Rabbit, as: 'mother' }
+          { model: Breed, as: 'breed', where: { user_id: userId }, required: false },
+          { model: Cage, where: { user_id: userId }, required: false },
+          { model: Rabbit, as: 'father', where: { user_id: userId }, required: false },
+          { model: Rabbit, as: 'mother', where: { user_id: userId }, required: false }
         ]
       });
 
@@ -191,14 +199,13 @@ class RabbitService {
       }
 
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
+        // Колонки называем полями модели, а не голым `col('name')`: в выборку
+        // подмешана порода, у которой тоже есть `name`, и MySQL отказывался
+        // выполнять запрос — поиск по списку кроликов падал целиком.
+        // Сравнение и так регистронезависимое: колонки в utf8mb4_unicode_ci.
         where[Op.or] = [
-          Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), {
-            [Op.like]: `%${searchLower}%`
-          }),
-          Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('tag_id')), {
-            [Op.like]: `%${searchLower}%`
-          })
+          { name: { [Op.like]: `%${filters.search}%` } },
+          { tag_id: { [Op.like]: `%${filters.search}%` } }
         ];
       }
 
@@ -209,8 +216,8 @@ class RabbitService {
       const rabbits = await Rabbit.findAll({
         where,
         include: [
-          { model: Breed, as: 'breed' },
-          { model: Cage }
+          { model: Breed, as: 'breed', where: { user_id: userId }, required: false },
+          { model: Cage, where: { user_id: userId }, required: false }
         ],
         order: [[sort_by, sort_order.toUpperCase()]],
         limit: parseInt(limit),
@@ -270,9 +277,13 @@ class RabbitService {
         }
       }
 
-      // Check if breed exists (if being updated)
+      // Порода должна быть своей — иначе правкой кролика можно было
+      // подтянуть в карточку породу чужой фермы.
       if (updateData.breed_id) {
-        const breed = await Breed.findByPk(updateData.breed_id);
+        const breed = await Breed.findOne({
+          where: { id: updateData.breed_id, user_id: userId },
+          transaction
+        });
         if (!breed) {
           throw new Error('BREED_NOT_FOUND');
         }
@@ -518,7 +529,13 @@ class RabbitService {
           'breed_id',
           [Sequelize.fn('COUNT', '*'), 'count']
         ],
-        include: [{ model: Breed, as: 'breed', attributes: ['name'] }],
+        include: [{
+          model: Breed,
+          as: 'breed',
+          attributes: ['name'],
+          where: { user_id: userId },
+          required: false
+        }],
         group: ['breed_id', 'breed.id', 'breed.name'],
         where: { ...where, status: { [Op.notIn]: ['sold', 'dead'] } },
         raw: false

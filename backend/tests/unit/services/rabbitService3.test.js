@@ -16,7 +16,7 @@ jest.mock('../../../src/models', () => {
       findAll: jest.fn(),
       findAndCountAll: jest.fn()
     },
-    Breed: { findByPk: jest.fn(), findAll: jest.fn() },
+    Breed: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn() },
     Cage: { findOne: jest.fn() },
     RabbitWeight: { create: jest.fn(), findAll: jest.fn() },
     Photo: { findAll: jest.fn() },
@@ -55,7 +55,7 @@ describe('RabbitService - uncovered lines', () => {
   describe('createRabbit', () => {
     it('should set cage_id to null when status is dead and cage_id provided', async () => {
       const rabbitData = { breed_id: 1, cage_id: 5, user_id: 1, status: 'dead' };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 5, capacity: 10 });
       Rabbit.count.mockResolvedValue(2); // current count in cage
       Rabbit.create.mockResolvedValue({ id: 10 });
@@ -74,7 +74,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should set cage_id to null when status is sold and cage_id provided', async () => {
       const rabbitData = { breed_id: 1, cage_id: 5, user_id: 1, status: 'sold' };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 5, capacity: 10 });
       Rabbit.count.mockResolvedValue(0);
       Rabbit.create.mockResolvedValue({ id: 11 });
@@ -90,7 +90,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should throw FATHER_NOT_FOUND_OR_INVALID_SEX when father not found', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, father_id: 99 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       // father lookup returns null
       Rabbit.findOne.mockResolvedValue(null);
 
@@ -101,7 +101,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should throw MOTHER_NOT_FOUND_OR_INVALID_SEX when mother not found', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, mother_id: 88 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       // mother lookup returns null
       Rabbit.findOne.mockResolvedValue(null);
 
@@ -112,7 +112,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should pass father validation when father exists and is male', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, father_id: 5 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       // First findOne call: father lookup -> found
       // Second findOne call: getRabbitById
       Rabbit.findOne
@@ -127,7 +127,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should pass mother validation when mother exists and is female', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, mother_id: 6 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.findOne
         .mockResolvedValueOnce({ id: 6, sex: 'female' }) // mother found
         .mockResolvedValueOnce({ id: 10 }); // getRabbitById
@@ -139,7 +139,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should throw TAG_ID_EXISTS when tag_id already used by user', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, tag_id: 'TAG-001' };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       // tag check: findOne returns existing rabbit
       Rabbit.findOne.mockResolvedValue({ id: 99, tag_id: 'TAG-001' });
 
@@ -150,7 +150,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should pass tag validation when tag_id is unique', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, tag_id: 'TAG-NEW' };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.findOne
         .mockResolvedValueOnce(null) // tag check: not found
         .mockResolvedValueOnce({ id: 10 }); // getRabbitById
@@ -162,7 +162,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should create initial weight record when current_weight is provided', async () => {
       const rabbitData = { breed_id: 1, user_id: 1, current_weight: 2.5 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
       Rabbit.findOne.mockResolvedValue({ id: 10 });
       RabbitWeight.create.mockResolvedValue({ id: 1 });
@@ -181,7 +181,7 @@ describe('RabbitService - uncovered lines', () => {
 
     it('should NOT create weight record when current_weight is not provided', async () => {
       const rabbitData = { breed_id: 1, user_id: 1 };
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
       Rabbit.findOne.mockResolvedValue({ id: 10 });
 
@@ -254,7 +254,7 @@ describe('RabbitService - uncovered lines', () => {
     it('should throw BREED_NOT_FOUND when updating to invalid breed', async () => {
       const rabbit = { ...baseRabbit, update: jest.fn() };
       Rabbit.findOne.mockResolvedValueOnce(rabbit);
-      Breed.findByPk.mockResolvedValueOnce(null);
+      Breed.findOne.mockResolvedValueOnce(null);
 
       await expect(rabbitService.updateRabbit(1, 1, { breed_id: 999 }))
         .rejects.toThrow('BREED_NOT_FOUND');
@@ -267,7 +267,7 @@ describe('RabbitService - uncovered lines', () => {
       Rabbit.findOne
         .mockResolvedValueOnce(rabbit)
         .mockResolvedValueOnce({ id: 1 }); // getRabbitById
-      Breed.findByPk.mockResolvedValueOnce({ id: 2, name: 'Angora' });
+      Breed.findOne.mockResolvedValueOnce({ id: 2, name: 'Angora' });
 
       await rabbitService.updateRabbit(1, 1, { breed_id: 2 });
 

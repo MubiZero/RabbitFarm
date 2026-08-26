@@ -116,7 +116,8 @@ router.use(authenticate);
 // Statistics and special queries (before :id routes)
 router.get('/statistics', medicalRecordController.getStatistics);
 router.get('/ongoing', medicalRecordController.getOngoing);
-router.get('/costs', medicalRecordController.getCosts);
+// Затраты на лечение — денежный отчёт: работнику закрыт так же, как книга.
+router.get('/costs', authorize(['manager']), medicalRecordController.getCosts);
 
 // CRUD routes
 router.post('/', validate(createMedicalRecordSchema), medicalRecordController.create);

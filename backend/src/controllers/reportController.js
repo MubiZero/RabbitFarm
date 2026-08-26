@@ -15,6 +15,20 @@ const ApiResponse = require('../utils/apiResponse');
 const { farmMemberIds } = require('../utils/farm');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
+/**
+ * Видны ли этому человеку деньги фермы.
+ *
+ * Книга доходов и расходов работнику закрыта намеренно, но те же выручка,
+ * прибыль и себестоимость лежали в сводках — и отдавались всем подряд.
+ * Закрыть отчёты целиком нельзя: сводка нужна работнику ради задач,
+ * поголовья и прививок. Поэтому денежный блок не прячется за отказом, а
+ * просто не попадает в ответ: `null` честно говорит «не для вас», в отличие
+ * от нулей, которые читались бы как «на ферме пусто».
+ */
+const canSeeLedger = (req) =>
+  req.user.role === 'owner' || req.user.role === 'manager';
+
+
 // Живым считается всё, кроме проданных и павших. Перечислять живые
 // статусы поимённо опасно: список уже расходился с моделью.
 const ALIVE_STATUS = { [Op.notIn]: ['dead', 'sold'] };
@@ -31,6 +45,22 @@ const ALIVE_STATUS = { [Op.notIn]: ['dead', 'sold'] };
 exports.getDashboard = async (req, res, next) => {
   try {
     const userId = req.farmId;
+
+    // Состав фермы: деньги и задачи опознаются по участнику, а не по
+    // владельцу. Сводка считала их только по владельцу, поэтому расход
+    // управляющего и ветеринарная трата, записанная на сотрудника, в
+    // «доходы и расходы за 30 дней» не попадали — при том, что финансовый
+    // отчёт те же операции показывал. Две цифры про одни деньги расходились.
+    const memberIds = await farmMemberIds(userId);
+    const farmMoney = { created_by: { [Op.in]: memberIds } };
+    // Задача принадлежит ферме и когда её завёл работник, и когда её на
+    // работника назначили.
+    const farmTasks = {
+      [Op.or]: [
+        { created_by: { [Op.in]: memberIds } },
+        { assigned_to: { [Op.in]: memberIds } }
+      ]
+    };
 
     // Pre-compute date boundaries used by multiple queries
     const thirtyDaysAgo = new Date();
@@ -113,7 +143,7 @@ exports.getDashboard = async (req, res, next) => {
       // Financial summary (last 30 days)
       Transaction.sum('amount', {
         where: {
-          created_by: userId,
+          ...farmMoney,
           type: 'income',
           transaction_date: {
             [Op.gte]: thirtyDaysAgo
@@ -123,7 +153,7 @@ exports.getDashboard = async (req, res, next) => {
 
       Transaction.sum('amount', {
         where: {
-          created_by: userId,
+          ...farmMoney,
           type: 'expense',
           transaction_date: {
             [Op.gte]: thirtyDaysAgo
@@ -135,13 +165,13 @@ exports.getDashboard = async (req, res, next) => {
       Task.count({
         where: {
           status: 'pending',
-          created_by: userId
+          ...farmTasks
         }
       }),
 
       Task.count({
         where: {
-          created_by: userId,
+          ...farmTasks,
           due_date: {
             [Op.lt]: new Date()
           },
@@ -153,7 +183,7 @@ exports.getDashboard = async (req, res, next) => {
 
       Task.count({
         where: {
-          created_by: userId,
+          ...farmTasks,
           priority: 'urgent',
           status: {
             [Op.in]: ['pending', 'in_progress']
@@ -267,11 +297,13 @@ exports.getDashboard = async (req, res, next) => {
         upcomingVaccinations: upcomingVaccinations,
         overdueVaccinations: overdueVaccinations
       },
-      finance: {
-        income30days: parseFloat(recentIncome).toFixed(2),
-        expenses30days: parseFloat(recentExpenses).toFixed(2),
-        profit30days: parseFloat(recentIncome - recentExpenses).toFixed(2)
-      },
+      finance: canSeeLedger(req)
+        ? {
+          income30days: parseFloat(recentIncome).toFixed(2),
+          expenses30days: parseFloat(recentExpenses).toFixed(2),
+          profit30days: parseFloat(recentIncome - recentExpenses).toFixed(2)
+        }
+        : null,
       tasks: {
         pending: pendingTasks,
         overdue: overdueTasks,
@@ -399,17 +431,19 @@ exports.getFarmReport = async (req, res, next) => {
         total_rabbits: await Rabbit.count({ where: { user_id: req.farmId, status: ALIVE_STATUS } }),
         by_breed: rabbitsByBreed
       },
-      financial: {
-        transactions: transactions,
-        summary: transactions.reduce((acc, t) => {
-          if (t.type === 'income') {
-            acc.total_income = parseFloat(t.total);
-          } else {
-            acc.total_expenses = parseFloat(t.total);
-          }
-          return acc;
-        }, { total_income: 0, total_expenses: 0 })
-      },
+      financial: canSeeLedger(req)
+        ? {
+          transactions: transactions,
+          summary: transactions.reduce((acc, t) => {
+            if (t.type === 'income') {
+              acc.total_income = parseFloat(t.total);
+            } else {
+              acc.total_expenses = parseFloat(t.total);
+            }
+            return acc;
+          }, { total_income: 0, total_expenses: 0 })
+        }
+        : null,
       health: {
         vaccinations: vaccinationsCount,
         medical_records: medicalRecordsCount

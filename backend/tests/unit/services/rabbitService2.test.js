@@ -13,7 +13,7 @@ jest.mock('../../../src/models', () => {
       findAll: jest.fn(),
       findAndCountAll: jest.fn()
     },
-    Breed: { findByPk: jest.fn(), findAll: jest.fn() },
+    Breed: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn() },
     Cage: { findOne: jest.fn() },
     RabbitWeight: { create: jest.fn(), findAll: jest.fn() },
     Photo: { findAll: jest.fn() },

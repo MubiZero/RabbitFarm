@@ -312,9 +312,11 @@ describe('medicalRecordController', () => {
         rabbit: { user_id: 1, update: jest.fn().mockResolvedValue(true) },
         update: jest.fn().mockResolvedValue(true)
       };
-      MedicalRecord.findByPk
-        .mockResolvedValueOnce(medicalRecord)  // first call in update
-        .mockResolvedValueOnce({ id: 1 });     // second call to fetch updated
+      // Запись ищется сразу по своей ферме (`findOne` с include кролика), а не
+      // «любая по id, ферму проверим потом»: перечитывается она уже по
+      // подтверждённому id.
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
+      MedicalRecord.findByPk.mockResolvedValueOnce({ id: 1 });
 
       const req = mockReq({ params: { id: '1' }, body: { notes: 'Better now' } });
       const res = mockRes();
@@ -326,7 +328,7 @@ describe('medicalRecordController', () => {
     });
 
     it('should return 404 if record not found', async () => {
-      MedicalRecord.findByPk.mockResolvedValueOnce(null);
+      MedicalRecord.findOne.mockResolvedValueOnce(null);
 
       const res = mockRes();
       await ctrl.update(mockReq({ params: { id: '999' }, body: {} }), res, mockNext);
@@ -335,14 +337,20 @@ describe('medicalRecordController', () => {
       expect(mockTx.rollback).toHaveBeenCalled();
     });
 
-    it('should return 404 if record belongs to different user', async () => {
-      const medicalRecord = { id: 1, rabbit: { user_id: 99 } }; // different user
-      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+    it('чужая запись не находится: ферма стоит в самом запросе', async () => {
+      // Раньше поднималась любая запись по id, а принадлежность сверялась
+      // после — «взять что угодно, проверить потом» ломается от первой
+      // неаккуратной правки. Теперь ферма в условии выборки, поэтому чужая
+      // запись просто не возвращается.
+      MedicalRecord.findOne.mockResolvedValueOnce(null);
 
       const res = mockRes();
       await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(404);
+
+      const [options] = MedicalRecord.findOne.mock.calls[0];
+      expect(options.include[0].where).toEqual({ user_id: 1 });
     });
 
     it('should update rabbit to dead when outcome changes to died', async () => {
@@ -352,8 +360,8 @@ describe('medicalRecordController', () => {
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
       MedicalRecord.findByPk
-        .mockResolvedValueOnce(medicalRecord)
         .mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
@@ -371,8 +379,8 @@ describe('medicalRecordController', () => {
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
       MedicalRecord.findByPk
-        .mockResolvedValueOnce(medicalRecord)
         .mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
@@ -390,8 +398,8 @@ describe('medicalRecordController', () => {
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
       MedicalRecord.findByPk
-        .mockResolvedValueOnce(medicalRecord)
         .mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
@@ -408,7 +416,7 @@ describe('medicalRecordController', () => {
         rabbit: { user_id: 1 },
         update: jest.fn()
       };
-      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
       Rabbit.findOne.mockResolvedValueOnce(null);
 
       const res = mockRes();
@@ -430,7 +438,7 @@ describe('medicalRecordController', () => {
           errors: [{ message: 'Invalid value' }]
         })
       };
-      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
 
       const res = mockRes();
       await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), res, mockNext);
@@ -445,7 +453,7 @@ describe('medicalRecordController', () => {
         rabbit: { user_id: 1, update: jest.fn() },
         update: jest.fn().mockRejectedValue(new Error('DB error'))
       };
-      MedicalRecord.findByPk.mockResolvedValueOnce(medicalRecord);
+      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
 
       await ctrl.update(mockReq({ params: { id: '1' }, body: {} }), mockRes(), mockNext);
 

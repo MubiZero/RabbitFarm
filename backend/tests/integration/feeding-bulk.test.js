@@ -14,7 +14,6 @@ const API = '/api/v1';
  */
 describe('Кормление пачкой', () => {
   let ownerToken;
-  let strangerToken;
   let feedId;
   const cageIds = [];
   let strangerCageId;
@@ -54,7 +53,6 @@ describe('Кормление пачкой', () => {
         full_name: 'Stranger Owner',
         role: 'owner'
       });
-    strangerToken = stranger.body.data.access_token;
 
     const feed = await request(app)
       .post(`${API}/feeds`)

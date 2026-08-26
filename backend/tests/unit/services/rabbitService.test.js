@@ -2,7 +2,7 @@ jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
     Rabbit: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn(), create: jest.fn(), count: jest.fn(), findAndCountAll: jest.fn() },
-    Breed: { findByPk: jest.fn() },
+    Breed: { findOne: jest.fn(), findByPk: jest.fn() },
     Cage: { findOne: jest.fn() },
     RabbitWeight: { create: jest.fn() },
     Photo: {},
@@ -33,7 +33,7 @@ describe('RabbitService', () => {
     });
 
     it('должен бросать BREED_NOT_FOUND если порода не существует', async () => {
-      Breed.findByPk.mockResolvedValue(null);
+      Breed.findOne.mockResolvedValue(null);
 
       await expect(rabbitService.createRabbit({ breed_id: 999, user_id: 1 }))
         .rejects.toThrow('BREED_NOT_FOUND');
@@ -41,7 +41,7 @@ describe('RabbitService', () => {
     });
 
     it('должен бросать CAGE_NOT_FOUND если клетка не найдена у пользователя', async () => {
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue(null);
 
       await expect(rabbitService.createRabbit({ breed_id: 1, cage_id: 1, user_id: 1 }))
@@ -49,7 +49,7 @@ describe('RabbitService', () => {
     });
 
     it('должен бросать CAGE_FULL если клетка заполнена', async () => {
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 1, capacity: 2 });
       Rabbit.count.mockResolvedValue(2);
 
@@ -59,7 +59,7 @@ describe('RabbitService', () => {
 
     it('должен создавать кролика успешно если все данные корректны', async () => {
       const mockRabbit = createMockRabbit();
-      Breed.findByPk.mockResolvedValue({ id: 1 });
+      Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue(mockRabbit);
       // getRabbitById вызывается после commit — мокаем findOne для него
       Rabbit.findOne.mockResolvedValue(mockRabbit);
@@ -90,19 +90,21 @@ describe('RabbitService', () => {
       expect(result.items).toHaveLength(2);
       expect(result.pagination.total).toBe(2);
 
-      // Verify that findAll was called with a where clause containing Op.or
+      // Поиск отбирает по кличке и клейму и не выходит за пределы фермы.
+      // Раньше здесь стоял `Sequelize.where(fn('LOWER', col('name')))`: без
+      // указания таблицы, а в выборку джойнятся породы, где колонка `name`
+      // тоже есть — MySQL отвечал «ambiguous column», то есть любой поиск
+      // возвращал пятисотку. Регистр всё равно не различается: колонки
+      // лежат в utf8mb4_unicode_ci.
       const findAllCall = Rabbit.findAll.mock.calls[0][0];
       const whereClause = findAllCall.where;
       const { Op } = require('sequelize');
-      expect(whereClause[Op.or]).toBeDefined();
-      // The Op.or array should contain Sequelize.where() calls (objects with 'attribute' property)
-      // indicating LOWER() function usage rather than plain column references
+
+      expect(whereClause.user_id).toBe(1);
       const orConditions = whereClause[Op.or];
       expect(orConditions).toHaveLength(2);
-      // Each condition should be a Sequelize.where() result (has 'attribute' key for fn call)
-      orConditions.forEach(cond => {
-        expect(cond).toHaveProperty('attribute');
-      });
+      expect(orConditions[0].name[Op.like]).toBe('%rex%');
+      expect(orConditions[1].tag_id[Op.like]).toBe('%rex%');
     });
 
     it('should list rabbits with pagination defaults', async () => {

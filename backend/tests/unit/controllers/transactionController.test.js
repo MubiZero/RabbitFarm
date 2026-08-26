@@ -1,4 +1,9 @@
 jest.mock('../../../src/services/transactionService');
+// Ферма для сервиса — это её состав, а не один владелец. В юните состав
+// подменяется: без этого тест контроллера молча ходил бы в настоящую базу.
+jest.mock('../../../src/utils/farm', () => ({
+  farmMemberIds: jest.fn().mockResolvedValue([1, 2, 3])
+}));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(),
   error: jest.fn(),
@@ -7,6 +12,8 @@ jest.mock('../../../src/utils/logger', () => ({
 
 const transactionService = require('../../../src/services/transactionService');
 const transactionController = require('../../../src/controllers/transactionController');
+
+const farm = { id: 1, memberIds: [1, 2, 3] };
 
 const mockReq = (overrides = {}) => ({
   user: { id: 1 },
@@ -39,7 +46,7 @@ describe('TransactionController', () => {
 
       await transactionController.create(req, res, mockNext);
 
-      expect(transactionService.createTransaction).toHaveBeenCalledWith({ amount: 100, type: 'income', user_id: 1 });
+      expect(transactionService.createTransaction).toHaveBeenCalledWith({ amount: 100, type: 'income', farm_id: 1, author_id: 1 });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: transaction }));
     });
@@ -76,7 +83,7 @@ describe('TransactionController', () => {
 
       await transactionController.getById(req, res, mockNext);
 
-      expect(transactionService.getTransactionById).toHaveBeenCalledWith('1', 1);
+      expect(transactionService.getTransactionById).toHaveBeenCalledWith('1', farm);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: transaction }));
     });
@@ -113,7 +120,7 @@ describe('TransactionController', () => {
 
       await transactionController.list(req, res, mockNext);
 
-      expect(transactionService.listTransactions).toHaveBeenCalledWith(1, { page: '1' });
+      expect(transactionService.listTransactions).toHaveBeenCalledWith(farm, { page: '1' });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
@@ -145,7 +152,7 @@ describe('TransactionController', () => {
 
       await transactionController.update(req, res, mockNext);
 
-      expect(transactionService.updateTransaction).toHaveBeenCalledWith('1', 1, { amount: 200 });
+      expect(transactionService.updateTransaction).toHaveBeenCalledWith('1', farm, { amount: 200 });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: transaction }));
     });
@@ -192,7 +199,7 @@ describe('TransactionController', () => {
 
       await transactionController.delete(req, res, mockNext);
 
-      expect(transactionService.deleteTransaction).toHaveBeenCalledWith('1', 1);
+      expect(transactionService.deleteTransaction).toHaveBeenCalledWith('1', farm);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: null }));
     });
@@ -229,7 +236,7 @@ describe('TransactionController', () => {
 
       await transactionController.getStatistics(req, res, mockNext);
 
-      expect(transactionService.getStatistics).toHaveBeenCalledWith(1, { period: 'month' });
+      expect(transactionService.getStatistics).toHaveBeenCalledWith(farm, { period: 'month' });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: stats }));
     });
@@ -255,7 +262,7 @@ describe('TransactionController', () => {
 
       await transactionController.getRabbitTransactions(req, res, mockNext);
 
-      expect(transactionService.getRabbitTransactions).toHaveBeenCalledWith('5', 1);
+      expect(transactionService.getRabbitTransactions).toHaveBeenCalledWith('5', farm);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
     });
@@ -292,7 +299,7 @@ describe('TransactionController', () => {
 
       await transactionController.getMonthlyReport(req, res, mockNext);
 
-      expect(transactionService.getMonthlyReport).toHaveBeenCalledWith(1, '2025', '1');
+      expect(transactionService.getMonthlyReport).toHaveBeenCalledWith(farm, '2025', '1');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
     });

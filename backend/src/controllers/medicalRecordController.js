@@ -235,12 +235,17 @@ class MedicalRecordController {
   async update(req, res, next) {
     const t = await sequelize.transaction();
     try {
-      const medicalRecord = await MedicalRecord.findByPk(req.params.id, {
-        include: [{ model: Rabbit, as: 'rabbit' }],
+      // Ферма отбирается в самом запросе, а не сверкой user_id после выборки:
+      // выборка без скоупа поднимала чужую запись в память и падала пятисоткой,
+      // если кролика уже не было. Кролик грузится целиком — по нему же ниже
+      // выставляется статус.
+      const medicalRecord = await MedicalRecord.findOne({
+        where: { id: req.params.id },
+        include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId } }],
         transaction: t
       });
 
-      if (!medicalRecord || medicalRecord.rabbit.user_id !== req.farmId) {
+      if (!medicalRecord) {
         await t.rollback();
         return ApiResponse.notFound(res, 'Медицинская запись не найдена');
       }

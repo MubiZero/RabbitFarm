@@ -33,6 +33,18 @@ class RabbitController {
       if (error.message === 'TAG_ID_EXISTS') {
         return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует');
       }
+      // Те же отказы, что и при правке. Раньше они не разбирались здесь и
+      // уходили общей пятисоткой: попытка записать в родители кролика чужой
+      // фермы выглядела как поломка сервера, а не как отказ по делу.
+      if (error.message === 'FATHER_NOT_FOUND_OR_INVALID_SEX') {
+        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом');
+      }
+      if (error.message === 'MOTHER_NOT_FOUND_OR_INVALID_SEX') {
+        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой');
+      }
+      if (error.message === 'CAGE_FULL') {
+        return ApiResponse.badRequest(res, 'Клетка уже заполнена');
+      }
       next(error);
     }
   }

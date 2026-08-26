@@ -38,13 +38,18 @@ class AuthService {
   async register(userData) {
     const transaction = await User.sequelize.transaction();
     try {
-      // Первая регистрация поднимает ферму и её владельца. Дальше публичная
-      // регистрация закрыта: приглашать работников должен владелец, а такой
-      // возможности пока нет — до неё сервис не должен пускать посторонних,
-      // иначе любой прохожий заводит себе аккаунт на чужом стенде.
-      const userCount = await User.count({ transaction });
-      const registrationOpen = process.env.ALLOW_REGISTRATION === 'true';
-      if (userCount > 0 && !registrationOpen) {
+      // Регистрация заводит НОВУЮ ферму и её владельца — ферм в сервисе
+      // много. Раньше владельцем становился только самый первый
+      // зарегистрировавшийся, а всем следующим доставалась роль работника
+      // без фермы: пустой экран и ни одной доступной кнопки.
+      //
+      // Работника заводит не регистрация, а приглашение по коду
+      // (`staffService.acceptInvitation`): там человек получает `owner_id`
+      // фермы, которая его позвала.
+      //
+      // Флаг остаётся выключателем: `ALLOW_REGISTRATION=false` закрывает
+      // публичную регистрацию, когда стенд не должен принимать посторонних.
+      if (process.env.ALLOW_REGISTRATION === 'false') {
         throw new Error('REGISTRATION_CLOSED');
       }
 
@@ -60,14 +65,15 @@ class AuthService {
       // Hash password
       const passwordHash = await PasswordUtil.hash(userData.password);
 
-      // Владелец — только первый: он и есть ферма. Остальные (когда
-      // регистрацию открывают вручную) получают минимальные права.
+      // Пустой `owner_id` и есть признак собственной фермы: `req.farmId`
+      // считается как `owner_id || id`, поэтому владелец сам себе ферма.
       const user = await User.create({
         email: userData.email,
         password_hash: passwordHash,
         full_name: userData.full_name,
         phone: userData.phone || null,
-        role: userCount === 0 ? 'owner' : 'worker'
+        role: 'owner',
+        owner_id: null
       }, { transaction });
 
       // Generate tokens
