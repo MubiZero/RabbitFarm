@@ -3,7 +3,6 @@ jest.mock('../../../src/models', () => {
   return {
     Task: {
       findOne: jest.fn(),
-      findByPk: jest.fn(),
       create: jest.fn(),
       count: jest.fn(),
       findAll: jest.fn(),
@@ -12,9 +11,9 @@ jest.mock('../../../src/models', () => {
         transaction: jest.fn()
       }
     },
-    Rabbit: { findOne: jest.fn(), findByPk: jest.fn() },
-    Cage: { findOne: jest.fn(), findByPk: jest.fn() },
-    User: { findByPk: jest.fn(), findAll: jest.fn() },
+    Rabbit: { findOne: jest.fn() },
+    Cage: { findOne: jest.fn() },
+    User: { findOne: jest.fn() },
     sequelize: mockSequelize
   };
 });
@@ -30,6 +29,7 @@ const taskService = require('../../../src/services/taskService');
 
 const createMockTask = (overrides = {}) => ({
   id: 1,
+  farm_id: 1,
   title: 'Feed rabbits',
   description: 'Daily feeding',
   type: 'feeding',
@@ -59,15 +59,17 @@ describe('TaskService', () => {
     it('should create a task successfully with no rabbit/cage/assignee', async () => {
       const mockTask = createMockTask();
       Task.create.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValue(mockTask);
 
       const result = await taskService.createTask({
         title: 'Feed rabbits',
         type: 'feeding',
-        farm: { id: 1, memberIds: [1] }, author_id: 1
+        farm_id: 1, author_id: 1
       });
 
-      expect(Task.create).toHaveBeenCalled();
+      // Ферма проставляется в самой записи: без неё хук из tenancy.js
+      // не даст создать задачу.
+      expect(Task.create).toHaveBeenCalledWith(expect.objectContaining({ farm_id: 1 }));
       expect(result).toBeDefined();
     });
 
@@ -75,7 +77,7 @@ describe('TaskService', () => {
       Rabbit.findOne.mockResolvedValue(null);
 
       await expect(
-        taskService.createTask({ title: 'Check rabbit', rabbit_id: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
+        taskService.createTask({ title: 'Check rabbit', rabbit_id: 99, farm_id: 1, author_id: 1 })
       ).rejects.toThrow('RABBIT_NOT_FOUND');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -85,7 +87,7 @@ describe('TaskService', () => {
       Cage.findOne.mockResolvedValue(null);
 
       await expect(
-        taskService.createTask({ title: 'Clean cage', cage_id: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
+        taskService.createTask({ title: 'Clean cage', cage_id: 99, farm_id: 1, author_id: 1 })
       ).rejects.toThrow('CAGE_NOT_FOUND');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -94,18 +96,20 @@ describe('TaskService', () => {
     // Проверяется не существование пользователя, а принадлежность ферме:
     // иначе задачу можно было подсунуть работнику соседнего хозяйства.
     it('should throw ASSIGNEE_NOT_FOUND when assignee is from another farm', async () => {
-      User.findAll.mockResolvedValue([{ id: 1 }, { id: 3 }]);
+      User.findOne.mockResolvedValue(null);
 
       await expect(
-        taskService.createTask({ title: 'Task', assigned_to: 99, farm: { id: 1, memberIds: [1] }, author_id: 1 })
+        taskService.createTask({ title: 'Task', assigned_to: 99, farm_id: 1, author_id: 1 })
       ).rejects.toThrow('ASSIGNEE_NOT_FOUND');
+
+      expect(User.findOne).toHaveBeenCalledWith({ where: { id: 99, farm_id: 1 } });
 
       expect(Task.create).not.toHaveBeenCalled();
     });
 
     it('should throw INVALID_RECURRENCE_RULE when recurrence_rule is not a valid option', async () => {
       await expect(
-        taskService.createTask({ title: 'Bad recurrence', recurrence_rule: 'every_full_moon', farm: { id: 1, memberIds: [1] }, author_id: 1 })
+        taskService.createTask({ title: 'Bad recurrence', recurrence_rule: 'every_full_moon', farm_id: 1, author_id: 1 })
       ).rejects.toThrow('INVALID_RECURRENCE_RULE');
 
       expect(Task.create).not.toHaveBeenCalled();
@@ -114,13 +118,13 @@ describe('TaskService', () => {
     it('should create a task with a valid recurrence_rule', async () => {
       const mockTask = createMockTask({ is_recurring: true, recurrence_rule: 'daily' });
       Task.create.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValue(mockTask);
 
       const result = await taskService.createTask({
         title: 'Daily feeding',
         recurrence_rule: 'daily',
         is_recurring: true,
-        farm: { id: 1, memberIds: [1] }, author_id: 1
+        farm_id: 1, author_id: 1
       });
 
       expect(Task.create).toHaveBeenCalled();
@@ -130,11 +134,11 @@ describe('TaskService', () => {
     it('should create a task without recurrence_rule (non-recurring)', async () => {
       const mockTask = createMockTask();
       Task.create.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValue(mockTask);
 
       const result = await taskService.createTask({
         title: 'One-time task',
-        farm: { id: 1, memberIds: [1] }, author_id: 1
+        farm_id: 1, author_id: 1
       });
 
       expect(Task.create).toHaveBeenCalled();
@@ -144,22 +148,25 @@ describe('TaskService', () => {
     it('should create a task with valid rabbit, cage, and assignee', async () => {
       Rabbit.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 2 });
-      User.findAll.mockResolvedValue([{ id: 1 }, { id: 3 }]);
+      User.findOne.mockResolvedValue({ id: 3, farm_id: 1 });
 
       const mockTask = createMockTask({ rabbit_id: 1, cage_id: 2, assigned_to: 3 });
       Task.create.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValue(mockTask);
 
       const result = await taskService.createTask({
         title: 'Complex task',
         rabbit_id: 1,
         cage_id: 2,
         assigned_to: 3,
-        farm: { id: 1, memberIds: [1] }, author_id: 1
+        farm_id: 1, author_id: 1
       });
 
       expect(result).toBeDefined();
-      expect(Task.create).toHaveBeenCalled();
+      // Кролик и клетка ищутся в своей ферме, а не по всей базе.
+      expect(Rabbit.findOne).toHaveBeenCalledWith({ where: { id: 1, farm_id: 1 } });
+      expect(Cage.findOne).toHaveBeenCalledWith({ where: { id: 2, farm_id: 1 } });
+      expect(Task.create).toHaveBeenCalledWith(expect.objectContaining({ farm_id: 1 }));
     });
   });
 
@@ -173,7 +180,9 @@ describe('TaskService', () => {
       const result = await taskService.getTaskById(1, 1);
 
       expect(result).toBe(mockTask);
-      expect(Task.findOne).toHaveBeenCalled();
+      expect(Task.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 1, farm_id: 1 } })
+      );
     });
 
     it('should throw TASK_NOT_FOUND when task does not exist', async () => {
@@ -191,6 +200,9 @@ describe('TaskService', () => {
 
       const result = await taskService.listTasks(1);
 
+      // Список фермы отбирается по её колонке, а не по составу участников:
+      // «кто внёс» никогда не был признаком «чьё».
+      expect(Task.findAndCountAll.mock.calls[0][0].where).toEqual({ farm_id: 1 });
       expect(result.items).toHaveLength(2);
       expect(result.total).toBe(2);
       expect(result.page).toBe(1);
@@ -248,9 +260,10 @@ describe('TaskService', () => {
 
     it('should update task successfully', async () => {
       const mockTask = createMockTask();
-      Task.findOne.mockResolvedValue(mockTask);
       const updatedTask = createMockTask({ title: 'Updated' });
-      Task.findByPk.mockResolvedValue(updatedTask);
+      Task.findOne
+        .mockResolvedValueOnce(mockTask)
+        .mockResolvedValueOnce(updatedTask);
 
       const result = await taskService.updateTask(1, 1, { title: 'Updated' });
 
@@ -261,7 +274,6 @@ describe('TaskService', () => {
     it('should set completed_at when status becomes completed', async () => {
       const mockTask = createMockTask();
       Task.findOne.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
 
       await taskService.updateTask(1, 1, { status: 'completed' });
 
@@ -272,7 +284,6 @@ describe('TaskService', () => {
     it('should clear completed_at when status is not completed', async () => {
       const mockTask = createMockTask({ status: 'completed' });
       Task.findOne.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
 
       await taskService.updateTask(1, 1, { status: 'pending' });
 
@@ -282,7 +293,7 @@ describe('TaskService', () => {
 
     it('should throw RABBIT_NOT_FOUND when updating to a non-existent rabbit', async () => {
       const mockTask = createMockTask({ rabbit_id: 5 });
-      Task.findOne.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValueOnce(mockTask);
       Rabbit.findOne.mockResolvedValue(null);
 
       await expect(taskService.updateTask(1, 1, { rabbit_id: 99 })).rejects.toThrow('RABBIT_NOT_FOUND');
@@ -290,31 +301,32 @@ describe('TaskService', () => {
 
     it('should throw CAGE_NOT_FOUND when updating to a non-existent cage', async () => {
       const mockTask = createMockTask({ cage_id: 5 });
-      Task.findOne.mockResolvedValue(mockTask);
+      Task.findOne.mockResolvedValueOnce(mockTask);
       Cage.findOne.mockResolvedValue(null);
 
       await expect(taskService.updateTask(1, 1, { cage_id: 99 })).rejects.toThrow('CAGE_NOT_FOUND');
     });
 
-    it('should throw ASSIGNEE_NOT_FOUND when updating to a non-existent user', async () => {
+    it('should throw ASSIGNEE_NOT_FOUND when updating to a user from another farm', async () => {
       const mockTask = createMockTask();
-      Task.findOne.mockResolvedValue(mockTask);
-      User.findAll.mockResolvedValue([{ id: 1 }, { id: 5 }]);
+      Task.findOne.mockResolvedValueOnce(mockTask);
+      User.findOne.mockResolvedValue(null);
 
       await expect(taskService.updateTask(1, 1, { assigned_to: 99 })).rejects.toThrow('ASSIGNEE_NOT_FOUND');
       expect(mockTask.update).not.toHaveBeenCalled();
     });
 
-    it('should succeed when assigned_to points to an existing user', async () => {
+    it('should succeed when assigned_to points to a member of the same farm', async () => {
       const mockTask = createMockTask();
-      Task.findOne.mockResolvedValue(mockTask);
-      User.findAll.mockResolvedValue([{ id: 1 }, { id: 5 }]);
       const updatedTask = createMockTask({ assigned_to: 5 });
-      Task.findByPk.mockResolvedValue(updatedTask);
+      Task.findOne
+        .mockResolvedValueOnce(mockTask)
+        .mockResolvedValueOnce(updatedTask);
+      User.findOne.mockResolvedValue({ id: 5, farm_id: 1 });
 
       const result = await taskService.updateTask(1, 1, { assigned_to: 5 });
 
-      expect(User.findAll).toHaveBeenCalled();
+      expect(User.findOne).toHaveBeenCalledWith({ where: { id: 5, farm_id: 1 } });
       expect(mockTask.update).toHaveBeenCalled();
       expect(result).toBe(updatedTask);
     });
@@ -367,6 +379,7 @@ describe('TaskService', () => {
 
       const result = await taskService.getStatistics(1);
 
+      expect(Task.count.mock.calls[0][0].where).toEqual(expect.objectContaining({ farm_id: 1 }));
       expect(result.total_pending).toBe(5);
       expect(result.total_in_progress).toBe(2);
       expect(result.total_completed).toBe(10);
@@ -389,6 +402,7 @@ describe('TaskService', () => {
 
       expect(result).toBe(mockTasks);
       const callArg = Task.findAll.mock.calls[0][0];
+      expect(callArg.where.farm_id).toBe(1);
       expect(callArg.order).toEqual([['due_date', 'ASC'], ['priority', 'DESC']]);
     });
 
@@ -419,7 +433,6 @@ describe('TaskService', () => {
     it('should complete a non-recurring task', async () => {
       const mockTask = createMockTask({ is_recurring: false });
       Task.findOne.mockResolvedValue(mockTask);
-      Task.findByPk.mockResolvedValue(mockTask);
 
       const result = await taskService.completeTask(1, 1);
 
@@ -440,12 +453,12 @@ describe('TaskService', () => {
       });
       Task.findOne.mockResolvedValue(mockTask);
       Task.create.mockResolvedValue({});
-      Task.findByPk.mockResolvedValue(mockTask);
 
       await taskService.completeTask(1, 1);
 
+      // Следующее повторение — тоже запись фермы, farm_id обязателен.
       expect(Task.create).toHaveBeenCalledWith(
-        expect.objectContaining({ is_recurring: true, status: 'pending' }),
+        expect.objectContaining({ is_recurring: true, status: 'pending', farm_id: 1 }),
         expect.objectContaining({ transaction: mockTransaction })
       );
       expect(mockTransaction.commit).toHaveBeenCalled();
@@ -472,7 +485,6 @@ describe('TaskService', () => {
         });
         Task.findOne.mockResolvedValue(mockTask);
         Task.create.mockResolvedValue({});
-        Task.findByPk.mockResolvedValue(mockTask);
 
         await taskService.completeTask(1, 1);
 

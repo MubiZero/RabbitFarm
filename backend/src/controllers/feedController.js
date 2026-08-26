@@ -8,7 +8,7 @@ const ApiResponse = require('../utils/apiResponse');
 
 exports.create = async (req, res, next) => {
   try {
-    const feed = await feedService.createFeed({ ...req.body, user_id: req.farmId });
+    const feed = await feedService.createFeed({ ...req.body, farm_id: req.farmId });
     return ApiResponse.success(res, feed, 'Корм успешно добавлен', 201);
   } catch (error) {
     next(error);

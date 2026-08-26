@@ -5,25 +5,25 @@ const logger = require('../utils/logger');
  * Breed service
  * Business logic for breed management
  *
- * Породы принадлежат ферме: каждый запрос ограничен user_id владельца,
+ * Породы принадлежат ферме: каждый запрос ограничен farm_id хозяйства,
  * поэтому чужую породу нельзя ни увидеть, ни изменить, ни удалить.
  */
 class BreedService {
   /**
    * Get all breeds of a farm
-   * @param {Number} userId - Owner ID
+   * @param {Number} farmId - id хозяйства
    * @returns {Array} Breeds
    */
-  async getAllBreeds(userId) {
+  async getAllBreeds(farmId) {
     try {
       const breeds = await Breed.findAll({
-        where: { user_id: userId },
+        where: { farm_id: farmId },
         order: [['name', 'ASC']]
       });
 
       return breeds;
     } catch (error) {
-      logger.error('Get all breeds error', { error: error.message, userId });
+      logger.error('Get all breeds error', { error: error.message, farmId });
       throw error;
     }
   }
@@ -31,13 +31,13 @@ class BreedService {
   /**
    * Get breed by ID
    * @param {Number} breedId - Breed ID
-   * @param {Number} userId - Owner ID
+   * @param {Number} farmId - id хозяйства
    * @returns {Object} Breed
    */
-  async getBreedById(breedId, userId) {
+  async getBreedById(breedId, farmId) {
     try {
       const breed = await Breed.findOne({
-        where: { id: breedId, user_id: userId }
+        where: { id: breedId, farm_id: farmId }
       });
 
       if (!breed) {
@@ -46,7 +46,7 @@ class BreedService {
 
       return breed;
     } catch (error) {
-      logger.error('Get breed error', { error: error.message, breedId, userId });
+      logger.error('Get breed error', { error: error.message, breedId, farmId });
       throw error;
     }
   }
@@ -54,26 +54,26 @@ class BreedService {
   /**
    * Create new breed
    * @param {Object} breedData - Breed data
-   * @param {Number} userId - Owner ID
+   * @param {Number} farmId - id хозяйства
    * @returns {Object} Created breed
    */
-  async createBreed(breedData, userId) {
+  async createBreed(breedData, farmId) {
     try {
       // Имя уникально в пределах фермы: у соседа может быть порода
       // с таким же названием, и это не конфликт.
       const existing = await Breed.findOne({
-        where: { name: breedData.name, user_id: userId }
+        where: { name: breedData.name, farm_id: farmId }
       });
       if (existing) {
         throw new Error('BREED_NAME_EXISTS');
       }
 
-      const breed = await Breed.create({ ...breedData, user_id: userId });
+      const breed = await Breed.create({ ...breedData, farm_id: farmId });
 
-      logger.info('Breed created', { breedId: breed.id, userId });
+      logger.info('Breed created', { breedId: breed.id, farmId });
       return breed;
     } catch (error) {
-      logger.error('Create breed error', { error: error.message, userId });
+      logger.error('Create breed error', { error: error.message, farmId });
       throw error;
     }
   }
@@ -82,13 +82,13 @@ class BreedService {
    * Update breed
    * @param {Number} breedId - Breed ID
    * @param {Object} updateData - Data to update
-   * @param {Number} userId - Owner ID
+   * @param {Number} farmId - id хозяйства
    * @returns {Object} Updated breed
    */
-  async updateBreed(breedId, updateData, userId) {
+  async updateBreed(breedId, updateData, farmId) {
     try {
       const breed = await Breed.findOne({
-        where: { id: breedId, user_id: userId }
+        where: { id: breedId, farm_id: farmId }
       });
 
       if (!breed) {
@@ -97,21 +97,21 @@ class BreedService {
 
       if (updateData.name && updateData.name !== breed.name) {
         const existing = await Breed.findOne({
-          where: { name: updateData.name, user_id: userId }
+          where: { name: updateData.name, farm_id: farmId }
         });
         if (existing) {
           throw new Error('BREED_NAME_EXISTS');
         }
       }
 
-      // user_id не берём из тела запроса: породу нельзя переписать на чужую ферму.
-      const { user_id: _ignored, ...safeData } = updateData;
+      // farm_id не берём из тела запроса: породу нельзя переписать на чужую ферму.
+      const { farm_id: _ignored, ...safeData } = updateData;
       await breed.update(safeData);
 
-      logger.info('Breed updated', { breedId, userId });
+      logger.info('Breed updated', { breedId, farmId });
       return breed;
     } catch (error) {
-      logger.error('Update breed error', { error: error.message, breedId, userId });
+      logger.error('Update breed error', { error: error.message, breedId, farmId });
       throw error;
     }
   }
@@ -119,12 +119,12 @@ class BreedService {
   /**
    * Delete breed
    * @param {Number} breedId - Breed ID
-   * @param {Number} userId - Owner ID
+   * @param {Number} farmId - id хозяйства
    */
-  async deleteBreed(breedId, userId) {
+  async deleteBreed(breedId, farmId) {
     try {
       const breed = await Breed.findOne({
-        where: { id: breedId, user_id: userId }
+        where: { id: breedId, farm_id: farmId }
       });
 
       if (!breed) {
@@ -132,7 +132,7 @@ class BreedService {
       }
 
       const rabbitCount = await Rabbit.count({
-        where: { breed_id: breedId, user_id: userId }
+        where: { breed_id: breedId, farm_id: farmId }
       });
       if (rabbitCount > 0) {
         throw new Error('BREED_HAS_RABBITS');
@@ -140,10 +140,10 @@ class BreedService {
 
       await breed.destroy();
 
-      logger.info('Breed deleted', { breedId, userId });
+      logger.info('Breed deleted', { breedId, farmId });
       return { success: true };
     } catch (error) {
-      logger.error('Delete breed error', { error: error.message, breedId, userId });
+      logger.error('Delete breed error', { error: error.message, breedId, farmId });
       throw error;
     }
   }

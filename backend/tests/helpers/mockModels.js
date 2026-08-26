@@ -4,6 +4,7 @@ const createMockUser = (overrides = {}) => ({
   password_hash: '$2b$10$hashedpassword',
   full_name: 'Test User',
   role: 'owner',
+  farm_id: 1,
   is_active: true,
   last_login_at: null,
   toJSON: function() { return { ...this }; },
@@ -14,7 +15,7 @@ const createMockUser = (overrides = {}) => ({
 const createMockRabbit = (overrides = {}) => ({
   id: 1,
   name: 'Буся',
-  user_id: 1,
+  farm_id: 1,
   breed_id: 1,
   sex: 'female',
   birth_date: '2024-01-01',

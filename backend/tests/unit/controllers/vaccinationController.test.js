@@ -9,7 +9,7 @@ jest.mock('../../../src/models', () => {
   };
   return {
     Vaccination: {
-      findOne: jest.fn(), findAll: jest.fn(), findByPk: jest.fn(),
+      findOne: jest.fn(), findAll: jest.fn(),
       findAndCountAll: jest.fn(), create: jest.fn(), count: jest.fn()
     },
     Rabbit: { findOne: jest.fn(), findAll: jest.fn() },
@@ -52,7 +52,7 @@ describe('vaccinationController', () => {
       const rabbit = { id: 1, status: 'healthy' };
       Rabbit.findOne.mockResolvedValue(rabbit);
       Vaccination.create.mockResolvedValue({ id: 1 });
-      Vaccination.findByPk.mockResolvedValue({ id: 1 });
+      Vaccination.findOne.mockResolvedValue({ id: 1 });
 
       const req = mockReq({ body: baseBody });
       const res = mockRes();
@@ -61,13 +61,18 @@ describe('vaccinationController', () => {
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
+      // Без farm_id запись отвергает хук многоарендности.
+      expect(Vaccination.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1 }),
+        expect.any(Object)
+      );
     });
 
     it('should create financial transaction when cost > 0', async () => {
       const rabbit = { id: 1, status: 'healthy' };
       Rabbit.findOne.mockResolvedValue(rabbit);
       Vaccination.create.mockResolvedValue({ id: 2 });
-      Vaccination.findByPk.mockResolvedValue({ id: 2 });
+      Vaccination.findOne.mockResolvedValue({ id: 2 });
       Transaction.create.mockResolvedValue({});
 
       await ctrl.create(
@@ -75,8 +80,10 @@ describe('vaccinationController', () => {
         mockRes(), mockNext
       );
 
+      // Расход заводит сервер, но ферма у него та же — иначе трата
+      // повиснет вне хозяйства.
       expect(Transaction.create).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'expense', category: 'veterinary' }),
+        expect.objectContaining({ type: 'expense', category: 'veterinary', farm_id: 1 }),
         expect.any(Object)
       );
     });
@@ -135,7 +142,7 @@ describe('vaccinationController', () => {
 
   describe('getById', () => {
     it('should return vaccination by id', async () => {
-      Vaccination.findByPk.mockResolvedValue({ id: 1 });
+      Vaccination.findOne.mockResolvedValue({ id: 1 });
 
       const req = mockReq({ params: { id: '1' } });
       const res = mockRes();
@@ -143,10 +150,14 @@ describe('vaccinationController', () => {
       await ctrl.getById(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+      // Ферма стоит в самом запросе: перебором id чужую прививку не достать.
+      expect(Vaccination.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: '1', farm_id: 1 } })
+      );
     });
 
     it('should return 404 if not found', async () => {
-      Vaccination.findByPk.mockResolvedValue(null);
+      Vaccination.findOne.mockResolvedValue(null);
 
       const res = mockRes();
       await ctrl.getById(mockReq({ params: { id: '999' } }), res, mockNext);
@@ -155,7 +166,7 @@ describe('vaccinationController', () => {
     });
 
     it('should call next on error', async () => {
-      Vaccination.findByPk.mockRejectedValue(new Error('DB error'));
+      Vaccination.findOne.mockRejectedValue(new Error('DB error'));
 
       await ctrl.getById(mockReq({ params: { id: '1' } }), mockRes(), mockNext);
 
@@ -233,7 +244,7 @@ describe('vaccinationController', () => {
       await ctrl.getByRabbit(req, res, mockNext);
 
       expect(Rabbit.findOne).toHaveBeenCalledWith({
-        where: { id: '5', user_id: 42 }
+        where: { id: '5', farm_id: 42 }
       });
     });
 
@@ -284,11 +295,11 @@ describe('vaccinationController', () => {
     it('should update vaccination successfully', async () => {
       const vaccination = {
         id: 1, rabbit_id: 1,
-        rabbit: { user_id: 1 },
         update: jest.fn().mockResolvedValue(true)
       };
-      Vaccination.findOne.mockResolvedValueOnce(vaccination);
-      Vaccination.findByPk.mockResolvedValueOnce({ id: 1 });
+      Vaccination.findOne
+        .mockResolvedValueOnce(vaccination)
+        .mockResolvedValueOnce({ id: 1 });
 
       const req = mockReq({ params: { id: '1' }, body: { notes: 'Updated' } });
       const res = mockRes();
@@ -301,9 +312,7 @@ describe('vaccinationController', () => {
       // Запись ищется только внутри своей фермы: раньше findByPk по одному
       // идентификатору позволял править чужие вакцинации перебором id.
       expect(Vaccination.findOne).toHaveBeenCalledWith(
-        expect.objectContaining({
-          include: [expect.objectContaining({ where: { user_id: 1 } })]
-        })
+        expect.objectContaining({ where: { id: '1', farm_id: 1 } })
       );
     });
 
@@ -330,7 +339,6 @@ describe('vaccinationController', () => {
     it('should return 400 on SequelizeValidationError', async () => {
       const vaccination = {
         id: 1, rabbit_id: 1,
-        rabbit: { user_id: 1 },
         update: jest.fn().mockRejectedValue({
           name: 'SequelizeValidationError',
           errors: [{ message: 'Invalid date' }]
@@ -348,7 +356,6 @@ describe('vaccinationController', () => {
     it('should call next on unexpected error in update', async () => {
       const vaccination = {
         id: 1, rabbit_id: 1,
-        rabbit: { user_id: 1 },
         update: jest.fn().mockRejectedValue(new Error('DB error'))
       };
       Vaccination.findOne.mockResolvedValueOnce(vaccination);

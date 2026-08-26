@@ -5,6 +5,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
+    Farm: {},
     Rabbit: {
       findOne: jest.fn(),
       findByPk: jest.fn(),
@@ -42,7 +43,7 @@ describe('RabbitService - extended methods', () => {
 
   describe('getRabbitById', () => {
     it('should return rabbit if found', async () => {
-      const rabbit = { id: 1, name: 'Bugs', user_id: 1 };
+      const rabbit = { id: 1, name: 'Bugs', farm_id: 1 };
       Rabbit.findOne.mockResolvedValue(rabbit);
 
       const result = await rabbitService.getRabbitById(1, 1);

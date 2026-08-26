@@ -39,7 +39,7 @@ describe('FeedController', () => {
 
       await feedController.create(req, res, mockNext);
 
-      expect(feedService.createFeed).toHaveBeenCalledWith({ name: 'Hay', quantity: 50, user_id: 1 });
+      expect(feedService.createFeed).toHaveBeenCalledWith({ name: 'Hay', quantity: 50, farm_id: 1 });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: feed }));
     });

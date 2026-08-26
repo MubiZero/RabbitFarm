@@ -1,7 +1,6 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
-const { Cage } = require('../../src/models');
 
 const API = '/api/v1';
 
@@ -68,20 +67,16 @@ describe('Кормление пачкой', () => {
       cageIds.push(cage.body.data.id);
     }
 
-    // Чужая клетка заводится напрямую через модель, а не через API: завести
-    // вторую ферму регистрацией нельзя — роль владельца достаётся только
-    // самому первому пользователю системы, остальные становятся работниками
-    // (authService.js: `userCount === 0 ? 'owner' : 'worker'`). Как клетка
-    // появилась у соседа — не предмет этого теста, предмет — что её нельзя
-    // накормить со своей фермы.
-    const strangerCage = await Cage.create({
-      user_id: stranger.body.data.user.id,
-      number: 'X-01',
-      type: 'single',
-      capacity: 1,
-      condition: 'good'
-    });
-    strangerCageId = strangerCage.id;
+    // Клетка соседа заводится его же руками, через API. Раньше здесь стоял
+    // прямой вызов модели с оговоркой «вторую ферму регистрацией не завести»:
+    // владельцем становился только самый первый пользователь системы.
+    // Регистрация теперь заводит новое хозяйство, и обходной путь не нужен —
+    // тест проверяет ровно ту дорогу, по которой ходят живые клиенты.
+    const strangerCage = await request(app)
+      .post(`${API}/cages`)
+      .set('Authorization', `Bearer ${stranger.body.data.access_token}`)
+      .send({ number: 'X-01', type: 'single', capacity: 1, condition: 'good' });
+    strangerCageId = strangerCage.body.data.id;
   });
 
   afterAll(async () => {

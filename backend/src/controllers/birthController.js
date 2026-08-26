@@ -9,13 +9,13 @@ const logger = require('../utils/logger');
  */
 exports.getBirths = async (req, res, next) => {
   try {
-    const userId = req.farmId;
+    const farmId = req.farmId;
     const { page, limit, mother_id: motherId, from_date: fromDate, to_date: toDate } = req.query;
 
     // Раньше отдавались все окролы фермы разом, без страниц и фильтров: у
     // хозяйства с трёхлетней историей это многомегабайтный ответ на мобильной
     // связи. Свой параметр page при этом был описан в Swagger и не работал.
-    const where = {};
+    const where = { farm_id: farmId };
     if (motherId) where.mother_id = motherId;
     if (fromDate || toDate) {
       where.birth_date = {};
@@ -31,7 +31,6 @@ exports.getBirths = async (req, res, next) => {
         {
           model: Rabbit,
           as: 'mother',
-          where: { user_id: userId },
           attributes: ['id', 'name', 'tag_id'],
         },
         {
@@ -62,15 +61,14 @@ exports.getBirths = async (req, res, next) => {
 exports.getBirthById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.farmId;
+    const farmId = req.farmId;
 
     const birth = await Birth.findOne({
-      where: { id },
+      where: { id, farm_id: farmId },
       include: [
         {
           model: Rabbit,
           as: 'mother',
-          where: { user_id: userId },
           attributes: ['id', 'name', 'tag_id', 'breed_id'],
           include: [
             {
@@ -108,7 +106,7 @@ exports.getBirthById = async (req, res, next) => {
 exports.createBirth = async (req, res, next) => {
   const transaction = await Rabbit.sequelize.transaction();
   try {
-    const userId = req.farmId;
+    const farmId = req.farmId;
     const {
       breeding_id,
       mother_id,
@@ -121,7 +119,7 @@ exports.createBirth = async (req, res, next) => {
 
     // Проверяем, что мать принадлежит пользователю и жива
     const mother = await Rabbit.findOne({
-      where: { id: mother_id, user_id: userId },
+      where: { id: mother_id, farm_id: farmId },
       transaction
     });
 
@@ -139,7 +137,7 @@ exports.createBirth = async (req, res, next) => {
     let breeding = null;
     if (breeding_id) {
       breeding = await Breeding.findOne({
-        where: { id: breeding_id, user_id: userId },
+        where: { id: breeding_id, farm_id: farmId },
         transaction
       });
 
@@ -152,6 +150,7 @@ exports.createBirth = async (req, res, next) => {
     }
 
     const birth = await Birth.create({
+      farm_id: farmId,
       breeding_id: breeding_id || null,
       mother_id,
       birth_date,
@@ -166,15 +165,20 @@ exports.createBirth = async (req, res, next) => {
       await mother.update({ status: 'active' }, { transaction });
     }
 
-    // Automation: Create tasks for the nursing period
+    // Automation: Create tasks for the nursing period.
+    // Ферма задачи — в farm_id; в «кто завёл» и «на ком» идёт человек:
+    // раньше туда клали id владельца, а теперь req.farmId — это id хозяйства,
+    // и в колонке пользователя он указывал бы на постороннего.
+    const authorId = req.user.id;
     const birthDateObj = new Date(birth_date || new Date());
 
     // 1. Weight kits (+7 days)
     const weightDate = new Date(birthDateObj);
     weightDate.setDate(weightDate.getDate() + 7);
     await Task.create({
-      created_by: userId,
-      assigned_to: userId,
+      farm_id: farmId,
+      created_by: authorId,
+      assigned_to: authorId,
       title: `Взвесить крольчат: ${mother.name}`,
       description: `Первое взвешивание крольчат от самки ${mother.name}`,
       type: 'checkup',
@@ -188,8 +192,9 @@ exports.createBirth = async (req, res, next) => {
     const eyesDate = new Date(birthDateObj);
     eyesDate.setDate(eyesDate.getDate() + 10);
     await Task.create({
-      created_by: userId,
-      assigned_to: userId,
+      farm_id: farmId,
+      created_by: authorId,
+      assigned_to: authorId,
       title: `Проверить глаза: ${mother.name}`,
       description: `Проверить, открылись ли глаза у крольчат самки ${mother.name}`,
       type: 'checkup',
@@ -203,8 +208,9 @@ exports.createBirth = async (req, res, next) => {
     const weaningDate = new Date(birthDateObj);
     weaningDate.setDate(weaningDate.getDate() + 45);
     await Task.create({
-      created_by: userId,
-      assigned_to: userId,
+      farm_id: farmId,
+      created_by: authorId,
+      assigned_to: authorId,
       title: `Отсадка (отъем): ${mother.name}`,
       description: `Пора отсаживать крольчат от самки ${mother.name}`,
       type: 'breeding',
@@ -217,7 +223,8 @@ exports.createBirth = async (req, res, next) => {
     await transaction.commit();
 
     // Загружаем созданный окрол с отношениями
-    const createdBirth = await Birth.findByPk(birth.id, {
+    const createdBirth = await Birth.findOne({
+      where: { id: birth.id, farm_id: farmId },
       include: [
         {
           model: Rabbit,
@@ -249,7 +256,7 @@ exports.createBirth = async (req, res, next) => {
 exports.updateBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.farmId;
+    const farmId = req.farmId;
     const {
       birth_date,
       kits_born_alive,
@@ -260,16 +267,7 @@ exports.updateBirth = async (req, res, next) => {
       notes,
     } = req.body;
 
-    const birth = await Birth.findOne({
-      where: { id },
-      include: [
-        {
-          model: Rabbit,
-          as: 'mother',
-          where: { user_id: userId },
-        },
-      ],
-    });
+    const birth = await Birth.findOne({ where: { id, farm_id: farmId } });
 
     if (!birth) {
       return ApiResponse.notFound(res, 'Окрол не найден');
@@ -285,8 +283,13 @@ exports.updateBirth = async (req, res, next) => {
       notes,
     });
 
-    // Перезагружаем с отношениями
-    await birth.reload({
+    // Связи подтягиваем отдельной выборкой, а не `reload`: тот жёстко
+    // подставляет условие по одному первичному ключу, и хозяйство в него не
+    // добавить. Правило одно на все выборки — без фермы запрос не идёт, и
+    // исключений «этот запрос заведомо безопасен» мы не делаем: ровно из
+    // такого рассуждения дыры и появлялись.
+    const updated = await Birth.findOne({
+      where: { id: birth.id, farm_id: farmId },
       include: [
         {
           model: Rabbit,
@@ -302,7 +305,7 @@ exports.updateBirth = async (req, res, next) => {
       ],
     });
 
-    return ApiResponse.success(res, birth, 'Окрол успешно обновлен');
+    return ApiResponse.success(res, updated, 'Окрол успешно обновлен');
   } catch (error) {
     logger.error('Error updating birth', { error: error.message });
     // Дальше решает общий обработчик: он различает ошибки валидации
@@ -317,18 +320,9 @@ exports.updateBirth = async (req, res, next) => {
 exports.deleteBirth = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.farmId;
+    const farmId = req.farmId;
 
-    const birth = await Birth.findOne({
-      where: { id },
-      include: [
-        {
-          model: Rabbit,
-          as: 'mother',
-          where: { user_id: userId },
-        },
-      ],
-    });
+    const birth = await Birth.findOne({ where: { id, farm_id: farmId } });
 
     if (!birth) {
       return ApiResponse.notFound(res, 'Окрол не найден');
@@ -350,7 +344,7 @@ exports.deleteBirth = async (req, res, next) => {
  */
 exports.createKitsFromBirth = async (req, res, next) => {
   const { id } = req.params;
-  const userId = req.farmId;
+  const farmId = req.farmId;
   const {
     mother_id,
     father_id,
@@ -370,14 +364,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
   const transaction = await Birth.sequelize.transaction();
   try {
     const birth = await Birth.findOne({
-      where: { id },
-      include: [
-        {
-          model: Rabbit,
-          as: 'mother',
-          where: { user_id: userId },
-        },
-      ],
+      where: { id, farm_id: farmId },
       transaction
     });
 
@@ -390,7 +377,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
     // принадлежность ферме: иначе крольчата уезжали в чужую клетку, а ответ
     // об оставшихся местах раскрывал заполненность чужого хозяйства.
     const mother = await Rabbit.findOne({
-      where: { id: mother_id || birth.mother_id, user_id: userId },
+      where: { id: mother_id || birth.mother_id, farm_id: farmId },
       transaction
     });
 
@@ -402,7 +389,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
     let father = null;
     if (father_id) {
       father = await Rabbit.findOne({
-        where: { id: father_id, user_id: userId },
+        where: { id: father_id, farm_id: farmId },
         transaction
       });
 
@@ -422,7 +409,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
     const kitBreedId = breed_id || mother.breed_id;
     if (breed_id) {
       const breed = await Breed.findOne({
-        where: { id: breed_id, user_id: userId },
+        where: { id: breed_id, farm_id: farmId },
         transaction
       });
 
@@ -438,13 +425,13 @@ exports.createKitsFromBirth = async (req, res, next) => {
       // Клетка блокируется на время проверки: иначе два одновременных
       // создания помёта видят одни и те же свободные места и оба их занимают.
       const cage = await Cage.findOne({
-        where: { id: cageId, user_id: userId },
+        where: { id: cageId, farm_id: farmId },
         lock: transaction.LOCK.UPDATE,
         transaction
       });
       if (cage) {
         const currentCount = await Rabbit.count({
-          where: { cage_id: cageId, user_id: userId },
+          where: { cage_id: cageId, farm_id: farmId },
           transaction
         });
 
@@ -460,7 +447,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
     for (let i = 1; i <= kitCount; i++) {
       const kit = await Rabbit.create({
-        user_id: userId,
+        farm_id: farmId,
         tag_id: `kit-${randomUUID().slice(0, 8)}`,
         name: `${prefix}-${i}`,
         breed_id: kitBreedId,

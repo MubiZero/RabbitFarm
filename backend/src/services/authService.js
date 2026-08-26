@@ -1,4 +1,4 @@
-const { User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../models');
+const { Farm, User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../models');
 const crypto = require('crypto');
 const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
@@ -44,7 +44,7 @@ class AuthService {
       // без фермы: пустой экран и ни одной доступной кнопки.
       //
       // Работника заводит не регистрация, а приглашение по коду
-      // (`staffService.acceptInvitation`): там человек получает `owner_id`
+      // (`staffService.acceptInvitation`): там человек получает `farm_id`
       // фермы, которая его позвала.
       //
       // Флаг остаётся выключателем: `ALLOW_REGISTRATION=false` закрывает
@@ -65,16 +65,25 @@ class AuthService {
       // Hash password
       const passwordHash = await PasswordUtil.hash(userData.password);
 
-      // Пустой `owner_id` и есть признак собственной фермы: `req.farmId`
-      // считается как `owner_id || id`, поэтому владелец сам себе ферма.
+      // Ферма и её владелец ссылаются друг на друга, поэтому появляются по
+      // очереди: сначала хозяйство без владельца, затем человек в нём, затем
+      // владелец проставляется ферме. Всё в одной транзакции — хозяйство без
+      // хозяина наружу не выходит.
+      const farm = await Farm.create({
+        name: (userData.farm_name || '').trim() || `Ферма ${userData.full_name}`,
+        owner_id: null
+      }, { transaction });
+
       const user = await User.create({
         email: userData.email,
         password_hash: passwordHash,
         full_name: userData.full_name,
         phone: userData.phone || null,
         role: 'owner',
-        owner_id: null
+        farm_id: farm.id
       }, { transaction });
+
+      await farm.update({ owner_id: user.id }, { transaction });
 
       // Generate tokens
       const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
@@ -91,7 +100,7 @@ class AuthService {
       }, { transaction });
 
       await transaction.commit();
-      logger.info('User registered successfully', { userId: user.id, email: user.email });
+      logger.info('User registered successfully', { userId: user.id, email: user.email, farmId: farm.id });
 
       // Remove password hash from response
       const userResponse = user.toJSON();

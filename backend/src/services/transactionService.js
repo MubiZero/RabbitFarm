@@ -10,21 +10,15 @@ const TRANSACTION_INCLUDE = [
 /**
  * Книга фермы, а не одного человека.
  *
- * Своей колонки фермы у транзакции нет — ферма выражается через автора
- * записи. Пока хозяйство было одно на пользователя, фильтр `created_by =
- * владелец` совпадал с «операции этой фермы». С работниками совпадать
- * перестал: расход, заведённый управляющим, и ветеринарная трата, которую
- * автоматика записала на сотрудника, пропадали из книги владельца целиком —
- * из списка, из сумм и из месячного отчёта, — хотя в отчёте по ферме
- * (он считает по составу фермы) те же деньги были видны.
+ * Своей колонки фермы у транзакции раньше не было, и ферму выводили из автора
+ * записи. Пока хозяйство было одно на пользователя, это совпадало с «операции
+ * этой фермы». С работниками совпадать перестало: расход, заведённый
+ * управляющим, и ветеринарная трата, записанная автоматикой на сотрудника,
+ * пропадали из книги владельца целиком — из списка, из сумм и из месячного
+ * отчёта. «Кто внёс» никогда не был ответом на вопрос «чьё».
  *
- * @param {Object} farm - ферма запроса: { id, memberIds }
- */
-const farmScope = (farm) => ({ created_by: { [Op.in]: farm.memberIds } });
-
-/**
- * Transaction service
- * Business logic for financial transaction management
+ * Теперь хозяйство записано в самой строке: фильтр везде `farm_id`, а
+ * `created_by` остался тем, чем и был, — графой «кто внёс».
  */
 class TransactionService {
   async createTransaction(data) {
@@ -34,7 +28,7 @@ class TransactionService {
 
       let rabbit = null;
       if (rabbit_id) {
-        rabbit = await Rabbit.findOne({ where: { id: rabbit_id, user_id: farmId }, transaction: t });
+        rabbit = await Rabbit.findOne({ where: { id: rabbit_id, farm_id: farmId }, transaction: t });
         if (!rabbit) {
           await t.rollback();
           throw new Error('RABBIT_NOT_FOUND');
@@ -42,6 +36,7 @@ class TransactionService {
       }
 
       const transaction = await Transaction.create({
+        farm_id: farmId,
         type,
         category,
         amount: data.amount,
@@ -65,11 +60,9 @@ class TransactionService {
 
       await t.commit();
 
-      const created = await Transaction.findByPk(transaction.id, {
-        include: [
-          { ...TRANSACTION_INCLUDE[0], where: { user_id: farmId }, required: false },
-          TRANSACTION_INCLUDE[1]
-        ]
+      const created = await Transaction.findOne({
+        where: { id: transaction.id, farm_id: farmId },
+        include: TRANSACTION_INCLUDE
       });
 
       logger.info('Transaction created', { transactionId: transaction.id });
@@ -81,16 +74,16 @@ class TransactionService {
     }
   }
 
-  async getTransactionById(id, farm) {
+  async getTransactionById(id, farmId) {
     const transaction = await Transaction.findOne({
-      where: { id, ...farmScope(farm) },
+      where: { id, farm_id: farmId },
       include: TRANSACTION_INCLUDE
     });
     if (!transaction) throw new Error('TRANSACTION_NOT_FOUND');
     return transaction;
   }
 
-  async listTransactions(farm, filters = {}) {
+  async listTransactions(farmId, filters = {}) {
     const {
       page = 1,
       limit = 10,
@@ -106,7 +99,7 @@ class TransactionService {
     } = filters;
 
     const offset = (page - 1) * limit;
-    const where = farmScope(farm);
+    const where = { farm_id: farmId };
 
     if (type) where.type = type;
     if (category) where.category = category;
@@ -136,37 +129,40 @@ class TransactionService {
     return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
-  async updateTransaction(id, farm, data) {
+  async updateTransaction(id, farmId, data) {
     // Принадлежность проверяется до правки: чужая операция не находится
     // вовсе, поэтому наружу уходит 404, а не «нельзя».
-    const transaction = await Transaction.findOne({ where: { id, ...farmScope(farm) } });
+    const transaction = await Transaction.findOne({ where: { id, farm_id: farmId } });
     if (!transaction) throw new Error('TRANSACTION_NOT_FOUND');
 
     if (data.rabbit_id && data.rabbit_id !== transaction.rabbit_id) {
-      const rabbit = await Rabbit.findOne({ where: { id: data.rabbit_id, user_id: farm.id } });
+      const rabbit = await Rabbit.findOne({ where: { id: data.rabbit_id, farm_id: farmId } });
       if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
     }
 
     await transaction.update(data);
 
-    const updated = await Transaction.findByPk(id, { include: TRANSACTION_INCLUDE });
+    const updated = await Transaction.findOne({
+      where: { id, farm_id: farmId },
+      include: TRANSACTION_INCLUDE
+    });
     logger.info('Transaction updated', { transactionId: id });
     return updated;
   }
 
-  async deleteTransaction(id, farm) {
-    const transaction = await Transaction.findOne({ where: { id, ...farmScope(farm) } });
+  async deleteTransaction(id, farmId) {
+    const transaction = await Transaction.findOne({ where: { id, farm_id: farmId } });
     if (!transaction) throw new Error('TRANSACTION_NOT_FOUND');
     await transaction.destroy();
     logger.info('Transaction deleted', { transactionId: id });
     return { success: true };
   }
 
-  async getStatistics(farm, filters = {}) {
+  async getStatistics(farmId, filters = {}) {
     const { from_date, to_date } = filters;
     // Суммы и группировки берут тот же фильтр фермы, что и список: иначе
     // «итого за период» и книга под ним расходятся между собой.
-    const where = farmScope(farm);
+    const where = { farm_id: farmId };
 
     if (from_date || to_date) {
       where.transaction_date = {};
@@ -216,16 +212,15 @@ class TransactionService {
     };
   }
 
-  async getRabbitTransactions(rabbitId, farm) {
-    const rabbit = await Rabbit.findOne({ where: { id: rabbitId, user_id: farm.id } });
+  async getRabbitTransactions(rabbitId, farmId) {
+    const rabbit = await Rabbit.findOne({ where: { id: rabbitId, farm_id: farmId } });
     if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
 
     // Ферма указана и здесь, хотя кролик уже проверен: выборка по одному
-    // rabbit_id держится только на том, что операцию к чужому кролику не
-    // привяжут. Это условие соблюдают четыре разных места, и достаточно
-    // одному его потерять, чтобы в карточку кролика попали чужие деньги.
+    // rabbit_id держалась бы только на том, что операцию к чужому кролику не
+    // привяжут.
     const transactions = await Transaction.findAll({
-      where: { rabbit_id: rabbitId, ...farmScope(farm) },
+      where: { rabbit_id: rabbitId, farm_id: farmId },
       include: [{ model: User, as: 'creator', attributes: ['id', 'full_name', 'email'] }],
       order: [['transaction_date', 'DESC'], ['created_at', 'DESC']]
     });
@@ -243,7 +238,7 @@ class TransactionService {
     };
   }
 
-  async getMonthlyReport(farm, year, month) {
+  async getMonthlyReport(farmId, year, month) {
     if (!year || !month) throw new Error('YEAR_MONTH_REQUIRED');
 
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
@@ -251,7 +246,7 @@ class TransactionService {
 
     const transactions = await Transaction.findAll({
       where: {
-        ...farmScope(farm),
+        farm_id: farmId,
         transaction_date: { [Op.gte]: startDate, [Op.lte]: endDate }
       },
       include: [{ model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] }],

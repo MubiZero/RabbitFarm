@@ -21,6 +21,7 @@ const assertNotProduction = () => {
 };
 
 const OWNER_EMAIL = 'admin@rabbitfarm.com';
+const FARM_NAME = 'Демонстрационная ферма';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -45,13 +46,11 @@ module.exports = {
      * а только доводится до нужной фермы: на стендах, залитых старой версией
      * сидера, менеджер и работник остались владельцами собственных пустых ферм.
      */
-    const ensureUser = async ({ email, password, fullName, role, phone, ownerId = null }) => {
+    const ensureUser = async ({ email, password, fullName, role, phone, farmId }) => {
       const existingId = await findUserIdByEmail(email);
 
       if (existingId) {
-        if (ownerId !== null) {
-          await queryInterface.bulkUpdate('users', { owner_id: ownerId, updated_at: now() }, { id: existingId });
-        }
+        await queryInterface.bulkUpdate('users', { farm_id: farmId, updated_at: now() }, { id: existingId });
         return existingId;
       }
 
@@ -61,7 +60,7 @@ module.exports = {
         full_name: fullName,
         role,
         phone,
-        owner_id: ownerId,
+        farm_id: farmId,
         is_active: true,
         created_at: now(),
         updated_at: now()
@@ -70,32 +69,61 @@ module.exports = {
       return findUserIdByEmail(email);
     };
 
+    /**
+     * Демо-ферма. Заводится до людей и поначалу без владельца: хозяйство и
+     * хозяин ссылаются друг на друга, поэтому появляются по очереди.
+     */
+    const ensureFarm = async () => {
+      const [existing] = await queryInterface.sequelize.query(
+        'SELECT id FROM farms WHERE name = :name LIMIT 1',
+        { replacements: { name: FARM_NAME }, type: QueryTypes.SELECT }
+      );
+      if (existing) return existing.id;
+
+      await queryInterface.bulkInsert('farms', [{
+        name: FARM_NAME,
+        owner_id: null,
+        created_at: now(),
+        updated_at: now()
+      }], {});
+
+      const [created] = await queryInterface.sequelize.query(
+        'SELECT id FROM farms WHERE name = :name LIMIT 1',
+        { replacements: { name: FARM_NAME }, type: QueryTypes.SELECT }
+      );
+      return created.id;
+    };
+
     /** Демо-справочник фермы заливается один раз: ферма с записями не трогается. */
     const seedFarmTable = async (table, rows) => {
       const [{ count }] = await queryInterface.sequelize.query(
-        `SELECT COUNT(*) AS count FROM ${table} WHERE user_id = :userId`,
-        { replacements: { userId: ownerId }, type: QueryTypes.SELECT }
+        `SELECT COUNT(*) AS count FROM ${table} WHERE farm_id = :farmId`,
+        { replacements: { farmId }, type: QueryTypes.SELECT }
       );
       if (Number(count) > 0) return 0;
 
       await queryInterface.bulkInsert(
         table,
-        rows.map((row) => ({ ...row, user_id: ownerId, created_at: now(), updated_at: now() })),
+        rows.map((row) => ({ ...row, farm_id: farmId, created_at: now(), updated_at: now() })),
         {}
       );
       return rows.length;
     };
 
-    // Владелец — это и есть ферма: у него owner_id пустой, а данные ниже
-    // принадлежат его id. Менеджер и работник получают owner_id владельца,
-    // иначе роли не проверить: каждый входил в собственную пустую ферму.
+    // Все трое — люди одной фермы, иначе роли не проверить: раньше каждый
+    // входил в собственное пустое хозяйство.
+    const farmId = await ensureFarm();
+
     const ownerId = await ensureUser({
       email: OWNER_EMAIL,
       password: 'admin123',
       fullName: 'Администратор',
       role: 'owner',
-      phone: '+79991234567'
+      phone: '+79991234567',
+      farmId
     });
+
+    await queryInterface.bulkUpdate('farms', { owner_id: ownerId, updated_at: now() }, { id: farmId });
 
     await ensureUser({
       email: 'manager@rabbitfarm.com',
@@ -103,7 +131,7 @@ module.exports = {
       fullName: 'Менеджер фермы',
       role: 'manager',
       phone: '+79991234568',
-      ownerId
+      farmId
     });
 
     await ensureUser({
@@ -112,7 +140,7 @@ module.exports = {
       fullName: 'Работник',
       role: 'worker',
       phone: '+79991234569',
-      ownerId
+      farmId
     });
 
     const breedsInserted = await seedFarmTable('breeds', [

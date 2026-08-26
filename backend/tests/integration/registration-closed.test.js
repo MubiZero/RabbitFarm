@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
-const { User } = require('../../src/models');
+const { Farm, User } = require('../../src/models');
 
 /**
  * Ферм в сервисе много, и регистрация заводит новую: каждый
@@ -29,10 +29,15 @@ describe('Регистрация', () => {
     delete process.env.ALLOW_REGISTRATION;
   });
 
-  const register = (email, name) =>
+  const register = (email, name, farmName) =>
     request(app)
       .post('/api/v1/auth/register')
-      .send({ email, password: 'Password123!', full_name: name });
+      .send({
+        email,
+        password: 'Password123!',
+        full_name: name,
+        ...(farmName === undefined ? {} : { farm_name: farmName })
+      });
 
   it('первый зарегистрированный становится владельцем', async () => {
     const res = await register('first@example.com', 'Первый');
@@ -47,19 +52,38 @@ describe('Регистрация', () => {
     expect(res.status).toBe(201);
     expect(res.body.data.user.role).toBe('owner');
 
-    // Пустой `owner_id` и есть признак собственной фермы: `req.farmId`
-    // считается как `owner_id || id`.
+    // Регистрация заводит хозяйство, а не только человека: у новой фермы
+    // владельцем должен стоять он сам.
     const user = await User.findByPk(res.body.data.user.id);
-    expect(user.owner_id).toBeNull();
+    const farm = await Farm.findByPk(user.farm_id);
+    expect(farm.owner_id).toBe(user.id);
   });
 
   it('фермы разные: у второго свой farmId, не первого', async () => {
     const first = await User.findOne({ where: { email: 'first@example.com' } });
     const second = await User.findOne({ where: { email: 'second@example.com' } });
 
-    const farmOf = (user) => user.owner_id || user.id;
+    expect(second.farm_id).not.toBe(first.farm_id);
+  });
 
-    expect(farmOf(second)).not.toBe(farmOf(first));
+  it('название хозяйства берётся из формы', async () => {
+    const res = await register('named@example.com', 'Третий', 'Кроличий двор');
+
+    const user = await User.findByPk(res.body.data.user.id);
+    const farm = await Farm.findByPk(user.farm_id);
+
+    expect(farm.name).toBe('Кроличий двор');
+  });
+
+  it('без названия ферма зовётся по имени владельца', async () => {
+    // Пустое название читалось бы в списках как сбой, а не как
+    // «человек просто не заполнил поле».
+    const res = await register('unnamed@example.com', 'Четвёртый');
+
+    const user = await User.findByPk(res.body.data.user.id);
+    const farm = await Farm.findByPk(user.farm_id);
+
+    expect(farm.name).toBe('Ферма Четвёртый');
   });
 
   it('занятая почта отвергается', async () => {

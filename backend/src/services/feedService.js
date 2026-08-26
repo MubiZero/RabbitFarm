@@ -18,13 +18,13 @@ class FeedService {
     }
   }
 
-  async getFeedById(id, userId) {
-    const feed = await Feed.findOne({ where: { id, user_id: userId } });
+  async getFeedById(id, farmId) {
+    const feed = await Feed.findOne({ where: { id, farm_id: farmId } });
     if (!feed) throw new Error('FEED_NOT_FOUND');
     return feed;
   }
 
-  async listFeeds(userId, filters = {}, pagination = {}) {
+  async listFeeds(farmId, filters = {}, pagination = {}) {
     const {
       page = 1,
       limit = 50,
@@ -36,7 +36,7 @@ class FeedService {
     } = { ...filters, ...pagination };
 
     const offset = (page - 1) * limit;
-    const where = { user_id: userId };
+    const where = { farm_id: farmId };
 
     if (type) where.type = type;
     // Joi приводит значение к булеву, поэтому сравнение со строкой не
@@ -62,19 +62,19 @@ class FeedService {
     return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
-  async updateFeed(id, userId, data) {
-    const feed = await Feed.findOne({ where: { id, user_id: userId } });
+  async updateFeed(id, farmId, data) {
+    const feed = await Feed.findOne({ where: { id, farm_id: farmId } });
     if (!feed) throw new Error('FEED_NOT_FOUND');
     await feed.update(data);
     logger.info('Feed updated', { feedId: id });
     return feed;
   }
 
-  async deleteFeed(id, userId) {
-    const feed = await Feed.findOne({ where: { id, user_id: userId } });
+  async deleteFeed(id, farmId) {
+    const feed = await Feed.findOne({ where: { id, farm_id: farmId } });
     if (!feed) throw new Error('FEED_NOT_FOUND');
 
-    const recordsCount = await FeedingRecord.count({ where: { feed_id: id } });
+    const recordsCount = await FeedingRecord.count({ where: { farm_id: farmId, feed_id: id } });
     if (recordsCount > 0) throw new Error('FEED_HAS_RECORDS');
 
     await feed.destroy();
@@ -82,8 +82,8 @@ class FeedService {
     return { success: true, recordsCount };
   }
 
-  async getStatistics(userId) {
-    const feeds = await Feed.findAll({ where: { user_id: userId } });
+  async getStatistics(farmId) {
+    const feeds = await Feed.findAll({ where: { farm_id: farmId } });
 
     const stats = {
       total_feeds: feeds.length,
@@ -115,10 +115,10 @@ class FeedService {
     return stats;
   }
 
-  async getLowStock(userId) {
+  async getLowStock(farmId) {
     const feeds = await Feed.findAll({
       where: {
-        user_id: userId,
+        farm_id: farmId,
         [Op.and]: [{ current_stock: { [Op.lte]: col('min_stock') } }]
       },
       order: [[literal('(current_stock / NULLIF(min_stock, 0))'), 'ASC']]
@@ -132,11 +132,11 @@ class FeedService {
     }));
   }
 
-  async adjustStock(id, userId, quantity, operation) {
+  async adjustStock(id, farmId, quantity, operation) {
     const transaction = await Feed.sequelize.transaction();
     try {
       const feed = await Feed.findOne({
-        where: { id, user_id: userId },
+        where: { id, farm_id: farmId },
         lock: transaction.LOCK.UPDATE,
         transaction
       });

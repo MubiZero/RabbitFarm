@@ -1,9 +1,4 @@
 jest.mock('../../../src/services/taskService');
-// Ферма для сервиса — это её состав: у задач своей колонки фермы нет.
-// Без подмены юнит контроллера молча ходил бы в настоящую базу.
-jest.mock('../../../src/utils/farm', () => ({
-  farmMemberIds: jest.fn().mockResolvedValue([1, 2, 3])
-}));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(),
   error: jest.fn(),
@@ -13,11 +8,11 @@ jest.mock('../../../src/utils/logger', () => ({
 const taskService = require('../../../src/services/taskService');
 const taskController = require('../../../src/controllers/taskController');
 
-const farm = { id: 1, memberIds: [1, 2, 3] };
+const FARM_ID = 1;
 
 const mockReq = (overrides = {}) => ({
   user: { id: 1 },
-  farmId: 1,
+  farmId: FARM_ID,
   params: {},
   body: {},
   query: {},
@@ -46,7 +41,7 @@ describe('TaskController', () => {
 
       await taskController.create(req, res, mockNext);
 
-      expect(taskService.createTask).toHaveBeenCalledWith({ title: 'Feed rabbits', farm, author_id: 1 });
+      expect(taskService.createTask).toHaveBeenCalledWith({ title: 'Feed rabbits', farm_id: FARM_ID, author_id: 1 });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: task }));
     });
@@ -105,7 +100,7 @@ describe('TaskController', () => {
 
       await taskController.getById(req, res, mockNext);
 
-      expect(taskService.getTaskById).toHaveBeenCalledWith('1', farm);
+      expect(taskService.getTaskById).toHaveBeenCalledWith('1', FARM_ID);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: task }));
     });
@@ -142,7 +137,7 @@ describe('TaskController', () => {
 
       await taskController.list(req, res, mockNext);
 
-      expect(taskService.listTasks).toHaveBeenCalledWith(farm, { status: 'pending' });
+      expect(taskService.listTasks).toHaveBeenCalledWith(FARM_ID, { status: 'pending' });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
@@ -174,7 +169,7 @@ describe('TaskController', () => {
 
       await taskController.update(req, res, mockNext);
 
-      expect(taskService.updateTask).toHaveBeenCalledWith('1', farm, { title: 'Updated task' });
+      expect(taskService.updateTask).toHaveBeenCalledWith('1', FARM_ID, { title: 'Updated task' });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: task }));
     });
@@ -243,7 +238,7 @@ describe('TaskController', () => {
 
       await taskController.delete(req, res, mockNext);
 
-      expect(taskService.deleteTask).toHaveBeenCalledWith('1', farm);
+      expect(taskService.deleteTask).toHaveBeenCalledWith('1', FARM_ID);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: null }));
     });
@@ -280,7 +275,7 @@ describe('TaskController', () => {
 
       await taskController.getStatistics(req, res, mockNext);
 
-      expect(taskService.getStatistics).toHaveBeenCalledWith(farm);
+      expect(taskService.getStatistics).toHaveBeenCalledWith(FARM_ID);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: stats }));
     });
@@ -306,7 +301,7 @@ describe('TaskController', () => {
 
       await taskController.getUpcoming(req, res, mockNext);
 
-      expect(taskService.getUpcoming).toHaveBeenCalledWith(farm, 7);
+      expect(taskService.getUpcoming).toHaveBeenCalledWith(FARM_ID, 7);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: tasks }));
     });
@@ -319,7 +314,7 @@ describe('TaskController', () => {
 
       await taskController.getUpcoming(req, res, mockNext);
 
-      expect(taskService.getUpcoming).toHaveBeenCalledWith(farm, '14');
+      expect(taskService.getUpcoming).toHaveBeenCalledWith(FARM_ID, '14');
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -344,7 +339,7 @@ describe('TaskController', () => {
 
       await taskController.completeTask(req, res, mockNext);
 
-      expect(taskService.completeTask).toHaveBeenCalledWith('1', farm);
+      expect(taskService.completeTask).toHaveBeenCalledWith('1', FARM_ID);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: task }));
     });

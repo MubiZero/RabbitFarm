@@ -6,6 +6,7 @@ jest.mock('../../../src/models', () => {
     transaction: jest.fn()
   };
   return {
+    Farm: {},
     Feed: {
       findAll: jest.fn(),
       findOne: jest.fn(),
@@ -159,6 +160,19 @@ describe('feedService', () => {
       FeedingRecord.count.mockResolvedValue(5);
 
       await expect(feedService.deleteFeed(1, 1)).rejects.toThrow('FEED_HAS_RECORDS');
+    });
+
+    it('кормления считаются в своей ферме', async () => {
+      Feed.findOne.mockResolvedValue({ id: 1, destroy: jest.fn().mockResolvedValue(true) });
+      FeedingRecord.count.mockResolvedValue(0);
+
+      await feedService.deleteFeed(1, 7);
+
+      // Без условия по ферме сюда попадали чужие кормления, и корм
+      // отказывался удаляться из-за совпадения id в соседнем хозяйстве.
+      expect(FeedingRecord.count).toHaveBeenCalledWith({
+        where: { farm_id: 7, feed_id: 1 }
+      });
     });
   });
 

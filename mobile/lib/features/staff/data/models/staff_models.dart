@@ -40,13 +40,17 @@ class FarmMember with _$FarmMember {
     String? phone,
     required FarmRole role,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
-    @JsonKey(name: 'owner_id') @NullableIntConverter() int? ownerId,
   }) = _FarmMember;
 
   const FarmMember._();
 
-  /// У владельца нет своего владельца — по этому и отличаем.
-  bool get isOwner => ownerId == null;
+  /// Владельца отличаем по роли.
+  ///
+  /// Раньше признаком была пустая ссылка на владельца: у хозяина её не было,
+  /// потому что он и считался фермой. Теперь ферма — отдельная запись, и
+  /// принадлежность к ней есть у всех, включая хозяина. Роль отвечает на
+  /// вопрос прямо, а не через отсутствие поля.
+  bool get isOwner => role == FarmRole.owner;
 
   factory FarmMember.fromJson(Map<String, dynamic> json) =>
       _$FarmMemberFromJson(json);

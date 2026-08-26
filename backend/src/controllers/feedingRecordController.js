@@ -2,7 +2,6 @@ const { FeedingRecord, Feed, Rabbit, Cage, User, sequelize } = require('../model
 const logger = require('../utils/logger');
 const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
-const { farmMemberIds } = require('../utils/farm');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
 /**
@@ -16,16 +15,15 @@ const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 exports.create = async (req, res, next) => {
   try {
     const { feed_id, quantity, rabbit_id, cage_id } = req.body;
-    // Кто кормил, тот и записан. Раньше сюда шёл req.farmId, то есть владелец
-    // фермы: любая работа работника доставалась в журнале хозяину. Выборки
-    // всё равно идут по всей ферме (farmMemberIds), поэтому владелец видит
-    // записи работника и после этого.
+    // Кто кормил, тот и записан. Раньше сюда шёл владелец фермы: работа
+    // работника доставалась в журнале хозяину. На принадлежность записи это
+    // больше не влияет — хозяйство лежит в farm_id отдельно от автора.
     const fed_by = req.user.id;
 
     // Validate rabbit_id if provided
     if (rabbit_id) {
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbit_id, user_id: req.farmId }
+        where: { id: rabbit_id, farm_id: req.farmId }
       });
       if (!rabbit) {
         return ApiResponse.error(res, 'Кролик не найден', 404);
@@ -35,7 +33,7 @@ exports.create = async (req, res, next) => {
     // Validate cage_id if provided
     if (cage_id) {
       const cage = await Cage.findOne({
-        where: { id: cage_id, user_id: req.farmId }
+        where: { id: cage_id, farm_id: req.farmId }
       });
       if (!cage) {
         return ApiResponse.error(res, 'Клетка не найдена', 404);
@@ -46,7 +44,7 @@ exports.create = async (req, res, next) => {
     const result = await sequelize.transaction(async (t) => {
       // Re-fetch feed with lock to ensure stock is accurate
       const feedToUpdate = await Feed.findOne({
-        where: { id: feed_id, user_id: req.farmId },
+        where: { id: feed_id, farm_id: req.farmId },
         lock: t.LOCK.UPDATE,
         transaction: t
       });
@@ -64,23 +62,29 @@ exports.create = async (req, res, next) => {
 
       const record = await FeedingRecord.create({
         ...req.body,
+        farm_id: req.farmId,
         fed_by
       }, { transaction: t });
 
       return record;
     });
 
-    // Load relationships with safety filters
-    await result.reload({
+    // Связи подтягиваем отдельной выборкой, а не `reload`: тот жёстко
+    // подставляет условие по одному первичному ключу, и хозяйство в него не
+    // добавить. Правило одно на все выборки — без фермы запрос не идёт, и
+    // исключений «этот запрос заведомо безопасен» мы не делаем: ровно из
+    // такого рассуждения дыры и появлялись.
+    const created = await FeedingRecord.findOne({
+      where: { id: result.id, farm_id: req.farmId },
       include: [
-        { model: Feed, as: 'feed', where: { user_id: req.farmId }, required: false },
-        { model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, required: false },
-        { model: Cage, as: 'cage', where: { user_id: req.farmId }, required: false },
+        { model: Feed, as: 'feed' },
+        { model: Rabbit, as: 'rabbit' },
+        { model: Cage, as: 'cage' },
         { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ]
     });
 
-    return ApiResponse.success(res, result, 'Запись о кормлении создана', 201);
+    return ApiResponse.success(res, created, 'Запись о кормлении создана', 201);
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') {
       return ApiResponse.error(res, 'Корм не найден', 404);
@@ -127,7 +131,7 @@ exports.createBulk = async (req, res, next) => {
       // должна оборвать её целиком, не оставив ни одной строки.
       if (rabbit_ids.length) {
         const owned = await Rabbit.count({
-          where: { id: { [Op.in]: rabbit_ids }, user_id: req.farmId },
+          where: { id: { [Op.in]: rabbit_ids }, farm_id: req.farmId },
           transaction: t
         });
         if (owned !== rabbit_ids.length) throw new Error('RABBIT_NOT_FOUND');
@@ -135,14 +139,14 @@ exports.createBulk = async (req, res, next) => {
 
       if (cage_ids.length) {
         const owned = await Cage.count({
-          where: { id: { [Op.in]: cage_ids }, user_id: req.farmId },
+          where: { id: { [Op.in]: cage_ids }, farm_id: req.farmId },
           transaction: t
         });
         if (owned !== cage_ids.length) throw new Error('CAGE_NOT_FOUND');
       }
 
       const feedToUpdate = await Feed.findOne({
-        where: { id: feed_id, user_id: req.farmId },
+        where: { id: feed_id, farm_id: req.farmId },
         lock: t.LOCK.UPDATE,
         transaction: t
       });
@@ -162,10 +166,10 @@ exports.createBulk = async (req, res, next) => {
 
       const rows = [
         ...rabbit_ids.map((rabbit_id) => ({
-          rabbit_id, cage_id: null, feed_id, quantity, fed_at, notes, fed_by
+          farm_id: req.farmId, rabbit_id, cage_id: null, feed_id, quantity, fed_at, notes, fed_by
         })),
         ...cage_ids.map((cage_id) => ({
-          rabbit_id: null, cage_id, feed_id, quantity, fed_at, notes, fed_by
+          farm_id: req.farmId, rabbit_id: null, cage_id, feed_id, quantity, fed_at, notes, fed_by
         }))
       ];
 
@@ -204,10 +208,7 @@ exports.getById = async (req, res, next) => {
     const { id } = req.params;
 
     const feedingRecord = await FeedingRecord.findOne({
-      where: {
-        id,
-        fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-      },
+      where: { id, farm_id: req.farmId },
       include: [
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },
@@ -244,9 +245,7 @@ exports.list = async (req, res, next) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    const where = {
-      fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-    };
+    const where = { farm_id: req.farmId };
 
     // Filter by rabbit
     if (rabbit_id) {
@@ -311,7 +310,7 @@ exports.getByRabbit = async (req, res, next) => {
     const rabbit = await Rabbit.findOne({
       where: {
         id: rabbitId,
-        user_id: req.farmId
+        farm_id: req.farmId
       }
     });
     if (!rabbit) {
@@ -319,9 +318,9 @@ exports.getByRabbit = async (req, res, next) => {
     }
 
     const records = await FeedingRecord.findAll({
-      where: { rabbit_id: rabbitId },
+      where: { rabbit_id: rabbitId, farm_id: req.farmId },
       include: [
-        { model: Feed, as: 'feed', where: { user_id: req.farmId }, required: false },
+        { model: Feed, as: 'feed' },
         { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
       ],
       order: [['fed_at', 'DESC']]
@@ -341,10 +340,7 @@ exports.update = async (req, res, next) => {
     const { id } = req.params;
 
     const feedingRecord = await FeedingRecord.findOne({
-      where: {
-        id,
-        fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-      }
+      where: { id, farm_id: req.farmId }
     });
 
     if (!feedingRecord) {
@@ -352,12 +348,12 @@ exports.update = async (req, res, next) => {
     }
 
     if (req.body.rabbit_id && req.body.rabbit_id !== feedingRecord.rabbit_id) {
-      const rabbit = await Rabbit.findOne({ where: { id: req.body.rabbit_id, user_id: req.farmId } });
+      const rabbit = await Rabbit.findOne({ where: { id: req.body.rabbit_id, farm_id: req.farmId } });
       if (!rabbit) return ApiResponse.error(res, 'Кролик не найден', 404);
     }
 
     if (req.body.cage_id && req.body.cage_id !== feedingRecord.cage_id) {
-      const cage = await Cage.findOne({ where: { id: req.body.cage_id, user_id: req.farmId } });
+      const cage = await Cage.findOne({ where: { id: req.body.cage_id, farm_id: req.farmId } });
       if (!cage) return ApiResponse.error(res, 'Клетка не найдена', 404);
     }
 
@@ -371,7 +367,7 @@ exports.update = async (req, res, next) => {
       if (newQuantity !== oldQuantity || feedId !== feedingRecord.feed_id) {
         // Find the feed that will be affected (the new one, or the old one if feedId didn't change)
         const feed = await Feed.findOne({
-          where: { id: feedId, user_id: req.farmId },
+          where: { id: feedId, farm_id: req.farmId },
           lock: transaction.LOCK.UPDATE,
           transaction
         });
@@ -393,7 +389,7 @@ exports.update = async (req, res, next) => {
         } else {
           // Changed feed: return to old, subtract from new
           const oldFeed = await Feed.findOne({
-            where: { id: feedingRecord.feed_id, user_id: req.farmId },
+            where: { id: feedingRecord.feed_id, farm_id: req.farmId },
             lock: transaction.LOCK.UPDATE,
             transaction
           });
@@ -416,16 +412,18 @@ exports.update = async (req, res, next) => {
       await feedingRecord.update(req.body, { transaction });
       await transaction.commit();
 
-      await feedingRecord.reload({
+      // Отдельная выборка вместо `reload` — см. комментарий в create.
+      const updated = await FeedingRecord.findOne({
+        where: { id: feedingRecord.id, farm_id: req.farmId },
         include: [
-          { model: Feed, as: 'feed', where: { user_id: req.farmId }, required: false },
-          { model: Rabbit, as: 'rabbit', where: { user_id: req.farmId }, required: false },
-          { model: Cage, as: 'cage', where: { user_id: req.farmId }, required: false },
+          { model: Feed, as: 'feed' },
+          { model: Rabbit, as: 'rabbit' },
+          { model: Cage, as: 'cage' },
           { model: User, as: 'fedBy', attributes: ['id', 'full_name', 'email'] }
         ]
       });
 
-      return ApiResponse.success(res, feedingRecord, 'Запись о кормлении обновлена');
+      return ApiResponse.success(res, updated, 'Запись о кормлении обновлена');
     } catch (error) {
       await transaction.rollback();
       // If it's an error we explicitly threw (like INSUFFICIENT_STOCK), it's already handled.
@@ -446,10 +444,7 @@ exports.delete = async (req, res, next) => {
     const { id } = req.params;
 
     const feedingRecord = await FeedingRecord.findOne({
-      where: {
-        id,
-        fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-      },
+      where: { id, farm_id: req.farmId },
       transaction
     });
 
@@ -460,7 +455,7 @@ exports.delete = async (req, res, next) => {
 
     // Return stock to feed
     const feed = await Feed.findOne({
-      where: { id: feedingRecord.feed_id, user_id: req.farmId },
+      where: { id: feedingRecord.feed_id, farm_id: req.farmId },
       lock: transaction.LOCK.UPDATE,
       transaction
     });
@@ -487,9 +482,7 @@ exports.getStatistics = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
-    const where = {
-      fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-    };
+    const where = { farm_id: req.farmId };
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
@@ -553,9 +546,7 @@ exports.getRecent = async (req, res, next) => {
     const { limit = 10 } = req.query;
 
     const records = await FeedingRecord.findAll({
-      where: {
-        fed_by: { [Op.in]: await farmMemberIds(req.farmId) }
-      },
+      where: { farm_id: req.farmId },
       include: [
         { model: Feed, as: 'feed' },
         { model: Rabbit, as: 'rabbit' },

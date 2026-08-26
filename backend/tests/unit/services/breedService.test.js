@@ -5,6 +5,7 @@
  * «работает ли операция», но и «ограничена ли она своим владельцем».
  */
 jest.mock('../../../src/models', () => ({
+  Farm: {},
   Breed: {
     findAll: jest.fn(),
     findOne: jest.fn(),
@@ -39,7 +40,7 @@ describe('breedService', () => {
 
       expect(result).toEqual(breeds);
       expect(Breed.findAll).toHaveBeenCalledWith({
-        where: { user_id: OWNER },
+        where: { farm_id: OWNER },
         order: [['name', 'ASC']]
       });
     });
@@ -60,12 +61,12 @@ describe('breedService', () => {
 
       expect(result).toEqual(breed);
       expect(Breed.findOne).toHaveBeenCalledWith({
-        where: { id: 1, user_id: OWNER }
+        where: { id: 1, farm_id: OWNER }
       });
     });
 
     it('чужая порода выглядит как несуществующая', async () => {
-      // Запрос ограничен user_id, поэтому чужая строка просто не находится —
+      // Запрос ограничен farm_id, поэтому чужая строка просто не находится —
       // и посторонний не узнаёт даже о самом факте её существования.
       Breed.findOne.mockResolvedValue(null);
 
@@ -83,7 +84,7 @@ describe('breedService', () => {
       const result = await breedService.createBreed({ name: 'Rex' }, OWNER);
 
       expect(result).toEqual(newBreed);
-      expect(Breed.create).toHaveBeenCalledWith({ name: 'Rex', user_id: OWNER });
+      expect(Breed.create).toHaveBeenCalledWith({ name: 'Rex', farm_id: OWNER });
     });
 
     it('имя проверяется на уникальность в пределах фермы', async () => {
@@ -93,7 +94,7 @@ describe('breedService', () => {
       await breedService.createBreed({ name: 'Rex' }, OWNER);
 
       expect(Breed.findOne).toHaveBeenCalledWith({
-        where: { name: 'Rex', user_id: OWNER }
+        where: { name: 'Rex', farm_id: OWNER }
       });
     });
 
@@ -127,7 +128,7 @@ describe('breedService', () => {
       const breed = { id: 1, name: 'Rex', update: jest.fn().mockResolvedValue(true) };
       Breed.findOne.mockResolvedValue(breed);
 
-      await breedService.updateBreed(1, { description: 'x', user_id: STRANGER }, OWNER);
+      await breedService.updateBreed(1, { description: 'x', farm_id: STRANGER }, OWNER);
 
       expect(breed.update).toHaveBeenCalledWith({ description: 'x' });
     });
@@ -189,7 +190,7 @@ describe('breedService', () => {
         .rejects.toThrow('BREED_HAS_RABBITS');
       // Считаем только своих кроликов: чужие не должны мешать удалению.
       expect(Rabbit.count).toHaveBeenCalledWith({
-        where: { breed_id: 1, user_id: OWNER }
+        where: { breed_id: 1, farm_id: OWNER }
       });
     });
   });

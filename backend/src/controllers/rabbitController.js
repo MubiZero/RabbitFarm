@@ -17,8 +17,9 @@ class RabbitController {
         req.body.photo_url = `/uploads/rabbits/${req.file.filename}`;
       }
 
-      // Add user_id from authenticated user
-      req.body.user_id = req.farmId;
+      // Ферму берём из токена, а не из тела: иначе клиент мог бы записать
+      // кролика на чужую ферму.
+      req.body.farm_id = req.farmId;
 
       const rabbit = await rabbitService.createRabbit(req.body);
 

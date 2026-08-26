@@ -16,7 +16,6 @@ jest.mock('../../../src/models', () => {
       findAll: jest.fn(),
       findAndCountAll: jest.fn(),
       findOne: jest.fn(),
-      findByPk: jest.fn(),
       create: jest.fn(),
       sequelize: mockSequelize
     },
@@ -79,6 +78,7 @@ describe('birthController', () => {
       );
 
       const args = Birth.findAndCountAll.mock.calls[0][0];
+      expect(args.where.farm_id).toBe(1);
       expect(args.where.mother_id).toBe(7);
       expect(args.limit).toBe(10);
       expect(args.offset).toBe(10);
@@ -105,6 +105,11 @@ describe('birthController', () => {
       await ctrl.getBirthById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
+      // Ферма стоит в самом запросе, а не выводится через мать: перебором id
+      // чужой окрол не достать.
+      expect(Birth.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: '1', farm_id: 1 } })
+      );
     });
 
     it('should return 404 if birth not found', async () => {
@@ -132,7 +137,7 @@ describe('birthController', () => {
       Rabbit.findOne.mockResolvedValue(mother);
       Birth.create.mockResolvedValue({ id: 1 });
       Task.create.mockResolvedValue({});
-      Birth.findByPk.mockResolvedValue({ id: 1 });
+      Birth.findOne.mockResolvedValue({ id: 1 });
 
       const req = mockReq({ body: baseBody });
       const res = mockRes();
@@ -141,6 +146,17 @@ describe('birthController', () => {
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
+      // Без farm_id и окрол, и задачи по нему отвергает хук многоарендности.
+      expect(Birth.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1 }),
+        expect.any(Object)
+      );
+      // «Кто завёл» и «на ком» — человек: id хозяйства в колонке пользователя
+      // указывал бы на постороннего.
+      expect(Task.create).toHaveBeenCalledTimes(3);
+      Task.create.mock.calls.forEach(([task]) => {
+        expect(task).toMatchObject({ farm_id: 1, created_by: 1, assigned_to: 1 });
+      });
     });
 
     it('should create birth with breeding_id', async () => {
@@ -150,7 +166,7 @@ describe('birthController', () => {
       Breeding.findOne.mockResolvedValue(breeding);
       Birth.create.mockResolvedValue({ id: 2 });
       Task.create.mockResolvedValue({});
-      Birth.findByPk.mockResolvedValue({ id: 2 });
+      Birth.findOne.mockResolvedValue({ id: 2 });
 
       const req = mockReq({ body: { ...baseBody, breeding_id: 5 } });
       const res = mockRes();
@@ -196,7 +212,7 @@ describe('birthController', () => {
       Rabbit.findOne.mockResolvedValue(mother);
       Birth.create.mockResolvedValue({ id: 3 });
       Task.create.mockResolvedValue({});
-      Birth.findByPk.mockResolvedValue({ id: 3 });
+      Birth.findOne.mockResolvedValue({ id: 3 });
 
       await ctrl.createBirth(mockReq({ body: baseBody }), mockRes());
 
@@ -314,6 +330,10 @@ describe('birthController', () => {
       await ctrl.createKitsFromBirth(req, res);
 
       expect(Rabbit.create).toHaveBeenCalledTimes(3);
+      expect(Rabbit.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1 }),
+        expect.any(Object)
+      );
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
     });

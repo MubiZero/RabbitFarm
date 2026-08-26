@@ -28,7 +28,7 @@ describe('Ферма и работники', () => {
       .post('/api/v1/auth/register')
       .send({ email: 'farm_worker@example.com', password: 'Password123!', full_name: 'Работник' });
     await User.update(
-      { owner_id: owner.body.data.user.id, role: 'worker' },
+      { farm_id: owner.body.data.user.farm_id, role: 'worker' },
       { where: { email: 'farm_worker@example.com' } }
     );
     const workerLogin = await request(app)
@@ -41,7 +41,7 @@ describe('Ферма и работники', () => {
       .post('/api/v1/auth/register')
       .send({ email: 'farm_manager@example.com', password: 'Password123!', full_name: 'Менеджер' });
     await User.update(
-      { owner_id: owner.body.data.user.id, role: 'manager' },
+      { farm_id: owner.body.data.user.farm_id, role: 'manager' },
       { where: { email: 'farm_manager@example.com' } }
     );
     const managerLogin = await request(app)

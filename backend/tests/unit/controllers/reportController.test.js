@@ -1,9 +1,3 @@
-jest.mock('../../../src/utils/farm', () => ({
-  // Контроллер не должен знать, как определяется состав фермы —
-  // здесь важно лишь то, что фильтр строится по всем её участникам.
-  farmMemberIds: jest.fn().mockResolvedValue([1, 2])
-}));
-
 /**
  * Unit tests for reportController
  */
@@ -20,6 +14,7 @@ jest.mock('../../../src/models', () => {
     Task: { count: jest.fn() },
     Breeding: { count: jest.fn(), findAll: jest.fn() },
     Birth: { count: jest.fn(), findAll: jest.fn() },
+    Farm: { findOne: jest.fn(), findAll: jest.fn() },
     sequelize: mockSequelize
   };
 });
@@ -112,6 +107,32 @@ describe('reportController', () => {
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
+
+    // Деньги сводка искала по тому, кто внёс операцию, а поголовье — по ферме.
+    // Признак должен быть один, иначе две цифры про одни деньги разъедутся.
+    it('отбирает деньги, задачи и поголовье по одной и той же ферме', async () => {
+      setAllMocksToEmpty();
+
+      await ctrl.getDashboard(mockReq({ farmId: 7 }), mockRes(), mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+
+      const counted = [
+        ...Rabbit.count.mock.calls, ...Rabbit.findAll.mock.calls,
+        ...Cage.count.mock.calls, ...Vaccination.count.mock.calls,
+        ...Task.count.mock.calls, ...Feed.count.mock.calls,
+        ...Birth.count.mock.calls, ...Birth.findAll.mock.calls
+      ].map(([options]) => options.where);
+
+      // У Transaction.sum первым аргументом идёт поле, опции — вторым.
+      const money = Transaction.sum.mock.calls.map(([, options]) => options.where);
+
+      expect(counted).toHaveLength(14);
+      expect(money).toHaveLength(2);
+      for (const where of [...counted, ...money]) {
+        expect(where.farm_id).toBe(7);
+      }
+    });
   });
 
   describe('getFarmReport', () => {
@@ -178,6 +199,27 @@ describe('reportController', () => {
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
+
+    it('считает каждый раздел по колонке фермы', async () => {
+      setAllMocksToEmpty();
+
+      await ctrl.getFarmReport(mockReq({ query: {}, farmId: 7 }), mockRes(), mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+
+      const calls = [
+        ...Rabbit.findAll.mock.calls, ...Rabbit.count.mock.calls,
+        ...Transaction.findAll.mock.calls, ...Vaccination.count.mock.calls,
+        ...MedicalRecord.count.mock.calls, ...Breeding.count.mock.calls,
+        ...Birth.count.mock.calls, ...FeedingRecord.count.mock.calls,
+        ...FeedingRecord.findAll.mock.calls
+      ];
+
+      expect(calls).toHaveLength(9);
+      for (const [options] of calls) {
+        expect(options.where.farm_id).toBe(7);
+      }
+    });
   });
 
   describe('getHealthReport', () => {
@@ -202,6 +244,21 @@ describe('reportController', () => {
       await ctrl.getHealthReport(mockReq({ query: {} }), mockRes(), mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    it('отбирает прививки и лечения по колонке фермы', async () => {
+      Vaccination.findAll.mockResolvedValue([]);
+      MedicalRecord.findAll.mockResolvedValue([]);
+
+      await ctrl.getHealthReport(mockReq({ query: {}, farmId: 7 }), mockRes(), mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+
+      const calls = [...Vaccination.findAll.mock.calls, ...MedicalRecord.findAll.mock.calls];
+      expect(calls).toHaveLength(3);
+      for (const [options] of calls) {
+        expect(options.where.farm_id).toBe(7);
+      }
     });
   });
 
@@ -253,6 +310,18 @@ describe('reportController', () => {
       await ctrl.getFinancialReport(mockReq({ query: {} }), mockRes(), mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    it('отбирает операции по ферме, а не по автору записи', async () => {
+      Transaction.findAll.mockResolvedValue([]);
+
+      await ctrl.getFinancialReport(mockReq({ query: {}, farmId: 7 }), mockRes(), mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+      for (const [options] of Transaction.findAll.mock.calls) {
+        expect(options.where.farm_id).toBe(7);
+        expect(options.where.created_by).toBeUndefined();
+      }
     });
 
     it('should group by category when groupBy=by_category', async () => {

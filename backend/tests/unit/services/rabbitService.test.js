@@ -1,6 +1,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
+    Farm: {},
     Rabbit: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn(), create: jest.fn(), count: jest.fn(), findAndCountAll: jest.fn() },
     Breed: { findOne: jest.fn(), findByPk: jest.fn() },
     Cage: { findOne: jest.fn() },
@@ -35,7 +36,7 @@ describe('RabbitService', () => {
     it('должен бросать BREED_NOT_FOUND если порода не существует', async () => {
       Breed.findOne.mockResolvedValue(null);
 
-      await expect(rabbitService.createRabbit({ breed_id: 999, user_id: 1 }))
+      await expect(rabbitService.createRabbit({ breed_id: 999, farm_id: 1 }))
         .rejects.toThrow('BREED_NOT_FOUND');
       expect(mockTransaction.rollback).toHaveBeenCalled();
     });
@@ -44,7 +45,7 @@ describe('RabbitService', () => {
       Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue(null);
 
-      await expect(rabbitService.createRabbit({ breed_id: 1, cage_id: 1, user_id: 1 }))
+      await expect(rabbitService.createRabbit({ breed_id: 1, cage_id: 1, farm_id: 1 }))
         .rejects.toThrow('CAGE_NOT_FOUND');
     });
 
@@ -53,7 +54,7 @@ describe('RabbitService', () => {
       Cage.findOne.mockResolvedValue({ id: 1, capacity: 2 });
       Rabbit.count.mockResolvedValue(2);
 
-      await expect(rabbitService.createRabbit({ breed_id: 1, cage_id: 1, user_id: 1, status: 'healthy' }))
+      await expect(rabbitService.createRabbit({ breed_id: 1, cage_id: 1, farm_id: 1, status: 'healthy' }))
         .rejects.toThrow('CAGE_FULL');
     });
 
@@ -65,7 +66,7 @@ describe('RabbitService', () => {
       Rabbit.findOne.mockResolvedValue(mockRabbit);
 
       const result = await rabbitService.createRabbit({
-        name: 'Буся', breed_id: 1, user_id: 1, sex: 'female',
+        name: 'Буся', breed_id: 1, farm_id: 1, sex: 'female',
         birth_date: '2024-01-01', status: 'healthy'
       });
 
@@ -100,7 +101,7 @@ describe('RabbitService', () => {
       const whereClause = findAllCall.where;
       const { Op } = require('sequelize');
 
-      expect(whereClause.user_id).toBe(1);
+      expect(whereClause.farm_id).toBe(1);
       const orConditions = whereClause[Op.or];
       expect(orConditions).toHaveLength(2);
       expect(orConditions[0].name[Op.like]).toBe('%rex%');

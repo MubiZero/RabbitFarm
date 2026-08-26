@@ -1,13 +1,5 @@
 const taskService = require('../services/taskService');
-const { farmMemberIds } = require('../utils/farm');
 const ApiResponse = require('../utils/apiResponse');
-
-// Ферма для сервиса — это её состав: у задач своей колонки фермы нет,
-// принадлежность выражается через участников.
-const requestFarm = async (req) => ({
-  id: req.farmId,
-  memberIds: await farmMemberIds(req.farmId)
-});
 
 /**
  * Task Controller
@@ -16,7 +8,7 @@ const requestFarm = async (req) => ({
 
 exports.create = async (req, res, next) => {
   try {
-    const task = await taskService.createTask({ ...req.body, farm: await requestFarm(req), author_id: req.user.id });
+    const task = await taskService.createTask({ ...req.body, farm_id: req.farmId, author_id: req.user.id });
     return ApiResponse.success(res, task, 'Задача успешно создана', 201);
   } catch (error) {
     if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
@@ -28,7 +20,7 @@ exports.create = async (req, res, next) => {
 
 exports.getById = async (req, res, next) => {
   try {
-    const task = await taskService.getTaskById(req.params.id, await requestFarm(req));
+    const task = await taskService.getTaskById(req.params.id, req.farmId);
     return ApiResponse.success(res, task, 'Задача получена');
   } catch (error) {
     if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
@@ -38,7 +30,7 @@ exports.getById = async (req, res, next) => {
 
 exports.list = async (req, res, next) => {
   try {
-    const result = await taskService.listTasks(await requestFarm(req), req.query);
+    const result = await taskService.listTasks(req.farmId, req.query);
     // Общий конверт пагинации. Раньше каждый сервис лепил свой: items/rows/
     // tasks/transactions и totalPages/pages — клиенту приходилось угадывать
     // форму в каждом репозитории, и в медкартах он угадал неверно.
@@ -50,7 +42,7 @@ exports.list = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const task = await taskService.updateTask(req.params.id, await requestFarm(req), req.body);
+    const task = await taskService.updateTask(req.params.id, req.farmId, req.body);
     return ApiResponse.success(res, task, 'Задача успешно обновлена');
   } catch (error) {
     if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
@@ -63,7 +55,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    await taskService.deleteTask(req.params.id, await requestFarm(req));
+    await taskService.deleteTask(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Задача успешно удалена');
   } catch (error) {
     if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
@@ -73,7 +65,7 @@ exports.delete = async (req, res, next) => {
 
 exports.getStatistics = async (req, res, next) => {
   try {
-    const stats = await taskService.getStatistics(await requestFarm(req));
+    const stats = await taskService.getStatistics(req.farmId);
     return ApiResponse.success(res, stats, 'Статистика получена');
   } catch (error) {
     next(error);
@@ -83,7 +75,7 @@ exports.getStatistics = async (req, res, next) => {
 exports.getUpcoming = async (req, res, next) => {
   try {
     const { days = 7 } = req.query;
-    const tasks = await taskService.getUpcoming(await requestFarm(req), days);
+    const tasks = await taskService.getUpcoming(req.farmId, days);
     return ApiResponse.success(res, tasks, 'Предстоящие задачи получены');
   } catch (error) {
     next(error);
@@ -92,7 +84,7 @@ exports.getUpcoming = async (req, res, next) => {
 
 exports.completeTask = async (req, res, next) => {
   try {
-    const task = await taskService.completeTask(req.params.id, await requestFarm(req));
+    const task = await taskService.completeTask(req.params.id, req.farmId);
     return ApiResponse.success(res, task, 'Задача выполнена');
   } catch (error) {
     if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);

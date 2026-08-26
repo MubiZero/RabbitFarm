@@ -27,11 +27,11 @@ class RabbitService {
   async createRabbit(rabbitData) {
     const transaction = await sequelize.transaction();
     try {
-      // Порода принадлежит ферме, а не сервису: без фильтра по user_id
+      // Порода принадлежит ферме, а не сервису: без фильтра по farm_id
       // сюда проходил идентификатор чужой породы, и в карточке кролика
       // показывалось её название — данные соседней фермы.
       const breed = await Breed.findOne({
-        where: { id: rabbitData.breed_id, user_id: rabbitData.user_id },
+        where: { id: rabbitData.breed_id, farm_id: rabbitData.farm_id },
         transaction
       });
       if (!breed) {
@@ -45,7 +45,7 @@ class RabbitService {
           // телефонов одновременно видят одно свободное место и оба его
           // занимают — в клетке оказывается больше кроликов, чем вмещает.
         const cage = await Cage.findOne({
-          where: { id: rabbitData.cage_id, user_id: rabbitData.user_id },
+          where: { id: rabbitData.cage_id, farm_id: rabbitData.farm_id },
           lock: transaction.LOCK.UPDATE,
           transaction
         });
@@ -55,7 +55,7 @@ class RabbitService {
 
         // Check capacity (skip for maternity types usually, but let's be strict or use capacity field)
         const currentCount = await Rabbit.count({
-          where: { cage_id: rabbitData.cage_id, user_id: rabbitData.user_id },
+          where: { cage_id: rabbitData.cage_id, farm_id: rabbitData.farm_id },
           transaction
         });
         if (currentCount >= cage.capacity) {
@@ -68,10 +68,10 @@ class RabbitService {
         }
       }
 
-      // Check if father exists and is male and belongs to the user
+      // Check if father exists and is male and belongs to the farm
       if (rabbitData.father_id) {
         const father = await Rabbit.findOne({
-          where: { id: rabbitData.father_id, user_id: rabbitData.user_id, sex: 'male' },
+          where: { id: rabbitData.father_id, farm_id: rabbitData.farm_id, sex: 'male' },
           transaction
         });
         if (!father) {
@@ -79,10 +79,10 @@ class RabbitService {
         }
       }
 
-      // Check if mother exists and is female and belongs to the user
+      // Check if mother exists and is female and belongs to the farm
       if (rabbitData.mother_id) {
         const mother = await Rabbit.findOne({
-          where: { id: rabbitData.mother_id, user_id: rabbitData.user_id, sex: 'female' },
+          where: { id: rabbitData.mother_id, farm_id: rabbitData.farm_id, sex: 'female' },
           transaction
         });
         if (!mother) {
@@ -90,10 +90,10 @@ class RabbitService {
         }
       }
 
-      // Check if tag_id is unique for THIS user
+      // Клеймо уникально в пределах фермы: у соседа может быть такое же
       if (rabbitData.tag_id) {
         const existing = await Rabbit.findOne({
-          where: { tag_id: rabbitData.tag_id, user_id: rabbitData.user_id }
+          where: { tag_id: rabbitData.tag_id, farm_id: rabbitData.farm_id }
         });
         if (existing) {
           throw new Error('TAG_ID_EXISTS');
@@ -107,6 +107,7 @@ class RabbitService {
       if (rabbitData.current_weight) {
         await RabbitWeight.create({
           rabbit_id: rabbit.id,
+          farm_id: rabbitData.farm_id,
           weight: rabbitData.current_weight,
           measured_at: new Date()
         }, { transaction });
@@ -115,7 +116,7 @@ class RabbitService {
       await transaction.commit();
 
       // Fetch rabbit with associations
-      const createdRabbit = await this.getRabbitById(rabbit.id, rabbitData.user_id);
+      const createdRabbit = await this.getRabbitById(rabbit.id, rabbitData.farm_id);
 
       logger.info('Rabbit created', { rabbitId: rabbit.id });
       return createdRabbit;
@@ -129,24 +130,24 @@ class RabbitService {
   /**
    * Get rabbit by ID
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    * @returns {Object} Rabbit with associations
    */
-  async getRabbitById(rabbitId, userId) {
+  async getRabbitById(rabbitId, farmId) {
     try {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: userId
+          farm_id: farmId
         },
         // Ветки карточки фильтруем так же, как корень: связи проверяются
         // при записи, но записи бывают старше проверок. `required: false`
         // оставляет кролика в ответе — чужая связь просто не раскрывается.
         include: [
-          { model: Breed, as: 'breed', where: { user_id: userId }, required: false },
-          { model: Cage, where: { user_id: userId }, required: false },
-          { model: Rabbit, as: 'father', where: { user_id: userId }, required: false },
-          { model: Rabbit, as: 'mother', where: { user_id: userId }, required: false }
+          { model: Breed, as: 'breed', where: { farm_id: farmId }, required: false },
+          { model: Cage, where: { farm_id: farmId }, required: false },
+          { model: Rabbit, as: 'father', where: { farm_id: farmId }, required: false },
+          { model: Rabbit, as: 'mother', where: { farm_id: farmId }, required: false }
         ]
       });
 
@@ -163,19 +164,19 @@ class RabbitService {
 
   /**
    * Get list of rabbits with filters and pagination
-   * @param {Number} userId - User ID for filtering
+   * @param {Number} farmId - id хозяйства
    * @param {Object} filters - Filter options
    * @param {Object} pagination - Pagination options
    * @returns {Object} Rabbits list with pagination info
    */
-  async listRabbits(userId, filters = {}, pagination = {}) {
+  async listRabbits(farmId, filters = {}, pagination = {}) {
     try {
       const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'desc' } = pagination;
       const offset = (page - 1) * limit;
 
       // Build where clause
       const where = {
-        user_id: userId  // Filter by user
+        farm_id: farmId
       };
 
       if (filters.breed_id) {
@@ -216,8 +217,8 @@ class RabbitService {
       const rabbits = await Rabbit.findAll({
         where,
         include: [
-          { model: Breed, as: 'breed', where: { user_id: userId }, required: false },
-          { model: Cage, where: { user_id: userId }, required: false }
+          { model: Breed, as: 'breed', where: { farm_id: farmId }, required: false },
+          { model: Cage, where: { farm_id: farmId }, required: false }
         ],
         order: [[sort_by, sort_order.toUpperCase()]],
         limit: parseInt(limit),
@@ -242,17 +243,17 @@ class RabbitService {
   /**
    * Update rabbit
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    * @param {Object} updateData - Data to update
    * @returns {Object} Updated rabbit
    */
-  async updateRabbit(rabbitId, userId, updateData) {
+  async updateRabbit(rabbitId, farmId, updateData) {
     const transaction = await sequelize.transaction();
     try {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: userId
+          farm_id: farmId
         }
       });
 
@@ -263,11 +264,11 @@ class RabbitService {
       // Sex change protection: cannot change sex if has history
       if (updateData.sex && updateData.sex !== rabbit.sex) {
         const offspringCount = await Rabbit.count({
-          where: { [Op.or]: [{ mother_id: rabbitId }, { father_id: rabbitId }] },
+          where: { farm_id: farmId, [Op.or]: [{ mother_id: rabbitId }, { father_id: rabbitId }] },
           transaction
         });
         const breedingCount = await Breeding.count({
-          where: { [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] },
+          where: { farm_id: farmId, [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] },
           transaction
         });
 
@@ -281,7 +282,7 @@ class RabbitService {
       // подтянуть в карточку породу чужой фермы.
       if (updateData.breed_id) {
         const breed = await Breed.findOne({
-          where: { id: updateData.breed_id, user_id: userId },
+          where: { id: updateData.breed_id, farm_id: farmId },
           transaction
         });
         if (!breed) {
@@ -296,14 +297,14 @@ class RabbitService {
           // телефонов одновременно видят одно свободное место и оба его
           // занимают — в клетке оказывается больше кроликов, чем вмещает.
         const cage = await Cage.findOne({
-          where: { id: updateData.cage_id, user_id: userId },
+          where: { id: updateData.cage_id, farm_id: farmId },
           lock: transaction.LOCK.UPDATE,
           transaction
         });
         if (!cage) throw new Error('CAGE_NOT_FOUND');
 
         const currentCount = await Rabbit.count({
-          where: { cage_id: updateData.cage_id, user_id: userId },
+          where: { cage_id: updateData.cage_id, farm_id: farmId },
           transaction
         });
         if (currentCount >= cage.capacity) {
@@ -321,7 +322,7 @@ class RabbitService {
       if (updateData.father_id) {
         if (updateData.father_id === rabbitId) throw new Error('CANNOT_BE_OWN_FATHER');
         const father = await Rabbit.findOne({
-          where: { id: updateData.father_id, user_id: userId, sex: 'male' },
+          where: { id: updateData.father_id, farm_id: farmId, sex: 'male' },
           transaction
         });
         if (!father) throw new Error('FATHER_NOT_FOUND_OR_INVALID_SEX');
@@ -331,16 +332,16 @@ class RabbitService {
       if (updateData.mother_id) {
         if (updateData.mother_id === rabbitId) throw new Error('CANNOT_BE_OWN_MOTHER');
         const mother = await Rabbit.findOne({
-          where: { id: updateData.mother_id, user_id: userId, sex: 'female' },
+          where: { id: updateData.mother_id, farm_id: farmId, sex: 'female' },
           transaction
         });
         if (!mother) throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');
       }
 
-      // Check if tag_id is unique for THIS user (if being updated)
+      // Клеймо уникально в пределах фермы (если его меняют)
       if (updateData.tag_id && updateData.tag_id !== rabbit.tag_id) {
         const existing = await Rabbit.findOne({
-          where: { tag_id: updateData.tag_id, user_id: userId }
+          where: { tag_id: updateData.tag_id, farm_id: farmId }
         });
         if (existing) {
           throw new Error('TAG_ID_EXISTS');
@@ -366,6 +367,7 @@ class RabbitService {
           Number(updateData.current_weight) !== Number(previousWeight)) {
         await RabbitWeight.create({
           rabbit_id: rabbit.id,
+          farm_id: farmId,
           weight: updateData.current_weight,
           measured_at: new Date()
         }, { transaction });
@@ -374,7 +376,7 @@ class RabbitService {
       await transaction.commit();
 
       // Fetch updated rabbit with associations
-      const updatedRabbit = await this.getRabbitById(rabbit.id, userId);
+      const updatedRabbit = await this.getRabbitById(rabbit.id, farmId);
 
       logger.info('Rabbit updated', { rabbitId });
       return updatedRabbit;
@@ -388,39 +390,38 @@ class RabbitService {
   /**
    * Delete rabbit
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    */
-  async deleteRabbit(rabbitId, userId) {
+  async deleteRabbit(rabbitId, farmId) {
     try {
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbitId, user_id: userId }
+        where: { id: rabbitId, farm_id: farmId }
       });
 
       if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
 
-      // Check for offspring
+      // Связанные записи считаем внутри своей фермы. Кролик и его история
+      // всё равно лежат в одном хозяйстве, но без условия по farm_id запрос
+      // ушёл бы по всей таблице — и отказ в удалении мог прийти из-за
+      // совпадения id в чужих данных.
       const offspring = await Rabbit.count({
-        where: { [Op.or]: [{ father_id: rabbitId }, { mother_id: rabbitId }] }
+        where: { farm_id: farmId, [Op.or]: [{ father_id: rabbitId }, { mother_id: rabbitId }] }
       });
       if (offspring > 0) throw new Error('RABBIT_HAS_OFFSPRING');
 
-      // Check for Breeding records
       const breedings = await Breeding.count({
-        where: { [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] }
+        where: { farm_id: farmId, [Op.or]: [{ male_id: rabbitId }, { female_id: rabbitId }] }
       });
       if (breedings > 0) throw new Error('RABBIT_HAS_BREEDING_HISTORY');
 
-      // Check for Birth records
-      const births = await Birth.count({ where: { mother_id: rabbitId } });
+      const births = await Birth.count({ where: { farm_id: farmId, mother_id: rabbitId } });
       if (births > 0) throw new Error('RABBIT_HAS_BIRTH_HISTORY');
 
-      // Check for Medical/Health records
-      const medical = await MedicalRecord.count({ where: { rabbit_id: rabbitId } });
-      const vaccinations = await Vaccination.count({ where: { rabbit_id: rabbitId } });
+      const medical = await MedicalRecord.count({ where: { farm_id: farmId, rabbit_id: rabbitId } });
+      const vaccinations = await Vaccination.count({ where: { farm_id: farmId, rabbit_id: rabbitId } });
       if (medical > 0 || vaccinations > 0) throw new Error('RABBIT_HAS_HEALTH_HISTORY');
 
-      // Check for financial records
-      const transactions = await Transaction.count({ where: { rabbit_id: rabbitId } });
+      const transactions = await Transaction.count({ where: { farm_id: farmId, rabbit_id: rabbitId } });
       if (transactions > 0) throw new Error('RABBIT_HAS_FINANCIAL_HISTORY');
 
       // File Cleanup
@@ -440,15 +441,15 @@ class RabbitService {
   /**
    * Get rabbit weight history
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    * @returns {Array} Weight records
    */
-  async getWeightHistory(rabbitId, userId) {
+  async getWeightHistory(rabbitId, farmId) {
     try {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: userId
+          farm_id: farmId
         }
       });
 
@@ -457,7 +458,7 @@ class RabbitService {
       }
 
       const weights = await RabbitWeight.findAll({
-        where: { rabbit_id: rabbitId },
+        where: { farm_id: farmId, rabbit_id: rabbitId },
         order: [['measured_at', 'DESC']]
       });
 
@@ -471,15 +472,15 @@ class RabbitService {
   /**
    * Add weight record
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    * @param {Object} weightData - Weight data
    * @returns {Object} Weight record
    */
-  async addWeightRecord(rabbitId, userId, weightData) {
+  async addWeightRecord(rabbitId, farmId, weightData) {
     const transaction = await sequelize.transaction();
     try {
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbitId, user_id: userId },
+        where: { id: rabbitId, farm_id: farmId },
         transaction
       });
 
@@ -487,9 +488,12 @@ class RabbitService {
         throw new Error('RABBIT_NOT_FOUND');
       }
 
+      // farm_id ставим сами, а не из weightData: тело запроса приходит
+      // снаружи, и ферма записи должна совпадать с фермой кролика.
       const weightRecord = await RabbitWeight.create({
+        ...weightData,
         rabbit_id: rabbitId,
-        ...weightData
+        farm_id: farmId
       }, { transaction });
 
       // Update current_weight on rabbit
@@ -507,12 +511,12 @@ class RabbitService {
 
   /**
    * Get rabbit statistics
-   * @param {Number} userId - User ID for filtering
+   * @param {Number} farmId - id хозяйства
    * @returns {Object} Statistics
    */
-  async getStatistics(userId) {
+  async getStatistics(farmId) {
     try {
-      const where = { user_id: userId };
+      const where = { farm_id: farmId };
 
       const total = await Rabbit.count({ where });
       const deadCount = await Rabbit.count({ where: { ...where, status: 'dead' } });
@@ -533,7 +537,7 @@ class RabbitService {
           model: Breed,
           as: 'breed',
           attributes: ['name'],
-          where: { user_id: userId },
+          where: { farm_id: farmId },
           required: false
         }],
         group: ['breed_id', 'breed.id', 'breed.name'],
@@ -568,13 +572,13 @@ class RabbitService {
   /**
    * Get rabbit pedigree (parents tree)
    * @param {Number} rabbitId - Rabbit ID
-   * @param {Number} userId - User ID for ownership verification
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
    * @param {Number} generations - Number of generations (default: 3)
    * @returns {Object} Pedigree tree
    */
-  async getPedigree(rabbitId, userId, generations = 3) {
+  async getPedigree(rabbitId, farmId, generations = 3) {
     try {
-      const rabbit = await this.getRabbitById(rabbitId, userId);
+      const rabbit = await this.getRabbitById(rabbitId, farmId);
       const buildPedigree = async (currentRabbit, level, pathVisited = new Set()) => {
         if (!currentRabbit) return null;
         if (pathVisited.has(currentRabbit.id)) return null;
@@ -599,7 +603,7 @@ class RabbitService {
 
         if (currentRabbit.father_id) {
           try {
-            const father = await this.getRabbitById(currentRabbit.father_id, userId);
+            const father = await this.getRabbitById(currentRabbit.father_id, farmId);
             result.father = await buildPedigree(father, level + 1, pathVisited);
           } catch (error) {
             // Родитель не найден - пропускаем
@@ -612,7 +616,7 @@ class RabbitService {
 
         if (currentRabbit.mother_id) {
           try {
-            const mother = await this.getRabbitById(currentRabbit.mother_id, userId);
+            const mother = await this.getRabbitById(currentRabbit.mother_id, farmId);
             result.mother = await buildPedigree(mother, level + 1, pathVisited);
           } catch (error) {
             // Родитель не найден - пропускаем

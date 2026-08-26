@@ -29,7 +29,7 @@ describe('BreedingController', () => {
 
       await breedingController.create(req, res, mockNext);
 
-      expect(breedingService.createBreeding).toHaveBeenCalledWith({ male_id: 1, female_id: 2, user_id: 1 });
+      expect(breedingService.createBreeding).toHaveBeenCalledWith({ male_id: 1, female_id: 2, farm_id: 1 });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: breeding }));
     });

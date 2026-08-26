@@ -11,11 +11,10 @@ const { Transaction } = require('../models');
  *
  * Удаление обрабатывает сама база: внешний ключ объявлен с CASCADE.
  *
- * Ферма расхода — та же, что у записи о здоровье: `userId` здесь автор
- * записи, участник фермы, и книга фермы читается по составу участников
- * (`farmScope` в transactionService). Класть сюда владельца вместо автора
- * нельзя — тогда в графе «кто внёс» у лечения, заведённого сотрудником,
- * оказывался хозяин.
+ * `farmId` — хозяйство записи о здоровье, `userId` — человек, который её
+ * завёл. Это разные вещи: в книгу расход попадает по ферме, а в графе «кто
+ * внёс» стоит сотрудник, а не хозяин. По ферме же ищется и уже созданный
+ * расход — иначе правка стоимости шарила бы по чужим строкам.
  */
 async function syncAutoExpense({
   link,
@@ -23,11 +22,12 @@ async function syncAutoExpense({
   rabbitId,
   transactionDate,
   description,
+  farmId,
   userId,
   transaction
 }) {
   const amount = cost === null || cost === undefined || cost === '' ? 0 : parseFloat(cost);
-  const existing = await Transaction.findOne({ where: link, transaction });
+  const existing = await Transaction.findOne({ where: { ...link, farm_id: farmId }, transaction });
 
   // Стоимость убрали — расход тоже должен уйти, иначе в ведомости остаётся
   // трата, которой на карточке уже не видно.
@@ -51,7 +51,7 @@ async function syncAutoExpense({
   }
 
   return Transaction.create(
-    { ...fields, ...link, created_by: userId },
+    { ...fields, ...link, farm_id: farmId, created_by: userId },
     { transaction }
   );
 }

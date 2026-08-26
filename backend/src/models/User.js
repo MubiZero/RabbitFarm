@@ -30,11 +30,15 @@ module.exports = (sequelize) => {
         }
       }
     },
-    // NULL — пользователь сам себе ферма (владелец).
-    // Заполнено — это работник фермы указанного владельца.
-    owner_id: {
+    // Хозяйство, в котором человек работает. Заполнено всегда: учётная
+    // запись вне фермы не значит ничего.
+    //
+    // Раньше здесь стоял `owner_id`, отвечавший сразу на два вопроса — к
+    // какой ферме относится человек и кто на ферме главный. Второй ответ
+    // переехал в `farms.owner_id`, и у принадлежности остался один источник.
+    farm_id: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     },
     role: {
       type: DataTypes.ENUM('owner', 'manager', 'worker'),
@@ -78,6 +82,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     indexes: [
+      { fields: ['farm_id'], name: 'idx_users_farm' },
       { fields: ['email'] },
       { fields: ['role'] },
       { fields: ['is_active'] }

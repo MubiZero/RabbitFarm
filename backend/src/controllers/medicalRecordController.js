@@ -19,7 +19,7 @@ class MedicalRecordController {
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbit_id, user_id: req.farmId },
+        where: { id: rabbit_id, farm_id: req.farmId },
         transaction: t
       });
       if (!rabbit) {
@@ -33,7 +33,7 @@ class MedicalRecordController {
         return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика');
       }
 
-      const medicalRecord = await MedicalRecord.create(req.body, { transaction: t });
+      const medicalRecord = await MedicalRecord.create({ ...req.body, farm_id: req.farmId }, { transaction: t });
 
       // Automation 1: Status Update
       if (['died', 'euthanized'].includes(outcome)) {
@@ -51,6 +51,7 @@ class MedicalRecordController {
         rabbitId: rabbit_id,
         transactionDate: started_at,
         description: `Лечение: ${diagnosis || 'без диагноза'}`,
+        farmId: req.farmId,
         userId: req.user.id,
         transaction: t
       });
@@ -58,7 +59,8 @@ class MedicalRecordController {
       await t.commit();
 
       // Fetch created record with rabbit info
-      const result = await MedicalRecord.findByPk(medicalRecord.id, {
+      const result = await MedicalRecord.findOne({
+        where: { id: medicalRecord.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
@@ -85,12 +87,12 @@ class MedicalRecordController {
    */
   async getById(req, res, next) {
     try {
-      const medicalRecord = await MedicalRecord.findByPk(req.params.id, {
+      const medicalRecord = await MedicalRecord.findOne({
+        where: { id: req.params.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -132,7 +134,7 @@ class MedicalRecordController {
       } = req.query;
 
       const offset = (parseInt(page) - 1) * parseInt(limit);
-      const where = {};
+      const where = { farm_id: req.farmId };
 
       // Filters
       if (rabbit_id) where.rabbit_id = rabbit_id;
@@ -161,7 +163,6 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -203,7 +204,7 @@ class MedicalRecordController {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: req.farmId
+          farm_id: req.farmId
         }
       });
       if (!rabbit) {
@@ -211,7 +212,7 @@ class MedicalRecordController {
       }
 
       const medicalRecords = await MedicalRecord.findAll({
-        where: { rabbit_id: rabbitId },
+        where: { rabbit_id: rabbitId, farm_id: req.farmId },
         order: [['started_at', 'DESC']],
         include: [
           {
@@ -235,13 +236,12 @@ class MedicalRecordController {
   async update(req, res, next) {
     const t = await sequelize.transaction();
     try {
-      // Ферма отбирается в самом запросе, а не сверкой user_id после выборки:
-      // выборка без скоупа поднимала чужую запись в память и падала пятисоткой,
-      // если кролика уже не было. Кролик грузится целиком — по нему же ниже
-      // выставляется статус.
+      // Ферма отбирается в самом запросе, а не сверкой после выборки: иначе
+      // чужая запись поднималась в память и падала пятисоткой. Кролик грузится
+      // целиком — по нему же ниже выставляется статус.
       const medicalRecord = await MedicalRecord.findOne({
-        where: { id: req.params.id },
-        include: [{ model: Rabbit, as: 'rabbit', where: { user_id: req.farmId } }],
+        where: { id: req.params.id, farm_id: req.farmId },
+        include: [{ model: Rabbit, as: 'rabbit', required: true }],
         transaction: t
       });
 
@@ -256,7 +256,7 @@ class MedicalRecordController {
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
       if (req.body.rabbit_id && req.body.rabbit_id !== medicalRecord.rabbit_id) {
         const newRabbit = await Rabbit.findOne({
-          where: { id: req.body.rabbit_id, user_id: req.farmId },
+          where: { id: req.body.rabbit_id, farm_id: req.farmId },
           transaction: t
         });
         if (!newRabbit) {
@@ -275,6 +275,7 @@ class MedicalRecordController {
         rabbitId: medicalRecord.rabbit_id,
         transactionDate: medicalRecord.started_at,
         description: `Лечение: ${medicalRecord.diagnosis || 'без диагноза'}`,
+        farmId: req.farmId,
         userId: req.user.id,
         transaction: t
       });
@@ -294,7 +295,8 @@ class MedicalRecordController {
       await t.commit();
 
       // Fetch updated record with rabbit info
-      const result = await MedicalRecord.findByPk(medicalRecord.id, {
+      const result = await MedicalRecord.findOne({
+        where: { id: medicalRecord.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
@@ -322,13 +324,7 @@ class MedicalRecordController {
   async delete(req, res, next) {
     try {
       const medicalRecord = await MedicalRecord.findOne({
-        where: { id: req.params.id },
-        include: [{
-          model: Rabbit,
-          as: 'rabbit',
-          where: { user_id: req.farmId },
-          attributes: ['id']
-        }]
+        where: { id: req.params.id, farm_id: req.farmId }
       });
 
       if (!medicalRecord) {
@@ -349,17 +345,10 @@ class MedicalRecordController {
    */
   async getStatistics(req, res, next) {
     try {
-      const user_id = req.farmId;
+      const farm_id = req.farmId;
       const now = new Date();
       const thisYear = new Date(now.getFullYear(), 0, 1);
       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-
-      const rabbitInclude = {
-        model: Rabbit,
-        as: 'rabbit',
-        where: { user_id },
-        attributes: []
-      };
 
       // Run all aggregate queries in parallel
       const [
@@ -371,9 +360,7 @@ class MedicalRecordController {
         ongoingTreatments
       ] = await Promise.all([
         // Total count
-        MedicalRecord.count({
-          include: [rabbitInclude]
-        }),
+        MedicalRecord.count({ where: { farm_id } }),
 
         // Count by outcome
         MedicalRecord.findAll({
@@ -381,7 +368,7 @@ class MedicalRecordController {
             'outcome',
             [sequelize.fn('COUNT', sequelize.col('MedicalRecord.id')), 'count']
           ],
-          include: [rabbitInclude],
+          where: { farm_id },
           group: ['outcome'],
           raw: true
         }),
@@ -391,29 +378,26 @@ class MedicalRecordController {
           attributes: [
             [sequelize.fn('SUM', sequelize.col('cost')), 'total_cost']
           ],
-          include: [rabbitInclude],
+          where: { farm_id },
           raw: true
         }),
 
         // This year count
         MedicalRecord.count({
-          where: { started_at: { [Op.gte]: thisYear } },
-          include: [rabbitInclude]
+          where: { farm_id, started_at: { [Op.gte]: thisYear } }
         }),
 
         // Last month count
         MedicalRecord.count({
-          where: { started_at: { [Op.gte]: lastMonth } },
-          include: [rabbitInclude]
+          where: { farm_id, started_at: { [Op.gte]: lastMonth } }
         }),
 
         // Ongoing treatments (limited query, not all records)
         MedicalRecord.findAll({
-          where: { outcome: 'ongoing' },
+          where: { farm_id, outcome: 'ongoing' },
           include: [{
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id },
             attributes: ['id', 'name']
           }],
           attributes: ['id', 'rabbit_id', 'diagnosis', 'started_at', 'symptoms'],
@@ -474,6 +458,7 @@ class MedicalRecordController {
     try {
       const medicalRecords = await MedicalRecord.findAll({
         where: {
+          farm_id: req.farmId,
           outcome: 'ongoing'
         },
         include: [
@@ -482,7 +467,8 @@ class MedicalRecordController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
-              user_id: req.farmId, // Filter by user
+              // Кролик здесь нужен ради живого статуса, а не ради фермы:
+              // ферма отобрана выше, по farm_id самой записи.
               // Перечисление живых статусов пропускало 'active' и
               // 'quarantine'. Статус 'active' код сам ставит матери после
               // окрола, поэтому любая окролившаяся самка исчезала из списка
@@ -525,6 +511,7 @@ class MedicalRecordController {
     try {
       const { from_date, to_date } = req.query;
       const where = {
+        farm_id: req.farmId,
         cost: { [Op.not]: null }
       };
 
@@ -557,7 +544,6 @@ class MedicalRecordController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id']
           }
         ],

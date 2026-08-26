@@ -12,8 +12,9 @@ class BreedingController {
      */
     async create(req, res, next) {
         try {
-            // Add user_id from authenticated user
-            req.body.user_id = req.farmId;
+            // Ферму берём из токена, а не из тела: иначе клиент мог бы записать
+            // случку на чужую ферму.
+            req.body.farm_id = req.farmId;
 
             const breeding = await breedingService.createBreeding(req.body);
             return ApiResponse.created(res, breeding, 'Случка успешно зарегистрирована');

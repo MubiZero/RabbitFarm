@@ -30,9 +30,6 @@ mixin _$FarmMember {
   FarmRole get role => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
-  @JsonKey(name: 'owner_id')
-  @NullableIntConverter()
-  int? get ownerId => throw _privateConstructorUsedError;
 
   /// Serializes this FarmMember to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -58,7 +55,6 @@ abstract class $FarmMemberCopyWith<$Res> {
     String? phone,
     FarmRole role,
     @JsonKey(name: 'is_active') bool isActive,
-    @JsonKey(name: 'owner_id') @NullableIntConverter() int? ownerId,
   });
 }
 
@@ -83,7 +79,6 @@ class _$FarmMemberCopyWithImpl<$Res, $Val extends FarmMember>
     Object? phone = freezed,
     Object? role = null,
     Object? isActive = null,
-    Object? ownerId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -111,10 +106,6 @@ class _$FarmMemberCopyWithImpl<$Res, $Val extends FarmMember>
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
-            ownerId: freezed == ownerId
-                ? _value.ownerId
-                : ownerId // ignore: cast_nullable_to_non_nullable
-                      as int?,
           )
           as $Val,
     );
@@ -137,7 +128,6 @@ abstract class _$$FarmMemberImplCopyWith<$Res>
     String? phone,
     FarmRole role,
     @JsonKey(name: 'is_active') bool isActive,
-    @JsonKey(name: 'owner_id') @NullableIntConverter() int? ownerId,
   });
 }
 
@@ -161,7 +151,6 @@ class __$$FarmMemberImplCopyWithImpl<$Res>
     Object? phone = freezed,
     Object? role = null,
     Object? isActive = null,
-    Object? ownerId = freezed,
   }) {
     return _then(
       _$FarmMemberImpl(
@@ -189,10 +178,6 @@ class __$$FarmMemberImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
-        ownerId: freezed == ownerId
-            ? _value.ownerId
-            : ownerId // ignore: cast_nullable_to_non_nullable
-                  as int?,
       ),
     );
   }
@@ -208,7 +193,6 @@ class _$FarmMemberImpl extends _FarmMember {
     this.phone,
     required this.role,
     @JsonKey(name: 'is_active') this.isActive = true,
-    @JsonKey(name: 'owner_id') @NullableIntConverter() this.ownerId,
   }) : super._();
 
   factory _$FarmMemberImpl.fromJson(Map<String, dynamic> json) =>
@@ -229,14 +213,10 @@ class _$FarmMemberImpl extends _FarmMember {
   @override
   @JsonKey(name: 'is_active')
   final bool isActive;
-  @override
-  @JsonKey(name: 'owner_id')
-  @NullableIntConverter()
-  final int? ownerId;
 
   @override
   String toString() {
-    return 'FarmMember(id: $id, email: $email, fullName: $fullName, phone: $phone, role: $role, isActive: $isActive, ownerId: $ownerId)';
+    return 'FarmMember(id: $id, email: $email, fullName: $fullName, phone: $phone, role: $role, isActive: $isActive)';
   }
 
   @override
@@ -251,22 +231,13 @@ class _$FarmMemberImpl extends _FarmMember {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.isActive, isActive) ||
-                other.isActive == isActive) &&
-            (identical(other.ownerId, ownerId) || other.ownerId == ownerId));
+                other.isActive == isActive));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    email,
-    fullName,
-    phone,
-    role,
-    isActive,
-    ownerId,
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, id, email, fullName, phone, role, isActive);
 
   /// Create a copy of FarmMember
   /// with the given fields replaced by the non-null parameter values.
@@ -290,7 +261,6 @@ abstract class _FarmMember extends FarmMember {
     final String? phone,
     required final FarmRole role,
     @JsonKey(name: 'is_active') final bool isActive,
-    @JsonKey(name: 'owner_id') @NullableIntConverter() final int? ownerId,
   }) = _$FarmMemberImpl;
   const _FarmMember._() : super._();
 
@@ -312,10 +282,6 @@ abstract class _FarmMember extends FarmMember {
   @override
   @JsonKey(name: 'is_active')
   bool get isActive;
-  @override
-  @JsonKey(name: 'owner_id')
-  @NullableIntConverter()
-  int? get ownerId;
 
   /// Create a copy of FarmMember
   /// with the given fields replaced by the non-null parameter values.

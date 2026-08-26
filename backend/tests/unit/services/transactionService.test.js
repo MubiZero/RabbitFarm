@@ -3,7 +3,6 @@ jest.mock('../../../src/models', () => {
   return {
     Transaction: {
       findOne: jest.fn(),
-      findByPk: jest.fn(),
       create: jest.fn(),
       count: jest.fn(),
       findAll: jest.fn(),
@@ -14,6 +13,7 @@ jest.mock('../../../src/models', () => {
       }
     },
     Rabbit: { findOne: jest.fn(), findByPk: jest.fn() },
+    Farm: { findOne: jest.fn(), findByPk: jest.fn(), create: jest.fn() },
     User: { findByPk: jest.fn() },
     sequelize: mockSequelize
   };
@@ -37,7 +37,8 @@ const createMockTransaction = (overrides = {}) => ({
   rabbit_id: null,
   description: 'Bought hay',
   receipt_url: null,
-  created_by: 1,
+  farm_id: 1,
+  created_by: 7,
   toJSON: function () { return { ...this }; },
   update: jest.fn().mockResolvedValue(true),
   destroy: jest.fn().mockResolvedValue(true),
@@ -59,17 +60,21 @@ describe('TransactionService', () => {
     it('should create a simple expense transaction successfully', async () => {
       const mockTx = createMockTransaction();
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       const result = await transactionService.createTransaction({
         type: 'expense',
         category: 'feed',
         amount: 150,
         transaction_date: '2026-02-20',
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
-      expect(Transaction.create).toHaveBeenCalled();
+      expect(Transaction.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1, created_by: 7 }),
+        expect.objectContaining({ transaction: mockDbTransaction })
+      );
       expect(mockDbTransaction.commit).toHaveBeenCalled();
       expect(result).toBe(mockTx);
     });
@@ -78,9 +83,12 @@ describe('TransactionService', () => {
       Rabbit.findOne.mockResolvedValue(null);
 
       await expect(
-        transactionService.createTransaction({ type: 'expense', category: 'vet', amount: 100, rabbit_id: 99, user_id: 1 })
+        transactionService.createTransaction({ type: 'expense', category: 'vet', amount: 100, rabbit_id: 99, farm_id: 1, author_id: 7 })
       ).rejects.toThrow('RABBIT_NOT_FOUND');
 
+      expect(Rabbit.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 99, farm_id: 1 } })
+      );
       expect(Transaction.create).not.toHaveBeenCalled();
       expect(mockDbTransaction.rollback).toHaveBeenCalled();
     });
@@ -91,14 +99,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
         category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).toHaveBeenCalledWith(
@@ -114,14 +123,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_meat', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
         category: 'sale_meat',
         amount: 500,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).toHaveBeenCalledWith(
@@ -136,14 +146,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       const result = await transactionService.createTransaction({
         type: 'income',
         category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).not.toHaveBeenCalled();
@@ -157,14 +168,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       const result = await transactionService.createTransaction({
         type: 'income',
         category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).not.toHaveBeenCalled();
@@ -178,14 +190,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
         category: 'sale_rabbit',
         amount: 500,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).toHaveBeenCalledWith(
@@ -201,14 +214,15 @@ describe('TransactionService', () => {
 
       const mockTx = createMockTransaction({ type: 'income', category: 'other', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       await transactionService.createTransaction({
         type: 'income',
         category: 'other',
         amount: 100,
         rabbit_id: 1,
-        user_id: 1
+        farm_id: 1,
+        author_id: 7
       });
 
       expect(mockRabbit.update).not.toHaveBeenCalled();
@@ -224,6 +238,9 @@ describe('TransactionService', () => {
 
       const result = await transactionService.getTransactionById(1, 1);
 
+      expect(Transaction.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 1, farm_id: 1 } })
+      );
       expect(result).toBe(mockTx);
     });
 
@@ -245,6 +262,7 @@ describe('TransactionService', () => {
 
       const result = await transactionService.listTransactions(1);
 
+      expect(Transaction.findAndCountAll.mock.calls[0][0].where.farm_id).toBe(1);
       expect(result.items).toHaveLength(3);
       expect(result.total).toBe(3);
       expect(result.page).toBe(1);
@@ -292,7 +310,7 @@ describe('TransactionService', () => {
     it('should update transaction successfully', async () => {
       const mockTx = createMockTransaction();
       Transaction.findOne.mockResolvedValue(mockTx);
-      Transaction.findByPk.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
 
       const result = await transactionService.updateTransaction(1, 1, { description: 'Updated' });
 
@@ -350,6 +368,8 @@ describe('TransactionService', () => {
 
       const result = await transactionService.getStatistics(1);
 
+      expect(Transaction.sum.mock.calls[0][1].where.farm_id).toBe(1);
+      expect(Transaction.count.mock.calls[0][0].where.farm_id).toBe(1);
       expect(result.total_income).toBe('1000.00');
       expect(result.total_expenses).toBe('400.00');
       expect(result.net_profit).toBe('600.00');
@@ -386,6 +406,35 @@ describe('TransactionService', () => {
     });
   });
 
+  // ─── книга фермы, а не автора ─────────────────────────────────────────────
+
+  describe('принадлежность операции', () => {
+    // Пока ферму выводили из автора записи, расход, заведённый работником,
+    // исчезал из книги владельца — и из списка, и из сумм, и из отчёта.
+    // Фильтр по `created_by` не должен вернуться ни в одно из этих мест.
+    it('не фильтрует по тому, кто внёс запись', async () => {
+      Transaction.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
+      Transaction.sum.mockResolvedValue(0);
+      Transaction.findAll.mockResolvedValue([]);
+      Transaction.count.mockResolvedValue(0);
+
+      await transactionService.listTransactions(1);
+      await transactionService.getStatistics(1);
+      await transactionService.getMonthlyReport(1, 2026, 2);
+
+      const wheres = [
+        Transaction.findAndCountAll.mock.calls[0][0].where,
+        Transaction.sum.mock.calls[0][1].where,
+        ...Transaction.findAll.mock.calls.map(call => call[0].where)
+      ];
+
+      for (const where of wheres) {
+        expect(where.farm_id).toBe(1);
+        expect(where.created_by).toBeUndefined();
+      }
+    });
+  });
+
   // ─── getRabbitTransactions ────────────────────────────────────────────────
 
   describe('getRabbitTransactions', () => {
@@ -406,6 +455,10 @@ describe('TransactionService', () => {
 
       const result = await transactionService.getRabbitTransactions(1, 1);
 
+      expect(Rabbit.findOne).toHaveBeenCalledWith({ where: { id: 1, farm_id: 1 } });
+      expect(Transaction.findAll.mock.calls[0][0].where).toEqual(
+        expect.objectContaining({ rabbit_id: 1, farm_id: 1 })
+      );
       expect(result.transactions).toBe(rows);
       expect(result.summary.total_income).toBe('500.00');
       expect(result.summary.total_expenses).toBe('50.00');
@@ -441,6 +494,7 @@ describe('TransactionService', () => {
 
       const result = await transactionService.getMonthlyReport(1, 2026, 2);
 
+      expect(Transaction.findAll.mock.calls[0][0].where.farm_id).toBe(1);
       expect(result.period.year).toBe(2026);
       expect(result.period.month).toBe(2);
       expect(result.period.start_date).toBe('2026-02-01');

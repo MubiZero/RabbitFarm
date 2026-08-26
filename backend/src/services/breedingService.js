@@ -47,9 +47,9 @@ class BreedingService {
                 throw new Error('CANNOT_BREED_SAME_RABBIT');
             }
 
-            // Check if male exists and is male and belongs to user
+            // Check if male exists and is male and belongs to farm
             const male = await Rabbit.findOne({
-                where: { id: data.male_id, user_id: data.user_id },
+                where: { id: data.male_id, farm_id: data.farm_id },
                 transaction
             });
             if (!male) {
@@ -62,9 +62,9 @@ class BreedingService {
                 throw new Error('MALE_NOT_AVAILABLE');
             }
 
-            // Check if female exists and is female and belongs to user
+            // Check if female exists and is female and belongs to farm
             const female = await Rabbit.findOne({
-                where: { id: data.female_id, user_id: data.user_id },
+                where: { id: data.female_id, farm_id: data.farm_id },
                 transaction
             });
             if (!female) {
@@ -94,9 +94,14 @@ class BreedingService {
                 const palpationDate = new Date(breedingDate);
                 palpationDate.setDate(palpationDate.getDate() + 14);
 
+                // Задачи по случке заводит сервер, а не человек, поэтому
+                // автора и исполнителя нет. Раньше в оба поля писали id
+                // владельца — только потому, что «ферма» и была этим id;
+                // теперь ферма записана в farm_id, и подставлять хозяина
+                // автором чужой работы незачем: список фермы всё равно
+                // видит задачу.
                 await Task.create({
-                    created_by: data.user_id,
-                    assigned_to: data.user_id,
+                    farm_id: data.farm_id,
                     title: `Пальпация: ${female.name}`,
                     description: `Проверить на беременность самку ${female.name} после случки с ${male.name}`,
                     type: 'checkup',
@@ -111,8 +116,7 @@ class BreedingService {
                 nestBoxDate.setDate(nestBoxDate.getDate() + 28);
 
                 await Task.create({
-                    created_by: data.user_id,
-                    assigned_to: data.user_id,
+                    farm_id: data.farm_id,
                     title: `Поставить маточник: ${female.name}`,
                     description: `Подготовить клетку и поставить гнездовой ящик для ${female.name}`,
                     type: 'breeding',
@@ -128,8 +132,7 @@ class BreedingService {
                 birthDate.setDate(birthDate.getDate() + 31);
 
                 await Task.create({
-                    created_by: data.user_id,
-                    assigned_to: data.user_id,
+                    farm_id: data.farm_id,
                     title: `Ожидаемый окрол: ${female.name}`,
                     description: `Ожидается окрол у самки ${female.name} (случка с ${male.name})`,
                     type: 'breeding',
@@ -143,7 +146,7 @@ class BreedingService {
             await transaction.commit();
 
             // Fetch with associations
-            const createdBreeding = await this.getBreedingById(breeding.id, data.user_id);
+            const createdBreeding = await this.getBreedingById(breeding.id, data.farm_id);
 
             logger.info('Breeding created', { breedingId: breeding.id });
             return createdBreeding;
@@ -162,27 +165,27 @@ class BreedingService {
     /**
      * Get breeding by ID
      * @param {Number} id - Breeding ID
-     * @param {Number} userId - User ID for ownership verification
+     * @param {Number} farmId - Farm ID for ownership verification
      * @returns {Object} Breeding record with associations
      */
-    async getBreedingById(id, userId) {
+    async getBreedingById(id, farmId) {
         try {
             const breeding = await Breeding.findOne({
                 where: {
                     id,
-                    user_id: userId
+                    farm_id: farmId
                 },
                 include: [
                     {
                         model: Rabbit,
                         as: 'male',
-                        where: { user_id: userId },
+                        where: { farm_id: farmId },
                         required: false
                     },
                     {
                         model: Rabbit,
                         as: 'female',
-                        where: { user_id: userId },
+                        where: { farm_id: farmId },
                         required: false
                     }
                 ]
@@ -201,17 +204,17 @@ class BreedingService {
 
     /**
      * List breedings with filters
-     * @param {Number} userId - User ID for filtering
+     * @param {Number} farmId - Farm ID for filtering
      * @param {Object} filters - Filter options
      * @param {Object} pagination - Pagination options
      */
-    async listBreedings(userId, filters = {}, pagination = {}) {
+    async listBreedings(farmId, filters = {}, pagination = {}) {
         try {
             const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'desc' } = pagination;
             const offset = (page - 1) * limit;
 
             const where = {
-                user_id: userId  // Filter by user
+                farm_id: farmId  // Filter by farm
             };
 
             if (filters.status) {
@@ -244,13 +247,13 @@ class BreedingService {
                     {
                         model: Rabbit,
                         as: 'male',
-                        where: { user_id: userId },
+                        where: { farm_id: farmId },
                         required: false
                     },
                     {
                         model: Rabbit,
                         as: 'female',
-                        where: { user_id: userId },
+                        where: { farm_id: farmId },
                         required: false
                     },
                     {
@@ -286,14 +289,14 @@ class BreedingService {
     /**
      * Update breeding record
      * @param {Number} id - Breeding ID
-     * @param {Number} userId - User ID for ownership verification
+     * @param {Number} farmId - Farm ID for ownership verification
      * @param {Object} data - Update data
      */
-    async updateBreeding(id, userId, data) {
+    async updateBreeding(id, farmId, data) {
         const transaction = await Breeding.sequelize.transaction();
         try {
             const breeding = await Breeding.findOne({
-                where: { id, user_id: userId },
+                where: { id, farm_id: farmId },
                 transaction
             });
 
@@ -304,7 +307,7 @@ class BreedingService {
             // If updating male/female, check existence and ownership
             if (data.male_id) {
                 const male = await Rabbit.findOne({
-                    where: { id: data.male_id, user_id: userId, sex: 'male' },
+                    where: { id: data.male_id, farm_id: farmId, sex: 'male' },
                     transaction
                 });
                 if (!male) {
@@ -316,7 +319,7 @@ class BreedingService {
                     throw new Error('CANNOT_BREED_SAME_RABBIT');
                 }
                 const female = await Rabbit.findOne({
-                    where: { id: data.female_id, user_id: userId, sex: 'female' },
+                    where: { id: data.female_id, farm_id: farmId, sex: 'female' },
                     transaction
                 });
                 if (!female) {
@@ -330,13 +333,21 @@ class BreedingService {
             await breeding.update(data, { transaction });
 
             // Automation: Update female status to 'pregnant' if is_pregnant is true
+            // Самку ищем в пределах фермы: findByPk брал её по всей базе, и
+            // чужой кролик, подставленный в female_id, менял статус.
             if (data.is_pregnant === true) {
-                const female = await Rabbit.findByPk(data.female_id || breeding.female_id, { transaction });
+                const female = await Rabbit.findOne({
+                    where: { id: data.female_id || breeding.female_id, farm_id: farmId },
+                    transaction
+                });
                 if (female) {
                     await female.update({ status: 'pregnant' }, { transaction });
                 }
             } else if (data.is_pregnant === false || data.status === 'failed') {
-                const female = await Rabbit.findByPk(breeding.female_id, { transaction });
+                const female = await Rabbit.findOne({
+                    where: { id: breeding.female_id, farm_id: farmId },
+                    transaction
+                });
                 if (female && female.status === 'pregnant') {
                     await female.update({ status: 'active' }, { transaction });
                 }
@@ -344,7 +355,7 @@ class BreedingService {
 
             await transaction.commit();
 
-            const updated = await this.getBreedingById(id, userId);
+            const updated = await this.getBreedingById(id, farmId);
             logger.info('Breeding updated', { breedingId: id });
             return updated;
         } catch (error) {
@@ -362,14 +373,14 @@ class BreedingService {
     /**
      * Delete breeding record
      * @param {Number} id - Breeding ID
-     * @param {Number} userId - User ID for ownership verification
+     * @param {Number} farmId - Farm ID for ownership verification
      */
-    async deleteBreeding(id, userId) {
+    async deleteBreeding(id, farmId) {
         try {
             const breeding = await Breeding.findOne({
                 where: {
                     id,
-                    user_id: userId
+                    farm_id: farmId
                 }
             });
 
@@ -388,11 +399,11 @@ class BreedingService {
 
     /**
      * Get breeding statistics
-     * @param {Number} userId - User ID for filtering
+     * @param {Number} farmId - Farm ID for filtering
      */
-    async getStatistics(userId) {
+    async getStatistics(farmId) {
         try {
-            const where = { user_id: userId };
+            const where = { farm_id: farmId };
 
             const total = await Breeding.count({ where });
             const planned = await Breeding.count({ where: { ...where, status: 'planned' } });

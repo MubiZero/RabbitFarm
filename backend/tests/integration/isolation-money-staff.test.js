@@ -19,11 +19,12 @@ describe('Изоляция ферм: деньги, отчёты, персона�
 
   let alphaToken;
   let alphaId;
+  let alphaFarmId;
   let alphaManagerToken;
   let alphaManagerId;
   let alphaWorkerToken;
   let betaToken;
-  let betaId;
+  let betaFarmId;
 
   let alphaRabbitId;
   let betaRabbitId;
@@ -37,7 +38,11 @@ describe('Изоляция ферм: деньги, отчёты, персона�
     const res = await request(app)
       .post('/api/v1/auth/register')
       .send({ email, password: 'Password123!', full_name: email });
-    return { token: res.body.data.access_token, id: res.body.data.user.id };
+    return {
+      token: res.body.data.access_token,
+      id: res.body.data.user.id,
+      farmId: res.body.data.user.farm_id
+    };
   };
 
   /** Пригласить человека в ферму и сразу активировать код. */
@@ -82,10 +87,11 @@ describe('Изоляция ферм: деньги, отчёты, персона�
     const alpha = await createFarm('alpha_owner@example.com');
     alphaToken = alpha.token;
     alphaId = alpha.id;
+    alphaFarmId = alpha.farmId;
 
     const beta = await createFarm('beta_owner@example.com');
     betaToken = beta.token;
-    betaId = beta.id;
+    betaFarmId = beta.farmId;
 
     const alphaManager = await hire(alphaToken, 'alpha_manager@example.com', 'manager');
     alphaManagerToken = alphaManager.token;
@@ -460,8 +466,8 @@ describe('Изоляция ферм: деньги, отчёты, персона�
         .post('/api/v1/auth/accept-invitation')
         .send({ code: invitation.body.data.code, password: 'Password123!', full_name: 'Новичок Альфы' });
 
-      expect(joined.body.data.user.owner_id).toBe(alphaId);
-      expect(joined.body.data.user.owner_id).not.toBe(betaId);
+      expect(joined.body.data.user.farm_id).toBe(alphaFarmId);
+      expect(joined.body.data.user.farm_id).not.toBe(betaFarmId);
     });
   });
 

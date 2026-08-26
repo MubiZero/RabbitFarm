@@ -8,6 +8,16 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    // Хозяйство, которому принадлежит запись.
+    //
+    // Раньше принадлежность выводили из соседей — чей кролик, чья клетка,
+    // кто внёс. Оба признака подводили: «кто внёс» — это не «чьё», а сама
+    // ссылка на автора обнуляется при удалении человека, и запись оставалась
+    // ничьей. Теперь хозяйство записано в строке и держится внешним ключом.
+    farm_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     rabbit_id: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -35,6 +45,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: false,
     indexes: [
+      { fields: ['farm_id'], name: 'idx_rabbit_weights_farm' },
       { fields: ['rabbit_id'] },
       { fields: ['measured_at'] }
     ]

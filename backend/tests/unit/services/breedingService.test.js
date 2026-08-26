@@ -13,11 +13,13 @@ jest.mock('../../../src/models', () => {
       sequelize: mockSequelize
     },
     Rabbit: {
-      findOne: jest.fn(),
-      findByPk: jest.fn()
+      findOne: jest.fn()
     },
     Task: {
       create: jest.fn()
+    },
+    Birth: {
+      findAll: jest.fn()
     }
   };
 });
@@ -43,7 +45,7 @@ describe('BreedingService', () => {
     const breedingData = {
       male_id: 1,
       female_id: 2,
-      user_id: 1,
+      farm_id: 1,
       breeding_date: '2024-05-01'
     };
 
@@ -60,12 +62,21 @@ describe('BreedingService', () => {
 
       expect(Breeding.create).toHaveBeenCalled();
       expect(Task.create).toHaveBeenCalledTimes(3);
+      // Задачи по случке заводит сервер — ферму им проставляет он же,
+      // иначе хук из tenancy.js откажет в записи.
+      for (const [taskData] of Task.create.mock.calls) {
+        expect(taskData.farm_id).toBe(1);
+      }
+      // Автора и исполнителя у автоматической задачи нет: раньше туда писали
+      // id владельца просто потому, что «ферма» и была этим id.
+      expect(Task.create.mock.calls[0][0].created_by).toBeUndefined();
+      expect(Task.create.mock.calls[0][0].assigned_to).toBeUndefined();
       expect(mockTx.commit).toHaveBeenCalled();
       expect(result).toEqual(createdBreeding);
     });
 
     it('should create breeding without tasks when no breeding_date', async () => {
-      const dataNoDate = { male_id: 1, female_id: 2, user_id: 1 };
+      const dataNoDate = { male_id: 1, female_id: 2, farm_id: 1 };
       Rabbit.findOne
         .mockResolvedValueOnce(male)
         .mockResolvedValueOnce(female);
@@ -86,14 +97,14 @@ describe('BreedingService', () => {
       Task.create.mockResolvedValue({});
       Breeding.findOne.mockResolvedValue({ id: 3 });
 
-      const data = { male_id: 1, female_id: 2, user_id: 1, breeding_date: '2024-05-01' };
+      const data = { male_id: 1, female_id: 2, farm_id: 1, breeding_date: '2024-05-01' };
       await breedingService.createBreeding(data);
 
       expect(data.expected_birth_date).toBe('2024-06-01');
     });
 
     it('should throw CANNOT_BREED_SAME_RABBIT when male_id === female_id', async () => {
-      await expect(breedingService.createBreeding({ male_id: 1, female_id: 1, user_id: 1 }))
+      await expect(breedingService.createBreeding({ male_id: 1, female_id: 1, farm_id: 1 }))
         .rejects.toThrow('CANNOT_BREED_SAME_RABBIT');
       expect(mockTx.rollback).toHaveBeenCalled();
     });
@@ -103,6 +114,10 @@ describe('BreedingService', () => {
 
       await expect(breedingService.createBreeding(breedingData))
         .rejects.toThrow('MALE_NOT_FOUND');
+      // Кролик ищется в своей ферме: чужого самца в случку не подставить.
+      expect(Rabbit.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 1, farm_id: 1 } })
+      );
       expect(mockTx.rollback).toHaveBeenCalled();
     });
 
@@ -179,6 +194,9 @@ describe('BreedingService', () => {
       const result = await breedingService.getBreedingById(1, 1);
 
       expect(result).toEqual(breeding);
+      expect(Breeding.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 1, farm_id: 1 } })
+      );
     });
 
     it('should throw BREEDING_NOT_FOUND if not found', async () => {
@@ -197,6 +215,7 @@ describe('BreedingService', () => {
       const result = await breedingService.listBreedings(1);
 
       expect(result.items).toHaveLength(3);
+      expect(Breeding.count).toHaveBeenCalledWith({ where: { farm_id: 1 } });
       expect(result.pagination.total).toBe(3);
       expect(result.pagination.page).toBe(1);
     });
@@ -270,7 +289,7 @@ describe('BreedingService', () => {
       id: 1,
       male_id: 1,
       female_id: 2,
-      user_id: 1,
+      farm_id: 1,
       update: jest.fn().mockResolvedValue(true)
     };
 
@@ -356,10 +375,15 @@ describe('BreedingService', () => {
       Breeding.findOne
         .mockResolvedValueOnce(breeding)
         .mockResolvedValueOnce({ id: 1 });
-      Rabbit.findByPk.mockResolvedValueOnce(femaleMock);
+      Rabbit.findOne.mockResolvedValueOnce(femaleMock);
 
       await breedingService.updateBreeding(1, 1, { is_pregnant: true });
 
+      // Самку ищем в пределах фермы: поиск по одному лишь id брал её по всей
+      // базе, и чужой кролик в female_id менял статус.
+      expect(Rabbit.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 2, farm_id: 1 } })
+      );
       expect(femaleMock.update).toHaveBeenCalledWith({ status: 'pregnant' }, expect.any(Object));
     });
 
@@ -369,7 +393,7 @@ describe('BreedingService', () => {
       Breeding.findOne
         .mockResolvedValueOnce(breeding)
         .mockResolvedValueOnce({ id: 1 });
-      Rabbit.findByPk.mockResolvedValueOnce(femaleMock);
+      Rabbit.findOne.mockResolvedValueOnce(femaleMock);
 
       await breedingService.updateBreeding(1, 1, { is_pregnant: false });
 
@@ -382,7 +406,7 @@ describe('BreedingService', () => {
       Breeding.findOne
         .mockResolvedValueOnce(breeding)
         .mockResolvedValueOnce({ id: 1 });
-      Rabbit.findByPk.mockResolvedValueOnce(femaleMock);
+      Rabbit.findOne.mockResolvedValueOnce(femaleMock);
 
       await breedingService.updateBreeding(1, 1, { status: 'failed' });
 
@@ -395,7 +419,7 @@ describe('BreedingService', () => {
       Breeding.findOne
         .mockResolvedValueOnce(breeding)
         .mockResolvedValueOnce({ id: 1 });
-      Rabbit.findByPk.mockResolvedValueOnce(femaleMock);
+      Rabbit.findOne.mockResolvedValueOnce(femaleMock);
 
       await breedingService.updateBreeding(1, 1, { is_pregnant: false });
 
@@ -410,6 +434,7 @@ describe('BreedingService', () => {
 
       const result = await breedingService.deleteBreeding(1, 1);
 
+      expect(Breeding.findOne).toHaveBeenCalledWith({ where: { id: 1, farm_id: 1 } });
       expect(breeding.destroy).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
     });
@@ -432,6 +457,7 @@ describe('BreedingService', () => {
 
       const result = await breedingService.getStatistics(1);
 
+      expect(Breeding.count).toHaveBeenCalledWith({ where: { farm_id: 1 } });
       expect(result.total).toBe(10);
       expect(result.planned).toBe(3);
       expect(result.completed).toBe(5);

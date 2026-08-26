@@ -21,12 +21,12 @@ class StaffService {
 
   /**
    * Состав фермы: владелец и его работники.
-   * @param {Number} farmId - id владельца
+   * @param {Number} farmId - id хозяйства
    */
   async listMembers(farmId) {
     return User.findAll({
-      where: { [Op.or]: [{ id: farmId }, { owner_id: farmId }] },
-      attributes: ['id', 'email', 'full_name', 'phone', 'role', 'is_active', 'owner_id', 'created_at'],
+      where: { farm_id: farmId },
+      attributes: ['id', 'email', 'full_name', 'phone', 'role', 'is_active', 'farm_id', 'created_at'],
       order: [['created_at', 'ASC']]
     });
   }
@@ -115,7 +115,7 @@ class StaffService {
       full_name: fullName,
       phone: phone || null,
       role: invitation.role,
-      owner_id: invitation.farm_id
+      farm_id: invitation.farm_id
     });
 
     await invitation.update({ accepted_at: new Date() });
@@ -133,7 +133,7 @@ class StaffService {
    */
   async resetMemberPassword(farmId, memberId) {
     const member = await User.findOne({
-      where: { id: memberId, owner_id: farmId }
+      where: { id: memberId, farm_id: farmId, role: { [Op.ne]: 'owner' } }
     });
     if (!member) {
       throw new Error('MEMBER_NOT_FOUND');
@@ -157,11 +157,13 @@ class StaffService {
   /**
    * Изменить работника: роль или доступ.
    * Владельца через этот метод менять нельзя — иначе ферма может остаться
-   * без хозяина или работник поднимет сам себя.
+   * без хозяина или работник поднимет сам себя. Раньше запрет выходил сам
+   * собой: у владельца `owner_id` был пуст, и условие его не находило.
+   * Теперь ферма записана у всех, включая хозяина, поэтому отказ явный.
    */
   async updateMember(farmId, memberId, { role, is_active: isActive }) {
     const member = await User.findOne({
-      where: { id: memberId, owner_id: farmId }
+      where: { id: memberId, farm_id: farmId, role: { [Op.ne]: 'owner' } }
     });
     if (!member) {
       throw new Error('MEMBER_NOT_FOUND');

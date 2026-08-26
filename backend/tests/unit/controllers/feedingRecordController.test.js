@@ -1,19 +1,16 @@
-jest.mock('../../../src/utils/farm', () => ({
-  // Контроллер не должен знать, как определяется состав фермы —
-  // здесь важно лишь то, что фильтр строится по всем её участникам.
-  farmMemberIds: jest.fn().mockResolvedValue([1, 2])
-}));
-
 /**
  * Unit tests for feedingRecordController
  */
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
-    FeedingRecord: { findOne: jest.fn(), findAll: jest.fn(), findAndCountAll: jest.fn(), create: jest.fn() },
+    FeedingRecord: {
+      findOne: jest.fn(), findAll: jest.fn(), findAndCountAll: jest.fn(),
+      create: jest.fn(), bulkCreate: jest.fn()
+    },
     Feed: { findOne: jest.fn(), findByPk: jest.fn() },
-    Rabbit: { findOne: jest.fn() },
-    Cage: { findOne: jest.fn() },
+    Rabbit: { findOne: jest.fn(), count: jest.fn() },
+    Cage: { findOne: jest.fn(), count: jest.fn() },
     User: {},
     sequelize: mockSequelize
   };
@@ -62,6 +59,12 @@ describe('feedingRecordController', () => {
       await ctrl.create(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(201);
+      // Ферма — в самой записи: раньше её выводили из автора (fed_by), и
+      // журнал разъезжался, стоило удалить работника.
+      expect(FeedingRecord.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1, fed_by: 1 }),
+        expect.any(Object)
+      );
     });
 
     it('should return 404 if rabbit not found', async () => {
@@ -125,6 +128,33 @@ describe('feedingRecordController', () => {
     });
   });
 
+  describe('createBulk', () => {
+    it('каждая строка пачки уходит со своей фермой', async () => {
+      Rabbit.count.mockResolvedValue(2);
+      Cage.count.mockResolvedValue(1);
+      const feed = { id: 1, current_stock: 100, update: jest.fn().mockResolvedValue(true) };
+      Feed.findOne.mockResolvedValue(feed);
+      FeedingRecord.bulkCreate.mockResolvedValue([]);
+
+      const req = mockReq({
+        body: {
+          feed_id: 1, quantity: 2, fed_at: '2024-05-01T08:00:00Z',
+          rabbit_ids: [10, 11], cage_ids: [20]
+        },
+        user: { id: 7 }, farmId: 42
+      });
+      const res = mockRes();
+
+      await ctrl.createBulk(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      // Строка без farm_id обрывает всю пачку на хуке многоарендности.
+      const [rows] = FeedingRecord.bulkCreate.mock.calls[0];
+      expect(rows).toHaveLength(3);
+      rows.forEach((row) => expect(row).toMatchObject({ farm_id: 42, fed_by: 7 }));
+    });
+  });
+
   describe('getById', () => {
     it('should return feeding record', async () => {
       FeedingRecord.findOne.mockResolvedValue({ id: 1 });
@@ -135,6 +165,9 @@ describe('feedingRecordController', () => {
       await ctrl.getById(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+      expect(FeedingRecord.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: '1', farm_id: 1 } })
+      );
     });
 
     it('should return 404 if not found', async () => {
@@ -177,7 +210,9 @@ describe('feedingRecordController', () => {
 
       expect(FeedingRecord.findAndCountAll).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: expect.objectContaining({ rabbit_id: '1', feed_id: '2', cage_id: '3' })
+          where: expect.objectContaining({
+            farm_id: 1, rabbit_id: '1', feed_id: '2', cage_id: '3'
+          })
         })
       );
     });

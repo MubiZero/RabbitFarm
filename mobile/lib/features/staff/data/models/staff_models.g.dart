@@ -14,7 +14,6 @@ _$FarmMemberImpl _$$FarmMemberImplFromJson(Map<String, dynamic> json) =>
       phone: json['phone'] as String?,
       role: $enumDecode(_$FarmRoleEnumMap, json['role']),
       isActive: json['is_active'] as bool? ?? true,
-      ownerId: const NullableIntConverter().fromJson(json['owner_id']),
     );
 
 Map<String, dynamic> _$$FarmMemberImplToJson(_$FarmMemberImpl instance) =>
@@ -25,7 +24,6 @@ Map<String, dynamic> _$$FarmMemberImplToJson(_$FarmMemberImpl instance) =>
       'phone': instance.phone,
       'role': _$FarmRoleEnumMap[instance.role]!,
       'is_active': instance.isActive,
-      'owner_id': const NullableIntConverter().toJson(instance.ownerId),
     };
 
 const _$FarmRoleEnumMap = {

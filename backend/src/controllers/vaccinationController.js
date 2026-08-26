@@ -19,7 +19,7 @@ class VaccinationController {
 
       // Check if rabbit exists and belongs to user
       const rabbit = await Rabbit.findOne({
-        where: { id: rabbit_id, user_id: req.farmId },
+        where: { id: rabbit_id, farm_id: req.farmId },
         transaction: t
       });
       if (!rabbit) {
@@ -33,7 +33,7 @@ class VaccinationController {
         return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика');
       }
 
-      const vaccination = await Vaccination.create(req.body, { transaction: t });
+      const vaccination = await Vaccination.create({ ...req.body, farm_id: req.farmId }, { transaction: t });
 
       // Automation: Financial Transaction
       await syncAutoExpense({
@@ -42,6 +42,7 @@ class VaccinationController {
         rabbitId: rabbit_id,
         transactionDate: vaccination_date,
         description: `Вакцинация: ${vaccine_name}`,
+        farmId: req.farmId,
         userId: req.user.id,
         transaction: t
       });
@@ -49,7 +50,8 @@ class VaccinationController {
       await t.commit();
 
       // Fetch created vaccination with rabbit info
-      const result = await Vaccination.findByPk(vaccination.id, {
+      const result = await Vaccination.findOne({
+        where: { id: vaccination.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
@@ -76,12 +78,12 @@ class VaccinationController {
    */
   async getById(req, res, next) {
     try {
-      const vaccination = await Vaccination.findByPk(req.params.id, {
+      const vaccination = await Vaccination.findOne({
+        where: { id: req.params.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url'],
             include: [
               {
@@ -123,7 +125,7 @@ class VaccinationController {
       } = req.query;
 
       const offset = (parseInt(page) - 1) * parseInt(limit);
-      const where = {};
+      const where = { farm_id: req.farmId };
 
       // Filters
       if (rabbit_id) where.rabbit_id = rabbit_id;
@@ -157,7 +159,6 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'birth_date', 'photo_url', 'status'],
             include: [
               {
@@ -199,7 +200,7 @@ class VaccinationController {
       const rabbit = await Rabbit.findOne({
         where: {
           id: rabbitId,
-          user_id: req.farmId
+          farm_id: req.farmId
         }
       });
       if (!rabbit) {
@@ -207,7 +208,7 @@ class VaccinationController {
       }
 
       const vaccinations = await Vaccination.findAll({
-        where: { rabbit_id: rabbitId },
+        where: { rabbit_id: rabbitId, farm_id: req.farmId },
         order: [['vaccination_date', 'DESC']],
         include: [
           {
@@ -236,13 +237,7 @@ class VaccinationController {
       // Скоупинг по ферме обязателен: findByPk по одному идентификатору
       // позволял править чужие записи перебором id.
       const vaccination = await Vaccination.findOne({
-        where: { id: req.params.id },
-        include: [{
-          model: Rabbit,
-          as: 'rabbit',
-          where: { user_id: req.farmId },
-          attributes: ['id']
-        }],
+        where: { id: req.params.id, farm_id: req.farmId },
         transaction: t
       });
 
@@ -256,7 +251,7 @@ class VaccinationController {
         const rabbit = await Rabbit.findOne({
           where: {
             id: req.body.rabbit_id,
-            user_id: req.farmId
+            farm_id: req.farmId
           },
           transaction: t
         });
@@ -276,6 +271,7 @@ class VaccinationController {
         rabbitId: vaccination.rabbit_id,
         transactionDate: vaccination.vaccination_date,
         description: `Вакцинация: ${vaccination.vaccine_name}`,
+        farmId: req.farmId,
         userId: req.user.id,
         transaction: t
       });
@@ -283,7 +279,8 @@ class VaccinationController {
       await t.commit();
 
       // Fetch updated vaccination with rabbit info
-      const result = await Vaccination.findByPk(vaccination.id, {
+      const result = await Vaccination.findOne({
+        where: { id: vaccination.id, farm_id: req.farmId },
         include: [
           {
             model: Rabbit,
@@ -317,13 +314,7 @@ class VaccinationController {
   async delete(req, res, next) {
     try {
       const vaccination = await Vaccination.findOne({
-        where: { id: req.params.id },
-        include: [{
-          model: Rabbit,
-          as: 'rabbit',
-          where: { user_id: req.farmId },
-          attributes: ['id']
-        }]
+        where: { id: req.params.id, farm_id: req.farmId }
       });
 
       if (!vaccination) {
@@ -344,18 +335,11 @@ class VaccinationController {
    */
   async getStatistics(req, res, next) {
     try {
-      const user_id = req.farmId;
+      const farm_id = req.farmId;
       const now = new Date();
       const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       const yearStart = new Date(now.getFullYear(), 0, 1);
-
-      const rabbitInclude = {
-        model: Rabbit,
-        as: 'rabbit',
-        where: { user_id },
-        attributes: []
-      };
 
       // Run all aggregate queries in parallel
       const [
@@ -369,9 +353,7 @@ class VaccinationController {
         upcomingList
       ] = await Promise.all([
         // Total count
-        Vaccination.count({
-          include: [rabbitInclude]
-        }),
+        Vaccination.count({ where: { farm_id } }),
 
         // Count by vaccine_type
         Vaccination.findAll({
@@ -379,54 +361,51 @@ class VaccinationController {
             'vaccine_type',
             [sequelize.fn('COUNT', sequelize.col('Vaccination.id')), 'count']
           ],
-          include: [rabbitInclude],
+          where: { farm_id },
           group: ['vaccine_type'],
           raw: true
         }),
 
         // This year count
         Vaccination.count({
-          where: { vaccination_date: { [Op.gte]: yearStart } },
-          include: [rabbitInclude]
+          where: { farm_id, vaccination_date: { [Op.gte]: yearStart } }
         }),
 
         // Last 30 days count
         Vaccination.count({
-          where: { vaccination_date: { [Op.gte]: thirtyDaysAgo } },
-          include: [rabbitInclude]
+          where: { farm_id, vaccination_date: { [Op.gte]: thirtyDaysAgo } }
         }),
 
         // Upcoming total (next_vaccination_date >= now)
         Vaccination.count({
-          where: { next_vaccination_date: { [Op.gte]: now } },
-          include: [rabbitInclude]
+          where: { farm_id, next_vaccination_date: { [Op.gte]: now } }
         }),
 
         // Upcoming next 30 days
         Vaccination.count({
           where: {
+            farm_id,
             next_vaccination_date: { [Op.gte]: now, [Op.lte]: thirtyDaysFromNow }
-          },
-          include: [rabbitInclude]
+          }
         }),
 
         // Overdue (next_vaccination_date < now)
         Vaccination.count({
           where: {
+            farm_id,
             next_vaccination_date: { [Op.lt]: now, [Op.not]: null }
-          },
-          include: [rabbitInclude]
+          }
         }),
 
         // Upcoming + overdue list (only records with next_vaccination_date)
         Vaccination.findAll({
           where: {
+            farm_id,
             next_vaccination_date: { [Op.not]: null }
           },
           include: [{
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id },
             attributes: ['id', 'name']
           }],
           attributes: ['id', 'rabbit_id', 'vaccine_name', 'vaccine_type', 'next_vaccination_date'],
@@ -496,6 +475,7 @@ class VaccinationController {
 
       const vaccinations = await Vaccination.findAll({
         where: {
+          farm_id: req.farmId,
           next_vaccination_date: {
             [Op.between]: [now, futureDate]
           }
@@ -504,7 +484,6 @@ class VaccinationController {
           {
             model: Rabbit,
             as: 'rabbit',
-            where: { user_id: req.farmId }, // Filter by user
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             include: [
               {
@@ -545,6 +524,7 @@ class VaccinationController {
     try {
       const vaccinations = await Vaccination.findAll({
         where: {
+          farm_id: req.farmId,
           next_vaccination_date: {
             [Op.lt]: new Date()
           }
@@ -555,7 +535,8 @@ class VaccinationController {
             as: 'rabbit',
             attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'photo_url'],
             where: {
-              user_id: req.farmId, // Filter by user
+              // Кролик здесь нужен ради живого статуса, а не ради фермы:
+              // ферма отобрана выше, по farm_id самой прививки.
               // Перечисление живых статусов пропускало 'active' и
               // 'quarantine'. Статус 'active' код сам ставит матери после
               // окрола, поэтому любая окролившаяся самка исчезала из списка

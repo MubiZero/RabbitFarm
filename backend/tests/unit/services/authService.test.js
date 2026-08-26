@@ -1,4 +1,7 @@
 jest.mock('../../../src/models', () => ({
+  Farm: {
+    create: jest.fn()
+  },
   User: {
     count: jest.fn().mockResolvedValue(0),
     findOne: jest.fn(),
@@ -13,7 +16,7 @@ jest.mock('../../../src/models', () => ({
   }
 }));
 
-const { User, RefreshToken } = require('../../../src/models');
+const { Farm, User, RefreshToken } = require('../../../src/models');
 const authService = require('../../../src/services/authService');
 const PasswordUtil = require('../../../src/utils/password');
 const { createMockUser } = require('../../helpers/mockModels');
@@ -96,6 +99,41 @@ describe('AuthService', () => {
       })).rejects.toThrow('USER_EXISTS');
 
       expect(mockTransaction.rollback).toHaveBeenCalled();
+    });
+
+    it('заводит ферму и делает регистрирующегося её владельцем', async () => {
+      const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+      User.sequelize.transaction.mockResolvedValue(mockTransaction);
+      User.findOne.mockResolvedValue(null);
+
+      const farm = { id: 77, update: jest.fn().mockResolvedValue(true) };
+      Farm.create.mockResolvedValue(farm);
+      User.create.mockResolvedValue(createMockUser({ id: 42, farm_id: 77 }));
+      RefreshToken.create.mockResolvedValue({});
+
+      await authService.register({
+        email: 'new@example.com',
+        password: 'password123',
+        full_name: 'Новый Фермер'
+      });
+
+      // Ферма появляется первой и без владельца: сослаться на человека,
+      // которого ещё нет, нельзя.
+      expect(Farm.create).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Ферма Новый Фермер', owner_id: null }),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+      // Человек заводится сразу в этой ферме и хозяином.
+      expect(User.create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'owner', farm_id: 77 }),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+      // И только потом ферма узнаёт своего владельца.
+      expect(farm.update).toHaveBeenCalledWith(
+        { owner_id: 42 },
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+      expect(mockTransaction.commit).toHaveBeenCalled();
     });
   });
 

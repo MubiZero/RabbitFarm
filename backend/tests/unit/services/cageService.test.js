@@ -1,6 +1,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
+    Farm: {},
     Cage: {
       findOne: jest.fn(),
       findByPk: jest.fn(),
@@ -30,7 +31,7 @@ const createMockCage = (overrides = {}) => ({
   capacity: 2,
   location: 'Building A',
   notes: null,
-  user_id: 1,
+  farm_id: 1,
   last_cleaned_at: null,
   rabbits: [],
   toJSON: function () { return { ...this }; },
@@ -49,7 +50,7 @@ describe('CageService', () => {
       const mockCage = createMockCage();
       Cage.create.mockResolvedValue(mockCage);
 
-      const result = await cageService.createCage({ number: 'A-01', type: 'single', capacity: 2, user_id: 1 });
+      const result = await cageService.createCage({ number: 'A-01', type: 'single', capacity: 2, farm_id: 1 });
 
       expect(Cage.create).toHaveBeenCalled();
       expect(result).toBe(mockCage);
@@ -58,7 +59,7 @@ describe('CageService', () => {
     it('should propagate errors from Cage.create', async () => {
       Cage.create.mockRejectedValue(new Error('DB_ERROR'));
 
-      await expect(cageService.createCage({ number: 'A-01', user_id: 1 })).rejects.toThrow('DB_ERROR');
+      await expect(cageService.createCage({ number: 'A-01', farm_id: 1 })).rejects.toThrow('DB_ERROR');
     });
   });
 
@@ -240,6 +241,18 @@ describe('CageService', () => {
 
       await expect(cageService.deleteCage(1, 1)).rejects.toThrow('CAGE_HAS_RABBITS');
       expect(mockCage.destroy).not.toHaveBeenCalled();
+    });
+
+    it('жильцов клетки подтягиваем в пределах фермы', async () => {
+      Cage.findOne.mockResolvedValue(createMockCage({ rabbits: [] }));
+
+      await cageService.deleteCage(1, 7);
+
+      // Пустая клетка обязана остаться удаляемой, поэтому связь не
+      // становится обязательной от добавления условия.
+      const include = Cage.findOne.mock.calls[0][0].include[0];
+      expect(include.where).toEqual({ farm_id: 7 });
+      expect(include.required).toBe(false);
     });
   });
 

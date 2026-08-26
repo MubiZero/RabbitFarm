@@ -39,7 +39,7 @@ describe('CageController', () => {
 
       await cageController.create(req, res, mockNext);
 
-      expect(cageService.createCage).toHaveBeenCalledWith({ number: 'A-001', type: 'single', user_id: 1 });
+      expect(cageService.createCage).toHaveBeenCalledWith({ number: 'A-001', type: 'single', farm_id: 1 });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: cage }));
     });

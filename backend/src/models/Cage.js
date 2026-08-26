@@ -15,7 +15,7 @@ module.exports = (sequelize) => {
         notEmpty: { msg: 'Номер клетки обязателен' }
       }
     },
-    user_id: {
+    farm_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -65,7 +65,7 @@ module.exports = (sequelize) => {
       { fields: ['number'] },
       { fields: ['type'] },
       { fields: ['condition'] },
-      { unique: true, fields: ['user_id', 'number'] }
+      { unique: true, name: 'unique_farm_cage_number', fields: ['farm_id', 'number'] }
     ]
   });
 

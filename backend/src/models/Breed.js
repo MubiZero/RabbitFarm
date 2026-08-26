@@ -16,7 +16,7 @@ module.exports = (sequelize) => {
     },
     // Порода принадлежит конкретной ферме: имена уникальны в пределах
     // пользователя, а не на весь сервис.
-    user_id: {
+    farm_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

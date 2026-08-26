@@ -8,6 +8,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
+    Farm: {},
     Rabbit: {
       findOne: jest.fn(),
       findByPk: jest.fn(),
@@ -54,7 +55,7 @@ describe('RabbitService - uncovered lines', () => {
   // ========== createRabbit uncovered branches ==========
   describe('createRabbit', () => {
     it('should set cage_id to null when status is dead and cage_id provided', async () => {
-      const rabbitData = { breed_id: 1, cage_id: 5, user_id: 1, status: 'dead' };
+      const rabbitData = { breed_id: 1, cage_id: 5, farm_id: 1, status: 'dead' };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 5, capacity: 10 });
       Rabbit.count.mockResolvedValue(2); // current count in cage
@@ -73,7 +74,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should set cage_id to null when status is sold and cage_id provided', async () => {
-      const rabbitData = { breed_id: 1, cage_id: 5, user_id: 1, status: 'sold' };
+      const rabbitData = { breed_id: 1, cage_id: 5, farm_id: 1, status: 'sold' };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Cage.findOne.mockResolvedValue({ id: 5, capacity: 10 });
       Rabbit.count.mockResolvedValue(0);
@@ -89,7 +90,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should throw FATHER_NOT_FOUND_OR_INVALID_SEX when father not found', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, father_id: 99 };
+      const rabbitData = { breed_id: 1, farm_id: 1, father_id: 99 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       // father lookup returns null
       Rabbit.findOne.mockResolvedValue(null);
@@ -100,7 +101,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should throw MOTHER_NOT_FOUND_OR_INVALID_SEX when mother not found', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, mother_id: 88 };
+      const rabbitData = { breed_id: 1, farm_id: 1, mother_id: 88 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       // mother lookup returns null
       Rabbit.findOne.mockResolvedValue(null);
@@ -111,7 +112,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should pass father validation when father exists and is male', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, father_id: 5 };
+      const rabbitData = { breed_id: 1, farm_id: 1, father_id: 5 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       // First findOne call: father lookup -> found
       // Second findOne call: getRabbitById
@@ -126,7 +127,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should pass mother validation when mother exists and is female', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, mother_id: 6 };
+      const rabbitData = { breed_id: 1, farm_id: 1, mother_id: 6 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.findOne
         .mockResolvedValueOnce({ id: 6, sex: 'female' }) // mother found
@@ -138,7 +139,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should throw TAG_ID_EXISTS when tag_id already used by user', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, tag_id: 'TAG-001' };
+      const rabbitData = { breed_id: 1, farm_id: 1, tag_id: 'TAG-001' };
       Breed.findOne.mockResolvedValue({ id: 1 });
       // tag check: findOne returns existing rabbit
       Rabbit.findOne.mockResolvedValue({ id: 99, tag_id: 'TAG-001' });
@@ -149,7 +150,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should pass tag validation when tag_id is unique', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, tag_id: 'TAG-NEW' };
+      const rabbitData = { breed_id: 1, farm_id: 1, tag_id: 'TAG-NEW' };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.findOne
         .mockResolvedValueOnce(null) // tag check: not found
@@ -161,7 +162,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should create initial weight record when current_weight is provided', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1, current_weight: 2.5 };
+      const rabbitData = { breed_id: 1, farm_id: 1, current_weight: 2.5 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
       Rabbit.findOne.mockResolvedValue({ id: 10 });
@@ -180,7 +181,7 @@ describe('RabbitService - uncovered lines', () => {
     });
 
     it('should NOT create weight record when current_weight is not provided', async () => {
-      const rabbitData = { breed_id: 1, user_id: 1 };
+      const rabbitData = { breed_id: 1, farm_id: 1 };
       Breed.findOne.mockResolvedValue({ id: 1 });
       Rabbit.create.mockResolvedValue({ id: 10 });
       Rabbit.findOne.mockResolvedValue({ id: 10 });
@@ -195,7 +196,7 @@ describe('RabbitService - uncovered lines', () => {
   describe('updateRabbit', () => {
     const baseRabbit = {
       id: 1,
-      user_id: 1,
+      farm_id: 1,
       sex: 'male',
       breed_id: 1,
       cage_id: 5,
@@ -780,6 +781,90 @@ describe('RabbitService - uncovered lines', () => {
       expect(result.id).toBe(1);
       expect(result.name).toBe('Bunny');
       expect(result.breed).toBeNull();
+    });
+  });
+
+  // ========== ограничение по ферме ==========
+  describe('ограничение по ферме', () => {
+    it('родословная не выходит за пределы фермы', async () => {
+      // База отдаёт строку, только если ферма в запросе совпала: так же
+      // ведёт себя хук из tenancy.js. Отец записан на соседнюю ферму —
+      // раньше рекурсия дотягивалась до него и раскрывала кличку и породу
+      // чужого кролика прямо в родословной.
+      const own = { id: 1, name: 'Буся', sex: 'female', tag_id: 'R1', birth_date: null, breed: null, father_id: 2, mother_id: null, farm_id: 1 };
+      const stranger = { id: 2, name: 'Чужой', sex: 'male', tag_id: 'X1', birth_date: null, breed: { name: 'Rex' }, father_id: null, mother_id: null, farm_id: 2 };
+
+      Rabbit.findOne.mockImplementation(({ where }) => {
+        const row = [own, stranger].find(r => r.id === where.id);
+        return Promise.resolve(row && row.farm_id === where.farm_id ? row : null);
+      });
+
+      const result = await rabbitService.getPedigree(1, 1, 3);
+
+      expect(result.id).toBe(1);
+      expect(result.father).toBeUndefined();
+      // И каждый заход в базу шёл со своей фермой, а не только первый.
+      for (const [options] of Rabbit.findOne.mock.calls) {
+        expect(options.where.farm_id).toBe(1);
+      }
+    });
+
+    it('связанные записи при удалении считаются в своей ферме', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1, photo_url: null, destroy: jest.fn().mockResolvedValue(true) });
+      Rabbit.count.mockResolvedValue(0);
+      Breeding.count.mockResolvedValue(0);
+      Birth.count.mockResolvedValue(0);
+      MedicalRecord.count.mockResolvedValue(0);
+      Vaccination.count.mockResolvedValue(0);
+      Transaction.count.mockResolvedValue(0);
+
+      await rabbitService.deleteRabbit(1, 7);
+
+      const scoped = { where: expect.objectContaining({ farm_id: 7 }) };
+      expect(Rabbit.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+      expect(Breeding.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+      expect(Birth.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+      expect(MedicalRecord.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+      expect(Vaccination.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+      expect(Transaction.count).toHaveBeenCalledWith(expect.objectContaining(scoped));
+    });
+
+    it('история веса читается только по своей ферме', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1 });
+      RabbitWeight.findAll.mockResolvedValue([]);
+
+      await rabbitService.getWeightHistory(1, 7);
+
+      expect(RabbitWeight.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: { farm_id: 7, rabbit_id: 1 }
+      }));
+    });
+
+    it('замер веса записывается на ферму кролика, а не из тела запроса', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1, update: jest.fn().mockResolvedValue(true) });
+      RabbitWeight.create.mockResolvedValue({ id: 1 });
+
+      // farm_id из тела запроса не должен переехать в запись.
+      await rabbitService.addWeightRecord(1, 7, { weight: 3.0, farm_id: 999 });
+
+      expect(RabbitWeight.create).toHaveBeenCalledWith(
+        expect.objectContaining({ rabbit_id: 1, farm_id: 7, weight: 3.0 }),
+        { transaction: mockTx }
+      );
+    });
+
+    it('первый замер при создании кролика получает ферму', async () => {
+      Breed.findOne.mockResolvedValue({ id: 1 });
+      Rabbit.create.mockResolvedValue({ id: 10 });
+      Rabbit.findOne.mockResolvedValue({ id: 10 });
+      RabbitWeight.create.mockResolvedValue({ id: 1 });
+
+      await rabbitService.createRabbit({ breed_id: 1, farm_id: 7, current_weight: 2.5 });
+
+      expect(RabbitWeight.create).toHaveBeenCalledWith(
+        expect.objectContaining({ rabbit_id: 10, farm_id: 7 }),
+        { transaction: mockTx }
+      );
     });
   });
 });

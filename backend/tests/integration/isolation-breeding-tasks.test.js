@@ -5,7 +5,7 @@ const { User } = require('../../src/models');
 
 /**
  * Ферм в сервисе много, а к ферме эти три ресурса привязаны по-разному:
- * у случки есть своя колонка user_id, у окрола фермы нет вовсе — только через
+ * у случки своя колонка farm_id, у окрола она появилась недавно — раньше
  * мать, у задачи нет тоже — только через created_by/assigned_to. Разная
  * привязка и есть источник дыр: где-то фильтр стоит в where, где-то держится
  * на одном include, и достаточно поставить ему required: false, чтобы соседнее
@@ -61,6 +61,7 @@ describe('Изоляция ферм: случки, окролы и задачи'
     });
     farm.token = registered.body.data.access_token;
     farm.ownerId = registered.body.data.user.id;
+    farm.farmId = registered.body.data.user.farm_id;
 
     const breed = await post('/api/v1/breeds', farm.token, { name: `Порода ${suffix}` });
     farm.breedId = breed.body.data.id;
@@ -143,7 +144,7 @@ describe('Изоляция ферм: случки, окролы и задачи'
     });
     const worker = await User.findOne({ where: { email: 'iso_worker_a@example.com' } });
     workerAId = worker.id;
-    await worker.update({ owner_id: farmA.ownerId, role: 'worker' });
+    await worker.update({ farm_id: farmA.farmId, role: 'worker' });
 
     const workerLogin = await post('/api/v1/auth/login', undefined, {
       email: 'iso_worker_a@example.com',

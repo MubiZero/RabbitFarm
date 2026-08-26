@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    user_id: {
+    farm_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       comment: 'Owner of this breeding record'
@@ -52,7 +52,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     indexes: [
-      { fields: ['user_id'] },
+      { fields: ['farm_id'], name: 'idx_breedings_farm' },
       { fields: ['male_id'] },
       { fields: ['female_id'] },
       { fields: ['breeding_date'] },

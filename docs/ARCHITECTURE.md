@@ -513,8 +513,9 @@ CREATE INDEX idx_rabbits_status ON rabbits(status);
 CREATE INDEX idx_rabbits_breed_id ON rabbits(breed_id);
 
 -- Composite indexes for common queries
-CREATE INDEX idx_tasks_user_date ON tasks(user_id, due_date);
-CREATE INDEX idx_transactions_type_date ON transactions(type, transaction_date);
+-- Ферма идёт первой: с неё начинается любая выборка (см. «Многоарендность»).
+CREATE INDEX idx_tasks_farm_status_due ON tasks(farm_id, status, due_date);
+CREATE INDEX idx_transactions_farm_type_date ON transactions(farm_id, type, transaction_date);
 
 -- Full-text search
 CREATE FULLTEXT INDEX idx_rabbits_search ON rabbits(name, tag_id);
@@ -525,6 +526,56 @@ CREATE FULLTEXT INDEX idx_rabbits_search ON rabbits(name, tag_id);
 - NOT NULL for required fields
 - CHECK constraints for valid values
 - UNIQUE constraints where needed
+
+## 🏡 Многоарендность (изоляция ферм)
+
+Сервис обслуживает много независимых хозяйств. Данные одного клиента не
+должны быть видны другому ни при каком запросе — это главное свойство
+системы, и держится оно на схеме, а не на аккуратности кода.
+
+**Ферма — сущность, а не формула.** Таблица `farms` хранит хозяйство:
+название и владельца. У пользователя есть `farm_id NOT NULL`, у каждой
+таблицы с данными фермы — тоже. Раньше фермой считался идентификатор
+владельца, а принадлежность вычислялась выражением `user.owner_id || user.id`
+в middleware: единственная граница между клиентами жила в коде.
+
+```
+farms ──< users
+      ──< breeds, cages, feeds, rabbits, rabbit_weights
+      ──< breedings, births, vaccinations, medical_records
+      ──< feeding_records, transactions, tasks, photos, notes
+      ──< invitations
+```
+
+**Правила**
+
+1. `req.farmId` берётся из `users.farm_id` и больше ниоткуда.
+2. Всякая выборка из таблицы фермы обязана нести `farm_id` в `where`.
+   `findByPk` для таких таблиц не применяется — только
+   `findOne({ where: { id, farm_id } })`.
+3. Всякая запись обязана проставлять `farm_id`, включая те, что сервер
+   создаёт сам: автоматические расходы на лечение и задачи по случке.
+4. «Кто внёс» (`created_by`, `fed_by`, `assigned_to`, `uploaded_by`) — это
+   не «чьё». Эти поля обнуляемы и для отбора по ферме непригодны: именно
+   поэтому операции работника когда-то пропадали из ведомости владельца.
+
+**Удаление хозяйства.** `users.farm_id` и все таблицы фермы стоят с
+`ON DELETE CASCADE`, поэтому отключение клиента — одна операция:
+`DELETE FROM farms WHERE id = ?` уносит его данные и не трогает соседей.
+`farms.owner_id` намеренно стоит с `ON DELETE SET NULL`, а не с `RESTRICT`:
+встречный `RESTRICT` замыкал круг с `users.farm_id` и делал удаление фермы
+невозможным вовсе. Правило «у фермы должен быть хозяин» — правило продукта,
+и живёт оно в `staffService`, который отказывается трогать владельца.
+
+**Страховка.** `src/utils/tenancy.js` вешает на все таблицы фермы хуки
+`beforeFind`, `beforeCount`, `beforeCreate` и `beforeBulkCreate`. Запрос без
+условия по `farm_id` не выполняется — вместо тихой выдачи чужих строк
+получается громкий отказ. Осознанное исключение объявляется явно:
+`{ tenantScope: 'all' }`, и такое исключение видно в diff.
+
+Ограничение: `Model.sum`, `Model.max` и `Model.min` в Sequelize хуков не
+вызывают. Сейчас в коде их нет; агрегаты считаются через `fn('SUM', …)`
+внутри `findAll`, который проверяется.
 
 ## 🔐 Security Architecture
 

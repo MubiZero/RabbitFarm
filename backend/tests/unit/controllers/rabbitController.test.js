@@ -45,7 +45,7 @@ describe('RabbitController', () => {
       expect(rabbitService.createRabbit).toHaveBeenCalledWith({
         name: 'Bunny',
         breed_id: 1,
-        user_id: 1
+        farm_id: 1
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: rabbit }));

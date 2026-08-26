@@ -10,7 +10,6 @@ jest.mock('../../../src/models', () => {
   return {
     MedicalRecord: {
       findAll: jest.fn(),
-      findByPk: jest.fn(),
       findOne: jest.fn(),
       findAndCountAll: jest.fn(),
       create: jest.fn(),
@@ -56,7 +55,7 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 1 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 1 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 1 });
 
       const req = mockReq({ body: baseBody });
       const res = mockRes();
@@ -65,13 +64,18 @@ describe('medicalRecordController', () => {
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
+      // Без farm_id запись отвергает хук многоарендности.
+      expect(MedicalRecord.create).toHaveBeenCalledWith(
+        expect.objectContaining({ farm_id: 1 }),
+        expect.any(Object)
+      );
     });
 
     it('should update rabbit status to dead when outcome is died', async () => {
       const rabbit = { id: 1, status: 'sick', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 2 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 2 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 2 });
 
       await ctrl.create(mockReq({ body: { ...baseBody, outcome: 'died' } }), mockRes(), mockNext);
 
@@ -82,7 +86,7 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'sick', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 3 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 3 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 3 });
 
       await ctrl.create(mockReq({ body: { ...baseBody, outcome: 'euthanized' } }), mockRes(), mockNext);
 
@@ -93,7 +97,7 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 4 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 4 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 4 });
 
       await ctrl.create(mockReq({ body: { ...baseBody, outcome: 'ongoing' } }), mockRes(), mockNext);
 
@@ -104,7 +108,7 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'sick', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 6 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 6 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 6 });
 
       await ctrl.create(mockReq({ body: { ...baseBody, outcome: 'recovered' } }), mockRes(), mockNext);
 
@@ -115,7 +119,7 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 7 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 7 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 7 });
 
       await ctrl.create(mockReq({ body: baseBody }), mockRes(), mockNext);
 
@@ -126,13 +130,15 @@ describe('medicalRecordController', () => {
       const rabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
       Rabbit.findOne.mockResolvedValue(rabbit);
       MedicalRecord.create.mockResolvedValue({ id: 5 });
-      MedicalRecord.findByPk.mockResolvedValue({ id: 5 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 5 });
       Transaction.create.mockResolvedValue({});
 
       await ctrl.create(mockReq({ body: { ...baseBody, cost: 50.0 } }), mockRes(), mockNext);
 
+      // Расход заводит сервер, но ферма у него та же — иначе трата
+      // повиснет вне хозяйства.
       expect(Transaction.create).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'expense', category: 'veterinary' }),
+        expect.objectContaining({ type: 'expense', category: 'veterinary', farm_id: 1 }),
         expect.any(Object)
       );
     });
@@ -192,7 +198,7 @@ describe('medicalRecordController', () => {
 
   describe('getById', () => {
     it('should return medical record by id', async () => {
-      MedicalRecord.findByPk.mockResolvedValue({ id: 1 });
+      MedicalRecord.findOne.mockResolvedValue({ id: 1 });
 
       const req = mockReq({ params: { id: '1' } });
       const res = mockRes();
@@ -200,10 +206,14 @@ describe('medicalRecordController', () => {
       await ctrl.getById(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+      // Ферма стоит в самом запросе: перебором id чужую карточку не достать.
+      expect(MedicalRecord.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: '1', farm_id: 1 } })
+      );
     });
 
     it('should return 404 if not found', async () => {
-      MedicalRecord.findByPk.mockResolvedValue(null);
+      MedicalRecord.findOne.mockResolvedValue(null);
 
       const res = mockRes();
       await ctrl.getById(mockReq({ params: { id: '999' } }), res, mockNext);
@@ -212,7 +222,7 @@ describe('medicalRecordController', () => {
     });
 
     it('should call next on error', async () => {
-      MedicalRecord.findByPk.mockRejectedValue(new Error('DB error'));
+      MedicalRecord.findOne.mockRejectedValue(new Error('DB error'));
 
       await ctrl.getById(mockReq({ params: { id: '1' } }), mockRes(), mockNext);
 
@@ -309,14 +319,14 @@ describe('medicalRecordController', () => {
     it('should update medical record successfully', async () => {
       const medicalRecord = {
         id: 1, outcome: 'ongoing', cost: 0, rabbit_id: 1,
-        rabbit: { user_id: 1, update: jest.fn().mockResolvedValue(true) },
+        rabbit: { update: jest.fn().mockResolvedValue(true) },
         update: jest.fn().mockResolvedValue(true)
       };
-      // Запись ищется сразу по своей ферме (`findOne` с include кролика), а не
-      // «любая по id, ферму проверим потом»: перечитывается она уже по
-      // подтверждённому id.
-      MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
-      MedicalRecord.findByPk.mockResolvedValueOnce({ id: 1 });
+      // Запись ищется сразу по своей ферме, а не «любая по id, ферму
+      // проверим потом»: перечитывается она уже по подтверждённому id.
+      MedicalRecord.findOne
+        .mockResolvedValueOnce(medicalRecord)
+        .mockResolvedValueOnce({ id: 1 });
 
       const req = mockReq({ params: { id: '1' }, body: { notes: 'Better now' } });
       const res = mockRes();
@@ -350,19 +360,18 @@ describe('medicalRecordController', () => {
       expect(res.status).toHaveBeenCalledWith(404);
 
       const [options] = MedicalRecord.findOne.mock.calls[0];
-      expect(options.include[0].where).toEqual({ user_id: 1 });
+      expect(options.where).toEqual({ id: '1', farm_id: 1 });
     });
 
     it('should update rabbit to dead when outcome changes to died', async () => {
-      const rabbitMock = { user_id: 1, update: jest.fn().mockResolvedValue(true) };
+      const rabbitMock = { update: jest.fn().mockResolvedValue(true) };
       const medicalRecord = {
         id: 1, outcome: 'ongoing', rabbit_id: 1,
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
       MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
-      MedicalRecord.findByPk
-        .mockResolvedValueOnce({ id: 1 });
+      MedicalRecord.findOne.mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
         mockReq({ params: { id: '1' }, body: { outcome: 'died' } }),
@@ -373,15 +382,14 @@ describe('medicalRecordController', () => {
     });
 
     it('should update rabbit to healthy when outcome changes to recovered', async () => {
-      const rabbitMock = { user_id: 1, update: jest.fn().mockResolvedValue(true) };
+      const rabbitMock = { update: jest.fn().mockResolvedValue(true) };
       const medicalRecord = {
         id: 1, outcome: 'ongoing', rabbit_id: 1,
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
       MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
-      MedicalRecord.findByPk
-        .mockResolvedValueOnce({ id: 1 });
+      MedicalRecord.findOne.mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
         mockReq({ params: { id: '1' }, body: { outcome: 'recovered' } }),
@@ -392,15 +400,14 @@ describe('medicalRecordController', () => {
     });
 
     it('should update rabbit to sick when outcome changes to ongoing', async () => {
-      const rabbitMock = { user_id: 1, update: jest.fn().mockResolvedValue(true) };
+      const rabbitMock = { update: jest.fn().mockResolvedValue(true) };
       const medicalRecord = {
         id: 1, outcome: 'recovered', rabbit_id: 1,
         rabbit: rabbitMock,
         update: jest.fn().mockResolvedValue(true)
       };
       MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
-      MedicalRecord.findByPk
-        .mockResolvedValueOnce({ id: 1 });
+      MedicalRecord.findOne.mockResolvedValueOnce({ id: 1 });
 
       await ctrl.update(
         mockReq({ params: { id: '1' }, body: { outcome: 'ongoing' } }),
@@ -413,7 +420,6 @@ describe('medicalRecordController', () => {
     it('should return 404 if new rabbit_id not found', async () => {
       const medicalRecord = {
         id: 1, outcome: null, rabbit_id: 1,
-        rabbit: { user_id: 1 },
         update: jest.fn()
       };
       MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);
@@ -432,7 +438,7 @@ describe('medicalRecordController', () => {
     it('should return 400 on SequelizeValidationError in update', async () => {
       const medicalRecord = {
         id: 1, outcome: 'ongoing', rabbit_id: 1,
-        rabbit: { user_id: 1, update: jest.fn() },
+        rabbit: { update: jest.fn() },
         update: jest.fn().mockRejectedValue({
           name: 'SequelizeValidationError',
           errors: [{ message: 'Invalid value' }]
@@ -450,7 +456,7 @@ describe('medicalRecordController', () => {
     it('should call next on unexpected error in update', async () => {
       const medicalRecord = {
         id: 1, outcome: 'ongoing', rabbit_id: 1,
-        rabbit: { user_id: 1, update: jest.fn() },
+        rabbit: { update: jest.fn() },
         update: jest.fn().mockRejectedValue(new Error('DB error'))
       };
       MedicalRecord.findOne.mockResolvedValueOnce(medicalRecord);

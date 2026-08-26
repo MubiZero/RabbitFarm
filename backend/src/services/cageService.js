@@ -32,13 +32,13 @@ class CageService {
     }
   }
 
-  async getCageById(id, userId) {
+  async getCageById(id, farmId) {
     const cage = await Cage.findOne({
-      where: { id, user_id: userId },
+      where: { id, farm_id: farmId },
       include: [{
         ...RABBIT_INCLUDE,
         attributes: ['id', 'name', 'tag_id', 'sex', 'status', 'breed_id', 'birth_date', 'purpose', 'created_at', 'updated_at'],
-        where: { user_id: userId }
+        where: { farm_id: farmId }
       }]
     });
 
@@ -46,7 +46,7 @@ class CageService {
     return addOccupancy(cage);
   }
 
-  async listCages(userId, filters = {}, pagination = {}) {
+  async listCages(farmId, filters = {}, pagination = {}) {
     const {
       page = 1,
       limit = 50,
@@ -62,7 +62,7 @@ class CageService {
     const parsedPage = parseInt(page);
     const parsedLimit = parseInt(limit);
     const offset = (parsedPage - 1) * parsedLimit;
-    const where = { user_id: userId };
+    const where = { farm_id: farmId };
 
     if (type) where.type = type;
     if (condition) where.condition = condition;
@@ -90,7 +90,7 @@ class CageService {
       // Fetch ALL matching cages (no limit/offset) so we can filter by computed occupancy
       const allCages = await Cage.findAndCountAll({
         where,
-        include: [{ ...RABBIT_INCLUDE, where: { user_id: userId } }],
+        include: [{ ...RABBIT_INCLUDE, where: { farm_id: farmId } }],
         order: [[sort_by, sort_order.toUpperCase()]],
         distinct: true
       });
@@ -104,7 +104,7 @@ class CageService {
 
     const cages = await Cage.findAndCountAll({
       where,
-      include: [{ ...RABBIT_INCLUDE, where: { user_id: userId } }],
+      include: [{ ...RABBIT_INCLUDE, where: { farm_id: farmId } }],
       limit: parsedLimit,
       offset,
       order: [[sort_by, sort_order.toUpperCase()]],
@@ -116,18 +116,18 @@ class CageService {
     return { items, total: cages.count, page: parsedPage, limit: parsedLimit };
   }
 
-  async updateCage(id, userId, data) {
-    const cage = await Cage.findOne({ where: { id, user_id: userId } });
+  async updateCage(id, farmId, data) {
+    const cage = await Cage.findOne({ where: { id, farm_id: farmId } });
     if (!cage) throw new Error('CAGE_NOT_FOUND');
     await cage.update(data);
     logger.info('Cage updated', { cageId: id });
     return cage;
   }
 
-  async deleteCage(id, userId) {
+  async deleteCage(id, farmId) {
     const cage = await Cage.findOne({
-      where: { id, user_id: userId },
-      include: [{ model: Rabbit, as: 'rabbits' }]
+      where: { id, farm_id: farmId },
+      include: [{ ...RABBIT_INCLUDE, where: { farm_id: farmId } }]
     });
 
     if (!cage) throw new Error('CAGE_NOT_FOUND');
@@ -138,13 +138,13 @@ class CageService {
     return { success: true };
   }
 
-  async getStatistics(userId) {
+  async getStatistics(farmId) {
     const cages = await Cage.findAll({
-      where: { user_id: userId },
+      where: { farm_id: farmId },
       include: [{
         ...RABBIT_INCLUDE,
         attributes: ['id'],
-        where: { user_id: userId }
+        where: { farm_id: farmId }
       }]
     });
 
@@ -179,8 +179,8 @@ class CageService {
     return stats;
   }
 
-  async markCleaned(id, userId) {
-    const cage = await Cage.findOne({ where: { id, user_id: userId } });
+  async markCleaned(id, farmId) {
+    const cage = await Cage.findOne({ where: { id, farm_id: farmId } });
     if (!cage) throw new Error('CAGE_NOT_FOUND');
     await cage.update({ last_cleaned_at: new Date() });
     logger.info('Cage marked cleaned', { cageId: id });

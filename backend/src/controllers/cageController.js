@@ -8,7 +8,7 @@ const ApiResponse = require('../utils/apiResponse');
 class CageController {
   async create(req, res, next) {
     try {
-      const cage = await cageService.createCage({ ...req.body, user_id: req.farmId });
+      const cage = await cageService.createCage({ ...req.body, farm_id: req.farmId });
       return ApiResponse.created(res, cage, 'Клетка успешно создана');
     } catch (error) {
       next(error);

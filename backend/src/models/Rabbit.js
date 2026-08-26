@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    user_id: {
+    farm_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -105,7 +105,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     indexes: [
-      { fields: ['user_id'] },
+      { fields: ['farm_id'], name: 'idx_rabbits_farm' },
       { fields: ['name'] },
       { fields: ['breed_id'] },
       { fields: ['sex'] },
@@ -116,7 +116,7 @@ module.exports = (sequelize) => {
       { fields: ['father_id'] },
       { fields: ['mother_id'] },
       // MySQL считает NULL различными, поэтому кролики без бирки не конфликтуют.
-      { unique: true, name: 'unique_user_rabbit_tag', fields: ['user_id', 'tag_id'] }
+      { unique: true, name: 'unique_farm_rabbit_tag', fields: ['farm_id', 'tag_id'] }
     ]
   });
 

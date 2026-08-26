@@ -21,7 +21,6 @@ const _worker = FarmMember(
   email: 'worker@example.com',
   fullName: 'Иван Работник',
   role: FarmRole.worker,
-  ownerId: 1,
 );
 
 final _blockedManager = FarmMember(
@@ -30,7 +29,6 @@ final _blockedManager = FarmMember(
   fullName: 'Анна Управляющая',
   role: FarmRole.manager,
   isActive: false,
-  ownerId: 1,
 );
 
 Future<void> _settle(WidgetTester tester) async {

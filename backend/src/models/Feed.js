@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    user_id: {
+    farm_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -55,7 +55,7 @@ module.exports = (sequelize) => {
     indexes: [
       { fields: ['name'] },
       { fields: ['type'] },
-      { unique: true, fields: ['user_id', 'name'] }
+      { unique: true, name: 'unique_farm_feed_name', fields: ['farm_id', 'name'] }
     ]
   });
 };
