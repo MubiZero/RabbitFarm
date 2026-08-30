@@ -10,6 +10,7 @@ import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -99,6 +100,8 @@ class StaffScreen extends ConsumerWidget {
                   isActive: !member.isActive,
                 ),
                 onResetPassword: () => _resetPassword(context, ref, member),
+                onTransferOwnership: () =>
+                    _transferOwnership(context, ref, member),
               ),
           const SizedBox(height: 24),
           invitationsAsync.when(
@@ -200,6 +203,55 @@ class StaffScreen extends ConsumerWidget {
         explanation: context.l10n.staffTempPasswordBody(member.fullName),
         secret: password,
       );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, e)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  /// Передача хозяйства мгновенна и необратима действием одной кнопки —
+  /// поэтому подтверждение здесь жёстче, чем у смены роли.
+  Future<void> _transferOwnership(
+    BuildContext context,
+    WidgetRef ref,
+    FarmMember member,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final transferred = context.l10n.staffTransferred(member.fullName);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.staffTransferTitle),
+        content: Text(context.l10n.staffTransferBody(member.fullName)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.l10n.staffTransferConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(staffRepositoryProvider).transferOwnership(member.id);
+      // Наша собственная роль сменилась на «управляющий» — без этого
+      // локальный профиль продолжал бы считать нас владельцем до
+      // следующего перелогина.
+      await ref.read(authProvider.notifier).refreshProfile();
+      if (!context.mounted) return;
+      ref.invalidate(farmMembersProvider);
+      messenger.showSnackBar(SnackBar(content: Text(transferred)));
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
@@ -450,12 +502,14 @@ class _MemberCard extends StatelessWidget {
   final ValueChanged<FarmRole>? onChangeRole;
   final VoidCallback? onToggleAccess;
   final VoidCallback? onResetPassword;
+  final VoidCallback? onTransferOwnership;
 
   const _MemberCard({
     required this.member,
     this.onChangeRole,
     this.onToggleAccess,
     this.onResetPassword,
+    this.onTransferOwnership,
   });
 
   @override
@@ -522,6 +576,8 @@ class _MemberCard extends StatelessWidget {
                       onToggleAccess?.call();
                     case 'password':
                       onResetPassword?.call();
+                    case 'transfer-ownership':
+                      onTransferOwnership?.call();
                   }
                 },
                 itemBuilder: (context) => [
@@ -543,6 +599,11 @@ class _MemberCard extends StatelessWidget {
                     value: 'access',
                     child: Text(inactive ? context.l10n.staffOpenAccess : context.l10n.staffCloseAccess),
                   ),
+                  if (!inactive)
+                    PopupMenuItem(
+                      value: 'transfer-ownership',
+                      child: Text(context.l10n.staffTransferOwnership),
+                    ),
                 ],
               ),
           ],
