@@ -72,8 +72,8 @@ lib/
 │       ├── failures.dart           # Failure types
 │       └── error_handler.dart      # Global error handling
 │
-├── features/                       # Feature modules (15 модулей)
-│   ├── auth/                       # ✅ Аутентификация
+├── features/                       # Feature modules (13 модулей)
+│   ├── auth/                       # ✅ Аутентификация, регистрация фермы
 │   │   ├── data/
 │   │   │   ├── models/             # Freezed JSON models
 │   │   │   └── repositories/       # Repository implementations
@@ -132,13 +132,18 @@ lib/
 │   │       ├── providers/          # tasksProvider, taskActionsProvider
 │   │       └── screens/            # TasksList, TaskForm
 │   │
-│   └── reports/                    # ✅ Отчеты и Dashboard
-│       ├── data/
-│       │   ├── models/             # DashboardReport, FarmReport, HealthReport, FinancialReport
-│       │   └── repositories/
-│       └── presentation/
-│           ├── providers/          # dashboardReportProvider
-│           └── screens/            # DashboardScreen
+│   ├── reports/                    # ✅ Отчеты и Dashboard
+│   │   ├── data/
+│   │   │   ├── models/             # DashboardReport, FarmReport, HealthReport, FinancialReport
+│   │   │   └── repositories/
+│   │   └── presentation/
+│   │       ├── providers/          # dashboardReportProvider
+│   │       └── screens/            # DashboardScreen
+│   │
+│   ├── staff/                      # ✅ Работники, приглашения, передача хозяйства
+│   ├── home/                       # ✅ Дневник фермы, сегодня, быстрая запись
+│   ├── onboarding/                 # ✅ Регистрация фермы, первый вход
+│   └── settings/                   # ✅ Настройки приложения
 │
 ├── shared/                         # Shared across features
 │   ├── widgets/
@@ -317,10 +322,13 @@ backend/
 │   │   ├── rateLimiter.js          # Rate limiting
 │   │   └── upload.js               # File upload handler
 │   │
-│   ├── models/                     # ✅ 14 моделей Sequelize
-│   │   ├── index.js                # Sequelize init & associations
+│   ├── models/                     # ✅ 20 моделей Sequelize
+│   │   ├── index.js                # Sequelize init, ассоциации, tenancy.attach()
+│   │   ├── Farm.js                 # Хозяйство: название, владелец
 │   │   ├── User.js                 # Пользователи
+│   │   ├── Invitation.js           # Приглашения работников
 │   │   ├── Rabbit.js               # Кролики
+│   │   ├── RabbitWeight.js         # История веса
 │   │   ├── Breed.js                # Породы
 │   │   ├── Cage.js                 # Клетки
 │   │   ├── Breeding.js             # Случки
@@ -331,12 +339,14 @@ backend/
 │   │   ├── FeedingRecord.js        # Записи кормления
 │   │   ├── Transaction.js          # Финансовые транзакции
 │   │   ├── Task.js                 # Задачи
-│   │   ├── RefreshToken.js         # Refresh токены
-│   │   └── PasswordReset.js        # Сброс паролей
+│   │   ├── Photo.js                # Фото кроликов
+│   │   ├── Note.js                 # Заметки (модель есть, ручек API и экрана — нет)
+│   │   ├── RefreshToken.js         # Refresh-токены
+│   │   ├── TokenBlacklist.js       # Отозванные access-токены
+│   │   └── PasswordResetToken.js   # Сброс паролей
 │   │
-│   ├── controllers/                # ✅ 13 контроллеров (~5000 строк)
-│   │   ├── authController.js       # Аутентификация, JWT
-│   │   ├── userController.js       # Управление пользователями
+│   ├── controllers/                # ✅ 14 контроллеров
+│   │   ├── authController.js       # Аутентификация, JWT, регистрация фермы
 │   │   ├── rabbitController.js     # CRUD кроликов, статистика
 │   │   ├── breedController.js      # CRUD пород
 │   │   ├── cageController.js       # CRUD клеток, автостатусы
@@ -345,21 +355,26 @@ backend/
 │   │   ├── vaccinationController.js # Вакцинации, upcoming/overdue
 │   │   ├── medicalRecordController.js # Медкарты
 │   │   ├── feedController.js       # Корма, управление складом
-│   │   ├── feedingRecordController.js # Кормление, автоспискание
+│   │   ├── feedingRecordController.js # Кормление, автосписание
 │   │   ├── transactionController.js # Финансы, статистика
 │   │   ├── taskController.js       # Задачи, планирование
-│   │   └── reportController.js     # Dashboard, отчеты
+│   │   ├── reportController.js     # Dashboard, отчеты
+│   │   └── staffController.js      # Работники, приглашения, передача хозяйства
 │   │
-│   ├── services/
-│   │   ├── authService.js          # Business logic
+│   ├── services/                   # Бизнес-логика — не у каждого контроллера свой сервис
+│   │   ├── authService.js          # Регистрация, вход, токены
+│   │   ├── staffService.js         # Работники, приглашения, передача хозяйства
 │   │   ├── rabbitService.js
+│   │   ├── breedService.js
 │   │   ├── breedingService.js
-│   │   ├── pedigreeService.js      # Pedigree calculations
-│   │   ├── notificationService.js  # Notifications logic
-│   │   └── reportService.js        # Report generation
+│   │   ├── cageService.js
+│   │   ├── feedService.js
+│   │   ├── taskService.js
+│   │   ├── transactionService.js
+│   │   └── autoExpenseService.js   # Автоматические расходы на лечение
 │   │
-│   ├── routes/                     # ✅ 15 роутов
-│   │   ├── index.js                # Main router, монтирует все модули
+│   ├── routes/                     # ✅ 14 роутов + index.js
+│   │   ├── index.js                # Главный роутер, монтирует все модули
 │   │   ├── auth.routes.js          # /auth - login, register, refresh
 │   │   ├── rabbit.routes.js        # /rabbits - CRUD + статистика
 │   │   ├── breed.routes.js         # /breeds - CRUD пород
@@ -372,25 +387,29 @@ backend/
 │   │   ├── feeding-record.routes.js # /feeding-records - кормление
 │   │   ├── transaction.routes.js   # /transactions - финансы
 │   │   ├── task.routes.js          # /tasks - задачи
-│   │   └── report.routes.js        # /reports - dashboard, отчеты
+│   │   ├── report.routes.js        # /reports - dashboard, отчеты
+│   │   └── staff.routes.js         # /staff - работники, приглашения, передача хозяйства
 │   │
-│   ├── validators/                 # ✅ 10 валидаторов Joi (~2500 строк)
-│   │   ├── authValidator.js        # Валидация login, register
+│   ├── validators/                 # ✅ 13 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
+│   │   ├── authValidator.js        # Валидация login, register (включая farm_name)
 │   │   ├── rabbitValidator.js      # Валидация кроликов
 │   │   ├── breedValidator.js       # Валидация пород
 │   │   ├── cageValidator.js        # Валидация клеток
+│   │   ├── breedingValidator.js    # Валидация случек
+│   │   ├── birthValidator.js       # Валидация рождений
 │   │   ├── vaccinationValidator.js # Валидация вакцинаций
 │   │   ├── medicalRecordValidator.js # Валидация медкарт
 │   │   ├── feedValidator.js        # Валидация кормов
 │   │   ├── feedingRecordValidator.js # Валидация кормления
 │   │   ├── transactionValidator.js # Валидация транзакций
-│   │   └── taskValidator.js        # Валидация задач
+│   │   ├── taskValidator.js        # Валидация задач
+│   │   └── staffValidator.js       # Валидация приглашений и работников
 │   │
 │   └── utils/
 │       ├── jwt.js                  # JWT helpers
 │       ├── password.js             # Password hashing
-│       ├── dateUtils.js
-│       ├── fileUtils.js
+│       ├── tenancy.js              # Страховка изоляции ферм (см. «Многоарендность»)
+│       ├── dateRange.js
 │       └── apiResponse.js          # Standardized responses
 │
 ├── migrations/                     # Sequelize migrations
@@ -568,14 +587,21 @@ farms ──< users
 и живёт оно в `staffService`, который отказывается трогать владельца.
 
 **Страховка.** `src/utils/tenancy.js` вешает на все таблицы фермы хуки
-`beforeFind`, `beforeCount`, `beforeCreate` и `beforeBulkCreate`. Запрос без
-условия по `farm_id` не выполняется — вместо тихой выдачи чужих строк
-получается громкий отказ. Осознанное исключение объявляется явно:
-`{ tenantScope: 'all' }`, и такое исключение видно в diff.
+`beforeFind`, `beforeCount`, `beforeBulkDestroy` и `beforeBulkUpdate` —
+запрос без условия по `farm_id` не выполняется вовсе, вместо тихой выдачи
+(или порчи) чужих строк получается громкий отказ. `beforeCreate` и
+`beforeBulkCreate` отдельно требуют `farm_id` у самой записи. Осознанное
+исключение объявляется явно: `{ tenantScope: 'all' }`, и такое исключение
+видно в diff.
 
-Ограничение: `Model.sum`, `Model.max` и `Model.min` в Sequelize хуков не
-вызывают. Сейчас в коде их нет; агрегаты считаются через `fn('SUM', …)`
-внутри `findAll`, который проверяется.
+`Model.sum`, `Model.max` и `Model.min` в Sequelize реализованы через
+`aggregate()`, который обычные хуки не запускает — этот путь закрыт
+отдельно: `tenancy.js` подменяет `model.aggregate`, прогоняя те же
+проверки перед вызовом оригинала.
+
+Точечные `instance.destroy()` / `instance.update()` хук не проверяет: до
+них можно дойти только через уже проверенный `find`, которым инстанс был
+получен.
 
 ## 🔐 Security Architecture
 
@@ -737,33 +763,35 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ## 🎯 Реализованные модули и возможности
 
-### ✅ Все 15 модулей завершены (100%)
+### Модули (14 готовы, 1 не достроен)
 
 | # | Модуль | Backend | Mobile | Возможности |
 |---|--------|---------|--------|-------------|
-| 1 | **Auth** | ✅ | ✅ | JWT токены, Login, Register, Refresh, Change Password |
-| 2 | **Rabbits** | ✅ | ✅ | CRUD, Статистика, Фильтрация, Родословная |
-| 3 | **Breeds** | ✅ | ✅ | CRUD пород, Характеристики |
-| 4 | **Cages** | ✅ | ✅ | CRUD, Автоматические статусы (occupied/available) |
-| 5 | **Breeding** | ✅ | ✅ | Планирование случек, Отслеживание статусов |
-| 6 | **Births** | ✅ | ✅ | Регистрация рождений, Связь со случками |
-| 7 | **Vaccinations** | ✅ | ✅ | CRUD, Upcoming/Overdue, Статистика |
-| 8 | **Medical Records** | ✅ | ✅ | История болезней, Типы записей |
-| 9 | **Feeds** | ✅ | ✅ | Управление кормами, Контроль остатков |
-| 10 | **Feeding Records** | ✅ | ✅ | Автоматическое списание со склада |
-| 11 | **Transactions** | ✅ | ✅ | Доходы/расходы, Категории, Статистика |
-| 12 | **Tasks** | ✅ | ✅ | Планирование, Приоритеты, Overdue tracking |
-| 13 | **Reports** | ✅ | ✅ | Dashboard, Farm/Health/Financial отчеты |
+| 1 | **Auth & Farm** | ✅ | ✅ | JWT токены, Login, Register (с названием фермы), Refresh, Change Password |
+| 2 | **Staff** | ✅ | ✅ | Приглашения, роли, сброс пароля, передача хозяйства фермы |
+| 3 | **Rabbits** | ✅ | ✅ | CRUD, Статистика, Фильтрация, Родословная |
+| 4 | **Breeds** | ✅ | ✅ | CRUD пород, Характеристики |
+| 5 | **Cages** | ✅ | ✅ | CRUD, Автоматические статусы (occupied/available) |
+| 6 | **Breeding** | ✅ | ✅ | Планирование случек, Отслеживание статусов |
+| 7 | **Births** | ✅ | ✅ | Регистрация рождений, Связь со случками |
+| 8 | **Vaccinations** | ✅ | ✅ | CRUD, Upcoming/Overdue, Статистика |
+| 9 | **Medical Records** | ✅ | ✅ | История болезней, Типы записей |
+| 10 | **Feeds** | ✅ | ✅ | Управление кормами, Контроль остатков |
+| 11 | **Feeding Records** | ✅ | ✅ | Автоматическое списание со склада |
+| 12 | **Transactions** | ✅ | ✅ | Доходы/расходы, Категории, Статистика |
+| 13 | **Tasks** | ✅ | ✅ | Планирование, Приоритеты, Overdue tracking |
+| 14 | **Reports** | ✅ | ✅ | Dashboard, Farm/Health/Financial отчеты |
+| 15 | **Notes** | ⚠️ | ❌ | Модель и tenancy-хук заведены, но ручек API и экрана нет |
 
-### Backend API - 95+ эндпоинтов
+### Backend API - 108 эндпоинтов
 
 **Статистика:**
-- 13 контроллеров (~5000 строк)
-- 14 моделей БД
-- 15 роутов
-- 10 валидаторов Joi (~2500 строк)
+- 14 контроллеров
+- 20 моделей БД
+- 14 роутов + index.js
+- 13 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
 - JWT аутентификация
-- Автоматическая бизнес-логика
+- Многоарендность: изоляция по ферме на find/count/aggregate/create/destroy/update (см. раздел «Многоарендность»)
 
 **Ключевые возможности Backend:**
 - ✅ Автоматическое списание кормов при кормлении
@@ -827,21 +855,20 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - **Всего:** ~25,000 строк кода
 
 ### Покрытие функционала:
-- **Модули:** 15/15 (100%) ✅
-- **API эндпоинты:** 95+ ✅
-- **UI экраны:** 35+ ✅
-- **Модели данных:** 85+ ✅
+- **Модули:** 14/15 — «Notes» модель есть, API и экрана нет
+- **API эндпоинты:** 108
+- **Модели БД (backend):** 20
+- **UI экраны:** 35+ (не пересчитывалось при этой правке)
 
 ### Готовность:
-- ✅ Production-ready backend API
+- ✅ Backend API с многоарендностью (изоляция ферм на всех операциях с данными)
 - ✅ Полнофункциональное mobile приложение
-- ✅ Безопасность (JWT, bcrypt, валидация)
-- ✅ Документация (README, ARCHITECTURE, PROJECT_SUMMARY)
-- ✅ Clean Architecture
+- ✅ Безопасность (JWT, bcrypt, валидация, tenancy-хук)
+- ⚠️ Документация (этот файл отставал от кода — актуализирован 2026-08-30)
 - ✅ Автоматизация бизнес-процессов
 
 ---
 
-**Architecture Version**: 2.0
-**Last Updated**: 2024-12-XX
-**Project Status**: ✅ COMPLETED 100%
+**Architecture Version**: 2.1
+**Last Updated**: 2026-08-30
+**Project Status**: Активная разработка — базовый функционал и многоарендность готовы, «Notes» пока без API и экрана
