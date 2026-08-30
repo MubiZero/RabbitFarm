@@ -235,6 +235,10 @@ class StaffScreen extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(dialogContext).colorScheme.error,
+              foregroundColor: Theme.of(dialogContext).colorScheme.onError,
+            ),
             child: Text(context.l10n.staffTransferConfirm),
           ),
         ],
@@ -599,11 +603,23 @@ class _MemberCard extends StatelessWidget {
                     value: 'access',
                     child: Text(inactive ? context.l10n.staffOpenAccess : context.l10n.staffCloseAccess),
                   ),
-                  if (!inactive)
+                  if (!inactive) ...[
+                    const PopupMenuDivider(),
                     PopupMenuItem(
                       value: 'transfer-ownership',
-                      child: Text(context.l10n.staffTransferOwnership),
+                      child: Row(
+                        children: [
+                          Icon(Icons.swap_horizontal_circle_outlined,
+                              color: cs.error, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            context.l10n.staffTransferOwnership,
+                            style: TextStyle(color: cs.error),
+                          ),
+                        ],
+                      ),
                     ),
+                  ],
                 ],
               ),
           ],

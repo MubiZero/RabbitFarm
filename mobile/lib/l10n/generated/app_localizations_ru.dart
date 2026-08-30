@@ -2730,7 +2730,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get staffTransferConfirm => 'Передать';
+  String get staffTransferConfirm => 'Передать ферму';
 
   @override
   String staffTransferred(String name) {

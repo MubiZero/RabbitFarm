@@ -4951,7 +4951,7 @@ abstract class AppLocalizations {
   /// No description provided for @staffTransferConfirm.
   ///
   /// In ru, this message translates to:
-  /// **'Передать'**
+  /// **'Передать ферму'**
   String get staffTransferConfirm;
 
   /// No description provided for @staffTransferred.

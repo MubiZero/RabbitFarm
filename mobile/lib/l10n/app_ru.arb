@@ -1077,7 +1077,7 @@
   "@staffTransferBody": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "staffTransferConfirm": "Передать",
+  "staffTransferConfirm": "Передать ферму",
   "staffTransferred": "Хозяйство передано {name}",
   "@staffTransferred": {
     "placeholders": { "name": { "type": "String" } }
