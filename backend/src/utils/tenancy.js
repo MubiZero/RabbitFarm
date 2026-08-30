@@ -65,6 +65,16 @@ const attach = (models) => {
     // непроверенными, хотя выдают ровно те же чужие строки, только числом.
     model.addHook('beforeCount', guard);
 
+    // sum/max/min идут в обход хуков вовсе — Sequelize реализует их через
+    // aggregate(), а aggregate() хуки не запускает (в отличие от count(),
+    // который вызывает их вручную). Перехватываем сам aggregate: это разом
+    // закрывает все три метода и любые будущие вызовы через них.
+    const originalAggregate = model.aggregate;
+    model.aggregate = function (attribute, aggregateFunction, options) {
+      guard(options || {});
+      return originalAggregate.call(this, attribute, aggregateFunction, options);
+    };
+
     const requireFarm = (instance) => {
       if (instance.farm_id === null || instance.farm_id === undefined) {
         throw new Error(`Запись ${name} создаётся без farm_id.`);

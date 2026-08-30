@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
-const { Farm, Rabbit, Breed, Cage } = require('../../src/models');
+const { Farm, Rabbit, Breed, Cage, Transaction } = require('../../src/models');
 
 /**
  * Страховка от забытого фильтра по ферме.
@@ -78,6 +78,36 @@ describe('Страховка многоарендности', () => {
     it('намеренный запрос по всем фермам объявляется явно', async () => {
       const all = await Rabbit.findAll({ tenantScope: 'all' });
       expect(all).toHaveLength(1);
+    });
+  });
+
+  describe('агрегаты', () => {
+    // sum/max/min реализованы в Sequelize через aggregate(), а он идёт в
+    // обход beforeFind и beforeCount — свой собственный хук у него не
+    // проверяется. Без отдельного перехвата эти три метода оставались бы
+    // единственной дырой в предохранителе.
+    beforeAll(async () => {
+      await Transaction.create({
+        farm_id: farmId,
+        type: 'income',
+        category: 'sale_rabbit',
+        amount: '500.00',
+        transaction_date: '2025-01-01'
+      });
+    });
+
+    it('sum без условия по ферме не выполняется', async () => {
+      await expect(Transaction.sum('amount')).rejects.toThrow(/farm_id/);
+    });
+
+    it('max и min без условия по ферме тоже отвергаются', async () => {
+      await expect(Transaction.max('amount')).rejects.toThrow(/farm_id/);
+      await expect(Transaction.min('amount')).rejects.toThrow(/farm_id/);
+    });
+
+    it('с условием по ферме sum проходит', async () => {
+      const total = await Transaction.sum('amount', { where: { farm_id: farmId } });
+      expect(Number(total)).toBe(500);
     });
   });
 
