@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
-const { User, Invitation, RefreshToken } = require('../models');
+const { User, Farm, Invitation, RefreshToken } = require('../models');
 const PasswordUtil = require('../utils/password');
 const logger = require('../utils/logger');
 
@@ -179,6 +179,42 @@ class StaffService {
     await member.update(changes);
     logger.info('Staff member updated', { memberId, farmId, changes });
     return member;
+  }
+
+  /**
+   * Передать хозяйство фермы активному работнику.
+   *
+   * Мгновенно, без подтверждения со стороны получателя: он уже
+   * авторизованный участник этой же фермы, а не посторонний по коду, как в
+   * приглашении. Прежний владелец становится управляющим — остаётся в
+   * ферме с почти полным доступом, но без права передавать хозяйство
+   * дальше или менять состав.
+   */
+  async transferOwnership(farmId, currentOwner, newOwnerId) {
+    const newOwner = await User.findOne({
+      where: { id: newOwnerId, farm_id: farmId, role: { [Op.ne]: 'owner' }, is_active: true }
+    });
+    if (!newOwner) {
+      throw new Error('MEMBER_NOT_FOUND');
+    }
+
+    const transaction = await User.sequelize.transaction();
+    try {
+      await Farm.update({ owner_id: newOwner.id }, { where: { id: farmId }, transaction });
+      await newOwner.update({ role: 'owner' }, { transaction });
+      await currentOwner.update({ role: 'manager' }, { transaction });
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+
+    logger.info('Ownership transferred', {
+      farmId,
+      fromUserId: currentOwner.id,
+      toUserId: newOwner.id
+    });
+    return newOwner;
   }
 }
 
