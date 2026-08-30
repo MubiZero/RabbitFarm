@@ -318,6 +318,7 @@ String _kindLabel(BuildContext context, JournalKind kind) => switch (kind) {
       JournalKind.treatment => context.l10n.journalKindTreatment,
       JournalKind.vaccination => context.l10n.journalKindVaccination,
       JournalKind.task => context.l10n.journalKindTask,
+      JournalKind.note => context.l10n.journalKindNote,
     };
 
 extension _JournalKindVisuals on JournalKind {
@@ -326,6 +327,7 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.treatment => AppDomain.health,
         JournalKind.vaccination => AppDomain.health,
         JournalKind.task => AppDomain.tasks,
+        JournalKind.note => AppDomain.admin,
       };
 
   IconData get icon => switch (this) {
@@ -333,5 +335,6 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.treatment => Icons.medical_services_outlined,
         JournalKind.vaccination => Icons.vaccines_outlined,
         JournalKind.task => Icons.check_circle_outline,
+        JournalKind.note => Icons.sticky_note_2_outlined,
       };
 }

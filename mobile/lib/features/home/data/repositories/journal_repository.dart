@@ -8,13 +8,14 @@ import '../../../feeding/data/models/feeding_record_model.dart';
 import '../../../health/data/models/medical_record_model.dart';
 import '../../../health/data/models/vaccination_model.dart';
 import '../../../tasks/data/models/task_model.dart';
+import '../../../notes/data/models/note_model.dart';
 import '../models/journal_entry.dart';
 
-/// Собирает ленту записей смены из четырёх источников.
+/// Собирает ленту записей смены из пяти источников.
 ///
 /// Запроса «покажи, что записали за смену» на сервере нет: кормления, лечение,
-/// прививки и задачи лежат по разным адресам, поэтому четыре списка тянутся
-/// параллельно и склеиваются по времени здесь.
+/// прививки, задачи и заметки лежат по разным адресам, поэтому пять списков
+/// тянутся параллельно и склеиваются по времени здесь.
 ///
 /// Кормления и задачи разбираются своими моделями: те теперь забирают из
 /// ответа связанные корм, кролика, клетку и автора записи. А вот модели
@@ -39,6 +40,7 @@ class JournalRepository {
       _treatments(from, to),
       _vaccinations(from, to),
       _closedTasks(),
+      _notes(from, to),
     ]);
 
     // Границы периода проверяются ещё раз здесь: у задач сервер их вовсе не
@@ -174,6 +176,35 @@ class JournalRepository {
       ));
     }
     return entries;
+  }
+
+  Future<List<JournalEntry>> _notes(DateTime from, DateTime to) async {
+    final items = await _items(ApiEndpoints.notes, {
+      'limit': _pageLimit,
+      'sort_by': 'created_at',
+      'sort_order': 'DESC',
+      'from_date': from.toIso8601String(),
+      'to_date': to.toIso8601String(),
+    });
+
+    return [
+      for (final item in items) _noteEntry(item),
+    ];
+  }
+
+  JournalEntry _noteEntry(Map<String, dynamic> item) {
+    final note = NoteModel.fromJson(item);
+
+    return JournalEntry(
+      kind: JournalKind.note,
+      at: note.createdAt ?? DateTime.now(),
+      hasTime: true,
+      title: note.content,
+      rabbitName: note.rabbit?.label,
+      cageNumber: note.cage?.number,
+      author: note.author?.fullName,
+      formArgs: note,
+    );
   }
 
   Future<List<Map<String, dynamic>>> _items(

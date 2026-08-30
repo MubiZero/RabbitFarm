@@ -96,6 +96,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get journalKindTask => 'Задача';
 
   @override
+  String get journalKindNote => 'Заметка';
+
+  @override
   String get journalEmptyTodayTitle => 'Сегодня ещё ничего не записано';
 
   @override
@@ -103,7 +106,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get journalEmptyBody =>
-      'Кормления, лечение, прививки и закрытые задачи попадают сюда сами. Запишите первое — и оно появится здесь.';
+      'Кормления, лечение, прививки, закрытые задачи и заметки попадают сюда сами. Запишите первое — и оно появится здесь.';
 
   @override
   String get journalNoneInViewTitle => 'В этой выборке пусто';
@@ -303,6 +306,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get quickCreateTask => 'Создать задачу';
+
+  @override
+  String get quickRecordNote => 'Оставить заметку';
 
   @override
   String get quickAddRabbit => 'Добавить кролика';
@@ -841,6 +847,42 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get taskFormDeleteFailed => 'Не удалось удалить задачу';
+
+  @override
+  String get noteFormNewTitle => 'Новая заметка';
+
+  @override
+  String get noteFormEditTitle => 'Заметка';
+
+  @override
+  String get noteFormSectionMain => 'Основное';
+
+  @override
+  String get noteFormContentLabel => 'Текст заметки';
+
+  @override
+  String get noteFormContentEmpty => 'Введите текст заметки';
+
+  @override
+  String get noteFormCreate => 'Добавить';
+
+  @override
+  String get noteFormCreated => 'Заметка добавлена';
+
+  @override
+  String get noteFormUpdated => 'Заметка обновлена';
+
+  @override
+  String get noteFormDeleteTitle => 'Удалить заметку?';
+
+  @override
+  String get noteFormDeleteBody => 'Восстановить её будет нельзя.';
+
+  @override
+  String get noteFormDeleted => 'Заметка удалена';
+
+  @override
+  String get noteFormDeleteFailed => 'Не удалось удалить заметку';
 
   @override
   String get repeatDaily => 'Каждый день';

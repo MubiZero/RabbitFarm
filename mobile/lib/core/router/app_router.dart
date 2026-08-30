@@ -45,6 +45,8 @@ import '../../features/finance/data/models/transaction_model.dart';
 import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
+import '../../features/notes/presentation/screens/note_form_screen.dart';
+import '../../features/notes/data/models/note_model.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/farm_screen.dart';
@@ -528,6 +530,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final task = state.extra as Task?;
           return TaskFormScreen(task: task);
+        },
+      ),
+
+      // Note form route (outside shell)
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/notes/form',
+        name: 'note-form',
+        builder: (context, state) {
+          final note = state.extra as NoteModel?;
+          return NoteFormScreen(note: note);
         },
       ),
 

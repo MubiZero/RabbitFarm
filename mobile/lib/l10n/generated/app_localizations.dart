@@ -268,6 +268,12 @@ abstract class AppLocalizations {
   /// **'Задача'**
   String get journalKindTask;
 
+  /// No description provided for @journalKindNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка'**
+  String get journalKindNote;
+
   /// No description provided for @journalEmptyTodayTitle.
   ///
   /// In ru, this message translates to:
@@ -283,7 +289,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalEmptyBody.
   ///
   /// In ru, this message translates to:
-  /// **'Кормления, лечение, прививки и закрытые задачи попадают сюда сами. Запишите первое — и оно появится здесь.'**
+  /// **'Кормления, лечение, прививки, закрытые задачи и заметки попадают сюда сами. Запишите первое — и оно появится здесь.'**
   String get journalEmptyBody;
 
   /// No description provided for @journalNoneInViewTitle.
@@ -669,6 +675,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Создать задачу'**
   String get quickCreateTask;
+
+  /// No description provided for @quickRecordNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставить заметку'**
+  String get quickRecordNote;
 
   /// No description provided for @quickAddRabbit.
   ///
@@ -1497,6 +1509,78 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось удалить задачу'**
   String get taskFormDeleteFailed;
+
+  /// No description provided for @noteFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая заметка'**
+  String get noteFormNewTitle;
+
+  /// No description provided for @noteFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка'**
+  String get noteFormEditTitle;
+
+  /// No description provided for @noteFormSectionMain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основное'**
+  String get noteFormSectionMain;
+
+  /// No description provided for @noteFormContentLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текст заметки'**
+  String get noteFormContentLabel;
+
+  /// No description provided for @noteFormContentEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текст заметки'**
+  String get noteFormContentEmpty;
+
+  /// No description provided for @noteFormCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить'**
+  String get noteFormCreate;
+
+  /// No description provided for @noteFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка добавлена'**
+  String get noteFormCreated;
+
+  /// No description provided for @noteFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка обновлена'**
+  String get noteFormUpdated;
+
+  /// No description provided for @noteFormDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить заметку?'**
+  String get noteFormDeleteTitle;
+
+  /// No description provided for @noteFormDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить её будет нельзя.'**
+  String get noteFormDeleteBody;
+
+  /// No description provided for @noteFormDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка удалена'**
+  String get noteFormDeleted;
+
+  /// No description provided for @noteFormDeleteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить заметку'**
+  String get noteFormDeleteFailed;
 
   /// No description provided for @repeatDaily.
   ///

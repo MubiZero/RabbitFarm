@@ -79,6 +79,9 @@ class ApiEndpoints {
   static const String taskStatistics = '/tasks/statistics';
   static const String tasksUpcoming = '/tasks/upcoming';
 
+  // Notes endpoints
+  static const String notes = '/notes';
+
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';
   static const String reportFarm = '/reports/farm';

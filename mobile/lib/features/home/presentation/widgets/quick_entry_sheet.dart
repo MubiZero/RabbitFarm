@@ -72,6 +72,13 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           domain: AppDomain.tasks,
           capability: FarmCapability.recordDailyWork,
         ),
+        QuickEntryAction(
+          icon: Icons.sticky_note_2_outlined,
+          label: l10n.quickRecordNote,
+          route: '/notes/form',
+          domain: AppDomain.admin,
+          capability: FarmCapability.recordDailyWork,
+        ),
       ],
     ),
     QuickEntryGroup(

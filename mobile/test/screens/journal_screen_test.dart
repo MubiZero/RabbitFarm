@@ -96,6 +96,24 @@ void main() {
     expect(find.text('Прививка · Кролик Зорька'), findsOneWidget);
   });
 
+  testWidgets('заметка без привязки к кролику или клетке показывает текст',
+      (tester) async {
+    await _pumpJournal(
+      tester,
+      _feed([
+        _entry(
+          kind: JournalKind.note,
+          at: DateTime(_today.year, _today.month, _today.day, 14),
+          title: 'Заказать сено на следующую неделю',
+        ),
+      ]),
+    );
+
+    expect(find.text('Заказать сено на следующую неделю'), findsOneWidget);
+    // Без кролика и клетки строка вида не приписывает лишней цели.
+    expect(find.text('Заметка'), findsOneWidget);
+  });
+
   testWidgets('пустой журнал зовёт сделать первую запись', (tester) async {
     await _pumpJournal(tester, _feed(const []));
 

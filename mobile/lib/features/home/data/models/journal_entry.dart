@@ -1,6 +1,6 @@
 /// Одна строка ленты записей.
 ///
-/// Четыре источника — кормление, лечение, прививки и закрытые задачи —
+/// Пять источников — кормление, лечение, прививки, закрытые задачи и заметки —
 /// приводятся к общему виду, чтобы лента сортировалась по времени и рисовалась
 /// одним виджетом. Готовых подписей здесь нет: они зависят от языка, а слой
 /// данных о нём не знает. Хранятся только куски, из которых экран собирает
@@ -9,7 +9,8 @@ enum JournalKind {
   feeding,
   treatment,
   vaccination,
-  task;
+  task,
+  note;
 
   /// Форма, в которой эту запись правят.
   String get formRoute => switch (this) {
@@ -17,6 +18,7 @@ enum JournalKind {
         JournalKind.treatment => '/medical-records/form',
         JournalKind.vaccination => '/vaccinations/form',
         JournalKind.task => '/tasks/form',
+        JournalKind.note => '/notes/form',
       };
 }
 
