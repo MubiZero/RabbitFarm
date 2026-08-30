@@ -86,6 +86,17 @@ class StaffRepository {
     }
   }
 
+  /// Передать хозяйство фермы работнику. Мгновенно, без подтверждения с
+  /// его стороны — он уже участник этой же фермы.
+  Future<FarmMember> transferOwnership(int id) async {
+    try {
+      final response = await _apiClient.post('/staff/$id/transfer-ownership');
+      return FarmMember.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   /// Присоединиться к ферме по коду. Вызывается до авторизации.
   Future<Map<String, dynamic>> acceptInvitation({
     required String code,

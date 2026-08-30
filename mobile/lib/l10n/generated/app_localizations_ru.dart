@@ -2719,6 +2719,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffCloseAccess => 'Закрыть доступ';
 
   @override
+  String get staffTransferOwnership => 'Передать хозяйство';
+
+  @override
+  String get staffTransferTitle => 'Передать хозяйство?';
+
+  @override
+  String staffTransferBody(String name) {
+    return 'Ферма перейдёт $name, а вы станете управляющим. Отменить это будет нельзя.';
+  }
+
+  @override
+  String get staffTransferConfirm => 'Передать';
+
+  @override
+  String staffTransferred(String name) {
+    return 'Хозяйство передано $name';
+  }
+
+  @override
   String get rabbitTapToZoom => 'Нажмите, чтобы рассмотреть';
 
   @override

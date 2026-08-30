@@ -1071,6 +1071,17 @@
   "staffResetPassword": "Сбросить пароль",
   "staffOpenAccess": "Открыть доступ",
   "staffCloseAccess": "Закрыть доступ",
+  "staffTransferOwnership": "Передать хозяйство",
+  "staffTransferTitle": "Передать хозяйство?",
+  "staffTransferBody": "Ферма перейдёт {name}, а вы станете управляющим. Отменить это будет нельзя.",
+  "@staffTransferBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "staffTransferConfirm": "Передать",
+  "staffTransferred": "Хозяйство передано {name}",
+  "@staffTransferred": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "rabbitTapToZoom": "Нажмите, чтобы рассмотреть",
   "rabbitTagLine": "Бирка {tag}",

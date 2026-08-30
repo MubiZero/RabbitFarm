@@ -4930,6 +4930,36 @@ abstract class AppLocalizations {
   /// **'Закрыть доступ'**
   String get staffCloseAccess;
 
+  /// No description provided for @staffTransferOwnership.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать хозяйство'**
+  String get staffTransferOwnership;
+
+  /// No description provided for @staffTransferTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать хозяйство?'**
+  String get staffTransferTitle;
+
+  /// No description provided for @staffTransferBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма перейдёт {name}, а вы станете управляющим. Отменить это будет нельзя.'**
+  String staffTransferBody(String name);
+
+  /// No description provided for @staffTransferConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать'**
+  String get staffTransferConfirm;
+
+  /// No description provided for @staffTransferred.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство передано {name}'**
+  String staffTransferred(String name);
+
   /// No description provided for @rabbitTapToZoom.
   ///
   /// In ru, this message translates to:
