@@ -269,6 +269,19 @@ class RabbitController {
   }
 
   /**
+   * List gallery photos across the whole farm
+   * GET /api/v1/photos
+   */
+  async listFarmPhotos(req, res, next) {
+    try {
+      const result = await rabbitService.listFarmGalleryPhotos(req.farmId, req.query);
+      return ApiResponse.paginated(res, result.items, result.page, result.limit, result.total, 'Лента фото получена');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Get statistics
    * GET /api/v1/rabbits/statistics
    */

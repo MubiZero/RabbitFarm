@@ -26,7 +26,8 @@ const modules = [
   ['/breeding', require('./breeding.routes')],
   ['/notes', require('./note.routes')],
   ['/device-tokens', require('./device-token.routes')],
-  ['/payments', require('./payment.routes')]
+  ['/payments', require('./payment.routes')],
+  ['/photos', require('./photo.routes')]
 ];
 
 // API Info

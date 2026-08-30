@@ -15,6 +15,7 @@ const {
 const { Op, Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
+const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 
 /**
  * Rabbit service
@@ -579,6 +580,46 @@ class RabbitService {
     await photo.destroy();
     deleteFile(photo.url);
     logger.info('Gallery photo deleted', { rabbitId, photoId });
+  }
+
+  /**
+   * Лента фото по всей ферме — для Дневника, который не знает заранее,
+   * о каком кролике речь.
+   * @param {Number} farmId - id хозяйства
+   * @param {Object} filters - { page, limit, sort_by, sort_order, from_date, to_date }
+   */
+  async listFarmGalleryPhotos(farmId, filters = {}) {
+    const {
+      page = 1,
+      limit = 50,
+      sort_by = 'created_at',
+      sort_order = 'DESC',
+      from_date,
+      to_date
+    } = filters;
+
+    const offset = (page - 1) * limit;
+    const where = { farm_id: farmId };
+
+    if (from_date || to_date) {
+      where.created_at = {};
+      if (from_date) where.created_at[Op.gte] = startOfDayUtc(from_date);
+      if (to_date) where.created_at[Op.lt] = nextDayUtc(to_date);
+    }
+
+    const { count, rows } = await Photo.findAndCountAll({
+      where,
+      include: [
+        { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
+        { model: User, as: 'author', attributes: ['id', 'full_name', 'email'] }
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [[sort_by, sort_order.toUpperCase()]],
+      distinct: true
+    });
+
+    return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
   /**
