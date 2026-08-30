@@ -51,6 +51,23 @@ class StaffController {
     }
   }
 
+  /** POST /staff/:id/transfer-ownership — передать хозяйство фермы */
+  async transferOwnership(req, res, next) {
+    try {
+      const newOwner = await staffService.transferOwnership(
+        req.farmId,
+        req.user,
+        req.params.id
+      );
+      return ApiResponse.success(res, newOwner, 'Хозяйство передано');
+    } catch (error) {
+      if (error.message === 'MEMBER_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Работник не найден');
+      }
+      next(error);
+    }
+  }
+
   /** POST /staff/invitations — выписать приглашение */
   async createInvitation(req, res, next) {
     try {

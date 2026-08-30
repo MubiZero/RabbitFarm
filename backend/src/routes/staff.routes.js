@@ -58,6 +58,15 @@ router.delete('/invitations/:id', authorize(['owner']), staffController.revokeIn
  */
 router.post('/:id/reset-password', authorize(['owner']), staffController.resetMemberPassword);
 
+/**
+ * @swagger
+ * /staff/{id}/transfer-ownership:
+ *   post:
+ *     summary: Передать хозяйство фермы активному работнику
+ *     tags: [Staff]
+ */
+router.post('/:id/transfer-ownership', authorize(['owner']), staffController.transferOwnership);
+
 router.patch(
   '/:id',
   authorize(['owner']),
