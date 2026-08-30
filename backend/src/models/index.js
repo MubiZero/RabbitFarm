@@ -171,7 +171,8 @@ Note.belongsTo(User, { foreignKey: 'created_by' });
 // Подключаем после того, как все модели определены и связаны.
 require('../utils/tenancy').attach({
   Breed, Cage, Feed, Rabbit, RabbitWeight, Breeding, Birth,
-  Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note
+  Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note,
+  Invitation
 });
 
 // Export models and sequelize instance

@@ -94,8 +94,11 @@ class StaffService {
    * @param {String} token - код из приглашения
    */
   async acceptInvitation(token, { password, full_name: fullName, phone }) {
+    // Приглашённый ещё ни к одной ферме не привязан — искать его можно
+    // только по коду, без условия по farm_id.
     const invitation = await Invitation.findOne({
-      where: { token_hash: this.hashToken(token), accepted_at: null }
+      where: { token_hash: this.hashToken(token), accepted_at: null },
+      tenantScope: 'all'
     });
 
     // Просроченное и несуществующее приглашение неотличимы снаружи:

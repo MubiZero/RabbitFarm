@@ -52,7 +52,10 @@ describe('Приглашения в ферму', () => {
       .set('Authorization', `Bearer ${ownerToken}`)
       .send({ email: 'hashcheck@example.com', role: 'worker' });
 
-    const row = await Invitation.findOne({ where: { email: 'hashcheck@example.com' } });
+    const row = await Invitation.findOne({
+      where: { email: 'hashcheck@example.com' },
+      tenantScope: 'all'
+    });
     expect(row.token_hash).not.toBe(created.body.data.code);
     expect(row.get('token')).toBeUndefined();
   });
