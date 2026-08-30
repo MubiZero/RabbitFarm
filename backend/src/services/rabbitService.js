@@ -8,6 +8,8 @@ const {
   Vaccination,
   MedicalRecord,
   Transaction,
+  Photo,
+  User,
   sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
@@ -514,6 +516,69 @@ class RabbitService {
       logger.error('Add weight record error', { error: error.message, rabbitId });
       throw error;
     }
+  }
+
+  /**
+   * Галерея кролика — в отличие от `photo_url`, снимков может быть много.
+   * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
+   * @returns {Array} Photo records
+   */
+  async listGalleryPhotos(rabbitId, farmId) {
+    const rabbit = await Rabbit.findOne({ where: { id: rabbitId, farm_id: farmId } });
+    if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
+
+    return Photo.findAll({
+      where: { farm_id: farmId, rabbit_id: rabbitId },
+      include: [{ model: User, as: 'author', attributes: ['id', 'full_name', 'email'] }],
+      order: [['created_at', 'DESC']]
+    });
+  }
+
+  /**
+   * Добавить снимок в галерею.
+   * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
+   * @param {Object} data - { url, caption, taken_at, uploaded_by }
+   * @returns {Object} Photo record
+   */
+  async addGalleryPhoto(rabbitId, farmId, data) {
+    const rabbit = await Rabbit.findOne({ where: { id: rabbitId, farm_id: farmId } });
+    if (!rabbit) throw new Error('RABBIT_NOT_FOUND');
+
+    const photo = await Photo.create({
+      farm_id: farmId,
+      rabbit_id: rabbitId,
+      url: data.url,
+      caption: data.caption || null,
+      taken_at: data.taken_at || null,
+      uploaded_by: data.uploaded_by
+    });
+
+    const created = await Photo.findOne({
+      where: { id: photo.id, farm_id: farmId },
+      include: [{ model: User, as: 'author', attributes: ['id', 'full_name', 'email'] }]
+    });
+
+    logger.info('Gallery photo added', { rabbitId, photoId: photo.id });
+    return created;
+  }
+
+  /**
+   * Удалить снимок из галереи — вместе с файлом на диске.
+   * @param {Number} rabbitId - Rabbit ID
+   * @param {Number} photoId - Photo ID
+   * @param {Number} farmId - id хозяйства: чужая запись не найдётся
+   */
+  async deleteGalleryPhoto(rabbitId, photoId, farmId) {
+    const photo = await Photo.findOne({
+      where: { id: photoId, rabbit_id: rabbitId, farm_id: farmId }
+    });
+    if (!photo) throw new Error('PHOTO_NOT_FOUND');
+
+    await photo.destroy();
+    deleteFile(photo.url);
+    logger.info('Gallery photo deleted', { rabbitId, photoId });
   }
 
   /**

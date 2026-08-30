@@ -237,6 +237,37 @@ router.delete(
 );
 
 /**
+ * @route   GET /api/v1/rabbits/:id/photos
+ * @desc    Галерея кролика — в отличие от /photo, снимков может быть много
+ * @access  Private
+ */
+router.get('/:id/photos', rabbitController.listGalleryPhotos);
+
+/**
+ * @route   POST /api/v1/rabbits/:id/photos
+ * @desc    Добавить снимок в галерею
+ * @access  Private (Manager, Owner)
+ */
+router.post(
+  '/:id/photos',
+  authorize(['manager', 'owner']),
+  uploadLimiter,
+  upload.single('photo'),
+  rabbitController.addGalleryPhoto
+);
+
+/**
+ * @route   DELETE /api/v1/rabbits/:id/photos/:photoId
+ * @desc    Удалить снимок из галереи
+ * @access  Private (Manager, Owner)
+ */
+router.delete(
+  '/:id/photos/:photoId',
+  authorize(['manager', 'owner']),
+  rabbitController.deleteGalleryPhoto
+);
+
+/**
  * @route   GET /api/v1/rabbits/:rabbitId/vaccinations
  * @desc    Get rabbit vaccinations history
  * @access  Private

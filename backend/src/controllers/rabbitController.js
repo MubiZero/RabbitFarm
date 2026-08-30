@@ -208,6 +208,67 @@ class RabbitController {
   }
 
   /**
+   * List gallery photos
+   * GET /api/v1/rabbits/:id/photos
+   */
+  async listGalleryPhotos(req, res, next) {
+    try {
+      const photos = await rabbitService.listGalleryPhotos(req.params.id, req.farmId);
+      return ApiResponse.success(res, photos, 'Галерея получена');
+    } catch (error) {
+      if (error.message === 'RABBIT_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Кролик не найден');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Add gallery photo
+   * POST /api/v1/rabbits/:id/photos
+   */
+  async addGalleryPhoto(req, res, next) {
+    try {
+      if (!req.file) {
+        return ApiResponse.badRequest(res, 'Файл не загружен');
+      }
+
+      const photo = await rabbitService.addGalleryPhoto(req.params.id, req.farmId, {
+        url: `/uploads/rabbits/${req.file.filename}`,
+        caption: req.body.caption,
+        taken_at: req.body.taken_at,
+        uploaded_by: req.user.id
+      });
+
+      return ApiResponse.success(res, photo, 'Фото добавлено в галерею', 201);
+    } catch (error) {
+      if (error.message === 'RABBIT_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Кролик не найден');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Delete gallery photo
+   * DELETE /api/v1/rabbits/:id/photos/:photoId
+   */
+  async deleteGalleryPhoto(req, res, next) {
+    try {
+      await rabbitService.deleteGalleryPhoto(req.params.id, req.params.photoId, req.farmId);
+      return ApiResponse.success(res, null, 'Фото удалено из галереи');
+    } catch (error) {
+      if (error.message === 'RABBIT_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Кролик не найден');
+      }
+      if (error.message === 'PHOTO_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Фото не найдено');
+      }
+      next(error);
+    }
+  }
+
+  /**
    * Get statistics
    * GET /api/v1/rabbits/statistics
    */

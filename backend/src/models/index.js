@@ -166,8 +166,8 @@ Task.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
 Task.belongsTo(User, { as: 'assignedTo', foreignKey: 'assigned_to' });
 Task.belongsTo(User, { as: 'creator', foreignKey: 'created_by' });
 
-Photo.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-Photo.belongsTo(User, { foreignKey: 'uploaded_by' });
+Photo.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+Photo.belongsTo(User, { as: 'author', foreignKey: 'uploaded_by' });
 
 Note.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 Note.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
