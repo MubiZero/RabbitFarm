@@ -144,4 +144,32 @@ describe('Страховка многоарендности', () => {
       ])).rejects.toThrow(/farm_id/);
     });
   });
+
+  describe('массовое изменение и удаление', () => {
+    // Model.destroy({ where }) и Model.update(values, { where }) идут в обход
+    // beforeFind — у них свои хуки (beforeBulkDestroy/beforeBulkUpdate), и
+    // без проверки условие по ферме забыть так же легко, как в выборке, а
+    // цена ошибки выше: без where это не чтение чужих строк, а их порча.
+    it('destroy без условия по ферме не выполняется', async () => {
+      await expect(Cage.destroy({ where: {} })).rejects.toThrow(/farm_id/);
+    });
+
+    it('update без условия по ферме не выполняется', async () => {
+      await expect(Cage.update({ number: 'X' }, { where: {} })).rejects.toThrow(/farm_id/);
+    });
+
+    it('с условием по ферме destroy и update проходят', async () => {
+      const cage = await Cage.create({ number: 'MASS-1', farm_id: farmId });
+
+      await Cage.update(
+        { number: 'MASS-1-renamed' },
+        { where: { id: cage.id, farm_id: farmId } }
+      );
+      const renamed = await Cage.findOne({ where: { id: cage.id, farm_id: farmId } });
+      expect(renamed.number).toBe('MASS-1-renamed');
+
+      await Cage.destroy({ where: { id: cage.id, farm_id: farmId } });
+      expect(await Cage.count({ where: { id: cage.id, farm_id: farmId } })).toBe(0);
+    });
+  });
 });

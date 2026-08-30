@@ -437,7 +437,7 @@ describe('Изоляция ферм: деньги, отчёты, персона�
 
       await Invitation.update(
         { expires_at: new Date('2020-01-01T00:00:00.000Z') },
-        { where: { id: invitation.body.data.id } }
+        { where: { id: invitation.body.data.id }, tenantScope: 'all' }
       );
 
       const res = await request(app)

@@ -64,6 +64,13 @@ const attach = (models) => {
     // подсчёты (а это все сводки на главном экране) оставались бы
     // непроверенными, хотя выдают ровно те же чужие строки, только числом.
     model.addHook('beforeCount', guard);
+    // Массовые destroy/update тоже идут мимо beforeFind — у них свои хуки,
+    // и без условия по ферме `Model.destroy({ where })` или
+    // `Model.update(values, { where })` задели бы чужие строки безвозвратно.
+    // Точечные `instance.destroy()`/`instance.update()` сюда не попадают:
+    // инстанс уже прошёл через guard на этапе find, которым он был получен.
+    model.addHook('beforeBulkDestroy', guard);
+    model.addHook('beforeBulkUpdate', guard);
 
     // sum/max/min идут в обход хуков вовсе — Sequelize реализует их через
     // aggregate(), а aggregate() хуки не запускает (в отличие от count(),
