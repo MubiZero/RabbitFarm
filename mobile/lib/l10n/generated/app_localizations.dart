@@ -1540,6 +1540,30 @@ abstract class AppLocalizations {
   /// **'Введите текст заметки'**
   String get noteFormContentEmpty;
 
+  /// No description provided for @noteFormSectionLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'К чему относится'**
+  String get noteFormSectionLink;
+
+  /// No description provided for @noteFormRabbitLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик (необязательно)'**
+  String get noteFormRabbitLabel;
+
+  /// No description provided for @noteFormCageLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка (необязательно)'**
+  String get noteFormCageLabel;
+
+  /// No description provided for @noteFormCageNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не выбрано'**
+  String get noteFormCageNone;
+
   /// No description provided for @noteFormCreate.
   ///
   /// In ru, this message translates to:

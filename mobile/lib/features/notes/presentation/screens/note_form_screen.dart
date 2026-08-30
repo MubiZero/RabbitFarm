@@ -6,7 +6,10 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../cages/presentation/providers/cages_provider.dart';
 import '../../../home/presentation/providers/journal_provider.dart';
+import '../../../rabbits/data/models/rabbit_model.dart';
+import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/note_model.dart';
 import '../providers/notes_provider.dart';
 
@@ -25,6 +28,16 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
   late final TextEditingController _content;
   bool _touched = false;
 
+  // Эффективные значения, которые уходят на сервер. Пикер кролика отдаёт
+  // полную модель только когда выбор поменяли — при правке существующей
+  // заметки её нет, есть только имя. Если хранить привязку исключительно
+  // в модели пикера, непотроганное поле на сохранении отправило бы null
+  // и молча отвязало бы кролика, которого никто не трогал.
+  int? _rabbitId;
+  RabbitModel? _rabbitModel;
+  String? _rabbitLabel;
+  int? _cageId;
+
   NoteModel? get _note => widget.note;
   bool get _isEditing => _note != null;
 
@@ -35,6 +48,10 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     _content.addListener(() {
       if (!_touched) _touched = true;
     });
+
+    _rabbitId = _note?.rabbitId;
+    _rabbitLabel = _note?.rabbit?.label;
+    _cageId = _note?.cageId;
   }
 
   @override
@@ -48,9 +65,20 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     final repo = ref.read(notesRepositoryProvider);
     try {
       if (_isEditing) {
-        await repo.updateNote(_note!.id, NoteUpdate(content: _content.text.trim()));
+        await repo.updateNote(
+          _note!.id,
+          NoteUpdate(
+            content: _content.text.trim(),
+            rabbitId: _rabbitId,
+            cageId: _cageId,
+          ),
+        );
       } else {
-        await repo.createNote(NoteCreate(content: _content.text.trim()));
+        await repo.createNote(NoteCreate(
+          content: _content.text.trim(),
+          rabbitId: _rabbitId,
+          cageId: _cageId,
+        ));
       }
       ref.invalidate(journalFeedProvider);
       return null;
@@ -139,6 +167,51 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? context.l10n.noteFormContentEmpty
                   : null,
+            ),
+          ],
+        ),
+        AppFormSection(
+          title: context.l10n.noteFormSectionLink,
+          children: [
+            RabbitPickerField(
+              label: context.l10n.noteFormRabbitLabel,
+              selected: _rabbitModel,
+              selectedLabel: _rabbitLabel,
+              onChanged: (rabbit) => setState(() {
+                _rabbitModel = rabbit;
+                _rabbitLabel = null;
+                _rabbitId = rabbit?.id;
+                _touched = true;
+              }),
+            ),
+            Consumer(
+              builder: (context, ref, _) {
+                final cagesAsync = ref.watch(cageOptionsProvider);
+                final cages = cagesAsync.valueOrNull ?? const [];
+
+                return DropdownButtonFormField<int?>(
+                  initialValue: _cageId,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.noteFormCageLabel,
+                    prefixIcon: const Icon(Icons.grid_view_outlined),
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text(context.l10n.noteFormCageNone),
+                    ),
+                    for (final cage in cages)
+                      DropdownMenuItem(
+                        value: cage.id,
+                        child: Text(cage.number),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() {
+                    _cageId = value;
+                    _touched = true;
+                  }),
+                );
+              },
             ),
           ],
         ),

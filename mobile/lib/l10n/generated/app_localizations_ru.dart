@@ -864,6 +864,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noteFormContentEmpty => 'Введите текст заметки';
 
   @override
+  String get noteFormSectionLink => 'К чему относится';
+
+  @override
+  String get noteFormRabbitLabel => 'Кролик (необязательно)';
+
+  @override
+  String get noteFormCageLabel => 'Клетка (необязательно)';
+
+  @override
+  String get noteFormCageNone => 'Не выбрано';
+
+  @override
   String get noteFormCreate => 'Добавить';
 
   @override
