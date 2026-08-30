@@ -23,6 +23,8 @@ stack.
 | Finance | Income and expenses by category, profit, recent operations |
 | Analytics | Separate screens for finance, feed stock and feeding consumption |
 | Tasks | Farm to-dos with types, priorities and statuses |
+| Journal | Feeding, treatments, vaccinations, closed tasks and free-form notes in one timeline |
+| Staff | Invite by code, assign roles, hand the whole farm to someone else |
 | Notifications | Push (Android): daily digest of overdue vaccinations/tasks/feed stock, instant push on task assignment and new notes |
 
 One installation is multi-tenant: it can host many independent farms, each
