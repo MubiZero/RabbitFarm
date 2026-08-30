@@ -2175,6 +2175,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Заведите ферму — доступ работникам выдадите потом';
 
   @override
+  String get registerFarmName => 'Название фермы';
+
+  @override
+  String get registerFarmNameHint =>
+      'Можно оставить пустым — назовём по вашему имени. Потом название не поменять';
+
+  @override
+  String get registerFarmNameShort => 'Слишком коротко';
+
+  @override
   String get registerFullName => 'Имя и фамилия';
 
   @override
@@ -2196,13 +2206,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registerPhone => 'Телефон, если нужен';
 
   @override
-  String get registerPasswordHint => 'Не короче 6 символов';
+  String get registerPasswordHint => 'Не короче 8 символов';
 
   @override
   String get registerPasswordEmpty => 'Придумайте пароль';
 
   @override
-  String get registerPasswordShort => 'Пароль должен быть не короче 6 символов';
+  String get registerPasswordShort => 'Пароль должен быть не короче 8 символов';
 
   @override
   String get registerPasswordRepeat => 'Повторите пароль';

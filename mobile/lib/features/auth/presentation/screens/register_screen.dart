@@ -17,6 +17,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _farmNameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -27,6 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _farmNameController.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -43,6 +45,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               email: _emailController.text.trim(),
               password: _passwordController.text,
               fullName: _fullNameController.text.trim(),
+              farmName: _farmNameController.text.trim().isNotEmpty
+                  ? _farmNameController.text.trim()
+                  : null,
               phone: _phoneController.text.trim().isNotEmpty
                   ? _phoneController.text.trim()
                   : null,
@@ -124,6 +129,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
+                // Farm name field (optional)
+                TextFormField(
+                  controller: _farmNameController,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.registerFarmName,
+                    hintText: context.l10n.registerFarmNameHint,
+                    prefixIcon: const Icon(Icons.home_work_outlined),
+                  ),
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty && value.length < 2) {
+                      return context.l10n.registerFarmNameShort;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
                 // Full name field
                 TextFormField(
                   controller: _fullNameController,
@@ -202,7 +224,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return context.l10n.registerPasswordEmpty;
                     }
-                    if (value.length < 6) {
+                    if (value.length < 8) {
                       return context.l10n.registerPasswordShort;
                     }
                     return null;

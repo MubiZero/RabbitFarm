@@ -3952,6 +3952,24 @@ abstract class AppLocalizations {
   /// **'Заведите ферму — доступ работникам выдадите потом'**
   String get registerSubtitle;
 
+  /// No description provided for @registerFarmName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название фермы'**
+  String get registerFarmName;
+
+  /// No description provided for @registerFarmNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Можно оставить пустым — назовём по вашему имени. Потом название не поменять'**
+  String get registerFarmNameHint;
+
+  /// No description provided for @registerFarmNameShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком коротко'**
+  String get registerFarmNameShort;
+
   /// No description provided for @registerFullName.
   ///
   /// In ru, this message translates to:
@@ -3997,7 +4015,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordHint.
   ///
   /// In ru, this message translates to:
-  /// **'Не короче 6 символов'**
+  /// **'Не короче 8 символов'**
   String get registerPasswordHint;
 
   /// No description provided for @registerPasswordEmpty.
@@ -4009,7 +4027,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordShort.
   ///
   /// In ru, this message translates to:
-  /// **'Пароль должен быть не короче 6 символов'**
+  /// **'Пароль должен быть не короче 8 символов'**
   String get registerPasswordShort;
 
   /// No description provided for @registerPasswordRepeat.

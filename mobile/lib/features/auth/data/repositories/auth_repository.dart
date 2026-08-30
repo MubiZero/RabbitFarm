@@ -59,6 +59,7 @@ class AuthRepository {
     required String email,
     required String password,
     required String fullName,
+    String? farmName,
     String? phone,
   }) async {
     try {
@@ -66,6 +67,7 @@ class AuthRepository {
         'email': email,
         'password': password,
         'full_name': fullName,
+        if (farmName != null) 'farm_name': farmName,
         if (phone != null) 'phone': phone,
       });
 
