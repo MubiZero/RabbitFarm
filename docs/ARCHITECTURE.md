@@ -340,12 +340,12 @@ backend/
 │   │   ├── Transaction.js          # Финансовые транзакции
 │   │   ├── Task.js                 # Задачи
 │   │   ├── Photo.js                # Фото кроликов
-│   │   ├── Note.js                 # Заметки (модель есть, ручек API и экрана — нет)
+│   │   ├── Note.js                 # Заметки: по кролику, клетке или ферме в целом
 │   │   ├── RefreshToken.js         # Refresh-токены
 │   │   ├── TokenBlacklist.js       # Отозванные access-токены
 │   │   └── PasswordResetToken.js   # Сброс паролей
 │   │
-│   ├── controllers/                # ✅ 14 контроллеров
+│   ├── controllers/                # ✅ 15 контроллеров
 │   │   ├── authController.js       # Аутентификация, JWT, регистрация фермы
 │   │   ├── rabbitController.js     # CRUD кроликов, статистика
 │   │   ├── breedController.js      # CRUD пород
@@ -359,11 +359,13 @@ backend/
 │   │   ├── transactionController.js # Финансы, статистика
 │   │   ├── taskController.js       # Задачи, планирование
 │   │   ├── reportController.js     # Dashboard, отчеты
-│   │   └── staffController.js      # Работники, приглашения, передача хозяйства
+│   │   ├── staffController.js      # Работники, приглашения, передача хозяйства
+│   │   └── noteController.js       # Заметки по кролику, клетке или ферме
 │   │
 │   ├── services/                   # Бизнес-логика — не у каждого контроллера свой сервис
 │   │   ├── authService.js          # Регистрация, вход, токены
 │   │   ├── staffService.js         # Работники, приглашения, передача хозяйства
+│   │   ├── noteService.js          # Заметки
 │   │   ├── rabbitService.js
 │   │   ├── breedService.js
 │   │   ├── breedingService.js
@@ -373,7 +375,7 @@ backend/
 │   │   ├── transactionService.js
 │   │   └── autoExpenseService.js   # Автоматические расходы на лечение
 │   │
-│   ├── routes/                     # ✅ 14 роутов + index.js
+│   ├── routes/                     # ✅ 15 роутов + index.js
 │   │   ├── index.js                # Главный роутер, монтирует все модули
 │   │   ├── auth.routes.js          # /auth - login, register, refresh
 │   │   ├── rabbit.routes.js        # /rabbits - CRUD + статистика
@@ -388,9 +390,10 @@ backend/
 │   │   ├── transaction.routes.js   # /transactions - финансы
 │   │   ├── task.routes.js          # /tasks - задачи
 │   │   ├── report.routes.js        # /reports - dashboard, отчеты
-│   │   └── staff.routes.js         # /staff - работники, приглашения, передача хозяйства
+│   │   ├── staff.routes.js         # /staff - работники, приглашения, передача хозяйства
+│   │   └── note.routes.js          # /notes - заметки
 │   │
-│   ├── validators/                 # ✅ 13 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
+│   ├── validators/                 # ✅ 14 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
 │   │   ├── authValidator.js        # Валидация login, register (включая farm_name)
 │   │   ├── rabbitValidator.js      # Валидация кроликов
 │   │   ├── breedValidator.js       # Валидация пород
@@ -403,7 +406,8 @@ backend/
 │   │   ├── feedingRecordValidator.js # Валидация кормления
 │   │   ├── transactionValidator.js # Валидация транзакций
 │   │   ├── taskValidator.js        # Валидация задач
-│   │   └── staffValidator.js       # Валидация приглашений и работников
+│   │   ├── staffValidator.js       # Валидация приглашений и работников
+│   │   └── noteValidator.js        # Валидация заметок
 │   │
 │   └── utils/
 │       ├── jwt.js                  # JWT helpers
@@ -763,7 +767,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ## 🎯 Реализованные модули и возможности
 
-### Модули (14 готовы, 1 не достроен)
+### Модули (15/15)
 
 | # | Модуль | Backend | Mobile | Возможности |
 |---|--------|---------|--------|-------------|
@@ -781,15 +785,15 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 | 12 | **Transactions** | ✅ | ✅ | Доходы/расходы, Категории, Статистика |
 | 13 | **Tasks** | ✅ | ✅ | Планирование, Приоритеты, Overdue tracking |
 | 14 | **Reports** | ✅ | ✅ | Dashboard, Farm/Health/Financial отчеты |
-| 15 | **Notes** | ⚠️ | ❌ | Модель и tenancy-хук заведены, но ручек API и экрана нет |
+| 15 | **Notes** | ✅ | ✅ | Заметка по кролику, клетке или ферме в целом — пятый тип записи в Дневнике |
 
-### Backend API - 108 эндпоинтов
+### Backend API - 113 эндпоинтов
 
 **Статистика:**
-- 14 контроллеров
+- 15 контроллеров
 - 20 моделей БД
-- 14 роутов + index.js
-- 13 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
+- 15 роутов + index.js
+- 14 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
 - JWT аутентификация
 - Многоарендность: изоляция по ферме на find/count/aggregate/create/destroy/update (см. раздел «Многоарендность»)
 
@@ -855,8 +859,8 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - **Всего:** ~25,000 строк кода
 
 ### Покрытие функционала:
-- **Модули:** 14/15 — «Notes» модель есть, API и экрана нет
-- **API эндпоинты:** 108
+- **Модули:** 15/15
+- **API эндпоинты:** 113
 - **Модели БД (backend):** 20
 - **UI экраны:** 35+ (не пересчитывалось при этой правке)
 
@@ -864,11 +868,11 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - ✅ Backend API с многоарендностью (изоляция ферм на всех операциях с данными)
 - ✅ Полнофункциональное mobile приложение
 - ✅ Безопасность (JWT, bcrypt, валидация, tenancy-хук)
-- ⚠️ Документация (этот файл отставал от кода — актуализирован 2026-08-30)
+- ⚠️ Документация (этот файл отставал от кода — актуализирован 2026-08-31)
 - ✅ Автоматизация бизнес-процессов
 
 ---
 
-**Architecture Version**: 2.1
-**Last Updated**: 2026-08-30
-**Project Status**: Активная разработка — базовый функционал и многоарендность готовы, «Notes» пока без API и экрана
+**Architecture Version**: 2.2
+**Last Updated**: 2026-08-31
+**Project Status**: Активная разработка — базовый функционал, многоарендность и передача хозяйства фермы готовы
