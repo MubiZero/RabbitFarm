@@ -23,7 +23,8 @@ const modules = [
   ['/transactions', require('./transaction.routes')],
   ['/tasks', require('./task.routes')],
   ['/reports', require('./report.routes')],
-  ['/breeding', require('./breeding.routes')]
+  ['/breeding', require('./breeding.routes')],
+  ['/notes', require('./note.routes')]
 ];
 
 // API Info

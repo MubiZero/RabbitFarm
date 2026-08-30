@@ -163,9 +163,9 @@ Task.belongsTo(User, { as: 'creator', foreignKey: 'created_by' });
 Photo.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
 Photo.belongsTo(User, { foreignKey: 'uploaded_by' });
 
-Note.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
-Note.belongsTo(Cage, { foreignKey: 'cage_id' });
-Note.belongsTo(User, { foreignKey: 'created_by' });
+Note.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+Note.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
+Note.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 
 // Запрос к таблице фермы без условия по farm_id дальше не проходит.
 // Подключаем после того, как все модели определены и связаны.
