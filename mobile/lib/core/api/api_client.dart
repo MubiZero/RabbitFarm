@@ -218,6 +218,39 @@ class ApiClient {
     return _dio.delete('${ApiEndpoints.rabbits}/$rabbitId/photo');
   }
 
+  Future<Response> getGalleryPhotos(int rabbitId) {
+    return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/photos');
+  }
+
+  Future<Response> uploadGalleryPhoto(
+    int rabbitId,
+    String filePath, {
+    Uint8List? bytes,
+    String? caption,
+  }) async {
+    final MultipartFile file;
+
+    if (kIsWeb && bytes != null) {
+      file = MultipartFile.fromBytes(bytes, filename: 'photo.jpg');
+    } else {
+      file = await MultipartFile.fromFile(filePath);
+    }
+
+    final formData = FormData.fromMap({
+      'photo': file,
+      if (caption != null && caption.isNotEmpty) 'caption': caption,
+    });
+
+    return _dio.post(
+      '${ApiEndpoints.rabbits}/$rabbitId/photos',
+      data: formData,
+    );
+  }
+
+  Future<Response> deleteGalleryPhoto(int rabbitId, int photoId) {
+    return _dio.delete('${ApiEndpoints.rabbits}/$rabbitId/photos/$photoId');
+  }
+
   // Breeds endpoints
   Future<Response> getBreeds() {
     return _dio.get(ApiEndpoints.breeds);

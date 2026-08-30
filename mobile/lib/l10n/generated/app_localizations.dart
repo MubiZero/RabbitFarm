@@ -3568,6 +3568,72 @@ abstract class AppLocalizations {
   /// **'Не удалось записать вес'**
   String get weightSaveFailed;
 
+  /// No description provided for @galleryTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Галерея фото'**
+  String get galleryTitle;
+
+  /// No description provided for @galleryEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимков пока нет'**
+  String get galleryEmptyTitle;
+
+  /// No description provided for @galleryEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте фото — на карточке останется одно, а здесь поместятся все.'**
+  String get galleryEmptyBody;
+
+  /// No description provided for @galleryAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить фото'**
+  String get galleryAdd;
+
+  /// No description provided for @galleryUploaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото добавлено'**
+  String get galleryUploaded;
+
+  /// No description provided for @galleryCaptionTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подпись к фото'**
+  String get galleryCaptionTitle;
+
+  /// No description provided for @galleryCaptionLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, «После стрижки»'**
+  String get galleryCaptionLabel;
+
+  /// No description provided for @galleryCaptionSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без подписи'**
+  String get galleryCaptionSkip;
+
+  /// No description provided for @galleryDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить фото?'**
+  String get galleryDeleteTitle;
+
+  /// No description provided for @galleryDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить его будет нельзя.'**
+  String get galleryDeleteBody;
+
+  /// No description provided for @galleryDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото удалено'**
+  String get galleryDeleted;
+
   /// No description provided for @pedigreeTitle.
   ///
   /// In ru, this message translates to:

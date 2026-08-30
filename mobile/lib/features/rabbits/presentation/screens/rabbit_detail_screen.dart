@@ -7,6 +7,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import 'weight_history_screen.dart';
+import 'photo_gallery_screen.dart';
 import '../../../../core/utils/age_utils.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -281,6 +282,25 @@ class RabbitDetailScreen extends ConsumerWidget {
                       },
                       icon: const Icon(Icons.account_tree),
                       label: Text(context.l10n.rabbitPedigree),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhotoGalleryScreen(rabbit: rabbit),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(context.l10n.galleryTitle),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),

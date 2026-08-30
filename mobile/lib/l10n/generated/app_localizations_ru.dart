@@ -1970,6 +1970,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get weightSaveFailed => 'Не удалось записать вес';
 
   @override
+  String get galleryTitle => 'Галерея фото';
+
+  @override
+  String get galleryEmptyTitle => 'Снимков пока нет';
+
+  @override
+  String get galleryEmptyBody =>
+      'Добавьте фото — на карточке останется одно, а здесь поместятся все.';
+
+  @override
+  String get galleryAdd => 'Добавить фото';
+
+  @override
+  String get galleryUploaded => 'Фото добавлено';
+
+  @override
+  String get galleryCaptionTitle => 'Подпись к фото';
+
+  @override
+  String get galleryCaptionLabel => 'Например, «После стрижки»';
+
+  @override
+  String get galleryCaptionSkip => 'Без подписи';
+
+  @override
+  String get galleryDeleteTitle => 'Удалить фото?';
+
+  @override
+  String get galleryDeleteBody => 'Восстановить его будет нельзя.';
+
+  @override
+  String get galleryDeleted => 'Фото удалено';
+
+  @override
   String get pedigreeTitle => 'Родословная';
 
   @override

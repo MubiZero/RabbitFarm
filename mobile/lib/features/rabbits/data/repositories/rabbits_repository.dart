@@ -6,6 +6,7 @@ import '../../../../shared/models/api_response.dart';
 import '../models/rabbit_model.dart';
 import '../models/rabbit_statistics.dart';
 import '../models/rabbit_weight_model.dart';
+import '../models/rabbit_photo_model.dart';
 import '../../../../core/api/api_failure.dart';
 
 class RabbitsRepository {
@@ -257,6 +258,67 @@ class RabbitsRepository {
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  // Get gallery photos
+  Future<List<RabbitPhoto>> getGalleryPhotos(int rabbitId) async {
+    try {
+      final response = await _apiClient.getGalleryPhotos(rabbitId);
+
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        response.data,
+        (json) => json as List<dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+      }
+
+      return apiResponse.data!
+          .map((item) => RabbitPhoto.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  // Add gallery photo
+  Future<RabbitPhoto> uploadGalleryPhoto(
+    int rabbitId,
+    String filePath, {
+    Uint8List? bytes,
+    String? caption,
+  }) async {
+    try {
+      final response = await _apiClient.uploadGalleryPhoto(
+        rabbitId,
+        filePath,
+        bytes: bytes,
+        caption: caption,
+      );
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+      }
+
+      return RabbitPhoto.fromJson(apiResponse.data!);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  // Delete gallery photo
+  Future<void> deleteGalleryPhoto(int rabbitId, int photoId) async {
+    try {
+      await _apiClient.deleteGalleryPhoto(rabbitId, photoId);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

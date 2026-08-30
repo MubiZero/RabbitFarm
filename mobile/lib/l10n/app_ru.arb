@@ -782,6 +782,18 @@
   "weightSaved": "Вес записан",
   "weightSaveFailed": "Не удалось записать вес",
 
+  "galleryTitle": "Галерея фото",
+  "galleryEmptyTitle": "Снимков пока нет",
+  "galleryEmptyBody": "Добавьте фото — на карточке останется одно, а здесь поместятся все.",
+  "galleryAdd": "Добавить фото",
+  "galleryUploaded": "Фото добавлено",
+  "galleryCaptionTitle": "Подпись к фото",
+  "galleryCaptionLabel": "Например, «После стрижки»",
+  "galleryCaptionSkip": "Без подписи",
+  "galleryDeleteTitle": "Удалить фото?",
+  "galleryDeleteBody": "Восстановить его будет нельзя.",
+  "galleryDeleted": "Фото удалено",
+
   "pedigreeTitle": "Родословная",
   "rabbitDetailEdit": "Изменить",
   "rabbitDetailDeleteTitle": "Удалить кролика?",
