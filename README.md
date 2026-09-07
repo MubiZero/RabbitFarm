@@ -23,10 +23,14 @@ stack.
 | Finance | Income and expenses by category, profit, recent operations |
 | Analytics | Separate screens for finance, feed stock and feeding consumption |
 | Tasks | Farm to-dos with types, priorities and statuses |
-| Notifications | Push (Android) for overdue vaccinations/tasks/feed stock and new diary entries |
+| Notifications | Push (Android): daily digest of overdue vaccinations/tasks/feed stock, instant push on task assignment and new notes |
 
-One installation serves one farm. The first person to register becomes its
-owner and invites everyone else — see [Accounts](#accounts).
+One installation is multi-tenant: it can host many independent farms, each
+fully isolated from the others at the database level (every farm-owned table
+carries a `farm_id`, enforced by hooks, not just application code — see
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#-многоарендность-изоляция-ферм)).
+Registration creates a new farm with its own owner every time; people join an
+existing farm only by invitation — see [Accounts](#accounts).
 
 ## Stack
 
@@ -76,6 +80,17 @@ docker compose up -d
 | API reference (Swagger) | http://localhost:4567/api-docs |
 | Health check | http://localhost:4567/health |
 | MySQL | localhost:3307 |
+
+Adminer (DB browser) sits behind its own profile — it's not part of a plain
+`docker compose up -d` on purpose, so a login form for the database isn't
+sitting open on every deployment by default:
+
+```bash
+docker compose --profile debug up -d adminer
+```
+
+| Service | Address |
+|---|---|
 | Adminer (DB browser) | http://localhost:8080 |
 
 Migrations run automatically when the API container starts. To load demo
@@ -100,27 +115,32 @@ actually reach:
 
 ## Accounts
 
-Registration bootstraps the farm once: the first account created becomes the
-`owner`, every later attempt is refused with 403. That keeps a publicly
-reachable installation from being claimed by a stranger.
+Every registration creates a brand-new farm and makes that account its
+`owner` — there is no "first user wins" gate. `ALLOW_REGISTRATION=false` (the
+default) simply closes public sign-up, e.g. once a deployment's farms are
+provisioned some other way; set it to `true` to let people register their own
+farms.
 
-Everyone else joins by invitation. The owner issues a code on the Работники
-screen and passes it on; the person enters it at `/join` and lands inside the
-owner's farm, seeing the same livestock, feed and tasks.
+Everyone else joins an *existing* farm by invitation rather than by
+registering. The owner issues a code on the Работники screen and passes it
+on; the person enters it at `/join` and lands inside that farm, seeing the
+same livestock, feed and tasks as everyone else there.
 
 | Role | Can |
 |---|---|
-| `owner` | everything, including inviting people and changing roles |
-| `manager` | run the farm: livestock, feed, finances |
-| `worker` | read the farm and record daily work |
+| `owner` | everything: invite people, change roles, reset passwords, transfer ownership |
+| `manager` | create/edit livestock, cages, feed, breeding and finances; view financial reports |
+| `worker` | record daily work (feeding, vaccinations, medical records, notes, tasks); no finances, no create/edit on rabbits, cages, breeds, breeding or feed stock |
 
-There is no mail server, so codes travel however the owner already talks to
-people, and a forgotten password is reset by the owner rather than by email.
-Codes and temporary passwords are shown once — only their hashes are stored.
+Deleting a record is owner-only almost everywhere; a few day-to-day types
+(feeding records, notes, tasks) can also be deleted by a manager. The owner
+can hand the farm to another active member (`staff/:id/transfer-ownership`):
+the recipient becomes `owner`, the previous owner drops to `manager`.
 
-`ALLOW_REGISTRATION=true` reopens plain registration if you ever need it; new
-accounts then arrive as workers with their own empty farm, which is rarely
-what you want. Invitations are the normal path.
+There is no mail server, so invitation codes travel however the owner already
+talks to people, and a forgotten password is reset by the owner rather than
+by email. Codes and temporary passwords are shown once — only their hashes
+are stored.
 
 ## Deployment
 

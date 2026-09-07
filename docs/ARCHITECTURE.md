@@ -461,7 +461,7 @@ router.post('/:id/photo',
   upload.single('photo'),
   rabbitController.uploadPhoto);
 router.delete('/:id',
-  authorize(['manager', 'owner']),                           // роль важна не везде
+  authorize(['owner']),                                       // роль важна не везде
   rabbitController.delete);
 ```
 
@@ -473,25 +473,42 @@ router.delete('/:id',
 - Use foreign keys for relationships
 
 ### Indexing Strategy
+
+Одиночные индексы на внешних ключах и часто фильтруемых полях (`cage_id`,
+`breed_id`, `status` у `rabbits` и т.п.) заведены как обычные, безымянные
+Sequelize-индексы прямо в моделях (`fields: [...]` в `indexes:` блоке) —
+своих имён у них нет, искать по названию бессмысленно.
+
+Именованные составные индексы — отдельная миграция
+[`20260826000004-index-tenant-tables-by-farm.js`](../backend/migrations/20260826000004-index-tenant-tables-by-farm.js),
+и `farm_id` в них всегда первым — с него начинается любая выборка (см.
+«Многоарендность»), без этого MySQL поднимал бы строки всех ферм и
+отбрасывал чужие уже после чтения:
+
 ```sql
--- Primary keys (automatic)
--- Foreign keys
-CREATE INDEX idx_rabbits_cage_id ON rabbits(cage_id);
-CREATE INDEX idx_breedings_male_id ON breedings(male_id);
-CREATE INDEX idx_breedings_female_id ON breedings(female_id);
-
--- Frequently filtered fields
-CREATE INDEX idx_rabbits_status ON rabbits(status);
-CREATE INDEX idx_rabbits_breed_id ON rabbits(breed_id);
-
--- Composite indexes for common queries
--- Ферма идёт первой: с неё начинается любая выборка (см. «Многоарендность»).
+CREATE INDEX idx_rabbits_farm_status ON rabbits(farm_id, status);
+CREATE INDEX idx_rabbits_farm_cage ON rabbits(farm_id, cage_id);
+CREATE INDEX idx_rabbits_farm_breed ON rabbits(farm_id, breed_id);
+CREATE INDEX idx_cages_farm_condition ON cages(farm_id, condition);
+CREATE INDEX idx_breedings_farm_status ON breedings(farm_id, status);
+CREATE INDEX idx_breedings_farm_expected ON breedings(farm_id, expected_birth_date);
+CREATE INDEX idx_births_farm_date ON births(farm_id, birth_date);
 CREATE INDEX idx_tasks_farm_status_due ON tasks(farm_id, status, due_date);
+CREATE INDEX idx_tasks_farm_assignee ON tasks(farm_id, assigned_to);
+CREATE INDEX idx_transactions_farm_date ON transactions(farm_id, transaction_date);
 CREATE INDEX idx_transactions_farm_type_date ON transactions(farm_id, type, transaction_date);
-
--- Full-text search
-CREATE FULLTEXT INDEX idx_rabbits_search ON rabbits(name, tag_id);
+CREATE INDEX idx_feeding_farm_fed_at ON feeding_records(farm_id, fed_at);
+CREATE INDEX idx_vaccinations_farm_next ON vaccinations(farm_id, next_vaccination_date);
+CREATE INDEX idx_vaccinations_farm_date ON vaccinations(farm_id, vaccination_date);
+CREATE INDEX idx_medical_farm_started ON medical_records(farm_id, started_at);
+CREATE INDEX idx_medical_farm_outcome ON medical_records(farm_id, outcome);
+CREATE INDEX idx_weights_farm_rabbit ON rabbit_weights(farm_id, rabbit_id);
+CREATE INDEX idx_photos_farm_rabbit ON photos(farm_id, rabbit_id);
+CREATE INDEX idx_notes_farm_rabbit ON notes(farm_id, rabbit_id);
 ```
+
+Полнотекстового поиска в проекте нет — ни одного `FULLTEXT`-индекса ни в
+одной миграции, поиск по кроликам делает обычный `LIKE`.
 
 ### Data Integrity
 - Foreign key constraints with CASCADE/RESTRICT
@@ -607,9 +624,9 @@ worker) — код опущен под `kIsWeb`.
 ## 🔐 Security Architecture
 
 ### Authentication
-- **JWT** with RS256 algorithm
+- **JWT** with HS256 algorithm (symmetric secret, `backend/src/config/jwt.js` — not RS256/RSA keypair)
 - **Access Token**: 15 minutes (short-lived)
-- **Refresh Token**: 7 days (stored in httpOnly cookie or secure storage)
+- **Refresh Token**: 7 days, stored in `refresh_tokens` table; the client keeps its copy in `flutter_secure_storage` — no httpOnly cookie exists anywhere in the stack
 - **Password**: bcrypt with salt rounds 10
 
 ### Authorization
@@ -630,8 +647,28 @@ const authorize = (allowedRoles = []) => (req, res, next) => {
 
 // Usage — authenticate на весь роутер, authorize точечно на чувствительных операциях
 router.use(authenticate);
-router.delete('/:id', authorize(['manager', 'owner']), deleteRabbit);
+router.delete('/:id', authorize(['owner']), deleteRabbit);   // удаление кролика — только owner
 ```
+
+**Реальная матрица прав** (по `grep authorize( src/routes/*.js`, без роута —
+доступно всем трём ролям):
+
+| Действие | worker | manager | owner |
+|---|---|---|---|
+| Читать (списки, карточки, статистика) везде | ✅ | ✅ | ✅ |
+| Создавать/править кормление, вакцинации, медкарты, заметки, задачи | ✅ | ✅ | ✅ |
+| Завершить задачу (`/tasks/:id/complete`) | ✅ | ✅ | ✅ |
+| Создавать/править кроликов, клетки, породы, случки, рождения, корма | ❌ | ✅ | ✅ |
+| Финансы: транзакции, финансовый отчёт, себестоимость лечения, доходы по кролику | ❌ | ✅ | ✅ |
+| Удалять кормление/заметку/задачу | ❌ | ✅ | ✅ |
+| Удалять кролика/клетку/породу/корм/случку/рождение/вакцинацию/медкарту/транзакцию | ❌ | ❌ | ✅ |
+| Работники: список, приглашения (просмотр) | ❌ | ✅ | ✅ |
+| Работники: пригласить, отозвать приглашение, сбросить пароль, изменить роль, передать хозяйство | ❌ | ❌ | ✅ |
+
+Она не выведена из абстрактного правила («owner может всё, manager —
+хозяйство без кадров и без удалений, worker — только текучка») — это
+наблюдение по факту, а не документированный принцип в коде: где `authorize`
+не указан явно на POST/PUT, роут открыт для всех трёх ролей, включая worker.
 
 ### Input Validation
 ```javascript
@@ -646,10 +683,10 @@ const createRabbitSchema = Joi.object({
 ```
 
 ### File Upload Security
-- Whitelist MIME types (image/jpeg, image/png)
-- Max file size: 5MB
-- Sanitize filenames
-- Store outside web root
+- Whitelist MIME types: `image/jpeg, image/png, image/jpg, image/webp` (`.env` → `ALLOWED_FILE_TYPES`, fallback в `config/multer.js` без `webp`, если переменная не задана)
+- Max file size: 5MB (`MAX_FILE_SIZE`)
+- Filename полностью генерируется на сервере (`config/multer.js`) — имя, пришедшее от клиента, никогда не используется как есть, а не просто «очищается»
+- **Не «вне веб-рута»**: `app.js` монтирует `app.use('/uploads', express.static(...))` — загруженные файлы отдаются напрямую по HTTP с того же origin, что и API, отдельного приватного хранилища нет
 - Сканирование на вирусы не подключено (ClamAV или аналог — не реализовано, не только «опционально»)
 
 ## 📊 Performance Optimizations
@@ -785,7 +822,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - 110 Riverpod провайдеров (все написаны вручную — riverpod_generator в проекте не используется, несмотря на зависимость в pubspec.yaml)
 - 18 репозиториев
 - 49 экранов (`presentation/screens/*.dart`)
-- 52 маршрута (`GoRoute` в `app_router.dart`)
+- 56 маршрутов (`GoRoute` в `app_router.dart`)
 
 **Реализованные экраны (49, пересчитано 2026-09-07 по `presentation/screens/`):**
 1. Auth: Login, Register
@@ -851,14 +888,36 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ---
 
-**Architecture Version**: 2.4
+**Architecture Version**: 2.5
 **Last Updated**: 2026-09-07
 **Project Status**: Активная разработка — базовый функционал, многоарендность, передача хозяйства фермы и push-уведомления готовы
 
-**Аудит устаревших сведений (2026-09-07):** документ писался частично как
-шаблон до того, как код был написан, и часть разделов с тех пор разошлась
-с реальностью — offline/sync, дерево `lib/`, примеры Riverpod/GoRouter,
-Authorization, часть структуры backend, Golden-тесты, Redis/Sentry/ClamAV.
-Все такие разделы выше приведены в соответствие с кодом по состоянию на
-эту дату; разделы «Многоарендность» и «Push-уведомления» уже были точными
-и не менялись.
+**Аудит устаревших сведений (2026-09-07, первый проход):** документ писался
+частично как шаблон до того, как код был написан, и часть разделов с тех пор
+разошлась с реальностью — offline/sync, дерево `lib/`, примеры
+Riverpod/GoRouter, Authorization, часть структуры backend, Golden-тесты,
+Redis/Sentry/ClamAV. Все такие разделы выше приведены в соответствие с кодом
+по состоянию на эту дату; разделы «Многоарендность» и «Push-уведомления» уже
+были точными и не менялись.
+
+**Аудит устаревших сведений (2026-09-07, второй проход):** первый проход сам
+пропустил часть неточностей — второй, сделанный двумя параллельными агентами
+по конкретным пунктам (не «на глаз»), нашёл и поправил ещё: JWT-алгоритм
+(было RS256, на деле HS256), второй экземпляр того же примера с
+`authorize(['manager','owner'])` на удалении кролика (реально — `['owner']`,
+первый экземпляр в разделе Authorization уже был исправлен отдельно, этот
+пропустили), «файлы вне веб-рута» (на деле отдаются через
+`express.static('/uploads')`, то есть внутри), раздел индексов БД (три
+несуществующих индекса и вымышленный FULLTEXT — заменены реальным списком из
+миграции), число маршрутов GoRouter (52 → 56). Заодно нашлись и настоящие
+баги, не только неточности в тексте: `docker-compose.yml` не пробрасывал
+`ALLOW_REGISTRATION`/`FIREBASE_*` в контейнер `api` (из-за этого локальный
+стенд по умолчанию держал регистрацию открытой, а не закрытой, как
+предполагает `.env.example`) — исправлено; и в мобильном приложении право
+«удалять записи» было одним булевым капабилити на все типы записей, хотя
+сервер разрешает удаление кормления/заметок/задач менеджеру, а не только
+владельцу, и наоборот — на нескольких экранах (кролики, клетки, окролы,
+породы, случки) кнопка удаления или вовсе не проверяла роль, или проверяла
+не ту — на семи экранах пользователь видел действие, которое сервер бы
+отклонил 403. Разошлось с кодом даже то, что уже однажды «актуализировали»:
+второй проход стоит повторять, а не считать разовой процедурой.

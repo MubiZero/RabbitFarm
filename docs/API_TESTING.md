@@ -37,7 +37,7 @@ npm run seed
 npm run dev
 ```
 
-Server should be running at `http://localhost:3000`
+Server should be running at `http://localhost:4567`
 
 ---
 
@@ -53,16 +53,16 @@ After seeding, you can use these accounts:
 
 ## API Endpoints
 
-Base URL: `http://localhost:3000/api/v1`
+Base URL: `http://localhost:4567/api/v1`
 
 ### Health Check
 
 ```bash
 # Health check
-curl http://localhost:3000/health
+curl http://localhost:4567/health
 
 # API info
-curl http://localhost:3000/api/v1
+curl http://localhost:4567/api/v1
 ```
 
 ---
@@ -72,7 +72,7 @@ curl http://localhost:3000/api/v1
 ### 1. Register
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/auth/register \
+curl -X POST http://localhost:4567/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -105,7 +105,7 @@ curl -X POST http://localhost:3000/api/v1/auth/register \
 ### 2. Login
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/auth/login \
+curl -X POST http://localhost:4567/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@rabbitfarm.com",
@@ -118,14 +118,14 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
 ### 3. Get Current User Profile
 
 ```bash
-curl http://localhost:3000/api/v1/auth/me \
+curl http://localhost:4567/api/v1/auth/me \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 4. Update Profile
 
 ```bash
-curl -X PUT http://localhost:3000/api/v1/auth/profile \
+curl -X PUT http://localhost:4567/api/v1/auth/profile \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -137,7 +137,7 @@ curl -X PUT http://localhost:3000/api/v1/auth/profile \
 ### 5. Change Password
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/auth/change-password \
+curl -X POST http://localhost:4567/api/v1/auth/change-password \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -149,7 +149,7 @@ curl -X POST http://localhost:3000/api/v1/auth/change-password \
 ### 6. Refresh Token
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/auth/refresh \
+curl -X POST http://localhost:4567/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
     "refresh_token": "YOUR_REFRESH_TOKEN"
@@ -159,7 +159,7 @@ curl -X POST http://localhost:3000/api/v1/auth/refresh \
 ### 7. Logout
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/auth/logout \
+curl -X POST http://localhost:4567/api/v1/auth/logout \
   -H "Content-Type: application/json" \
   -d '{
     "refresh_token": "YOUR_REFRESH_TOKEN"
@@ -175,7 +175,7 @@ curl -X POST http://localhost:3000/api/v1/auth/logout \
 ### 1. Get Rabbit Statistics
 
 ```bash
-curl http://localhost:3000/api/v1/rabbits/statistics \
+curl http://localhost:4567/api/v1/rabbits/statistics \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -185,13 +185,14 @@ curl http://localhost:3000/api/v1/rabbits/statistics \
   "success": true,
   "data": {
     "total": 0,
-    "alive": 0,
-    "males": 0,
-    "females": 0,
-    "pregnant": 0,
-    "sick": 0,
-    "forSale": 0,
-    "breedDistribution": []
+    "alive_count": 0,
+    "male_count": 0,
+    "female_count": 0,
+    "pregnant_count": 0,
+    "sick_count": 0,
+    "for_sale_count": 0,
+    "dead_count": 0,
+    "by_breed": []
   }
 }
 ```
@@ -199,7 +200,7 @@ curl http://localhost:3000/api/v1/rabbits/statistics \
 ### 2. Create Rabbit
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/rabbits \
+curl -X POST http://localhost:4567/api/v1/rabbits \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -220,7 +221,7 @@ curl -X POST http://localhost:3000/api/v1/rabbits \
 ### 3. Create Rabbit with Photo
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/rabbits \
+curl -X POST http://localhost:4567/api/v1/rabbits \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -F "tag_id=R002" \
   -F "name=Пушок" \
@@ -237,49 +238,49 @@ curl -X POST http://localhost:3000/api/v1/rabbits \
 
 ```bash
 # All rabbits
-curl http://localhost:3000/api/v1/rabbits \
+curl http://localhost:4567/api/v1/rabbits \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # With pagination
-curl "http://localhost:3000/api/v1/rabbits?page=1&limit=10" \
+curl "http://localhost:4567/api/v1/rabbits?page=1&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Filter by breed
-curl "http://localhost:3000/api/v1/rabbits?breed_id=1" \
+curl "http://localhost:4567/api/v1/rabbits?breed_id=1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Filter by sex
-curl "http://localhost:3000/api/v1/rabbits?sex=female" \
+curl "http://localhost:4567/api/v1/rabbits?sex=female" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Filter by status
-curl "http://localhost:3000/api/v1/rabbits?status=healthy" \
+curl "http://localhost:4567/api/v1/rabbits?status=healthy" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Search by name or tag
-curl "http://localhost:3000/api/v1/rabbits?search=Снежок" \
+curl "http://localhost:4567/api/v1/rabbits?search=Снежок" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Sort by birth date
-curl "http://localhost:3000/api/v1/rabbits?sort_by=birth_date&sort_order=asc" \
+curl "http://localhost:4567/api/v1/rabbits?sort_by=birth_date&sort_order=asc" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Combine filters
-curl "http://localhost:3000/api/v1/rabbits?breed_id=1&sex=male&status=healthy&page=1&limit=20" \
+curl "http://localhost:4567/api/v1/rabbits?breed_id=1&sex=male&status=healthy&page=1&limit=20" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 5. Get Rabbit by ID
 
 ```bash
-curl http://localhost:3000/api/v1/rabbits/1 \
+curl http://localhost:4567/api/v1/rabbits/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 6. Update Rabbit
 
 ```bash
-curl -X PUT http://localhost:3000/api/v1/rabbits/1 \
+curl -X PUT http://localhost:4567/api/v1/rabbits/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -294,21 +295,21 @@ curl -X PUT http://localhost:3000/api/v1/rabbits/1 \
 **Note**: Only owners can delete rabbits
 
 ```bash
-curl -X DELETE http://localhost:3000/api/v1/rabbits/1 \
+curl -X DELETE http://localhost:4567/api/v1/rabbits/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 8. Get Weight History
 
 ```bash
-curl http://localhost:3000/api/v1/rabbits/1/weights \
+curl http://localhost:4567/api/v1/rabbits/1/weights \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 9. Add Weight Record
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/rabbits/1/weights \
+curl -X POST http://localhost:4567/api/v1/rabbits/1/weights \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -322,18 +323,18 @@ curl -X POST http://localhost:3000/api/v1/rabbits/1/weights \
 
 ```bash
 # Default 3 generations
-curl http://localhost:3000/api/v1/rabbits/1/pedigree \
+curl http://localhost:4567/api/v1/rabbits/1/pedigree \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # Custom generations
-curl "http://localhost:3000/api/v1/rabbits/1/pedigree?generations=5" \
+curl "http://localhost:4567/api/v1/rabbits/1/pedigree?generations=5" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 11. Upload Photo
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/rabbits/1/photo \
+curl -X POST http://localhost:4567/api/v1/rabbits/1/photo \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -F "photo=@/path/to/rabbit.jpg"
 ```
@@ -346,7 +347,7 @@ curl -X POST http://localhost:3000/api/v1/rabbits/1/photo \
 
 1. **Import Collection** (you can create from these examples)
 2. **Set Environment Variables**:
-   - `base_url`: `http://localhost:3000/api/v1`
+   - `base_url`: `http://localhost:4567/api/v1`
    - `access_token`: (will be set after login)
 
 ### Auto-Set Token
@@ -433,7 +434,7 @@ Then in other requests, use: `{{access_token}}` in Authorization header.
 
 ```bash
 # 1. Login as admin
-curl -X POST http://localhost:3000/api/v1/auth/login \
+curl -X POST http://localhost:4567/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@rabbitfarm.com","password":"admin123"}'
 
@@ -445,7 +446,7 @@ export TOKEN="your_access_token_here"
 
 ```bash
 # Create male rabbit
-curl -X POST http://localhost:3000/api/v1/rabbits \
+curl -X POST http://localhost:4567/api/v1/rabbits \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -460,7 +461,7 @@ curl -X POST http://localhost:3000/api/v1/rabbits \
   }'
 
 # Create female rabbit
-curl -X POST http://localhost:3000/api/v1/rabbits \
+curl -X POST http://localhost:4567/api/v1/rabbits \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -479,19 +480,19 @@ curl -X POST http://localhost:3000/api/v1/rabbits \
 
 ```bash
 # Get list
-curl http://localhost:3000/api/v1/rabbits -H "Authorization: Bearer $TOKEN"
+curl http://localhost:4567/api/v1/rabbits -H "Authorization: Bearer $TOKEN"
 
 # Get statistics
-curl http://localhost:3000/api/v1/rabbits/statistics -H "Authorization: Bearer $TOKEN"
+curl http://localhost:4567/api/v1/rabbits/statistics -H "Authorization: Bearer $TOKEN"
 
 # Add weight
-curl -X POST http://localhost:3000/api/v1/rabbits/1/weights \
+curl -X POST http://localhost:4567/api/v1/rabbits/1/weights \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"weight": 5.2}'
 
 # Get weight history
-curl http://localhost:3000/api/v1/rabbits/1/weights -H "Authorization: Bearer $TOKEN"
+curl http://localhost:4567/api/v1/rabbits/1/weights -H "Authorization: Bearer $TOKEN"
 ```
 
 ---
