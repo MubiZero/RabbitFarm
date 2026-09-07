@@ -234,7 +234,7 @@ class RabbitController {
       }
 
       const photo = await rabbitService.addGalleryPhoto(req.params.id, req.farmId, {
-        url: `/uploads/rabbits/${req.file.filename}`,
+        url: await fileStorage.uploadFile('rabbits', req.file),
         caption: req.body.caption,
         taken_at: req.body.taken_at,
         uploaded_by: req.user.id

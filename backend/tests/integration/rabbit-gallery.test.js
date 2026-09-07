@@ -1,8 +1,19 @@
 const request = require('supertest');
-const path = require('path');
-const fs = require('fs');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { client: minioClient, bucket: minioBucket } = require('../../src/config/minio');
+
+// Файлы галереи хранятся в MinIO, а не на локальном диске — существование
+// проверяем через statObject: резолвится, если объект есть, иначе бросает.
+async function objectExists(relativeUrl) {
+  const objectKey = relativeUrl.replace(/^\/uploads\//, '');
+  try {
+    await minioClient.statObject(minioBucket, objectKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // Крошечный валидный PNG (1x1), чтобы multer принял файл как настоящее
 // изображение — content-type определяется supertest по расширению файла.
@@ -82,9 +93,8 @@ describe('Галерея фото кролика', () => {
       expect(res.body.data.url).toMatch(/^\/uploads\/rabbits\//);
       expect(res.body.data.author.full_name).toBe('Владелец');
 
-      // Файл реально лежит на диске.
-      const absolutePath = path.join(__dirname, '../../', res.body.data.url);
-      expect(fs.existsSync(absolutePath)).toBe(true);
+      // Файл реально загружен в MinIO.
+      expect(await objectExists(res.body.data.url)).toBe(true);
     });
 
     it('работнику нельзя добавлять фото', async () => {
@@ -164,15 +174,14 @@ describe('Галерея фото кролика', () => {
     });
 
     it('владелец удаляет фото — файл тоже исчезает', async () => {
-      const absolutePath = path.join(__dirname, '../../', photoUrl);
-      expect(fs.existsSync(absolutePath)).toBe(true);
+      expect(await objectExists(photoUrl)).toBe(true);
 
       const res = await request(app)
         .delete(`/api/v1/rabbits/${rabbitId}/photos/${photoId}`)
         .set('Authorization', `Bearer ${ownerToken}`);
 
       expect(res.status).toBe(200);
-      expect(fs.existsSync(absolutePath)).toBe(false);
+      expect(await objectExists(photoUrl)).toBe(false);
     });
 
     it('повторное удаление — 404', async () => {

@@ -578,7 +578,7 @@ class RabbitService {
     if (!photo) throw new Error('PHOTO_NOT_FOUND');
 
     await photo.destroy();
-    deleteFile(photo.url);
+    await deleteFile(photo.url);
     logger.info('Gallery photo deleted', { rabbitId, photoId });
   }
 
