@@ -235,7 +235,8 @@ backend/
 │   ├── config/
 │   │   ├── database.js             # Sequelize config
 │   │   ├── jwt.js                  # JWT config
-│   │   ├── multer.js               # File upload config — подключается прямо в роутах
+│   │   ├── multer.js               # File upload config (memoryStorage) — подключается прямо в роутах
+│   │   ├── minio.js                # Клиент MinIO + ensureBucket() при старте
 │   │   ├── firebase.js             # Firebase Admin SDK (push), молчит без ключей
 │   │   ├── swagger.js              # OpenAPI-схема
 │   │   └── validateEnv.js          # Проверка обязательных переменных окружения при старте
@@ -307,7 +308,7 @@ backend/
 │   │   ├── tokenCleanup.js         # Чистка просроченных токенов, раз в час
 │   │   └── notificationDigestJob.js # Дайджест просрочек по фермам, раз в сутки в 08:00
 │   │
-│   ├── routes/                     # ✅ 16 роутов + index.js
+│   ├── routes/                     # ✅ 17 роутов + index.js (16 под API-версией + files.routes.js отдельно)
 │   │   ├── index.js                # Главный роутер, монтирует все модули
 │   │   ├── auth.routes.js          # /auth - login, register, refresh
 │   │   ├── rabbit.routes.js        # /rabbits - CRUD + статистика
@@ -324,7 +325,9 @@ backend/
 │   │   ├── report.routes.js        # /reports - dashboard, отчеты
 │   │   ├── staff.routes.js         # /staff - работники, приглашения, передача хозяйства
 │   │   ├── note.routes.js          # /notes - заметки
-│   │   └── device-token.routes.js  # /device-tokens - регистрация устройств для push
+│   │   ├── device-token.routes.js  # /device-tokens - регистрация устройств для push
+│   │   └── files.routes.js         # /uploads/:folder/:filename - раздача из MinIO,
+│   │                                #   монтируется в app.js напрямую, не через этот index.js
 │   │
 │   ├── validators/                 # ✅ 15 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
 │   │   ├── authValidator.js        # Валидация login, register (включая farm_name)
@@ -349,7 +352,7 @@ backend/
 │       ├── tenancy.js              # Страховка изоляции ферм (см. «Многоарендность»)
 │       ├── dateRange.js
 │       ├── apiResponse.js          # Standardized responses
-│       ├── fileHelper.js           # Работа с загруженными файлами
+│       ├── fileStorage.js          # Загрузка/удаление/раздача файлов через MinIO
 │       └── logger.js               # Winston-логгер (см. «Monitoring & Logging»)
 │
 ├── migrations/                     # Sequelize migrations
@@ -685,8 +688,18 @@ const createRabbitSchema = Joi.object({
 ### File Upload Security
 - Whitelist MIME types: `image/jpeg, image/png, image/jpg, image/webp` (`.env` → `ALLOWED_FILE_TYPES`, fallback в `config/multer.js` без `webp`, если переменная не задана)
 - Max file size: 5MB (`MAX_FILE_SIZE`)
-- Filename полностью генерируется на сервере (`config/multer.js`) — имя, пришедшее от клиента, никогда не используется как есть, а не просто «очищается»
-- **Не «вне веб-рута»**: `app.js` монтирует `app.use('/uploads', express.static(...))` — загруженные файлы отдаются напрямую по HTTP с того же origin, что и API, отдельного приватного хранилища нет
+- Filename полностью генерируется на сервере (`utils/fileStorage.js`) — имя, пришедшее от клиента, никогда не используется как есть, а не просто «очищается»
+- **Хранилище — MinIO, не локальный диск.** `multer` держит файл в памяти
+  (`memoryStorage`), `fileStorage.uploadFile` кладёт его в бакет; `GET
+  /uploads/:folder/:filename` — тонкий прокси-роут (`routes/files.routes.js`),
+  который читает объект из MinIO и отдаёт с `Content-Type` из метаданных
+  объекта, а не угадывает по расширению. Формат `photo_url` в БД не
+  поменялся (`/uploads/rabbits/<файл>`), поэтому это внутренняя замена
+  бэкенда, а не смена контракта для мобильного клиента.
+- Авторизации на самом маршруте раздачи по-прежнему нет — как и раньше,
+  единственная защита это непредсказуемое имя файла (timestamp+random).
+  Кто угодно с URL может посмотреть фото; получить чужой URL, не зная его
+  и не имея доступа к ферме, нельзя.
 - Сканирование на вирусы не подключено (ClamAV или аналог — не реализовано, не только «опционально»)
 
 ## 📊 Performance Optimizations
@@ -794,12 +807,12 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 | 15 | **Notes** | ✅ | ✅ | Заметка по кролику, клетке или ферме в целом — пятый тип записи в Дневнике |
 | 16 | **Push-уведомления** | ✅ | ✅ | FCM: просроченные вакцинации/задачи/корм (дайджест раз в сутки), назначение задачи и новая заметка — мгновенно |
 
-### Backend API - 115 эндпоинтов
+### Backend API - 116 эндпоинтов
 
 **Статистика:**
 - 16 контроллеров
 - 21 модель БД
-- 16 роутов + index.js
+- 17 роутов + index.js (16 под `/api/v1` + `files.routes.js`, раздающий `/uploads` из MinIO напрямую)
 - 15 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
 - JWT аутентификация
 - Многоарендность: изоляция по ферме на find/count/aggregate/create/destroy/update (см. раздел «Многоарендность»)
@@ -874,10 +887,10 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ### Покрытие функционала:
 - **Модули:** 16/16
-- **API эндпоинты:** 115
+- **API эндпоинты:** 116
 - **Модели БД (backend):** 21
 - **UI экраны:** 49
-- **Backend-тесты:** 1151 (736 юнит + 415 интеграционных)
+- **Backend-тесты:** 1156 (741 юнит + 415 интеграционных)
 
 ### Готовность:
 - ✅ Backend API с многоарендностью (изоляция ферм на всех операциях с данными)

@@ -40,8 +40,8 @@ Swagger reference, Jest.
 **Client** — Flutter 3.41, Riverpod, go_router, freezed + json_serializable,
 Dio. One codebase for Android, iOS and web.
 
-**Runtime** — Docker Compose: `db`, `api`, and `web` (nginx serving the Flutter
-web build).
+**Runtime** — Docker Compose: `db`, `minio` (S3-compatible file storage),
+`api`, and `web` (nginx serving the Flutter web build).
 
 ## Quick start
 
@@ -61,9 +61,10 @@ cp backend/.env.example .env
 ```
 
 Fill in the secrets in `.env` — at minimum `DB_PASSWORD`, `DB_ROOT_PASSWORD`,
-`JWT_SECRET` and `JWT_REFRESH_SECRET`. Generate each with
-`openssl rand -base64 32`. Compose refuses to start without them on purpose:
-no installation should run with default credentials.
+`JWT_SECRET`, `JWT_REFRESH_SECRET`, `MINIO_ROOT_USER` and
+`MINIO_ROOT_PASSWORD`. Generate each with `openssl rand -base64 32`. Compose
+refuses to start without them on purpose: no installation should run with
+default credentials.
 
 Push notifications need three more (`FIREBASE_PROJECT_ID`,
 `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) from a Firebase project's
@@ -80,6 +81,7 @@ docker compose up -d
 | API reference (Swagger) | http://localhost:4567/api-docs |
 | Health check | http://localhost:4567/health |
 | MySQL | localhost:3307 |
+| MinIO console (file storage) | http://localhost:9001 |
 
 Adminer (DB browser) sits behind its own profile — it's not part of a plain
 `docker compose up -d` on purpose, so a login form for the database isn't
@@ -162,7 +164,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 1151 tests
+npm test                 # 1156 tests
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change
