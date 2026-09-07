@@ -230,3 +230,10 @@ final rabbitVaccinationsProvider =
   final repository = ref.watch(vaccinationsRepositoryProvider);
   return await repository.getRabbitVaccinations(rabbitId);
 });
+
+/// Provider для одной вакцинации по id — переход по тапу из push-уведомления
+final vaccinationByIdProvider =
+    FutureProvider.autoDispose.family<Vaccination, int>((ref, id) async {
+  final repository = ref.watch(vaccinationsRepositoryProvider);
+  return await repository.getVaccinationById(id);
+});

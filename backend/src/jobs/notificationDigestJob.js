@@ -56,7 +56,7 @@ async function runDigestForFarm(farmId) {
     await notificationService.sendToUsers(farmId, [task.assigned_to], {
       title: 'Просроченная задача',
       body: task.title,
-      data: { type: 'task_overdue', route: '/tasks' }
+      data: { type: 'task_overdue', route: `/tasks/${task.id}` }
     });
   }
 

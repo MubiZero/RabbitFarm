@@ -27,6 +27,7 @@ import '../../features/health/presentation/screens/health_journal_screen.dart';
 import '../../features/health/presentation/screens/vaccinations_list_screen.dart';
 import '../../features/health/presentation/screens/vaccination_form_screen.dart';
 import '../../features/health/data/models/vaccination_model.dart';
+import '../../features/health/presentation/providers/vaccinations_provider.dart';
 import '../../features/health/presentation/screens/medical_records_list_screen.dart';
 import '../../features/health/presentation/screens/medical_record_form_screen.dart';
 import '../../features/health/data/models/medical_record_model.dart';
@@ -38,6 +39,7 @@ import '../../features/feeding/presentation/screens/feeding_record_form_screen.d
 import '../../features/feeding/presentation/screens/feeding_statistics_screen.dart';
 import '../../features/feeding/data/models/feed_model.dart';
 import '../../features/feeding/data/models/feeding_record_model.dart';
+import '../../features/feeding/presentation/providers/feeds_provider.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/presentation/screens/transaction_statistics_screen.dart';
@@ -45,8 +47,11 @@ import '../../features/finance/data/models/transaction_model.dart';
 import '../../features/tasks/presentation/screens/tasks_list_screen.dart';
 import '../../features/tasks/presentation/screens/task_form_screen.dart';
 import '../../features/tasks/data/models/task_model.dart';
+import '../../features/tasks/presentation/providers/tasks_provider.dart';
 import '../../features/notes/presentation/screens/note_form_screen.dart';
 import '../../features/notes/data/models/note_model.dart';
+import '../../features/notes/presentation/providers/notes_provider.dart';
+import '../widgets/app_async_view.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/farm_screen.dart';
@@ -409,6 +414,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           return VaccinationFormScreen(vaccination: vaccination);
         },
       ),
+      // Открывает карточку (=форму редактирования) по id — для тапа по push.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/vaccinations/:id',
+        name: 'vaccination-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return Consumer(
+            builder: (context, ref, _) => AppAsyncView<Vaccination>(
+              value: ref.watch(vaccinationByIdProvider(id)),
+              onRetry: () => ref.invalidate(vaccinationByIdProvider(id)),
+              builder: (vaccination) => VaccinationFormScreen(vaccination: vaccination),
+            ),
+          );
+        },
+      ),
 
       // Cages routes
       GoRoute(
@@ -475,6 +496,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'feed-statistics',
         builder: (context, state) => const FeedStatisticsScreen(),
       ),
+      // Открывает карточку (=форму редактирования) по id — для тапа по push.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/feeds/:id',
+        name: 'feed-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return Consumer(
+            builder: (context, ref, _) => AppAsyncView<Feed>(
+              value: ref.watch(feedByIdProvider(id)),
+              onRetry: () => ref.invalidate(feedByIdProvider(id)),
+              builder: (feed) => FeedFormScreen(feed: feed),
+            ),
+          );
+        },
+      ),
 
       // Feeding Records routes
       GoRoute(
@@ -532,6 +569,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           return TaskFormScreen(task: task);
         },
       ),
+      // Открывает карточку (=форму редактирования) по id — для тапа по push.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/tasks/:id',
+        name: 'task-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return Consumer(
+            builder: (context, ref, _) => AppAsyncView<Task>(
+              value: ref.watch(taskProvider(id)),
+              onRetry: () => ref.invalidate(taskProvider(id)),
+              builder: (task) => TaskFormScreen(task: task),
+            ),
+          );
+        },
+      ),
 
       // Note form route (outside shell)
       GoRoute(
@@ -541,6 +594,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final note = state.extra as NoteModel?;
           return NoteFormScreen(note: note);
+        },
+      ),
+      // Открывает карточку (=форму редактирования) по id — для тапа по push.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/notes/:id',
+        name: 'note-detail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return Consumer(
+            builder: (context, ref, _) => AppAsyncView<NoteModel>(
+              value: ref.watch(noteByIdProvider(id)),
+              onRetry: () => ref.invalidate(noteByIdProvider(id)),
+              builder: (note) => NoteFormScreen(note: note),
+            ),
+          );
         },
       ),
 

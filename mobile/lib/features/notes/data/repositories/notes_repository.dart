@@ -27,6 +27,15 @@ class NotesRepository {
     }
   }
 
+  Future<NoteModel> getNoteById(int id) async {
+    try {
+      final response = await _apiClient.get('${ApiEndpoints.notes}/$id');
+      return NoteModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   Future<NoteModel> createNote(NoteCreate note) async {
     try {
       final response = await _apiClient.post(

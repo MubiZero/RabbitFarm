@@ -8,7 +8,7 @@ const notifyAssignee = (task, farmId) => {
   notificationService.sendToUsers(farmId, [task.assigned_to], {
     title: 'Вам назначена задача',
     body: task.title,
-    data: { type: 'task', route: '/tasks' }
+    data: { type: 'task', route: `/tasks/${task.id}` }
   }).catch(error => {
     logger.error('Task assignment notification failed', { taskId: task.id, error: error.message });
   });

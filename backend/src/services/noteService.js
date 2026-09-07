@@ -61,7 +61,7 @@ class NoteService {
     await notificationService.sendToUsers(farmId, recipients, {
       title: 'Новая запись в дневнике',
       body: note.content.length > 80 ? `${note.content.slice(0, 80)}…` : note.content,
-      data: { type: 'note', route: '/today' }
+      data: { type: 'note', route: `/notes/${note.id}` }
     });
   }
 
