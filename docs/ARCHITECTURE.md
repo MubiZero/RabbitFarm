@@ -8,8 +8,8 @@
 │                      (Android Primary)                      │
 │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐     │
 │  │ Presentation│  │  Business   │  │  Data Layer      │     │
-│  │   Layer     │◄─┤   Logic     │◄─┤  (Local + Remote)│     │
-│  │  (Widgets)  │  │  (Riverpod) │  │                  │     │
+│  │   Layer     │◄─┤   Logic     │◄─┤  (Remote only,   │     │
+│  │  (Widgets)  │  │  (Riverpod) │  │   online-only)   │     │
 │  └─────────────┘  └─────────────┘  └──────────────────┘     │
 │                                            │                │
 │                                            │                │
@@ -42,122 +42,68 @@
 
 ## 📱 Flutter Application Architecture
 
-### Clean Architecture Layers
+### Слои (по факту — двухслойные, без domain и use-case классов)
+
+Ниже реальное дерево `lib/`, а не то, что задумывалось на старте: отдельного
+domain-слоя с абстрактными репозиториями и use-case классами в проекте нет —
+`presentation/providers` работает напрямую с конкретным классом
+`XxxRepository`, который сам оборачивает `ApiClient`.
 
 ```
 lib/
-├── core/                           # Core functionality
+├── core/                           # Сквозная инфраструктура
+│   ├── access/                     # Права по роли (farm_access.dart, капабилити)
 │   ├── api/
 │   │   ├── api_client.dart         # Dio HTTP client
-│   │   ├── api_interceptor.dart    # JWT interceptor
-│   │   ├── api_exception.dart      # Custom exceptions
-│   │   └── endpoints.dart          # API endpoints constants
-│   ├── database/
-│   │   ├── app_database.dart       # SQLite database
-│   │   ├── dao/                    # Data Access Objects
-│   │   └── entities/               # Local entities
-│   ├── theme/
-│   │   ├── app_theme.dart          # Material 3 theme
-│   │   ├── colors.dart             # Color palette
-│   │   └── text_styles.dart        # Typography
+│   │   ├── api_error.dart          # Разбор ошибки ответа
+│   │   ├── api_failure.dart        # Типизированный сбой запроса
+│   │   ├── api_endpoints.dart      # Константы эндпоинтов
+│   │   └── paginated.dart          # Разбор постраничных ответов
+│   ├── json/                       # Общие JSON-конвертеры для Freezed-моделей
+│   ├── l10n/                       # context.l10n, error_text.dart (текст ошибки по ApiFailure)
+│   ├── models/                     # Модели, общие для нескольких фич
+│   ├── notifications/
+│   │   └── fcm_service.dart        # Push (FCM): регистрация токена, тап по уведомлению
+│   ├── providers/                  # Сквозные провайдеры (сессия, тема, revision)
 │   ├── router/
-│   │   ├── app_router.dart         # GoRouter configuration
-│   │   └── route_guards.dart       # Auth guards
-│   ├── utils/
-│   │   ├── date_utils.dart         # Date helpers
-│   │   ├── validators.dart         # Form validators
-│   │   ├── image_utils.dart        # Image compression
-│   │   └── constants.dart          # App constants
-│   └── errors/
-│       ├── failures.dart           # Failure types
-│       └── error_handler.dart      # Global error handling
+│   │   └── app_router.dart         # GoRouter: маршруты, ShellRoute, редирект по авторизации
+│   ├── theme/                      # Material 3 theme
+│   ├── utils/                      # Даты, форматирование, возраст кролика и т.п.
+│   └── widgets/                    # Общая библиотека виджетов, см. widgets.dart:
+│       ├── app_async_view.dart     #   единая обвязка loading/error/data
+│       ├── app_empty_state.dart, app_error_state.dart, skeleton.dart,
+│       └── delayed_spinner.dart, stale_data_banner.dart, ...
 │
-├── features/                       # Feature modules (13 модулей)
+├── features/                       # Feature modules (15 модулей)
 │   ├── auth/                       # ✅ Аутентификация, регистрация фермы
-│   │   ├── data/
-│   │   │   ├── models/             # Freezed JSON models
-│   │   │   └── repositories/       # Repository implementations
-│   │   └── presentation/
-│   │       ├── providers/          # Riverpod providers
-│   │       └── screens/            # Login, Register
-│   │
-│   ├── rabbits/                    # ✅ Управление кроликами
-│   │   ├── data/
-│   │   │   ├── models/             # RabbitModel, BreedModel, Pedigree
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       ├── providers/
-│   │       └── screens/            # List, Detail, Form, Pedigree
-│   │
+│   ├── onboarding/                 # ✅ Первый вход, название и тип фермы
+│   ├── home/                       # ✅ Дневник фермы, «Сегодня», быстрая запись
+│   ├── rabbits/                    # ✅ Кролики, породы, родословная, история веса
 │   ├── cages/                      # ✅ Клетки
-│   │   ├── data/
-│   │   │   ├── models/             # CageModel
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       └── screens/            # List, Detail, Form
-│   │
-│   ├── breeding/                   # ✅ Разведение (Случки и Рождения)
-│   │   ├── data/
-│   │   │   ├── models/             # BreedingModel, BirthModel
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       └── screens/            # BreedingPlanner, BirthsList, Forms
-│   │
-│   ├── health/                     # ✅ Здоровье (Вакцинация + Медкарты)
-│   │   ├── data/
-│   │   │   ├── models/             # Vaccination, MedicalRecord
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       └── screens/            # VaccinationsList, MedicalRecordsList, Forms
-│   │
+│   ├── breeding/                   # ✅ Случки и рождения
+│   ├── health/                     # ✅ Вакцинации и медкарты
 │   ├── feeding/                    # ✅ Корма и кормление
-│   │   ├── data/
-│   │   │   ├── models/             # Feed, FeedingRecord
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       └── screens/            # FeedsList, FeedingRecordsList, Forms
-│   │
-│   ├── finance/                    # ✅ Финансы (Транзакции)
-│   │   ├── data/
-│   │   │   ├── models/             # Transaction, Statistics
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       └── screens/            # TransactionsList, Form
-│   │
+│   ├── finance/                    # ✅ Транзакции
 │   ├── tasks/                      # ✅ Задачи
-│   │   ├── data/
-│   │   │   ├── models/             # Task, TaskStatistics
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       ├── providers/          # tasksProvider, taskActionsProvider
-│   │       └── screens/            # TasksList, TaskForm
-│   │
-│   ├── reports/                    # ✅ Отчеты и Dashboard
-│   │   ├── data/
-│   │   │   ├── models/             # DashboardReport, FarmReport, HealthReport, FinancialReport
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       ├── providers/          # dashboardReportProvider
-│   │       └── screens/            # DashboardScreen
-│   │
+│   ├── notes/                      # ✅ Заметки — пятый тип записи в дневнике
+│   ├── reports/                    # ✅ Dashboard и отчёты
 │   ├── staff/                      # ✅ Работники, приглашения, передача хозяйства
-│   ├── home/                       # ✅ Дневник фермы, сегодня, быстрая запись
-│   ├── onboarding/                 # ✅ Регистрация фермы, первый вход
+│   ├── device_tokens/              # ✅ Регистрация устройств для push
 │   └── settings/                   # ✅ Настройки приложения
 │
-├── shared/                         # Shared across features
-│   ├── widgets/
-│   │   ├── custom_app_bar.dart
-│   │   ├── loading_indicator.dart
-│   │   ├── error_view.dart
-│   │   ├── empty_state.dart
-│   │   ├── image_picker_widget.dart
-│   │   └── date_picker_field.dart
+│   Каждый модуль устроен одинаково:
+│   ├── data/
+│   │   ├── models/                 # Freezed JSON-модели
+│   │   └── repositories/           # Класс-репозиторий поверх ApiClient
+│   └── presentation/
+│       ├── providers/              # Riverpod-провайдеры
+│       └── screens/                # Экраны (форма одна и на создание, и на правку)
+│
+├── shared/                         # Общее между фичами
 │   ├── models/
-│   │   └── paginated_response.dart
-│   └── providers/
-│       ├── connectivity_provider.dart
-│       └── sync_provider.dart
+│   │   └── api_response.dart       # ApiResponse<T> и PaginatedResponse<T>
+│   └── widgets/
+│       └── logout_dialog.dart
 │
 └── main.dart                       # App entry point
 ```
@@ -171,134 +117,110 @@ lib/
 - `FutureProvider` - Async data fetching
 - `StreamProvider` - Real-time updates
 
-**Example Structure:**
+**Как это выглядит по факту** (упрощено из `rabbits_provider.dart`) — без
+абстрактного интерфейса репозитория и без отдельного use-case класса,
+провайдер работает с конкретным классом репозитория напрямую:
+
 ```dart
-// Domain Entity
-class Rabbit {
-  final String id;
-  final String name;
-  final String breed;
-  // ...
+// Repository — конкретный класс поверх ApiClient, без интерфейса
+class RabbitsRepository {
+  final ApiClient apiClient;
+  RabbitsRepository({required this.apiClient});
+
+  Future<PaginatedResponse<RabbitModel>> getRabbits({...}) async { ... }
+  Future<RabbitModel> getRabbitById(int id) async { ... }
 }
 
-// Repository Interface
-abstract class RabbitRepository {
-  Future<List<Rabbit>> getRabbits();
-  Future<Rabbit> getRabbitById(String id);
-  Future<void> createRabbit(Rabbit rabbit);
-}
-
-// Use Case
-class GetRabbitsUseCase {
-  final RabbitRepository repository;
-
-  Future<List<Rabbit>> call() => repository.getRabbits();
-}
-
-// Provider
-final rabbitsProvider = StateNotifierProvider<RabbitsNotifier, AsyncValue<List<Rabbit>>>((ref) {
-  return RabbitsNotifier(ref.watch(rabbitRepositoryProvider));
+final rabbitsRepositoryProvider = Provider<RabbitsRepository>((ref) {
+  return RabbitsRepository(apiClient: ref.watch(apiClientProvider));
 });
 
-// State Notifier
-class RabbitsNotifier extends StateNotifier<AsyncValue<List<Rabbit>>> {
-  final RabbitRepository _repository;
+// StateNotifier с состоянием списка (загрузка/ошибка/данные/пагинация)
+final rabbitsProvider = StateNotifierProvider<RabbitsNotifier, RabbitsState>((ref) {
+  return RabbitsNotifier(ref.watch(rabbitsRepositoryProvider));
+});
 
-  RabbitsNotifier(this._repository) : super(const AsyncValue.loading()) {
+class RabbitsNotifier extends StateNotifier<RabbitsState> {
+  final RabbitsRepository _repository;
+
+  RabbitsNotifier(this._repository) : super(const RabbitsState()) {
     loadRabbits();
   }
 
   Future<void> loadRabbits() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repository.getRabbits());
+    state = state.copyWith(isLoading: true);
+    // ...
   }
 }
+
+// Загрузка одной сущности по id — FutureProvider.family, тот же приём
+// используют /rabbits/:id, /cages/:id, /breeding/:id и другие detail-маршруты
+final rabbitDetailProvider =
+    FutureProvider.family<RabbitModel, int>((ref, id) async {
+  return ref.watch(rabbitsRepositoryProvider).getRabbitById(id);
+});
 ```
 
 ### Navigation (GoRouter)
 
-```dart
-final appRouter = GoRouter(
-  initialLocation: '/splash',
-  redirect: (context, state) {
-    final isAuthenticated = ref.read(authProvider).isAuthenticated;
-    final isAuthRoute = state.location.startsWith('/auth');
-
-    if (!isAuthenticated && !isAuthRoute) return '/auth/login';
-    if (isAuthenticated && isAuthRoute) return '/';
-    return null;
-  },
-  routes: [
-    GoRoute(path: '/splash', builder: (_, __) => SplashScreen()),
-    GoRoute(
-      path: '/auth',
-      builder: (_, __) => AuthWrapper(),
-      routes: [
-        GoRoute(path: 'login', builder: (_, __) => LoginScreen()),
-        GoRoute(path: 'register', builder: (_, __) => RegisterScreen()),
-      ],
-    ),
-    ShellRoute(
-      builder: (_, __, child) => MainScaffold(child: child),
-      routes: [
-        GoRoute(path: '/', builder: (_, __) => DashboardScreen()),
-        GoRoute(
-          path: '/rabbits',
-          builder: (_, __) => RabbitsListScreen(),
-          routes: [
-            GoRoute(path: ':id', builder: (_, state) => RabbitDetailScreen(id: state.params['id']!)),
-            GoRoute(path: 'add', builder: (_, __) => AddRabbitScreen()),
-          ],
-        ),
-        // More routes...
-      ],
-    ),
-  ],
-);
-```
-
-### Offline Strategy
-
-**Three-Layer Approach:**
-1. **Remote Data Source** - API calls
-2. **Local Data Source** - SQLite cache
-3. **Repository** - Orchestrates both
+Актуальный API `go_router` (не `state.location`/`state.params`, которые уже
+убраны из пакета): `state.uri.path`, `state.pathParameters`,
+`state.uri.queryParameters`. Реальный `app_router.dart` устроен так же, но
+плоским списком маршрутов вместо вложенных `routes:` — большинство
+detail/form-маршрутов идут `parentNavigatorKey: rootNavigatorKey`, поверх
+`ShellRoute` с нижней навигацией, а не внутри неё:
 
 ```dart
-class RabbitRepositoryImpl implements RabbitRepository {
-  final RabbitRemoteDataSource remoteDataSource;
-  final RabbitLocalDataSource localDataSource;
-  final NetworkInfo networkInfo;
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: '/splash',
+    redirect: (context, state) {
+      final isAuthenticated = ref.read(authProvider).isAuthenticated;
+      final isAuthRoute = state.uri.path.startsWith('/login');
 
-  @override
-  Future<List<Rabbit>> getRabbits() async {
-    if (await networkInfo.isConnected) {
-      try {
-        final rabbits = await remoteDataSource.getRabbits();
-        await localDataSource.cacheRabbits(rabbits); // Update cache
-        return rabbits;
-      } catch (e) {
-        // Fallback to cache on error
-        return await localDataSource.getCachedRabbits();
-      }
-    } else {
-      // Offline: use cache
-      return await localDataSource.getCachedRabbits();
-    }
-  }
-
-  @override
-  Future<void> createRabbit(Rabbit rabbit) async {
-    if (await networkInfo.isConnected) {
-      await remoteDataSource.createRabbit(rabbit);
-      await localDataSource.cacheRabbit(rabbit);
-    } else {
-      // Save to pending sync queue
-      await localDataSource.addToPendingSync(rabbit);
-    }
-  }
-}
+      if (!isAuthenticated && !isAuthRoute) return '/login';
+      if (isAuthenticated && isAuthRoute) return '/';
+      return null;
+    },
+    routes: [
+      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      ShellRoute(
+        builder: (_, __, child) => MainNavigationScreen(child: child),
+        routes: [
+          GoRoute(path: '/', builder: (_, __) => const TodayScreen()),
+          // ...
+        ],
+      ),
+      // Detail/form-маршруты — вне ShellRoute, во весь экран:
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/rabbits/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return RabbitDetailScreen(rabbitId: id);
+        },
+      ),
+    ],
+  );
+});
 ```
+
+### Работа без сети — не реализована
+
+Приложение online-only: нет ни локальной SQLite-базы, ни очереди
+отложенных операций, ни детектора подключения (`sqflite`/`hive` не
+подключены, `mobile/lib/core` и `mobile/lib/shared` не содержат ни
+`database/`, ни `connectivity_provider.dart`). Каждый экран сам делает
+запрос через `ApiClient (Dio)` и показывает загрузку/ошибку.
+
+Единственная уступка нестабильной сети — [`AppAsyncView`](../mobile/lib/core/widgets/app_async_view.dart)
+и [`StaleDataBanner`](../mobile/lib/core/widgets/stale_data_banner.dart):
+если повторный запрос (обновление списка) упал, а прежние данные уже
+показаны — экран не переключается в пустоту, а оставляет старые данные и
+рисует сверху баннер «показаны старые данные» с кнопкой повтора. Полностью
+офлайн (без единого успешного запроса) приложением пользоваться нельзя —
+это осознанное ограничение MVP, а не пропущенная фича.
 
 ## 🔧 Backend API Architecture
 
@@ -313,14 +235,16 @@ backend/
 │   ├── config/
 │   │   ├── database.js             # Sequelize config
 │   │   ├── jwt.js                  # JWT config
-│   │   └── multer.js               # File upload config
+│   │   ├── multer.js               # File upload config — подключается прямо в роутах
+│   │   ├── firebase.js             # Firebase Admin SDK (push), молчит без ключей
+│   │   ├── swagger.js              # OpenAPI-схема
+│   │   └── validateEnv.js          # Проверка обязательных переменных окружения при старте
 │   │
-│   ├── middleware/
+│   ├── middleware/                 # Без отдельного upload.js — загрузка идёт через config/multer.js
 │   │   ├── auth.js                 # JWT verification
 │   │   ├── validation.js           # Request validation
 │   │   ├── errorHandler.js         # Global error handler
-│   │   ├── rateLimiter.js          # Rate limiting
-│   │   └── upload.js               # File upload handler
+│   │   └── rateLimiter.js          # Rate limiting (не на все роуты — см. «Middleware Chain»)
 │   │
 │   ├── models/                     # ✅ 21 модель Sequelize
 │   │   ├── index.js                # Sequelize init, ассоциации, tenancy.attach()
@@ -424,7 +348,9 @@ backend/
 │       ├── password.js             # Password hashing
 │       ├── tenancy.js              # Страховка изоляции ферм (см. «Многоарендность»)
 │       ├── dateRange.js
-│       └── apiResponse.js          # Standardized responses
+│       ├── apiResponse.js          # Standardized responses
+│       ├── fileHelper.js           # Работа с загруженными файлами
+│       └── logger.js               # Winston-логгер (см. «Monitoring & Logging»)
 │
 ├── migrations/                     # Sequelize migrations
 ├── seeders/                        # Seed data
@@ -517,13 +443,26 @@ backend/
 
 ### Middleware Chain
 
+Глобально (`app.js`): `helmet` → `cors` → `compression` → body-parsers →
+`morgan` → `generalLimiter` (один лимит на весь `/api/`, не per-route) →
+роуты → `notFoundHandler` → `errorHandler`.
+
+Внутри роутера конкретного ресурса — `authenticate` на весь роутер,
+`authorize([...])` точечно там, где роль имеет значение, `rateLimiter`
+не универсален (свой лимитер только там, где нужен, например на аплоаде):
+
 ```javascript
-app.use('/api/v1/rabbits', [
-  auth,              // 1. Verify JWT
-  rateLimiter,       // 2. Rate limiting
-  validate(schema),  // 3. Request validation
-  rabbitController   // 4. Handle request
-]);
+// backend/src/routes/rabbit.routes.js (сокращённо)
+router.use(authenticate);                                   // JWT на весь роутер
+
+router.get('/', validate(listSchema), rabbitController.list);
+router.post('/:id/photo',
+  uploadLimiter,                                             // свой лимит, не общий
+  upload.single('photo'),
+  rabbitController.uploadPhoto);
+router.delete('/:id',
+  authorize(['manager', 'owner']),                           // роль важна не везде
+  rabbitController.delete);
 ```
 
 ## 🗄️ Database Design Principles
@@ -674,27 +613,24 @@ worker) — код опущен под `kIsWeb`.
 - **Password**: bcrypt with salt rounds 10
 
 ### Authorization
+
+Три роли (`owner`, `manager`, `worker`), без гранулярных permission-строк
+вроде `write:rabbits` — `authorize` просто сверяет роль пользователя со
+списком разрешённых для роута, а `owner` всегда проходит:
+
 ```javascript
-// Role-based access control
-const roles = {
-  OWNER: ['all'],
-  MANAGER: ['read:all', 'write:rabbits', 'write:health', 'write:tasks'],
-  WORKER: ['read:rabbits', 'read:tasks', 'write:tasks']
-};
-
-// Middleware
-const authorize = (permissions) => (req, res, next) => {
-  const userRole = req.user.role;
-  const hasPermission = roles[userRole].some(p =>
-    p === 'all' || permissions.includes(p)
-  );
-
-  if (!hasPermission) return res.status(403).json({ error: 'Forbidden' });
+// backend/src/middleware/auth.js
+const authorize = (allowedRoles = []) => (req, res, next) => {
+  if (req.user.role === 'owner') return next();
+  if (!allowedRoles.includes(req.user.role)) {
+    return ApiResponse.forbidden(res, 'Недостаточно прав');
+  }
   next();
 };
 
-// Usage
-router.delete('/rabbits/:id', authorize(['write:rabbits']), deleteRabbit);
+// Usage — authenticate на весь роутер, authorize точечно на чувствительных операциях
+router.use(authenticate);
+router.delete('/:id', authorize(['manager', 'owner']), deleteRabbit);
 ```
 
 ### Input Validation
@@ -714,14 +650,14 @@ const createRabbitSchema = Joi.object({
 - Max file size: 5MB
 - Sanitize filenames
 - Store outside web root
-- Virus scanning (optional, using ClamAV)
+- Сканирование на вирусы не подключено (ClamAV или аналог — не реализовано, не только «опционально»)
 
 ## 📊 Performance Optimizations
 
 ### Backend
 - **Connection Pooling**: MySQL pool size 10-20
 - **Query Optimization**: Use indexes, avoid N+1 queries
-- **Caching**: Redis for frequently accessed data (optional for MVP)
+- **Caching**: Redis не подключён (ни в коде, ни в зависимостях) — для MVP не потребовался
 - **Pagination**: Limit 20-50 items per page
 - **Compression**: gzip for responses
 - **CDN**: For static assets (future)
@@ -742,48 +678,23 @@ const createRabbitSchema = Joi.object({
   - Enable tree shaking
   - Use ProGuard/R8
 
-## 🔄 Sync Strategy (Offline Mode)
-
-### Conflict Resolution
-```
-1. Last-Write-Wins (LWW)
-   - Use updated_at timestamp
-   - Server timestamp is source of truth
-
-2. Pending Operations Queue
-   - Store failed operations locally
-   - Retry on reconnection
-   - Show sync status to user
-
-3. Sync Flow
-   ├─► Device comes online
-   ├─► Fetch server updates since last sync
-   ├─► Apply server changes to local DB
-   ├─► Upload pending local changes
-   ├─► Resolve conflicts (if any)
-   └─► Mark sync complete
-```
-
 ## 📱 App Lifecycle
+
+Очередь синхронизации и конфликт-резолюшн не реализованы — см. «Работа без
+сети» выше. Реальный старт приложения (`main.dart`):
 
 ```
 App Start
-├─► Check authentication
-├─► Initialize local database
-├─► Check network connectivity
-├─► Sync data (if online)
-└─► Navigate to appropriate screen
-
-Background
-├─► Stop active operations
-├─► Save state
-└─► Listen for notifications
-
-Foreground Resume
-├─► Restore state
-├─► Check for updates
-└─► Sync if needed
+├─► Firebase.initializeApp() — в try/catch, без ключей push просто выключен
+├─► initializeDateFormatting('ru') — даты и числа по-русски
+├─► runApp(ProviderScope(MyApp()))
+└─► Если запуск был тапом по push из полностью закрытого состояния —
+    дождаться первого кадра и передать управление handleMessageTap
 ```
+
+`redirect` в `GoRouter` сам решает, куда вести неавторизованного/
+авторизованного пользователя при каждой навигации — отдельного шага
+«проверить авторизацию на старте» не требуется.
 
 ## 🧪 Testing Strategy
 
@@ -793,14 +704,14 @@ Foreground Resume
 - **E2E Tests**: Complete workflows (optional)
 
 ### Flutter Tests
-- **Unit Tests**: Business logic, utils
-- **Widget Tests**: Individual widgets
-- **Integration Tests**: Complete flows
-- **Golden Tests**: UI snapshot testing
+`mobile/test/` — unit- и widget-тесты (access, api, auth, breeding, domain,
+json, l10n, models, screens, utils). Golden-тестов (снапшоты UI) нет ни
+одного, отдельной папки `integration_test/` тоже нет.
 
 ### Coverage Target
-- Backend: 80%+
-- Flutter: 70%+
+- Backend: порог реально задан в `backend/jest.config.js`
+  (`branches 70 / functions 80 / lines 80 / statements 80`)
+- Flutter: порог покрытия нигде не настроен — цифры для него нет
 
 ## 📈 Monitoring & Logging
 
@@ -812,7 +723,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 ```
 
 ### Error Tracking
-- **Sentry** (optional) for production error tracking
+- **Sentry** не подключён (ни в `backend/package.json`, ни в `mobile/pubspec.yaml`) — в проде ошибки видны только по логам и жалобам пользователей
 - **Log files** with rotation (7 days retention)
 
 ### Metrics
@@ -940,6 +851,14 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ---
 
-**Architecture Version**: 2.3
+**Architecture Version**: 2.4
 **Last Updated**: 2026-09-07
 **Project Status**: Активная разработка — базовый функционал, многоарендность, передача хозяйства фермы и push-уведомления готовы
+
+**Аудит устаревших сведений (2026-09-07):** документ писался частично как
+шаблон до того, как код был написан, и часть разделов с тех пор разошлась
+с реальностью — offline/sync, дерево `lib/`, примеры Riverpod/GoRouter,
+Authorization, часть структуры backend, Golden-тесты, Redis/Sentry/ClamAV.
+Все такие разделы выше приведены в соответствие с кодом по состоянию на
+эту дату; разделы «Многоарендность» и «Push-уведомления» уже были точными
+и не менялись.
