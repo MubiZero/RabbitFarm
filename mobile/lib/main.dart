@@ -16,9 +16,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Web пока без push — нужен отдельный VAPID-ключ и service worker.
-  // До того как в проект добавлен google-services.json, Firebase на Android
-  // не инициализируется вовсе — приложение не должно падать на старте
-  // только потому, что push ещё не настроен.
+  // До того как в проект добавлен google-services.json (Android) или
+  // GoogleService-Info.plist (iOS), Firebase не инициализируется вовсе —
+  // приложение не должно падать на старте только потому, что push ещё не
+  // настроен на этой платформе.
   var firebaseReady = false;
   if (!kIsWeb) {
     try {

@@ -650,9 +650,13 @@ Push — опциональная интеграция, а не обязател
 нет маршрута по id в мобильном роутере — это ограничение существовало и до
 push, чинить его отдельная задача.
 
-**Android — основная платформа, iOS — код готов, доставка не настроена.**
-`firebase_messaging` написан платформенно-независимо, но включение iOS
-требует APNs-ключ и Apple Developer аккаунт — отдельный шаг, не блокирующий
+**Android — основная платформа, iOS — код и Xcode-проект готовы, доставка
+не настроена.** `firebase_messaging` написан платформенно-независимо, в
+`ios/Runner` уже прописаны `Runner.entitlements` (`aps-environment`) и
+`UIBackgroundModes: remote-notification`. Не хватает того, что нельзя
+завести без внешних учёток: Apple Developer аккаунта, APNs-ключа (.p8),
+привязки его к проекту в Firebase Console и файла
+`GoogleService-Info.plist` для `ios/Runner` — отдельный шаг, не блокирующий
 Android. Web push не поддерживается вовсе (нужны VAPID-ключ и service
 worker) — код опущен под `kIsWeb`.
 
