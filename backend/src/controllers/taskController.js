@@ -42,7 +42,7 @@ exports.list = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const task = await taskService.updateTask(req.params.id, req.farmId, req.body);
+    const task = await taskService.updateTask(req.params.id, req.farmId, req.body, req.user.id);
     return ApiResponse.success(res, task, 'Задача успешно обновлена');
   } catch (error) {
     if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);

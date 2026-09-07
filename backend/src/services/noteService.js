@@ -2,6 +2,8 @@ const { Note, Rabbit, Cage, User } = require('../models');
 const { Op } = require('sequelize');
 const logger = require('../utils/logger');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const staffService = require('./staffService');
+const notificationService = require('./notificationService');
 
 const NOTE_INCLUDE = [
   { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
@@ -40,7 +42,27 @@ class NoteService {
 
     const created = await Note.findOne({ where: { id: note.id, farm_id }, include: NOTE_INCLUDE });
     logger.info('Note created', { noteId: note.id, farmId: farm_id });
+
+    this._notifyOthers(created, farm_id, author_id).catch(error => {
+      logger.error('Note notification failed', { noteId: note.id, error: error.message });
+    });
+
     return created;
+  }
+
+  /** Уведомить остальных участников фермы о новой записи — кроме автора. */
+  async _notifyOthers(note, farmId, authorId) {
+    const members = await staffService.listMembers(farmId);
+    const recipients = members
+      .filter(m => m.id !== authorId && m.is_active)
+      .map(m => m.id);
+    if (recipients.length === 0) return;
+
+    await notificationService.sendToUsers(farmId, recipients, {
+      title: 'Новая запись в дневнике',
+      body: note.content.length > 80 ? `${note.content.slice(0, 80)}…` : note.content,
+      data: { type: 'note', route: '/today' }
+    });
   }
 
   async getNoteById(id, farmId) {

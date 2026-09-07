@@ -33,6 +33,7 @@ const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
 const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 const PasswordResetToken = require('./PasswordResetToken')(sequelize);
+const DeviceToken = require('./DeviceToken')(sequelize);
 
 // Define associations
 
@@ -59,8 +60,10 @@ Farm.hasMany(Task, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
 Farm.hasMany(Photo, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
 Farm.hasMany(Note, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
 Farm.hasMany(Invitation, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
+Farm.hasMany(DeviceToken, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
 
 // Обратная сторона: по записи всегда видно её хозяйство.
+DeviceToken.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 Breed.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 Cage.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 Feed.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
@@ -93,6 +96,8 @@ User.hasMany(Transaction, { foreignKey: 'created_by', onDelete: 'SET NULL' });
 User.hasMany(FeedingRecord, { foreignKey: 'fed_by', onDelete: 'SET NULL' });
 User.hasMany(Photo, { foreignKey: 'uploaded_by', onDelete: 'SET NULL' });
 User.hasMany(Note, { foreignKey: 'created_by', onDelete: 'SET NULL' });
+User.hasMany(DeviceToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+DeviceToken.belongsTo(User, { foreignKey: 'user_id' });
 
 // Breed associations
 Breed.hasMany(Rabbit, { foreignKey: 'breed_id', onDelete: 'RESTRICT' });
@@ -172,7 +177,7 @@ Note.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 require('../utils/tenancy').attach({
   Breed, Cage, Feed, Rabbit, RabbitWeight, Breeding, Birth,
   Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note,
-  Invitation
+  Invitation, DeviceToken
 });
 
 // Export models and sequelize instance
@@ -198,5 +203,6 @@ module.exports = {
   Transaction,
   Task,
   Photo,
-  Note
+  Note,
+  DeviceToken
 };

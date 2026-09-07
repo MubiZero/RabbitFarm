@@ -22,7 +22,7 @@ const { Op } = require('sequelize');
 const TENANT_MODELS = [
   'Breed', 'Cage', 'Feed', 'Rabbit', 'RabbitWeight', 'Breeding', 'Birth',
   'Vaccination', 'MedicalRecord', 'FeedingRecord', 'Transaction', 'Task',
-  'Photo', 'Note', 'Invitation'
+  'Photo', 'Note', 'Invitation', 'DeviceToken'
 ];
 
 /** Условие могло попасть и в верхний уровень, и внутрь Op.and/Op.or. */

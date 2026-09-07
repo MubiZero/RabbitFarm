@@ -2,6 +2,17 @@ const { Task, Rabbit, Cage, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
 const logger = require('../utils/logger');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const notificationService = require('./notificationService');
+
+const notifyAssignee = (task, farmId) => {
+  notificationService.sendToUsers(farmId, [task.assigned_to], {
+    title: 'Вам назначена задача',
+    body: task.title,
+    data: { type: 'task', route: '/tasks' }
+  }).catch(error => {
+    logger.error('Task assignment notification failed', { taskId: task.id, error: error.message });
+  });
+};
 
 const TASK_INCLUDE = [
   { model: Rabbit, as: 'rabbit', attributes: ['id', 'name', 'tag_id'] },
@@ -89,6 +100,11 @@ class TaskService {
     });
 
     logger.info('Task created', { taskId: task.id });
+
+    if (assigned_to && assigned_to !== author_id) {
+      notifyAssignee(created, farm_id);
+    }
+
     return created;
   }
 
@@ -168,11 +184,14 @@ class TaskService {
     return { items: rows, total: count, page: parseInt(page), limit: parseInt(limit) };
   }
 
-  async updateTask(id, farmId, data) {
+  async updateTask(id, farmId, data, actorId) {
     const task = await Task.findOne({ where: { id, farm_id: farmId } });
     if (!task) throw new Error('TASK_NOT_FOUND');
 
     const { rabbit_id, cage_id, assigned_to, status, completed_at } = data;
+    const isReassignment = assigned_to !== undefined
+      && assigned_to !== task.assigned_to
+      && assigned_to !== actorId;
 
     if (rabbit_id && rabbit_id !== task.rabbit_id) {
       const rabbit = await Rabbit.findOne({ where: { id: rabbit_id, farm_id: farmId } });
@@ -199,6 +218,11 @@ class TaskService {
 
     const updated = await Task.findOne({ where: { id, farm_id: farmId }, include: TASK_INCLUDE });
     logger.info('Task updated', { taskId: id });
+
+    if (isReassignment) {
+      notifyAssignee(updated, farmId);
+    }
+
     return updated;
   }
 

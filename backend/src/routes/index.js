@@ -24,7 +24,8 @@ const modules = [
   ['/tasks', require('./task.routes')],
   ['/reports', require('./report.routes')],
   ['/breeding', require('./breeding.routes')],
-  ['/notes', require('./note.routes')]
+  ['/notes', require('./note.routes')],
+  ['/device-tokens', require('./device-token.routes')]
 ];
 
 // API Info

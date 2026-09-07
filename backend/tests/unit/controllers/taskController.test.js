@@ -169,7 +169,7 @@ describe('TaskController', () => {
 
       await taskController.update(req, res, mockNext);
 
-      expect(taskService.updateTask).toHaveBeenCalledWith('1', FARM_ID, { title: 'Updated task' });
+      expect(taskService.updateTask).toHaveBeenCalledWith('1', FARM_ID, { title: 'Updated task' }, 1);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: task }));
     });
