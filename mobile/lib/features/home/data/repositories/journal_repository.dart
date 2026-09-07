@@ -9,6 +9,8 @@ import '../../../health/data/models/medical_record_model.dart';
 import '../../../health/data/models/vaccination_model.dart';
 import '../../../tasks/data/models/task_model.dart';
 import '../../../notes/data/models/note_model.dart';
+import '../../../rabbits/data/models/rabbit_photo_model.dart';
+import '../../../../core/utils/image_url_helper.dart';
 import '../models/journal_entry.dart';
 
 /// Собирает ленту записей смены из пяти источников.
@@ -41,6 +43,7 @@ class JournalRepository {
       _vaccinations(from, to),
       _closedTasks(),
       _notes(from, to),
+      _photos(from, to),
     ]);
 
     // Границы периода проверяются ещё раз здесь: у задач сервер их вовсе не
@@ -204,6 +207,38 @@ class JournalRepository {
       cageNumber: note.cage?.number,
       author: note.author?.fullName,
       formArgs: note,
+    );
+  }
+
+  Future<List<JournalEntry>> _photos(DateTime from, DateTime to) async {
+    final items = await _items(ApiEndpoints.photos, {
+      'limit': _pageLimit,
+      'sort_by': 'created_at',
+      'sort_order': 'DESC',
+      'from_date': from.toIso8601String(),
+      'to_date': to.toIso8601String(),
+    });
+
+    return [
+      for (final item in items) _photoEntry(item),
+    ];
+  }
+
+  JournalEntry _photoEntry(Map<String, dynamic> item) {
+    final photo = RabbitPhoto.fromJson(item);
+    final caption = photo.caption?.trim();
+
+    return JournalEntry(
+      kind: JournalKind.photo,
+      at: photo.createdAt ?? DateTime.now(),
+      hasTime: true,
+      // Без подписи заголовком не может быть null: общий фолбэк на экране
+      // придуман для кормления («Корм неизвестен») и здесь бы соврал.
+      title: caption == null || caption.isEmpty ? null : caption,
+      rabbitName: photo.rabbit?.label,
+      author: photo.author?.fullName,
+      imageUrl: ImageUrlHelper.getFullImageUrl(photo.url),
+      formArgs: photo,
     );
   }
 

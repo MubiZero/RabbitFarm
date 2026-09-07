@@ -36,9 +36,10 @@
   "journalKindVaccination": "Прививка",
   "journalKindTask": "Задача",
   "journalKindNote": "Заметка",
+  "journalKindPhoto": "Фото",
   "journalEmptyTodayTitle": "Сегодня ещё ничего не записано",
   "journalEmptyWeekTitle": "За неделю ничего не записано",
-  "journalEmptyBody": "Кормления, лечение, прививки, закрытые задачи и заметки попадают сюда сами. Запишите первое — и оно появится здесь.",
+  "journalEmptyBody": "Кормления, лечение, прививки, закрытые задачи, заметки и фото попадают сюда сами. Запишите первое — и оно появится здесь.",
   "journalNoneInViewTitle": "В этой выборке пусто",
   "journalNoneInViewBody": "Смените вид записи или срок.",
 

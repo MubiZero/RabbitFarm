@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -221,21 +222,47 @@ class _EntryCard extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
+          if (entry.imageUrl != null)
+            ClipRRect(
               borderRadius: AppRadius.smAll,
+              child: CachedNetworkImage(
+                imageUrl: entry.imageUrl!,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  width: 40,
+                  height: 40,
+                  color: color.withValues(alpha: 0.12),
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  width: 40,
+                  height: 40,
+                  color: color.withValues(alpha: 0.12),
+                  child: Icon(entry.kind.icon, color: color, size: 20),
+                ),
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: AppRadius.smAll,
+              ),
+              child: Icon(entry.kind.icon, color: color, size: 20),
             ),
-            child: Icon(entry.kind.icon, color: color, size: 20),
-          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  entry.title ?? context.l10n.feedingUnknownFeed,
+                  // Без заголовка — а это бывает не только у кормления без
+                  // корма, но и у фото без подписи — строкой служит сам вид
+                  // записи, а не текст, придуманный для одного частного
+                  // случая.
+                  entry.title ?? _kindLabel(context, entry.kind),
                   style: AppTypography.titleMd
                       .copyWith(color: context.colors.onSurface),
                   maxLines: 1,
@@ -319,6 +346,7 @@ String _kindLabel(BuildContext context, JournalKind kind) => switch (kind) {
       JournalKind.vaccination => context.l10n.journalKindVaccination,
       JournalKind.task => context.l10n.journalKindTask,
       JournalKind.note => context.l10n.journalKindNote,
+      JournalKind.photo => context.l10n.journalKindPhoto,
     };
 
 extension _JournalKindVisuals on JournalKind {
@@ -328,6 +356,7 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.vaccination => AppDomain.health,
         JournalKind.task => AppDomain.tasks,
         JournalKind.note => AppDomain.admin,
+        JournalKind.photo => AppDomain.livestock,
       };
 
   IconData get icon => switch (this) {
@@ -335,6 +364,7 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.treatment => Icons.medical_services_outlined,
         JournalKind.vaccination => Icons.vaccines_outlined,
         JournalKind.task => Icons.check_circle_outline,
+        JournalKind.photo => Icons.photo_camera_outlined,
         JournalKind.note => Icons.sticky_note_2_outlined,
       };
 }

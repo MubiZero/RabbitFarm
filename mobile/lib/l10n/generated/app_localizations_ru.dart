@@ -99,6 +99,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get journalKindNote => 'Заметка';
 
   @override
+  String get journalKindPhoto => 'Фото';
+
+  @override
   String get journalEmptyTodayTitle => 'Сегодня ещё ничего не записано';
 
   @override
@@ -106,7 +109,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get journalEmptyBody =>
-      'Кормления, лечение, прививки, закрытые задачи и заметки попадают сюда сами. Запишите первое — и оно появится здесь.';
+      'Кормления, лечение, прививки, закрытые задачи, заметки и фото попадают сюда сами. Запишите первое — и оно появится здесь.';
 
   @override
   String get journalNoneInViewTitle => 'В этой выборке пусто';

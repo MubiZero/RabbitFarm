@@ -274,6 +274,12 @@ abstract class AppLocalizations {
   /// **'Заметка'**
   String get journalKindNote;
 
+  /// No description provided for @journalKindPhoto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото'**
+  String get journalKindPhoto;
+
   /// No description provided for @journalEmptyTodayTitle.
   ///
   /// In ru, this message translates to:
@@ -289,7 +295,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalEmptyBody.
   ///
   /// In ru, this message translates to:
-  /// **'Кормления, лечение, прививки, закрытые задачи и заметки попадают сюда сами. Запишите первое — и оно появится здесь.'**
+  /// **'Кормления, лечение, прививки, закрытые задачи, заметки и фото попадают сюда сами. Запишите первое — и оно появится здесь.'**
   String get journalEmptyBody;
 
   /// No description provided for @journalNoneInViewTitle.

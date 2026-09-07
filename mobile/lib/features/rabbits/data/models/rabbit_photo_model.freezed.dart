@@ -31,7 +31,13 @@ mixin _$RabbitPhoto {
   @JsonKey(name: 'created_at')
   @NullableDateTimeConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
-  UserRef? get author => throw _privateConstructorUsedError;
+  UserRef? get author =>
+      throw _privateConstructorUsedError; // Приходит только в общей по ферме ленте (/photos) — в галерее одного
+  // кролика (/rabbits/:id/photos) он и так известен снаружи.
+  @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
+  int? get rabbitId => throw _privateConstructorUsedError;
+  RabbitRef? get rabbit => throw _privateConstructorUsedError;
 
   /// Serializes this RabbitPhoto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -59,9 +65,12 @@ abstract class $RabbitPhotoCopyWith<$Res> {
     @NullableDateTimeConverter()
     DateTime? createdAt,
     UserRef? author,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+    RabbitRef? rabbit,
   });
 
   $UserRefCopyWith<$Res>? get author;
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -85,6 +94,8 @@ class _$RabbitPhotoCopyWithImpl<$Res, $Val extends RabbitPhoto>
     Object? takenAt = freezed,
     Object? createdAt = freezed,
     Object? author = freezed,
+    Object? rabbitId = freezed,
+    Object? rabbit = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -112,6 +123,14 @@ class _$RabbitPhotoCopyWithImpl<$Res, $Val extends RabbitPhoto>
                 ? _value.author
                 : author // ignore: cast_nullable_to_non_nullable
                       as UserRef?,
+            rabbitId: freezed == rabbitId
+                ? _value.rabbitId
+                : rabbitId // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            rabbit: freezed == rabbit
+                ? _value.rabbit
+                : rabbit // ignore: cast_nullable_to_non_nullable
+                      as RabbitRef?,
           )
           as $Val,
     );
@@ -128,6 +147,20 @@ class _$RabbitPhotoCopyWithImpl<$Res, $Val extends RabbitPhoto>
 
     return $UserRefCopyWith<$Res>(_value.author!, (value) {
       return _then(_value.copyWith(author: value) as $Val);
+    });
+  }
+
+  /// Create a copy of RabbitPhoto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RabbitRefCopyWith<$Res>? get rabbit {
+    if (_value.rabbit == null) {
+      return null;
+    }
+
+    return $RabbitRefCopyWith<$Res>(_value.rabbit!, (value) {
+      return _then(_value.copyWith(rabbit: value) as $Val);
     });
   }
 }
@@ -150,10 +183,14 @@ abstract class _$$RabbitPhotoImplCopyWith<$Res>
     @NullableDateTimeConverter()
     DateTime? createdAt,
     UserRef? author,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+    RabbitRef? rabbit,
   });
 
   @override
   $UserRefCopyWith<$Res>? get author;
+  @override
+  $RabbitRefCopyWith<$Res>? get rabbit;
 }
 
 /// @nodoc
@@ -176,6 +213,8 @@ class __$$RabbitPhotoImplCopyWithImpl<$Res>
     Object? takenAt = freezed,
     Object? createdAt = freezed,
     Object? author = freezed,
+    Object? rabbitId = freezed,
+    Object? rabbit = freezed,
   }) {
     return _then(
       _$RabbitPhotoImpl(
@@ -203,6 +242,14 @@ class __$$RabbitPhotoImplCopyWithImpl<$Res>
             ? _value.author
             : author // ignore: cast_nullable_to_non_nullable
                   as UserRef?,
+        rabbitId: freezed == rabbitId
+            ? _value.rabbitId
+            : rabbitId // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        rabbit: freezed == rabbit
+            ? _value.rabbit
+            : rabbit // ignore: cast_nullable_to_non_nullable
+                  as RabbitRef?,
       ),
     );
   }
@@ -218,6 +265,8 @@ class _$RabbitPhotoImpl implements _RabbitPhoto {
     @JsonKey(name: 'taken_at') @NullableDateTimeConverter() this.takenAt,
     @JsonKey(name: 'created_at') @NullableDateTimeConverter() this.createdAt,
     this.author,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() this.rabbitId,
+    this.rabbit,
   });
 
   factory _$RabbitPhotoImpl.fromJson(Map<String, dynamic> json) =>
@@ -240,10 +289,18 @@ class _$RabbitPhotoImpl implements _RabbitPhoto {
   final DateTime? createdAt;
   @override
   final UserRef? author;
+  // Приходит только в общей по ферме ленте (/photos) — в галерее одного
+  // кролика (/rabbits/:id/photos) он и так известен снаружи.
+  @override
+  @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
+  final int? rabbitId;
+  @override
+  final RabbitRef? rabbit;
 
   @override
   String toString() {
-    return 'RabbitPhoto(id: $id, url: $url, caption: $caption, takenAt: $takenAt, createdAt: $createdAt, author: $author)';
+    return 'RabbitPhoto(id: $id, url: $url, caption: $caption, takenAt: $takenAt, createdAt: $createdAt, author: $author, rabbitId: $rabbitId, rabbit: $rabbit)';
   }
 
   @override
@@ -257,13 +314,25 @@ class _$RabbitPhotoImpl implements _RabbitPhoto {
             (identical(other.takenAt, takenAt) || other.takenAt == takenAt) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.author, author) || other.author == author));
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.rabbitId, rabbitId) ||
+                other.rabbitId == rabbitId) &&
+            (identical(other.rabbit, rabbit) || other.rabbit == rabbit));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, url, caption, takenAt, createdAt, author);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    url,
+    caption,
+    takenAt,
+    createdAt,
+    author,
+    rabbitId,
+    rabbit,
+  );
 
   /// Create a copy of RabbitPhoto
   /// with the given fields replaced by the non-null parameter values.
@@ -291,6 +360,8 @@ abstract class _RabbitPhoto implements RabbitPhoto {
     @NullableDateTimeConverter()
     final DateTime? createdAt,
     final UserRef? author,
+    @JsonKey(name: 'rabbit_id') @NullableIntConverter() final int? rabbitId,
+    final RabbitRef? rabbit,
   }) = _$RabbitPhotoImpl;
 
   factory _RabbitPhoto.fromJson(Map<String, dynamic> json) =
@@ -312,7 +383,14 @@ abstract class _RabbitPhoto implements RabbitPhoto {
   @NullableDateTimeConverter()
   DateTime? get createdAt;
   @override
-  UserRef? get author;
+  UserRef? get author; // Приходит только в общей по ферме ленте (/photos) — в галерее одного
+  // кролика (/rabbits/:id/photos) он и так известен снаружи.
+  @override
+  @JsonKey(name: 'rabbit_id')
+  @NullableIntConverter()
+  int? get rabbitId;
+  @override
+  RabbitRef? get rabbit;
 
   /// Create a copy of RabbitPhoto
   /// with the given fields replaced by the non-null parameter values.

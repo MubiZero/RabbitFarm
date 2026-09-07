@@ -16,6 +16,10 @@ _$RabbitPhotoImpl _$$RabbitPhotoImplFromJson(Map<String, dynamic> json) =>
       author: json['author'] == null
           ? null
           : UserRef.fromJson(json['author'] as Map<String, dynamic>),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      rabbit: json['rabbit'] == null
+          ? null
+          : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$RabbitPhotoImplToJson(
@@ -27,4 +31,6 @@ Map<String, dynamic> _$$RabbitPhotoImplToJson(
   'taken_at': const NullableDateTimeConverter().toJson(instance.takenAt),
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'author': instance.author,
+  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+  'rabbit': instance.rabbit,
 };

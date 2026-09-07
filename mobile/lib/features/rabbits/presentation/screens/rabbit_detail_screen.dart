@@ -295,7 +295,10 @@ class RabbitDetailScreen extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PhotoGalleryScreen(rabbit: rabbit),
+                            builder: (context) => PhotoGalleryScreen(
+                              rabbitId: rabbit.id,
+                              rabbitLabel: rabbit.label,
+                            ),
                           ),
                         );
                       },

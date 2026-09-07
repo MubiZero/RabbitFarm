@@ -21,6 +21,7 @@ JournalEntry _entry({
   String? rabbitName,
   String? cageNumber,
   String? author,
+  String? imageUrl,
 }) =>
     JournalEntry(
       kind: kind,
@@ -30,6 +31,7 @@ JournalEntry _entry({
       rabbitName: rabbitName,
       cageNumber: cageNumber,
       author: author,
+      imageUrl: imageUrl,
       formArgs: Object(),
     );
 
@@ -112,6 +114,25 @@ void main() {
     expect(find.text('Заказать сено на следующую неделю'), findsOneWidget);
     // Без кролика и клетки строка вида не приписывает лишней цели.
     expect(find.text('Заметка'), findsOneWidget);
+  });
+
+  testWidgets('фото без подписи подписывается видом записи, а не кормом',
+      (tester) async {
+    await _pumpJournal(
+      tester,
+      _feed([
+        _entry(
+          kind: JournalKind.photo,
+          at: DateTime(_today.year, _today.month, _today.day, 10),
+          rabbitName: 'Зорька',
+        ),
+      ]),
+    );
+
+    // Общий фолбэк для записи без заголовка — вид записи, а не текст,
+    // придуманный для кормления без корма.
+    expect(find.text('Фото'), findsWidgets);
+    expect(find.text('Корм не указан'), findsNothing);
   });
 
   testWidgets('пустой журнал зовёт сделать первую запись', (tester) async {

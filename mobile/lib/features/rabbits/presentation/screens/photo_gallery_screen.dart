@@ -13,25 +13,33 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_photo_model.dart';
 import '../providers/gallery_provider.dart';
 
 /// Галерея снимков кролика — в отличие от одной фотографии на карточке,
 /// снимков здесь может быть сколько угодно.
+///
+/// Принимает id и подпись отдельно, а не целую модель кролика: открыть эту
+/// галерею можно и из записи Дневника, где полной модели нет — только
+/// урезанная ссылка на кролика (id и то, чем его называют).
 class PhotoGalleryScreen extends ConsumerWidget {
-  final RabbitModel rabbit;
+  final int rabbitId;
+  final String rabbitLabel;
 
-  const PhotoGalleryScreen({super.key, required this.rabbit});
+  const PhotoGalleryScreen({
+    super.key,
+    required this.rabbitId,
+    required this.rabbitLabel,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photosAsync = ref.watch(galleryProvider(rabbit.id));
+    final photosAsync = ref.watch(galleryProvider(rabbitId));
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     Future<void> refresh() async {
-      ref.invalidate(galleryProvider(rabbit.id));
-      await ref.read(galleryProvider(rabbit.id).future);
+      ref.invalidate(galleryProvider(rabbitId));
+      await ref.read(galleryProvider(rabbitId).future);
     }
 
     return Scaffold(
@@ -47,7 +55,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                rabbit.label,
+                rabbitLabel,
                 style: AppTypography.bodyMd
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),
@@ -234,7 +242,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
     if (kIsWeb) bytes = await image.readAsBytes();
 
     await ref.read(galleryNotifierProvider.notifier).upload(
-          rabbit.id,
+          rabbitId,
           image.path,
           bytes: bytes,
           caption: caption,
@@ -314,7 +322,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final deleted = l10n.galleryDeleted;
 
-    await ref.read(galleryNotifierProvider.notifier).delete(rabbit.id, photo.id);
+    await ref.read(galleryNotifierProvider.notifier).delete(rabbitId, photo.id);
 
     final state = ref.read(galleryNotifierProvider);
     if (state.hasError) {

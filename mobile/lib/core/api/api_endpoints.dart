@@ -85,6 +85,9 @@ class ApiEndpoints {
   // Device tokens (push-уведомления)
   static const String deviceTokens = '/device-tokens';
 
+  // Photos endpoints (farm-wide feed for the Journal)
+  static const String photos = '/photos';
+
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';
   static const String reportFarm = '/reports/farm';

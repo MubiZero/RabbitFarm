@@ -52,6 +52,8 @@ import '../../features/notes/presentation/screens/note_form_screen.dart';
 import '../../features/notes/data/models/note_model.dart';
 import '../../features/notes/presentation/providers/notes_provider.dart';
 import '../widgets/app_async_view.dart';
+import '../../features/rabbits/presentation/screens/photo_gallery_screen.dart';
+import '../../features/rabbits/data/models/rabbit_photo_model.dart';
 import '../../features/home/presentation/screens/main_navigation_screen.dart';
 import '../../features/home/presentation/screens/today_screen.dart';
 import '../../features/home/presentation/screens/farm_screen.dart';
@@ -609,6 +611,22 @@ final routerProvider = Provider<GoRouter>((ref) {
               onRetry: () => ref.invalidate(noteByIdProvider(id)),
               builder: (note) => NoteFormScreen(note: note),
             ),
+          );
+        },
+      ),
+
+      // Photo journal entry route (outside shell) — открывает галерею
+      // кролика, которому принадлежит снимок: у самой записи Дневника нет
+      // формы правки, редактировать там нечего.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/rabbits/gallery',
+        name: 'rabbit-gallery-from-journal',
+        builder: (context, state) {
+          final photo = state.extra as RabbitPhoto;
+          return PhotoGalleryScreen(
+            rabbitId: photo.rabbitId!,
+            rabbitLabel: photo.rabbit?.label ?? '',
           );
         },
       ),
