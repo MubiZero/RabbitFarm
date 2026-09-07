@@ -1,4 +1,5 @@
 jest.mock('../../../src/services/rabbitService');
+jest.mock('../../../src/utils/fileStorage');
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(),
   error: jest.fn(),
@@ -6,6 +7,7 @@ jest.mock('../../../src/utils/logger', () => ({
 }));
 
 const rabbitService = require('../../../src/services/rabbitService');
+const fileStorage = require('../../../src/utils/fileStorage');
 const rabbitController = require('../../../src/controllers/rabbitController');
 
 const mockReq = (overrides = {}) => ({
@@ -54,14 +56,16 @@ describe('RabbitController', () => {
     it('should attach photo_url when file is uploaded', async () => {
       const rabbit = { id: 1, name: 'Bunny', photo_url: '/uploads/rabbits/photo.jpg' };
       rabbitService.createRabbit.mockResolvedValue(rabbit);
+      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/photo.jpg');
       const req = mockReq({
         body: { name: 'Bunny' },
-        file: { filename: 'photo.jpg' }
+        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 }
       });
       const res = mockRes();
 
       await rabbitController.create(req, res, mockNext);
 
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith('rabbits', req.file);
       expect(rabbitService.createRabbit).toHaveBeenCalledWith(
         expect.objectContaining({ photo_url: '/uploads/rabbits/photo.jpg' })
       );
@@ -224,10 +228,11 @@ describe('RabbitController', () => {
     it('should attach photo_url when file is uploaded', async () => {
       const rabbit = { id: 1, photo_url: '/uploads/rabbits/new.jpg' };
       rabbitService.updateRabbit.mockResolvedValue(rabbit);
+      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/new.jpg');
       const req = mockReq({
         params: { id: '1' },
         body: { name: 'Updated' },
-        file: { filename: 'new.jpg' }
+        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 }
       });
       const res = mockRes();
 
@@ -623,14 +628,21 @@ describe('RabbitController', () => {
   // ─── uploadPhoto ───────────────────────────────────────────────────
 
   describe('uploadPhoto', () => {
+    const uploadedFile = { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 };
+
+    beforeEach(() => {
+      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/img.jpg');
+    });
+
     it('should upload photo and return 200', async () => {
       const rabbit = { id: 1, photo_url: '/uploads/rabbits/img.jpg' };
       rabbitService.updateRabbit.mockResolvedValue(rabbit);
-      const req = mockReq({ params: { id: '1' }, file: { filename: 'img.jpg' } });
+      const req = mockReq({ params: { id: '1' }, file: uploadedFile });
       const res = mockRes();
 
       await rabbitController.uploadPhoto(req, res, mockNext);
 
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith('rabbits', uploadedFile);
       expect(rabbitService.updateRabbit).toHaveBeenCalledWith('1', 1, {
         photo_url: '/uploads/rabbits/img.jpg'
       });
@@ -660,7 +672,7 @@ describe('RabbitController', () => {
 
     it('should return 404 when RABBIT_NOT_FOUND', async () => {
       rabbitService.updateRabbit.mockRejectedValue(new Error('RABBIT_NOT_FOUND'));
-      const req = mockReq({ params: { id: '99' }, file: { filename: 'img.jpg' } });
+      const req = mockReq({ params: { id: '99' }, file: uploadedFile });
       const res = mockRes();
 
       await rabbitController.uploadPhoto(req, res, mockNext);
@@ -672,7 +684,7 @@ describe('RabbitController', () => {
     it('should call next for unexpected errors', async () => {
       const err = new Error('DB error');
       rabbitService.updateRabbit.mockRejectedValue(err);
-      const req = mockReq({ params: { id: '1' }, file: { filename: 'img.jpg' } });
+      const req = mockReq({ params: { id: '1' }, file: uploadedFile });
       const res = mockRes();
 
       await rabbitController.uploadPhoto(req, res, mockNext);

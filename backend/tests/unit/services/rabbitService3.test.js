@@ -31,7 +31,7 @@ jest.mock('../../../src/models', () => {
   };
 });
 
-jest.mock('../../../src/utils/fileHelper', () => ({ deleteFile: jest.fn() }));
+jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
 }));
@@ -40,7 +40,7 @@ const {
   Rabbit, Breed, Cage, RabbitWeight, Breeding, Birth, Vaccination,
   MedicalRecord, Transaction, sequelize
 } = require('../../../src/models');
-const { deleteFile } = require('../../../src/utils/fileHelper');
+const { deleteFile } = require('../../../src/utils/fileStorage');
 const rabbitService = require('../../../src/services/rabbitService');
 
 describe('RabbitService - uncovered lines', () => {

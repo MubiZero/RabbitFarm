@@ -1,53 +1,9 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { EXTENSION_BY_MIME } = require('../utils/fileStorage');
 
-// Ensure upload directories exist
-const uploadDirs = {
-  rabbits: path.join(__dirname, '../../uploads/rabbits'),
-  receipts: path.join(__dirname, '../../uploads/receipts'),
-  temp: path.join(__dirname, '../../uploads/temp')
-};
-
-Object.values(uploadDirs).forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
-
-// Расширение файла определяется сервером по типу содержимого: значение,
-// присланное клиентом, доверия не заслуживает.
-const EXTENSION_BY_MIME = {
-  'image/jpeg': '.jpg',
-  'image/jpg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'application/pdf': '.pdf'
-};
-
-// Storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Check if this is a rabbit photo upload from the route
-    if (req.originalUrl && req.originalUrl.includes('/rabbits/') && req.originalUrl.includes('/photo')) {
-      cb(null, uploadDirs.rabbits);
-    } else {
-      // hasOwn обязателен: req.body.type — строка от клиента, и обычный доступ
-      // по ключу для '__proto__' возвращает объект из прототипа, а не каталог.
-      const type = req.body.type;
-      const dest = Object.hasOwn(uploadDirs, type) ? uploadDirs[type] : uploadDirs.temp;
-      cb(null, dest);
-    }
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    // Расширение берём из типа, который прошёл фильтр, а не из имени файла.
-    // Каталог uploads отдаётся статикой, поэтому имя вроде photo.svg или
-    // photo.html означало бы активное содержимое с адреса нашего API.
-    const ext = Object.hasOwn(EXTENSION_BY_MIME, file.mimetype) ? EXTENSION_BY_MIME[file.mimetype] : '.bin';
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
+// Файл держим в памяти, а не на диске: следующий шаг — загрузка в MinIO,
+// а не в локальную файловую систему контейнера.
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {

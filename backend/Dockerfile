@@ -23,9 +23,10 @@ ENV NODE_ENV=production \
 COPY --from=deps /app/node_modules ./node_modules
 COPY --chown=node:node . .
 
-# Каталоги загрузок и логов должны быть записываемыми не-root пользователем.
-RUN mkdir -p uploads/rabbits uploads/receipts logs \
-    && chown -R node:node uploads logs
+# Каталог логов должен быть записываемым не-root пользователем. Загрузки
+# больше не лежат на диске контейнера — они уходят в MinIO (см. src/utils/fileStorage.js).
+RUN mkdir -p logs \
+    && chown -R node:node logs
 
 # Процесс работает от непривилегированного пользователя: выход из контейнера
 # через уязвимость в приложении не даёт root на хосте.

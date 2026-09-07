@@ -1,5 +1,6 @@
 const rabbitService = require('../services/rabbitService');
 const ApiResponse = require('../utils/apiResponse');
+const fileStorage = require('../utils/fileStorage');
 
 /**
  * Rabbit controller
@@ -14,7 +15,7 @@ class RabbitController {
     try {
       // If photo uploaded, add to request body
       if (req.file) {
-        req.body.photo_url = `/uploads/rabbits/${req.file.filename}`;
+        req.body.photo_url = await fileStorage.uploadFile('rabbits', req.file);
       }
 
       // Ферму берём из токена, а не из тела: иначе клиент мог бы записать
@@ -102,7 +103,7 @@ class RabbitController {
     try {
       // If photo uploaded, add to request body
       if (req.file) {
-        req.body.photo_url = `/uploads/rabbits/${req.file.filename}`;
+        req.body.photo_url = await fileStorage.uploadFile('rabbits', req.file);
       }
 
       const rabbit = await rabbitService.updateRabbit(req.params.id, req.farmId, req.body);
@@ -248,7 +249,7 @@ class RabbitController {
         return ApiResponse.badRequest(res, 'Файл не загружен');
       }
 
-      const photoUrl = `/uploads/rabbits/${req.file.filename}`;
+      const photoUrl = await fileStorage.uploadFile('rabbits', req.file);
 
       // Update rabbit with new photo
       const rabbit = await rabbitService.updateRabbit(req.params.id, req.farmId, {

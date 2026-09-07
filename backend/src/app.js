@@ -3,12 +3,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
-const path = require('path');
 
 const logger = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
+const filesRoutes = require('./routes/files.routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
@@ -87,8 +87,8 @@ if (process.env.NODE_ENV === 'development') {
   }));
 }
 
-// Static files (uploads)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Загруженные файлы — из MinIO, не с локального диска (см. files.routes.js).
+app.use('/uploads', filesRoutes);
 
 // Rate limiting (disabled in test environment)
 if (process.env.NODE_ENV !== 'test') {

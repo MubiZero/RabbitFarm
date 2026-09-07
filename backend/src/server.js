@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== 'test') {
 const app = require('./app');
 const logger = require('./utils/logger');
 const { sequelize } = require('./models');
+const { ensureBucket } = require('./config/minio');
 const { startTokenCleanupJob } = require('./jobs/tokenCleanup');
 const { startNotificationDigestJob } = require('./jobs/notificationDigestJob');
 
@@ -36,6 +37,18 @@ async function startServer() {
     if (!dbConnected) {
       logger.error('Failed to connect to database. Exiting...');
       process.exit(1);
+    }
+
+    // Бакет для загрузок. В отличие от БД не роняем старт: сам сервис не
+    // зависит от MinIO целиком, недоступен окажется только аплоад фото —
+    // это должно упасть понятной ошибкой на конкретном запросе, а не
+    // положить весь сервер.
+    try {
+      await ensureBucket();
+    } catch (error) {
+      logger.error('MinIO недоступен при старте — загрузка файлов не будет работать', {
+        error: error.message
+      });
     }
 
     // Start background jobs

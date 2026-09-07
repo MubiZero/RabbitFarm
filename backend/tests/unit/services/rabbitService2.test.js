@@ -28,7 +28,7 @@ jest.mock('../../../src/models', () => {
   };
 });
 
-jest.mock('../../../src/utils/fileHelper', () => ({ deleteFile: jest.fn() }));
+jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
 }));

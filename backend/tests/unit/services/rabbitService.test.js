@@ -17,7 +17,7 @@ jest.mock('../../../src/models', () => {
     sequelize: mockSequelize
   };
 });
-jest.mock('../../../src/utils/fileHelper', () => ({ deleteFile: jest.fn() }));
+jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
 
 const { Rabbit, Breed, Cage, sequelize } = require('../../../src/models');
 const rabbitService = require('../../../src/services/rabbitService');

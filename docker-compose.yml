@@ -20,6 +20,28 @@ services:
       timeout: 20s
       retries: 10
 
+  # Хранилище загруженных файлов (фото кроликов). Здоровье проверяем через
+  # встроенный `mc ready local` — образ minio его несёт сам, curl внутри нет.
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    container_name: rabbitfarm-minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?задайте MINIO_ROOT_USER в .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?задайте MINIO_ROOT_PASSWORD в .env}
+    command: server /data --console-address ":9001"
+    ports:
+      # 9000 — сам API, наружу не публикуем: к нему ходит только api по
+      # внутренней сети compose. 9001 — веб-консоль, только на localhost.
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: ./backend
@@ -51,6 +73,15 @@ services:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
       - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL:-}
       - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY:-}
+      # Хранилище файлов — тот же minio, что и выше, по внутренней сети
+      # compose. Учётка — root-пользователь бакета, для одного стенда
+      # отдельный IAM-пользователь под API избыточен.
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_USE_SSL=false
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:?задайте MINIO_ROOT_USER в .env}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:?задайте MINIO_ROOT_PASSWORD в .env}
+      - MINIO_BUCKET=${MINIO_BUCKET:-rabbitfarm-uploads}
       # Демо-данные для разработки: три учётные записи с общеизвестными
       # паролями, породы, клетки и корма. В продакшене сидер откажется работать.
       # - RUN_SEEDS=true
@@ -59,8 +90,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     volumes:
-      - ./backend/uploads:/app/uploads
       - ./backend/logs:/app/logs
 
   # Админка базы. Профиль debug: поднимается только явным
@@ -76,3 +108,4 @@ services:
 
 volumes:
   mysql_data:
+  minio_data:

@@ -12,7 +12,7 @@ const {
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
-const { deleteFile } = require('../utils/fileHelper');
+const { deleteFile } = require('../utils/fileStorage');
 
 /**
  * Rabbit service
@@ -349,10 +349,13 @@ class RabbitService {
       }
 
       // Update rabbit
-      // File Cleanup: if photo is changing, delete old file
-      if (updateData.photo_url && rabbit.photo_url && updateData.photo_url !== rabbit.photo_url) {
-        deleteFile(rabbit.photo_url);
-      }
+      // File Cleanup: if photo is changing, delete old file — после коммита
+      // (см. ниже): MinIO — сетевой вызов, и держать ради него открытой
+      // транзакцию с захваченными блокировками строк смысла нет.
+      const oldPhotoUrl =
+        updateData.photo_url && rabbit.photo_url && updateData.photo_url !== rabbit.photo_url
+          ? rabbit.photo_url
+          : null;
 
       // Прежний вес нужно запомнить до update: после него экземпляр уже
       // хранит новое значение, сравнение всегда давало «не изменился», и
@@ -374,6 +377,10 @@ class RabbitService {
       }
 
       await transaction.commit();
+
+      if (oldPhotoUrl) {
+        await deleteFile(oldPhotoUrl);
+      }
 
       // Fetch updated rabbit with associations
       const updatedRabbit = await this.getRabbitById(rabbit.id, farmId);
@@ -426,7 +433,7 @@ class RabbitService {
 
       // File Cleanup
       if (rabbit.photo_url) {
-        deleteFile(rabbit.photo_url);
+        await deleteFile(rabbit.photo_url);
       }
 
       await rabbit.destroy();

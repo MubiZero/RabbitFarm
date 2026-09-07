@@ -27,6 +27,22 @@ services:
       retries: 12
       start_period: 60s
 
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=${SERVICE_USER_MINIO}
+      - MINIO_ROOT_PASSWORD=${SERVICE_PASSWORD_MINIO}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
   api:
     build:
       context: ./backend
@@ -55,8 +71,9 @@ services:
       - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
       - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
       - LOG_LEVEL=${LOG_LEVEL:-info}
-      # Публичная регистрация закрыта: ферму поднимает первый
-      # зарегистрировавшийся, дальше учётки выдаёт владелец.
+      # Каждая регистрация заводит новую ферму — сервис многоарендный.
+      # false закрывает публичную регистрацию совсем; сотрудников заводит
+      # не регистрация, а приглашение по коду (см. README → Accounts).
       - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-false}
       # Справочники наливаются только по явному указанию.
       # Демо-данные для разработки, не справочники: сидер заводит учётные
@@ -67,12 +84,17 @@ services:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
       - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL:-}
       - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY:-}
-    volumes:
-      # Фотографии кроликов и чеки лежат на диске: без тома они исчезнут
-      # при первом же передеплое.
-      - api-uploads:/app/uploads
+      # Хранилище фото — тот же minio, что и выше, по внутренней сети.
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_USE_SSL=false
+      - MINIO_ACCESS_KEY=${SERVICE_USER_MINIO}
+      - MINIO_SECRET_KEY=${SERVICE_PASSWORD_MINIO}
+      - MINIO_BUCKET=${MINIO_BUCKET:-rabbitfarm-uploads}
     depends_on:
       db:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   web:
@@ -92,4 +114,4 @@ services:
 
 volumes:
   db-data:
-  api-uploads:
+  minio-data:
