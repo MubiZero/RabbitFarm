@@ -41,6 +41,16 @@ services:
       # Список источников для браузера через запятую. Мобильные клиенты
       # ходят без Origin и под ограничение не попадают.
       - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:8080,http://localhost:3000}
+      # Без явной передачи переменная в контейнере отсутствует, а не «false»:
+      # проверка `=== 'false'` не срабатывает, и регистрация оказывается
+      # открытой по умолчанию. Значение по умолчанию здесь — то же самое
+      # «закрыто», что и в backend/.env.example.
+      - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-false}
+      # Push-уведомления (FCM) — опционально, см. backend/.env.example.
+      # Без этих трёх переменных notificationService молча ничего не шлёт.
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL:-}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY:-}
       # Демо-данные для разработки: три учётные записи с общеизвестными
       # паролями, породы, клетки и корма. В продакшене сидер откажется работать.
       # - RUN_SEEDS=true
