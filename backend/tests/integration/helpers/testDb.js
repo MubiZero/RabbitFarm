@@ -5,7 +5,10 @@ const { sequelize } = require('../../../src/models');
 
 const BACKEND_ROOT = path.resolve(__dirname, '../../..');
 const MIGRATIONS_DIR = path.join(BACKEND_ROOT, 'migrations');
-const SEQUELIZE_CLI = path.join(BACKEND_ROOT, 'node_modules', '.bin', 'sequelize-cli');
+// Запускаем сам JS-файл через node, а не .bin/sequelize-cli: это shell-скрипт
+// с шебангом, и Windows не умеет исполнять его напрямую через execFileSync
+// (падает с ENOENT, хотя файл на месте) — на Linux-раннере CI это не всплывало.
+const SEQUELIZE_CLI = require.resolve('sequelize-cli/lib/sequelize');
 
 /**
  * Тестовая база строится теми же миграциями, что и продакшен.
@@ -79,7 +82,7 @@ const truncateAllTables = async () => {
 };
 
 const runMigrations = () => {
-  execFileSync(SEQUELIZE_CLI, ['db:migrate', '--env', 'test'], {
+  execFileSync(process.execPath, [SEQUELIZE_CLI, 'db:migrate', '--env', 'test'], {
     cwd: BACKEND_ROOT,
     env: process.env,
     stdio: 'pipe'
