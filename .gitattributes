@@ -1,0 +1,5 @@
+# Shell-скрипты запускаются внутри Alpine-контейнера (busybox ash), который
+# не переваривает CRLF в шебанге — "No such file or directory" при exec.
+# Без этого правила Windows-чекаут с core.autocrlf=true портит перенос строк
+# и ломает сборку образа.
+*.sh text eol=lf
