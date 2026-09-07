@@ -62,6 +62,11 @@ services:
       # Демо-данные для разработки, не справочники: сидер заводит учётные
       # записи с общеизвестными паролями и при NODE_ENV=production падает.
       - RUN_SEEDS=${RUN_SEEDS:-false}
+      # Push-уведомления (FCM) — опционально: без этих трёх значений сервис
+      # просто ничего не отправляет, вместо падения при старте.
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL:-}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY:-}
     volumes:
       # Фотографии кроликов и чеки лежат на диске: без тома они исчезнут
       # при первом же передеплое.

@@ -322,7 +322,7 @@ backend/
 │   │   ├── rateLimiter.js          # Rate limiting
 │   │   └── upload.js               # File upload handler
 │   │
-│   ├── models/                     # ✅ 20 моделей Sequelize
+│   ├── models/                     # ✅ 21 модель Sequelize
 │   │   ├── index.js                # Sequelize init, ассоциации, tenancy.attach()
 │   │   ├── Farm.js                 # Хозяйство: название, владелец
 │   │   ├── User.js                 # Пользователи
@@ -341,11 +341,12 @@ backend/
 │   │   ├── Task.js                 # Задачи
 │   │   ├── Photo.js                # Фото кроликов
 │   │   ├── Note.js                 # Заметки: по кролику, клетке или ферме в целом
+│   │   ├── DeviceToken.js          # FCM-токены устройств для push-уведомлений
 │   │   ├── RefreshToken.js         # Refresh-токены
 │   │   ├── TokenBlacklist.js       # Отозванные access-токены
 │   │   └── PasswordResetToken.js   # Сброс паролей
 │   │
-│   ├── controllers/                # ✅ 15 контроллеров
+│   ├── controllers/                # ✅ 16 контроллеров
 │   │   ├── authController.js       # Аутентификация, JWT, регистрация фермы
 │   │   ├── rabbitController.js     # CRUD кроликов, статистика
 │   │   ├── breedController.js      # CRUD пород
@@ -360,12 +361,15 @@ backend/
 │   │   ├── taskController.js       # Задачи, планирование
 │   │   ├── reportController.js     # Dashboard, отчеты
 │   │   ├── staffController.js      # Работники, приглашения, передача хозяйства
-│   │   └── noteController.js       # Заметки по кролику, клетке или ферме
+│   │   ├── noteController.js       # Заметки по кролику, клетке или ферме
+│   │   └── deviceTokenController.js # Регистрация устройств для push-уведомлений
 │   │
 │   ├── services/                   # Бизнес-логика — не у каждого контроллера свой сервис
 │   │   ├── authService.js          # Регистрация, вход, токены
 │   │   ├── staffService.js         # Работники, приглашения, передача хозяйства
 │   │   ├── noteService.js          # Заметки
+│   │   ├── notificationService.js  # Push-уведомления (FCM), опционально — молчит без Firebase
+│   │   ├── deviceTokenService.js   # Регистрация FCM-токенов устройств
 │   │   ├── rabbitService.js
 │   │   ├── breedService.js
 │   │   ├── breedingService.js
@@ -375,7 +379,11 @@ backend/
 │   │   ├── transactionService.js
 │   │   └── autoExpenseService.js   # Автоматические расходы на лечение
 │   │
-│   ├── routes/                     # ✅ 15 роутов + index.js
+│   ├── jobs/                       # Фоновые задачи (setInterval / node-cron)
+│   │   ├── tokenCleanup.js         # Чистка просроченных токенов, раз в час
+│   │   └── notificationDigestJob.js # Дайджест просрочек по фермам, раз в сутки в 08:00
+│   │
+│   ├── routes/                     # ✅ 16 роутов + index.js
 │   │   ├── index.js                # Главный роутер, монтирует все модули
 │   │   ├── auth.routes.js          # /auth - login, register, refresh
 │   │   ├── rabbit.routes.js        # /rabbits - CRUD + статистика
@@ -391,9 +399,10 @@ backend/
 │   │   ├── task.routes.js          # /tasks - задачи
 │   │   ├── report.routes.js        # /reports - dashboard, отчеты
 │   │   ├── staff.routes.js         # /staff - работники, приглашения, передача хозяйства
-│   │   └── note.routes.js          # /notes - заметки
+│   │   ├── note.routes.js          # /notes - заметки
+│   │   └── device-token.routes.js  # /device-tokens - регистрация устройств для push
 │   │
-│   ├── validators/                 # ✅ 14 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
+│   ├── validators/                 # ✅ 15 валидаторов Joi + listQuery.js, messages.js (общие хелперы)
 │   │   ├── authValidator.js        # Валидация login, register (включая farm_name)
 │   │   ├── rabbitValidator.js      # Валидация кроликов
 │   │   ├── breedValidator.js       # Валидация пород
@@ -407,7 +416,8 @@ backend/
 │   │   ├── transactionValidator.js # Валидация транзакций
 │   │   ├── taskValidator.js        # Валидация задач
 │   │   ├── staffValidator.js       # Валидация приглашений и работников
-│   │   └── noteValidator.js        # Валидация заметок
+│   │   ├── noteValidator.js        # Валидация заметок
+│   │   └── deviceTokenValidator.js # Валидация регистрации устройств
 │   │
 │   └── utils/
 │       ├── jwt.js                  # JWT helpers
@@ -607,6 +617,45 @@ farms ──< users
 них можно дойти только через уже проверенный `find`, которым инстанс был
 получен.
 
+## 🔔 Push-уведомления (FCM)
+
+Push — опциональная интеграция, а не обязательная часть стенда. Без
+`FIREBASE_PROJECT_ID`/`FIREBASE_CLIENT_EMAIL`/`FIREBASE_PRIVATE_KEY` в `.env`
+`notificationService` тихо ничего не отправляет и логирует предупреждение —
+сервис не должен отказываться стартовать только потому, что Firebase-проект
+ещё не заведён. Мобильный клиент устроен так же: без `google-services.json`
+`Firebase.initializeApp()` перехватывается try/catch в `main.dart`, и
+приложение продолжает работать без push.
+
+**Устройство ⇄ пользователь.** Таблица `device_tokens` хранит FCM-токен,
+привязанный к `user_id` и `farm_id` — не сам факт «пуш пришёл», а то, кому
+его слать. Уникальность по токену, а не по паре (user, token): устройство
+может сменить владельца (логаут одного работника, логин другого на том же
+телефоне), и `upsert` переписывает `user_id`, а не плодит вторую строку.
+Модель заведена в `TENANT_MODELS` — как и у любой таблицы фермы, выборка без
+`farm_id` в `where` не выполнится.
+
+**Дайджест, а не пуш на каждую просрочку.** Просроченные вакцинации, задачи
+без исполнителя и низкий остаток корма собираются раз в сутки, в 08:00
+(`node-cron`, `src/jobs/notificationDigestJob.js`) — один пуш на категорию на
+ферму, а не пять, если просрочек пять. Исключение — задача с назначенным
+исполнителем: тому шлётся точечный пуш по этой конкретной задаче, а не в
+общий счёт владельцу. Событийные уведомления (новая заметка, назначение
+задачи) остаются мгновенными и идут прямо из `noteService`/`taskService`
+после успешного `create`, в отдельной цепочке промисов — сбой отправки
+пуша логируется, но никогда не откатывает и не задерживает ответ на запись.
+
+**Тап по уведомлению** ведёт на список (`/vaccinations`, `/feeds`, `/tasks`,
+`/today` для заметок), не на конкретную карточку: у vaccination/feed/note
+нет маршрута по id в мобильном роутере — это ограничение существовало и до
+push, чинить его отдельная задача.
+
+**Android — основная платформа, iOS — код готов, доставка не настроена.**
+`firebase_messaging` написан платформенно-независимо, но включение iOS
+требует APNs-ключ и Apple Developer аккаунт — отдельный шаг, не блокирующий
+Android. Web push не поддерживается вовсе (нужны VAPID-ключ и service
+worker) — код опущен под `kIsWeb`.
+
 ## 🔐 Security Architecture
 
 ### Authentication
@@ -767,7 +816,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ## 🎯 Реализованные модули и возможности
 
-### Модули (15/15)
+### Модули (16/16)
 
 | # | Модуль | Backend | Mobile | Возможности |
 |---|--------|---------|--------|-------------|
@@ -786,14 +835,15 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 | 13 | **Tasks** | ✅ | ✅ | Планирование, Приоритеты, Overdue tracking |
 | 14 | **Reports** | ✅ | ✅ | Dashboard, Farm/Health/Financial отчеты |
 | 15 | **Notes** | ✅ | ✅ | Заметка по кролику, клетке или ферме в целом — пятый тип записи в Дневнике |
+| 16 | **Push-уведомления** | ✅ | ✅ | FCM: просроченные вакцинации/задачи/корм (дайджест раз в сутки), назначение задачи и новая заметка — мгновенно |
 
-### Backend API - 113 эндпоинтов
+### Backend API - 115 эндпоинтов
 
 **Статистика:**
-- 15 контроллеров
-- 20 моделей БД
-- 15 роутов + index.js
-- 14 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
+- 16 контроллеров
+- 21 модель БД
+- 16 роутов + index.js
+- 15 валидаторов Joi (+ listQuery.js, messages.js — общие хелперы)
 - JWT аутентификация
 - Многоарендность: изоляция по ферме на find/count/aggregate/create/destroy/update (см. раздел «Многоарендность»)
 
@@ -806,29 +856,32 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - ✅ Фильтрация по множественным параметрам
 - ✅ Пагинация всех списков
 - ✅ Статистика по всем модулям
+- ✅ Push-уведомления (FCM): дайджест просрочек раз в сутки + мгновенные события
 
-### Mobile App - 35+ экранов
+### Mobile App - 49 экранов
 
-**Статистика:**
-- 70+ Freezed моделей
-- 20+ Riverpod провайдеров
-- 15 репозиториев
-- 35+ UI экранов
-- 25+ маршрутов
+**Статистика (пересчитано 2026-09-07):**
+- 90 @freezed классов (20 файлов моделей)
+- 110 Riverpod провайдеров (все написаны вручную — riverpod_generator в проекте не используется, несмотря на зависимость в pubspec.yaml)
+- 18 репозиториев
+- 49 экранов (`presentation/screens/*.dart`)
+- 52 маршрута (`GoRoute` в `app_router.dart`)
 
-**Реализованные экраны:**
-1. Login, Register
-2. RabbitsList, RabbitDetail, RabbitForm, Pedigree
-3. BreedsList, BreedForm
-4. CagesList, CageDetail, CageForm
-5. BreedingPlanner, BirthsList, BirthForm
-6. VaccinationsList, VaccinationForm
-7. MedicalRecordsList, MedicalRecordForm
-8. FeedsList, FeedForm
-9. FeedingRecordsList, FeedingRecordForm
-10. TransactionsList, TransactionForm
-11. TasksList, TaskForm
-12. **DashboardScreen** - главная сводка с 7 карточками метрик
+**Реализованные экраны (49, пересчитано 2026-09-07 по `presentation/screens/`):**
+1. Auth: Login, Register
+2. Onboarding: Splash, Welcome, FarmName, FarmType, Ready
+3. Home: Today, Farm, Journal, MainNavigation
+4. Rabbits: RabbitsList, RabbitDetail, RabbitForm, Herd, Pedigree, WeightHistory, BreedsList, BreedForm, BreedingPlanner, BirthsList, BirthForm
+5. Breeding: BreedingCycle, BreedingDetail, BreedingForm
+6. Cages: CagesList, CageDetail, CageForm
+7. Health: HealthJournal, VaccinationsList, VaccinationForm, MedicalRecordsList, MedicalRecordForm
+8. Feeding: FeedsList, FeedForm, FeedStatistics, FeedingRecordsList, FeedingRecordForm, FeedingStatistics
+9. Finance: TransactionsList, TransactionForm, TransactionStatistics
+10. Tasks: TasksList, TaskForm
+11. Notes: NoteForm (заметки прикрепляются к дневнику, отдельного списка нет)
+12. Reports: Reports (Farm/Health/Finance — переключаются сегментами на одном экране, не отдельные роуты; финансы скрыты от роли worker)
+13. Staff: Staff, JoinFarm
+14. Settings: Settings
 
 **Ключевые возможности Mobile:**
 - ✅ Material Design 3
@@ -853,26 +906,31 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 ## 📊 Финальная статистика проекта
 
-### Написано кода:
-- **Backend:** ~10,000 строк
-- **Mobile:** ~15,000 строк
-- **Всего:** ~25,000 строк кода
+### Написано кода (пересчитано 2026-09-07, `wc -l`):
+- **Backend:** ~15,400 строк (`backend/src`, без тестов)
+- **Mobile:** ~43,100 строк (`mobile/lib`, без `.freezed.dart`/`.g.dart` — со
+  сгенерированным кодом выходит ~74,000)
+- **Всего:** ~58,500 строк написанного кода
+
+Прежние цифры (~10,000 / ~15,000 / ~25,000) сильно отставали от факта —
+особенно по mobile, где реальный объём почти втрое больше заявленного.
 
 ### Покрытие функционала:
-- **Модули:** 15/15
-- **API эндпоинты:** 113
-- **Модели БД (backend):** 20
-- **UI экраны:** 35+ (не пересчитывалось при этой правке)
+- **Модули:** 16/16
+- **API эндпоинты:** 115
+- **Модели БД (backend):** 21
+- **UI экраны:** 49
+- **Backend-тесты:** 1151 (736 юнит + 415 интеграционных)
 
 ### Готовность:
 - ✅ Backend API с многоарендностью (изоляция ферм на всех операциях с данными)
 - ✅ Полнофункциональное mobile приложение
 - ✅ Безопасность (JWT, bcrypt, валидация, tenancy-хук)
-- ⚠️ Документация (этот файл отставал от кода — актуализирован 2026-08-31)
+- ✅ Push-уведомления (FCM) — Android; iOS код готов, доставка не настроена (нет APNs)
 - ✅ Автоматизация бизнес-процессов
 
 ---
 
-**Architecture Version**: 2.2
-**Last Updated**: 2026-08-31
-**Project Status**: Активная разработка — базовый функционал, многоарендность и передача хозяйства фермы готовы
+**Architecture Version**: 2.3
+**Last Updated**: 2026-09-07
+**Project Status**: Активная разработка — базовый функционал, многоарендность, передача хозяйства фермы и push-уведомления готовы

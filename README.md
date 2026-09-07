@@ -23,6 +23,7 @@ stack.
 | Finance | Income and expenses by category, profit, recent operations |
 | Analytics | Separate screens for finance, feed stock and feeding consumption |
 | Tasks | Farm to-dos with types, priorities and statuses |
+| Notifications | Push (Android) for overdue vaccinations/tasks/feed stock and new diary entries |
 
 One installation serves one farm. The first person to register becomes its
 owner and invites everyone else — see [Accounts](#accounts).
@@ -41,7 +42,13 @@ web build).
 ## Quick start
 
 You need Docker and Docker Compose. For client work you also need the Flutter
-SDK.
+SDK — **exactly the version CI uses** (`FLUTTER_VERSION` in
+[.github/workflows/mobile-release.yml](.github/workflows/mobile-release.yml),
+`3.41.6` at the time of writing). A newer stable Flutter ships a newer `analyzer`
+than this project's pinned `freezed`/`build_runner` support, and code
+generation fails outright (`Missing implementation of visitDotShorthand...`).
+If you installed Flutter via git, check out that exact tag:
+`git -C <flutter-dir> checkout 3.41.6 && flutter --version`.
 
 ```bash
 git clone https://github.com/MubiZero/RabbitFarm.git
@@ -53,6 +60,11 @@ Fill in the secrets in `.env` — at minimum `DB_PASSWORD`, `DB_ROOT_PASSWORD`,
 `JWT_SECRET` and `JWT_REFRESH_SECRET`. Generate each with
 `openssl rand -base64 32`. Compose refuses to start without them on purpose:
 no installation should run with default credentials.
+
+Push notifications need three more (`FIREBASE_PROJECT_ID`,
+`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) from a Firebase project's
+service account — optional, the API runs fine without them and simply sends
+no push.
 
 ```bash
 docker compose up -d
@@ -130,7 +142,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 860 tests
+npm test                 # 1151 tests
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change
@@ -144,7 +156,7 @@ Client:
 ```bash
 cd mobile
 flutter analyze
-flutter test             # 34 tests
+flutter test             # 207 tests
 dart run build_runner build --delete-conflicting-outputs   # after model changes
 ```
 
