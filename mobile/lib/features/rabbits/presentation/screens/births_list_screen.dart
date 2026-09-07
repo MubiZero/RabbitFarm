@@ -23,6 +23,7 @@ class BirthsListScreen extends ConsumerWidget {
     final state = ref.watch(birthsProvider);
     final notifier = ref.read(birthsProvider.notifier);
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.birthsTitle)),
@@ -41,6 +42,7 @@ class BirthsListScreen extends ConsumerWidget {
         itemBuilder: (context, birth, _) => _BirthCard(
           birth: birth,
           canManage: canManage,
+          canDelete: canDelete,
           onDelete: () => _delete(context, ref, birth),
           onCreateKits: () => _createKits(context, ref, birth),
         ),
@@ -118,12 +120,14 @@ class BirthsListScreen extends ConsumerWidget {
 class _BirthCard extends ConsumerWidget {
   final BirthModel birth;
   final bool canManage;
+  final bool canDelete;
   final VoidCallback onDelete;
   final VoidCallback onCreateKits;
 
   const _BirthCard({
     required this.birth,
     required this.canManage,
+    required this.canDelete,
     required this.onDelete,
     required this.onCreateKits,
   });
@@ -161,7 +165,7 @@ class _BirthCard extends ConsumerWidget {
                       .copyWith(color: context.colors.onSurface),
                 ),
               ),
-              if (canManage)
+              if (canDelete)
                 IconButton(
                   tooltip: l10n.commonDelete,
                   icon: const Icon(Icons.delete_outline),

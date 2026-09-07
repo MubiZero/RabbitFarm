@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -17,20 +18,23 @@ class BreedingDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final breedingAsync = ref.watch(breedingDetailProvider(breedingId));
     final breeding = breedingAsync.valueOrNull;
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.breedingDetailTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: breeding == null
-                ? null
-                : () => context.push(
-                      '/breeding/$breedingId/edit',
-                      extra: breeding,
-                    ),
-          ),
+          if (canManage)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: breeding == null
+                  ? null
+                  : () => context.push(
+                        '/breeding/$breedingId/edit',
+                        extra: breeding,
+                      ),
+            ),
         ],
       ),
       body: RefreshIndicator(
@@ -42,13 +46,15 @@ class BreedingDetailScreen extends ConsumerWidget {
           value: breedingAsync,
           onRetry: () => ref.invalidate(breedingDetailProvider(breedingId)),
           skeleton: (_) => const SkeletonList(itemHeight: 120),
-          builder: (breeding) => _buildContent(context, ref, breeding),
+          builder: (breeding) =>
+              _buildContent(context, ref, breeding, canManage, canDelete),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, BreedingModel breeding) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, BreedingModel breeding,
+      bool canManage, bool canDelete) {
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -312,7 +318,8 @@ class BreedingDetailScreen extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // Кнопка регистрации окрола
-        if (breeding.status == 'completed' || breeding.status == 'planned')
+        if (canManage &&
+            (breeding.status == 'completed' || breeding.status == 'planned'))
           ElevatedButton.icon(
             onPressed: () {
               context.push('/births/new', extra: breeding);
@@ -331,59 +338,63 @@ class BreedingDetailScreen extends ConsumerWidget {
         const SizedBox(height: 16),
 
         // Кнопка удаления
-        OutlinedButton.icon(
-          onPressed: () async {
-            final confirmed = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(context.l10n.breedingDeleteTitle),
-                content: Text(context.l10n.breedingDeleteBody),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text(context.l10n.commonCancel),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                    child: Text(context.l10n.commonDelete),
-                  ),
-                ],
-              ),
-            );
-
-            if (confirmed == true && context.mounted) {
-              try {
-                await ref.read(breedingRepositoryProvider).deleteBreeding(breedingId);
-                ref.invalidate(breedingListProvider);
-                ref.invalidate(breedingDetailProvider(breedingId));
-                if (context.mounted) {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(context.l10n.breedingDeleted)),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.l10n.commonActionFailed(
-                          errorText(context.l10n, e))),
-                      backgroundColor: AppColors.error,
+        if (canDelete)
+          OutlinedButton.icon(
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(context.l10n.breedingDeleteTitle),
+                  content: Text(context.l10n.breedingDeleteBody),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(context.l10n.commonCancel),
                     ),
-                  );
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style:
+                          TextButton.styleFrom(foregroundColor: AppColors.error),
+                      child: Text(context.l10n.commonDelete),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true && context.mounted) {
+                try {
+                  await ref
+                      .read(breedingRepositoryProvider)
+                      .deleteBreeding(breedingId);
+                  ref.invalidate(breedingListProvider);
+                  ref.invalidate(breedingDetailProvider(breedingId));
+                  if (context.mounted) {
+                    context.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(context.l10n.breedingDeleted)),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.l10n.commonActionFailed(
+                            errorText(context.l10n, e))),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
                 }
               }
-            }
-          },
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.all(16),
-            foregroundColor: AppColors.error,
-            side: const BorderSide(color: AppColors.error),
+            },
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.all(16),
+              foregroundColor: AppColors.error,
+              side: const BorderSide(color: AppColors.error),
+            ),
+            icon: const Icon(Icons.delete),
+            label: Text(context.l10n.commonDelete),
           ),
-          icon: const Icon(Icons.delete),
-          label: Text(context.l10n.commonDelete),
-        ),
       ],
     );
   }

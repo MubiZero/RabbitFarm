@@ -188,7 +188,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteDailyRecords));
 
     return AppFormScaffold(
       title: _isEditing

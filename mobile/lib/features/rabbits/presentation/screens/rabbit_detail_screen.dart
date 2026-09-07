@@ -28,6 +28,7 @@ class RabbitDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rabbitAsync = ref.watch(rabbitDetailProvider(rabbitId));
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return Scaffold(
       appBar: AppBar(
@@ -52,19 +53,20 @@ class RabbitDetailScreen extends ConsumerWidget {
                     title: Text(context.l10n.cageEdit),
                   ),
                 ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.delete_outline,
-                        color: AppColors.error),
-                    title: Text(
-                      context.l10n.commonDelete,
-                      style: AppTypography.bodyLg
-                          .copyWith(color: AppColors.error),
+                if (canDelete)
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.delete_outline,
+                          color: AppColors.error),
+                      title: Text(
+                        context.l10n.commonDelete,
+                        style: AppTypography.bodyLg
+                            .copyWith(color: AppColors.error),
+                      ),
                     ),
                   ),
-                ),
                 ],
               ),
             ) ??

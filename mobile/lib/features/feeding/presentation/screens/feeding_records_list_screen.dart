@@ -38,6 +38,7 @@ class _FeedingRecordsListScreenState
     final state = ref.watch(feedingRecordsProvider);
     final notifier = ref.read(feedingRecordsProvider.notifier);
     final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteDailyRecords));
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +85,7 @@ class _FeedingRecordsListScreenState
               ),
         itemBuilder: (context, record, _) => _RecordCard(
           record: record,
-          canRecord: canRecord,
+          canDelete: canDelete,
           onTap: canRecord
               ? () => context.push('/feeding-records/form', extra: record)
               : null,
@@ -196,13 +197,13 @@ class _PeriodChips extends ConsumerWidget {
 
 class _RecordCard extends StatelessWidget {
   final FeedingRecord record;
-  final bool canRecord;
+  final bool canDelete;
   final VoidCallback? onTap;
   final VoidCallback onDelete;
 
   const _RecordCard({
     required this.record,
-    required this.canRecord,
+    required this.canDelete,
     required this.onTap,
     required this.onDelete,
   });
@@ -305,7 +306,7 @@ class _RecordCard extends StatelessWidget {
               ],
             ),
           ),
-          if (canRecord)
+          if (canDelete)
             IconButton(
               tooltip: context.l10n.commonDelete,
               icon: const Icon(Icons.delete_outline),

@@ -45,6 +45,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     final state = ref.watch(cagesProvider);
     final notifier = ref.read(cagesProvider.notifier);
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return Scaffold(
       appBar: AppBar(
@@ -92,6 +93,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
         itemBuilder: (context, cage, _) => _CageCard(
           cage: cage,
           canManage: canManage,
+          canDelete: canDelete,
           onTap: () => context.push('/cages/${cage.id}'),
           onEdit: () => context.push('/cages/form', extra: cage),
           onClean: () => _markCleaned(cage),
@@ -241,6 +243,7 @@ enum _CageAction { edit, clean, delete }
 class _CageCard extends StatelessWidget {
   final CageModel cage;
   final bool canManage;
+  final bool canDelete;
   final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onClean;
@@ -249,6 +252,7 @@ class _CageCard extends StatelessWidget {
   const _CageCard({
     required this.cage,
     required this.canManage,
+    required this.canDelete,
     required this.onTap,
     required this.onEdit,
     required this.onClean,
@@ -331,19 +335,20 @@ class _CageCard extends StatelessWidget {
                         title: Text(context.l10n.cagesMarkCleaned),
                       ),
                     ),
-                    PopupMenuItem(
-                      value: _CageAction.delete,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading:
-                            const Icon(Icons.delete_outline, color: AppColors.error),
-                        title: Text(
-                          context.l10n.commonDelete,
-                          style: AppTypography.bodyLg
-                              .copyWith(color: AppColors.error),
+                    if (canDelete)
+                      PopupMenuItem(
+                        value: _CageAction.delete,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.delete_outline,
+                              color: AppColors.error),
+                          title: Text(
+                            context.l10n.commonDelete,
+                            style: AppTypography.bodyLg
+                                .copyWith(color: AppColors.error),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
             ],

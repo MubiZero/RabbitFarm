@@ -99,7 +99,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteDailyRecords));
 
     return AppFormScaffold(
       title: _isEditing

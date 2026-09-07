@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/theme/theme.dart';
@@ -31,6 +32,8 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
   @override
   Widget build(BuildContext context) {
     final breedsState = ref.watch(breedsProvider);
+    final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
+    final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return Scaffold(
       appBar: AppBar(
@@ -65,19 +68,22 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
 
           // Список пород
           Expanded(
-            child: _buildBreedsList(context, breedsState),
+            child: _buildBreedsList(context, breedsState, canManage, canDelete),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showBreedForm(context, null),
-        icon: const Icon(Icons.add),
-        label: Text(context.l10n.breedsAdd),
-      ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => _showBreedForm(context, null),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.breedsAdd),
+            )
+          : null,
     );
   }
 
-  Widget _buildBreedsList(BuildContext context, BreedsState state) {
+  Widget _buildBreedsList(
+      BuildContext context, BreedsState state, bool canManage, bool canDelete) {
     if (state.isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -112,17 +118,18 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
         itemCount: breeds.length,
         itemBuilder: (context, index) {
           final breed = breeds[index];
-          return _buildBreedCard(context, breed);
+          return _buildBreedCard(context, breed, canManage, canDelete);
         },
       ),
     );
   }
 
-  Widget _buildBreedCard(BuildContext context, BreedModel breed) {
+  Widget _buildBreedCard(
+      BuildContext context, BreedModel breed, bool canManage, bool canDelete) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => _showBreedForm(context, breed),
+        onTap: canManage ? () => _showBreedForm(context, breed) : null,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -162,38 +169,41 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                     ),
                   ),
                   // Действия
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        _showBreedForm(context, breed);
-                      } else if (value == 'delete') {
-                        _confirmDelete(context, breed);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.edit_outlined),
-                          title: Text(context.l10n.cageEdit),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.delete_outline,
-                              color: AppColors.error),
-                          title: Text(
-                            context.l10n.commonDelete,
-                            style: AppTypography.bodyLg
-                                .copyWith(color: AppColors.error),
+                  if (canManage || canDelete)
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'edit') {
+                          _showBreedForm(context, breed);
+                        } else if (value == 'delete') {
+                          _confirmDelete(context, breed);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (canManage)
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.edit_outlined),
+                              title: Text(context.l10n.cageEdit),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        if (canDelete)
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.delete_outline,
+                                  color: AppColors.error),
+                              title: Text(
+                                context.l10n.commonDelete,
+                                style: AppTypography.bodyLg
+                                    .copyWith(color: AppColors.error),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                 ],
               ),
 
