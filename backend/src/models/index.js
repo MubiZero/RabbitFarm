@@ -34,6 +34,7 @@ const Note = require('./Note')(sequelize);
 const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 const DeviceToken = require('./DeviceToken')(sequelize);
+const Payment = require('./Payment')(sequelize);
 
 // Define associations
 
@@ -172,12 +173,15 @@ Note.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 Note.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
 Note.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 
+Farm.hasMany(Payment, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
+Payment.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
+
 // Запрос к таблице фермы без условия по farm_id дальше не проходит.
 // Подключаем после того, как все модели определены и связаны.
 require('../utils/tenancy').attach({
   Breed, Cage, Feed, Rabbit, RabbitWeight, Breeding, Birth,
   Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note,
-  Invitation, DeviceToken
+  Invitation, DeviceToken, Payment
 });
 
 // Export models and sequelize instance
@@ -204,5 +208,6 @@ module.exports = {
   Task,
   Photo,
   Note,
-  DeviceToken
+  DeviceToken,
+  Payment
 };
