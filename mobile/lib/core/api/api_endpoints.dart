@@ -82,6 +82,9 @@ class ApiEndpoints {
   // Notes endpoints
   static const String notes = '/notes';
 
+  // Device tokens (push-уведомления)
+  static const String deviceTokens = '/device-tokens';
+
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';
   static const String reportFarm = '/reports/farm';

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/notifications/fcm_service.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
 import '../../data/models/user_model.dart';
@@ -88,6 +89,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             isAuthenticated: true,
             isLoading: false,
           );
+          _ref.read(fcmServiceProvider).registerCurrentToken();
         } on DioException catch (e) {
           if (_isNetworkError(e)) {
             // Сети нет, но токен есть — работаем дальше. Профиль при этом
@@ -134,6 +136,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
+      _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -167,6 +170,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
+      _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -196,6 +200,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
+      _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -210,6 +215,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
 
     try {
+      // Отвязываем токен, пока access-токен ещё не стёрт: после
+      // _authRepository.logout() запрос ушёл бы уже без авторизации.
+      await _ref.read(fcmServiceProvider).unregisterCurrentToken();
       await _authRepository.logout();
     } catch (_) {
       // Ignore network errors — tokens are already cleared in repository (finally)

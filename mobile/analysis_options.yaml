@@ -13,6 +13,13 @@ analyzer:
   exclude:
     - "**/*.freezed.dart"
     - "**/*.g.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     # freezed ставит @JsonKey/@Default на параметры конструктора — анализатор
     # считает это неверной целью аннотации, хотя код корректен.
