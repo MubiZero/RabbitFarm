@@ -1,3 +1,10 @@
+# ВАЖНО (2026-09-08): реальный прод в Coolify больше НЕ использует этот
+# файл — RabbitFarm переведён с одного docker-compose-приложения на
+# отдельные ресурсы (Database для MySQL, Service для MinIO, обычные
+# Application для api/web), см. docs/HANDOFF.md. Файл оставлен как
+# референс/для локального прод-подобного стека, не как источник для
+# Coolify-редеплоя.
+#
 # Прод-стек для Coolify. Локальная разработка — в docker-compose.yml.
 #
 # Секреты не хранятся ни здесь, ни в репозитории: Coolify генерирует их сам
@@ -97,7 +104,7 @@ services:
       - SMS_TEMPLATE_IDS=${SMS_TEMPLATE_IDS:-{}}
       # Почта (код сброса пароля) — опционально, см. backend/.env.example.
       - SMTP_HOST=${SMTP_HOST:-}
-      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_PORT=${SMTP_PORT:-465}
       - SMTP_USE_STARTTLS=${SMTP_USE_STARTTLS:-true}
       - SMTP_USERNAME=${SMTP_USERNAME:-}
       - SMTP_PASSWORD=${SMTP_PASSWORD:-}
