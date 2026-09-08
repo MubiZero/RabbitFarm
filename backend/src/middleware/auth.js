@@ -1,6 +1,6 @@
 const JWTUtil = require('../utils/jwt');
 const ApiResponse = require('../utils/apiResponse');
-const { User, TokenBlacklist } = require('../models');
+const { User, TokenBlacklist, Farm } = require('../models');
 
 /**
  * Authentication middleware
@@ -30,7 +30,8 @@ const authenticate = async (req, res, next) => {
 
     // Get user from database
     const user = await User.findByPk(decoded.id, {
-      attributes: { exclude: ['password_hash'] }
+      attributes: { exclude: ['password_hash'] },
+      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'deleted_at'] }]
     });
 
     if (!user) {
@@ -46,6 +47,30 @@ const authenticate = async (req, res, next) => {
     // не отбирал доступ у того, кто уже вошёл.
     if ((decoded.tv || 0) !== user.token_version) {
       return ApiResponse.unauthorized(res, 'Токен отозван, войдите заново');
+    }
+
+    // Статус хозяйства проверяется здесь, а не по контроллерам: это
+    // единственная точка, через которую проходит каждый запрос.
+    //
+    // Платформенный админ не должен потерять доступ к своей же панели из-за
+    // статуса собственной фермы — приостановка/read_only это рычаг для чужих
+    // хозяйств, не для себя.
+    if (user.farm && !user.is_platform_admin) {
+      // Удаление сильнее любого статуса: пока идут 30 дней до физической
+      // зачистки (см. 2.4), данные ещё на месте, но работать с ними нельзя.
+      if (user.farm.deleted_at) {
+        return ApiResponse.forbidden(res, 'Хозяйство удалено. Обратитесь в поддержку.', 'FARM_DELETED');
+      }
+      if (user.farm.status === 'suspended') {
+        return ApiResponse.forbidden(res, 'Хозяйство приостановлено. Обратитесь в поддержку.', 'FARM_SUSPENDED');
+      }
+      if (user.farm.status === 'read_only' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+        return ApiResponse.forbidden(
+          res,
+          'Хозяйство доступно только для чтения — обратитесь в поддержку, чтобы возобновить полный доступ.',
+          'FARM_READ_ONLY'
+        );
+      }
     }
 
     // Attach user to request

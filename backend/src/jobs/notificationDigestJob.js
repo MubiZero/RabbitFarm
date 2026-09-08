@@ -70,7 +70,9 @@ async function runDigestForFarm(farmId) {
 }
 
 async function runDigest() {
-  const farms = await Farm.findAll({ attributes: ['id'] });
+  // Мягко удалённые фермы обходим: доступ им уже закрыт (`authenticate`), и
+  // пуш «у вас просрочены вакцинации» ушёл бы туда, куда нельзя войти.
+  const farms = await Farm.findAll({ attributes: ['id'], where: { deleted_at: null } });
 
   for (const farm of farms) {
     try {

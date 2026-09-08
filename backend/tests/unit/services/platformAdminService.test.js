@@ -7,12 +7,19 @@ jest.mock('../../../src/models', () => ({
     findByPk: jest.fn()
   },
   Rabbit: {
-    count: jest.fn()
+    count: jest.fn(),
+    sum: jest.fn()
   },
   User: {
     count: jest.fn(),
     max: jest.fn(),
     findAll: jest.fn()
+  },
+  Payment: {
+    findAll: jest.fn()
+  },
+  Photo: {
+    sum: jest.fn()
   }
 }));
 jest.mock('../../../src/utils/logger', () => ({
@@ -20,13 +27,16 @@ jest.mock('../../../src/utils/logger', () => ({
 }));
 
 const { Op } = require('sequelize');
-const { Farm, Plan, Rabbit, User } = require('../../../src/models');
+const { Farm, Payment, Photo, Plan, Rabbit, User } = require('../../../src/models');
 const platformAdminService = require('../../../src/services/platformAdminService');
 
 describe('PlatformAdminService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     User.findAll.mockResolvedValue([]);
+    Payment.findAll.mockResolvedValue([]);
+    Photo.sum.mockResolvedValue(null);
+    Rabbit.sum.mockResolvedValue(null);
   });
 
   describe('listFarms', () => {
@@ -91,7 +101,64 @@ describe('PlatformAdminService', () => {
 
       await platformAdminService.listFarms({ filter: 'no_plan' });
 
-      expect(Farm.findAll.mock.calls[0][0].where).toEqual({ plan_id: null });
+      expect(Farm.findAll.mock.calls[0][0].where).toEqual({ plan_id: null, deleted_at: null });
+    });
+
+    it('по умолчанию не показывает мягко удалённые фермы', async () => {
+      Farm.findAll.mockResolvedValue([]);
+
+      await platformAdminService.listFarms();
+
+      expect(Farm.findAll.mock.calls[0][0].where).toEqual({ deleted_at: null });
+    });
+
+    it('фильтр deleted показывает только удалённые, свежеудалённые сверху', async () => {
+      const farms = [
+        { id: 1, toJSON: () => ({ id: 1, deleted_at: '2026-09-01T00:00:00.000Z' }) },
+        { id: 2, toJSON: () => ({ id: 2, deleted_at: '2026-09-05T00:00:00.000Z' }) }
+      ];
+      Farm.findAll.mockResolvedValue(farms);
+      Rabbit.count.mockResolvedValue([]);
+      User.count.mockResolvedValue([]);
+
+      const result = await platformAdminService.listFarms({ filter: 'deleted' });
+
+      expect(Farm.findAll.mock.calls[0][0].where).toEqual({ deleted_at: { [Op.ne]: null } });
+      // Порядок задан датой удаления, а не датой создания: срок до
+      // физической зачистки идёт именно от неё.
+      expect(result.items.map((farm) => farm.id)).toEqual([2, 1]);
+    });
+
+    it('фильтр suspended оставляет только приостановленные фермы', async () => {
+      const farms = [
+        { id: 1, toJSON: () => ({ id: 1, status: 'active' }) },
+        { id: 2, toJSON: () => ({ id: 2, status: 'suspended' }) },
+        { id: 3, toJSON: () => ({ id: 3, status: 'read_only' }) }
+      ];
+      Farm.findAll.mockResolvedValue(farms);
+      Rabbit.count.mockResolvedValue([]);
+      User.count.mockResolvedValue([]);
+
+      const result = await platformAdminService.listFarms({ filter: 'suspended' });
+
+      expect(result.items.map((farm) => farm.id)).toEqual([2]);
+    });
+
+    it('фильтр expired оставляет фермы с истёкшим платным тарифом', async () => {
+      const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const farms = [
+        { id: 1, toJSON: () => ({ id: 1, plan_expires_at: '2020-01-01T00:00:00.000Z' }) },
+        { id: 2, toJSON: () => ({ id: 2, plan_expires_at: future }) },
+        // Бесплатный тариф бессрочен — никогда не просрочен.
+        { id: 3, toJSON: () => ({ id: 3, plan_expires_at: null }) }
+      ];
+      Farm.findAll.mockResolvedValue(farms);
+      Rabbit.count.mockResolvedValue([]);
+      User.count.mockResolvedValue([]);
+
+      const result = await platformAdminService.listFarms({ filter: 'expired' });
+
+      expect(result.items.map((farm) => farm.id)).toEqual([1]);
     });
 
     it('фильтр at_limit оставляет только фермы, упёршиеся в предел тарифа', async () => {
@@ -109,6 +176,34 @@ describe('PlatformAdminService', () => {
       // Ферма 1 упёрлась в лимит кроликов, ферма 3 без тарифа — ограничений
       // для неё нет, сколько бы кроликов ни было.
       expect(result.items.map((farm) => farm.id)).toEqual([1]);
+    });
+
+    it('фильтр at_limit не считает упёршейся ферму с активной поблажкой', async () => {
+      const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const farms = [
+        {
+          id: 1,
+          toJSON: () => ({ id: 1, plan: { max_rabbits: 10, max_staff: null }, extra_rabbits: 50, extras_until: future })
+        },
+        {
+          id: 2,
+          toJSON: () => ({
+            id: 2,
+            plan: { max_rabbits: 10, max_staff: null },
+            extra_rabbits: 50,
+            extras_until: '2020-01-01'
+          })
+        }
+      ];
+      Farm.findAll.mockResolvedValue(farms);
+      Rabbit.count.mockResolvedValue([{ farm_id: 1, count: 12 }, { farm_id: 2, count: 12 }]);
+      User.count.mockResolvedValue([]);
+
+      const result = await platformAdminService.listFarms({ filter: 'at_limit' });
+
+      // У фермы 1 поблажка действует — предел 60, упираться ещё некуда;
+      // у фермы 2 та же поблажка истекла, предел снова тарифный.
+      expect(result.items.map((farm) => farm.id)).toEqual([2]);
     });
 
     it('фильтр inactive_days отбирает фермы без входов дольше N дней, включая тех, кто не заходил вовсе', async () => {
@@ -215,8 +310,75 @@ describe('PlatformAdminService', () => {
         plan: { id: 2 },
         rabbits_count: 12,
         staff_count: 3,
-        last_active: '2026-08-01T00:00:00.000Z'
+        last_active: '2026-08-01T00:00:00.000Z',
+        staff: [],
+        payments: [],
+        storage_bytes: 0
       });
+    });
+
+    it('отдаёт состав фермы с ролями и последними входами', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 7, toJSON: () => ({ id: 7 }) });
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(2);
+      User.max.mockResolvedValue(null);
+      User.findAll.mockResolvedValue([
+        { id: 1, full_name: 'Владелец', role: 'owner', is_active: true, last_login_at: '2026-08-01T00:00:00.000Z' },
+        { id: 2, full_name: 'Работник', role: 'worker', is_active: false, last_login_at: null }
+      ]);
+
+      const farm = await platformAdminService.getFarm(7);
+
+      expect(farm.staff.map((member) => member.id)).toEqual([1, 2]);
+      expect(User.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: { farm_id: 7 },
+        attributes: ['id', 'full_name', 'email', 'phone', 'role', 'is_active', 'last_login_at'],
+        order: [['id', 'ASC']]
+      }));
+    });
+
+    it('отдаёт последние платежи фермы, новые сверху', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 7, toJSON: () => ({ id: 7 }) });
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+      User.max.mockResolvedValue(null);
+      Payment.findAll.mockResolvedValue([{ id: 2, amount: 100 }, { id: 1, amount: 50 }]);
+
+      const farm = await platformAdminService.getFarm(7);
+
+      expect(farm.payments.map((payment) => payment.id)).toEqual([2, 1]);
+      expect(Payment.findAll).toHaveBeenCalledWith({
+        where: { farm_id: 7 },
+        attributes: ['id', 'amount', 'currency', 'status', 'description', 'created_at'],
+        order: [['created_at', 'DESC']],
+        limit: 20
+      });
+    });
+
+    it('складывает место фотографий галереи и одиночных фото кроликов', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 7, toJSON: () => ({ id: 7 }) });
+      Rabbit.count.mockResolvedValue(3);
+      User.count.mockResolvedValue(1);
+      User.max.mockResolvedValue(null);
+      Photo.sum.mockResolvedValue(1500);
+      Rabbit.sum.mockResolvedValue(700);
+
+      const farm = await platformAdminService.getFarm(7);
+
+      expect(farm.storage_bytes).toBe(2200);
+    });
+
+    it('считает место за ноль, если фотографий нет вовсе (SUM отдаёт NULL)', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 7, toJSON: () => ({ id: 7 }) });
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+      User.max.mockResolvedValue(null);
+      Photo.sum.mockResolvedValue(null);
+      Rabbit.sum.mockResolvedValue(null);
+
+      const farm = await platformAdminService.getFarm(7);
+
+      expect(farm.storage_bytes).toBe(0);
     });
 
     it('отдаёт last_active = null, если у фермы ещё никто не заходил', async () => {
@@ -300,6 +462,158 @@ describe('PlatformAdminService', () => {
       // целиком, чтобы показать «сколько уже израсходовано из лимита».
       expect(result.rabbits_count).toBe(5);
       expect(result.staff_count).toBe(2);
+    });
+  });
+
+  describe('updateStatus', () => {
+    beforeEach(() => {
+      User.max.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.updateStatus(999, 'suspended')).rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('переводит ферму в новый статус и отдаёт её той же формы, что и getFarm', async () => {
+      const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, status: 'suspended' }) });
+
+      const result = await platformAdminService.updateStatus(1, 'suspended');
+
+      expect(farm.update).toHaveBeenCalledWith({ status: 'suspended' });
+      expect(result.status).toBe('suspended');
+      expect(result.rabbits_count).toBe(0);
+      expect(result.staff_count).toBe(1);
+    });
+  });
+
+  describe('updateExtras', () => {
+    beforeEach(() => {
+      User.max.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.updateExtras(999, { extra_rabbits: 50 }))
+        .rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('записывает поблажку и не трогает тариф фермы', async () => {
+      const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({
+          id: 1,
+          toJSON: () => ({ id: 1, plan_id: 2, extra_rabbits: 50, extras_until: '2026-10-08T00:00:00.000Z' })
+        });
+
+      const result = await platformAdminService.updateExtras(1, {
+        extra_rabbits: 50,
+        extras_until: '2026-10-08T00:00:00.000Z'
+      });
+
+      expect(farm.update).toHaveBeenCalledWith({
+        extra_rabbits: 50,
+        extras_until: '2026-10-08T00:00:00.000Z'
+      });
+      expect(result.extra_rabbits).toBe(50);
+      expect(result.plan_id).toBe(2);
+    });
+
+    it('снимает поблажку, когда передан null', async () => {
+      const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, extra_rabbits: null }) });
+
+      const result = await platformAdminService.updateExtras(1, { extra_rabbits: null });
+
+      expect(farm.update).toHaveBeenCalledWith({ extra_rabbits: null });
+      expect(result.extra_rabbits).toBeNull();
+    });
+  });
+
+  describe('softDelete', () => {
+    beforeEach(() => {
+      User.max.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.softDelete(999, 'Ферма')).rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('бросает CONFIRM_NAME_MISMATCH и не удаляет, если название не совпало', async () => {
+      const farm = { id: 1, name: 'Ферма Иванова', update: jest.fn() };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      await expect(platformAdminService.softDelete(1, 'Ферма иванова'))
+        .rejects.toThrow('CONFIRM_NAME_MISMATCH');
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('ставит deleted_at при точном совпадении названия', async () => {
+      const farm = { id: 1, name: 'Ферма Иванова', update: jest.fn().mockResolvedValue(undefined) };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, deleted_at: '2026-09-09T00:00:00.000Z' }) });
+
+      const result = await platformAdminService.softDelete(1, 'Ферма Иванова');
+
+      expect(farm.update).toHaveBeenCalledWith({ deleted_at: expect.any(Date) });
+      expect(result.deleted_at).toBe('2026-09-09T00:00:00.000Z');
+    });
+  });
+
+  describe('restore', () => {
+    beforeEach(() => {
+      User.max.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.restore(999)).rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('бросает FARM_NOT_DELETED, если ферма и не была удалена', async () => {
+      const farm = { id: 1, deleted_at: null, update: jest.fn() };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      await expect(platformAdminService.restore(1)).rejects.toThrow('FARM_NOT_DELETED');
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('снимает deleted_at, пока запись ещё существует — срок при этом не проверяется', async () => {
+      // Удалена больше 30 дней назад, но физическая зачистка до неё не
+      // дошла: данные на месте, значит вернуть можно.
+      const farm = {
+        id: 1,
+        deleted_at: '2020-01-01T00:00:00.000Z',
+        update: jest.fn().mockResolvedValue(undefined)
+      };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, deleted_at: null }) });
+
+      const result = await platformAdminService.restore(1);
+
+      expect(farm.update).toHaveBeenCalledWith({ deleted_at: null });
+      expect(result.deleted_at).toBeNull();
     });
   });
 });

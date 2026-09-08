@@ -46,6 +46,40 @@ module.exports = (sequelize) => {
     plan_expires_at: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    // Доступ хозяйства целиком. `active` — обычная работа; `read_only` —
+    // только чтение (просрочка или неуплата: данные видны, запись
+    // запрещена); `suspended` — доступ закрыт полностью. Проверяется в
+    // `authenticate` — единственной точке, через которую идёт каждый запрос.
+    status: {
+      type: DataTypes.ENUM('active', 'read_only', 'suspended'),
+      allowNull: false,
+      defaultValue: 'active'
+    },
+    // Разовая поблажка сверх лимита тарифа, а не смена тарифа: тариф
+    // остаётся тем же, поблажка просто складывается с его пределом.
+    extra_rabbits: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    extra_staff: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    // До какого момента поблажка действует. NULL при ненулевом `extra_*` —
+    // «бессрочно», а не «просрочено»: так же, как `plan_expires_at` выше.
+    extras_until: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    // NULL — ферма живая; иначе мягко удалена: доступ закрыт сразу, а запись
+    // с данными ждёт физической зачистки фоновой задачей (см.
+    // docs/plans/PLATFORM-ADMIN.md, 2.4). Не `paranoid: true` намеренно —
+    // скоуп «не видеть удалённое» испортил бы карточку, экспорт,
+    // восстановление и саму зачистку, которым ферму найти обязательно.
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     tableName: 'farms',

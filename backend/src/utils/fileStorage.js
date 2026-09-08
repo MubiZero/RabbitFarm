@@ -61,6 +61,32 @@ async function deleteFile(relativeUrl) {
 }
 
 /**
+ * Удалить все объекты с этим префиксом — чистка файлов фермы при физической
+ * зачистке (см. docs/plans/PLATFORM-ADMIN.md, 2.4). Ошибка логируется, а не
+ * бросается — как и в `deleteFile`: отсутствие файлов не должно остановить
+ * удаление самой фермы.
+ */
+async function deleteByPrefix(prefix) {
+  try {
+    const objectNames = await new Promise((resolve, reject) => {
+      const names = [];
+      const stream = client.listObjectsV2(bucket, prefix, true);
+      stream.on('data', (obj) => names.push(obj.name));
+      stream.on('end', () => resolve(names));
+      stream.on('error', reject);
+    });
+
+    if (objectNames.length) {
+      await client.removeObjects(bucket, objectNames);
+    }
+
+    logger.info('Farm files deleted', { prefix, count: objectNames.length });
+  } catch (error) {
+    logger.error('Error deleting files by prefix', { error: error.message, prefix });
+  }
+}
+
+/**
  * Отдать файл в ответ на HTTP-запрос — замена express.static для
  * /uploads. Content-Type берём из метаданных объекта, а не угадываем по
  * расширению: он был записан при загрузке и всегда точен.
@@ -82,5 +108,6 @@ module.exports = {
   buildObjectKey,
   uploadFile,
   deleteFile,
+  deleteByPrefix,
   serveFile
 };

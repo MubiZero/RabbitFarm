@@ -6,7 +6,10 @@ const validate = require('../middleware/validation');
 const {
   createPlanSchema,
   updatePlanSchema,
-  assignPlanSchema
+  assignPlanSchema,
+  updateFarmStatusSchema,
+  updateFarmExtrasSchema,
+  deleteFarmSchema
 } = require('../validators/planValidator');
 
 /**
@@ -70,6 +73,52 @@ router.get('/farms/:id', platformAdminController.getFarm);
  *     tags: [PlatformAdmin]
  */
 router.patch('/farms/:id/plan', validate(assignPlanSchema), platformAdminController.assignPlan);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/status:
+ *   patch:
+ *     summary: Приостановить ферму, перевести в режим чтения или вернуть к работе
+ *     tags: [PlatformAdmin]
+ */
+router.patch('/farms/:id/status', validate(updateFarmStatusSchema), platformAdminController.updateStatus);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/extras:
+ *   patch:
+ *     summary: Разовая поблажка сверх лимита тарифа — без смены самого тарифа
+ *     tags: [PlatformAdmin]
+ */
+router.patch('/farms/:id/extras', validate(updateFarmExtrasSchema), platformAdminController.updateExtras);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/export:
+ *   get:
+ *     summary: Все данные фермы одним JSON — для «отдайте мои данные» и копии перед удалением
+ *     tags: [PlatformAdmin]
+ */
+router.get('/farms/:id/export', platformAdminController.exportFarm);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}:
+ *   delete:
+ *     summary: Мягко удалить ферму — доступ закрывается сразу, данные очищаются через 30 дней
+ *     description: Требует confirm_name с точным названием фермы; сервер перепроверяет совпадение сам
+ *     tags: [PlatformAdmin]
+ */
+router.delete('/farms/:id', validate(deleteFarmSchema), platformAdminController.deleteFarm);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/restore:
+ *   post:
+ *     summary: Отменить мягкое удаление, пока физическая зачистка ещё не наступила
+ *     tags: [PlatformAdmin]
+ */
+router.post('/farms/:id/restore', platformAdminController.restoreFarm);
 
 /**
  * @swagger

@@ -7,7 +7,10 @@ jest.mock('../../../src/utils/jwt', () => ({
 
 jest.mock('../../../src/models', () => ({
   User: { findByPk: jest.fn() },
-  TokenBlacklist: { findOne: jest.fn() }
+  TokenBlacklist: { findOne: jest.fn() },
+  // Farm нужен только как модель для include — запросов к нему middleware
+  // не делает, ферма приезжает вместе с пользователем.
+  Farm: {}
 }));
 
 const JWTUtil = require('../../../src/utils/jwt');
@@ -154,6 +157,119 @@ describe('authenticate middleware', () => {
     await authenticate(req, res, next);
 
     expect(next).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  // Статус хозяйства (см. docs/plans/PLATFORM-ADMIN.md, 2.2) проверяется
+  // здесь — единственная точка, через которую проходит каждый запрос.
+  describe('гейт по статусу фермы', () => {
+    const authenticateWith = async ({ farm, isPlatformAdmin = false, method = 'GET' }) => {
+      JWTUtil.verifyAccessToken.mockReturnValue({ id: 1, jti: null, tv: 0 });
+      User.findByPk.mockResolvedValue({
+        id: 1,
+        is_active: true,
+        token_version: 0,
+        farm_id: farm ? farm.id : null,
+        is_platform_admin: isPlatformAdmin,
+        farm
+      });
+
+      const req = { headers: { authorization: 'Bearer valid-token' }, method };
+      const res = mockRes();
+      await authenticate(req, res, mockNext);
+      return { req, res };
+    };
+
+    it('приостановленное хозяйство не пускает вовсе — 403 FARM_SUSPENDED', async () => {
+      const { res } = await authenticateWith({ farm: { id: 5, status: 'suspended' } });
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.code).toBe('FARM_SUSPENDED');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('приостановленное хозяйство не пускает и на чтение', async () => {
+      const { res } = await authenticateWith({ farm: { id: 5, status: 'suspended' }, method: 'GET' });
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.code).toBe('FARM_SUSPENDED');
+    });
+
+    it('режим чтения пропускает GET', async () => {
+      const { res } = await authenticateWith({ farm: { id: 5, status: 'read_only' }, method: 'GET' });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it.each(['POST', 'PATCH', 'PUT', 'DELETE'])(
+      'режим чтения отклоняет %s с кодом FARM_READ_ONLY',
+      async (method) => {
+        const { res } = await authenticateWith({ farm: { id: 5, status: 'read_only' }, method });
+
+        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.json.mock.calls[0][0].error.code).toBe('FARM_READ_ONLY');
+        expect(mockNext).not.toHaveBeenCalled();
+      }
+    );
+
+    it('пропускает платформенного админа несмотря на статус его собственной фермы', async () => {
+      const { res } = await authenticateWith({
+        farm: { id: 5, status: 'suspended' },
+        isPlatformAdmin: true,
+        method: 'POST'
+      });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it('активное хозяйство пропускает как раньше', async () => {
+      const { req, res } = await authenticateWith({ farm: { id: 5, status: 'active' }, method: 'POST' });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(req.farmId).toBe(5);
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    // Мягко удалённая ферма (см. 2.4): доступ закрывается сразу, не дожидаясь
+    // физической зачистки через 30 дней.
+    it('удалённое хозяйство не пускает вовсе — 403 FARM_DELETED', async () => {
+      const { res } = await authenticateWith({
+        farm: { id: 5, status: 'active', deleted_at: '2026-09-09T00:00:00.000Z' }
+      });
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.code).toBe('FARM_DELETED');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('удаление сильнее статуса — FARM_DELETED, а не FARM_READ_ONLY', async () => {
+      const { res } = await authenticateWith({
+        farm: { id: 5, status: 'read_only', deleted_at: '2026-09-09T00:00:00.000Z' },
+        method: 'GET'
+      });
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json.mock.calls[0][0].error.code).toBe('FARM_DELETED');
+    });
+
+    it('пропускает платформенного админа несмотря на удаление его собственной фермы', async () => {
+      const { res } = await authenticateWith({
+        farm: { id: 5, status: 'active', deleted_at: '2026-09-09T00:00:00.000Z' },
+        isPlatformAdmin: true,
+        method: 'POST'
+      });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it('пользователь без фермы проходит — гейту нечего проверять', async () => {
+      const { res } = await authenticateWith({ farm: null, method: 'POST' });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith();
+    });
   });
 
   it('should skip blacklist check when jti is not present', async () => {

@@ -12,6 +12,7 @@ const { sequelize } = require('./models');
 const { ensureBucket } = require('./config/minio');
 const { startTokenCleanupJob } = require('./jobs/tokenCleanup');
 const { startNotificationDigestJob } = require('./jobs/notificationDigestJob');
+const { startFarmPurgeJob } = require('./jobs/farmPurgeJob');
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -55,6 +56,7 @@ async function startServer() {
     if (process.env.NODE_ENV !== 'test') {
       startTokenCleanupJob();
       startNotificationDigestJob();
+      startFarmPurgeJob();
     }
 
     // Start listening

@@ -100,12 +100,32 @@ class PlanService {
   }
 
   /**
+   * Предел ресурса с учётом активной разовой поблажки (см.
+   * docs/plans/PLATFORM-ADMIN.md, 2.3). `null` — лимита нет вовсе (ни у
+   * тарифа, ни у фермы без тарифа).
+   *
+   * Поблажка не расширяет «нет лимита»: если у тарифа `max_*` уже NULL,
+   * складывать с ним нечего. Пустой `extras_until` при ненулевой поблажке —
+   * «бессрочно», как и у `plan_expires_at`.
+   */
+  getEffectiveLimit(farm, resource) {
+    const planLimit = resource === 'rabbits' ? farm?.plan?.max_rabbits : farm?.plan?.max_staff;
+    if (planLimit == null) return null;
+
+    const extra = resource === 'rabbits' ? farm.extra_rabbits : farm.extra_staff;
+    if (!extra) return planLimit;
+
+    const extraActive = !farm.extras_until || new Date(farm.extras_until) > new Date();
+    return extraActive ? planLimit + extra : planLimit;
+  }
+
+  /**
    * Бросает `RABBIT_LIMIT_REACHED`, если по тарифу фермы больше нельзя
    * заводить кроликов. Вызывается перед созданием кролика.
    */
   async assertRabbitLimit(farmId) {
     const farm = await this._getFarmWithPlan(farmId);
-    const maxRabbits = farm?.plan?.max_rabbits;
+    const maxRabbits = this.getEffectiveLimit(farm, 'rabbits');
     if (!maxRabbits) return;
 
     const count = await Rabbit.count({ where: { farm_id: farmId } });
@@ -122,7 +142,7 @@ class PlanService {
    */
   async assertStaffLimit(farmId) {
     const farm = await this._getFarmWithPlan(farmId);
-    const maxStaff = farm?.plan?.max_staff;
+    const maxStaff = this.getEffectiveLimit(farm, 'staff');
     if (!maxStaff) return;
 
     const count = await User.count({ where: { farm_id: farmId } });
@@ -136,7 +156,9 @@ class PlanService {
    * «Сегодня» самой фермы («26 из 30 кроликов»). Считает теми же запросами,
    * что и проверки лимита выше (без фильтра по статусу кролика), чтобы число
    * на экране не расходилось с моментом, когда сервер реально откажет.
-   * `limit: null` — без ограничения, как и везде в этом сервисе.
+   * `limit: null` — без ограничения, как и везде в этом сервисе; сам предел
+   * эффективный, то есть уже с разовой поблажкой, — иначе полоса на
+   * «Сегодня» показывала бы «26 из 30» ферме, которой продажи выдали +50.
    */
   async getUsage(farmId) {
     const [farm, rabbitsUsed, staffUsed] = await Promise.all([
@@ -146,8 +168,8 @@ class PlanService {
     ]);
 
     return {
-      rabbits: { used: rabbitsUsed, limit: farm?.plan?.max_rabbits ?? null },
-      staff: { used: staffUsed, limit: farm?.plan?.max_staff ?? null }
+      rabbits: { used: rabbitsUsed, limit: this.getEffectiveLimit(farm, 'rabbits') },
+      staff: { used: staffUsed, limit: this.getEffectiveLimit(farm, 'staff') }
     };
   }
 }

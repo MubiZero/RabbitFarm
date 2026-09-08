@@ -133,6 +133,52 @@ describe('PlanService', () => {
     });
   });
 
+  describe('getEffectiveLimit', () => {
+    const future = () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    it('null, если у фермы нет тарифа', () => {
+      expect(planService.getEffectiveLimit({ plan: null }, 'rabbits')).toBeNull();
+      expect(planService.getEffectiveLimit(null, 'staff')).toBeNull();
+    });
+
+    it('null, если у тарифа предел не задан — поблажка не расширяет «нет лимита»', () => {
+      const farm = { plan: { max_rabbits: null }, extra_rabbits: 50, extras_until: future() };
+
+      expect(planService.getEffectiveLimit(farm, 'rabbits')).toBeNull();
+    });
+
+    it('предел тарифа, если поблажки нет', () => {
+      const farm = { plan: { max_rabbits: 30, max_staff: 2 }, extra_rabbits: null, extra_staff: null };
+
+      expect(planService.getEffectiveLimit(farm, 'rabbits')).toBe(30);
+      expect(planService.getEffectiveLimit(farm, 'staff')).toBe(2);
+    });
+
+    it('складывает активную поблажку с пределом тарифа', () => {
+      const farm = {
+        plan: { max_rabbits: 30, max_staff: 2 },
+        extra_rabbits: 50,
+        extra_staff: 1,
+        extras_until: future()
+      };
+
+      expect(planService.getEffectiveLimit(farm, 'rabbits')).toBe(80);
+      expect(planService.getEffectiveLimit(farm, 'staff')).toBe(3);
+    });
+
+    it('считает поблажку без срока бессрочной, а не просроченной', () => {
+      const farm = { plan: { max_rabbits: 30 }, extra_rabbits: 50, extras_until: null };
+
+      expect(planService.getEffectiveLimit(farm, 'rabbits')).toBe(80);
+    });
+
+    it('не учитывает истёкшую поблажку', () => {
+      const farm = { plan: { max_rabbits: 30 }, extra_rabbits: 50, extras_until: '2020-01-01' };
+
+      expect(planService.getEffectiveLimit(farm, 'rabbits')).toBe(30);
+    });
+  });
+
   describe('assertRabbitLimit', () => {
     it('не бросает, если у фермы нет плана', async () => {
       Farm.findByPk.mockResolvedValue({ id: 1, plan: null });
@@ -161,6 +207,43 @@ describe('PlanService', () => {
 
       await expect(planService.assertRabbitLimit(1)).resolves.toBeUndefined();
     });
+
+    it('не бросает при упоре в предел тарифа, если действует поблажка', async () => {
+      const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_rabbits: 10 },
+        extra_rabbits: 5,
+        extras_until: future
+      });
+      Rabbit.count.mockResolvedValue(12);
+
+      await expect(planService.assertRabbitLimit(1)).resolves.toBeUndefined();
+    });
+
+    it('бросает, когда поблажка истекла и предел снова тарифный', async () => {
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_rabbits: 10 },
+        extra_rabbits: 5,
+        extras_until: '2020-01-01'
+      });
+      Rabbit.count.mockResolvedValue(12);
+
+      await expect(planService.assertRabbitLimit(1)).rejects.toThrow('RABBIT_LIMIT_REACHED');
+    });
+
+    it('бросает при упоре уже в расширенный поблажкой предел', async () => {
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_rabbits: 10 },
+        extra_rabbits: 5,
+        extras_until: null
+      });
+      Rabbit.count.mockResolvedValue(15);
+
+      await expect(planService.assertRabbitLimit(1)).rejects.toThrow('RABBIT_LIMIT_REACHED');
+    });
   });
 
   describe('assertStaffLimit', () => {
@@ -176,6 +259,25 @@ describe('PlanService', () => {
 
       await expect(planService.assertStaffLimit(1)).resolves.toBeUndefined();
       expect(User.count).not.toHaveBeenCalled();
+    });
+
+    it('не бросает при упоре в предел тарифа, если действует поблажка по людям', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: { max_staff: 3 }, extra_staff: 2, extras_until: null });
+      User.count.mockResolvedValue(3);
+
+      await expect(planService.assertStaffLimit(1)).resolves.toBeUndefined();
+    });
+
+    it('бросает, когда поблажка по людям истекла', async () => {
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_staff: 3 },
+        extra_staff: 2,
+        extras_until: '2020-01-01'
+      });
+      User.count.mockResolvedValue(3);
+
+      await expect(planService.assertStaffLimit(1)).rejects.toThrow('STAFF_LIMIT_REACHED');
     });
   });
 
@@ -204,6 +306,42 @@ describe('PlanService', () => {
         rabbits: { used: 26, limit: 30 },
         staff: { used: 2, limit: null }
       });
+    });
+
+    it('показывает предел уже с активной поблажкой, а не голый тарифный', async () => {
+      const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_rabbits: 30, max_staff: 2 },
+        extra_rabbits: 50,
+        extra_staff: 1,
+        extras_until: future
+      });
+      Rabbit.count.mockResolvedValue(40);
+      User.count.mockResolvedValue(2);
+
+      const usage = await planService.getUsage(1);
+
+      expect(usage).toEqual({
+        rabbits: { used: 40, limit: 80 },
+        staff: { used: 2, limit: 3 }
+      });
+    });
+
+    it('возвращает тарифный предел, если поблажка истекла', async () => {
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan: { max_rabbits: 30, max_staff: 2 },
+        extra_rabbits: 50,
+        extras_until: '2020-01-01'
+      });
+      Rabbit.count.mockResolvedValue(40);
+      User.count.mockResolvedValue(2);
+
+      const usage = await planService.getUsage(1);
+
+      expect(usage.rabbits.limit).toBe(30);
+      expect(usage.staff.limit).toBe(2);
     });
   });
 });

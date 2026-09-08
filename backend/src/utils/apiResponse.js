@@ -108,9 +108,11 @@ class ApiResponse {
 
   /**
    * Forbidden response (403)
+   * @param {String} code - машинный код, когда клиенту важно отличить случай
+   *   (например `FARM_READ_ONLY` — показать баннер, а не общий отказ)
    */
-  static forbidden(res, message = 'Доступ запрещён') {
-    return this.error(res, message, 403, 'FORBIDDEN');
+  static forbidden(res, message = 'Доступ запрещён', code = 'FORBIDDEN') {
+    return this.error(res, message, 403, code);
   }
 
   /**

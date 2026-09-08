@@ -1,5 +1,6 @@
 const { Op, fn, col } = require('sequelize');
-const { Farm, Plan, Rabbit, User } = require('../models');
+const { Farm, Payment, Photo, Plan, Rabbit, User } = require('../models');
+const planService = require('./planService');
 
 /**
  * Платформенная админка: список ферм со сводкой по использованию и
@@ -20,12 +21,19 @@ const FARM_INCLUDES = [
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DEFAULT_INACTIVE_DAYS = 30;
 
-/** Потребление фермы уже уперлось в предел её тарифа (по кроликам или по людям). */
+/**
+ * Потребление фермы уже уперлось в предел её тарифа (по кроликам или по людям).
+ *
+ * Предел берём у `planService` — тот же, по которому сервер реально откажет:
+ * ферма с активной поблажкой ещё не упёрлась, и в фильтре «упёрлась в предел»
+ * её быть не должно, иначе админ пойдёт разбираться с тем, чего нет.
+ */
 function isAtLimit(farm) {
-  const plan = farm.plan;
-  if (!plan) return false; // без тарифа ограничений нет — упираться некуда
-  const rabbitsAtLimit = plan.max_rabbits != null && farm.rabbits_count >= plan.max_rabbits;
-  const staffAtLimit = plan.max_staff != null && farm.staff_count >= plan.max_staff;
+  if (!farm.plan) return false; // без тарифа ограничений нет — упираться некуда
+  const rabbitsLimit = planService.getEffectiveLimit(farm, 'rabbits');
+  const staffLimit = planService.getEffectiveLimit(farm, 'staff');
+  const rabbitsAtLimit = rabbitsLimit != null && farm.rabbits_count >= rabbitsLimit;
+  const staffAtLimit = staffLimit != null && farm.staff_count >= staffLimit;
   return rabbitsAtLimit || staffAtLimit;
 }
 
@@ -63,6 +71,15 @@ class PlatformAdminService {
     if (filter === 'no_plan') {
       where.plan_id = null;
     }
+    // Мягко удалённые фермы (см. 2.4) не засоряют обычный список: их видно
+    // только в собственном режиме просмотра `deleted` — он же единственный
+    // способ заметить, что уходит на физическую зачистку, и успеть вернуть
+    // удалённое по ошибке.
+    if (filter === 'deleted') {
+      where.deleted_at = { [Op.ne]: null };
+    } else {
+      where.deleted_at = null;
+    }
 
     const farms = await Farm.findAll({ include: FARM_INCLUDES, where });
 
@@ -85,6 +102,12 @@ class PlatformAdminService {
 
     if (filter === 'at_limit') {
       items = items.filter(isAtLimit);
+    } else if (filter === 'suspended') {
+      items = items.filter((farm) => farm.status === 'suspended');
+    } else if (filter === 'expired') {
+      // Тот же `isExpired`, по которому решается судьба доступа фермы, — иначе
+      // «просрочена» в админке и «просрочена» в проверке лимитов разошлись бы.
+      items = items.filter((farm) => planService.isExpired(farm));
     } else if (filter === 'inactive_days') {
       // Сколько дней считать «не заходили» — настраиваемо через `days`, но
       // по умолчанию месяц: чипу в мобилке не нужен пикер, чтобы включить
@@ -96,7 +119,12 @@ class PlatformAdminService {
       items = items.filter((farm) => !farm.last_active || new Date(farm.last_active).getTime() < cutoff);
     }
 
-    items = this._sortFarms(items, sort);
+    // В режиме удалённых порядок задан самим смыслом экрана: срок до
+    // физической зачистки идёт от даты удаления, поэтому свежеудалённые
+    // сверху, а не «новые по дате создания».
+    items = filter === 'deleted'
+      ? [...items].sort((a, b) => new Date(b.deleted_at).getTime() - new Date(a.deleted_at).getTime())
+      : this._sortFarms(items, sort);
 
     const total = items.length;
     const offset = (safePage - 1) * safeLimit;
@@ -172,14 +200,43 @@ class PlatformAdminService {
     return this.getFarm(farmId);
   }
 
-  /** Одна ферма с тарифом, владельцем, фактическим потреблением и последней активностью. */
+  /**
+   * Одна ферма со всем, что нужно карточке клиента (см.
+   * docs/plans/PLATFORM-ADMIN.md, 2.1): тариф, владелец, потребление,
+   * последняя активность, состав с ролями и входами, последние платежи и
+   * занятое фотографиями место.
+   *
+   * Все запросы уходят вместе: карточка открывается одним движением, и
+   * последовательная цепочка из семи запросов растянула бы её открытие на
+   * сумму задержек вместо самой долгой из них.
+   */
   async getFarm(farmId) {
-    const [farm, rabbitsCount, staffCount, lastActive] = await Promise.all([
-      Farm.findByPk(farmId, { include: FARM_INCLUDES }),
-      Rabbit.count({ where: { farm_id: farmId } }),
-      User.count({ where: { farm_id: farmId } }),
-      User.max('last_login_at', { where: { farm_id: farmId } })
-    ]);
+    const [farm, rabbitsCount, staffCount, lastActive, staff, payments, photoBytes, rabbitPhotoBytes] =
+      await Promise.all([
+        Farm.findByPk(farmId, { include: FARM_INCLUDES }),
+        Rabbit.count({ where: { farm_id: farmId } }),
+        User.count({ where: { farm_id: farmId } }),
+        User.max('last_login_at', { where: { farm_id: farmId } }),
+        User.findAll({
+          where: { farm_id: farmId },
+          attributes: ['id', 'full_name', 'email', 'phone', 'role', 'is_active', 'last_login_at'],
+          order: [['id', 'ASC']]
+        }),
+        // Двадцати хватает, чтобы увидеть историю оплат клиента; вся история
+        // на карточке не нужна, а у эндпоинта нет пагинации.
+        // Без raw_response — сырой ответ банка тяжёлый и ему нечего делать
+        // в ответе на просмотр карточки клиента.
+        Payment.findAll({
+          where: { farm_id: farmId },
+          attributes: ['id', 'amount', 'currency', 'status', 'description', 'created_at'],
+          order: [['created_at', 'DESC']],
+          limit: 20
+        }),
+        // Место считается по двум таблицам: фото галереи и одиночное фото
+        // кролика лежат отдельно (см. 1.6). SUM по пустой выборке — NULL.
+        Photo.sum('size_bytes', { where: { farm_id: farmId } }),
+        Rabbit.sum('photo_size_bytes', { where: { farm_id: farmId } })
+      ]);
 
     if (!farm) {
       throw new Error('FARM_NOT_FOUND');
@@ -189,8 +246,84 @@ class PlatformAdminService {
       ...farm.toJSON(),
       rabbits_count: rabbitsCount,
       staff_count: staffCount,
-      last_active: lastActive || null
+      last_active: lastActive || null,
+      staff,
+      payments,
+      storage_bytes: (photoBytes || 0) + (rabbitPhotoBytes || 0)
     };
+  }
+
+  /**
+   * Сменить статус доступа фермы (`active` / `read_only` / `suspended`) —
+   * см. docs/plans/PLATFORM-ADMIN.md, 2.2. Ответ той же формы, что и везде
+   * в этом сервисе, чтобы клиент обновил карточку, а не перечитывал её.
+   */
+  async updateStatus(farmId, status) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+
+    await farm.update({ status });
+
+    return this.getFarm(farmId);
+  }
+
+  /**
+   * Разовая поблажка сверх тарифа — не смена тарифа (см.
+   * docs/plans/PLATFORM-ADMIN.md, 2.3): тариф остаётся тем же, а по
+   * истечении `extras_until` предел сам возвращается к тарифному.
+   */
+  async updateExtras(farmId, data) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+
+    // Состав полей ограничен Joi-схемой (`updateFarmExtrasSchema`) — сюда
+    // доезжают только extra_rabbits / extra_staff / extras_until.
+    await farm.update(data);
+
+    return this.getFarm(farmId);
+  }
+
+  /**
+   * Мягкое удаление — доступ закрывается сразу (`authenticate`), сама запись
+   * и все её данные ждут физической зачистки 30 дней (см. `jobs/farmPurgeJob`).
+   * `confirmName` — обязательное подтверждение: админ должен набрать точное
+   * название фермы, сервер это перепроверяет сам, не доверяя клиенту.
+   */
+  async softDelete(farmId, confirmName) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+    if (farm.name !== confirmName) {
+      throw new Error('CONFIRM_NAME_MISMATCH');
+    }
+
+    await farm.update({ deleted_at: new Date() });
+
+    return this.getFarm(farmId);
+  }
+
+  /**
+   * Отменить мягкое удаление. Срок 30 дней здесь не проверяется намеренно:
+   * если запись ещё существует, значит зачистка до неё не дошла — а раз
+   * данные на месте, возвращать их можно.
+   */
+  async restore(farmId) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+    if (!farm.deleted_at) {
+      throw new Error('FARM_NOT_DELETED');
+    }
+
+    await farm.update({ deleted_at: null });
+
+    return this.getFarm(farmId);
   }
 }
 

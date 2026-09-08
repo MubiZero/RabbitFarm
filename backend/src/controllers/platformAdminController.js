@@ -1,5 +1,6 @@
 const planService = require('../services/planService');
 const platformAdminService = require('../services/platformAdminService');
+const farmExportService = require('../services/farmExportService');
 const auditService = require('../services/auditService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -148,6 +149,135 @@ class PlatformAdminController {
       }
       if (error.message === 'PLAN_INACTIVE') {
         return ApiResponse.badRequest(res, 'Тариф выключен — включите его или выберите другой');
+      }
+      next(error);
+    }
+  }
+
+  /** PATCH /platform-admin/farms/:id/status */
+  async updateStatus(req, res, next) {
+    try {
+      const before = await platformAdminService.getFarm(req.params.id);
+      const farm = await platformAdminService.updateStatus(req.params.id, req.body.status);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.status',
+        farmId: req.params.id,
+        before: { status: before.status },
+        after: { status: farm.status },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, farm, 'Статус фермы обновлён');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      next(error);
+    }
+  }
+
+  /** PATCH /platform-admin/farms/:id/extras */
+  async updateExtras(req, res, next) {
+    try {
+      const before = await platformAdminService.getFarm(req.params.id);
+      const farm = await platformAdminService.updateExtras(req.params.id, req.body);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.extras',
+        farmId: req.params.id,
+        before: {
+          extra_rabbits: before.extra_rabbits,
+          extra_staff: before.extra_staff,
+          extras_until: before.extras_until
+        },
+        after: {
+          extra_rabbits: farm.extra_rabbits,
+          extra_staff: farm.extra_staff,
+          extras_until: farm.extras_until
+        },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, farm, 'Поблажка фермы обновлена');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * GET /platform-admin/farms/:id/export
+   * Читающее действие, но в журнал пишется всё равно: выгрузка всех данных
+   * клиента — это то, о чём потом спрашивают «кто и когда».
+   */
+  async exportFarm(req, res, next) {
+    try {
+      const data = await farmExportService.exportFarm(req.params.id);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.export',
+        farmId: req.params.id,
+        ip: req.ip
+      });
+      return ApiResponse.success(res, data, 'Экспорт фермы готов');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      next(error);
+    }
+  }
+
+  /** DELETE /platform-admin/farms/:id */
+  async deleteFarm(req, res, next) {
+    try {
+      const before = await platformAdminService.getFarm(req.params.id);
+      const farm = await platformAdminService.softDelete(req.params.id, req.body.confirm_name);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.delete',
+        farmId: req.params.id,
+        before: { deleted_at: before.deleted_at },
+        after: { deleted_at: farm.deleted_at },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, farm, 'Ферма удалена — данные будут окончательно очищены через 30 дней');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      if (error.message === 'CONFIRM_NAME_MISMATCH') {
+        return ApiResponse.badRequest(
+          res,
+          'Введённое название не совпадает с названием фермы',
+          'CONFIRM_NAME_MISMATCH'
+        );
+      }
+      next(error);
+    }
+  }
+
+  /** POST /platform-admin/farms/:id/restore */
+  async restoreFarm(req, res, next) {
+    try {
+      const before = await platformAdminService.getFarm(req.params.id);
+      const farm = await platformAdminService.restore(req.params.id);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.restore',
+        farmId: req.params.id,
+        before: { deleted_at: before.deleted_at },
+        after: { deleted_at: farm.deleted_at },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, farm, 'Ферма восстановлена');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      if (error.message === 'FARM_NOT_DELETED') {
+        return ApiResponse.badRequest(res, 'Ферма не была удалена', 'FARM_NOT_DELETED');
       }
       next(error);
     }
