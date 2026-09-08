@@ -90,6 +90,12 @@ class ApiEndpoints {
   // Photos endpoints (farm-wide feed for the Journal)
   static const String photos = '/photos';
 
+  // Платформенная админка (суперадмин): тарифы и все фермы сервиса
+  static const String platformPlans = '/platform-admin/plans';
+  static String platformPlan(int id) => '/platform-admin/plans/$id';
+  static const String platformFarms = '/platform-admin/farms';
+  static String platformFarmPlan(int id) => '/platform-admin/farms/$id/plan';
+
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';
   static const String reportFarm = '/reports/farm';

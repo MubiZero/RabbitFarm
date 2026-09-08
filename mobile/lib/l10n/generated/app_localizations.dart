@@ -2446,11 +2446,11 @@ abstract class AppLocalizations {
   /// **'Не указана'**
   String get medFormNotSet;
 
-  /// No description provided for @medFormCostLabel.
+  /// Знак валюты передаётся параметром — он один на всё приложение, см. kCurrencySymbol
   ///
   /// In ru, this message translates to:
-  /// **'Затраты, ₽'**
-  String get medFormCostLabel;
+  /// **'Затраты, {currency}'**
+  String medFormCostLabel(String currency);
 
   /// No description provided for @commonNumberInvalid.
   ///
@@ -6063,6 +6063,300 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Лечение по исходу'**
   String get reportsRecordsByOutcome;
+
+  /// No description provided for @farmSectionPlatform.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платформа'**
+  String get farmSectionPlatform;
+
+  /// No description provided for @farmPlatformAdmin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фермы и тарифы'**
+  String get farmPlatformAdmin;
+
+  /// No description provided for @platformTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платформа'**
+  String get platformTitle;
+
+  /// No description provided for @platformTabFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фермы'**
+  String get platformTabFarms;
+
+  /// No description provided for @platformTabPlans.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тарифы'**
+  String get platformTabPlans;
+
+  /// No description provided for @countFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}'**
+  String countFarms(int count);
+
+  /// No description provided for @platformFarmsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферм пока нет'**
+  String get platformFarmsEmptyTitle;
+
+  /// No description provided for @platformFarmsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.'**
+  String get platformFarmsEmptyBody;
+
+  /// No description provided for @platformOwnerMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец не назначен'**
+  String get platformOwnerMissing;
+
+  /// No description provided for @platformNoPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без тарифа'**
+  String get platformNoPlan;
+
+  /// No description provided for @platformNoPlanHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ограничений нет'**
+  String get platformNoPlanHint;
+
+  /// No description provided for @platformRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get platformRabbits;
+
+  /// No description provided for @platformStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Люди'**
+  String get platformStaff;
+
+  /// No description provided for @platformUsageOfLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'{used} из {limit}'**
+  String platformUsageOfLimit(int used, int limit);
+
+  /// No description provided for @platformUsageUnlimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'{used}, без предела'**
+  String platformUsageUnlimited(int used);
+
+  /// No description provided for @platformAtLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Упёрлась в предел тарифа'**
+  String get platformAtLimit;
+
+  /// No description provided for @platformNearLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подходит к пределу тарифа'**
+  String get platformNearLimit;
+
+  /// No description provided for @platformChangePlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить тариф'**
+  String get platformChangePlan;
+
+  /// No description provided for @platformAssignPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назначить тариф'**
+  String get platformAssignPlan;
+
+  /// No description provided for @platformPlanSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф хозяйства «{farm}»'**
+  String platformPlanSheetTitle(String farm);
+
+  /// No description provided for @platformPlanOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без тарифа — работает без ограничений'**
+  String get platformPlanOff;
+
+  /// No description provided for @platformPlanAssigned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф обновлён'**
+  String get platformPlanAssigned;
+
+  /// No description provided for @platformPlanInactive.
+  ///
+  /// In ru, this message translates to:
+  /// **'выключен'**
+  String get platformPlanInactive;
+
+  /// No description provided for @platformPlansEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тарифов пока нет'**
+  String get platformPlansEmptyTitle;
+
+  /// No description provided for @platformPlansEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока их нет, все фермы работают без ограничений. Создайте первый — и его можно будет назначать.'**
+  String get platformPlansEmptyBody;
+
+  /// No description provided for @platformPlanNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый тариф'**
+  String get platformPlanNew;
+
+  /// No description provided for @platformPlanEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get platformPlanEdit;
+
+  /// No description provided for @platformPlanDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить тариф?'**
+  String get platformPlanDeleteTitle;
+
+  /// No description provided for @platformPlanDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'«{name}» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.'**
+  String platformPlanDeleteBody(String name);
+
+  /// No description provided for @platformPlanDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф удалён'**
+  String get platformPlanDeleted;
+
+  /// No description provided for @platformPlanUnlimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без ограничений'**
+  String get platformPlanUnlimited;
+
+  /// No description provided for @platformPlanFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бесплатный'**
+  String get platformPlanFree;
+
+  /// No description provided for @platformPlanLimitRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{до {count} кролика} few{до {count} кроликов} many{до {count} кроликов} other{до {count} кроликов}}'**
+  String platformPlanLimitRabbits(int count);
+
+  /// No description provided for @platformPlanLimitStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{до {count} человека} few{до {count} человек} many{до {count} человек} other{до {count} человек}}'**
+  String platformPlanLimitStaff(int count);
+
+  /// No description provided for @platformPlanFormNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый тариф'**
+  String get platformPlanFormNewTitle;
+
+  /// No description provided for @platformPlanFormEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get platformPlanFormEditTitle;
+
+  /// No description provided for @platformPlanFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get platformPlanFormName;
+
+  /// No description provided for @platformPlanFormNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, «Базовый»'**
+  String get platformPlanFormNameHint;
+
+  /// No description provided for @platformPlanFormNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название'**
+  String get platformPlanFormNameEmpty;
+
+  /// No description provided for @platformPlanFormPrice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена в месяц'**
+  String get platformPlanFormPrice;
+
+  /// No description provided for @platformPlanFormPriceHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пусто — бесплатно'**
+  String get platformPlanFormPriceHint;
+
+  /// No description provided for @platformPlanFormSectionLimits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пределы'**
+  String get platformPlanFormSectionLimits;
+
+  /// No description provided for @platformPlanFormMaxRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кроликов не больше'**
+  String get platformPlanFormMaxRabbits;
+
+  /// No description provided for @platformPlanFormMaxStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Людей не больше'**
+  String get platformPlanFormMaxStaff;
+
+  /// No description provided for @platformPlanFormLimitHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пусто — без ограничения'**
+  String get platformPlanFormLimitHint;
+
+  /// No description provided for @platformPlanFormActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф в ходу'**
+  String get platformPlanFormActive;
+
+  /// No description provided for @platformPlanFormActiveHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.'**
+  String get platformPlanFormActiveHint;
+
+  /// No description provided for @platformPlanFormCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф создан'**
+  String get platformPlanFormCreated;
+
+  /// No description provided for @platformPlanFormUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф обновлён'**
+  String get platformPlanFormUpdated;
 
   /// No description provided for @emptyNoRecordsTitle.
   ///

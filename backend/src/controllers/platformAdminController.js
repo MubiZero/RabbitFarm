@@ -88,6 +88,9 @@ class PlatformAdminController {
       if (error.message === 'PLAN_NOT_FOUND') {
         return ApiResponse.notFound(res, 'Тариф не найден');
       }
+      if (error.message === 'PLAN_INACTIVE') {
+        return ApiResponse.badRequest(res, 'Тариф выключен — включите его или выберите другой');
+      }
       next(error);
     }
   }

@@ -8,13 +8,20 @@ import '../support/test_app.dart';
 
 /// Экран не скроллится в тесте: высокая «поверхность» строит сразу весь
 /// список, иначе find.text не нашёл бы то, что осталось ниже сгиба.
-Future<void> _pumpFor(WidgetTester tester, FarmRoleAccess role) async {
+Future<void> _pumpFor(
+  WidgetTester tester,
+  FarmRoleAccess role, {
+  bool isPlatformAdmin = false,
+}) async {
   await tester.binding.setSurfaceSize(const Size(420, 2400));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
   await tester.pumpWidget(testAppScreen(
     const FarmScreen(),
-    overrides: [farmRoleProvider.overrideWithValue(role)],
+    overrides: [
+      farmRoleProvider.overrideWithValue(role),
+      isPlatformAdminProvider.overrideWithValue(isPlatformAdmin),
+    ],
   ));
   await tester.pump();
 }
@@ -66,6 +73,22 @@ void main() {
     expect(find.text('Корма'), findsOneWidget);
     expect(find.text('Здоровье'), findsOneWidget);
     expect(find.text('Люди'), findsNothing);
+  });
+
+  testWidgets('платформенная админка не видна владельцу фермы',
+      (tester) async {
+    await _pumpFor(tester, FarmRoleAccess.owner);
+
+    expect(find.text('Платформа'), findsNothing);
+    expect(find.text('Фермы и тарифы'), findsNothing);
+  });
+
+  testWidgets('платформенная админка видна суперадмину отдельным разделом',
+      (tester) async {
+    await _pumpFor(tester, FarmRoleAccess.owner, isPlatformAdmin: true);
+
+    expect(find.text('Платформа'), findsOneWidget);
+    expect(find.text('Фермы и тарифы'), findsOneWidget);
   });
 
   testWidgets('поголовье и разведение из вкладки убраны', (tester) async {

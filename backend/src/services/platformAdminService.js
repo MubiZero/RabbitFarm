@@ -6,6 +6,17 @@ const logger = require('../utils/logger');
  * назначение им тарифа. В отличие от остального сервиса, здесь нарочно
  * видно сразу все фермы — это единственное место в бэкенде, где так можно.
  */
+
+/**
+ * Что нужно знать о ферме платформенному админу помимо её названия: на каком
+ * она тарифе и с кем по ней связаться. Одно и то же для списка и для одной
+ * фермы, чтобы ответы этих двух эндпоинтов не расходились по форме.
+ */
+const FARM_INCLUDES = [
+  { model: Plan, as: 'plan' },
+  { model: User, as: 'owner', attributes: ['id', 'full_name', 'email', 'phone'] }
+];
+
 class PlatformAdminService {
   /** Фермы постранично, с текущим планом и фактическим потреблением. */
   async listFarms({ page = 1, limit = 20 } = {}) {
@@ -14,7 +25,7 @@ class PlatformAdminService {
     const offset = (safePage - 1) * safeLimit;
 
     const { count, rows: farms } = await Farm.findAndCountAll({
-      include: [{ model: Plan, as: 'plan' }],
+      include: FARM_INCLUDES,
       order: [['created_at', 'DESC']],
       limit: safeLimit,
       offset
@@ -46,7 +57,14 @@ class PlatformAdminService {
     };
   }
 
-  /** Назначить (или снять — `planId: null`) тариф ферме. */
+  /**
+   * Назначить (или снять — `planId: null`) тариф ферме.
+   *
+   * Возвращает ферму в том же виде, в каком она приходит в списке, — вместе
+   * с потреблением. Иначе после назначения тарифа клиенту негде взять
+   * «сколько уже израсходовано из нового лимита», кроме перезагрузки всего
+   * списка: а ответ на смену одной строки не должен стоить целой страницы.
+   */
   async assignPlan(farmId, planId) {
     const farm = await Farm.findByPk(farmId);
     if (!farm) {
@@ -58,12 +76,37 @@ class PlatformAdminService {
       if (!plan) {
         throw new Error('PLAN_NOT_FOUND');
       }
+      // Выключенный тариф больше не выдаётся — иначе `is_active` был бы
+      // флагом без последствий. Фермы, которым его уже назначили, остаются
+      // на нём: выключение закрывает продажи, а не работу хозяйства.
+      if (!plan.is_active) {
+        throw new Error('PLAN_INACTIVE');
+      }
     }
 
     await farm.update({ plan_id: planId });
     logger.info('Farm plan assigned', { farmId, planId });
 
-    return Farm.findByPk(farmId, { include: [{ model: Plan, as: 'plan' }] });
+    return this.getFarm(farmId);
+  }
+
+  /** Одна ферма с тарифом, владельцем и фактическим потреблением. */
+  async getFarm(farmId) {
+    const [farm, rabbitsCount, staffCount] = await Promise.all([
+      Farm.findByPk(farmId, { include: FARM_INCLUDES }),
+      Rabbit.count({ where: { farm_id: farmId } }),
+      User.count({ where: { farm_id: farmId } })
+    ]);
+
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+
+    return {
+      ...farm.toJSON(),
+      rabbits_count: rabbitsCount,
+      staff_count: staffCount
+    };
   }
 }
 

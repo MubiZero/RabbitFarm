@@ -16,6 +16,7 @@ class UserRef with _$UserRef {
     @IntConverter() required int id,
     @JsonKey(name: 'full_name') required String fullName,
     String? email,
+    String? phone,
   }) = _UserRef;
 
   factory UserRef.fromJson(Map<String, dynamic> json) =>

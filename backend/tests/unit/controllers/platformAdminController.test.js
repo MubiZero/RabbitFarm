@@ -99,6 +99,15 @@ describe('PlatformAdminController', () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
 
+    it('возвращает 400 при попытке назначить выключенный тариф', async () => {
+      platformAdminService.assignPlan.mockRejectedValue(new Error('PLAN_INACTIVE'));
+      const res = mockRes();
+
+      await platformAdminController.assignPlan(mockReq({ params: { id: 1 }, body: { plan_id: 2 } }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
     it('возвращает 200 при успешном назначении', async () => {
       platformAdminService.assignPlan.mockResolvedValue({ id: 1, plan_id: 2 });
       const res = mockRes();

@@ -247,7 +247,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.txFormAmount,
                 prefixIcon: const Icon(Icons.payments_outlined),
-                suffixText: '₽',
+                suffixText: kCurrencySymbol,
               ),
               validator: (v) {
                 final value = parseDecimal(v);

@@ -262,7 +262,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.feedFormCost,
                 prefixIcon: const Icon(Icons.payments_outlined),
-                suffixText: '₽/${_unit.displayName}',
+                suffixText: '$kCurrencySymbol/${_unit.displayName}',
               ),
               validator: (v) => _validateAmount(v, required: false),
             ),

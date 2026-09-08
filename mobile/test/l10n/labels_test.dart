@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mobile/core/utils/format_utils.dart';
 import 'package:mobile/l10n/generated/app_localizations_ru.dart';
 
 /// Строки выносились в переводы с дедупликацией по совпадению текста, и из-за
@@ -12,6 +13,10 @@ void main() {
   group('Тип — у клетки свой, у корма свой', () {
     test('клетка', () => expect(l10n.cageFormType, 'Тип клетки'));
     test('корм', () => expect(l10n.feedsFilterType, 'Тип корма'));
+  });
+
+  test('знак валюты в подписях приходит параметром, а не зашит в перевод', () {
+    expect(l10n.medFormCostLabel(kCurrencySymbol), 'Затраты, с');
   });
 
   group('Общие подписи не принадлежат экрану', () {

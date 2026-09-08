@@ -214,8 +214,8 @@ void main() {
 
       expect(find.text('Деньги'), findsOneWidget); // сегмент выбора отчёта
       expect(find.text('ДЕНЬГИ ЗА ПЕРИОД'), findsOneWidget);
-      expect(find.text('184\u00A0500 ₽'), findsOneWidget);
-      expect(find.text('88\u00A0300 ₽'), findsOneWidget); // 184 500 − 96 200
+      expect(find.text('184\u00A0500 с'), findsOneWidget);
+      expect(find.text('88\u00A0300 с'), findsOneWidget); // 184 500 − 96 200
     });
 
     testWidgets('работнику финансов не показываем вовсе', (tester) async {
@@ -262,10 +262,10 @@ void main() {
       await _openSection(tester, 'Деньги');
 
       expect(find.text('Прибыль'), findsOneWidget);
-      expect(find.text('88\u00A0300 ₽'), findsOneWidget);
+      expect(find.text('88\u00A0300 с'), findsOneWidget);
       expect(find.text('ДОХОДЫ ПО КАТЕГОРИЯМ'), findsOneWidget);
       expect(find.text('Продажа кролика'), findsOneWidget);
-      expect(find.text('142\u00A0000 ₽'), findsOneWidget);
+      expect(find.text('142\u00A0000 с'), findsOneWidget);
       expect(find.text('РАСХОДЫ ПО КАТЕГОРИЯМ'), findsOneWidget);
       expect(find.text('Корм'), findsOneWidget);
     });

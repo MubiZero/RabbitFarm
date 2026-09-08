@@ -42,6 +42,18 @@ describe('PlatformAdminService', () => {
       expect(result.pagination).toEqual({ page: 1, limit: 20, total: 2, totalPages: 1 });
     });
 
+    it('запрашивает вместе с фермой её тариф и владельца', async () => {
+      Farm.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
+
+      await platformAdminService.listFarms();
+
+      const { include } = Farm.findAndCountAll.mock.calls[0][0];
+      expect(include).toEqual(expect.arrayContaining([
+        expect.objectContaining({ as: 'plan' }),
+        expect.objectContaining({ as: 'owner' })
+      ]));
+    });
+
     it('не запрашивает счётчики, если ферм нет', async () => {
       Farm.findAndCountAll.mockResolvedValue({ count: 0, rows: [] });
 
@@ -50,6 +62,35 @@ describe('PlatformAdminService', () => {
       expect(Rabbit.count).not.toHaveBeenCalled();
       expect(User.count).not.toHaveBeenCalled();
       expect(result.items).toEqual([]);
+    });
+  });
+
+  describe('getFarm', () => {
+    it('отдаёт ферму вместе с её фактическим потреблением', async () => {
+      Farm.findByPk.mockResolvedValue({
+        id: 7,
+        toJSON: () => ({ id: 7, name: 'Ферма 7', plan: { id: 2 } })
+      });
+      Rabbit.count.mockResolvedValue(12);
+      User.count.mockResolvedValue(3);
+
+      const farm = await platformAdminService.getFarm(7);
+
+      expect(farm).toEqual({
+        id: 7,
+        name: 'Ферма 7',
+        plan: { id: 2 },
+        rabbits_count: 12,
+        staff_count: 3
+      });
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(0);
+
+      await expect(platformAdminService.getFarm(999)).rejects.toThrow('FARM_NOT_FOUND');
     });
   });
 
@@ -69,7 +110,11 @@ describe('PlatformAdminService', () => {
 
     it('снимает тариф, когда planId = null, не проверяя существование плана', async () => {
       const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
-      Farm.findByPk.mockResolvedValueOnce(farm).mockResolvedValueOnce({ id: 1, plan: null });
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, plan: null }) });
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
 
       await platformAdminService.assignPlan(1, null);
 
@@ -77,15 +122,31 @@ describe('PlatformAdminService', () => {
       expect(farm.update).toHaveBeenCalledWith({ plan_id: null });
     });
 
+    it('не назначает выключенный тариф', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, update: jest.fn() });
+      Plan.findByPk.mockResolvedValue({ id: 2, name: 'Pro', is_active: false });
+
+      await expect(platformAdminService.assignPlan(1, 2)).rejects.toThrow('PLAN_INACTIVE');
+    });
+
     it('назначает тариф, когда он существует', async () => {
       const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
-      Farm.findByPk.mockResolvedValueOnce(farm).mockResolvedValueOnce({ id: 1, plan: { id: 2 } });
-      Plan.findByPk.mockResolvedValue({ id: 2, name: 'Pro' });
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({ id: 1, toJSON: () => ({ id: 1, plan: { id: 2 } }) });
+      Plan.findByPk.mockResolvedValue({ id: 2, name: 'Pro', is_active: true });
+      Rabbit.count.mockResolvedValue(5);
+      User.count.mockResolvedValue(2);
 
       const result = await platformAdminService.assignPlan(1, 2);
 
       expect(farm.update).toHaveBeenCalledWith({ plan_id: 2 });
       expect(result.plan.id).toBe(2);
+      // Ответ той же формы, что и элемент списка: с потреблением, иначе
+      // после назначения тарифа клиенту пришлось бы перечитывать страницу
+      // целиком, чтобы показать «сколько уже израсходовано из лимита».
+      expect(result.rabbits_count).toBe(5);
+      expect(result.staff_count).toBe(2);
     });
   });
 });

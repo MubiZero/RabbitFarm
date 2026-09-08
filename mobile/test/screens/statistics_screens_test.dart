@@ -160,9 +160,9 @@ void main() {
       await _settle(tester);
 
       expect(find.text('Финансы в цифрах'), findsOneWidget);
-      expect(find.text('184\u00A0500 ₽'), findsOneWidget); // доходы
-      expect(find.text('96\u00A0200 ₽'), findsOneWidget); // расходы
-      expect(find.text('88\u00A0300 ₽'), findsOneWidget); // прибыль
+      expect(find.text('184\u00A0500 с'), findsOneWidget); // доходы
+      expect(find.text('96\u00A0200 с'), findsOneWidget); // расходы
+      expect(find.text('88\u00A0300 с'), findsOneWidget); // прибыль
       expect(find.text('Прибыль'), findsOneWidget);
       expect(find.text('37 операций'), findsOneWidget);
       expect(find.text('ДОХОДЫ ПО КАТЕГОРИЯМ'), findsOneWidget);
@@ -183,7 +183,7 @@ void main() {
       await _settle(tester);
 
       expect(find.text('Убыток'), findsOneWidget);
-      expect(find.text('15\u00A0000 ₽'), findsOneWidget);
+      expect(find.text('15\u00A0000 с'), findsOneWidget);
     });
 
     testWidgets('на пустом периоде предлагает добавить операцию',
@@ -227,7 +227,7 @@ void main() {
 
       expect(find.text('Склад в цифрах'), findsOneWidget);
       expect(find.text('9'), findsOneWidget); // позиций на складе
-      expect(find.text('43\u00A0700 ₽'), findsOneWidget); // стоимость запаса
+      expect(find.text('43\u00A0700 с'), findsOneWidget); // стоимость запаса
       expect(find.text('СОСТАВ ПО ТИПАМ'), findsOneWidget);
       expect(find.text('Гранулы'), findsOneWidget);
       expect(find.text('ОСТАТКИ НА ИСХОДЕ'), findsOneWidget);
@@ -279,7 +279,7 @@ void main() {
 
       expect(find.text('Кормления в цифрах'), findsOneWidget);
       expect(find.text('214'), findsOneWidget);
-      expect(find.text('40\u00A0265 ₽'), findsOneWidget);
+      expect(find.text('40\u00A0265 с'), findsOneWidget);
       expect(find.text('Выдано'), findsOneWidget);
       expect(find.text('486,5 кг'), findsOneWidget);
       // Единица одна, поэтому в заголовке её не дублируем.

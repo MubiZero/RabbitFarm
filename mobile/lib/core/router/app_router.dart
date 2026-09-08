@@ -65,6 +65,9 @@ import '../../features/breeding/presentation/screens/breeding_cycle_screen.dart'
 import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
+import '../../features/platform_admin/data/models/platform_admin_models.dart';
+import '../../features/platform_admin/presentation/screens/platform_admin_screen.dart';
+import '../../features/platform_admin/presentation/screens/plan_form_screen.dart';
 import '../../features/staff/presentation/screens/join_farm_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
@@ -662,6 +665,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/staff',
         name: 'staff',
         builder: (context, state) => const StaffScreen(),
+      ),
+
+      // Платформенная админка. Вход в неё есть только у суперадмина (см.
+      // экран «Хозяйство»), а доступ к данным закрыт на сервере — маршрут
+      // сам по себе ничего не открывает.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/platform-admin',
+        name: 'platform-admin',
+        builder: (context, state) => const PlatformAdminScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/platform-admin/plans/form',
+        name: 'platform-plan-form',
+        builder: (context, state) => PlanFormScreen(plan: state.extra as Plan?),
       ),
 
     ],

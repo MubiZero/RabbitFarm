@@ -542,7 +542,13 @@
   "medFormDosage": "Дозировка",
   "medFormEndedDate": "Дата окончания",
   "medFormNotSet": "Не указана",
-  "medFormCostLabel": "Затраты, ₽",
+  "medFormCostLabel": "Затраты, {currency}",
+  "@medFormCostLabel": {
+    "description": "Знак валюты передаётся параметром — он один на всё приложение, см. kCurrencySymbol",
+    "placeholders": {
+      "currency": { "type": "String" }
+    }
+  },
   "commonNumberInvalid": "Введите число",
 
   "feedsTitle": "Склад кормов",
@@ -1298,6 +1304,96 @@
   "reportsHealthEmptyBody": "Выберите период шире или отметьте прививку — отчёт посчитается сам.",
   "reportsVaccinesByName": "Прививки по вакцинам",
   "reportsRecordsByOutcome": "Лечение по исходу",
+
+  "farmSectionPlatform": "Платформа",
+  "farmPlatformAdmin": "Фермы и тарифы",
+
+  "platformTitle": "Платформа",
+  "platformTabFarms": "Фермы",
+  "platformTabPlans": "Тарифы",
+
+  "countFarms": "{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}",
+  "@countFarms": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "platformFarmsEmptyTitle": "Ферм пока нет",
+  "platformFarmsEmptyBody": "Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.",
+  "platformOwnerMissing": "Владелец не назначен",
+  "platformNoPlan": "Без тарифа",
+  "platformNoPlanHint": "Ограничений нет",
+  "platformRabbits": "Кролики",
+  "platformStaff": "Люди",
+  "platformUsageOfLimit": "{used} из {limit}",
+  "@platformUsageOfLimit": {
+    "placeholders": {
+      "used": { "type": "int" },
+      "limit": { "type": "int" }
+    }
+  },
+  "platformUsageUnlimited": "{used}, без предела",
+  "@platformUsageUnlimited": {
+    "placeholders": {
+      "used": { "type": "int" }
+    }
+  },
+  "platformAtLimit": "Упёрлась в предел тарифа",
+  "platformNearLimit": "Подходит к пределу тарифа",
+  "platformChangePlan": "Сменить тариф",
+  "platformAssignPlan": "Назначить тариф",
+  "platformPlanSheetTitle": "Тариф хозяйства «{farm}»",
+  "@platformPlanSheetTitle": {
+    "placeholders": {
+      "farm": { "type": "String" }
+    }
+  },
+  "platformPlanOff": "Без тарифа — работает без ограничений",
+  "platformPlanAssigned": "Тариф обновлён",
+  "platformPlanInactive": "выключен",
+
+  "platformPlansEmptyTitle": "Тарифов пока нет",
+  "platformPlansEmptyBody": "Пока их нет, все фермы работают без ограничений. Создайте первый — и его можно будет назначать.",
+  "platformPlanNew": "Новый тариф",
+  "platformPlanEdit": "Изменить",
+  "platformPlanDeleteTitle": "Удалить тариф?",
+  "platformPlanDeleteBody": "«{name}» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.",
+  "@platformPlanDeleteBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "platformPlanDeleted": "Тариф удалён",
+  "platformPlanUnlimited": "Без ограничений",
+  "platformPlanFree": "Бесплатный",
+  "platformPlanLimitRabbits": "{count, plural, one{до {count} кролика} few{до {count} кроликов} many{до {count} кроликов} other{до {count} кроликов}}",
+  "@platformPlanLimitRabbits": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformPlanLimitStaff": "{count, plural, one{до {count} человека} few{до {count} человек} many{до {count} человек} other{до {count} человек}}",
+  "@platformPlanLimitStaff": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformPlanFormNewTitle": "Новый тариф",
+  "platformPlanFormEditTitle": "Тариф",
+  "platformPlanFormName": "Название",
+  "platformPlanFormNameHint": "Например, «Базовый»",
+  "platformPlanFormNameEmpty": "Введите название",
+  "platformPlanFormPrice": "Цена в месяц",
+  "platformPlanFormPriceHint": "Пусто — бесплатно",
+  "platformPlanFormSectionLimits": "Пределы",
+  "platformPlanFormMaxRabbits": "Кроликов не больше",
+  "platformPlanFormMaxStaff": "Людей не больше",
+  "platformPlanFormLimitHint": "Пусто — без ограничения",
+  "platformPlanFormActive": "Тариф в ходу",
+  "platformPlanFormActiveHint": "Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.",
+  "platformPlanFormCreated": "Тариф создан",
+  "platformPlanFormUpdated": "Тариф обновлён",
 
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."
