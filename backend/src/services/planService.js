@@ -28,6 +28,10 @@ class PlanService {
       throw new Error('PLAN_NAME_EXISTS');
     }
 
+    if (data.is_default) {
+      await this._assertNoDefaultPlan();
+    }
+
     const plan = await Plan.create(data);
     logger.info('Plan created', { planId: plan.id, name: plan.name });
     return plan;
@@ -43,9 +47,25 @@ class PlanService {
       }
     }
 
+    if (data.is_default && !plan.is_default) {
+      await this._assertNoDefaultPlan();
+    }
+
     await plan.update(data);
     logger.info('Plan updated', { planId });
     return plan;
+  }
+
+  /**
+   * Бросает `DEFAULT_PLAN_EXISTS`, если default уже назначен другому тарифу.
+   * Осознанное решение: второй `is_default` не проходит молча переключая
+   * старый — админ должен сперва явно снять флаг со старого тарифа.
+   */
+  async _assertNoDefaultPlan() {
+    const existingDefault = await Plan.findOne({ where: { is_default: true } });
+    if (existingDefault) {
+      throw new Error('DEFAULT_PLAN_EXISTS');
+    }
   }
 
   /** Удаление плана не трогает фермы — они просто становятся безлимитными. */
@@ -54,6 +74,24 @@ class PlanService {
     await plan.destroy();
     logger.info('Plan deleted', { planId });
     return { success: true };
+  }
+
+  /**
+   * Тариф, который автоматически достаётся новой ферме при регистрации.
+   * `null`, если такого тарифа ещё не завели через админку.
+   */
+  async getDefault() {
+    return Plan.findOne({ where: { is_default: true } });
+  }
+
+  /**
+   * `true`, если у платного тарифа фермы истёк срок действия. Бесплатный
+   * тариф по умолчанию бессрочен (`plan_expires_at = null`), поэтому такая
+   * ферма никогда не просрочена.
+   */
+  isExpired(farm) {
+    if (!farm?.plan_expires_at) return false;
+    return new Date(farm.plan_expires_at) < new Date();
   }
 
   /** Ферма вместе с её текущим планом — единая точка для проверок лимита. */

@@ -16,6 +16,7 @@ _$PlanImpl _$$PlanImplFromJson(Map<String, dynamic> json) => _$PlanImpl(
     const DoubleConverter().fromJson,
   ),
   isActive: json['is_active'] as bool? ?? true,
+  isDefault: json['is_default'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$PlanImplToJson(_$PlanImpl instance) =>
@@ -29,6 +30,7 @@ Map<String, dynamic> _$$PlanImplToJson(_$PlanImpl instance) =>
         const DoubleConverter().toJson,
       ),
       'is_active': instance.isActive,
+      'is_default': instance.isDefault,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(
@@ -48,6 +50,7 @@ _$PlanDraftImpl _$$PlanDraftImplFromJson(Map<String, dynamic> json) =>
       maxStaff: (json['max_staff'] as num?)?.toInt(),
       price: (json['price'] as num?)?.toDouble(),
       isActive: json['is_active'] as bool,
+      isDefault: json['is_default'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$PlanDraftImplToJson(_$PlanDraftImpl instance) =>
@@ -57,6 +60,7 @@ Map<String, dynamic> _$$PlanDraftImplToJson(_$PlanDraftImpl instance) =>
       'max_staff': instance.maxStaff,
       'price': instance.price,
       'is_active': instance.isActive,
+      'is_default': instance.isDefault,
     };
 
 _$PlatformFarmImpl _$$PlatformFarmImplFromJson(Map<String, dynamic> json) =>

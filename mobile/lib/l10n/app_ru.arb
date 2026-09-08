@@ -1396,6 +1396,8 @@
   "platformPlanFormLimitHint": "Пусто — без ограничения",
   "platformPlanFormActive": "Тариф в ходу",
   "platformPlanFormActiveHint": "Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.",
+  "platformPlanFormDefault": "Выдавать новым фермам",
+  "platformPlanFormDefaultHint": "Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.",
   "platformPlanFormCreated": "Тариф создан",
   "platformPlanFormUpdated": "Тариф обновлён",
 

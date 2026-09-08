@@ -53,21 +53,21 @@ describe('RabbitController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: rabbit }));
     });
 
-    it('should attach photo_url when file is uploaded', async () => {
-      const rabbit = { id: 1, name: 'Bunny', photo_url: '/uploads/rabbits/photo.jpg' };
+    it('should attach photo_url and photo_size_bytes when file is uploaded', async () => {
+      const rabbit = { id: 1, name: 'Bunny', photo_url: '/uploads/farm-1/rabbits/photo.jpg' };
       rabbitService.createRabbit.mockResolvedValue(rabbit);
-      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/photo.jpg');
+      fileStorage.uploadFile.mockResolvedValue('/uploads/farm-1/rabbits/photo.jpg');
       const req = mockReq({
         body: { name: 'Bunny' },
-        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 }
+        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 12345 }
       });
       const res = mockRes();
 
       await rabbitController.create(req, res, mockNext);
 
-      expect(fileStorage.uploadFile).toHaveBeenCalledWith('rabbits', req.file);
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith(1, 'rabbits', req.file);
       expect(rabbitService.createRabbit).toHaveBeenCalledWith(
-        expect.objectContaining({ photo_url: '/uploads/rabbits/photo.jpg' })
+        expect.objectContaining({ photo_url: '/uploads/farm-1/rabbits/photo.jpg', photo_size_bytes: 12345 })
       );
       expect(res.status).toHaveBeenCalledWith(201);
     });
@@ -240,21 +240,23 @@ describe('RabbitController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: rabbit }));
     });
 
-    it('should attach photo_url when file is uploaded', async () => {
-      const rabbit = { id: 1, photo_url: '/uploads/rabbits/new.jpg' };
+    it('should attach photo_url and photo_size_bytes when file is uploaded', async () => {
+      const rabbit = { id: 1, photo_url: '/uploads/farm-1/rabbits/new.jpg' };
       rabbitService.updateRabbit.mockResolvedValue(rabbit);
-      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/new.jpg');
+      fileStorage.uploadFile.mockResolvedValue('/uploads/farm-1/rabbits/new.jpg');
       const req = mockReq({
         params: { id: '1' },
         body: { name: 'Updated' },
-        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 }
+        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 54321 }
       });
       const res = mockRes();
 
       await rabbitController.update(req, res, mockNext);
 
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith(1, 'rabbits', req.file);
       expect(rabbitService.updateRabbit).toHaveBeenCalledWith('1', 1, expect.objectContaining({
-        photo_url: '/uploads/rabbits/new.jpg'
+        photo_url: '/uploads/farm-1/rabbits/new.jpg',
+        photo_size_bytes: 54321
       }));
     });
 
@@ -640,26 +642,80 @@ describe('RabbitController', () => {
     });
   });
 
+  // ─── addGalleryPhoto ───────────────────────────────────────────────
+
+  describe('addGalleryPhoto', () => {
+    it('should upload the file scoped to the farm and record its size', async () => {
+      const photo = { id: 5, url: '/uploads/farm-1/rabbits/gallery.jpg', size_bytes: 777 };
+      fileStorage.uploadFile.mockResolvedValue('/uploads/farm-1/rabbits/gallery.jpg');
+      rabbitService.addGalleryPhoto.mockResolvedValue(photo);
+      const file = { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 777 };
+      const req = mockReq({
+        params: { id: '1' },
+        file,
+        body: { caption: 'Cute' }
+      });
+      const res = mockRes();
+
+      await rabbitController.addGalleryPhoto(req, res, mockNext);
+
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith(1, 'rabbits', file);
+      expect(rabbitService.addGalleryPhoto).toHaveBeenCalledWith('1', 1, expect.objectContaining({
+        url: '/uploads/farm-1/rabbits/gallery.jpg',
+        size_bytes: 777,
+        caption: 'Cute'
+      }));
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: photo }));
+    });
+
+    it('should return 400 when no file uploaded', async () => {
+      const req = mockReq({ params: { id: '1' }, file: null });
+      const res = mockRes();
+
+      await rabbitController.addGalleryPhoto(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(rabbitService.addGalleryPhoto).not.toHaveBeenCalled();
+    });
+
+    it('should return 404 when RABBIT_NOT_FOUND', async () => {
+      fileStorage.uploadFile.mockResolvedValue('/uploads/farm-1/rabbits/gallery.jpg');
+      rabbitService.addGalleryPhoto.mockRejectedValue(new Error('RABBIT_NOT_FOUND'));
+      const req = mockReq({
+        params: { id: '99' },
+        file: { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 }
+      });
+      const res = mockRes();
+
+      await rabbitController.addGalleryPhoto(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+  });
+
   // ─── uploadPhoto ───────────────────────────────────────────────────
 
   describe('uploadPhoto', () => {
-    const uploadedFile = { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1 };
+    const uploadedFile = { fieldname: 'photo', buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 999 };
 
     beforeEach(() => {
-      fileStorage.uploadFile.mockResolvedValue('/uploads/rabbits/img.jpg');
+      fileStorage.uploadFile.mockResolvedValue('/uploads/farm-1/rabbits/img.jpg');
     });
 
     it('should upload photo and return 200', async () => {
-      const rabbit = { id: 1, photo_url: '/uploads/rabbits/img.jpg' };
+      const rabbit = { id: 1, photo_url: '/uploads/farm-1/rabbits/img.jpg' };
       rabbitService.updateRabbit.mockResolvedValue(rabbit);
       const req = mockReq({ params: { id: '1' }, file: uploadedFile });
       const res = mockRes();
 
       await rabbitController.uploadPhoto(req, res, mockNext);
 
-      expect(fileStorage.uploadFile).toHaveBeenCalledWith('rabbits', uploadedFile);
+      expect(fileStorage.uploadFile).toHaveBeenCalledWith(1, 'rabbits', uploadedFile);
       expect(rabbitService.updateRabbit).toHaveBeenCalledWith('1', 1, {
-        photo_url: '/uploads/rabbits/img.jpg'
+        photo_url: '/uploads/farm-1/rabbits/img.jpg',
+        photo_size_bytes: 999
       });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: rabbit }));
@@ -719,7 +775,7 @@ describe('RabbitController', () => {
 
       await rabbitController.deletePhoto(req, res, mockNext);
 
-      expect(rabbitService.updateRabbit).toHaveBeenCalledWith('1', 1, { photo_url: null });
+      expect(rabbitService.updateRabbit).toHaveBeenCalledWith('1', 1, { photo_url: null, photo_size_bytes: null });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: rabbit }));
     });

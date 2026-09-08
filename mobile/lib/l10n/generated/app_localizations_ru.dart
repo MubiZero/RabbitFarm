@@ -3528,6 +3528,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.';
 
   @override
+  String get platformPlanFormDefault => 'Выдавать новым фермам';
+
+  @override
+  String get platformPlanFormDefaultHint =>
+      'Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.';
+
+  @override
   String get platformPlanFormCreated => 'Тариф создан';
 
   @override

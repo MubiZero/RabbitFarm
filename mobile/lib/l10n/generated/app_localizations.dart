@@ -6370,6 +6370,18 @@ abstract class AppLocalizations {
   /// **'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.'**
   String get platformPlanFormActiveHint;
 
+  /// No description provided for @platformPlanFormDefault.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдавать новым фермам'**
+  String get platformPlanFormDefault;
+
+  /// No description provided for @platformPlanFormDefaultHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.'**
+  String get platformPlanFormDefaultHint;
+
   /// No description provided for @platformPlanFormCreated.
   ///
   /// In ru, this message translates to:

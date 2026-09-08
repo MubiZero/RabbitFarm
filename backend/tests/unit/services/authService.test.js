@@ -15,8 +15,12 @@ jest.mock('../../../src/models', () => ({
     destroy: jest.fn()
   }
 }));
+jest.mock('../../../src/services/planService', () => ({
+  getDefault: jest.fn()
+}));
 
 const { Farm, User, RefreshToken } = require('../../../src/models');
+const planService = require('../../../src/services/planService');
 const authService = require('../../../src/services/authService');
 const PasswordUtil = require('../../../src/utils/password');
 const { createMockUser } = require('../../helpers/mockModels');
@@ -30,6 +34,8 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // По умолчанию дефолтного тарифа нет — как до появления п. 1.2.
+    planService.getDefault.mockResolvedValue(null);
   });
 
   describe('login', () => {
@@ -134,6 +140,52 @@ describe('AuthService', () => {
         expect.objectContaining({ transaction: mockTransaction })
       );
       expect(mockTransaction.commit).toHaveBeenCalled();
+    });
+
+    it('назначает новой ферме тариф по умолчанию, если он заведён', async () => {
+      const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+      User.sequelize.transaction.mockResolvedValue(mockTransaction);
+      User.findOne.mockResolvedValue(null);
+      planService.getDefault.mockResolvedValue({ id: 5, name: 'Бесплатный', is_default: true });
+
+      const farm = { id: 78, update: jest.fn().mockResolvedValue(true) };
+      Farm.create.mockResolvedValue(farm);
+      User.create.mockResolvedValue(createMockUser({ id: 43, farm_id: 78 }));
+      RefreshToken.create.mockResolvedValue({});
+
+      await authService.register({
+        email: 'another@example.com',
+        password: 'password123',
+        full_name: 'Ещё Фермер'
+      });
+
+      expect(Farm.create).toHaveBeenCalledWith(
+        expect.objectContaining({ plan_id: 5 }),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+    });
+
+    it('не назначает план, если дефолтный тариф ещё не заведён', async () => {
+      const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+      User.sequelize.transaction.mockResolvedValue(mockTransaction);
+      User.findOne.mockResolvedValue(null);
+      planService.getDefault.mockResolvedValue(null);
+
+      const farm = { id: 79, update: jest.fn().mockResolvedValue(true) };
+      Farm.create.mockResolvedValue(farm);
+      User.create.mockResolvedValue(createMockUser({ id: 44, farm_id: 79 }));
+      RefreshToken.create.mockResolvedValue({});
+
+      await authService.register({
+        email: 'third@example.com',
+        password: 'password123',
+        full_name: 'Третий Фермер'
+      });
+
+      expect(Farm.create).toHaveBeenCalledWith(
+        expect.objectContaining({ plan_id: null }),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
     });
   });
 

@@ -6,6 +6,7 @@ const logger = require('../utils/logger');
 const { generateOtp, hashOtp } = require('../utils/otp');
 const payomSmsTransport = require('./notifications/payomSmsTransport');
 const emailTransport = require('./notifications/emailTransport');
+const planService = require('./planService');
 
 const RESET_CODE_TTL_MINUTES = 15;
 const RESET_CODE_MAX_ATTEMPTS = 5;
@@ -75,9 +76,17 @@ class AuthService {
       // очереди: сначала хозяйство без владельца, затем человек в нём, затем
       // владелец проставляется ферме. Всё в одной транзакции — хозяйство без
       // хозяина наружу не выходит.
+      //
+      // Тариф по умолчанию назначается сразу: без него «нет плана = нет
+      // лимитов», то есть каждая новая ферма была бы вечным безлимитным
+      // клиентом. Если дефолтный тариф ещё не заведён через админку —
+      // ферма остаётся без плана, как и раньше.
+      const defaultPlan = await planService.getDefault();
+
       const farm = await Farm.create({
         name: (userData.farm_name || '').trim() || `Ферма ${userData.full_name}`,
-        owner_id: null
+        owner_id: null,
+        plan_id: defaultPlan ? defaultPlan.id : null
       }, { transaction });
 
       const user = await User.create({
