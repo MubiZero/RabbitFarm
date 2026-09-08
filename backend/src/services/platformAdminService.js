@@ -1,5 +1,4 @@
 const { Farm, Plan, Rabbit, User } = require('../models');
-const logger = require('../utils/logger');
 
 /**
  * Платформенная админка: список ферм со сводкой по использованию и
@@ -85,7 +84,6 @@ class PlatformAdminService {
     }
 
     await farm.update({ plan_id: planId });
-    logger.info('Farm plan assigned', { farmId, planId });
 
     return this.getFarm(farmId);
   }

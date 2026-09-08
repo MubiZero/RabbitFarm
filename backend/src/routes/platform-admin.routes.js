@@ -62,4 +62,13 @@ router.get('/farms', platformAdminController.listFarms);
  */
 router.patch('/farms/:id/plan', validate(assignPlanSchema), platformAdminController.assignPlan);
 
+/**
+ * @swagger
+ * /platform-admin/audit:
+ *   get:
+ *     summary: Журнал действий платформенного админа, постранично, опционально по ферме
+ *     tags: [PlatformAdmin]
+ */
+router.get('/audit', platformAdminController.listAudit);
+
 module.exports = router;
