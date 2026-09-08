@@ -16,11 +16,17 @@ const EXTENSION_BY_MIME = {
  * Ключ объекта в бакете. Тот же формат имени, что и раньше на диске
  * (`fieldname-timestamp-random.ext`), чтобы старые `photo_url` в БД и новые
  * оставались одной и той же формы: `/uploads/<folder>/<key>`.
+ *
+ * Префикс `farm-<farmId>/` добавлен, чтобы объекты фермы можно было найти
+ * по префиксу — без него посчитать место, занятое фермой, или вычистить её
+ * файлы при удалении (см. docs/plans/PLATFORM-ADMIN.md, 1.6/2.4) было бы
+ * невозможно: ключ не хранил, чья это ферма. Старые ключи без префикса
+ * продолжают работать — `deleteFile`/`serveFile` формато-агностичны.
  */
-function buildObjectKey(folder, fieldname, mimetype) {
+function buildObjectKey(farmId, folder, fieldname, mimetype) {
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
   const ext = Object.hasOwn(EXTENSION_BY_MIME, mimetype) ? EXTENSION_BY_MIME[mimetype] : '.bin';
-  return `${folder}/${fieldname}-${uniqueSuffix}${ext}`;
+  return `farm-${farmId}/${folder}/${fieldname}-${uniqueSuffix}${ext}`;
 }
 
 /**
@@ -29,8 +35,8 @@ function buildObjectKey(folder, fieldname, mimetype) {
  * в котором он раньше указывал на локальный диск — так формат photo_url в
  * БД не меняется, и мобильному клиенту не нужно ничего знать про MinIO.
  */
-async function uploadFile(folder, file) {
-  const objectKey = buildObjectKey(folder, file.fieldname, file.mimetype);
+async function uploadFile(farmId, folder, file) {
+  const objectKey = buildObjectKey(farmId, folder, file.fieldname, file.mimetype);
   await client.putObject(bucket, objectKey, file.buffer, file.size, {
     'Content-Type': file.mimetype
   });

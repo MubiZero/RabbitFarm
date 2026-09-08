@@ -34,6 +34,8 @@ mixin _$Plan {
   double? get price => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_default')
+  bool get isDefault => throw _privateConstructorUsedError;
 
   /// Serializes this Plan to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,6 +58,7 @@ abstract class $PlanCopyWith<$Res> {
     @JsonKey(name: 'max_staff') @NullableIntConverter() int? maxStaff,
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_default') bool isDefault,
   });
 }
 
@@ -80,6 +83,7 @@ class _$PlanCopyWithImpl<$Res, $Val extends Plan>
     Object? maxStaff = freezed,
     Object? price = freezed,
     Object? isActive = null,
+    Object? isDefault = null,
   }) {
     return _then(
       _value.copyWith(
@@ -107,6 +111,10 @@ class _$PlanCopyWithImpl<$Res, $Val extends Plan>
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isDefault: null == isDefault
+                ? _value.isDefault
+                : isDefault // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -128,6 +136,7 @@ abstract class _$$PlanImplCopyWith<$Res> implements $PlanCopyWith<$Res> {
     @JsonKey(name: 'max_staff') @NullableIntConverter() int? maxStaff,
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_default') bool isDefault,
   });
 }
 
@@ -149,6 +158,7 @@ class __$$PlanImplCopyWithImpl<$Res>
     Object? maxStaff = freezed,
     Object? price = freezed,
     Object? isActive = null,
+    Object? isDefault = null,
   }) {
     return _then(
       _$PlanImpl(
@@ -176,6 +186,10 @@ class __$$PlanImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isDefault: null == isDefault
+            ? _value.isDefault
+            : isDefault // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -191,6 +205,7 @@ class _$PlanImpl extends _Plan {
     @JsonKey(name: 'max_staff') @NullableIntConverter() this.maxStaff,
     @DoubleConverter() this.price,
     @JsonKey(name: 'is_active') this.isActive = true,
+    @JsonKey(name: 'is_default') this.isDefault = false,
   }) : super._();
 
   factory _$PlanImpl.fromJson(Map<String, dynamic> json) =>
@@ -215,10 +230,13 @@ class _$PlanImpl extends _Plan {
   @override
   @JsonKey(name: 'is_active')
   final bool isActive;
+  @override
+  @JsonKey(name: 'is_default')
+  final bool isDefault;
 
   @override
   String toString() {
-    return 'Plan(id: $id, name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive)';
+    return 'Plan(id: $id, name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive, isDefault: $isDefault)';
   }
 
   @override
@@ -234,13 +252,23 @@ class _$PlanImpl extends _Plan {
                 other.maxStaff == maxStaff) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.isActive, isActive) ||
-                other.isActive == isActive));
+                other.isActive == isActive) &&
+            (identical(other.isDefault, isDefault) ||
+                other.isDefault == isDefault));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, maxRabbits, maxStaff, price, isActive);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    name,
+    maxRabbits,
+    maxStaff,
+    price,
+    isActive,
+    isDefault,
+  );
 
   /// Create a copy of Plan
   /// with the given fields replaced by the non-null parameter values.
@@ -264,6 +292,7 @@ abstract class _Plan extends Plan {
     @JsonKey(name: 'max_staff') @NullableIntConverter() final int? maxStaff,
     @DoubleConverter() final double? price,
     @JsonKey(name: 'is_active') final bool isActive,
+    @JsonKey(name: 'is_default') final bool isDefault,
   }) = _$PlanImpl;
   const _Plan._() : super._();
 
@@ -288,6 +317,9 @@ abstract class _Plan extends Plan {
   @override
   @JsonKey(name: 'is_active')
   bool get isActive;
+  @override
+  @JsonKey(name: 'is_default')
+  bool get isDefault;
 
   /// Create a copy of Plan
   /// with the given fields replaced by the non-null parameter values.
@@ -311,6 +343,8 @@ mixin _$PlanDraft {
   double? get price => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_default')
+  bool get isDefault => throw _privateConstructorUsedError;
 
   /// Serializes this PlanDraft to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -333,6 +367,7 @@ abstract class $PlanDraftCopyWith<$Res> {
     @JsonKey(name: 'max_staff') int? maxStaff,
     double? price,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_default') bool isDefault,
   });
 }
 
@@ -356,6 +391,7 @@ class _$PlanDraftCopyWithImpl<$Res, $Val extends PlanDraft>
     Object? maxStaff = freezed,
     Object? price = freezed,
     Object? isActive = null,
+    Object? isDefault = null,
   }) {
     return _then(
       _value.copyWith(
@@ -379,6 +415,10 @@ class _$PlanDraftCopyWithImpl<$Res, $Val extends PlanDraft>
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isDefault: null == isDefault
+                ? _value.isDefault
+                : isDefault // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -400,6 +440,7 @@ abstract class _$$PlanDraftImplCopyWith<$Res>
     @JsonKey(name: 'max_staff') int? maxStaff,
     double? price,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_default') bool isDefault,
   });
 }
 
@@ -422,6 +463,7 @@ class __$$PlanDraftImplCopyWithImpl<$Res>
     Object? maxStaff = freezed,
     Object? price = freezed,
     Object? isActive = null,
+    Object? isDefault = null,
   }) {
     return _then(
       _$PlanDraftImpl(
@@ -445,6 +487,10 @@ class __$$PlanDraftImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isDefault: null == isDefault
+            ? _value.isDefault
+            : isDefault // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -459,6 +505,7 @@ class _$PlanDraftImpl implements _PlanDraft {
     @JsonKey(name: 'max_staff') this.maxStaff,
     this.price,
     @JsonKey(name: 'is_active') required this.isActive,
+    @JsonKey(name: 'is_default') this.isDefault = false,
   });
 
   factory _$PlanDraftImpl.fromJson(Map<String, dynamic> json) =>
@@ -477,10 +524,13 @@ class _$PlanDraftImpl implements _PlanDraft {
   @override
   @JsonKey(name: 'is_active')
   final bool isActive;
+  @override
+  @JsonKey(name: 'is_default')
+  final bool isDefault;
 
   @override
   String toString() {
-    return 'PlanDraft(name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive)';
+    return 'PlanDraft(name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive, isDefault: $isDefault)';
   }
 
   @override
@@ -495,13 +545,22 @@ class _$PlanDraftImpl implements _PlanDraft {
                 other.maxStaff == maxStaff) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.isActive, isActive) ||
-                other.isActive == isActive));
+                other.isActive == isActive) &&
+            (identical(other.isDefault, isDefault) ||
+                other.isDefault == isDefault));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, maxRabbits, maxStaff, price, isActive);
+  int get hashCode => Object.hash(
+    runtimeType,
+    name,
+    maxRabbits,
+    maxStaff,
+    price,
+    isActive,
+    isDefault,
+  );
 
   /// Create a copy of PlanDraft
   /// with the given fields replaced by the non-null parameter values.
@@ -524,6 +583,7 @@ abstract class _PlanDraft implements PlanDraft {
     @JsonKey(name: 'max_staff') final int? maxStaff,
     final double? price,
     @JsonKey(name: 'is_active') required final bool isActive,
+    @JsonKey(name: 'is_default') final bool isDefault,
   }) = _$PlanDraftImpl;
 
   factory _PlanDraft.fromJson(Map<String, dynamic> json) =
@@ -542,6 +602,9 @@ abstract class _PlanDraft implements PlanDraft {
   @override
   @JsonKey(name: 'is_active')
   bool get isActive;
+  @override
+  @JsonKey(name: 'is_default')
+  bool get isDefault;
 
   /// Create a copy of PlanDraft
   /// with the given fields replaced by the non-null parameter values.

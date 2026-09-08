@@ -32,6 +32,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
   final _maxStaff = TextEditingController();
 
   late bool _isActive;
+  late bool _isDefault;
   bool _touched = false;
 
   Plan? get _plan => widget.plan;
@@ -50,6 +51,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
     _maxRabbits.text = plan?.maxRabbits?.toString() ?? '';
     _maxStaff.text = plan?.maxStaff?.toString() ?? '';
     _isActive = plan?.isActive ?? true;
+    _isDefault = plan?.isDefault ?? false;
 
     for (final c in [_name, _price, _maxRabbits, _maxStaff]) {
       c.addListener(() => _touched = true);
@@ -77,6 +79,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
       maxRabbits: _limitOf(_maxRabbits.text),
       maxStaff: _limitOf(_maxStaff.text),
       isActive: _isActive,
+      isDefault: _isDefault,
     );
 
     try {
@@ -178,6 +181,26 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
             ),
             subtitle: Text(
               l10n.platformPlanFormActiveHint,
+              style: AppTypography.labelSm
+                  .copyWith(color: context.colors.onSurfaceVariant),
+            ),
+          ),
+        ),
+        AppCard(
+          child: SwitchListTile(
+            value: _isDefault,
+            onChanged: (value) => setState(() {
+              _isDefault = value;
+              _touched = true;
+            }),
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              l10n.platformPlanFormDefault,
+              style: AppTypography.bodyLg
+                  .copyWith(color: context.colors.onSurface),
+            ),
+            subtitle: Text(
+              l10n.platformPlanFormDefaultHint,
               style: AppTypography.labelSm
                   .copyWith(color: context.colors.onSurfaceVariant),
             ),

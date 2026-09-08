@@ -20,6 +20,7 @@ export 'app_section_title.dart';
 export 'delayed_spinner.dart';
 export 'metric_bar.dart';
 export 'paged_list_view.dart';
+export 'plan_limit_dialog.dart';
 export 'skeleton.dart';
 export 'stale_data_banner.dart';
 export 'stat_tile.dart';

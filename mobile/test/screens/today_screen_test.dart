@@ -318,4 +318,75 @@ void main() {
     expect(find.text('Расход'), findsNothing);
     expect(find.text('Родилось'), findsNothing);
   });
+
+  group('Лимит кроликов по тарифу', () {
+    testWidgets('без тарифа полоса не показывается', (tester) async {
+      await tester.pumpWidget(_wrap(
+        dashboard: _calmDashboard.copyWith(planUsage: null),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Кролики'), findsNothing);
+    });
+
+    testWidgets('далеко от предела полоса не показывается', (tester) async {
+      await tester.pumpWidget(_wrap(
+        dashboard: _calmDashboard.copyWith(
+          planUsage: const PlanUsage(
+            rabbits: ResourceUsage(used: 10, limit: 30),
+            staff: ResourceUsage(used: 1, limit: null),
+          ),
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Кролики'), findsNothing);
+    });
+
+    testWidgets('на подходе к пределу показывает «26 из 30»', (tester) async {
+      await tester.pumpWidget(_wrap(
+        dashboard: _calmDashboard.copyWith(
+          planUsage: const PlanUsage(
+            rabbits: ResourceUsage(used: 26, limit: 30),
+            staff: ResourceUsage(used: 1, limit: null),
+          ),
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Кролики'), findsOneWidget);
+      expect(find.text('26 из 30'), findsOneWidget);
+    });
+
+    testWidgets('на пределе показывает предел тоже — не только «почти»',
+        (tester) async {
+      await tester.pumpWidget(_wrap(
+        dashboard: _calmDashboard.copyWith(
+          planUsage: const PlanUsage(
+            rabbits: ResourceUsage(used: 30, limit: 30),
+            staff: ResourceUsage(used: 1, limit: null),
+          ),
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Кролики'), findsOneWidget);
+      expect(find.text('30 из 30'), findsOneWidget);
+    });
+
+    testWidgets('лимит не задан (null) — полоса не показывается, потребление есть',
+        (tester) async {
+      await tester.pumpWidget(_wrap(
+        dashboard: _calmDashboard.copyWith(
+          planUsage: const PlanUsage(
+            rabbits: ResourceUsage(used: 48, limit: null),
+            staff: ResourceUsage(used: 2, limit: null),
+          ),
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Кролики'), findsNothing);
+    });
+  });
 }

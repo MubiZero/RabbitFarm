@@ -92,9 +92,11 @@ class ApiResponse {
 
   /**
    * Bad request response (400)
+   * @param {String} code - машинный код, когда клиенту важно отличить случай
+   *   (например `RABBIT_LIMIT_REACHED`) — по умолчанию общий `BAD_REQUEST`
    */
-  static badRequest(res, message = 'Неверный запрос', details = null) {
-    return this.error(res, message, 400, 'BAD_REQUEST', details);
+  static badRequest(res, message = 'Неверный запрос', code = 'BAD_REQUEST', details = null) {
+    return this.error(res, message, 400, code, details);
   }
 
   /**

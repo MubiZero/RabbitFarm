@@ -28,6 +28,7 @@ describe('StaffController', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(mockNext).not.toHaveBeenCalled();
+      expect(res.json.mock.calls[0][0].error.code).toBe('STAFF_LIMIT_REACHED');
     });
 
     it('возвращает 409 при USER_EXISTS', async () => {
@@ -64,6 +65,7 @@ describe('StaffController', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(authService.issueTokens).not.toHaveBeenCalled();
+      expect(res.json.mock.calls[0][0].error.code).toBe('STAFF_LIMIT_REACHED');
     });
 
     it('возвращает 400 при INVITATION_INVALID', async () => {

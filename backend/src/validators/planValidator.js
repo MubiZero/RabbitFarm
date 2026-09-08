@@ -5,7 +5,8 @@ const createPlanSchema = Joi.object({
   max_rabbits: Joi.number().integer().positive().allow(null),
   max_staff: Joi.number().integer().positive().allow(null),
   price: Joi.number().min(0).allow(null),
-  is_active: Joi.boolean()
+  is_active: Joi.boolean(),
+  is_default: Joi.boolean()
 });
 
 const updatePlanSchema = Joi.object({
@@ -13,7 +14,8 @@ const updatePlanSchema = Joi.object({
   max_rabbits: Joi.number().integer().positive().allow(null),
   max_staff: Joi.number().integer().positive().allow(null),
   price: Joi.number().min(0).allow(null),
-  is_active: Joi.boolean()
+  is_active: Joi.boolean(),
+  is_default: Joi.boolean()
 }).min(1);
 
 const assignPlanSchema = Joi.object({

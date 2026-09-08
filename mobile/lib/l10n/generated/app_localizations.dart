@@ -5116,6 +5116,18 @@ abstract class AppLocalizations {
   /// **'Приглашение отозвано'**
   String get staffRevoked;
 
+  /// No description provided for @planLimitStaffTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лимит участников по тарифу'**
+  String get planLimitStaffTitle;
+
+  /// No description provided for @planLimitStaffBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состав фермы достиг лимита участников, разрешённого текущим тарифом. Чтобы пригласить ещё, нужен тариф с большим лимитом.'**
+  String get planLimitStaffBody;
+
   /// No description provided for @staffInviteTitle.
   ///
   /// In ru, this message translates to:
@@ -5559,6 +5571,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось загрузить кролика'**
   String get rabbitFormLoadFailed;
+
+  /// No description provided for @planLimitRabbitsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лимит кроликов по тарифу'**
+  String get planLimitRabbitsTitle;
+
+  /// No description provided for @planLimitRabbitsBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма достигла лимита кроликов, разрешённого текущим тарифом. Чтобы завести ещё, нужен тариф с большим лимитом — обратитесь к владельцу фермы.'**
+  String get planLimitRabbitsBody;
 
   /// No description provided for @statusHealthy.
   ///
@@ -6369,6 +6393,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.'**
   String get platformPlanFormActiveHint;
+
+  /// No description provided for @platformPlanFormDefault.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдавать новым фермам'**
+  String get platformPlanFormDefault;
+
+  /// No description provided for @platformPlanFormDefaultHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.'**
+  String get platformPlanFormDefaultHint;
 
   /// No description provided for @platformPlanFormCreated.
   ///

@@ -17,6 +17,8 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/widgets/app_form_scaffold.dart';
+import '../../../../core/widgets/plan_limit_dialog.dart';
+import '../../../../core/api/api_failure.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -317,12 +319,22 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorText(context.l10n, e)),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        // Лимит тарифа не лечится повтором — фермеру нужно объяснение и
+        // понятный следующий шаг, а не текст ошибки в снекбаре.
+        if (e is ApiFailure && e.code == 'RABBIT_LIMIT_REACHED') {
+          showPlanLimitReachedDialog(
+            context,
+            title: context.l10n.planLimitRabbitsTitle,
+            body: context.l10n.planLimitRabbitsBody,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorText(context.l10n, e)),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

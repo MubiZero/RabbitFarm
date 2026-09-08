@@ -19,10 +19,38 @@ class DashboardReport with _$DashboardReport {
     required TaskStats tasks,
     required InventoryStats inventory,
     required BreedingStats breeding,
+    /// Потребление фермы против пределов тарифа. Пусто у ферм без тарифа —
+    /// сервер в этом случае просто не присылает блок целиком.
+    @JsonKey(name: 'plan_usage') PlanUsage? planUsage,
   }) = _DashboardReport;
 
   factory DashboardReport.fromJson(Map<String, dynamic> json) =>
       _$DashboardReportFromJson(json);
+}
+
+/// Потребление фермы против пределов тарифа: кролики и участники.
+@freezed
+class PlanUsage with _$PlanUsage {
+  const factory PlanUsage({
+    required ResourceUsage rabbits,
+    required ResourceUsage staff,
+  }) = _PlanUsage;
+
+  factory PlanUsage.fromJson(Map<String, dynamic> json) =>
+      _$PlanUsageFromJson(json);
+}
+
+/// Потребление одного ресурса тарифа. `limit: null` значит «без
+/// ограничения» — та же семантика, что и в `planService` на сервере.
+@freezed
+class ResourceUsage with _$ResourceUsage {
+  const factory ResourceUsage({
+    @IntConverter() required int used,
+    @NullableIntConverter() int? limit,
+  }) = _ResourceUsage;
+
+  factory ResourceUsage.fromJson(Map<String, dynamic> json) =>
+      _$ResourceUsageFromJson(json);
 }
 
 @freezed

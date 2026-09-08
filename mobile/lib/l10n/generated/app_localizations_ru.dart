@@ -2813,6 +2813,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffRevoked => 'Приглашение отозвано';
 
   @override
+  String get planLimitStaffTitle => 'Лимит участников по тарифу';
+
+  @override
+  String get planLimitStaffBody =>
+      'Состав фермы достиг лимита участников, разрешённого текущим тарифом. Чтобы пригласить ещё, нужен тариф с большим лимитом.';
+
+  @override
   String get staffInviteTitle => 'Пригласить на ферму';
 
   @override
@@ -3043,6 +3050,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get rabbitFormLoadFailed => 'Не удалось загрузить кролика';
+
+  @override
+  String get planLimitRabbitsTitle => 'Лимит кроликов по тарифу';
+
+  @override
+  String get planLimitRabbitsBody =>
+      'Ферма достигла лимита кроликов, разрешённого текущим тарифом. Чтобы завести ещё, нужен тариф с большим лимитом — обратитесь к владельцу фермы.';
 
   @override
   String get statusHealthy => 'Здоров';
@@ -3535,6 +3549,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get platformPlanFormActiveHint =>
       'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.';
+
+  @override
+  String get platformPlanFormDefault => 'Выдавать новым фермам';
+
+  @override
+  String get platformPlanFormDefaultHint =>
+      'Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.';
 
   @override
   String get platformPlanFormCreated => 'Тариф создан';

@@ -28,6 +28,10 @@ class PlanService {
       throw new Error('PLAN_NAME_EXISTS');
     }
 
+    if (data.is_default) {
+      await this._assertNoDefaultPlan();
+    }
+
     const plan = await Plan.create(data);
     logger.info('Plan created', { planId: plan.id, name: plan.name });
     return plan;
@@ -43,9 +47,25 @@ class PlanService {
       }
     }
 
+    if (data.is_default && !plan.is_default) {
+      await this._assertNoDefaultPlan();
+    }
+
     await plan.update(data);
     logger.info('Plan updated', { planId });
     return plan;
+  }
+
+  /**
+   * Бросает `DEFAULT_PLAN_EXISTS`, если default уже назначен другому тарифу.
+   * Осознанное решение: второй `is_default` не проходит молча переключая
+   * старый — админ должен сперва явно снять флаг со старого тарифа.
+   */
+  async _assertNoDefaultPlan() {
+    const existingDefault = await Plan.findOne({ where: { is_default: true } });
+    if (existingDefault) {
+      throw new Error('DEFAULT_PLAN_EXISTS');
+    }
   }
 
   /** Удаление плана не трогает фермы — они просто становятся безлимитными. */
@@ -54,6 +74,24 @@ class PlanService {
     await plan.destroy();
     logger.info('Plan deleted', { planId });
     return { success: true };
+  }
+
+  /**
+   * Тариф, который автоматически достаётся новой ферме при регистрации.
+   * `null`, если такого тарифа ещё не завели через админку.
+   */
+  async getDefault() {
+    return Plan.findOne({ where: { is_default: true } });
+  }
+
+  /**
+   * `true`, если у платного тарифа фермы истёк срок действия. Бесплатный
+   * тариф по умолчанию бессрочен (`plan_expires_at = null`), поэтому такая
+   * ферма никогда не просрочена.
+   */
+  isExpired(farm) {
+    if (!farm?.plan_expires_at) return false;
+    return new Date(farm.plan_expires_at) < new Date();
   }
 
   /** Ферма вместе с её текущим планом — единая точка для проверок лимита. */
@@ -91,6 +129,26 @@ class PlanService {
     if (count >= maxStaff) {
       throw new Error('STAFF_LIMIT_REACHED');
     }
+  }
+
+  /**
+   * Фактическое потребление фермы против пределов её тарифа — для сводки
+   * «Сегодня» самой фермы («26 из 30 кроликов»). Считает теми же запросами,
+   * что и проверки лимита выше (без фильтра по статусу кролика), чтобы число
+   * на экране не расходилось с моментом, когда сервер реально откажет.
+   * `limit: null` — без ограничения, как и везде в этом сервисе.
+   */
+  async getUsage(farmId) {
+    const [farm, rabbitsUsed, staffUsed] = await Promise.all([
+      this._getFarmWithPlan(farmId),
+      Rabbit.count({ where: { farm_id: farmId } }),
+      User.count({ where: { farm_id: farmId } })
+    ]);
+
+    return {
+      rabbits: { used: rabbitsUsed, limit: farm?.plan?.max_rabbits ?? null },
+      staff: { used: staffUsed, limit: farm?.plan?.max_staff ?? null }
+    };
   }
 }
 

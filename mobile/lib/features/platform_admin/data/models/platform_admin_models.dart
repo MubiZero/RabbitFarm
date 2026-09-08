@@ -25,6 +25,7 @@ class Plan with _$Plan {
     @JsonKey(name: 'max_staff') @NullableIntConverter() int? maxStaff,
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'is_default') @Default(false) bool isDefault,
   }) = _Plan;
 
   const Plan._();
@@ -39,6 +40,7 @@ class Plan with _$Plan {
         maxStaff: maxStaff,
         price: price,
         isActive: isActive,
+        isDefault: isDefault,
       );
 
   factory Plan.fromJson(Map<String, dynamic> json) => _$PlanFromJson(json);
@@ -57,6 +59,7 @@ class PlanDraft with _$PlanDraft {
     @JsonKey(name: 'max_staff') int? maxStaff,
     double? price,
     @JsonKey(name: 'is_active') required bool isActive,
+    @JsonKey(name: 'is_default') @Default(false) bool isDefault,
   }) = _PlanDraft;
 
   factory PlanDraft.fromJson(Map<String, dynamic> json) =>
