@@ -91,7 +91,7 @@ class StaffController {
       );
     } catch (error) {
       if (error.message === 'STAFF_LIMIT_REACHED') {
-        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы');
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы', 'STAFF_LIMIT_REACHED');
       }
       if (error.message === 'USER_EXISTS') {
         return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');
@@ -147,7 +147,7 @@ class StaffController {
         );
       }
       if (error.message === 'STAFF_LIMIT_REACHED') {
-        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.');
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.', 'STAFF_LIMIT_REACHED');
       }
       if (error.message === 'USER_EXISTS') {
         return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');

@@ -10,6 +10,7 @@ import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/api/api_failure.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Кто работает на ферме: состав, приглашения и доступы.
@@ -335,6 +336,20 @@ class StaffScreen extends ConsumerWidget {
                   .createInvitation(email: email, role: role);
               navigator.pop(invitation);
             } catch (e) {
+              // Лимит тарифа не лечится другим email — приглашать больше
+              // некуда, пока не сменится тариф. Диалог с полем ввода тут
+              // бесполезен: закрываем его и объясняем отдельно.
+              if (e is ApiFailure && e.code == 'STAFF_LIMIT_REACHED') {
+                navigator.pop();
+                if (context.mounted) {
+                  showPlanLimitReachedDialog(
+                    context,
+                    title: l10n.planLimitStaffTitle,
+                    body: l10n.planLimitStaffBody,
+                  );
+                }
+                return;
+              }
               setDialogState(() => isSending = false);
               messenger.showSnackBar(
                 SnackBar(

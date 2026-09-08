@@ -107,4 +107,32 @@ describe('PlanService', () => {
       expect(User.count).not.toHaveBeenCalled();
     });
   });
+
+  describe('getUsage', () => {
+    it('отдаёт limit: null по обоим ресурсам, если у фермы нет плана', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: null });
+      Rabbit.count.mockResolvedValue(26);
+      User.count.mockResolvedValue(2);
+
+      const usage = await planService.getUsage(1);
+
+      expect(usage).toEqual({
+        rabbits: { used: 26, limit: null },
+        staff: { used: 2, limit: null }
+      });
+    });
+
+    it('отдаёт лимиты из плана рядом с фактическим потреблением', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: { max_rabbits: 30, max_staff: null } });
+      Rabbit.count.mockResolvedValue(26);
+      User.count.mockResolvedValue(2);
+
+      const usage = await planService.getUsage(1);
+
+      expect(usage).toEqual({
+        rabbits: { used: 26, limit: 30 },
+        staff: { used: 2, limit: null }
+      });
+    });
+  });
 });

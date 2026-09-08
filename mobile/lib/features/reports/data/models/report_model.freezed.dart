@@ -33,6 +33,11 @@ mixin _$DashboardReport {
   InventoryStats get inventory => throw _privateConstructorUsedError;
   BreedingStats get breeding => throw _privateConstructorUsedError;
 
+  /// Потребление фермы против пределов тарифа. Пусто у ферм без тарифа —
+  /// сервер в этом случае просто не присылает блок целиком.
+  @JsonKey(name: 'plan_usage')
+  PlanUsage? get planUsage => throw _privateConstructorUsedError;
+
   /// Serializes this DashboardReport to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
@@ -58,6 +63,7 @@ abstract class $DashboardReportCopyWith<$Res> {
     TaskStats tasks,
     InventoryStats inventory,
     BreedingStats breeding,
+    @JsonKey(name: 'plan_usage') PlanUsage? planUsage,
   });
 
   $RabbitStatsCopyWith<$Res> get rabbits;
@@ -67,6 +73,7 @@ abstract class $DashboardReportCopyWith<$Res> {
   $TaskStatsCopyWith<$Res> get tasks;
   $InventoryStatsCopyWith<$Res> get inventory;
   $BreedingStatsCopyWith<$Res> get breeding;
+  $PlanUsageCopyWith<$Res>? get planUsage;
 }
 
 /// @nodoc
@@ -91,6 +98,7 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
     Object? tasks = null,
     Object? inventory = null,
     Object? breeding = null,
+    Object? planUsage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -122,6 +130,10 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
                 ? _value.breeding
                 : breeding // ignore: cast_nullable_to_non_nullable
                       as BreedingStats,
+            planUsage: freezed == planUsage
+                ? _value.planUsage
+                : planUsage // ignore: cast_nullable_to_non_nullable
+                      as PlanUsage?,
           )
           as $Val,
     );
@@ -200,6 +212,20 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
       return _then(_value.copyWith(breeding: value) as $Val);
     });
   }
+
+  /// Create a copy of DashboardReport
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PlanUsageCopyWith<$Res>? get planUsage {
+    if (_value.planUsage == null) {
+      return null;
+    }
+
+    return $PlanUsageCopyWith<$Res>(_value.planUsage!, (value) {
+      return _then(_value.copyWith(planUsage: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -219,6 +245,7 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
     TaskStats tasks,
     InventoryStats inventory,
     BreedingStats breeding,
+    @JsonKey(name: 'plan_usage') PlanUsage? planUsage,
   });
 
   @override
@@ -235,6 +262,8 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
   $InventoryStatsCopyWith<$Res> get inventory;
   @override
   $BreedingStatsCopyWith<$Res> get breeding;
+  @override
+  $PlanUsageCopyWith<$Res>? get planUsage;
 }
 
 /// @nodoc
@@ -258,6 +287,7 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
     Object? tasks = null,
     Object? inventory = null,
     Object? breeding = null,
+    Object? planUsage = freezed,
   }) {
     return _then(
       _$DashboardReportImpl(
@@ -289,6 +319,10 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
             ? _value.breeding
             : breeding // ignore: cast_nullable_to_non_nullable
                   as BreedingStats,
+        planUsage: freezed == planUsage
+            ? _value.planUsage
+            : planUsage // ignore: cast_nullable_to_non_nullable
+                  as PlanUsage?,
       ),
     );
   }
@@ -305,6 +339,7 @@ class _$DashboardReportImpl implements _DashboardReport {
     required this.tasks,
     required this.inventory,
     required this.breeding,
+    @JsonKey(name: 'plan_usage') this.planUsage,
   });
 
   factory _$DashboardReportImpl.fromJson(Map<String, dynamic> json) =>
@@ -329,9 +364,15 @@ class _$DashboardReportImpl implements _DashboardReport {
   @override
   final BreedingStats breeding;
 
+  /// Потребление фермы против пределов тарифа. Пусто у ферм без тарифа —
+  /// сервер в этом случае просто не присылает блок целиком.
+  @override
+  @JsonKey(name: 'plan_usage')
+  final PlanUsage? planUsage;
+
   @override
   String toString() {
-    return 'DashboardReport(rabbits: $rabbits, cages: $cages, health: $health, finance: $finance, tasks: $tasks, inventory: $inventory, breeding: $breeding)';
+    return 'DashboardReport(rabbits: $rabbits, cages: $cages, health: $health, finance: $finance, tasks: $tasks, inventory: $inventory, breeding: $breeding, planUsage: $planUsage)';
   }
 
   @override
@@ -347,7 +388,9 @@ class _$DashboardReportImpl implements _DashboardReport {
             (identical(other.inventory, inventory) ||
                 other.inventory == inventory) &&
             (identical(other.breeding, breeding) ||
-                other.breeding == breeding));
+                other.breeding == breeding) &&
+            (identical(other.planUsage, planUsage) ||
+                other.planUsage == planUsage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -361,6 +404,7 @@ class _$DashboardReportImpl implements _DashboardReport {
     tasks,
     inventory,
     breeding,
+    planUsage,
   );
 
   /// Create a copy of DashboardReport
@@ -389,6 +433,7 @@ abstract class _DashboardReport implements DashboardReport {
     required final TaskStats tasks,
     required final InventoryStats inventory,
     required final BreedingStats breeding,
+    @JsonKey(name: 'plan_usage') final PlanUsage? planUsage,
   }) = _$DashboardReportImpl;
 
   factory _DashboardReport.fromJson(Map<String, dynamic> json) =
@@ -413,11 +458,388 @@ abstract class _DashboardReport implements DashboardReport {
   @override
   BreedingStats get breeding;
 
+  /// Потребление фермы против пределов тарифа. Пусто у ферм без тарифа —
+  /// сервер в этом случае просто не присылает блок целиком.
+  @override
+  @JsonKey(name: 'plan_usage')
+  PlanUsage? get planUsage;
+
   /// Create a copy of DashboardReport
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DashboardReportImplCopyWith<_$DashboardReportImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PlanUsage _$PlanUsageFromJson(Map<String, dynamic> json) {
+  return _PlanUsage.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PlanUsage {
+  ResourceUsage get rabbits => throw _privateConstructorUsedError;
+  ResourceUsage get staff => throw _privateConstructorUsedError;
+
+  /// Serializes this PlanUsage to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $PlanUsageCopyWith<PlanUsage> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PlanUsageCopyWith<$Res> {
+  factory $PlanUsageCopyWith(PlanUsage value, $Res Function(PlanUsage) then) =
+      _$PlanUsageCopyWithImpl<$Res, PlanUsage>;
+  @useResult
+  $Res call({ResourceUsage rabbits, ResourceUsage staff});
+
+  $ResourceUsageCopyWith<$Res> get rabbits;
+  $ResourceUsageCopyWith<$Res> get staff;
+}
+
+/// @nodoc
+class _$PlanUsageCopyWithImpl<$Res, $Val extends PlanUsage>
+    implements $PlanUsageCopyWith<$Res> {
+  _$PlanUsageCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? rabbits = null, Object? staff = null}) {
+    return _then(
+      _value.copyWith(
+            rabbits: null == rabbits
+                ? _value.rabbits
+                : rabbits // ignore: cast_nullable_to_non_nullable
+                      as ResourceUsage,
+            staff: null == staff
+                ? _value.staff
+                : staff // ignore: cast_nullable_to_non_nullable
+                      as ResourceUsage,
+          )
+          as $Val,
+    );
+  }
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResourceUsageCopyWith<$Res> get rabbits {
+    return $ResourceUsageCopyWith<$Res>(_value.rabbits, (value) {
+      return _then(_value.copyWith(rabbits: value) as $Val);
+    });
+  }
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ResourceUsageCopyWith<$Res> get staff {
+    return $ResourceUsageCopyWith<$Res>(_value.staff, (value) {
+      return _then(_value.copyWith(staff: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$PlanUsageImplCopyWith<$Res>
+    implements $PlanUsageCopyWith<$Res> {
+  factory _$$PlanUsageImplCopyWith(
+    _$PlanUsageImpl value,
+    $Res Function(_$PlanUsageImpl) then,
+  ) = __$$PlanUsageImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({ResourceUsage rabbits, ResourceUsage staff});
+
+  @override
+  $ResourceUsageCopyWith<$Res> get rabbits;
+  @override
+  $ResourceUsageCopyWith<$Res> get staff;
+}
+
+/// @nodoc
+class __$$PlanUsageImplCopyWithImpl<$Res>
+    extends _$PlanUsageCopyWithImpl<$Res, _$PlanUsageImpl>
+    implements _$$PlanUsageImplCopyWith<$Res> {
+  __$$PlanUsageImplCopyWithImpl(
+    _$PlanUsageImpl _value,
+    $Res Function(_$PlanUsageImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? rabbits = null, Object? staff = null}) {
+    return _then(
+      _$PlanUsageImpl(
+        rabbits: null == rabbits
+            ? _value.rabbits
+            : rabbits // ignore: cast_nullable_to_non_nullable
+                  as ResourceUsage,
+        staff: null == staff
+            ? _value.staff
+            : staff // ignore: cast_nullable_to_non_nullable
+                  as ResourceUsage,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PlanUsageImpl implements _PlanUsage {
+  const _$PlanUsageImpl({required this.rabbits, required this.staff});
+
+  factory _$PlanUsageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PlanUsageImplFromJson(json);
+
+  @override
+  final ResourceUsage rabbits;
+  @override
+  final ResourceUsage staff;
+
+  @override
+  String toString() {
+    return 'PlanUsage(rabbits: $rabbits, staff: $staff)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PlanUsageImpl &&
+            (identical(other.rabbits, rabbits) || other.rabbits == rabbits) &&
+            (identical(other.staff, staff) || other.staff == staff));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, rabbits, staff);
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PlanUsageImplCopyWith<_$PlanUsageImpl> get copyWith =>
+      __$$PlanUsageImplCopyWithImpl<_$PlanUsageImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PlanUsageImplToJson(this);
+  }
+}
+
+abstract class _PlanUsage implements PlanUsage {
+  const factory _PlanUsage({
+    required final ResourceUsage rabbits,
+    required final ResourceUsage staff,
+  }) = _$PlanUsageImpl;
+
+  factory _PlanUsage.fromJson(Map<String, dynamic> json) =
+      _$PlanUsageImpl.fromJson;
+
+  @override
+  ResourceUsage get rabbits;
+  @override
+  ResourceUsage get staff;
+
+  /// Create a copy of PlanUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$PlanUsageImplCopyWith<_$PlanUsageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ResourceUsage _$ResourceUsageFromJson(Map<String, dynamic> json) {
+  return _ResourceUsage.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ResourceUsage {
+  @IntConverter()
+  int get used => throw _privateConstructorUsedError;
+  @NullableIntConverter()
+  int? get limit => throw _privateConstructorUsedError;
+
+  /// Serializes this ResourceUsage to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ResourceUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ResourceUsageCopyWith<ResourceUsage> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ResourceUsageCopyWith<$Res> {
+  factory $ResourceUsageCopyWith(
+    ResourceUsage value,
+    $Res Function(ResourceUsage) then,
+  ) = _$ResourceUsageCopyWithImpl<$Res, ResourceUsage>;
+  @useResult
+  $Res call({@IntConverter() int used, @NullableIntConverter() int? limit});
+}
+
+/// @nodoc
+class _$ResourceUsageCopyWithImpl<$Res, $Val extends ResourceUsage>
+    implements $ResourceUsageCopyWith<$Res> {
+  _$ResourceUsageCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ResourceUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? used = null, Object? limit = freezed}) {
+    return _then(
+      _value.copyWith(
+            used: null == used
+                ? _value.used
+                : used // ignore: cast_nullable_to_non_nullable
+                      as int,
+            limit: freezed == limit
+                ? _value.limit
+                : limit // ignore: cast_nullable_to_non_nullable
+                      as int?,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$ResourceUsageImplCopyWith<$Res>
+    implements $ResourceUsageCopyWith<$Res> {
+  factory _$$ResourceUsageImplCopyWith(
+    _$ResourceUsageImpl value,
+    $Res Function(_$ResourceUsageImpl) then,
+  ) = __$$ResourceUsageImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({@IntConverter() int used, @NullableIntConverter() int? limit});
+}
+
+/// @nodoc
+class __$$ResourceUsageImplCopyWithImpl<$Res>
+    extends _$ResourceUsageCopyWithImpl<$Res, _$ResourceUsageImpl>
+    implements _$$ResourceUsageImplCopyWith<$Res> {
+  __$$ResourceUsageImplCopyWithImpl(
+    _$ResourceUsageImpl _value,
+    $Res Function(_$ResourceUsageImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ResourceUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? used = null, Object? limit = freezed}) {
+    return _then(
+      _$ResourceUsageImpl(
+        used: null == used
+            ? _value.used
+            : used // ignore: cast_nullable_to_non_nullable
+                  as int,
+        limit: freezed == limit
+            ? _value.limit
+            : limit // ignore: cast_nullable_to_non_nullable
+                  as int?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ResourceUsageImpl implements _ResourceUsage {
+  const _$ResourceUsageImpl({
+    @IntConverter() required this.used,
+    @NullableIntConverter() this.limit,
+  });
+
+  factory _$ResourceUsageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ResourceUsageImplFromJson(json);
+
+  @override
+  @IntConverter()
+  final int used;
+  @override
+  @NullableIntConverter()
+  final int? limit;
+
+  @override
+  String toString() {
+    return 'ResourceUsage(used: $used, limit: $limit)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ResourceUsageImpl &&
+            (identical(other.used, used) || other.used == used) &&
+            (identical(other.limit, limit) || other.limit == limit));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, used, limit);
+
+  /// Create a copy of ResourceUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ResourceUsageImplCopyWith<_$ResourceUsageImpl> get copyWith =>
+      __$$ResourceUsageImplCopyWithImpl<_$ResourceUsageImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ResourceUsageImplToJson(this);
+  }
+}
+
+abstract class _ResourceUsage implements ResourceUsage {
+  const factory _ResourceUsage({
+    @IntConverter() required final int used,
+    @NullableIntConverter() final int? limit,
+  }) = _$ResourceUsageImpl;
+
+  factory _ResourceUsage.fromJson(Map<String, dynamic> json) =
+      _$ResourceUsageImpl.fromJson;
+
+  @override
+  @IntConverter()
+  int get used;
+  @override
+  @NullableIntConverter()
+  int? get limit;
+
+  /// Create a copy of ResourceUsage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ResourceUsageImplCopyWith<_$ResourceUsageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

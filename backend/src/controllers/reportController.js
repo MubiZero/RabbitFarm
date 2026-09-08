@@ -13,6 +13,7 @@ const {
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const planService = require('../services/planService');
 
 /**
  * Видны ли этому человеку деньги фермы.
@@ -76,7 +77,8 @@ exports.getDashboard = async (req, res, next) => {
       lowStockFeeds,
       recentBirths,
       allRabbits,
-      recentBirthsList
+      recentBirthsList,
+      planUsage
     ] = await Promise.all([
       // Поголовье считается без проданных и павших: иначе ферма, продавшая
       // за год три сотни кроликов, видела их в заголовке «кроликов на ферме».
@@ -209,7 +211,11 @@ exports.getDashboard = async (req, res, next) => {
           }
         },
         attributes: ['birth_date', 'kits_born_alive']
-      })
+      }),
+
+      // Потребление фермы против пределов тарифа — для полосы «26 из 30
+      // кроликов» на «Сегодня», до того как сервер откажет запросом.
+      planService.getUsage(farmId)
     ]);
 
     const recentIncome = recentIncomeRaw || 0;
@@ -284,7 +290,8 @@ exports.getDashboard = async (req, res, next) => {
       breeding: {
         recentBirths: recentBirths,
         history: birthsHistory
-      }
+      },
+      plan_usage: planUsage
     }, 'Сводка получена');
   } catch (error) {
     console.error('Dashboard Error:', error);

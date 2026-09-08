@@ -3,6 +3,7 @@ import 'package:mobile/features/rabbits/data/models/breed_model.dart';
 import 'package:mobile/features/rabbits/data/models/rabbit_model.dart';
 import 'package:mobile/features/rabbits/data/models/rabbit_statistics.dart';
 import 'package:mobile/features/platform_admin/data/models/platform_admin_models.dart';
+import 'package:mobile/features/reports/data/models/report_model.dart';
 
 void main() {
   group('Model parsing with IntConverter', () {
@@ -102,6 +103,34 @@ void main() {
       expect(plan.isUnlimited, isTrue);
       // Поля нет в ответе — тариф считается рабочим, а не выключенным.
       expect(plan.isActive, isTrue);
+    });
+
+    test('DashboardReport.planUsage разбирает потребление против тарифа', () {
+      final usage = PlanUsage.fromJson({
+        'rabbits': {'used': '26', 'limit': '30'},
+        'staff': {'used': '2', 'limit': null},
+      });
+
+      expect(usage.rabbits.used, 26);
+      expect(usage.rabbits.limit, 30);
+      // `limit: null` — без ограничения, а не ноль участников.
+      expect(usage.staff.used, 2);
+      expect(usage.staff.limit, isNull);
+    });
+
+    test('DashboardReport без plan_usage у фермы без тарифа', () {
+      final json = {
+        'rabbits': {'total': 5, 'male': 2, 'female': 3},
+        'cages': {'total': 3, 'occupied': 2, 'available': 1},
+        'health': {'upcomingVaccinations': 0, 'overdueVaccinations': 0},
+        'tasks': {'pending': 0, 'overdue': 0, 'urgent': 0},
+        'inventory': {'lowStockFeeds': 0},
+        'breeding': {'recentBirths': 0},
+      };
+
+      final report = DashboardReport.fromJson(json);
+
+      expect(report.planUsage, isNull);
     });
 
     test('PlatformFarm разбирает потребление, владельца и тариф', () {

@@ -18,6 +18,9 @@ _$DashboardReportImpl _$$DashboardReportImplFromJson(
   tasks: TaskStats.fromJson(json['tasks'] as Map<String, dynamic>),
   inventory: InventoryStats.fromJson(json['inventory'] as Map<String, dynamic>),
   breeding: BreedingStats.fromJson(json['breeding'] as Map<String, dynamic>),
+  planUsage: json['plan_usage'] == null
+      ? null
+      : PlanUsage.fromJson(json['plan_usage'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$DashboardReportImplToJson(
@@ -30,7 +33,29 @@ Map<String, dynamic> _$$DashboardReportImplToJson(
   'tasks': instance.tasks,
   'inventory': instance.inventory,
   'breeding': instance.breeding,
+  'plan_usage': instance.planUsage,
 };
+
+_$PlanUsageImpl _$$PlanUsageImplFromJson(Map<String, dynamic> json) =>
+    _$PlanUsageImpl(
+      rabbits: ResourceUsage.fromJson(json['rabbits'] as Map<String, dynamic>),
+      staff: ResourceUsage.fromJson(json['staff'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$PlanUsageImplToJson(_$PlanUsageImpl instance) =>
+    <String, dynamic>{'rabbits': instance.rabbits, 'staff': instance.staff};
+
+_$ResourceUsageImpl _$$ResourceUsageImplFromJson(Map<String, dynamic> json) =>
+    _$ResourceUsageImpl(
+      used: const IntConverter().fromJson(json['used'] as Object),
+      limit: const NullableIntConverter().fromJson(json['limit']),
+    );
+
+Map<String, dynamic> _$$ResourceUsageImplToJson(_$ResourceUsageImpl instance) =>
+    <String, dynamic>{
+      'used': const IntConverter().toJson(instance.used),
+      'limit': const NullableIntConverter().toJson(instance.limit),
+    };
 
 _$RabbitStatsImpl _$$RabbitStatsImplFromJson(Map<String, dynamic> json) =>
     _$RabbitStatsImpl(

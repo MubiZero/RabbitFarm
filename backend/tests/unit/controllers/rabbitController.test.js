@@ -92,6 +92,10 @@ describe('RabbitController', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(mockNext).not.toHaveBeenCalled();
+      // Мобилка различает этот отказ по коду, чтобы показать не текст ошибки,
+      // а отдельный экран «упёрлись в лимит тарифа».
+      const body = res.json.mock.calls[0][0];
+      expect(body.error.code).toBe('RABBIT_LIMIT_REACHED');
     });
 
     it('should return 404 when CAGE_NOT_FOUND', async () => {

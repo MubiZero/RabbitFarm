@@ -92,6 +92,26 @@ class PlanService {
       throw new Error('STAFF_LIMIT_REACHED');
     }
   }
+
+  /**
+   * Фактическое потребление фермы против пределов её тарифа — для сводки
+   * «Сегодня» самой фермы («26 из 30 кроликов»). Считает теми же запросами,
+   * что и проверки лимита выше (без фильтра по статусу кролика), чтобы число
+   * на экране не расходилось с моментом, когда сервер реально откажет.
+   * `limit: null` — без ограничения, как и везде в этом сервисе.
+   */
+  async getUsage(farmId) {
+    const [farm, rabbitsUsed, staffUsed] = await Promise.all([
+      this._getFarmWithPlan(farmId),
+      Rabbit.count({ where: { farm_id: farmId } }),
+      User.count({ where: { farm_id: farmId } })
+    ]);
+
+    return {
+      rabbits: { used: rabbitsUsed, limit: farm?.plan?.max_rabbits ?? null },
+      staff: { used: staffUsed, limit: farm?.plan?.max_staff ?? null }
+    };
+  }
 }
 
 module.exports = new PlanService();

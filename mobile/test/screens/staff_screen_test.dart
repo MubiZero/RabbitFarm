@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'package:mobile/core/api/api_client.dart';
+import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/features/staff/data/models/staff_models.dart';
+import 'package:mobile/features/staff/data/repositories/staff_repository.dart';
 import 'package:mobile/features/staff/presentation/providers/staff_provider.dart';
 import 'package:mobile/features/staff/presentation/screens/staff_screen.dart';
 
 import '../support/test_app.dart';
+
+/// Приглашение всегда упирается в лимит тарифа — без обращения к сети.
+class _LimitedStaffRepository extends StaffRepository {
+  _LimitedStaffRepository()
+      : super(ApiClient(storage: const FlutterSecureStorage()));
+
+  @override
+  Future<CreatedInvitation> createInvitation({
+    required String email,
+    required FarmRole role,
+  }) async {
+    throw const ApiFailure(ApiFailureKind.invalid, code: 'STAFF_LIMIT_REACHED');
+  }
+}
 
 const _owner = FarmMember(
   id: 1,
@@ -108,5 +126,32 @@ void main() {
 
     expect(find.text('Не удалось загрузить'), findsOneWidget);
     expect(find.text('Повторить'), findsOneWidget);
+  });
+
+  testWidgets(
+      'лимит участников по тарифу — закрывает форму приглашения и объясняет, что делать',
+      (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+      staffRepositoryProvider.overrideWithValue(_LimitedStaffRepository()),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'new@example.com');
+    await tester.tap(find.text('Выписать код'));
+    await tester.pumpAndSettle();
+
+    // Форма приглашения закрыта — почта сама по себе тут ни при чём, а
+    // повторный ввод другого адреса лимит не снимет.
+    expect(find.byType(TextField), findsNothing);
+    expect(find.text('Лимит участников по тарифу'), findsOneWidget);
+    expect(
+      find.textContaining('Состав фермы достиг лимита участников'),
+      findsOneWidget,
+    );
   });
 }

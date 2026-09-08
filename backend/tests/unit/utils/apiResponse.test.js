@@ -26,4 +26,22 @@ describe('ApiResponse', () => {
       expect(body.error.details).toEqual([{ field: 'email' }]);
     });
   });
+
+  describe('badRequest', () => {
+    it('defaults to code BAD_REQUEST when none given', () => {
+      const res = mockRes();
+      ApiResponse.badRequest(res, 'Неверный запрос');
+      const body = res.json.mock.calls[0][0];
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(body.error.code).toBe('BAD_REQUEST');
+    });
+
+    it('uses the given machine code — клиент различает случай без разбора текста', () => {
+      const res = mockRes();
+      ApiResponse.badRequest(res, 'Достигнут лимит кроликов по тарифу фермы', 'RABBIT_LIMIT_REACHED');
+      const body = res.json.mock.calls[0][0];
+      expect(body.error.code).toBe('RABBIT_LIMIT_REACHED');
+      expect(body.error.message).toBe('Достигнут лимит кроликов по тарифу фермы');
+    });
+  });
 });

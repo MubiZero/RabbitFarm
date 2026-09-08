@@ -189,9 +189,38 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
               ],
             ),
+            _rabbitsPlanUsage(d),
           ],
         ),
       ],
+    );
+  }
+
+  /// Полоса «26 из 30 кроликов» — заранее, до отказа сервера.
+  ///
+  /// Показывается только когда информативна: у фермы без тарифа (или без
+  /// предела на кроликов) лимита попросту нет, а далеко от предела полоса
+  /// была бы шумом на каждый день. Порог 80% — тот же, что и в карточке
+  /// фермы у платформенного админа.
+  Widget _rabbitsPlanUsage(DashboardReport d) {
+    final usage = d.planUsage?.rabbits;
+    final limit = usage?.limit;
+    if (usage == null || limit == null || limit <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final fraction = usage.used / limit;
+    if (fraction < 0.8) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: MetricBar(
+        icon: Icons.pets_outlined,
+        label: context.l10n.platformRabbits,
+        value: context.l10n.platformUsageOfLimit(usage.used, limit),
+        fraction: fraction,
+        color: fraction >= 1 ? AppColors.error : AppColors.warning,
+      ),
     );
   }
 

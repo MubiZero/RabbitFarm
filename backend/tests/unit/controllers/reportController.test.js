@@ -18,8 +18,14 @@ jest.mock('../../../src/models', () => {
     sequelize: mockSequelize
   };
 });
+// Потребление фермы против тарифа считает planService — здесь достаточно
+// мокнуть сам метод, не разбирая заново Plan/Farm/User на уровне моделей.
+jest.mock('../../../src/services/planService', () => ({
+  getUsage: jest.fn()
+}));
 
 const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transaction, Task, Breeding, Birth } = require('../../../src/models');
+const planService = require('../../../src/services/planService');
 const ctrl = require('../../../src/controllers/reportController');
 
 const mockReq = (overrides = {}) => ({
@@ -58,6 +64,10 @@ const setAllMocksToEmpty = () => {
   FeedingRecord.findAll.mockResolvedValue([]);
   FeedingRecord.count.mockResolvedValue(0);
   FeedingRecord.sum.mockResolvedValue(0);
+  planService.getUsage.mockResolvedValue({
+    rabbits: { used: 0, limit: null },
+    staff: { used: 0, limit: null }
+  });
 };
 
 describe('reportController', () => {
@@ -98,6 +108,26 @@ describe('reportController', () => {
       await ctrl.getDashboard(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('отдаёт потребление фермы против пределов тарифа как plan_usage', async () => {
+      setAllMocksToEmpty();
+      planService.getUsage.mockResolvedValue({
+        rabbits: { used: 26, limit: 30 },
+        staff: { used: 2, limit: null }
+      });
+
+      const req = mockReq({ farmId: 7 });
+      const res = mockRes();
+
+      await ctrl.getDashboard(req, res, mockNext);
+
+      expect(planService.getUsage).toHaveBeenCalledWith(7);
+      const body = res.json.mock.calls[0][0];
+      expect(body.data.plan_usage).toEqual({
+        rabbits: { used: 26, limit: 30 },
+        staff: { used: 2, limit: null }
+      });
     });
 
     it('should call next on error', async () => {
