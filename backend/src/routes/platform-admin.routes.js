@@ -9,7 +9,8 @@ const {
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
-  deleteFarmSchema
+  deleteFarmSchema,
+  createAnnouncementSchema
 } = require('../validators/planValidator');
 
 /**
@@ -128,5 +129,18 @@ router.post('/farms/:id/restore', platformAdminController.restoreFarm);
  *     tags: [PlatformAdmin]
  */
 router.get('/audit', platformAdminController.listAudit);
+
+/**
+ * @swagger
+ * /platform-admin/announcements:
+ *   get:
+ *     summary: История объявлений, постранично
+ *     tags: [PlatformAdmin]
+ *   post:
+ *     summary: Отправить объявление (push/email) всем фермам, одной ферме или по фильтру
+ *     tags: [PlatformAdmin]
+ */
+router.get('/announcements', platformAdminController.listAnnouncements);
+router.post('/announcements', validate(createAnnouncementSchema), platformAdminController.createAnnouncement);
 
 module.exports = router;

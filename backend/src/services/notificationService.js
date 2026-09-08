@@ -42,21 +42,28 @@ class NotificationService {
     return require('firebase-admin').messaging(this._app);
   }
 
-  /** Отправить пуш конкретным пользователям фермы. */
+  /**
+   * Отправить пуш конкретным пользователям фермы.
+   *
+   * Возвращает `{ sent, failed }` на уровне device-токенов (не пользователей —
+   * у одного человека их может быть несколько) — нужно объявлениям
+   * платформенного админа для «доставлено N из M», обычные вызовы (дайджест)
+   * результат просто игнорируют.
+   */
   async sendToUsers(farmId, userIds, { title, body, data = {} }) {
     const ids = [...new Set(userIds)].filter(Boolean);
-    if (ids.length === 0) return;
+    if (ids.length === 0) return { sent: 0, failed: 0 };
 
     const messaging = this._messaging();
     if (!messaging) {
       logger.warn('Push skipped: Firebase not configured', { farmId, title });
-      return;
+      return { sent: 0, failed: 0 };
     }
 
     const deviceTokens = await DeviceToken.findAll({
       where: { farm_id: farmId, user_id: { [Op.in]: ids } }
     });
-    if (deviceTokens.length === 0) return;
+    if (deviceTokens.length === 0) return { sent: 0, failed: 0 };
 
     const stringData = Object.fromEntries(
       Object.entries(data).map(([key, value]) => [key, String(value)])
@@ -77,6 +84,9 @@ class NotificationService {
       await DeviceToken.destroy({ where: { farm_id: farmId, token: { [Op.in]: staleTokens } } });
       logger.info('Removed stale device tokens', { farmId, count: staleTokens.length });
     }
+
+    const sent = response.responses.filter(r => r.success).length;
+    return { sent, failed: response.responses.length - sent };
   }
 
   /** Отправить пуш всем участникам фермы с одной из указанных ролей. */

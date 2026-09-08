@@ -37,6 +37,7 @@ const DeviceToken = require('./DeviceToken')(sequelize);
 const Payment = require('./Payment')(sequelize);
 const Plan = require('./Plan')(sequelize);
 const AdminAuditLog = require('./AdminAuditLog')(sequelize);
+const Announcement = require('./Announcement')(sequelize);
 
 // Define associations
 
@@ -189,6 +190,12 @@ AdminAuditLog.belongsTo(User, { as: 'admin', foreignKey: 'admin_id' });
 Farm.hasMany(AdminAuditLog, { as: 'auditLog', foreignKey: 'farm_id', onDelete: 'SET NULL' });
 AdminAuditLog.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 
+// Объявления платформенного админа — глобальная сущность, как и Plan.
+User.hasMany(Announcement, { as: 'announcements', foreignKey: 'admin_id' });
+Announcement.belongsTo(User, { as: 'admin', foreignKey: 'admin_id' });
+Farm.hasMany(Announcement, { as: 'announcements', foreignKey: 'target_farm_id', onDelete: 'SET NULL' });
+Announcement.belongsTo(Farm, { as: 'targetFarm', foreignKey: 'target_farm_id' });
+
 // Запрос к таблице фермы без условия по farm_id дальше не проходит.
 // Подключаем после того, как все модели определены и связаны.
 require('../utils/tenancy').attach({
@@ -224,5 +231,6 @@ module.exports = {
   DeviceToken,
   Payment,
   Plan,
-  AdminAuditLog
+  AdminAuditLog,
+  Announcement
 };

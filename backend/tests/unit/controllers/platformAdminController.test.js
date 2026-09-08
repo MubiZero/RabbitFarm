@@ -2,11 +2,13 @@ jest.mock('../../../src/services/planService');
 jest.mock('../../../src/services/platformAdminService');
 jest.mock('../../../src/services/farmExportService');
 jest.mock('../../../src/services/auditService');
+jest.mock('../../../src/services/announcementService');
 
 const planService = require('../../../src/services/planService');
 const platformAdminService = require('../../../src/services/platformAdminService');
 const farmExportService = require('../../../src/services/farmExportService');
 const auditService = require('../../../src/services/auditService');
+const announcementService = require('../../../src/services/announcementService');
 const platformAdminController = require('../../../src/controllers/platformAdminController');
 
 const mockReq = (overrides = {}) => ({
@@ -549,6 +551,171 @@ describe('PlatformAdminController', () => {
       await platformAdminController.listAudit(mockReq({ query: { farm_id: '7' } }), res, mockNext);
 
       expect(auditService.list).toHaveBeenCalledWith(expect.objectContaining({ farmId: '7' }));
+    });
+  });
+
+  describe('createAnnouncement', () => {
+    const announcementBody = {
+      title: 'Плановые работы',
+      body: 'В субботу сервис будет недоступен.',
+      channels: ['push', 'email'],
+      target_type: 'all'
+    };
+    const sentAnnouncement = {
+      id: 4,
+      target_type: 'all',
+      farms_count: 3,
+      recipients_count: 7,
+      channels: ['push', 'email'],
+      stats: { push: { sent: 5, failed: 1 }, email: { sent: 7, failed: 0 } }
+    };
+
+    it('возвращает 201 и статистику доставки', async () => {
+      announcementService.create.mockResolvedValue(sentAnnouncement);
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(mockReq({ body: announcementBody }), res, mockNext);
+
+      expect(announcementService.create).toHaveBeenCalledWith({
+        adminId: 1,
+        title: announcementBody.title,
+        body: announcementBody.body,
+        channels: ['push', 'email'],
+        targetType: 'all',
+        targetFarmId: undefined,
+        targetFilter: undefined
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: sentAnnouncement
+      }));
+    });
+
+    it('передаёт сервису фильтр получателей', async () => {
+      announcementService.create.mockResolvedValue({ ...sentAnnouncement, target_type: 'filter' });
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(
+        mockReq({ body: { ...announcementBody, target_type: 'filter', target_filter: 'no_plan' } }),
+        res,
+        mockNext
+      );
+
+      expect(announcementService.create).toHaveBeenCalledWith(expect.objectContaining({
+        targetType: 'filter',
+        targetFilter: 'no_plan'
+      }));
+    });
+
+    it('возвращает 404 при FARM_NOT_FOUND', async () => {
+      announcementService.create.mockRejectedValue(new Error('FARM_NOT_FOUND'));
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(
+        mockReq({ body: { ...announcementBody, target_type: 'farm', target_farm_id: 99 } }),
+        res,
+        mockNext
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 400 при NO_RECIPIENTS', async () => {
+      announcementService.create.mockRejectedValue(new Error('NO_RECIPIENTS'));
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(mockReq({ body: announcementBody }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+
+    it('пишет в журнал отправленное объявление со статистикой', async () => {
+      announcementService.create.mockResolvedValue(sentAnnouncement);
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(mockReq({ body: announcementBody }), res, mockNext);
+
+      expect(auditService.record).toHaveBeenCalledWith({
+        adminId: 1,
+        action: 'announcement.send',
+        farmId: null,
+        after: {
+          id: 4,
+          target_type: 'all',
+          farms_count: 3,
+          recipients_count: 7,
+          channels: ['push', 'email'],
+          stats: sentAnnouncement.stats
+        },
+        ip: '127.0.0.1'
+      });
+    });
+
+    it('привязывает журнальную запись к ферме, если объявление адресное', async () => {
+      announcementService.create.mockResolvedValue({
+        ...sentAnnouncement, target_type: 'farm', farms_count: 1, recipients_count: 2
+      });
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(
+        mockReq({ body: { ...announcementBody, target_type: 'farm', target_farm_id: 7 } }),
+        res,
+        mockNext
+      );
+
+      expect(auditService.record).toHaveBeenCalledWith(expect.objectContaining({
+        action: 'announcement.send',
+        farmId: 7
+      }));
+    });
+
+    it('отдаёт неожидаемую ошибку в next и не пишет в журнал', async () => {
+      announcementService.create.mockRejectedValue(new Error('DB down'));
+      const res = mockRes();
+
+      await platformAdminController.createAnnouncement(mockReq({ body: announcementBody }), res, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('listAnnouncements', () => {
+    it('отдаёт постраничную историю объявлений', async () => {
+      announcementService.list.mockResolvedValue({
+        items: [{ id: 1, title: 'Плановые работы' }],
+        pagination: { page: 1, limit: 20, total: 1, totalPages: 1 }
+      });
+      const res = mockRes();
+
+      await platformAdminController.listAnnouncements(mockReq(), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({ items: [{ id: 1, title: 'Плановые работы' }] })
+      }));
+    });
+
+    it('передаёт постраничные параметры из query', async () => {
+      announcementService.list.mockResolvedValue({
+        items: [],
+        pagination: { page: 2, limit: 5, total: 0, totalPages: 0 }
+      });
+      const res = mockRes();
+
+      await platformAdminController.listAnnouncements(
+        mockReq({ query: { page: '2', limit: '5' } }),
+        res,
+        mockNext
+      );
+
+      expect(announcementService.list).toHaveBeenCalledWith({ page: '2', limit: '5' });
     });
   });
 });

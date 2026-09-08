@@ -19,7 +19,10 @@ jest.mock('nodemailer', () => ({
 
 const nodemailer = require('nodemailer');
 const config = require('../../../../src/config/mailer');
-const { sendPasswordResetEmail } = require('../../../../src/services/notifications/emailTransport');
+const {
+  sendPasswordResetEmail,
+  sendAnnouncementEmail
+} = require('../../../../src/services/notifications/emailTransport');
 
 describe('emailTransport', () => {
   beforeEach(() => {
@@ -79,6 +82,56 @@ describe('emailTransport', () => {
       mockSendMail.mockRejectedValue(err);
 
       await expect(sendPasswordResetEmail({ to: 'user@example.com', code: '123456' }))
+        .rejects.toMatchObject({ permanent: false });
+    });
+  });
+
+  describe('sendAnnouncementEmail', () => {
+    const announcement = {
+      to: 'owner@example.com',
+      subject: 'Плановые работы',
+      text: 'В субботу сервис будет недоступен с 2:00 до 4:00.'
+    };
+
+    it('бросает permanent-ошибку и не трогает nodemailer, если не настроено', async () => {
+      config.isConfigured = false;
+
+      await expect(sendAnnouncementEmail(announcement))
+        .rejects.toMatchObject({ message: 'EMAIL_NOT_CONFIGURED', permanent: true });
+      expect(nodemailer.createTransport).not.toHaveBeenCalled();
+
+      config.isConfigured = true;
+    });
+
+    it('отправляет объявление получателю с заголовком и текстом как есть', async () => {
+      mockSendMail.mockResolvedValue({ messageId: 'abc' });
+
+      const result = await sendAnnouncementEmail(announcement);
+
+      expect(mockSendMail).toHaveBeenCalledWith({
+        from: '"RabbitFarm" <no-reply@test>',
+        to: 'owner@example.com',
+        subject: 'Плановые работы',
+        text: 'В субботу сервис будет недоступен с 2:00 до 4:00.'
+      });
+      expect(result).toEqual({ messageId: 'abc' });
+    });
+
+    it('помечает ошибку авторизации (EAUTH) как permanent', async () => {
+      const err = new Error('bad credentials');
+      err.code = 'EAUTH';
+      mockSendMail.mockRejectedValue(err);
+
+      await expect(sendAnnouncementEmail(announcement))
+        .rejects.toMatchObject({ permanent: true });
+    });
+
+    it('не помечает сетевую ошибку как permanent — рассылку можно повторить', async () => {
+      const err = new Error('connection timed out');
+      err.code = 'ETIMEDOUT';
+      mockSendMail.mockRejectedValue(err);
+
+      await expect(sendAnnouncementEmail(announcement))
         .rejects.toMatchObject({ permanent: false });
     });
   });

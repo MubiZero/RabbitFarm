@@ -41,11 +41,26 @@ const deleteFarmSchema = Joi.object({
   confirm_name: Joi.string().min(1).required()
 });
 
+// SMS сюда не входит — шлюз Payom принимает только заранее одобренные
+// шаблоны, свободный текст объявления через него не отправить (см.
+// announcementService.js).
+const createAnnouncementSchema = Joi.object({
+  title: Joi.string().min(1).max(255).required(),
+  body: Joi.string().min(1).max(4000).required(),
+  channels: Joi.array().items(Joi.string().valid('push', 'email')).min(1).required(),
+  target_type: Joi.string().valid('all', 'farm', 'filter').required(),
+  target_farm_id: Joi.number().integer().positive()
+    .when('target_type', { is: 'farm', then: Joi.required(), otherwise: Joi.forbidden() }),
+  target_filter: Joi.string().valid('no_plan', 'at_limit', 'suspended', 'expired', 'inactive_days')
+    .when('target_type', { is: 'filter', then: Joi.required(), otherwise: Joi.forbidden() })
+});
+
 module.exports = {
   createPlanSchema,
   updatePlanSchema,
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
-  deleteFarmSchema
+  deleteFarmSchema,
+  createAnnouncementSchema
 };

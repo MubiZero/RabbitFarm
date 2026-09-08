@@ -43,15 +43,28 @@ describe('notificationService', () => {
 
   describe('sendToUsers', () => {
     it('ничего не отправляет, если получателей нет', async () => {
-      await notificationService.sendToUsers(1, [], { title: 't', body: 'b' });
+      const result = await notificationService.sendToUsers(1, [], { title: 't', body: 'b' });
+
       expect(DeviceToken.findAll).not.toHaveBeenCalled();
+      expect(result).toEqual({ sent: 0, failed: 0 });
     });
 
     it('молча пропускает отправку, если Firebase не настроен', async () => {
-      await notificationService.sendToUsers(1, [5], { title: 't', body: 'b' });
+      const result = await notificationService.sendToUsers(1, [5], { title: 't', body: 'b' });
 
       expect(DeviceToken.findAll).not.toHaveBeenCalled();
       expect(logger.warn).toHaveBeenCalled();
+      expect(result).toEqual({ sent: 0, failed: 0 });
+    });
+
+    it('возвращает нули, если ни у одного получателя нет устройств', async () => {
+      firebaseConfig.isConfigured = true;
+      DeviceToken.findAll.mockResolvedValue([]);
+
+      const result = await notificationService.sendToUsers(1, [5], { title: 't', body: 'b' });
+
+      expect(mockMessaging.sendEachForMulticast).not.toHaveBeenCalled();
+      expect(result).toEqual({ sent: 0, failed: 0 });
     });
 
     it('шлёт пуш на токены получателей, когда Firebase настроен', async () => {
@@ -97,6 +110,27 @@ describe('notificationService', () => {
       expect(DeviceToken.destroy).toHaveBeenCalledWith({
         where: { farm_id: 1, token: { [Op.in]: ['token-dead'] } }
       });
+    });
+
+    // Счёт по токенам, а не по людям — нужен объявлениям платформенного админа.
+    it('считает доставленные и недоставленные токены', async () => {
+      firebaseConfig.isConfigured = true;
+      DeviceToken.findAll.mockResolvedValue([
+        { token: 'token-a' },
+        { token: 'token-b' },
+        { token: 'token-c' }
+      ]);
+      mockMessaging.sendEachForMulticast.mockResolvedValue({
+        responses: [
+          { success: true },
+          { success: false, error: { code: 'messaging/internal-error' } },
+          { success: true }
+        ]
+      });
+
+      const result = await notificationService.sendToUsers(1, [5, 6], { title: 't', body: 'b' });
+
+      expect(result).toEqual({ sent: 2, failed: 1 });
     });
   });
 

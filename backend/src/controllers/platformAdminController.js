@@ -1,6 +1,7 @@
 const planService = require('../services/planService');
 const platformAdminService = require('../services/platformAdminService');
 const farmExportService = require('../services/farmExportService');
+const announcementService = require('../services/announcementService');
 const auditService = require('../services/auditService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -298,6 +299,68 @@ class PlatformAdminController {
         result.pagination.limit,
         result.pagination.total,
         'Журнал действий получен'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /platform-admin/announcements
+   * Отправка синхронная — ответ приходит вместе со статистикой доставки,
+   * подтверждение перед вызовом делает клиент (действие необратимо и уходит наружу).
+   */
+  async createAnnouncement(req, res, next) {
+    try {
+      const announcement = await announcementService.create({
+        adminId: req.user.id,
+        title: req.body.title,
+        body: req.body.body,
+        channels: req.body.channels,
+        targetType: req.body.target_type,
+        targetFarmId: req.body.target_farm_id,
+        targetFilter: req.body.target_filter
+      });
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'announcement.send',
+        farmId: req.body.target_type === 'farm' ? req.body.target_farm_id : null,
+        after: {
+          id: announcement.id,
+          target_type: announcement.target_type,
+          farms_count: announcement.farms_count,
+          recipients_count: announcement.recipients_count,
+          channels: announcement.channels,
+          stats: announcement.stats
+        },
+        ip: req.ip
+      });
+      return ApiResponse.created(res, announcement, 'Объявление отправлено');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      if (error.message === 'NO_RECIPIENTS') {
+        return ApiResponse.badRequest(res, 'Получателей не нашлось — проверьте, кому адресовано объявление', 'NO_RECIPIENTS');
+      }
+      next(error);
+    }
+  }
+
+  /** GET /platform-admin/announcements */
+  async listAnnouncements(req, res, next) {
+    try {
+      const result = await announcementService.list({
+        page: req.query.page,
+        limit: req.query.limit
+      });
+      return ApiResponse.paginated(
+        res,
+        result.items,
+        result.pagination.page,
+        result.pagination.limit,
+        result.pagination.total,
+        'Список объявлений получен'
       );
     } catch (error) {
       next(error);
