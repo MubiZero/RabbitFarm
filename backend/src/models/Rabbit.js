@@ -97,6 +97,13 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(500),
       allowNull: true,
       comment: 'Main photo'
+    },
+    // Размер файла в MinIO — для учёта занятого места (см.
+    // docs/plans/PLATFORM-ADMIN.md, 1.6). Nullable по той же причине, что и
+    // Photo.size_bytes: старые записи заполняются бэкфиллом, а не миграцией.
+    photo_size_bytes: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'rabbits',

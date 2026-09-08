@@ -15,7 +15,8 @@ class RabbitController {
     try {
       // If photo uploaded, add to request body
       if (req.file) {
-        req.body.photo_url = await fileStorage.uploadFile('rabbits', req.file);
+        req.body.photo_url = await fileStorage.uploadFile(req.farmId, 'rabbits', req.file);
+        req.body.photo_size_bytes = req.file.size;
       }
 
       // Ферму берём из токена, а не из тела: иначе клиент мог бы записать
@@ -106,7 +107,8 @@ class RabbitController {
     try {
       // If photo uploaded, add to request body
       if (req.file) {
-        req.body.photo_url = await fileStorage.uploadFile('rabbits', req.file);
+        req.body.photo_url = await fileStorage.uploadFile(req.farmId, 'rabbits', req.file);
+        req.body.photo_size_bytes = req.file.size;
       }
 
       const rabbit = await rabbitService.updateRabbit(req.params.id, req.farmId, req.body);
@@ -237,7 +239,8 @@ class RabbitController {
       }
 
       const photo = await rabbitService.addGalleryPhoto(req.params.id, req.farmId, {
-        url: await fileStorage.uploadFile('rabbits', req.file),
+        url: await fileStorage.uploadFile(req.farmId, 'rabbits', req.file),
+        size_bytes: req.file.size,
         caption: req.body.caption,
         taken_at: req.body.taken_at,
         uploaded_by: req.user.id
@@ -326,11 +329,12 @@ class RabbitController {
         return ApiResponse.badRequest(res, 'Файл не загружен');
       }
 
-      const photoUrl = await fileStorage.uploadFile('rabbits', req.file);
+      const photoUrl = await fileStorage.uploadFile(req.farmId, 'rabbits', req.file);
 
       // Update rabbit with new photo
       const rabbit = await rabbitService.updateRabbit(req.params.id, req.farmId, {
-        photo_url: photoUrl
+        photo_url: photoUrl,
+        photo_size_bytes: req.file.size
       });
 
       return ApiResponse.success(res, rabbit, 'Фото загружено успешно');
@@ -350,7 +354,8 @@ class RabbitController {
     try {
       // Update rabbit to remove photo
       const rabbit = await rabbitService.updateRabbit(req.params.id, req.farmId, {
-        photo_url: null
+        photo_url: null,
+        photo_size_bytes: null
       });
 
       return ApiResponse.success(res, rabbit, 'Фото удалено успешно');

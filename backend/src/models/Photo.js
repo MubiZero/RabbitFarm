@@ -36,6 +36,15 @@ module.exports = (sequelize) => {
     uploaded_by: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    // Размер файла в MinIO — для учёта занятого места (см.
+    // docs/plans/PLATFORM-ADMIN.md, 1.6). Nullable: записи, сделанные до
+    // этого поля, заполняются разовым скриптом-бэкфиллом
+    // (scripts/backfillPhotoSizes.js), а не миграцией — размер знает
+    // только MinIO, а не БД.
+    size_bytes: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'photos',

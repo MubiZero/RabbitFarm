@@ -21,32 +21,39 @@ describe('fileStorage', () => {
   beforeEach(() => jest.clearAllMocks());
 
   describe('buildObjectKey', () => {
-    it('builds a key under the given folder with the extension for the mime type', () => {
-      const key = buildObjectKey('rabbits', 'photo', 'image/png');
-      expect(key).toMatch(/^rabbits\/photo-\d+-\d+\.png$/);
+    it('builds a key under the given farm and folder with the extension for the mime type', () => {
+      const key = buildObjectKey(42, 'rabbits', 'photo', 'image/png');
+      expect(key).toMatch(/^farm-42\/rabbits\/photo-\d+-\d+\.png$/);
     });
 
     it('falls back to .bin for an unknown mime type', () => {
-      const key = buildObjectKey('rabbits', 'photo', 'application/x-unknown');
-      expect(key).toMatch(/^rabbits\/photo-\d+-\d+\.bin$/);
+      const key = buildObjectKey(42, 'rabbits', 'photo', 'application/x-unknown');
+      expect(key).toMatch(/^farm-42\/rabbits\/photo-\d+-\d+\.bin$/);
+    });
+
+    it('keeps different farms in different prefixes', () => {
+      const keyA = buildObjectKey(1, 'rabbits', 'photo', 'image/jpeg');
+      const keyB = buildObjectKey(2, 'rabbits', 'photo', 'image/jpeg');
+      expect(keyA).toMatch(/^farm-1\//);
+      expect(keyB).toMatch(/^farm-2\//);
     });
   });
 
   describe('uploadFile', () => {
-    it('uploads the buffer to the bucket and returns a /uploads/ relative URL', async () => {
+    it('uploads the buffer to the bucket and returns a /uploads/ relative URL prefixed with the farm', async () => {
       client.putObject.mockResolvedValue(undefined);
       const file = { fieldname: 'photo', mimetype: 'image/jpeg', buffer: Buffer.from('x'), size: 1 };
 
-      const url = await uploadFile('rabbits', file);
+      const url = await uploadFile(42, 'rabbits', file);
 
       expect(client.putObject).toHaveBeenCalledWith(
         bucket,
-        expect.stringMatching(/^rabbits\/photo-\d+-\d+\.jpg$/),
+        expect.stringMatching(/^farm-42\/rabbits\/photo-\d+-\d+\.jpg$/),
         file.buffer,
         file.size,
         { 'Content-Type': 'image/jpeg' }
       );
-      expect(url).toMatch(/^\/uploads\/rabbits\/photo-\d+-\d+\.jpg$/);
+      expect(url).toMatch(/^\/uploads\/farm-42\/rabbits\/photo-\d+-\d+\.jpg$/);
     });
   });
 
