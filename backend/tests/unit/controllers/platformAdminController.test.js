@@ -150,6 +150,30 @@ describe('PlatformAdminController', () => {
     });
   });
 
+  describe('getFarm', () => {
+    it('возвращает ферму при успешном поиске', async () => {
+      platformAdminService.getFarm.mockResolvedValue({ id: 1, name: 'Ферма 1', last_active: null });
+      const res = mockRes();
+
+      await platformAdminController.getFarm(mockReq({ params: { id: 1 } }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: { id: 1, name: 'Ферма 1', last_active: null }
+      }));
+    });
+
+    it('возвращает 404 при FARM_NOT_FOUND', async () => {
+      platformAdminService.getFarm.mockRejectedValue(new Error('FARM_NOT_FOUND'));
+      const res = mockRes();
+
+      await platformAdminController.getFarm(mockReq({ params: { id: 99 } }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+  });
+
   describe('assignPlan', () => {
     it('возвращает 404 при FARM_NOT_FOUND', async () => {
       platformAdminService.getFarm.mockRejectedValue(new Error('FARM_NOT_FOUND'));

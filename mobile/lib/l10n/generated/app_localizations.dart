@@ -6112,6 +6112,18 @@ abstract class AppLocalizations {
   /// **'Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.'**
   String get platformFarmsEmptyBody;
 
+  /// No description provided for @platformFarmsNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не нашлось'**
+  String get platformFarmsNothingFound;
+
+  /// No description provided for @platformFarmsNothingFoundBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте запрос или снимите фильтр.'**
+  String get platformFarmsNothingFoundBody;
+
   /// No description provided for @platformOwnerMissing.
   ///
   /// In ru, this message translates to:
@@ -6165,6 +6177,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Подходит к пределу тарифа'**
   String get platformNearLimit;
+
+  /// No description provided for @platformFarmsSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма, владелец, почта, телефон'**
+  String get platformFarmsSearchHint;
+
+  /// No description provided for @platformFilterInactive.
+  ///
+  /// In ru, this message translates to:
+  /// **'{days, plural, one{Не заходили {days} день} few{Не заходили {days} дня} many{Не заходили {days} дней} other{Не заходили {days} дней}}'**
+  String platformFilterInactive(int days);
 
   /// No description provided for @platformChangePlan.
   ///

@@ -55,6 +55,15 @@ router.get('/farms', platformAdminController.listFarms);
 
 /**
  * @swagger
+ * /platform-admin/farms/{id}:
+ *   get:
+ *     summary: Одна ферма — тариф, владелец, потребление, последняя активность
+ *     tags: [PlatformAdmin]
+ */
+router.get('/farms/:id', platformAdminController.getFarm);
+
+/**
+ * @swagger
  * /platform-admin/farms/{id}/plan:
  *   patch:
  *     summary: Назначить (или снять) тариф ферме

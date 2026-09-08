@@ -78,6 +78,10 @@ class PlatformFarm with _$PlatformFarm {
     @JsonKey(name: 'rabbits_count') @IntConverter() @Default(0) int rabbitsCount,
     @JsonKey(name: 'staff_count') @IntConverter() @Default(0) int staffCount,
     @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    // Последний вход кого-либо из фермы — `max(users.last_login_at)`. `null`
+    // значит «никто ещё не заходил», а не «неизвестно»: разница важна для
+    // фильтра «не заходили N дней».
+    @JsonKey(name: 'last_active') @NullableDateTimeConverter() DateTime? lastActiveAt,
   }) = _PlatformFarm;
 
   const PlatformFarm._();

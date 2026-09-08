@@ -68,11 +68,23 @@ class PlatformAdminRepository {
     }
   }
 
-  Future<FarmsPage> getFarms({int page = 1, int limit = 20}) async {
+  Future<FarmsPage> getFarms({
+    int page = 1,
+    int limit = 20,
+    String? search,
+    String? filter,
+    String? sort,
+  }) async {
     try {
       final response = await _apiClient.get(
         ApiEndpoints.platformFarms,
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null && search.isNotEmpty) 'search': search,
+          if (filter != null) 'filter': filter,
+          if (sort != null) 'sort': sort,
+        },
       );
 
       final data = response.data['data'];

@@ -113,6 +113,7 @@ void main() {
         'staff_count': '2',
         'owner': {'id': '10', 'full_name': 'Пётр Иванов', 'phone': '+992...'},
         'plan': {'id': '1', 'name': 'Базовый', 'max_rabbits': 200, 'max_staff': 5},
+        'last_active': '2026-08-15T00:00:00.000Z',
       });
 
       expect(farm.id, 7);
@@ -122,6 +123,7 @@ void main() {
       expect(farm.owner?.phone, '+992...');
       expect(farm.rabbitsUsage, closeTo(0.24, 0.001));
       expect(farm.isAtLimit, isFalse);
+      expect(farm.lastActiveAt, isNotNull);
     });
 
     test('Ферма без тарифа и без счётчиков не выдумывает пределы', () {
@@ -137,6 +139,8 @@ void main() {
       expect(farm.staffUsage, isNull);
       expect(farm.isAtLimit, isFalse);
       expect(farm.isNearLimit, isFalse);
+      // Ни разу не заходили — это `null`, а не выдуманная дата.
+      expect(farm.lastActiveAt, isNull);
     });
 
     test('Ферма на пределе видна и как «упёрлась», и не как «подходит»', () {

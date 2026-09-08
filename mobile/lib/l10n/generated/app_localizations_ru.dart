@@ -3367,6 +3367,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.';
 
   @override
+  String get platformFarmsNothingFound => 'Ничего не нашлось';
+
+  @override
+  String get platformFarmsNothingFoundBody =>
+      'Проверьте запрос или снимите фильтр.';
+
+  @override
   String get platformOwnerMissing => 'Владелец не назначен';
 
   @override
@@ -3396,6 +3403,22 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformNearLimit => 'Подходит к пределу тарифа';
+
+  @override
+  String get platformFarmsSearchHint => 'Ферма, владелец, почта, телефон';
+
+  @override
+  String platformFilterInactive(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Не заходили $days дней',
+      many: 'Не заходили $days дней',
+      few: 'Не заходили $days дня',
+      one: 'Не заходили $days день',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get platformChangePlan => 'Сменить тариф';

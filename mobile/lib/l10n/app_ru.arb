@@ -1321,6 +1321,8 @@
 
   "platformFarmsEmptyTitle": "Ферм пока нет",
   "platformFarmsEmptyBody": "Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.",
+  "platformFarmsNothingFound": "Ничего не нашлось",
+  "platformFarmsNothingFoundBody": "Проверьте запрос или снимите фильтр.",
   "platformOwnerMissing": "Владелец не назначен",
   "platformNoPlan": "Без тарифа",
   "platformNoPlanHint": "Ограничений нет",
@@ -1341,6 +1343,13 @@
   },
   "platformAtLimit": "Упёрлась в предел тарифа",
   "platformNearLimit": "Подходит к пределу тарифа",
+  "platformFarmsSearchHint": "Ферма, владелец, почта, телефон",
+  "platformFilterInactive": "{days, plural, one{Не заходили {days} день} few{Не заходили {days} дня} many{Не заходили {days} дней} other{Не заходили {days} дней}}",
+  "@platformFilterInactive": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
   "platformChangePlan": "Сменить тариф",
   "platformAssignPlan": "Назначить тариф",
   "platformPlanSheetTitle": "Тариф хозяйства «{farm}»",

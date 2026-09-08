@@ -103,6 +103,19 @@ class PlatformAdminController {
     }
   }
 
+  /** GET /platform-admin/farms/:id */
+  async getFarm(req, res, next) {
+    try {
+      const farm = await platformAdminService.getFarm(req.params.id);
+      return ApiResponse.success(res, farm, 'Ферма получена');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      next(error);
+    }
+  }
+
   /** PATCH /platform-admin/farms/:id/plan */
   async assignPlan(req, res, next) {
     try {

@@ -570,7 +570,12 @@ mixin _$PlatformFarm {
   int get staffCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   @DateTimeConverter()
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError; // Последний вход кого-либо из фермы — `max(users.last_login_at)`. `null`
+  // значит «никто ещё не заходил», а не «неизвестно»: разница важна для
+  // фильтра «не заходили N дней».
+  @JsonKey(name: 'last_active')
+  @NullableDateTimeConverter()
+  DateTime? get lastActiveAt => throw _privateConstructorUsedError;
 
   /// Serializes this PlatformFarm to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -597,6 +602,9 @@ abstract class $PlatformFarmCopyWith<$Res> {
     @JsonKey(name: 'rabbits_count') @IntConverter() int rabbitsCount,
     @JsonKey(name: 'staff_count') @IntConverter() int staffCount,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'last_active')
+    @NullableDateTimeConverter()
+    DateTime? lastActiveAt,
   });
 
   $UserRefCopyWith<$Res>? get owner;
@@ -625,6 +633,7 @@ class _$PlatformFarmCopyWithImpl<$Res, $Val extends PlatformFarm>
     Object? rabbitsCount = null,
     Object? staffCount = null,
     Object? createdAt = null,
+    Object? lastActiveAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -656,6 +665,10 @@ class _$PlatformFarmCopyWithImpl<$Res, $Val extends PlatformFarm>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            lastActiveAt: freezed == lastActiveAt
+                ? _value.lastActiveAt
+                : lastActiveAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -707,6 +720,9 @@ abstract class _$$PlatformFarmImplCopyWith<$Res>
     @JsonKey(name: 'rabbits_count') @IntConverter() int rabbitsCount,
     @JsonKey(name: 'staff_count') @IntConverter() int staffCount,
     @JsonKey(name: 'created_at') @DateTimeConverter() DateTime createdAt,
+    @JsonKey(name: 'last_active')
+    @NullableDateTimeConverter()
+    DateTime? lastActiveAt,
   });
 
   @override
@@ -736,6 +752,7 @@ class __$$PlatformFarmImplCopyWithImpl<$Res>
     Object? rabbitsCount = null,
     Object? staffCount = null,
     Object? createdAt = null,
+    Object? lastActiveAt = freezed,
   }) {
     return _then(
       _$PlatformFarmImpl(
@@ -767,6 +784,10 @@ class __$$PlatformFarmImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        lastActiveAt: freezed == lastActiveAt
+            ? _value.lastActiveAt
+            : lastActiveAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -783,6 +804,9 @@ class _$PlatformFarmImpl extends _PlatformFarm {
     @JsonKey(name: 'rabbits_count') @IntConverter() this.rabbitsCount = 0,
     @JsonKey(name: 'staff_count') @IntConverter() this.staffCount = 0,
     @JsonKey(name: 'created_at') @DateTimeConverter() required this.createdAt,
+    @JsonKey(name: 'last_active')
+    @NullableDateTimeConverter()
+    this.lastActiveAt,
   }) : super._();
 
   factory _$PlatformFarmImpl.fromJson(Map<String, dynamic> json) =>
@@ -809,10 +833,17 @@ class _$PlatformFarmImpl extends _PlatformFarm {
   @JsonKey(name: 'created_at')
   @DateTimeConverter()
   final DateTime createdAt;
+  // Последний вход кого-либо из фермы — `max(users.last_login_at)`. `null`
+  // значит «никто ещё не заходил», а не «неизвестно»: разница важна для
+  // фильтра «не заходили N дней».
+  @override
+  @JsonKey(name: 'last_active')
+  @NullableDateTimeConverter()
+  final DateTime? lastActiveAt;
 
   @override
   String toString() {
-    return 'PlatformFarm(id: $id, name: $name, owner: $owner, plan: $plan, rabbitsCount: $rabbitsCount, staffCount: $staffCount, createdAt: $createdAt)';
+    return 'PlatformFarm(id: $id, name: $name, owner: $owner, plan: $plan, rabbitsCount: $rabbitsCount, staffCount: $staffCount, createdAt: $createdAt, lastActiveAt: $lastActiveAt)';
   }
 
   @override
@@ -829,7 +860,9 @@ class _$PlatformFarmImpl extends _PlatformFarm {
             (identical(other.staffCount, staffCount) ||
                 other.staffCount == staffCount) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.lastActiveAt, lastActiveAt) ||
+                other.lastActiveAt == lastActiveAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -843,6 +876,7 @@ class _$PlatformFarmImpl extends _PlatformFarm {
     rabbitsCount,
     staffCount,
     createdAt,
+    lastActiveAt,
   );
 
   /// Create a copy of PlatformFarm
@@ -870,6 +904,9 @@ abstract class _PlatformFarm extends PlatformFarm {
     @JsonKey(name: 'created_at')
     @DateTimeConverter()
     required final DateTime createdAt,
+    @JsonKey(name: 'last_active')
+    @NullableDateTimeConverter()
+    final DateTime? lastActiveAt,
   }) = _$PlatformFarmImpl;
   const _PlatformFarm._() : super._();
 
@@ -896,7 +933,13 @@ abstract class _PlatformFarm extends PlatformFarm {
   @override
   @JsonKey(name: 'created_at')
   @DateTimeConverter()
-  DateTime get createdAt;
+  DateTime get createdAt; // Последний вход кого-либо из фермы — `max(users.last_login_at)`. `null`
+  // значит «никто ещё не заходил», а не «неизвестно»: разница важна для
+  // фильтра «не заходили N дней».
+  @override
+  @JsonKey(name: 'last_active')
+  @NullableDateTimeConverter()
+  DateTime? get lastActiveAt;
 
   /// Create a copy of PlatformFarm
   /// with the given fields replaced by the non-null parameter values.

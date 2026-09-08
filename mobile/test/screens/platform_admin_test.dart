@@ -10,6 +10,7 @@ import 'package:mobile/features/platform_admin/data/repositories/platform_admin_
 import 'package:mobile/features/platform_admin/presentation/providers/platform_admin_provider.dart';
 import 'package:mobile/features/platform_admin/presentation/screens/platform_farms_tab.dart';
 import 'package:mobile/features/platform_admin/presentation/screens/platform_plans_tab.dart';
+import 'package:mobile/features/platform_admin/presentation/widgets/platform_farm_card.dart';
 
 import '../support/test_app.dart';
 
@@ -67,8 +68,19 @@ class _FakeRepository extends PlatformAdminRepository {
   /// Что ушло в `assignPlan` — по этому видно, дошёл ли выбор до сервера.
   final assigned = <({int farmId, int? planId})>[];
 
+  /// Каждый вызов `getFarms` — по нему видно, что поиск и фильтр реально
+  /// дошли до репозитория, а не осели где-то в виджете.
+  final queries = <({int page, int limit, String? search, String? filter})>[];
+
   @override
-  Future<FarmsPage> getFarms({int page = 1, int limit = 20}) async {
+  Future<FarmsPage> getFarms({
+    int page = 1,
+    int limit = 20,
+    String? search,
+    String? filter,
+    String? sort,
+  }) async {
+    queries.add((page: page, limit: limit, search: search, filter: filter));
     if (error != null) throw error!;
     return (
       items: farms,
@@ -142,7 +154,15 @@ void main() {
       await tester.pumpWidget(_farmsTab(farms: [_farm(rabbits: 12)]));
       await _settle(tester);
 
-      expect(find.text('Без тарифа'), findsOneWidget);
+      // «Без тарифа» встречается дважды на экране: ярлыком на карточке и
+      // подписью фильтрующего чипа над списком — про карточку тут и вопрос.
+      expect(
+        find.descendant(
+          of: find.byType(PlatformFarmCard),
+          matching: find.text('Без тарифа'),
+        ),
+        findsOneWidget,
+      );
       expect(find.text('12, без предела'), findsOneWidget);
       expect(find.text('Назначить тариф'), findsOneWidget);
     });
@@ -154,7 +174,13 @@ void main() {
       ));
       await _settle(tester);
 
-      expect(find.text('Упёрлась в предел тарифа'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(PlatformFarmCard),
+          matching: find.text('Упёрлась в предел тарифа'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('подошедшая к пределу ферма предупреждает мягче',
@@ -165,7 +191,13 @@ void main() {
       await _settle(tester);
 
       expect(find.text('Подходит к пределу тарифа'), findsOneWidget);
-      expect(find.text('Упёрлась в предел тарифа'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(PlatformFarmCard),
+          matching: find.text('Упёрлась в предел тарифа'),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('владелец без записи не оставляет строку пустой',
@@ -233,6 +265,50 @@ void main() {
       await _settle(tester);
 
       expect(find.text('Повторить'), findsOneWidget);
+    });
+
+    testWidgets('поиск уходит на сервер, а не фильтрует загруженную страницу',
+        (tester) async {
+      final repository = _FakeRepository(farms: [_farm(rabbits: 1)]);
+      await tester.pumpWidget(_farmsTab(repository: repository));
+      await _settle(tester);
+
+      await tester.enterText(find.byType(TextField), 'Иванов');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await _settle(tester);
+
+      expect(repository.queries.last.search, 'Иванов');
+    });
+
+    testWidgets('фильтр «Без тарифа» уходит на сервер и снимается повторным тапом',
+        (tester) async {
+      final repository = _FakeRepository(farms: [_farm(rabbits: 1)]);
+      await tester.pumpWidget(_farmsTab(repository: repository));
+      await _settle(tester);
+
+      final chip = find.widgetWithText(FilterChip, 'Без тарифа');
+      await tester.tap(chip);
+      await _settle(tester);
+      expect(repository.queries.last.filter, 'no_plan');
+
+      await tester.tap(chip);
+      await _settle(tester);
+      expect(repository.queries.last.filter, isNull);
+    });
+
+    testWidgets('фильтр «упёрлась в предел» и фильтр «не заходили» видны как чипы',
+        (tester) async {
+      await tester.pumpWidget(_farmsTab(farms: [_farm(rabbits: 1)]));
+      // Чипы лежат в горизонтальном списке: на обычной ширине телефона третий
+      // чип не построен вовсе, потому что закадрирован — здесь ширина шире,
+      // чтобы все три чипа реально попали во вьюпорт.
+      await tester.binding.setSurfaceSize(const Size(900, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.widgetWithText(FilterChip, 'Упёрлась в предел тарифа'), findsOneWidget);
+      expect(find.widgetWithText(FilterChip, 'Не заходили 30 дней'), findsOneWidget);
     });
   });
 

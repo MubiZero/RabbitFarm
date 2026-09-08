@@ -59,26 +59,26 @@ Map<String, dynamic> _$$PlanDraftImplToJson(_$PlanDraftImpl instance) =>
       'is_active': instance.isActive,
     };
 
-_$PlatformFarmImpl _$$PlatformFarmImplFromJson(Map<String, dynamic> json) =>
-    _$PlatformFarmImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      name: json['name'] as String,
-      owner: json['owner'] == null
-          ? null
-          : UserRef.fromJson(json['owner'] as Map<String, dynamic>),
-      plan: json['plan'] == null
-          ? null
-          : Plan.fromJson(json['plan'] as Map<String, dynamic>),
-      rabbitsCount: json['rabbits_count'] == null
-          ? 0
-          : const IntConverter().fromJson(json['rabbits_count'] as Object),
-      staffCount: json['staff_count'] == null
-          ? 0
-          : const IntConverter().fromJson(json['staff_count'] as Object),
-      createdAt: const DateTimeConverter().fromJson(
-        json['created_at'] as Object,
-      ),
-    );
+_$PlatformFarmImpl _$$PlatformFarmImplFromJson(
+  Map<String, dynamic> json,
+) => _$PlatformFarmImpl(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  name: json['name'] as String,
+  owner: json['owner'] == null
+      ? null
+      : UserRef.fromJson(json['owner'] as Map<String, dynamic>),
+  plan: json['plan'] == null
+      ? null
+      : Plan.fromJson(json['plan'] as Map<String, dynamic>),
+  rabbitsCount: json['rabbits_count'] == null
+      ? 0
+      : const IntConverter().fromJson(json['rabbits_count'] as Object),
+  staffCount: json['staff_count'] == null
+      ? 0
+      : const IntConverter().fromJson(json['staff_count'] as Object),
+  createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
+  lastActiveAt: const NullableDateTimeConverter().fromJson(json['last_active']),
+);
 
 Map<String, dynamic> _$$PlatformFarmImplToJson(_$PlatformFarmImpl instance) =>
     <String, dynamic>{
@@ -89,4 +89,7 @@ Map<String, dynamic> _$$PlatformFarmImplToJson(_$PlatformFarmImpl instance) =>
       'rabbits_count': const IntConverter().toJson(instance.rabbitsCount),
       'staff_count': const IntConverter().toJson(instance.staffCount),
       'created_at': const DateTimeConverter().toJson(instance.createdAt),
+      'last_active': const NullableDateTimeConverter().toJson(
+        instance.lastActiveAt,
+      ),
     };
