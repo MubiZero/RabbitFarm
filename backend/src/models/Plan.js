@@ -42,6 +42,15 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
+    },
+    // Тариф, который автоматически достаётся новой ферме при регистрации.
+    // Ровно один тариф может быть таким — проверка в planService, не здесь:
+    // на уровне модели/БД второй default не запрещён нарочно, чтобы не
+    // городить составной unique-индекс ради редкого админского действия.
+    is_default: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     tableName: 'plans',

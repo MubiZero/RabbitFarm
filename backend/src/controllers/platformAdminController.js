@@ -38,6 +38,9 @@ class PlatformAdminController {
       if (error.message === 'PLAN_NAME_EXISTS') {
         return ApiResponse.conflict(res, 'Тариф с таким названием уже существует');
       }
+      if (error.message === 'DEFAULT_PLAN_EXISTS') {
+        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него');
+      }
       next(error);
     }
   }
@@ -61,6 +64,9 @@ class PlatformAdminController {
       }
       if (error.message === 'PLAN_NAME_EXISTS') {
         return ApiResponse.conflict(res, 'Тариф с таким названием уже существует');
+      }
+      if (error.message === 'DEFAULT_PLAN_EXISTS') {
+        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него');
       }
       next(error);
     }
