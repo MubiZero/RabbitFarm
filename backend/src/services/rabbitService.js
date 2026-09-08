@@ -540,7 +540,7 @@ class RabbitService {
    * Добавить снимок в галерею.
    * @param {Number} rabbitId - Rabbit ID
    * @param {Number} farmId - id хозяйства: чужая запись не найдётся
-   * @param {Object} data - { url, caption, taken_at, uploaded_by }
+   * @param {Object} data - { url, size_bytes, caption, taken_at, uploaded_by }
    * @returns {Object} Photo record
    */
   async addGalleryPhoto(rabbitId, farmId, data) {
@@ -551,6 +551,7 @@ class RabbitService {
       farm_id: farmId,
       rabbit_id: rabbitId,
       url: data.url,
+      size_bytes: data.size_bytes ?? null,
       caption: data.caption || null,
       taken_at: data.taken_at || null,
       uploaded_by: data.uploaded_by

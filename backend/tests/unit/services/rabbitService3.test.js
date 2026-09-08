@@ -20,7 +20,8 @@ jest.mock('../../../src/models', () => {
     Breed: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn() },
     Cage: { findOne: jest.fn() },
     RabbitWeight: { create: jest.fn(), findAll: jest.fn() },
-    Photo: { findAll: jest.fn() },
+    Photo: { findAll: jest.fn(), create: jest.fn(), findOne: jest.fn() },
+    User: {},
     Breeding: { count: jest.fn() },
     Birth: { count: jest.fn() },
     Vaccination: { count: jest.fn() },
@@ -37,7 +38,7 @@ jest.mock('../../../src/utils/logger', () => ({
 }));
 
 const {
-  Rabbit, Breed, Cage, RabbitWeight, Breeding, Birth, Vaccination,
+  Rabbit, Breed, Cage, RabbitWeight, Photo, Breeding, Birth, Vaccination,
   MedicalRecord, Transaction, sequelize
 } = require('../../../src/models');
 const { deleteFile } = require('../../../src/utils/fileStorage');
@@ -865,6 +866,40 @@ describe('RabbitService - uncovered lines', () => {
         expect.objectContaining({ rabbit_id: 10, farm_id: 7 }),
         { transaction: mockTx }
       );
+    });
+  });
+
+  // ========== addGalleryPhoto: size_bytes ==========
+  describe('addGalleryPhoto', () => {
+    it('should write size_bytes on the new Photo record', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1, farm_id: 7 });
+      Photo.create.mockResolvedValue({ id: 20 });
+      Photo.findOne.mockResolvedValue({ id: 20, size_bytes: 4096 });
+
+      await rabbitService.addGalleryPhoto(1, 7, {
+        url: '/uploads/farm-7/rabbits/photo.jpg',
+        size_bytes: 4096,
+        caption: null,
+        taken_at: null,
+        uploaded_by: 3
+      });
+
+      expect(Photo.create).toHaveBeenCalledWith(expect.objectContaining({
+        farm_id: 7,
+        rabbit_id: 1,
+        url: '/uploads/farm-7/rabbits/photo.jpg',
+        size_bytes: 4096
+      }));
+    });
+
+    it('should default size_bytes to null when not provided', async () => {
+      Rabbit.findOne.mockResolvedValue({ id: 1, farm_id: 7 });
+      Photo.create.mockResolvedValue({ id: 21 });
+      Photo.findOne.mockResolvedValue({ id: 21 });
+
+      await rabbitService.addGalleryPhoto(1, 7, { url: '/uploads/farm-7/rabbits/photo.jpg', uploaded_by: 3 });
+
+      expect(Photo.create).toHaveBeenCalledWith(expect.objectContaining({ size_bytes: null }));
     });
   });
 });
