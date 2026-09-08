@@ -39,6 +39,20 @@ class JWTUtil {
   }
 
   /**
+   * Токен входа под клиентом (см. docs/plans/PLATFORM-ADMIN.md, 3.2).
+   * Тот же access-токен и тот же срок (`jwtConfig.expiresIn`, по умолчанию
+   * 15 минут) — короткий срок обеспечивает обычное истечение, отдельный
+   * refresh для него не выпускается: кончился срок — заново через админку.
+   *
+   * `read_only` проверяется в `authenticate` и режет все методы кроме
+   * GET/HEAD/OPTIONS; `impersonated_by` — id админа, который вошёл, для
+   * журнала и на случай разбирательства постфактум.
+   */
+  static generateImpersonationToken(payload) {
+    return this.generateAccessToken({ ...payload, read_only: true });
+  }
+
+  /**
    * Generate refresh token
    * @param {Object} payload - Token payload
    * @returns {String} - JWT refresh token

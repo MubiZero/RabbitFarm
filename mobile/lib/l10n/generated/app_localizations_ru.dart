@@ -3597,6 +3597,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformFarmSectionAccess => 'Доступ';
 
   @override
+  String get platformFarmSectionImpersonate => 'Просмотр под клиентом';
+
+  @override
   String get platformFarmSectionPlan => 'Тариф';
 
   @override
@@ -3798,6 +3801,47 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFarmPaymentFailed => 'Не прошёл';
+
+  @override
+  String get platformFarmImpersonate => 'Войти под клиентом';
+
+  @override
+  String get platformFarmImpersonateHint =>
+      'Увидеть приложение так же, как видит его владелец фермы — вместо переписки «а что у вас на экране». Только чтение, 15 минут, действие попадает в журнал.';
+
+  @override
+  String get platformFarmImpersonateTitle => 'Войти под клиентом?';
+
+  @override
+  String platformFarmImpersonateBody(String farmName) {
+    return 'Вы увидите $farmName глазами владельца — без права что-либо менять. Сеанс закончится сам через 15 минут или по кнопке «Выйти».';
+  }
+
+  @override
+  String get platformFarmImpersonateReasonLabel => 'Причина';
+
+  @override
+  String get platformFarmImpersonateReasonHint =>
+      'Например: жалоба в поддержку №482';
+
+  @override
+  String get platformFarmImpersonateReasonRequired =>
+      'Укажите причину — без неё вход не запишется в журнал';
+
+  @override
+  String get platformFarmImpersonateConfirm => 'Войти';
+
+  @override
+  String impersonationBanner(String farmName) {
+    return 'Вы смотрите «$farmName» — только чтение';
+  }
+
+  @override
+  String get impersonationExit => 'Выйти';
+
+  @override
+  String get impersonationExpired =>
+      'Сеанс просмотра истёк — вы снова в своём аккаунте';
 
   @override
   String get platformFarmExport => 'Экспортировать данные';

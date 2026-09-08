@@ -235,6 +235,12 @@ class AuthRepository {
       // На общем планшете фермы профиль предыдущего работника не должен
       // пережить выход — как и его токены.
       await clearCachedProfile();
+      // Отложенная сессия админа (см. startImpersonation) — на случай выхода
+      // мимо кнопки «Выйти из режима просмотра».
+      await _storage.delete(key: 'admin_access_token');
+      await _storage.delete(key: 'admin_refresh_token');
+      await _storage.delete(key: 'admin_profile');
+      await _storage.delete(key: _impersonationFarmNameKey);
     }
   }
 
@@ -242,6 +248,79 @@ class AuthRepository {
   Future<bool> isLoggedIn() async {
     final token = await _storage.read(key: 'access_token');
     return token != null;
+  }
+
+  /// Вход под клиентом, только чтение (см. docs/plans/PLATFORM-ADMIN.md, 3.2).
+  ///
+  /// Собственная сессия админа откладывается в сторону, а не стирается: её
+  /// нужно вернуть, когда просмотр закончится — сам или по истечении 15
+  /// минут. `refresh_token` у токена просмотра нет и не будет: коротким сроком
+  /// и обеспечивается «короткий сеанс» из плана, продлевать его не для чего.
+  static const _impersonationFarmNameKey = 'impersonation_farm_name';
+
+  Future<void> startImpersonation({
+    required String accessToken,
+    required String farmName,
+  }) async {
+    final ownAccessToken = await _storage.read(key: 'access_token');
+    final ownRefreshToken = await _storage.read(key: 'refresh_token');
+    final ownProfile = await _storage.read(key: _profileKey);
+
+    if (ownAccessToken != null) {
+      await _storage.write(key: 'admin_access_token', value: ownAccessToken);
+    }
+    if (ownRefreshToken != null) {
+      await _storage.write(key: 'admin_refresh_token', value: ownRefreshToken);
+    }
+    if (ownProfile != null) {
+      await _storage.write(key: 'admin_profile', value: ownProfile);
+    }
+    await _storage.write(key: _impersonationFarmNameKey, value: farmName);
+
+    await _storage.write(key: 'access_token', value: accessToken);
+    // Без refresh-токена: как только accessToken перестанет приниматься,
+    // единственный на все параллельные 401 обмен в `AuthInterceptor` не найдёт
+    // чем обновиться и явно вызовет `onSessionExpired` — это и есть сигнал
+    // «просмотр закончился», на который отвечает `_handleSessionExpired`.
+    await _storage.delete(key: 'refresh_token');
+  }
+
+  /// Название фермы для плашки — переживает перезапуск приложения посреди
+  /// сеанса просмотра, откуда и берётся при восстановлении состояния.
+  Future<String?> impersonatedFarmName() =>
+      _storage.read(key: _impersonationFarmNameKey);
+
+  /// Идёт ли сейчас просмотр под клиентом — по наличию отложенной сессии
+  /// админа, а не по значению в памяти: после перезапуска приложения в
+  /// памяти этого не остаётся, а на диске остаётся.
+  Future<bool> isImpersonating() async {
+    return await _storage.read(key: 'admin_access_token') != null;
+  }
+
+  /// Вернуть отложенную сессию админа — по кнопке «Выйти» или потому что
+  /// токен просмотра истёк сам. Возвращает `false`, если откладывать было
+  /// нечего (в норме не должно случаться, но токены на диске — не про то,
+  /// чтобы им слепо доверять).
+  Future<bool> restoreFromImpersonation() async {
+    final accessToken = await _storage.read(key: 'admin_access_token');
+    if (accessToken == null) return false;
+
+    final refreshToken = await _storage.read(key: 'admin_refresh_token');
+    final profile = await _storage.read(key: 'admin_profile');
+
+    await _storage.write(key: 'access_token', value: accessToken);
+    if (refreshToken != null) {
+      await _storage.write(key: 'refresh_token', value: refreshToken);
+    }
+    if (profile != null) {
+      await _storage.write(key: _profileKey, value: profile);
+    }
+
+    await _storage.delete(key: 'admin_access_token');
+    await _storage.delete(key: 'admin_refresh_token');
+    await _storage.delete(key: 'admin_profile');
+    await _storage.delete(key: _impersonationFarmNameKey);
+    return true;
   }
 
   // Get stored access token

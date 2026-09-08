@@ -10,10 +10,12 @@ import '../../../../core/models/user_ref.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
 import '../widgets/farm_delete_dialog.dart';
 import '../widgets/farm_extras_dialog.dart';
+import '../widgets/farm_impersonate_dialog.dart';
 import '../widgets/farm_status_labels.dart';
 import '../widgets/farm_status_sheet.dart';
 import '../widgets/farm_usage_row.dart';
@@ -63,6 +65,16 @@ class FarmDetailScreen extends ConsumerWidget {
               _Section(
                 title: context.l10n.platformFarmSectionOwner,
                 child: _OwnerCard(owner: farm.owner),
+              ),
+              _Section(
+                title: context.l10n.platformFarmSectionImpersonate,
+                child: _ImpersonateCard(
+                  // Ферма на пути к удалению: смотреть её глазами клиента
+                  // уже нечего.
+                  onOpen: farm.isDeleted
+                      ? null
+                      : () => _impersonate(context, ref, farm),
+                ),
               ),
               _Section(
                 title: context.l10n.platformFarmSectionAccess,
@@ -184,6 +196,50 @@ class FarmDetailScreen extends ConsumerWidget {
         .updateStatus(choice);
 
     _report(messenger, l10n, error: error, success: done);
+  }
+
+  /// Вход под клиентом, только чтение (см.
+  /// docs/plans/PLATFORM-ADMIN.md, 3.2): причина — диалогом, дальше сразу
+  /// переключаем сессию и открываем приложение так, как его видит владелец.
+  /// Запрос токена и переключение сессии — здесь, а не в диалоге: диалогу
+  /// нечего показать под полем ввода, серверная ошибка (например, у фермы
+  /// нет владельца) — это снекбар на уже закрытом диалоге, как и везде на
+  /// этом экране.
+  Future<void> _impersonate(
+    BuildContext context,
+    WidgetRef ref,
+    PlatformFarmDetail farm,
+  ) async {
+    final l10n = context.l10n;
+
+    final reason = await showFarmImpersonateDialog(context, farmName: farm.name);
+    if (reason == null || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final result = await ref
+          .read(platformAdminRepositoryProvider)
+          .impersonateFarm(farm.id, reason);
+      if (!context.mounted) return;
+
+      await ref.read(authProvider.notifier).startImpersonation(
+            accessToken: result.accessToken,
+            farmName: result.farmName,
+          );
+      if (!context.mounted) return;
+
+      // Дальше на карточке одной фермы делать нечего — приложение теперь
+      // показывает то, что видит владелец.
+      context.go('/today');
+    } catch (error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, error)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _editExtras(
@@ -366,6 +422,37 @@ class _OwnerCard extends StatelessWidget {
                   ],
                 ),
               ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Вход под клиентом. Пусто в [onOpen] — ферма помечена на удаление, смотреть
+/// уже нечего (см. [_ExportCard] — тот же приём).
+class _ImpersonateCard extends StatelessWidget {
+  const _ImpersonateCard({required this.onOpen});
+
+  final VoidCallback? onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Muted(l10n.platformFarmImpersonateHint),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: onOpen,
+              icon: const Icon(Icons.visibility_outlined, size: 18),
+              label: Text(l10n.platformFarmImpersonate),
+            ),
+          ),
         ],
       ),
     );

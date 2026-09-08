@@ -1427,6 +1427,7 @@
   "platformFarmTitleFallback": "Ферма",
   "platformFarmSectionOwner": "Владелец и связь",
   "platformFarmSectionAccess": "Доступ",
+  "platformFarmSectionImpersonate": "Просмотр под клиентом",
   "platformFarmSectionPlan": "Тариф",
   "platformFarmSectionExtras": "Поблажка",
   "platformFarmSectionUsage": "Потребление",
@@ -1536,6 +1537,28 @@
   "platformFarmPaymentNew": "Начат",
   "platformFarmPaymentCompleted": "Оплачен",
   "platformFarmPaymentFailed": "Не прошёл",
+
+  "platformFarmImpersonate": "Войти под клиентом",
+  "platformFarmImpersonateHint": "Увидеть приложение так же, как видит его владелец фермы — вместо переписки «а что у вас на экране». Только чтение, 15 минут, действие попадает в журнал.",
+  "platformFarmImpersonateTitle": "Войти под клиентом?",
+  "platformFarmImpersonateBody": "Вы увидите {farmName} глазами владельца — без права что-либо менять. Сеанс закончится сам через 15 минут или по кнопке «Выйти».",
+  "@platformFarmImpersonateBody": {
+    "placeholders": {
+      "farmName": { "type": "String" }
+    }
+  },
+  "platformFarmImpersonateReasonLabel": "Причина",
+  "platformFarmImpersonateReasonHint": "Например: жалоба в поддержку №482",
+  "platformFarmImpersonateReasonRequired": "Укажите причину — без неё вход не запишется в журнал",
+  "platformFarmImpersonateConfirm": "Войти",
+  "impersonationBanner": "Вы смотрите «{farmName}» — только чтение",
+  "@impersonationBanner": {
+    "placeholders": {
+      "farmName": { "type": "String" }
+    }
+  },
+  "impersonationExit": "Выйти",
+  "impersonationExpired": "Сеанс просмотра истёк — вы снова в своём аккаунте",
 
   "platformFarmExport": "Экспортировать данные",
   "platformFarmExportHint": "Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».",

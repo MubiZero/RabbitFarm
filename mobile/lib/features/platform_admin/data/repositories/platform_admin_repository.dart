@@ -171,6 +171,29 @@ class PlatformAdminRepository {
     }
   }
 
+  /// Токен входа под клиентом, только чтение (см.
+  /// docs/plans/PLATFORM-ADMIN.md, 3.2). `reason` обязателен — это
+  /// единственное, что отличает в журнале осмысленный вход от «зашёл
+  /// посмотреть от скуки».
+  Future<({String accessToken, String farmName})> impersonateFarm(
+    int farmId,
+    String reason,
+  ) async {
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.platformFarmImpersonate(farmId),
+        data: {'reason': reason},
+      );
+      final data = response.data['data'] as Map<String, dynamic>;
+      return (
+        accessToken: data['access_token'] as String,
+        farmName: (data['farm'] as Map<String, dynamic>)['name'] as String,
+      );
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   /// Все записи фермы одним JSON — для просьбы «отдайте мои данные».
   ///
   /// Содержимое сознательно не типизируется: это снимок восемнадцати таблиц,

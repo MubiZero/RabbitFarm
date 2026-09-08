@@ -49,6 +49,26 @@ const authenticate = async (req, res, next) => {
       return ApiResponse.unauthorized(res, 'Токен отозван, войдите заново');
     }
 
+    // Вход под клиентом (см. docs/plans/PLATFORM-ADMIN.md, 3.2): токен
+    // выдан не самому пользователю, а платформенным админом для просмотра
+    // его фермы. Проверяется раньше статуса фермы и режет мутирующие
+    // методы целиком — именно поэтому админ может открыть даже
+    // приостановленную ферму (это и есть цель просмотра), а её собственный
+    // статус read_only/suspended здесь уже ни на что не влияет.
+    if (decoded.read_only) {
+      if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+        return ApiResponse.forbidden(
+          res,
+          'Режим просмотра под клиентом — только чтение.',
+          'IMPERSONATION_READ_ONLY'
+        );
+      }
+      req.user = user;
+      req.farmId = user.farm_id;
+      req.impersonatedBy = decoded.impersonated_by;
+      return next();
+    }
+
     // Статус хозяйства проверяется здесь, а не по контроллерам: это
     // единственная точка, через которую проходит каждый запрос.
     //

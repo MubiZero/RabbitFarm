@@ -426,6 +426,61 @@ describe('PlatformAdminController', () => {
     });
   });
 
+  describe('impersonateFarm', () => {
+    it('возвращает 404 при FARM_NOT_FOUND и не пишет в журнал', async () => {
+      platformAdminService.impersonate.mockRejectedValue(new Error('FARM_NOT_FOUND'));
+      const res = mockRes();
+
+      await platformAdminController.impersonateFarm(
+        mockReq({ params: { id: 99 }, body: { reason: 'проверка жалобы' } }),
+        res,
+        mockNext
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 400 с кодом FARM_NO_OWNER, если у фермы нет владельца', async () => {
+      platformAdminService.impersonate.mockRejectedValue(new Error('FARM_NO_OWNER'));
+      const res = mockRes();
+
+      await platformAdminController.impersonateFarm(
+        mockReq({ params: { id: 1 }, body: { reason: 'проверка жалобы' } }),
+        res,
+        mockNext
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('FARM_NO_OWNER');
+    });
+
+    it('выдаёт токен и пишет причину в журнал', async () => {
+      platformAdminService.impersonate.mockResolvedValue({
+        access_token: 'token123',
+        farm: { id: 1, name: 'Ферма Иванова' },
+        owner: { id: 42, full_name: 'Иван Иванов' }
+      });
+      const res = mockRes();
+
+      await platformAdminController.impersonateFarm(
+        mockReq({ params: { id: 1 }, body: { reason: 'проверка жалобы' } }),
+        res,
+        mockNext
+      );
+
+      expect(platformAdminService.impersonate).toHaveBeenCalledWith(1, 1);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(auditService.record).toHaveBeenCalledWith({
+        adminId: 1,
+        action: 'farm.impersonate',
+        farmId: 1,
+        after: { reason: 'проверка жалобы', owner_id: 42 },
+        ip: '127.0.0.1'
+      });
+    });
+  });
+
   describe('deleteFarm', () => {
     it('возвращает 404 при FARM_NOT_FOUND', async () => {
       platformAdminService.getFarm.mockRejectedValue(new Error('FARM_NOT_FOUND'));

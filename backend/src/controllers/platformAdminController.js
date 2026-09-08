@@ -230,6 +230,34 @@ class PlatformAdminController {
     }
   }
 
+  /**
+   * POST /platform-admin/farms/:id/impersonate
+   * Самое опасное действие в этой панели — обязательное поле `reason` в
+   * журнале даже на строку веб-морда не полагается, его требует Joi-схема
+   * (см. docs/plans/PLATFORM-ADMIN.md, 3.2).
+   */
+  async impersonateFarm(req, res, next) {
+    try {
+      const result = await platformAdminService.impersonate(req.params.id, req.user.id);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.impersonate',
+        farmId: req.params.id,
+        after: { reason: req.body.reason, owner_id: result.owner.id },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, result, 'Токен для входа под клиентом выдан');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      if (error.message === 'FARM_NO_OWNER') {
+        return ApiResponse.badRequest(res, 'У фермы нет владельца — войти под клиентом некем', 'FARM_NO_OWNER');
+      }
+      next(error);
+    }
+  }
+
   /** DELETE /platform-admin/farms/:id */
   async deleteFarm(req, res, next) {
     try {

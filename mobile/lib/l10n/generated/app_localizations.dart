@@ -6460,6 +6460,12 @@ abstract class AppLocalizations {
   /// **'Доступ'**
   String get platformFarmSectionAccess;
 
+  /// No description provided for @platformFarmSectionImpersonate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просмотр под клиентом'**
+  String get platformFarmSectionImpersonate;
+
   /// No description provided for @platformFarmSectionPlan.
   ///
   /// In ru, this message translates to:
@@ -6777,6 +6783,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не прошёл'**
   String get platformFarmPaymentFailed;
+
+  /// No description provided for @platformFarmImpersonate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти под клиентом'**
+  String get platformFarmImpersonate;
+
+  /// No description provided for @platformFarmImpersonateHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Увидеть приложение так же, как видит его владелец фермы — вместо переписки «а что у вас на экране». Только чтение, 15 минут, действие попадает в журнал.'**
+  String get platformFarmImpersonateHint;
+
+  /// No description provided for @platformFarmImpersonateTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти под клиентом?'**
+  String get platformFarmImpersonateTitle;
+
+  /// No description provided for @platformFarmImpersonateBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы увидите {farmName} глазами владельца — без права что-либо менять. Сеанс закончится сам через 15 минут или по кнопке «Выйти».'**
+  String platformFarmImpersonateBody(String farmName);
+
+  /// No description provided for @platformFarmImpersonateReasonLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Причина'**
+  String get platformFarmImpersonateReasonLabel;
+
+  /// No description provided for @platformFarmImpersonateReasonHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: жалоба в поддержку №482'**
+  String get platformFarmImpersonateReasonHint;
+
+  /// No description provided for @platformFarmImpersonateReasonRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите причину — без неё вход не запишется в журнал'**
+  String get platformFarmImpersonateReasonRequired;
+
+  /// No description provided for @platformFarmImpersonateConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти'**
+  String get platformFarmImpersonateConfirm;
+
+  /// No description provided for @impersonationBanner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы смотрите «{farmName}» — только чтение'**
+  String impersonationBanner(String farmName);
+
+  /// No description provided for @impersonationExit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get impersonationExit;
+
+  /// No description provided for @impersonationExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сеанс просмотра истёк — вы снова в своём аккаунте'**
+  String get impersonationExpired;
 
   /// No description provided for @platformFarmExport.
   ///

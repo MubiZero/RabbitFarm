@@ -34,6 +34,12 @@ const updateFarmExtrasSchema = Joi.object({
   extras_until: Joi.date().iso().allow(null)
 }).min(1);
 
+// Причина обязательна — это единственное, что отличает в журнале осмысленный
+// вход под клиентом от «зашёл посмотреть от скуки» (см. 3.2).
+const impersonateFarmSchema = Joi.object({
+  reason: Joi.string().min(1).max(500).required()
+});
+
 // Название фермы набирают руками как подтверждение удаления. Схема требует
 // поле, а совпадение проверяет сервис: клиентской проверке здесь доверять
 // нельзя — именно она отличает случайный вызов API от намеренного.
@@ -61,6 +67,7 @@ module.exports = {
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
+  impersonateFarmSchema,
   deleteFarmSchema,
   createAnnouncementSchema
 };

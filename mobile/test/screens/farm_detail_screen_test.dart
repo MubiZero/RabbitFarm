@@ -85,8 +85,12 @@ PlatformFarmDetail _farm({
 /// Репозиторий с заранее известной фермой. Настоящий полез бы в сеть, а
 /// провайдер карточки при этом остаётся настоящим.
 class _FakeRepository extends PlatformAdminRepository {
-  _FakeRepository({PlatformFarmDetail? farm, this.error, this.deleteError})
-      : farm = farm ?? _farm(),
+  _FakeRepository({
+    PlatformFarmDetail? farm,
+    this.error,
+    this.deleteError,
+    this.impersonateError,
+  })  : farm = farm ?? _farm(),
         super(ApiClient(storage: const FlutterSecureStorage()));
 
   PlatformFarmDetail farm;
@@ -96,10 +100,15 @@ class _FakeRepository extends PlatformAdminRepository {
   /// «название не совпадает» — тот приезжает как обычная ошибка запроса.
   final Object? deleteError;
 
+  /// Чем сервер отвечает на вход под клиентом — например, «у фермы нет
+  /// владельца».
+  final Object? impersonateError;
+
   /// Что ушло в запросы — по этому видно, дошло ли решение админа до сервера.
   final statusCalls = <String>[];
   final extrasCalls = <({int? rabbits, int? staff, DateTime? until})>[];
   final deleteCalls = <String>[];
+  final impersonateCalls = <String>[];
   int restoreCalls = 0;
 
   /// Строка списка ферм — с нарочно устаревшим поголовьем: по нему видно,
@@ -170,6 +179,16 @@ class _FakeRepository extends PlatformAdminRepository {
     restoreCalls++;
     farm = farm.copyWith(deletedAt: null);
     return farm;
+  }
+
+  @override
+  Future<({String accessToken, String farmName})> impersonateFarm(
+    int farmId,
+    String reason,
+  ) async {
+    impersonateCalls.add(reason);
+    if (impersonateError != null) throw impersonateError!;
+    return (accessToken: 'owner-access-token', farmName: farm.name);
   }
 }
 
@@ -466,6 +485,85 @@ void main() {
 
       expect(find.text('Экспортировать данные'), findsOneWidget);
       expect(find.textContaining('отдайте мои данные'), findsOneWidget);
+    });
+  });
+
+  group('Вход под клиентом', () {
+    testWidgets('без причины диалог не подтверждается и сервер не тревожится',
+        (tester) async {
+      final repository = _FakeRepository();
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Войти под клиентом'));
+      await _settle(tester);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Войти'));
+      await _settle(tester);
+
+      expect(repository.impersonateCalls, isEmpty);
+      expect(find.text('Укажите причину — без неё вход не запишется в журнал'),
+          findsOneWidget);
+      // Диалог остаётся открытым, ждёт причину.
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('набранная причина уходит на сервер', (tester) async {
+      final repository = _FakeRepository();
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Войти под клиентом'));
+      await _settle(tester);
+
+      await tester.enterText(find.byType(TextField), 'жалоба в поддержку №482');
+      await tester.tap(find.widgetWithText(TextButton, 'Войти'));
+      await _settle(tester);
+
+      expect(repository.impersonateCalls, ['жалоба в поддержку №482']);
+    });
+
+    testWidgets('отказ сервера показан снекбаром, карточка остаётся на месте',
+        (tester) async {
+      final repository = _FakeRepository(
+        impersonateError: const ApiFailure(
+          ApiFailureKind.invalid,
+          code: 'FARM_NO_OWNER',
+          serverText: 'У фермы нет владельца — войти под клиентом некем',
+        ),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Войти под клиентом'));
+      await _settle(tester);
+      await tester.enterText(find.byType(TextField), 'проверка');
+      await tester.tap(find.widgetWithText(TextButton, 'Войти'));
+      await _settle(tester);
+
+      expect(repository.impersonateCalls, ['проверка']);
+      expect(
+        find.text('У фермы нет владельца — войти под клиентом некем'),
+        findsOneWidget,
+      );
+      expect(find.byType(FarmDetailScreen), findsOneWidget);
+    });
+
+    testWidgets('удалённой ферме смотреть уже нечего — кнопка мертва',
+        (tester) async {
+      final repository = _FakeRepository(
+        farm: _farm(deletedAt: DateTime(2026, 9, 8)),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester, height: 4600);
+
+      expect(
+        tester
+            .widget<TextButton>(
+                find.widgetWithText(TextButton, 'Войти под клиентом'))
+            .onPressed,
+        isNull,
+      );
     });
   });
 

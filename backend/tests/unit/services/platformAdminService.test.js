@@ -13,7 +13,8 @@ jest.mock('../../../src/models', () => ({
   User: {
     count: jest.fn(),
     max: jest.fn(),
-    findAll: jest.fn()
+    findAll: jest.fn(),
+    findByPk: jest.fn()
   },
   Payment: {
     findAll: jest.fn()
@@ -29,6 +30,7 @@ jest.mock('../../../src/utils/logger', () => ({
 const { Op } = require('sequelize');
 const { Farm, Payment, Photo, Plan, Rabbit, User } = require('../../../src/models');
 const platformAdminService = require('../../../src/services/platformAdminService');
+const JWTUtil = require('../../../src/utils/jwt');
 
 describe('PlatformAdminService', () => {
   beforeEach(() => {
@@ -539,6 +541,50 @@ describe('PlatformAdminService', () => {
 
       expect(farm.update).toHaveBeenCalledWith({ extra_rabbits: null });
       expect(result.extra_rabbits).toBeNull();
+    });
+  });
+
+  describe('impersonate', () => {
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.impersonate(999, 1)).rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('бросает FARM_NO_OWNER, если у фермы не назначен владелец', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, owner_id: null });
+
+      await expect(platformAdminService.impersonate(1, 1)).rejects.toThrow('FARM_NO_OWNER');
+      expect(User.findByPk).not.toHaveBeenCalled();
+    });
+
+    it('бросает FARM_NO_OWNER, если владелец фермы был удалён', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, owner_id: 42 });
+      User.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.impersonate(1, 1)).rejects.toThrow('FARM_NO_OWNER');
+    });
+
+    it('выдаёт read_only токен на владельца фермы с отметкой, кто из админов вошёл', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, name: 'Ферма Иванова', owner_id: 42 });
+      User.findByPk.mockResolvedValue({
+        id: 42,
+        email: 'owner@example.com',
+        role: 'owner',
+        full_name: 'Иван Иванов',
+        token_version: 3
+      });
+
+      const result = await platformAdminService.impersonate(1, 7);
+
+      expect(result.farm).toEqual({ id: 1, name: 'Ферма Иванова' });
+      expect(result.owner).toEqual({ id: 42, full_name: 'Иван Иванов' });
+
+      const decoded = JWTUtil.decode(result.access_token);
+      expect(decoded.id).toBe(42);
+      expect(decoded.tv).toBe(3);
+      expect(decoded.read_only).toBe(true);
+      expect(decoded.impersonated_by).toBe(7);
     });
   });
 

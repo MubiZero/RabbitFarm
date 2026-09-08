@@ -99,6 +99,8 @@ class ApiEndpoints {
   static String platformFarmStatus(int id) => '/platform-admin/farms/$id/status';
   static String platformFarmExtras(int id) => '/platform-admin/farms/$id/extras';
   static String platformFarmExport(int id) => '/platform-admin/farms/$id/export';
+  static String platformFarmImpersonate(int id) =>
+      '/platform-admin/farms/$id/impersonate';
   static String platformFarmRestore(int id) =>
       '/platform-admin/farms/$id/restore';
   static const String platformAnnouncements = '/platform-admin/announcements';

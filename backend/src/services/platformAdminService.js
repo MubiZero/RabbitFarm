@@ -1,6 +1,7 @@
 const { Op, fn, col } = require('sequelize');
 const { Farm, Payment, Photo, Plan, Rabbit, User } = require('../models');
 const planService = require('./planService');
+const JWTUtil = require('../utils/jwt');
 
 /**
  * Платформенная админка: список ферм со сводкой по использованию и
@@ -285,6 +286,43 @@ class PlatformAdminService {
     await farm.update(data);
 
     return this.getFarm(farmId);
+  }
+
+  /**
+   * Токен входа под клиентом, только чтение (см.
+   * docs/plans/PLATFORM-ADMIN.md, 3.2). Выдаётся на владельца фермы — того,
+   * кого фактически видит саппорт, когда открывает приложение её глазами —
+   * с claim'ами `read_only` и `impersonated_by`, проверяемыми в
+   * `middleware/auth.js`. Сама запись в журнал — забота вызывающего
+   * контроллера, здесь только выпуск токена.
+   */
+  async impersonate(farmId, adminId) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+    if (!farm.owner_id) {
+      throw new Error('FARM_NO_OWNER');
+    }
+
+    const owner = await User.findByPk(farm.owner_id);
+    if (!owner) {
+      throw new Error('FARM_NO_OWNER');
+    }
+
+    const token = JWTUtil.generateImpersonationToken({
+      id: owner.id,
+      email: owner.email,
+      role: owner.role,
+      tv: owner.token_version || 0,
+      impersonated_by: adminId
+    });
+
+    return {
+      access_token: token,
+      farm: { id: farm.id, name: farm.name },
+      owner: { id: owner.id, full_name: owner.full_name }
+    };
   }
 
   /**

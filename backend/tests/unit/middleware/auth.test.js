@@ -272,6 +272,50 @@ describe('authenticate middleware', () => {
     });
   });
 
+  // Вход под клиентом (см. docs/plans/PLATFORM-ADMIN.md, 3.2): токен несёт
+  // read_only, а фермой запроса становится ферма владельца, на которого
+  // выписан токен, — тот же farm_id, что был бы при его собственном логине.
+  describe('read_only токен входа под клиентом', () => {
+    const authenticateAsImpersonation = async ({ method = 'GET' } = {}) => {
+      JWTUtil.verifyAccessToken.mockReturnValue({
+        id: 42, jti: null, tv: 3, read_only: true, impersonated_by: 7
+      });
+      User.findByPk.mockResolvedValue({
+        id: 42,
+        is_active: true,
+        token_version: 3,
+        farm_id: 5,
+        is_platform_admin: false,
+        farm: { id: 5, status: 'suspended', deleted_at: null }
+      });
+
+      const req = { headers: { authorization: 'Bearer impersonation-token' }, method };
+      const res = mockRes();
+      await authenticate(req, res, mockNext);
+      return { req, res };
+    };
+
+    it('пропускает GET даже для приостановленной фермы — в этом весь смысл просмотра', async () => {
+      const { req, res } = await authenticateAsImpersonation({ method: 'GET' });
+
+      expect(res.status).not.toHaveBeenCalled();
+      expect(req.farmId).toBe(5);
+      expect(req.impersonatedBy).toBe(7);
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it.each(['POST', 'PATCH', 'PUT', 'DELETE'])(
+      'отклоняет %s с кодом IMPERSONATION_READ_ONLY',
+      async (method) => {
+        const { res } = await authenticateAsImpersonation({ method });
+
+        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.json.mock.calls[0][0].error.code).toBe('IMPERSONATION_READ_ONLY');
+        expect(mockNext).not.toHaveBeenCalled();
+      }
+    );
+  });
+
   it('should skip blacklist check when jti is not present', async () => {
     const decoded = { id: 1 }; // no jti
     const user = { id: 1, is_active: true, token_version: 0 };

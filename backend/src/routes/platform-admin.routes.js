@@ -9,6 +9,7 @@ const {
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
+  impersonateFarmSchema,
   deleteFarmSchema,
   createAnnouncementSchema
 } = require('../validators/planValidator');
@@ -92,6 +93,16 @@ router.patch('/farms/:id/status', validate(updateFarmStatusSchema), platformAdmi
  *     tags: [PlatformAdmin]
  */
 router.patch('/farms/:id/extras', validate(updateFarmExtrasSchema), platformAdminController.updateExtras);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/impersonate:
+ *   post:
+ *     summary: Выдать 15-минутный токен для входа под клиентом, только чтение
+ *     description: Требует поле reason — обязательно попадает в журнал
+ *     tags: [PlatformAdmin]
+ */
+router.post('/farms/:id/impersonate', validate(impersonateFarmSchema), platformAdminController.impersonateFarm);
 
 /**
  * @swagger
