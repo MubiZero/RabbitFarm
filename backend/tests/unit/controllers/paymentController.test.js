@@ -77,7 +77,7 @@ describe('PaymentController', () => {
   describe('webhook', () => {
     it('reconciles the invoice and always answers 200', async () => {
       paymentService.reconcile.mockResolvedValue({ found: true, payment: {}, changed: true });
-      const req = mockReq({ body: { invoiceId: 'inv1', orderId: 'o1' } });
+      const req = mockReq({ body: { data: { invoiceId: 'inv1', orderId: 'o1' } } });
       const res = mockRes();
 
       await paymentController.webhook(req, res, mockNext);
@@ -98,7 +98,7 @@ describe('PaymentController', () => {
 
     it('answers 200 even for an invoice we do not recognize', async () => {
       paymentService.reconcile.mockResolvedValue({ found: false });
-      const req = mockReq({ body: { invoiceId: 'unknown' } });
+      const req = mockReq({ body: { data: { invoiceId: 'unknown' } } });
       const res = mockRes();
 
       await paymentController.webhook(req, res, mockNext);
@@ -109,7 +109,7 @@ describe('PaymentController', () => {
     it('calls next on unexpected errors instead of answering 200 (bank should retry)', async () => {
       const err = new Error('db down');
       paymentService.reconcile.mockRejectedValue(err);
-      const req = mockReq({ body: { invoiceId: 'inv1' } });
+      const req = mockReq({ body: { data: { invoiceId: 'inv1' } } });
       const res = mockRes();
 
       await paymentController.webhook(req, res, mockNext);
