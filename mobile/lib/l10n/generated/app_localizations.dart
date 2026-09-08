@@ -6118,11 +6118,23 @@ abstract class AppLocalizations {
   /// **'Тарифы'**
   String get platformTabPlans;
 
+  /// No description provided for @platformTabAnnouncements.
+  ///
+  /// In ru, this message translates to:
+  /// **'Объявления'**
+  String get platformTabAnnouncements;
+
   /// No description provided for @countFarms.
   ///
   /// In ru, this message translates to:
   /// **'{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}'**
   String countFarms(int count);
+
+  /// No description provided for @countAnnouncements.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} объявление} few{{count} объявления} many{{count} объявлений} other{{count} объявления}}'**
+  String countAnnouncements(int count);
 
   /// No description provided for @platformFarmsEmptyTitle.
   ///
@@ -6219,6 +6231,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Просрочен тариф'**
   String get platformFilterExpired;
+
+  /// No description provided for @platformFilterUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неизвестный срез: {filter}'**
+  String platformFilterUnknown(String filter);
 
   /// No description provided for @platformChangePlan.
   ///
@@ -6873,6 +6891,246 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ферма создана'**
   String get platformFarmCreatedAt;
+
+  /// No description provided for @platformAnnouncementsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Объявлений ещё не было'**
+  String get platformAnnouncementsEmptyTitle;
+
+  /// No description provided for @platformAnnouncementsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь останется история рассылок: что отправляли, кому и сколько дошло. Отправленное не исправить и не отозвать, поэтому список пригодится, чтобы не повторить одно и то же дважды.'**
+  String get platformAnnouncementsEmptyBody;
+
+  /// No description provided for @platformAnnouncementNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое объявление'**
+  String get platformAnnouncementNew;
+
+  /// No description provided for @platformAnnouncementSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get platformAnnouncementSend;
+
+  /// No description provided for @platformAnnouncementTargetAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всем фермам'**
+  String get platformAnnouncementTargetAll;
+
+  /// No description provided for @platformAnnouncementTargetAllHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждому хозяйству сервиса, кроме удалённых'**
+  String get platformAnnouncementTargetAllHint;
+
+  /// No description provided for @platformAnnouncementTargetFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Одной ферме'**
+  String get platformAnnouncementTargetFarm;
+
+  /// No description provided for @platformAnnouncementTargetFarmHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Одному хозяйству — например, в ответ на его обращение'**
+  String get platformAnnouncementTargetFarmHint;
+
+  /// No description provided for @platformAnnouncementTargetFilter.
+  ///
+  /// In ru, this message translates to:
+  /// **'По срезу ферм'**
+  String get platformAnnouncementTargetFilter;
+
+  /// No description provided for @platformAnnouncementTargetFilterHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Те же срезы, что и в списке ферм: без тарифа, упёрлась в предел, доступ закрыт'**
+  String get platformAnnouncementTargetFilterHint;
+
+  /// No description provided for @platformAnnouncementAudienceFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферме «{farm}»'**
+  String platformAnnouncementAudienceFarm(String farm);
+
+  /// No description provided for @platformAnnouncementAudienceFilter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срез «{filter}»'**
+  String platformAnnouncementAudienceFilter(String filter);
+
+  /// No description provided for @platformAnnouncementChannelPush.
+  ///
+  /// In ru, this message translates to:
+  /// **'Push'**
+  String get platformAnnouncementChannelPush;
+
+  /// No description provided for @platformAnnouncementChannelPushHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомление в приложении фермы'**
+  String get platformAnnouncementChannelPushHint;
+
+  /// No description provided for @platformAnnouncementChannelEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Почта'**
+  String get platformAnnouncementChannelEmail;
+
+  /// No description provided for @platformAnnouncementChannelEmailHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Письмо на адрес из профиля'**
+  String get platformAnnouncementChannelEmailHint;
+
+  /// No description provided for @platformAnnouncementReach.
+  ///
+  /// In ru, this message translates to:
+  /// **'{farms, plural, one{{farms} ферма} few{{farms} фермы} many{{farms} ферм} other{{farms} фермы}} · {recipients, plural, one{{recipients} получатель} few{{recipients} получателя} many{{recipients} получателей} other{{recipients} получателя}}'**
+  String platformAnnouncementReach(int farms, int recipients);
+
+  /// No description provided for @platformAnnouncementNobody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получателей не нашлось — объявление никому не ушло'**
+  String get platformAnnouncementNobody;
+
+  /// No description provided for @platformAnnouncementDelivered.
+  ///
+  /// In ru, this message translates to:
+  /// **'доставлено {sent} из {attempted}'**
+  String platformAnnouncementDelivered(int sent, int attempted);
+
+  /// No description provided for @platformAnnouncementDeliveredNobody.
+  ///
+  /// In ru, this message translates to:
+  /// **'отправлять было некому'**
+  String get platformAnnouncementDeliveredNobody;
+
+  /// No description provided for @platformAnnouncementDeliveryUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'результат не сохранён'**
+  String get platformAnnouncementDeliveryUnknown;
+
+  /// No description provided for @platformAnnouncementFormTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое объявление'**
+  String get platformAnnouncementFormTitle;
+
+  /// No description provided for @platformAnnouncementFormSubject.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заголовок'**
+  String get platformAnnouncementFormSubject;
+
+  /// No description provided for @platformAnnouncementFormSubjectHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Он же станет темой письма и заголовком push'**
+  String get platformAnnouncementFormSubjectHint;
+
+  /// No description provided for @platformAnnouncementFormBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текст'**
+  String get platformAnnouncementFormBody;
+
+  /// No description provided for @platformAnnouncementFormBodyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что нужно знать фермам'**
+  String get platformAnnouncementFormBodyHint;
+
+  /// No description provided for @platformAnnouncementFormSectionChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каналы'**
+  String get platformAnnouncementFormSectionChannels;
+
+  /// No description provided for @platformAnnouncementFormNoSms.
+  ///
+  /// In ru, this message translates to:
+  /// **'SMS для объявлений недоступна: платёжный шлюз принимает только заранее одобренные шаблоны, а объявление — свободный текст.'**
+  String get platformAnnouncementFormNoSms;
+
+  /// No description provided for @platformAnnouncementFormSectionTarget.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому'**
+  String get platformAnnouncementFormSectionTarget;
+
+  /// No description provided for @platformAnnouncementFormPickFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите ферму'**
+  String get platformAnnouncementFormPickFarm;
+
+  /// No description provided for @platformAnnouncementFormPickFilter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите срез'**
+  String get platformAnnouncementFormPickFilter;
+
+  /// No description provided for @platformAnnouncementFarmSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Какой ферме отправить'**
+  String get platformAnnouncementFarmSheetTitle;
+
+  /// No description provided for @platformAnnouncementFilterSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Какому срезу ферм отправить'**
+  String get platformAnnouncementFilterSheetTitle;
+
+  /// No description provided for @platformAnnouncementConfirmTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить объявление?'**
+  String get platformAnnouncementConfirmTitle;
+
+  /// No description provided for @platformAnnouncementConfirmBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение уйдёт получателям сразу же. Отозвать или исправить отправленное нельзя.'**
+  String get platformAnnouncementConfirmBody;
+
+  /// No description provided for @platformAnnouncementConfirmAudience.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому: {audience}'**
+  String platformAnnouncementConfirmAudience(String audience);
+
+  /// No description provided for @platformAnnouncementConfirmChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каналы: {channels}'**
+  String platformAnnouncementConfirmChannels(String channels);
+
+  /// No description provided for @platformAnnouncementSentOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Объявление ушло {count} получателю} few{Объявление ушло {count} получателям} many{Объявление ушло {count} получателям} other{Объявление ушло {count} получателям}}'**
+  String platformAnnouncementSentOk(int count);
+
+  /// No description provided for @platformAnnouncementSentPartly.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Объявление ушло {count} получателю, но часть сообщений не дошла — смотрите строку в списке} few{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} many{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} other{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке}}'**
+  String platformAnnouncementSentPartly(int count);
+
+  /// No description provided for @platformAnnouncementSentPlain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Объявление отправлено'**
+  String get platformAnnouncementSentPlain;
 
   /// No description provided for @storageUnitBytes.
   ///

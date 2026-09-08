@@ -3361,6 +3361,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformTabPlans => 'Тарифы';
 
   @override
+  String get platformTabAnnouncements => 'Объявления';
+
+  @override
   String countFarms(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -3369,6 +3372,19 @@ class AppLocalizationsRu extends AppLocalizations {
       many: '$count ферм',
       few: '$count фермы',
       one: '$count ферма',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String countAnnouncements(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count объявления',
+      many: '$count объявлений',
+      few: '$count объявления',
+      one: '$count объявление',
     );
     return '$_temp0';
   }
@@ -3436,6 +3452,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFilterExpired => 'Просрочен тариф';
+
+  @override
+  String platformFilterUnknown(String filter) {
+    return 'Неизвестный срез: $filter';
+  }
 
   @override
   String get platformChangePlan => 'Сменить тариф';
@@ -3845,6 +3866,189 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFarmCreatedAt => 'Ферма создана';
+
+  @override
+  String get platformAnnouncementsEmptyTitle => 'Объявлений ещё не было';
+
+  @override
+  String get platformAnnouncementsEmptyBody =>
+      'Здесь останется история рассылок: что отправляли, кому и сколько дошло. Отправленное не исправить и не отозвать, поэтому список пригодится, чтобы не повторить одно и то же дважды.';
+
+  @override
+  String get platformAnnouncementNew => 'Новое объявление';
+
+  @override
+  String get platformAnnouncementSend => 'Отправить';
+
+  @override
+  String get platformAnnouncementTargetAll => 'Всем фермам';
+
+  @override
+  String get platformAnnouncementTargetAllHint =>
+      'Каждому хозяйству сервиса, кроме удалённых';
+
+  @override
+  String get platformAnnouncementTargetFarm => 'Одной ферме';
+
+  @override
+  String get platformAnnouncementTargetFarmHint =>
+      'Одному хозяйству — например, в ответ на его обращение';
+
+  @override
+  String get platformAnnouncementTargetFilter => 'По срезу ферм';
+
+  @override
+  String get platformAnnouncementTargetFilterHint =>
+      'Те же срезы, что и в списке ферм: без тарифа, упёрлась в предел, доступ закрыт';
+
+  @override
+  String platformAnnouncementAudienceFarm(String farm) {
+    return 'Ферме «$farm»';
+  }
+
+  @override
+  String platformAnnouncementAudienceFilter(String filter) {
+    return 'Срез «$filter»';
+  }
+
+  @override
+  String get platformAnnouncementChannelPush => 'Push';
+
+  @override
+  String get platformAnnouncementChannelPushHint =>
+      'Уведомление в приложении фермы';
+
+  @override
+  String get platformAnnouncementChannelEmail => 'Почта';
+
+  @override
+  String get platformAnnouncementChannelEmailHint =>
+      'Письмо на адрес из профиля';
+
+  @override
+  String platformAnnouncementReach(int farms, int recipients) {
+    String _temp0 = intl.Intl.pluralLogic(
+      farms,
+      locale: localeName,
+      other: '$farms фермы',
+      many: '$farms ферм',
+      few: '$farms фермы',
+      one: '$farms ферма',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      recipients,
+      locale: localeName,
+      other: '$recipients получателя',
+      many: '$recipients получателей',
+      few: '$recipients получателя',
+      one: '$recipients получатель',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get platformAnnouncementNobody =>
+      'Получателей не нашлось — объявление никому не ушло';
+
+  @override
+  String platformAnnouncementDelivered(int sent, int attempted) {
+    return 'доставлено $sent из $attempted';
+  }
+
+  @override
+  String get platformAnnouncementDeliveredNobody => 'отправлять было некому';
+
+  @override
+  String get platformAnnouncementDeliveryUnknown => 'результат не сохранён';
+
+  @override
+  String get platformAnnouncementFormTitle => 'Новое объявление';
+
+  @override
+  String get platformAnnouncementFormSubject => 'Заголовок';
+
+  @override
+  String get platformAnnouncementFormSubjectHint =>
+      'Он же станет темой письма и заголовком push';
+
+  @override
+  String get platformAnnouncementFormBody => 'Текст';
+
+  @override
+  String get platformAnnouncementFormBodyHint => 'Что нужно знать фермам';
+
+  @override
+  String get platformAnnouncementFormSectionChannels => 'Каналы';
+
+  @override
+  String get platformAnnouncementFormNoSms =>
+      'SMS для объявлений недоступна: платёжный шлюз принимает только заранее одобренные шаблоны, а объявление — свободный текст.';
+
+  @override
+  String get platformAnnouncementFormSectionTarget => 'Кому';
+
+  @override
+  String get platformAnnouncementFormPickFarm => 'Выберите ферму';
+
+  @override
+  String get platformAnnouncementFormPickFilter => 'Выберите срез';
+
+  @override
+  String get platformAnnouncementFarmSheetTitle => 'Какой ферме отправить';
+
+  @override
+  String get platformAnnouncementFilterSheetTitle =>
+      'Какому срезу ферм отправить';
+
+  @override
+  String get platformAnnouncementConfirmTitle => 'Отправить объявление?';
+
+  @override
+  String get platformAnnouncementConfirmBody =>
+      'Сообщение уйдёт получателям сразу же. Отозвать или исправить отправленное нельзя.';
+
+  @override
+  String platformAnnouncementConfirmAudience(String audience) {
+    return 'Кому: $audience';
+  }
+
+  @override
+  String platformAnnouncementConfirmChannels(String channels) {
+    return 'Каналы: $channels';
+  }
+
+  @override
+  String platformAnnouncementSentOk(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Объявление ушло $count получателям',
+      many: 'Объявление ушло $count получателям',
+      few: 'Объявление ушло $count получателям',
+      one: 'Объявление ушло $count получателю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformAnnouncementSentPartly(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Объявление ушло $count получателям, но часть сообщений не дошла — смотрите строку в списке',
+      many:
+          'Объявление ушло $count получателям, но часть сообщений не дошла — смотрите строку в списке',
+      few:
+          'Объявление ушло $count получателям, но часть сообщений не дошла — смотрите строку в списке',
+      one:
+          'Объявление ушло $count получателю, но часть сообщений не дошла — смотрите строку в списке',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get platformAnnouncementSentPlain => 'Объявление отправлено';
 
   @override
   String get storageUnitBytes => 'Б';

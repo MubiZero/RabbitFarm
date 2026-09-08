@@ -1315,9 +1315,16 @@
   "platformTitle": "Платформа",
   "platformTabFarms": "Фермы",
   "platformTabPlans": "Тарифы",
+  "platformTabAnnouncements": "Объявления",
 
   "countFarms": "{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}",
   "@countFarms": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "countAnnouncements": "{count, plural, one{{count} объявление} few{{count} объявления} many{{count} объявлений} other{{count} объявления}}",
+  "@countAnnouncements": {
     "placeholders": {
       "count": { "type": "int" }
     }
@@ -1355,6 +1362,12 @@
     }
   },
   "platformFilterExpired": "Просрочен тариф",
+  "platformFilterUnknown": "Неизвестный срез: {filter}",
+  "@platformFilterUnknown": {
+    "placeholders": {
+      "filter": { "type": "String" }
+    }
+  },
   "platformChangePlan": "Сменить тариф",
   "platformAssignPlan": "Назначить тариф",
   "platformPlanSheetTitle": "Тариф хозяйства «{farm}»",
@@ -1560,6 +1573,93 @@
   "platformFarmLastActive": "Последний вход",
   "platformFarmNeverActive": "Ещё не заходили",
   "platformFarmCreatedAt": "Ферма создана",
+
+  "platformAnnouncementsEmptyTitle": "Объявлений ещё не было",
+  "platformAnnouncementsEmptyBody": "Здесь останется история рассылок: что отправляли, кому и сколько дошло. Отправленное не исправить и не отозвать, поэтому список пригодится, чтобы не повторить одно и то же дважды.",
+  "platformAnnouncementNew": "Новое объявление",
+  "platformAnnouncementSend": "Отправить",
+
+  "platformAnnouncementTargetAll": "Всем фермам",
+  "platformAnnouncementTargetAllHint": "Каждому хозяйству сервиса, кроме удалённых",
+  "platformAnnouncementTargetFarm": "Одной ферме",
+  "platformAnnouncementTargetFarmHint": "Одному хозяйству — например, в ответ на его обращение",
+  "platformAnnouncementTargetFilter": "По срезу ферм",
+  "platformAnnouncementTargetFilterHint": "Те же срезы, что и в списке ферм: без тарифа, упёрлась в предел, доступ закрыт",
+  "platformAnnouncementAudienceFarm": "Ферме «{farm}»",
+  "@platformAnnouncementAudienceFarm": {
+    "placeholders": {
+      "farm": { "type": "String" }
+    }
+  },
+  "platformAnnouncementAudienceFilter": "Срез «{filter}»",
+  "@platformAnnouncementAudienceFilter": {
+    "placeholders": {
+      "filter": { "type": "String" }
+    }
+  },
+
+  "platformAnnouncementChannelPush": "Push",
+  "platformAnnouncementChannelPushHint": "Уведомление в приложении фермы",
+  "platformAnnouncementChannelEmail": "Почта",
+  "platformAnnouncementChannelEmailHint": "Письмо на адрес из профиля",
+  "platformAnnouncementReach": "{farms, plural, one{{farms} ферма} few{{farms} фермы} many{{farms} ферм} other{{farms} фермы}} · {recipients, plural, one{{recipients} получатель} few{{recipients} получателя} many{{recipients} получателей} other{{recipients} получателя}}",
+  "@platformAnnouncementReach": {
+    "placeholders": {
+      "farms": { "type": "int" },
+      "recipients": { "type": "int" }
+    }
+  },
+  "platformAnnouncementNobody": "Получателей не нашлось — объявление никому не ушло",
+  "platformAnnouncementDelivered": "доставлено {sent} из {attempted}",
+  "@platformAnnouncementDelivered": {
+    "placeholders": {
+      "sent": { "type": "int" },
+      "attempted": { "type": "int" }
+    }
+  },
+  "platformAnnouncementDeliveredNobody": "отправлять было некому",
+  "platformAnnouncementDeliveryUnknown": "результат не сохранён",
+
+  "platformAnnouncementFormTitle": "Новое объявление",
+  "platformAnnouncementFormSubject": "Заголовок",
+  "platformAnnouncementFormSubjectHint": "Он же станет темой письма и заголовком push",
+  "platformAnnouncementFormBody": "Текст",
+  "platformAnnouncementFormBodyHint": "Что нужно знать фермам",
+  "platformAnnouncementFormSectionChannels": "Каналы",
+  "platformAnnouncementFormNoSms": "SMS для объявлений недоступна: платёжный шлюз принимает только заранее одобренные шаблоны, а объявление — свободный текст.",
+  "platformAnnouncementFormSectionTarget": "Кому",
+  "platformAnnouncementFormPickFarm": "Выберите ферму",
+  "platformAnnouncementFormPickFilter": "Выберите срез",
+  "platformAnnouncementFarmSheetTitle": "Какой ферме отправить",
+  "platformAnnouncementFilterSheetTitle": "Какому срезу ферм отправить",
+
+  "platformAnnouncementConfirmTitle": "Отправить объявление?",
+  "platformAnnouncementConfirmBody": "Сообщение уйдёт получателям сразу же. Отозвать или исправить отправленное нельзя.",
+  "platformAnnouncementConfirmAudience": "Кому: {audience}",
+  "@platformAnnouncementConfirmAudience": {
+    "placeholders": {
+      "audience": { "type": "String" }
+    }
+  },
+  "platformAnnouncementConfirmChannels": "Каналы: {channels}",
+  "@platformAnnouncementConfirmChannels": {
+    "placeholders": {
+      "channels": { "type": "String" }
+    }
+  },
+  "platformAnnouncementSentOk": "{count, plural, one{Объявление ушло {count} получателю} few{Объявление ушло {count} получателям} many{Объявление ушло {count} получателям} other{Объявление ушло {count} получателям}}",
+  "@platformAnnouncementSentOk": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformAnnouncementSentPartly": "{count, plural, one{Объявление ушло {count} получателю, но часть сообщений не дошла — смотрите строку в списке} few{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} many{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} other{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке}}",
+  "@platformAnnouncementSentPartly": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformAnnouncementSentPlain": "Объявление отправлено",
 
   "storageUnitBytes": "Б",
   "storageUnitKb": "КБ",

@@ -17,7 +17,7 @@ part 'platform_admin_models.g.dart';
 /// уровнях сразу: у фермы может не быть тарифа вовсе, а у тарифа — предела по
 /// какому-то из ресурсов.
 @freezed
-class Plan with _$Plan {
+abstract class Plan with _$Plan {
   const factory Plan({
     @IntConverter() required int id,
     required String name,
@@ -52,7 +52,7 @@ class Plan with _$Plan {
 /// «снять ограничение» — такое же изменение, как «поставить 200», а
 /// умолчание о поле сервер понял бы как «оставь как было».
 @freezed
-class PlanDraft with _$PlanDraft {
+abstract class PlanDraft with _$PlanDraft {
   const factory PlanDraft({
     required String name,
     @JsonKey(name: 'max_rabbits') int? maxRabbits,
@@ -72,7 +72,7 @@ class PlanDraft with _$PlanDraft {
 /// Фактическое потребление приходит вместе с фермой, а не запрашивается по
 /// одной — иначе список из тридцати ферм означал бы шестьдесят запросов.
 @freezed
-class PlatformFarm with _$PlatformFarm {
+abstract class PlatformFarm with _$PlatformFarm {
   const factory PlatformFarm({
     @IntConverter() required int id,
     required String name,
@@ -124,7 +124,7 @@ class PlatformFarm with _$PlatformFarm {
 /// живёт в `core/access` (`FarmRoleAccess.parse`) вместе с подписями из
 /// словаря, и второй перечень тех же трёх значений расходился бы с ним.
 @freezed
-class FarmStaffMember with _$FarmStaffMember {
+abstract class FarmStaffMember with _$FarmStaffMember {
   const factory FarmStaffMember({
     @IntConverter() required int id,
     @JsonKey(name: 'full_name') required String fullName,
@@ -149,7 +149,7 @@ class FarmStaffMember with _$FarmStaffMember {
 /// здесь не переводим: модель отдаёт то, что прислал сервер, а округление и
 /// знак валюты — дело экрана.
 @freezed
-class FarmPayment with _$FarmPayment {
+abstract class FarmPayment with _$FarmPayment {
   const factory FarmPayment({
     @IntConverter() required int id,
     required String amount,
@@ -170,7 +170,7 @@ class FarmPayment with _$FarmPayment {
 /// впустую), а карточка — полную. Несколько общих полей продублированы
 /// осознанно — freezed-классы не наследуются друг от друга.
 @freezed
-class PlatformFarmDetail with _$PlatformFarmDetail {
+abstract class PlatformFarmDetail with _$PlatformFarmDetail {
   const factory PlatformFarmDetail({
     @IntConverter() required int id,
     required String name,
@@ -264,4 +264,146 @@ class PlatformFarmDetail with _$PlatformFarmDetail {
 
   factory PlatformFarmDetail.fromJson(Map<String, dynamic> json) =>
       _$PlatformFarmDetailFromJson(json);
+}
+
+/// Итог отправки по одному каналу.
+///
+/// Неудачи — такая же часть результата, как и удачи: объявление, дошедшее до
+/// тридцати из тридцати четырёх, отправлено не «успешно», а с потерями, и
+/// админ должен это видеть.
+@freezed
+abstract class ChannelDelivery with _$ChannelDelivery {
+  const factory ChannelDelivery({
+    @IntConverter() @Default(0) int sent,
+    @IntConverter() @Default(0) int failed,
+  }) = _ChannelDelivery;
+
+  const ChannelDelivery._();
+
+  /// Сколько сообщений вообще пытались отправить этим каналом.
+  int get attempted => sent + failed;
+
+  bool get hasFailures => failed > 0;
+
+  factory ChannelDelivery.fromJson(Map<String, dynamic> json) =>
+      _$ChannelDeliveryFromJson(json);
+}
+
+/// Доставка объявления по каналам.
+///
+/// Оба поля необязательные: сервер считает статистику только по тем каналам,
+/// которыми объявление отправляли, — и «нулём» отсутствие канала подменять
+/// нельзя, иначе «email 0 из 0» читалось бы как провал рассылки, которой не
+/// было.
+@freezed
+abstract class AnnouncementStats with _$AnnouncementStats {
+  const factory AnnouncementStats({
+    ChannelDelivery? push,
+    ChannelDelivery? email,
+  }) = _AnnouncementStats;
+
+  const AnnouncementStats._();
+
+  ChannelDelivery? byChannel(String channel) => switch (channel) {
+        'push' => push,
+        'email' => email,
+        _ => null,
+      };
+
+  /// Хотя бы одно сообщение не дошло — по любому из каналов.
+  bool get hasFailures =>
+      (push?.hasFailures ?? false) || (email?.hasFailures ?? false);
+
+  factory AnnouncementStats.fromJson(Map<String, dynamic> json) =>
+      _$AnnouncementStatsFromJson(json);
+}
+
+/// Ферма-адресат объявления — только то, что нужно для подписи в истории.
+///
+/// Отдельный класс, а не переиспользование [PlatformFarm]: сервер отдаёт
+/// объявлению только имя фермы, не её тариф и потребление, — тащить их сюда
+/// было бы полем, которое никогда не заполнится.
+@freezed
+abstract class AnnouncementTargetFarm with _$AnnouncementTargetFarm {
+  const factory AnnouncementTargetFarm({
+    @IntConverter() required int id,
+    required String name,
+  }) = _AnnouncementTargetFarm;
+
+  factory AnnouncementTargetFarm.fromJson(Map<String, dynamic> json) =>
+      _$AnnouncementTargetFarmFromJson(json);
+}
+
+/// Отправленное объявление платформенного админа.
+///
+/// Неизменяемая запись истории: отозвать её нельзя, поэтому в модели нет ни
+/// правки, ни черновиков — только то, что уже ушло, и с каким результатом.
+///
+/// `targetType` и `targetFilter` — строки, а не enum, по той же причине, что и
+/// `status` у [PlatformFarmDetail]: значения приходят от сервера, и незнакомое
+/// не должно ронять разбор всего списка.
+@freezed
+abstract class Announcement with _$Announcement {
+  const factory Announcement({
+    @IntConverter() required int id,
+    required String title,
+    required String body,
+    // Доступны только push и почта. SMS сюда не входит: шлюз принимает лишь
+    // заранее одобренные шаблоны, а объявление — свободный текст.
+    @Default(<String>[]) List<String> channels,
+    @JsonKey(name: 'target_type') @Default('all') String targetType,
+    @JsonKey(name: 'target_farm_id') @NullableIntConverter() int? targetFarmId,
+    // Имя приезжает вложенным объектом (ключ ассоциации на сервере — camelCase,
+    // как и у `auditLog` в других местах того же API). `null` у ферм, которых
+    // с тех пор удалили, — тогда история показывает id как есть.
+    AnnouncementTargetFarm? targetFarm,
+    @JsonKey(name: 'target_filter') String? targetFilter,
+    // Скольким фермам адресовано и сколько человек в них оказалось. Второе
+    // может быть нулём при непустом первом — например, у ферм без активных
+    // пользователей.
+    @JsonKey(name: 'farms_count') @IntConverter() @Default(0) int farmsCount,
+    @JsonKey(name: 'recipients_count')
+    @IntConverter()
+    @Default(0)
+    int recipientsCount,
+    AnnouncementStats? stats,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+  }) = _Announcement;
+
+  const Announcement._();
+
+  /// Объявление никому не досталось: подходящих получателей не нашлось.
+  bool get hasNoRecipients => recipientsCount == 0;
+
+  factory Announcement.fromJson(Map<String, dynamic> json) =>
+      _$AnnouncementFromJson(json);
+}
+
+/// Что админ набрал в форме объявления.
+///
+/// [toJson] написан руками, а не сгенерирован: сервер запрещает лишние поля —
+/// `target_farm_id` допустим только при адресате «одна ферма», а
+/// `target_filter` — только при «по срезу». Пустое значение в теле запроса
+/// это уже нарушение, поэтому неподходящие поля не отправляются вовсе.
+@freezed
+abstract class AnnouncementDraft with _$AnnouncementDraft {
+  const factory AnnouncementDraft({
+    required String title,
+    required String body,
+    required List<String> channels,
+    required String targetType,
+    int? targetFarmId,
+    String? targetFilter,
+  }) = _AnnouncementDraft;
+
+  const AnnouncementDraft._();
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'body': body,
+        'channels': channels,
+        'target_type': targetType,
+        if (targetType == 'farm') 'target_farm_id': targetFarmId,
+        if (targetType == 'filter') 'target_filter': targetFilter,
+      };
 }

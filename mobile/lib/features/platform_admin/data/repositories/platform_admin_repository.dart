@@ -10,6 +10,9 @@ import '../models/platform_admin_models.dart';
 /// Одна страница списка ферм: сами фермы и сведения о том, есть ли ещё.
 typedef FarmsPage = ({List<PlatformFarm> items, PageInfo page});
 
+/// То же для истории объявлений.
+typedef AnnouncementsPage = ({List<Announcement> items, PageInfo page});
+
 /// Тарифы и фермы всего сервиса — то, чем распоряжается платформенный админ.
 ///
 /// Единственный репозиторий приложения, который работает не внутри одной
@@ -207,6 +210,45 @@ class PlatformAdminRepository {
       final response =
           await _apiClient.post(ApiEndpoints.platformFarmRestore(farmId));
       return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// История объявлений, свежие сверху.
+  Future<AnnouncementsPage> getAnnouncements({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.platformAnnouncements,
+        queryParameters: {'page': page, 'limit': limit},
+      );
+
+      final data = response.data['data'];
+      final items = [
+        for (final item in itemsOf(data))
+          Announcement.fromJson(item as Map<String, dynamic>),
+      ];
+      return (items: items, page: PageInfo.of(data, fallbackCount: items.length));
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Отправить объявление. Отправка синхронная: ответ приходит уже со
+  /// статистикой доставки, поэтому опрашивать сервер о результате не нужно.
+  ///
+  /// Действие необратимо и уходит наружу — подтверждение обязано случиться до
+  /// вызова, здесь его уже не спросить.
+  Future<Announcement> createAnnouncement(AnnouncementDraft draft) async {
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.platformAnnouncements,
+        data: draft.toJson(),
+      );
+      return Announcement.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

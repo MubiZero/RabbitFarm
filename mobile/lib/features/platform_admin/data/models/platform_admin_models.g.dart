@@ -6,7 +6,7 @@ part of 'platform_admin_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlanImpl _$$PlanImplFromJson(Map<String, dynamic> json) => _$PlanImpl(
+_Plan _$PlanFromJson(Map<String, dynamic> json) => _Plan(
   id: const IntConverter().fromJson(json['id'] as Object),
   name: json['name'] as String,
   maxRabbits: const NullableIntConverter().fromJson(json['max_rabbits']),
@@ -19,19 +19,18 @@ _$PlanImpl _$$PlanImplFromJson(Map<String, dynamic> json) => _$PlanImpl(
   isDefault: json['is_default'] as bool? ?? false,
 );
 
-Map<String, dynamic> _$$PlanImplToJson(_$PlanImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'name': instance.name,
-      'max_rabbits': const NullableIntConverter().toJson(instance.maxRabbits),
-      'max_staff': const NullableIntConverter().toJson(instance.maxStaff),
-      'price': _$JsonConverterToJson<Object, double>(
-        instance.price,
-        const DoubleConverter().toJson,
-      ),
-      'is_active': instance.isActive,
-      'is_default': instance.isDefault,
-    };
+Map<String, dynamic> _$PlanToJson(_Plan instance) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+  'max_rabbits': const NullableIntConverter().toJson(instance.maxRabbits),
+  'max_staff': const NullableIntConverter().toJson(instance.maxStaff),
+  'price': _$JsonConverterToJson<Object, double>(
+    instance.price,
+    const DoubleConverter().toJson,
+  ),
+  'is_active': instance.isActive,
+  'is_default': instance.isDefault,
+};
 
 Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,
@@ -43,17 +42,16 @@ Json? _$JsonConverterToJson<Json, Value>(
   Json? Function(Value value) toJson,
 ) => value == null ? null : toJson(value);
 
-_$PlanDraftImpl _$$PlanDraftImplFromJson(Map<String, dynamic> json) =>
-    _$PlanDraftImpl(
-      name: json['name'] as String,
-      maxRabbits: (json['max_rabbits'] as num?)?.toInt(),
-      maxStaff: (json['max_staff'] as num?)?.toInt(),
-      price: (json['price'] as num?)?.toDouble(),
-      isActive: json['is_active'] as bool,
-      isDefault: json['is_default'] as bool? ?? false,
-    );
+_PlanDraft _$PlanDraftFromJson(Map<String, dynamic> json) => _PlanDraft(
+  name: json['name'] as String,
+  maxRabbits: (json['max_rabbits'] as num?)?.toInt(),
+  maxStaff: (json['max_staff'] as num?)?.toInt(),
+  price: (json['price'] as num?)?.toDouble(),
+  isActive: json['is_active'] as bool,
+  isDefault: json['is_default'] as bool? ?? false,
+);
 
-Map<String, dynamic> _$$PlanDraftImplToJson(_$PlanDraftImpl instance) =>
+Map<String, dynamic> _$PlanDraftToJson(_PlanDraft instance) =>
     <String, dynamic>{
       'name': instance.name,
       'max_rabbits': instance.maxRabbits,
@@ -63,9 +61,9 @@ Map<String, dynamic> _$$PlanDraftImplToJson(_$PlanDraftImpl instance) =>
       'is_default': instance.isDefault,
     };
 
-_$PlatformFarmImpl _$$PlatformFarmImplFromJson(
+_PlatformFarm _$PlatformFarmFromJson(
   Map<String, dynamic> json,
-) => _$PlatformFarmImpl(
+) => _PlatformFarm(
   id: const IntConverter().fromJson(json['id'] as Object),
   name: json['name'] as String,
   owner: json['owner'] == null
@@ -84,7 +82,7 @@ _$PlatformFarmImpl _$$PlatformFarmImplFromJson(
   lastActiveAt: const NullableDateTimeConverter().fromJson(json['last_active']),
 );
 
-Map<String, dynamic> _$$PlatformFarmImplToJson(_$PlatformFarmImpl instance) =>
+Map<String, dynamic> _$PlatformFarmToJson(_PlatformFarm instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'name': instance.name,
@@ -98,47 +96,42 @@ Map<String, dynamic> _$$PlatformFarmImplToJson(_$PlatformFarmImpl instance) =>
       ),
     };
 
-_$FarmStaffMemberImpl _$$FarmStaffMemberImplFromJson(
-  Map<String, dynamic> json,
-) => _$FarmStaffMemberImpl(
-  id: const IntConverter().fromJson(json['id'] as Object),
-  fullName: json['full_name'] as String,
-  email: json['email'] as String?,
-  phone: json['phone'] as String?,
-  role: json['role'] as String,
-  isActive: json['is_active'] as bool? ?? true,
-  lastLoginAt: const NullableDateTimeConverter().fromJson(
-    json['last_login_at'],
-  ),
-);
-
-Map<String, dynamic> _$$FarmStaffMemberImplToJson(
-  _$FarmStaffMemberImpl instance,
-) => <String, dynamic>{
-  'id': const IntConverter().toJson(instance.id),
-  'full_name': instance.fullName,
-  'email': instance.email,
-  'phone': instance.phone,
-  'role': instance.role,
-  'is_active': instance.isActive,
-  'last_login_at': const NullableDateTimeConverter().toJson(
-    instance.lastLoginAt,
-  ),
-};
-
-_$FarmPaymentImpl _$$FarmPaymentImplFromJson(Map<String, dynamic> json) =>
-    _$FarmPaymentImpl(
+_FarmStaffMember _$FarmStaffMemberFromJson(Map<String, dynamic> json) =>
+    _FarmStaffMember(
       id: const IntConverter().fromJson(json['id'] as Object),
-      amount: json['amount'] as String,
-      currency: json['currency'] as String,
-      status: json['status'] as String,
-      description: json['description'] as String?,
-      createdAt: const DateTimeConverter().fromJson(
-        json['created_at'] as Object,
+      fullName: json['full_name'] as String,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      role: json['role'] as String,
+      isActive: json['is_active'] as bool? ?? true,
+      lastLoginAt: const NullableDateTimeConverter().fromJson(
+        json['last_login_at'],
       ),
     );
 
-Map<String, dynamic> _$$FarmPaymentImplToJson(_$FarmPaymentImpl instance) =>
+Map<String, dynamic> _$FarmStaffMemberToJson(_FarmStaffMember instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'full_name': instance.fullName,
+      'email': instance.email,
+      'phone': instance.phone,
+      'role': instance.role,
+      'is_active': instance.isActive,
+      'last_login_at': const NullableDateTimeConverter().toJson(
+        instance.lastLoginAt,
+      ),
+    };
+
+_FarmPayment _$FarmPaymentFromJson(Map<String, dynamic> json) => _FarmPayment(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  amount: json['amount'] as String,
+  currency: json['currency'] as String,
+  status: json['status'] as String,
+  description: json['description'] as String?,
+  createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
+);
+
+Map<String, dynamic> _$FarmPaymentToJson(_FarmPayment instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'amount': instance.amount,
@@ -148,9 +141,9 @@ Map<String, dynamic> _$$FarmPaymentImplToJson(_$FarmPaymentImpl instance) =>
       'created_at': const DateTimeConverter().toJson(instance.createdAt),
     };
 
-_$PlatformFarmDetailImpl _$$PlatformFarmDetailImplFromJson(
+_PlatformFarmDetail _$PlatformFarmDetailFromJson(
   Map<String, dynamic> json,
-) => _$PlatformFarmDetailImpl(
+) => _PlatformFarmDetail(
   id: const IntConverter().fromJson(json['id'] as Object),
   name: json['name'] as String,
   owner: json['owner'] == null
@@ -191,8 +184,8 @@ _$PlatformFarmDetailImpl _$$PlatformFarmDetailImplFromJson(
   deletedAt: const NullableDateTimeConverter().fromJson(json['deleted_at']),
 );
 
-Map<String, dynamic> _$$PlatformFarmDetailImplToJson(
-  _$PlatformFarmDetailImpl instance,
+Map<String, dynamic> _$PlatformFarmDetailToJson(
+  _PlatformFarmDetail instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'name': instance.name,
@@ -218,4 +211,93 @@ Map<String, dynamic> _$$PlatformFarmDetailImplToJson(
   'payments': instance.payments,
   'storage_bytes': const IntConverter().toJson(instance.storageBytes),
   'deleted_at': const NullableDateTimeConverter().toJson(instance.deletedAt),
+};
+
+_ChannelDelivery _$ChannelDeliveryFromJson(Map<String, dynamic> json) =>
+    _ChannelDelivery(
+      sent: json['sent'] == null
+          ? 0
+          : const IntConverter().fromJson(json['sent'] as Object),
+      failed: json['failed'] == null
+          ? 0
+          : const IntConverter().fromJson(json['failed'] as Object),
+    );
+
+Map<String, dynamic> _$ChannelDeliveryToJson(_ChannelDelivery instance) =>
+    <String, dynamic>{
+      'sent': const IntConverter().toJson(instance.sent),
+      'failed': const IntConverter().toJson(instance.failed),
+    };
+
+_AnnouncementStats _$AnnouncementStatsFromJson(Map<String, dynamic> json) =>
+    _AnnouncementStats(
+      push: json['push'] == null
+          ? null
+          : ChannelDelivery.fromJson(json['push'] as Map<String, dynamic>),
+      email: json['email'] == null
+          ? null
+          : ChannelDelivery.fromJson(json['email'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$AnnouncementStatsToJson(_AnnouncementStats instance) =>
+    <String, dynamic>{'push': instance.push, 'email': instance.email};
+
+_AnnouncementTargetFarm _$AnnouncementTargetFarmFromJson(
+  Map<String, dynamic> json,
+) => _AnnouncementTargetFarm(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  name: json['name'] as String,
+);
+
+Map<String, dynamic> _$AnnouncementTargetFarmToJson(
+  _AnnouncementTargetFarm instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+};
+
+_Announcement _$AnnouncementFromJson(
+  Map<String, dynamic> json,
+) => _Announcement(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  title: json['title'] as String,
+  body: json['body'] as String,
+  channels:
+      (json['channels'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const <String>[],
+  targetType: json['target_type'] as String? ?? 'all',
+  targetFarmId: const NullableIntConverter().fromJson(json['target_farm_id']),
+  targetFarm: json['targetFarm'] == null
+      ? null
+      : AnnouncementTargetFarm.fromJson(
+          json['targetFarm'] as Map<String, dynamic>,
+        ),
+  targetFilter: json['target_filter'] as String?,
+  farmsCount: json['farms_count'] == null
+      ? 0
+      : const IntConverter().fromJson(json['farms_count'] as Object),
+  recipientsCount: json['recipients_count'] == null
+      ? 0
+      : const IntConverter().fromJson(json['recipients_count'] as Object),
+  stats: json['stats'] == null
+      ? null
+      : AnnouncementStats.fromJson(json['stats'] as Map<String, dynamic>),
+  createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
+);
+
+Map<String, dynamic> _$AnnouncementToJson(
+  _Announcement instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'title': instance.title,
+  'body': instance.body,
+  'channels': instance.channels,
+  'target_type': instance.targetType,
+  'target_farm_id': const NullableIntConverter().toJson(instance.targetFarmId),
+  'targetFarm': instance.targetFarm,
+  'target_filter': instance.targetFilter,
+  'farms_count': const IntConverter().toJson(instance.farmsCount),
+  'recipients_count': const IntConverter().toJson(instance.recipientsCount),
+  'stats': instance.stats,
+  'created_at': const DateTimeConverter().toJson(instance.createdAt),
 };

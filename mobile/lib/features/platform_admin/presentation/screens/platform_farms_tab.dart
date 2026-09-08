@@ -10,6 +10,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
+import '../widgets/farm_filter_labels.dart';
 import '../widgets/plan_picker_sheet.dart';
 import '../widgets/platform_farm_card.dart';
 
@@ -154,41 +155,16 @@ class _Header extends ConsumerWidget {
           ),
         ),
         AppFilterBar(
+          // Подписи и цвета срезов общие с формой объявления: адресовать
+          // рассылку можно по тому же срезу, и называться он должен так же.
           chips: [
-            AppFilterChipData(
-              label: l10n.platformNoPlan,
-              isSelected: state.filter == PlatformFarmFilter.noPlan,
-              onTap: () => notifier.toggleFilter(PlatformFarmFilter.noPlan),
-            ),
-            AppFilterChipData(
-              label: l10n.platformAtLimit,
-              isSelected: state.filter == PlatformFarmFilter.atLimit,
-              onTap: () => notifier.toggleFilter(PlatformFarmFilter.atLimit),
-              color: AppColors.error,
-            ),
-            AppFilterChipData(
-              // Подпись та же, что у состояния фермы на её карточке: одно
-              // состояние — одно название, иначе «приостановлена» в списке и
-              // «доступ закрыт» в карточке читались бы как разные вещи.
-              label: l10n.platformFarmStatusSuspended,
-              isSelected: state.filter == PlatformFarmFilter.suspended,
-              onTap: () => notifier.toggleFilter(PlatformFarmFilter.suspended),
-              color: AppColors.error,
-            ),
-            AppFilterChipData(
-              label: l10n.platformFilterExpired,
-              isSelected: state.filter == PlatformFarmFilter.expired,
-              onTap: () => notifier.toggleFilter(PlatformFarmFilter.expired),
-              color: AppColors.warning,
-            ),
-            AppFilterChipData(
-              // Порог фиксирован (30 дней) — чипу не нужен свой пикер, чтобы
-              // включить фильтр одним касанием; сервер это же значение
-              // подставляет по умолчанию, если `days` не передан.
-              label: l10n.platformFilterInactive(30),
-              isSelected: state.filter == PlatformFarmFilter.inactiveDays,
-              onTap: () => notifier.toggleFilter(PlatformFarmFilter.inactiveDays),
-            ),
+            for (final filter in PlatformFarmFilter.values)
+              AppFilterChipData(
+                label: farmFilterLabel(context, filter),
+                isSelected: state.filter == filter,
+                onTap: () => notifier.toggleFilter(filter),
+                color: farmFilterColor(filter),
+              ),
           ],
         ),
         // Счётчик берётся из пагинации, а не из длины загруженного списка:

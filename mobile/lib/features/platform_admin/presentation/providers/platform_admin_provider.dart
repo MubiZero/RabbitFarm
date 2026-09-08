@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
@@ -22,7 +23,9 @@ final platformPlansProvider =
 /// предел» всё равно было бы нечего — это взаимоисключающие срезы.
 enum PlatformFarmFilter { noPlan, atLimit, suspended, expired, inactiveDays }
 
-extension on PlatformFarmFilter {
+/// Названо, а не безымянное расширение: тот же срез выбирают и в объявлениях
+/// (`target_filter`), а безымянное расширение видно только в своей библиотеке.
+extension PlatformFarmFilterApi on PlatformFarmFilter {
   String get apiValue => switch (this) {
         PlatformFarmFilter.noPlan => 'no_plan',
         PlatformFarmFilter.atLimit => 'at_limit',
@@ -31,6 +34,13 @@ extension on PlatformFarmFilter {
         PlatformFarmFilter.inactiveDays => 'inactive_days',
       };
 }
+
+/// Разобрать срез, пришедший от сервера. `null` — значение незнакомое или
+/// отсутствует: сорвать из-за него показ всей строки нельзя.
+PlatformFarmFilter? platformFarmFilterOf(String? apiValue) =>
+    PlatformFarmFilter.values
+        .where((filter) => filter.apiValue == apiValue)
+        .firstOrNull;
 
 /// Список ферм платформы с постраничной подгрузкой, поиском и фильтром.
 class PlatformFarmsState {
@@ -219,18 +229,38 @@ final platformFarmsProvider = StateNotifierProvider.autoDispose<
 /// Оба действия (доступ и поблажка) получают в ответ ферму той же формы, что
 /// и загрузка, поэтому карточка обновляется из ответа и не перезапрашивает
 /// себя: пока шёл бы второй запрос, экран показывал бы прежнее состояние.
+///
+/// `StateNotifier` (не unified `AsyncNotifier`) — у ручного (не
+/// codegen-based) family-нотифаера в Riverpod 3.x нет прямого аналога
+/// прежнего `arg`-геттера; переизобретать его через `@riverpod`-кодогенерацию
+/// ради одного класса не стоит, когда рядом уже есть проверенный
+/// `StateNotifier`-путь (см. `platformFarmsProvider` выше).
 class PlatformFarmDetailNotifier
-    extends AutoDisposeFamilyAsyncNotifier<PlatformFarmDetail, int> {
-  @override
-  Future<PlatformFarmDetail> build(int farmId) {
-    return ref.watch(platformAdminRepositoryProvider).getFarmDetail(farmId);
+    extends StateNotifier<AsyncValue<PlatformFarmDetail>> {
+  PlatformFarmDetailNotifier(this._ref, this.farmId)
+      : super(const AsyncValue.loading()) {
+    _load();
+  }
+
+  final Ref _ref;
+  final int farmId;
+
+  Future<void> _load() async {
+    state = const AsyncValue.loading();
+    try {
+      final detail =
+          await _ref.read(platformAdminRepositoryProvider).getFarmDetail(farmId);
+      state = AsyncValue.data(detail);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 
   /// Сменить уровень доступа фермы. Возвращает причину неудачи или `null`,
   /// если всё получилось, — как `assignPlan` в списке ферм.
   Future<Object?> updateStatus(String status) {
     return _apply(
-      () => ref.read(platformAdminRepositoryProvider).updateFarmStatus(arg, status),
+      () => _ref.read(platformAdminRepositoryProvider).updateFarmStatus(farmId, status),
     );
   }
 
@@ -242,8 +272,8 @@ class PlatformFarmDetailNotifier
     DateTime? extrasUntil,
   }) {
     return _apply(
-      () => ref.read(platformAdminRepositoryProvider).updateFarmExtras(
-            arg,
+      () => _ref.read(platformAdminRepositoryProvider).updateFarmExtras(
+            farmId,
             extraRabbits: extraRabbits,
             extraStaff: extraStaff,
             extrasUntil: extrasUntil,
@@ -258,7 +288,7 @@ class PlatformFarmDetailNotifier
   /// куда деваться после удаления, знает вызвавший экран.
   Future<Object?> deleteFarm(int farmId, String confirmName) {
     return _apply(
-      () => ref
+      () => _ref
           .read(platformAdminRepositoryProvider)
           .deleteFarm(farmId, confirmName),
     );
@@ -268,7 +298,7 @@ class PlatformFarmDetailNotifier
   /// состоянию, а не разрушение.
   Future<Object?> restoreFarm(int farmId) {
     return _apply(
-      () => ref.read(platformAdminRepositoryProvider).restoreFarm(farmId),
+      () => _ref.read(platformAdminRepositoryProvider).restoreFarm(farmId),
     );
   }
 
@@ -277,11 +307,11 @@ class PlatformFarmDetailNotifier
   ) async {
     try {
       final updated = await action();
-      state = AsyncData(updated);
+      state = AsyncValue.data(updated);
       // Список ферм трогаем только пока он жив: `ref.read` поднял бы его
       // заново вместе с запросом страницы, которую никто не смотрит.
-      if (ref.exists(platformFarmsProvider)) {
-        ref.read(platformFarmsProvider.notifier).applyFarmDetail(updated);
+      if (_ref.exists(platformFarmsProvider)) {
+        _ref.read(platformFarmsProvider.notifier).applyFarmDetail(updated);
       }
       return null;
     } catch (e) {
@@ -290,9 +320,150 @@ class PlatformFarmDetailNotifier
   }
 }
 
-final platformFarmDetailProvider = AsyncNotifierProvider.autoDispose
-    .family<PlatformFarmDetailNotifier, PlatformFarmDetail, int>(
-        PlatformFarmDetailNotifier.new);
+final platformFarmDetailProvider = StateNotifierProvider.autoDispose
+    .family<PlatformFarmDetailNotifier, AsyncValue<PlatformFarmDetail>, int>(
+        (ref, farmId) {
+  // `watch`, не `read`: как раньше в `build()` — смена репозитория (в тестах
+  // через override) должна пересоздать нотифаер с нуля, а не молча
+  // остаться на прежних данных.
+  ref.watch(platformAdminRepositoryProvider);
+  return PlatformFarmDetailNotifier(ref, farmId);
+});
+
+/// История объявлений с постраничной подгрузкой.
+///
+/// Ни поиска, ни фильтров: объявлений на платформе единицы в месяц, и искать
+/// среди них нечего — их читают сверху вниз.
+class PlatformAnnouncementsState {
+  const PlatformAnnouncementsState({
+    this.items = const [],
+    this.isLoading = false,
+    this.error,
+    this.page = 1,
+    this.totalPages = 1,
+    this.total = 0,
+  });
+
+  final List<Announcement> items;
+  final bool isLoading;
+  final Object? error;
+  final int page;
+  final int totalPages;
+  final int total;
+
+  bool get hasMore => page < totalPages;
+
+  PlatformAnnouncementsState copyWith({
+    List<Announcement>? items,
+    bool? isLoading,
+    Object? error,
+    int? page,
+    int? totalPages,
+    int? total,
+  }) {
+    return PlatformAnnouncementsState(
+      items: items ?? this.items,
+      isLoading: isLoading ?? this.isLoading,
+      // Как и в списке ферм: ошибка присваивается напрямую, иначе сообщение
+      // залипало бы и после успешной загрузки.
+      error: error,
+      page: page ?? this.page,
+      totalPages: totalPages ?? this.totalPages,
+      total: total ?? this.total,
+    );
+  }
+}
+
+class PlatformAnnouncementsNotifier
+    extends StateNotifier<PlatformAnnouncementsState> {
+  PlatformAnnouncementsNotifier(this._repository)
+      : super(const PlatformAnnouncementsState()) {
+    load();
+  }
+
+  final PlatformAdminRepository _repository;
+
+  static const _pageSize = 20;
+
+  Future<void> load() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getAnnouncements(page: 1, limit: _pageSize);
+      state = state.copyWith(
+        items: result.items,
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getAnnouncements(
+        page: state.page + 1,
+        limit: _pageSize,
+      );
+      state = state.copyWith(
+        items: [...state.items, ...result.items],
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  /// Отправить объявление. Возвращает причину неудачи или `null`, если всё
+  /// получилось, — как `assignPlan` в списке ферм.
+  ///
+  /// Отправленное встаёт в начало списка из ответа сервера, а не
+  /// перезапрашивает страницу: в ответе уже есть и статистика доставки, и всё
+  /// остальное, а перезагрузка потеряла бы догруженные страницы.
+  Future<Object?> send(AnnouncementDraft draft) async {
+    try {
+      final sent = await _repository.createAnnouncement(draft);
+      state = state.copyWith(
+        items: [sent, ...state.items],
+        total: state.total + 1,
+      );
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+}
+
+final platformAnnouncementsProvider = StateNotifierProvider.autoDispose<
+    PlatformAnnouncementsNotifier, PlatformAnnouncementsState>((ref) {
+  return PlatformAnnouncementsNotifier(ref.watch(platformAdminRepositoryProvider));
+});
+
+/// Фермы для выбора адресата объявления, по поисковой строке.
+///
+/// Отдельный запрос, а не срез уже загруженного списка ферм: тот держит в
+/// памяти только показанные страницы, и ферма со второй страницы «не
+/// находилась» бы ровно так же, как когда-то в самом списке. Пустая строка —
+/// первые фермы без фильтра.
+final announcementFarmChoicesProvider = FutureProvider.autoDispose
+    .family<List<PlatformFarm>, String>((ref, search) async {
+  final result = await ref.watch(platformAdminRepositoryProvider).getFarms(
+        page: 1,
+        // Больше страницы списка: выбор адресата листают, а не пролистывают
+        // постранично, и подгрузка в модальном листе того не стоит.
+        limit: 50,
+        search: search,
+      );
+  return result.items;
+});
 
 /// Снимок всех записей одной фермы — то, что показывает экран выгрузки.
 ///

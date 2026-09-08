@@ -31,7 +31,7 @@ class FarmExportScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final value = ref.watch(platformFarmExportProvider(farmId));
-    final data = value.valueOrNull;
+    final data = value.value;
 
     return Scaffold(
       appBar: AppBar(

@@ -615,7 +615,10 @@ void main() {
       }
       expect(container.read(platformFarmsProvider).farms.single.rabbitsCount, 1);
 
-      await container.read(platformFarmDetailProvider(1).future);
+      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      while (container.read(platformFarmDetailProvider(1)).isLoading) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final error = await container
           .read(platformFarmDetailProvider(1).notifier)
           .updateStatus('read_only');
@@ -633,7 +636,10 @@ void main() {
       ]);
       addTearDown(container.dispose);
 
-      await container.read(platformFarmDetailProvider(1).future);
+      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      while (container.read(platformFarmDetailProvider(1)).isLoading) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final error = await container
           .read(platformFarmDetailProvider(1).notifier)
           .updateExtras(extraRabbits: 10);

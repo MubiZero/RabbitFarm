@@ -67,6 +67,7 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/platform_admin/data/models/platform_admin_models.dart';
 import '../../features/platform_admin/presentation/screens/platform_admin_screen.dart';
+import '../../features/platform_admin/presentation/screens/announcement_form_screen.dart';
 import '../../features/platform_admin/presentation/screens/plan_form_screen.dart';
 import '../../features/platform_admin/presentation/screens/farm_detail_screen.dart';
 import '../../features/platform_admin/presentation/screens/farm_export_screen.dart';
@@ -705,6 +706,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           farmId: int.parse(state.pathParameters['id']!),
           farmName: state.extra as String?,
         ),
+      ),
+      // Составление объявления. Правки у отправленного нет и быть не может,
+      // поэтому маршрут один и без параметров — только новое.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/platform-admin/announcements/form',
+        name: 'platform-announcement-form',
+        builder: (context, state) => const AnnouncementFormScreen(),
       ),
 
     ],

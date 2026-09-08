@@ -136,7 +136,10 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
 class AppSubmitBar extends StatelessWidget {
   final String label;
   final bool busy;
-  final VoidCallback onPressed;
+
+  /// Что сделать по нажатию. `null` — кнопка неактивна: так форма показывает,
+  /// что заполнено ещё не всё, до попытки отправки.
+  final VoidCallback? onPressed;
 
   const AppSubmitBar({
     super.key,

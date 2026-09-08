@@ -41,7 +41,7 @@ class FarmDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         // Пока ферма грузится, названия ещё нет — но и пустой заголовок
         // оставлять нельзя.
-        title: Text(value.valueOrNull?.name ?? context.l10n.platformFarmTitleFallback),
+        title: Text(value.value?.name ?? context.l10n.platformFarmTitleFallback),
       ),
       body: AppAsyncView<PlatformFarmDetail>(
         value: value,
