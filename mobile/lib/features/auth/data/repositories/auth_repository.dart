@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/api_endpoints.dart';
 import '../../../../shared/models/api_response.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
@@ -135,6 +136,34 @@ class AuthRepository {
       await _cacheProfile(authResponse.user.toJson());
 
       return authResponse;
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Запросить код сброса пароля — сервер сам решает, слать SMS или email,
+  /// и ничего не сообщает о том, существует ли аккаунт (ответ всегда success).
+  Future<void> forgotPassword({required String email}) async {
+    try {
+      await _apiClient.post(ApiEndpoints.forgotPassword, data: {'email': email});
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Сменить пароль по коду, присланному [forgotPassword]. Сессии нет —
+  /// токены не сохраняются, дальше — обычный вход по новому паролю.
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiClient.post(ApiEndpoints.resetPassword, data: {
+        'email': email,
+        'code': code,
+        'new_password': newPassword,
+      });
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_detail_screen.dart';
@@ -90,6 +92,8 @@ class RouterNotifier extends ChangeNotifier {
     final isPublic = loc == '/login' ||
         loc == '/register' ||
         loc == '/join' ||
+        loc == '/forgot-password' ||
+        loc == '/reset-password' ||
         loc == '/splash' ||
         loc.startsWith('/onboarding');
 
@@ -103,6 +107,8 @@ class RouterNotifier extends ChangeNotifier {
         (loc == '/login' ||
             loc == '/register' ||
             loc == '/join' ||
+            loc == '/forgot-password' ||
+            loc == '/reset-password' ||
             loc == '/splash')) {
       return '/today';
     }
@@ -182,6 +188,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/join',
         name: 'join-farm',
         builder: (context, state) => const JoinFarmScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/forgot-password',
+        name: 'forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/reset-password',
+        name: 'reset-password',
+        builder: (context, state) =>
+            ResetPasswordScreen(email: state.extra as String),
       ),
 
       // Root redirect

@@ -157,8 +157,55 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginCreateFarm => 'Завести свою ферму';
 
   @override
-  String get loginForgotPassword =>
-      'Забыли пароль? Его сбрасывает владелец фермы — писем сервис не отправляет.';
+  String get loginForgotPassword => 'Забыли пароль?';
+
+  @override
+  String get forgotPasswordTitle => 'Забыли пароль?';
+
+  @override
+  String get forgotPasswordIntro =>
+      'Укажите почту, с которой входите в ферму. Если аккаунт есть, пришлём код — по SMS или на почту.';
+
+  @override
+  String get forgotPasswordEmailHint => 'Введите почту';
+
+  @override
+  String get forgotPasswordSubmit => 'Отправить код';
+
+  @override
+  String get forgotPasswordSentMessage =>
+      'Если аккаунт существует, код отправлен';
+
+  @override
+  String get forgotPasswordBackToLogin => 'Вспомнили пароль? Войти';
+
+  @override
+  String get resetPasswordTitle => 'Введите код';
+
+  @override
+  String get resetPasswordCodeHint => '6-значный код из SMS или письма';
+
+  @override
+  String get resetPasswordCodeEmpty => 'Введите код';
+
+  @override
+  String get resetPasswordCodeInvalid => 'Код — это 6 цифр';
+
+  @override
+  String get resetPasswordNewPasswordHint => 'Новый пароль';
+
+  @override
+  String get resetPasswordConfirmHint => 'Повторите новый пароль';
+
+  @override
+  String get resetPasswordConfirmMismatch => 'Пароли не совпадают';
+
+  @override
+  String get resetPasswordSubmit => 'Сменить пароль';
+
+  @override
+  String get resetPasswordSuccessMessage =>
+      'Пароль изменён. Войдите с новым паролем.';
 
   @override
   String get todayGreetingMorning => 'Доброе утро';

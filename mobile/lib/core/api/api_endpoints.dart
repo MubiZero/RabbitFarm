@@ -35,6 +35,8 @@ class ApiEndpoints {
   // сервере нет, и запрос уходил в 404.
   static const String updateProfile = '/auth/profile';
   static const String changePassword = '/auth/change-password';
+  static const String forgotPassword = '/auth/forgot-password';
+  static const String resetPassword = '/auth/reset-password';
 
   // Rabbits endpoints
   static const String rabbits = '/rabbits';

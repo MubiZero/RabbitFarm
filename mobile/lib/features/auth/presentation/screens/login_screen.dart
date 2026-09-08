@@ -180,11 +180,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(context.l10n.loginCreateFarm),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text(
-                      context.l10n.loginForgotPassword,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.labelSm
-                          .copyWith(color: context.colors.onSurfaceVariant),
+                    TextButton(
+                      onPressed:
+                          busy ? null : () => context.push('/forgot-password'),
+                      child: Text(
+                        context.l10n.loginForgotPassword,
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
                     ),
                   ],
                 ),

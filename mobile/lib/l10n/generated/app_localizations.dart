@@ -391,8 +391,98 @@ abstract class AppLocalizations {
   /// No description provided for @loginForgotPassword.
   ///
   /// In ru, this message translates to:
-  /// **'Забыли пароль? Его сбрасывает владелец фермы — писем сервис не отправляет.'**
+  /// **'Забыли пароль?'**
   String get loginForgotPassword;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Забыли пароль?'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите почту, с которой входите в ферму. Если аккаунт есть, пришлём код — по SMS или на почту.'**
+  String get forgotPasswordIntro;
+
+  /// No description provided for @forgotPasswordEmailHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите почту'**
+  String get forgotPasswordEmailHint;
+
+  /// No description provided for @forgotPasswordSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить код'**
+  String get forgotPasswordSubmit;
+
+  /// No description provided for @forgotPasswordSentMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если аккаунт существует, код отправлен'**
+  String get forgotPasswordSentMessage;
+
+  /// No description provided for @forgotPasswordBackToLogin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вспомнили пароль? Войти'**
+  String get forgotPasswordBackToLogin;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordCodeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'6-значный код из SMS или письма'**
+  String get resetPasswordCodeHint;
+
+  /// No description provided for @resetPasswordCodeEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get resetPasswordCodeEmpty;
+
+  /// No description provided for @resetPasswordCodeInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код — это 6 цифр'**
+  String get resetPasswordCodeInvalid;
+
+  /// No description provided for @resetPasswordNewPasswordHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый пароль'**
+  String get resetPasswordNewPasswordHint;
+
+  /// No description provided for @resetPasswordConfirmHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите новый пароль'**
+  String get resetPasswordConfirmHint;
+
+  /// No description provided for @resetPasswordConfirmMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароли не совпадают'**
+  String get resetPasswordConfirmMismatch;
+
+  /// No description provided for @resetPasswordSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить пароль'**
+  String get resetPasswordSubmit;
+
+  /// No description provided for @resetPasswordSuccessMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль изменён. Войдите с новым паролем.'**
+  String get resetPasswordSuccessMessage;
 
   /// No description provided for @todayGreetingMorning.
   ///
