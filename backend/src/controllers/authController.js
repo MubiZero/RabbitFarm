@@ -128,7 +128,7 @@ class AuthController {
   }
 
   /**
-   * Forgot password - request reset token
+   * Forgot password - request reset code (SMS or email)
    * POST /api/v1/auth/forgot-password
    */
   async forgotPassword(req, res, next) {
@@ -136,29 +136,32 @@ class AuthController {
       const { email } = req.body;
       await authService.forgotPassword(email);
 
-      // Always return 200 to avoid email enumeration
-      return ApiResponse.success(res, null, 'Если аккаунт существует, инструкции отправлены на email');
+      // Always return 200 to avoid account enumeration
+      return ApiResponse.success(res, null, 'Если аккаунт существует, код отправлен');
     } catch (error) {
       next(error);
     }
   }
 
   /**
-   * Reset password using token
+   * Reset password using the code from forgotPassword
    * POST /api/v1/auth/reset-password
    */
   async resetPassword(req, res, next) {
     try {
-      const { token, new_password } = req.body;
-      await authService.resetPassword(token, new_password);
+      const { email, code, new_password: newPassword } = req.body;
+      await authService.resetPassword({ email, code, newPassword });
 
       return ApiResponse.success(res, null, 'Пароль успешно изменен. Пожалуйста, войдите заново.');
     } catch (error) {
-      if (error.message === 'INVALID_RESET_TOKEN') {
-        return ApiResponse.badRequest(res, 'Недействительный токен сброса пароля');
+      if (error.message === 'INVALID_RESET_CODE') {
+        return ApiResponse.badRequest(res, 'Неверный код');
       }
-      if (error.message === 'RESET_TOKEN_EXPIRED') {
-        return ApiResponse.badRequest(res, 'Срок действия токена истек');
+      if (error.message === 'RESET_CODE_EXPIRED') {
+        return ApiResponse.badRequest(res, 'Срок действия кода истёк');
+      }
+      if (error.message === 'RESET_CODE_LOCKED') {
+        return ApiResponse.error(res, 'Слишком много попыток — запросите новый код', 429, 'RESET_CODE_LOCKED');
       }
       if (error.message === 'USER_INACTIVE') {
         return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');

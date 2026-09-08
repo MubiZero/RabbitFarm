@@ -20,6 +20,16 @@ module.exports = (sequelize) => {
     expires_at: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    channel: {
+      type: DataTypes.ENUM('sms', 'email'),
+      allowNull: false,
+      defaultValue: 'email'
+    },
+    attempts: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     tableName: 'password_reset_tokens',

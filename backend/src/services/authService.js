@@ -3,6 +3,12 @@ const crypto = require('crypto');
 const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
+const { generateOtp, hashOtp } = require('../utils/otp');
+const payomSmsTransport = require('./notifications/payomSmsTransport');
+const emailTransport = require('./notifications/emailTransport');
+
+const RESET_CODE_TTL_MINUTES = 15;
+const RESET_CODE_MAX_ATTEMPTS = 5;
 
 /**
  * Authentication service
@@ -379,39 +385,60 @@ class AuthService {
   }
 
   /**
-   * Request password reset
+   * Запросить сброс пароля — код на телефон (если есть) или на email.
+   * Всегда отвечает успехом, даже если аккаунта нет: иначе по ответу можно
+   * было бы угадывать существующие email (энумерация).
    * @param {String} email - User email
-   * @returns {Object} { token } - plain text token for testing; in prod would be emailed
    */
   async forgotPassword(email) {
     try {
       const user = await User.findOne({ where: { email } });
-      // Always return success to avoid email enumeration
       if (!user || !user.is_active) {
         return { success: true };
       }
 
-      // Delete any existing tokens for this user
+      // Предыдущий код этого пользователя больше не должен работать —
+      // активным остаётся только последний запрошенный.
       await PasswordResetToken.destroy({ where: { user_id: user.id } });
 
-      // Generate a secure random token
-      const plainToken = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(plainToken).digest('hex');
+      const code = generateOtp();
+      const tokenHash = hashOtp(code);
+      const channel = user.phone ? 'sms' : 'email';
 
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour
+      expiresAt.setMinutes(expiresAt.getMinutes() + RESET_CODE_TTL_MINUTES);
 
       await PasswordResetToken.create({
         user_id: user.id,
         token_hash: tokenHash,
+        channel,
         expires_at: expiresAt
       });
 
-      logger.info('Password reset token created', { userId: user.id, email });
+      logger.info('Password reset code created', { userId: user.id, channel });
 
-      // In production, this token would be sent by email.
-      // We return it here for testability.
-      return { success: true, token: plainToken };
+      // Доставка — best-effort: не настроено или упало на стороне шлюза —
+      // логируем и продолжаем, не проваливая запрос (и не выдавая тем самым,
+      // что аккаунт существует, а канал недоступен).
+      try {
+        if (channel === 'sms') {
+          await payomSmsTransport.sendTemplateSms({
+            templateKey: 'user.verification_code',
+            telephone: user.phone,
+            variables: { 'text-1': 'RabbitFarm', 'code-1': code }
+          });
+        } else {
+          await emailTransport.sendPasswordResetEmail({ to: user.email, code });
+        }
+      } catch (dispatchError) {
+        logger.warn('Password reset dispatch failed', {
+          channel,
+          userId: user.id,
+          error: dispatchError.message
+        });
+      }
+
+      return { success: true };
     } catch (error) {
       logger.error('Forgot password error', { error: error.message, email });
       throw error;
@@ -419,49 +446,70 @@ class AuthService {
   }
 
   /**
-   * Reset password using token
-   * @param {String} token - Plain text reset token
-   * @param {String} newPassword - New password
+   * Сбросить пароль по коду, присланному forgotPassword.
+   * @param {Object} params
+   * @param {String} params.email
+   * @param {String} params.code - 6-значный код
+   * @param {String} params.newPassword
    */
-  async resetPassword(token, newPassword) {
+  async resetPassword({ email, code, newPassword }) {
     const transaction = await User.sequelize.transaction();
     try {
-      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      const user = await User.findOne({ where: { email }, transaction });
+      if (!user) {
+        throw new Error('INVALID_RESET_CODE');
+      }
 
+      // Код короткий (6 цифр) и не гарантирует глобальную уникальность хэша,
+      // в отличие от прежнего 32-байтного токена — ищем в пределах
+      // конкретного пользователя, а не по одному хэшу по всей таблице.
       const resetRecord = await PasswordResetToken.findOne({
-        where: { token_hash: tokenHash },
-        include: [{ model: User, attributes: ['id', 'email', 'is_active', 'token_version'] }],
+        where: { user_id: user.id },
         transaction
       });
 
       if (!resetRecord) {
-        throw new Error('INVALID_RESET_TOKEN');
+        throw new Error('INVALID_RESET_CODE');
+      }
+
+      // Эти три ветки завершаются ошибкой, а значит внешний catch откатит
+      // `transaction` — если снос/инкремент попадёт в неё же, откат вернёт
+      // всё как было. Поэтому здесь они выполняются вне транзакции: должны
+      // пережить неудачную попытку, а не отмениться вместе с ней.
+      if (resetRecord.attempts >= RESET_CODE_MAX_ATTEMPTS) {
+        await resetRecord.destroy();
+        throw new Error('RESET_CODE_LOCKED');
       }
 
       if (new Date() > resetRecord.expires_at) {
-        await resetRecord.destroy({ transaction });
-        throw new Error('RESET_TOKEN_EXPIRED');
+        await resetRecord.destroy();
+        throw new Error('RESET_CODE_EXPIRED');
       }
 
-      if (!resetRecord.User.is_active) {
+      if (hashOtp(code) !== resetRecord.token_hash) {
+        await resetRecord.increment('attempts');
+        throw new Error('INVALID_RESET_CODE');
+      }
+
+      if (!user.is_active) {
         throw new Error('USER_INACTIVE');
       }
 
       const newPasswordHash = await PasswordUtil.hash(newPassword);
 
       await User.update(
-        { password_hash: newPasswordHash, token_version: (resetRecord.User.token_version || 0) + 1 },
-        { where: { id: resetRecord.User.id }, transaction }
+        { password_hash: newPasswordHash, token_version: (user.token_version || 0) + 1 },
+        { where: { id: user.id }, transaction }
       );
 
       // Delete used token
       await resetRecord.destroy({ transaction });
 
       // Invalidate all refresh tokens (force re-login)
-      await RefreshToken.destroy({ where: { user_id: resetRecord.User.id }, transaction });
+      await RefreshToken.destroy({ where: { user_id: user.id }, transaction });
 
       await transaction.commit();
-      logger.info('Password reset successfully', { userId: resetRecord.User.id });
+      logger.info('Password reset successfully', { userId: user.id });
 
       return { success: true };
     } catch (error) {

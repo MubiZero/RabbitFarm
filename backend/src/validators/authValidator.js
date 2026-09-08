@@ -147,14 +147,24 @@ const forgotPasswordSchema = Joi.object({
     })
 });
 
-// Установка нового пароля по коду из письма.
+// Установка нового пароля по коду из SMS/email.
 // Раньше маршрут шёл без валидации вовсе: пароль можно было задать любой
 // длины в обход правила восьми символов, а запрос без токена уходил в 500.
 const resetPasswordSchema = Joi.object({
-  token: Joi.string()
+  email: Joi.string()
+    .email()
     .required()
     .messages({
-      'any.required': 'Код восстановления обязателен'
+      'string.email': 'Неверный формат email',
+      'any.required': 'Email обязателен'
+    }),
+
+  code: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Код должен состоять из 6 цифр',
+      'any.required': 'Код обязателен'
     }),
 
   new_password: Joi.string()

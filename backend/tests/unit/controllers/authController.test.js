@@ -330,18 +330,20 @@ describe('AuthController', () => {
   describe('resetPassword', () => {
     it('should reset password and return 200', async () => {
       authService.resetPassword.mockResolvedValue();
-      const req = mockReq({ body: { token: 'tok', new_password: 'newpass' } });
+      const req = mockReq({ body: { email: 'a@b.com', code: '123456', new_password: 'newpass' } });
       const res = mockRes();
 
       await authController.resetPassword(req, res, mockNext);
 
-      expect(authService.resetPassword).toHaveBeenCalledWith('tok', 'newpass');
+      expect(authService.resetPassword).toHaveBeenCalledWith({
+        email: 'a@b.com', code: '123456', newPassword: 'newpass'
+      });
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    it('should return 400 for INVALID_RESET_TOKEN', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('INVALID_RESET_TOKEN'));
-      const req = mockReq({ body: { token: 'bad', new_password: 'x' } });
+    it('should return 400 for INVALID_RESET_CODE', async () => {
+      authService.resetPassword.mockRejectedValue(new Error('INVALID_RESET_CODE'));
+      const req = mockReq({ body: { email: 'a@b.com', code: 'bad000', new_password: 'x' } });
       const res = mockRes();
 
       await authController.resetPassword(req, res, mockNext);
@@ -349,19 +351,30 @@ describe('AuthController', () => {
       expect(res.status).toHaveBeenCalledWith(400);
     });
 
-    it('should return 400 for RESET_TOKEN_EXPIRED', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('RESET_TOKEN_EXPIRED'));
-      const req = mockReq({ body: { token: 'old', new_password: 'x' } });
+    it('should return 400 for RESET_CODE_EXPIRED', async () => {
+      authService.resetPassword.mockRejectedValue(new Error('RESET_CODE_EXPIRED'));
+      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
       const res = mockRes();
 
       await authController.resetPassword(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it('should return 429 for RESET_CODE_LOCKED', async () => {
+      authService.resetPassword.mockRejectedValue(new Error('RESET_CODE_LOCKED'));
+      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
+      const res = mockRes();
+
+      await authController.resetPassword(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json.mock.calls[0][0].error.code).toBe('RESET_CODE_LOCKED');
     });
 
     it('should return 403 for USER_INACTIVE', async () => {
       authService.resetPassword.mockRejectedValue(new Error('USER_INACTIVE'));
-      const req = mockReq({ body: { token: 't', new_password: 'x' } });
+      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
       const res = mockRes();
 
       await authController.resetPassword(req, res, mockNext);
@@ -372,7 +385,7 @@ describe('AuthController', () => {
 
     it('should call next for unexpected errors', async () => {
       authService.resetPassword.mockRejectedValue(new Error('oops'));
-      const req = mockReq({ body: { token: 't', new_password: 'x' } });
+      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
       const res = mockRes();
 
       await authController.resetPassword(req, res, mockNext);
