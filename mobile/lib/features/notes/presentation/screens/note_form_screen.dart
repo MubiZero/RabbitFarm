@@ -187,7 +187,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
             Consumer(
               builder: (context, ref, _) {
                 final cagesAsync = ref.watch(cageOptionsProvider);
-                final cages = cagesAsync.valueOrNull ?? const [];
+                final cages = cagesAsync.value ?? const [];
 
                 return DropdownButtonFormField<int?>(
                   initialValue: _cageId,

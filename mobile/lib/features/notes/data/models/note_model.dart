@@ -10,7 +10,7 @@ part 'note_model.g.dart';
 /// Заметка — необязательно привязана к кролику или клетке: и то и другое
 /// может быть пустым, тогда это заметка по ферме в целом.
 @freezed
-class NoteModel with _$NoteModel {
+abstract class NoteModel with _$NoteModel {
   const factory NoteModel({
     @IntConverter() required int id,
     required String content,
@@ -28,7 +28,7 @@ class NoteModel with _$NoteModel {
 
 /// DTO создания заметки.
 @freezed
-class NoteCreate with _$NoteCreate {
+abstract class NoteCreate with _$NoteCreate {
   const factory NoteCreate({
     required String content,
     @JsonKey(name: 'rabbit_id') int? rabbitId,
@@ -41,7 +41,7 @@ class NoteCreate with _$NoteCreate {
 
 /// DTO правки заметки.
 @freezed
-class NoteUpdate with _$NoteUpdate {
+abstract class NoteUpdate with _$NoteUpdate {
   const factory NoteUpdate({
     String? content,
     @JsonKey(name: 'rabbit_id') int? rabbitId,

@@ -6,17 +6,16 @@ part of 'staff_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$FarmMemberImpl _$$FarmMemberImplFromJson(Map<String, dynamic> json) =>
-    _$FarmMemberImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      email: json['email'] as String,
-      fullName: json['full_name'] as String,
-      phone: json['phone'] as String?,
-      role: $enumDecode(_$FarmRoleEnumMap, json['role']),
-      isActive: json['is_active'] as bool? ?? true,
-    );
+_FarmMember _$FarmMemberFromJson(Map<String, dynamic> json) => _FarmMember(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  email: json['email'] as String,
+  fullName: json['full_name'] as String,
+  phone: json['phone'] as String?,
+  role: $enumDecode(_$FarmRoleEnumMap, json['role']),
+  isActive: json['is_active'] as bool? ?? true,
+);
 
-Map<String, dynamic> _$$FarmMemberImplToJson(_$FarmMemberImpl instance) =>
+Map<String, dynamic> _$FarmMemberToJson(_FarmMember instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'email': instance.email,
@@ -32,8 +31,8 @@ const _$FarmRoleEnumMap = {
   FarmRole.worker: 'worker',
 };
 
-_$FarmInvitationImpl _$$FarmInvitationImplFromJson(Map<String, dynamic> json) =>
-    _$FarmInvitationImpl(
+_FarmInvitation _$FarmInvitationFromJson(Map<String, dynamic> json) =>
+    _FarmInvitation(
       id: const IntConverter().fromJson(json['id'] as Object),
       email: json['email'] as String,
       role: $enumDecode(_$FarmRoleEnumMap, json['role']),
@@ -42,31 +41,30 @@ _$FarmInvitationImpl _$$FarmInvitationImplFromJson(Map<String, dynamic> json) =>
       ),
     );
 
-Map<String, dynamic> _$$FarmInvitationImplToJson(
-  _$FarmInvitationImpl instance,
-) => <String, dynamic>{
-  'id': const IntConverter().toJson(instance.id),
-  'email': instance.email,
-  'role': _$FarmRoleEnumMap[instance.role]!,
-  'expires_at': const DateTimeConverter().toJson(instance.expiresAt),
-};
+Map<String, dynamic> _$FarmInvitationToJson(_FarmInvitation instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'email': instance.email,
+      'role': _$FarmRoleEnumMap[instance.role]!,
+      'expires_at': const DateTimeConverter().toJson(instance.expiresAt),
+    };
 
-_$CreatedInvitationImpl _$$CreatedInvitationImplFromJson(
-  Map<String, dynamic> json,
-) => _$CreatedInvitationImpl(
-  id: const IntConverter().fromJson(json['id'] as Object),
-  email: json['email'] as String,
-  role: $enumDecode(_$FarmRoleEnumMap, json['role']),
-  code: json['code'] as String,
-  expiresAt: const DateTimeConverter().fromJson(json['expires_at'] as Object),
-);
+_CreatedInvitation _$CreatedInvitationFromJson(Map<String, dynamic> json) =>
+    _CreatedInvitation(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      email: json['email'] as String,
+      role: $enumDecode(_$FarmRoleEnumMap, json['role']),
+      code: json['code'] as String,
+      expiresAt: const DateTimeConverter().fromJson(
+        json['expires_at'] as Object,
+      ),
+    );
 
-Map<String, dynamic> _$$CreatedInvitationImplToJson(
-  _$CreatedInvitationImpl instance,
-) => <String, dynamic>{
-  'id': const IntConverter().toJson(instance.id),
-  'email': instance.email,
-  'role': _$FarmRoleEnumMap[instance.role]!,
-  'code': instance.code,
-  'expires_at': const DateTimeConverter().toJson(instance.expiresAt),
-};
+Map<String, dynamic> _$CreatedInvitationToJson(_CreatedInvitation instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'email': instance.email,
+      'role': _$FarmRoleEnumMap[instance.role]!,
+      'code': instance.code,
+      'expires_at': const DateTimeConverter().toJson(instance.expiresAt),
+    };

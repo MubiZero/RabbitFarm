@@ -56,7 +56,7 @@ extension TransactionCategoryExtension on TransactionCategory {
 
 /// Transaction model
 @freezed
-class Transaction with _$Transaction {
+abstract class Transaction with _$Transaction {
   const factory Transaction({
     @IntConverter() required int id,
     required TransactionType type,
@@ -84,7 +84,7 @@ class Transaction with _$Transaction {
 
 /// Transaction create model
 @freezed
-class TransactionCreate with _$TransactionCreate {
+abstract class TransactionCreate with _$TransactionCreate {
   const factory TransactionCreate({
     required TransactionType type,
     required TransactionCategory category,
@@ -101,7 +101,7 @@ class TransactionCreate with _$TransactionCreate {
 
 /// Transaction update model
 @freezed
-class TransactionUpdate with _$TransactionUpdate {
+abstract class TransactionUpdate with _$TransactionUpdate {
   const factory TransactionUpdate({
     TransactionType? type,
     TransactionCategory? category,
@@ -118,7 +118,7 @@ class TransactionUpdate with _$TransactionUpdate {
 
 /// Financial statistics model
 @freezed
-class FinancialStatistics with _$FinancialStatistics {
+abstract class FinancialStatistics with _$FinancialStatistics {
   const factory FinancialStatistics({
     @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
     @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
@@ -135,7 +135,7 @@ class FinancialStatistics with _$FinancialStatistics {
 
 /// Category statistics model
 @freezed
-class CategoryStatistics with _$CategoryStatistics {
+abstract class CategoryStatistics with _$CategoryStatistics {
   const factory CategoryStatistics({
     required TransactionCategory category,
     @DoubleConverter() required double total,
@@ -148,7 +148,7 @@ class CategoryStatistics with _$CategoryStatistics {
 
 /// Monthly report model
 @freezed
-class MonthlyReport with _$MonthlyReport {
+abstract class MonthlyReport with _$MonthlyReport {
   const factory MonthlyReport({
     required ReportPeriod period,
     required ReportSummary summary,
@@ -161,7 +161,7 @@ class MonthlyReport with _$MonthlyReport {
 
 /// Report period model
 @freezed
-class ReportPeriod with _$ReportPeriod {
+abstract class ReportPeriod with _$ReportPeriod {
   const factory ReportPeriod({
     @IntConverter() required int year,
     @IntConverter() required int month,
@@ -175,7 +175,7 @@ class ReportPeriod with _$ReportPeriod {
 
 /// Report summary model
 @freezed
-class ReportSummary with _$ReportSummary {
+abstract class ReportSummary with _$ReportSummary {
   const factory ReportSummary({
     @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
     @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
@@ -189,7 +189,7 @@ class ReportSummary with _$ReportSummary {
 
 /// Rabbit transactions summary model
 @freezed
-class RabbitTransactionsSummary with _$RabbitTransactionsSummary {
+abstract class RabbitTransactionsSummary with _$RabbitTransactionsSummary {
   const factory RabbitTransactionsSummary({
     required List<Transaction> transactions,
     required TransactionSummary summary,
@@ -201,7 +201,7 @@ class RabbitTransactionsSummary with _$RabbitTransactionsSummary {
 
 /// Transaction summary model
 @freezed
-class TransactionSummary with _$TransactionSummary {
+abstract class TransactionSummary with _$TransactionSummary {
   const factory TransactionSummary({
     @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
     @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,

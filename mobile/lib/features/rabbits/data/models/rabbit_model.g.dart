@@ -6,9 +6,7 @@ part of 'rabbit_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RabbitModelImpl _$$RabbitModelImplFromJson(
-  Map<String, dynamic> json,
-) => _$RabbitModelImpl(
+_RabbitModel _$RabbitModelFromJson(Map<String, dynamic> json) => _RabbitModel(
   id: const IntConverter().fromJson(json['id'] as Object),
   tagId: json['tag_id'] as String?,
   name: json['name'] as String?,
@@ -47,8 +45,8 @@ _$RabbitModelImpl _$$RabbitModelImplFromJson(
       : RabbitRef.fromJson(json['mother'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$$RabbitModelImplToJson(
-  _$RabbitModelImpl instance,
+Map<String, dynamic> _$RabbitModelToJson(
+  _RabbitModel instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'tag_id': instance.tagId,
@@ -80,30 +78,27 @@ Map<String, dynamic> _$$RabbitModelImplToJson(
   'mother': instance.mother,
 };
 
-_$CageInfoImpl _$$CageInfoImplFromJson(Map<String, dynamic> json) =>
-    _$CageInfoImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      number: json['number'] as String,
-      type: json['type'] as String?,
-      location: json['location'] as String?,
-    );
+_CageInfo _$CageInfoFromJson(Map<String, dynamic> json) => _CageInfo(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  number: json['number'] as String,
+  type: json['type'] as String?,
+  location: json['location'] as String?,
+);
 
-Map<String, dynamic> _$$CageInfoImplToJson(_$CageInfoImpl instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'number': instance.number,
-      'type': instance.type,
-      'location': instance.location,
-    };
+Map<String, dynamic> _$CageInfoToJson(_CageInfo instance) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'number': instance.number,
+  'type': instance.type,
+  'location': instance.location,
+};
 
-_$RabbitRefImpl _$$RabbitRefImplFromJson(Map<String, dynamic> json) =>
-    _$RabbitRefImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      name: json['name'] as String?,
-      tagId: json['tag_id'] as String?,
-    );
+_RabbitRef _$RabbitRefFromJson(Map<String, dynamic> json) => _RabbitRef(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  name: json['name'] as String?,
+  tagId: json['tag_id'] as String?,
+);
 
-Map<String, dynamic> _$$RabbitRefImplToJson(_$RabbitRefImpl instance) =>
+Map<String, dynamic> _$RabbitRefToJson(_RabbitRef instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'name': instance.name,

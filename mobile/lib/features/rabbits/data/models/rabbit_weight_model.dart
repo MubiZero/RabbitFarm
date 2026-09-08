@@ -9,7 +9,7 @@ part 'rabbit_weight_model.g.dart';
 // IntConverter вынесен в core/json/int_converter.dart и импортирован выше
 
 @freezed
-class RabbitWeight with _$RabbitWeight {
+abstract class RabbitWeight with _$RabbitWeight {
   const factory RabbitWeight({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,

@@ -103,11 +103,15 @@ void main() {
     testWidgets('прежние данные переживают неудачное обновление',
         (tester) async {
       await tester.pumpWidget(
+        // ignore: invalid_use_of_internal_member
         build(
           const AsyncValue<String>.loading()
+              // ignore: invalid_use_of_internal_member
               .copyWithPrevious(const AsyncValue.data('12 кроликов'))
+              // ignore: invalid_use_of_internal_member
               .copyWithPrevious(
                 AsyncValue<String>.error('Нет связи', StackTrace.empty)
+                    // ignore: invalid_use_of_internal_member
                     .copyWithPrevious(const AsyncValue.data('12 кроликов')),
               ),
         ),

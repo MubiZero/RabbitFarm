@@ -7,7 +7,7 @@ part 'cage_model.freezed.dart';
 part 'cage_model.g.dart';
 
 @freezed
-class CageModel with _$CageModel {
+abstract class CageModel with _$CageModel {
   const factory CageModel({
     @IntConverter() required int id,
     required String number,
@@ -32,7 +32,7 @@ class CageModel with _$CageModel {
 }
 
 @freezed
-class CageStatistics with _$CageStatistics {
+abstract class CageStatistics with _$CageStatistics {
   const factory CageStatistics({
     @JsonKey(name: 'total_cages') @IntConverter() required int totalCages,
     @JsonKey(name: 'by_type') required CageTypeStats byType,
@@ -45,7 +45,7 @@ class CageStatistics with _$CageStatistics {
 }
 
 @freezed
-class CageTypeStats with _$CageTypeStats {
+abstract class CageTypeStats with _$CageTypeStats {
   const factory CageTypeStats({
     @IntConverter() required int single,
     @IntConverter() required int group,
@@ -57,7 +57,7 @@ class CageTypeStats with _$CageTypeStats {
 }
 
 @freezed
-class CageConditionStats with _$CageConditionStats {
+abstract class CageConditionStats with _$CageConditionStats {
   const factory CageConditionStats({
     @IntConverter() required int good,
     @JsonKey(name: 'needs_repair') @IntConverter() required int needsRepair,
@@ -69,7 +69,7 @@ class CageConditionStats with _$CageConditionStats {
 }
 
 @freezed
-class CageOccupancyStats with _$CageOccupancyStats {
+abstract class CageOccupancyStats with _$CageOccupancyStats {
   const factory CageOccupancyStats({
     @JsonKey(name: 'total_capacity') @IntConverter() required int totalCapacity,
     @JsonKey(name: 'current_occupancy') @IntConverter() required int currentOccupancy,

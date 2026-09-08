@@ -68,7 +68,7 @@ extension FeedUnitDisplay on FeedUnit {
 
 /// Feed model
 @freezed
-class Feed with _$Feed {
+abstract class Feed with _$Feed {
   const factory Feed({
     @IntConverter() required int id,
     required String name,
@@ -88,7 +88,7 @@ class Feed with _$Feed {
 
 /// Feed Create DTO
 @freezed
-class FeedCreate with _$FeedCreate {
+abstract class FeedCreate with _$FeedCreate {
   const factory FeedCreate({
     required String name,
     required String type,
@@ -106,7 +106,7 @@ class FeedCreate with _$FeedCreate {
 
 /// Feed Update DTO
 @freezed
-class FeedUpdate with _$FeedUpdate {
+abstract class FeedUpdate with _$FeedUpdate {
   const factory FeedUpdate({
     String? name,
     String? type,
@@ -124,7 +124,7 @@ class FeedUpdate with _$FeedUpdate {
 
 /// Stock Adjustment DTO
 @freezed
-class StockAdjustment with _$StockAdjustment {
+abstract class StockAdjustment with _$StockAdjustment {
   const factory StockAdjustment({
     required double quantity,
     required String operation, // 'add' or 'subtract'
@@ -136,7 +136,7 @@ class StockAdjustment with _$StockAdjustment {
 
 /// Feed Statistics
 @freezed
-class FeedStatistics with _$FeedStatistics {
+abstract class FeedStatistics with _$FeedStatistics {
   const factory FeedStatistics({
     @JsonKey(name: 'total_feeds') required int totalFeeds,
     @JsonKey(name: 'by_type') required FeedTypeStats byType,
@@ -151,7 +151,7 @@ class FeedStatistics with _$FeedStatistics {
 
 /// Feed type statistics
 @freezed
-class FeedTypeStats with _$FeedTypeStats {
+abstract class FeedTypeStats with _$FeedTypeStats {
   const factory FeedTypeStats({
     @JsonKey(defaultValue: 0) required int pellets,
     @JsonKey(defaultValue: 0) required int hay,
@@ -167,7 +167,7 @@ class FeedTypeStats with _$FeedTypeStats {
 
 /// Low stock item
 @freezed
-class LowStockItem with _$LowStockItem {
+abstract class LowStockItem with _$LowStockItem {
   const factory LowStockItem({
     @IntConverter() required int id,
     required String name,

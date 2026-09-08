@@ -6,18 +6,18 @@ part of 'api_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ApiResponseImpl<T> _$$ApiResponseImplFromJson<T>(
+_ApiResponse<T> _$ApiResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => _$ApiResponseImpl<T>(
+) => _ApiResponse<T>(
   success: json['success'] as bool,
   message: json['message'] as String,
   data: _$nullableGenericFromJson(json['data'], fromJsonT),
   errors: json['errors'] as Map<String, dynamic>?,
 );
 
-Map<String, dynamic> _$$ApiResponseImplToJson<T>(
-  _$ApiResponseImpl<T> instance,
+Map<String, dynamic> _$ApiResponseToJson<T>(
+  _ApiResponse<T> instance,
   Object? Function(T value) toJsonT,
 ) => <String, dynamic>{
   'success': instance.success,
@@ -36,10 +36,10 @@ Object? _$nullableGenericToJson<T>(
   Object? Function(T value) toJson,
 ) => input == null ? null : toJson(input);
 
-_$PaginatedResponseImpl<T> _$$PaginatedResponseImplFromJson<T>(
+_PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => _$PaginatedResponseImpl<T>(
+) => _PaginatedResponse<T>(
   items: (json['items'] as List<dynamic>).map(fromJsonT).toList(),
   total: (json['total'] as num).toInt(),
   page: (json['page'] as num).toInt(),
@@ -47,8 +47,8 @@ _$PaginatedResponseImpl<T> _$$PaginatedResponseImplFromJson<T>(
   totalPages: (json['total_pages'] as num).toInt(),
 );
 
-Map<String, dynamic> _$$PaginatedResponseImplToJson<T>(
-  _$PaginatedResponseImpl<T> instance,
+Map<String, dynamic> _$PaginatedResponseToJson<T>(
+  _PaginatedResponse<T> instance,
   Object? Function(T value) toJsonT,
 ) => <String, dynamic>{
   'items': instance.items.map(toJsonT).toList(),

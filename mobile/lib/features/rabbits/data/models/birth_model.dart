@@ -11,7 +11,7 @@ part 'birth_model.freezed.dart';
 /// Содержит информацию о рождении крольчат, включая количество,
 /// выживаемость и связь с случкой
 @freezed
-class BirthModel with _$BirthModel {
+abstract class BirthModel with _$BirthModel {
   const factory BirthModel({
     required int id,
     @JsonKey(name: 'breeding_id') int? breedingId,

@@ -11,7 +11,7 @@ class OnboardingReadyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-    final onboarding = ref.watch(onboardingProvider).valueOrNull;
+    final onboarding = ref.watch(onboardingProvider).value;
     // Без названия фраза не должна изображать название: «"ваша ферма"
     // готова к работе!» читалось так, будто ферму действительно так зовут.
     final farmName =

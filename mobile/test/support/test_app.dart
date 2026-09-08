@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/l10n/generated/app_localizations.dart';
@@ -27,6 +28,12 @@ Widget testApp(
   Brightness brightness = Brightness.light,
 }) {
   return ProviderScope(
+    // Без этого сбойный провайдер в тесте молча ретраится по расписанию
+    // Riverpod (до 10 раз, растущая пауза) вместо немедленной ошибки — тесты
+    // на «показывает ошибку и кнопку „Повторить“» иначе зависали бы на
+    // фиктивной загрузке дольше, чем длится сам тест. См. `lib/main.dart`,
+    // где то же самое сделано для настоящего приложения.
+    retry: (retryCount, error) => null,
     overrides: overrides,
     child: MaterialApp(
       theme: _theme(brightness),
@@ -49,6 +56,12 @@ Widget testAppScreen(
   Brightness brightness = Brightness.light,
 }) {
   return ProviderScope(
+    // Без этого сбойный провайдер в тесте молча ретраится по расписанию
+    // Riverpod (до 10 раз, растущая пауза) вместо немедленной ошибки — тесты
+    // на «показывает ошибку и кнопку „Повторить“» иначе зависали бы на
+    // фиктивной загрузке дольше, чем длится сам тест. См. `lib/main.dart`,
+    // где то же самое сделано для настоящего приложения.
+    retry: (retryCount, error) => null,
     overrides: overrides,
     child: MaterialApp(
       theme: _theme(brightness),

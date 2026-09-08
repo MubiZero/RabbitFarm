@@ -6,8 +6,8 @@ part of 'rabbit_weight_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RabbitWeightImpl _$$RabbitWeightImplFromJson(Map<String, dynamic> json) =>
-    _$RabbitWeightImpl(
+_RabbitWeight _$RabbitWeightFromJson(Map<String, dynamic> json) =>
+    _RabbitWeight(
       id: const IntConverter().fromJson(json['id'] as Object),
       rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
       weight: const DoubleConverter().fromJson(json['weight'] as Object),
@@ -18,8 +18,8 @@ _$RabbitWeightImpl _$$RabbitWeightImplFromJson(Map<String, dynamic> json) =>
       createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
     );
 
-Map<String, dynamic> _$$RabbitWeightImplToJson(
-  _$RabbitWeightImpl instance,
+Map<String, dynamic> _$RabbitWeightToJson(
+  _RabbitWeight instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),

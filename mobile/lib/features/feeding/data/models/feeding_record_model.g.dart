@@ -6,8 +6,8 @@ part of 'feeding_record_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
-    _$FeedingRecordImpl(
+_FeedingRecord _$FeedingRecordFromJson(Map<String, dynamic> json) =>
+    _FeedingRecord(
       id: const IntConverter().fromJson(json['id'] as Object),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
       feedId: const IntConverter().fromJson(json['feed_id'] as Object),
@@ -31,8 +31,8 @@ _$FeedingRecordImpl _$$FeedingRecordImplFromJson(Map<String, dynamic> json) =>
           : UserRef.fromJson(json['fedBy'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$FeedingRecordImplToJson(
-  _$FeedingRecordImpl instance,
+Map<String, dynamic> _$FeedingRecordToJson(
+  _FeedingRecord instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
@@ -49,19 +49,18 @@ Map<String, dynamic> _$$FeedingRecordImplToJson(
   'fedBy': instance.author,
 };
 
-_$FeedingRecordCreateImpl _$$FeedingRecordCreateImplFromJson(
-  Map<String, dynamic> json,
-) => _$FeedingRecordCreateImpl(
-  rabbitId: (json['rabbit_id'] as num?)?.toInt(),
-  feedId: (json['feed_id'] as num).toInt(),
-  cageId: (json['cage_id'] as num?)?.toInt(),
-  quantity: (json['quantity'] as num).toDouble(),
-  fedAt: const DateTimeConverter().fromJson(json['fed_at'] as Object),
-  notes: json['notes'] as String?,
-);
+_FeedingRecordCreate _$FeedingRecordCreateFromJson(Map<String, dynamic> json) =>
+    _FeedingRecordCreate(
+      rabbitId: (json['rabbit_id'] as num?)?.toInt(),
+      feedId: (json['feed_id'] as num).toInt(),
+      cageId: (json['cage_id'] as num?)?.toInt(),
+      quantity: (json['quantity'] as num).toDouble(),
+      fedAt: const DateTimeConverter().fromJson(json['fed_at'] as Object),
+      notes: json['notes'] as String?,
+    );
 
-Map<String, dynamic> _$$FeedingRecordCreateImplToJson(
-  _$FeedingRecordCreateImpl instance,
+Map<String, dynamic> _$FeedingRecordCreateToJson(
+  _FeedingRecordCreate instance,
 ) => <String, dynamic>{
   'rabbit_id': instance.rabbitId,
   'feed_id': instance.feedId,
@@ -71,19 +70,18 @@ Map<String, dynamic> _$$FeedingRecordCreateImplToJson(
   'notes': instance.notes,
 };
 
-_$FeedingRecordUpdateImpl _$$FeedingRecordUpdateImplFromJson(
-  Map<String, dynamic> json,
-) => _$FeedingRecordUpdateImpl(
-  rabbitId: (json['rabbit_id'] as num?)?.toInt(),
-  feedId: (json['feed_id'] as num?)?.toInt(),
-  cageId: (json['cage_id'] as num?)?.toInt(),
-  quantity: (json['quantity'] as num?)?.toDouble(),
-  fedAt: const NullableDateTimeConverter().fromJson(json['fed_at']),
-  notes: json['notes'] as String?,
-);
+_FeedingRecordUpdate _$FeedingRecordUpdateFromJson(Map<String, dynamic> json) =>
+    _FeedingRecordUpdate(
+      rabbitId: (json['rabbit_id'] as num?)?.toInt(),
+      feedId: (json['feed_id'] as num?)?.toInt(),
+      cageId: (json['cage_id'] as num?)?.toInt(),
+      quantity: (json['quantity'] as num?)?.toDouble(),
+      fedAt: const NullableDateTimeConverter().fromJson(json['fed_at']),
+      notes: json['notes'] as String?,
+    );
 
-Map<String, dynamic> _$$FeedingRecordUpdateImplToJson(
-  _$FeedingRecordUpdateImpl instance,
+Map<String, dynamic> _$FeedingRecordUpdateToJson(
+  _FeedingRecordUpdate instance,
 ) => <String, dynamic>{
   'rabbit_id': instance.rabbitId,
   'feed_id': instance.feedId,
@@ -93,52 +91,50 @@ Map<String, dynamic> _$$FeedingRecordUpdateImplToJson(
   'notes': instance.notes,
 };
 
-_$FeedingStatisticsImpl _$$FeedingStatisticsImplFromJson(
-  Map<String, dynamic> json,
-) => _$FeedingStatisticsImpl(
-  totalFeedings: (json['total_feedings'] as num).toInt(),
-  quantityByUnit:
-      (json['quantity_by_unit'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, (e as num).toDouble()),
-      ) ??
-      const {},
-  byFeedType:
-      (json['by_feed_type'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(
-          k,
-          (e as Map<String, dynamic>).map(
+_FeedingStatistics _$FeedingStatisticsFromJson(Map<String, dynamic> json) =>
+    _FeedingStatistics(
+      totalFeedings: (json['total_feedings'] as num).toInt(),
+      quantityByUnit:
+          (json['quantity_by_unit'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toDouble()),
-          ),
-        ),
-      ) ??
-      const {},
-  byFeed:
-      (json['by_feed'] as Map<String, dynamic>?)?.map(
-        (k, e) =>
-            MapEntry(k, FeedingByFeed.fromJson(e as Map<String, dynamic>)),
-      ) ??
-      const {},
-  totalCost: (json['total_cost'] as num).toDouble(),
-);
+          ) ??
+          const {},
+      byFeedType:
+          (json['by_feed_type'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(
+              k,
+              (e as Map<String, dynamic>).map(
+                (k, e) => MapEntry(k, (e as num).toDouble()),
+              ),
+            ),
+          ) ??
+          const {},
+      byFeed:
+          (json['by_feed'] as Map<String, dynamic>?)?.map(
+            (k, e) =>
+                MapEntry(k, FeedingByFeed.fromJson(e as Map<String, dynamic>)),
+          ) ??
+          const {},
+      totalCost: (json['total_cost'] as num).toDouble(),
+    );
 
-Map<String, dynamic> _$$FeedingStatisticsImplToJson(
-  _$FeedingStatisticsImpl instance,
-) => <String, dynamic>{
-  'total_feedings': instance.totalFeedings,
-  'quantity_by_unit': instance.quantityByUnit,
-  'by_feed_type': instance.byFeedType,
-  'by_feed': instance.byFeed,
-  'total_cost': instance.totalCost,
-};
+Map<String, dynamic> _$FeedingStatisticsToJson(_FeedingStatistics instance) =>
+    <String, dynamic>{
+      'total_feedings': instance.totalFeedings,
+      'quantity_by_unit': instance.quantityByUnit,
+      'by_feed_type': instance.byFeedType,
+      'by_feed': instance.byFeed,
+      'total_cost': instance.totalCost,
+    };
 
-_$FeedingByFeedImpl _$$FeedingByFeedImplFromJson(Map<String, dynamic> json) =>
-    _$FeedingByFeedImpl(
+_FeedingByFeed _$FeedingByFeedFromJson(Map<String, dynamic> json) =>
+    _FeedingByFeed(
       quantity: (json['quantity'] as num).toDouble(),
       unit: json['unit'] as String,
       cost: (json['cost'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$FeedingByFeedImplToJson(_$FeedingByFeedImpl instance) =>
+Map<String, dynamic> _$FeedingByFeedToJson(_FeedingByFeed instance) =>
     <String, dynamic>{
       'quantity': instance.quantity,
       'unit': instance.unit,

@@ -6,33 +6,32 @@ part of 'vaccination_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$VaccinationImpl _$$VaccinationImplFromJson(Map<String, dynamic> json) =>
-    _$VaccinationImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
-      vaccineName: json['vaccine_name'] as String,
-      vaccineType: $enumDecode(_$VaccineTypeEnumMap, json['vaccine_type']),
-      vaccinationDate: const DateOnlyConverter().fromJson(
-        json['vaccination_date'] as Object,
-      ),
-      nextVaccinationDate: const NullableDateOnlyConverter().fromJson(
-        json['next_vaccination_date'],
-      ),
-      batchNumber: json['batch_number'] as String?,
-      veterinarian: json['veterinarian'] as String?,
-      notes: json['notes'] as String?,
-      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
-      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
-      rabbit: json['rabbit'] == null
-          ? null
-          : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
-      daysUntil: (json['days_until'] as num?)?.toInt(),
-      daysOverdue: (json['days_overdue'] as num?)?.toInt(),
-      isOverdue: json['is_overdue'] as bool?,
-    );
+_Vaccination _$VaccinationFromJson(Map<String, dynamic> json) => _Vaccination(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
+  vaccineName: json['vaccine_name'] as String,
+  vaccineType: $enumDecode(_$VaccineTypeEnumMap, json['vaccine_type']),
+  vaccinationDate: const DateOnlyConverter().fromJson(
+    json['vaccination_date'] as Object,
+  ),
+  nextVaccinationDate: const NullableDateOnlyConverter().fromJson(
+    json['next_vaccination_date'],
+  ),
+  batchNumber: json['batch_number'] as String?,
+  veterinarian: json['veterinarian'] as String?,
+  notes: json['notes'] as String?,
+  createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+  updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+  rabbit: json['rabbit'] == null
+      ? null
+      : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
+  daysUntil: (json['days_until'] as num?)?.toInt(),
+  daysOverdue: (json['days_overdue'] as num?)?.toInt(),
+  isOverdue: json['is_overdue'] as bool?,
+);
 
-Map<String, dynamic> _$$VaccinationImplToJson(
-  _$VaccinationImpl instance,
+Map<String, dynamic> _$VaccinationToJson(
+  _Vaccination instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),
@@ -62,9 +61,9 @@ const _$VaccineTypeEnumMap = {
   VaccineType.other: 'other',
 };
 
-_$VaccinationStatisticsImpl _$$VaccinationStatisticsImplFromJson(
+_VaccinationStatistics _$VaccinationStatisticsFromJson(
   Map<String, dynamic> json,
-) => _$VaccinationStatisticsImpl(
+) => _VaccinationStatistics(
   totalVaccinations: (json['total_vaccinations'] as num).toInt(),
   byVaccineType: Map<String, int>.from(json['by_vaccine_type'] as Map),
   upcoming: VaccinationUpcoming.fromJson(
@@ -74,8 +73,8 @@ _$VaccinationStatisticsImpl _$$VaccinationStatisticsImplFromJson(
   last30Days: (json['last_30_days'] as num).toInt(),
 );
 
-Map<String, dynamic> _$$VaccinationStatisticsImplToJson(
-  _$VaccinationStatisticsImpl instance,
+Map<String, dynamic> _$VaccinationStatisticsToJson(
+  _VaccinationStatistics instance,
 ) => <String, dynamic>{
   'total_vaccinations': instance.totalVaccinations,
   'by_vaccine_type': instance.byVaccineType,
@@ -84,19 +83,20 @@ Map<String, dynamic> _$$VaccinationStatisticsImplToJson(
   'last_30_days': instance.last30Days,
 };
 
-_$VaccinationUpcomingImpl _$$VaccinationUpcomingImplFromJson(
-  Map<String, dynamic> json,
-) => _$VaccinationUpcomingImpl(
-  total: (json['total'] as num).toInt(),
-  next30Days: (json['next_30_days'] as num).toInt(),
-  overdue: (json['overdue'] as num).toInt(),
-  list: (json['list'] as List<dynamic>)
-      .map((e) => UpcomingVaccinationItem.fromJson(e as Map<String, dynamic>))
-      .toList(),
-);
+_VaccinationUpcoming _$VaccinationUpcomingFromJson(Map<String, dynamic> json) =>
+    _VaccinationUpcoming(
+      total: (json['total'] as num).toInt(),
+      next30Days: (json['next_30_days'] as num).toInt(),
+      overdue: (json['overdue'] as num).toInt(),
+      list: (json['list'] as List<dynamic>)
+          .map(
+            (e) => UpcomingVaccinationItem.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+    );
 
-Map<String, dynamic> _$$VaccinationUpcomingImplToJson(
-  _$VaccinationUpcomingImpl instance,
+Map<String, dynamic> _$VaccinationUpcomingToJson(
+  _VaccinationUpcoming instance,
 ) => <String, dynamic>{
   'total': instance.total,
   'next_30_days': instance.next30Days,
@@ -104,9 +104,9 @@ Map<String, dynamic> _$$VaccinationUpcomingImplToJson(
   'list': instance.list,
 };
 
-_$UpcomingVaccinationItemImpl _$$UpcomingVaccinationItemImplFromJson(
+_UpcomingVaccinationItem _$UpcomingVaccinationItemFromJson(
   Map<String, dynamic> json,
-) => _$UpcomingVaccinationItemImpl(
+) => _UpcomingVaccinationItem(
   id: const IntConverter().fromJson(json['id'] as Object),
   rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
   rabbitName: json['rabbit_name'] as String?,
@@ -119,8 +119,8 @@ _$UpcomingVaccinationItemImpl _$$UpcomingVaccinationItemImplFromJson(
   isOverdue: json['is_overdue'] as bool?,
 );
 
-Map<String, dynamic> _$$UpcomingVaccinationItemImplToJson(
-  _$UpcomingVaccinationItemImpl instance,
+Map<String, dynamic> _$UpcomingVaccinationItemToJson(
+  _UpcomingVaccinationItem instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),

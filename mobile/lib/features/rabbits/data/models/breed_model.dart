@@ -6,7 +6,7 @@ part 'breed_model.freezed.dart';
 part 'breed_model.g.dart';
 
 @freezed
-class BreedModel with _$BreedModel {
+abstract class BreedModel with _$BreedModel {
   const factory BreedModel({
     @IntConverter() required int id,
     required String name,

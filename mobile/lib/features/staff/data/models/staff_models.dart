@@ -32,7 +32,7 @@ extension FarmRoleLabels on FarmRole {
 
 /// Участник фермы: владелец или его сотрудник.
 @freezed
-class FarmMember with _$FarmMember {
+abstract class FarmMember with _$FarmMember {
   const factory FarmMember({
     @IntConverter() required int id,
     required String email,
@@ -58,7 +58,7 @@ class FarmMember with _$FarmMember {
 
 /// Выписанное, но ещё не использованное приглашение.
 @freezed
-class FarmInvitation with _$FarmInvitation {
+abstract class FarmInvitation with _$FarmInvitation {
   const factory FarmInvitation({
     @IntConverter() required int id,
     required String email,
@@ -72,7 +72,7 @@ class FarmInvitation with _$FarmInvitation {
 
 /// Ответ на создание приглашения: код приходит ровно один раз.
 @freezed
-class CreatedInvitation with _$CreatedInvitation {
+abstract class CreatedInvitation with _$CreatedInvitation {
   const factory CreatedInvitation({
     @IntConverter() required int id,
     required String email,

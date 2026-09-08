@@ -129,7 +129,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
   Widget build(BuildContext context) {
     final cageAsync = ref.watch(cageDetailProvider(widget.cageId));
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
-    final cage = cageAsync.valueOrNull;
+    final cage = cageAsync.value;
 
     return Scaffold(
       appBar: AppBar(

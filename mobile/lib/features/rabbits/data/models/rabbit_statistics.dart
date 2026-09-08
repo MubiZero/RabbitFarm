@@ -5,7 +5,7 @@ part 'rabbit_statistics.freezed.dart';
 part 'rabbit_statistics.g.dart';
 
 @freezed
-class RabbitStatistics with _$RabbitStatistics {
+abstract class RabbitStatistics with _$RabbitStatistics {
   const factory RabbitStatistics({
     @IntConverter() @Default(0) int total,
     @JsonKey(name: 'alive_count') @IntConverter() @Default(0) int aliveCount,
@@ -23,7 +23,7 @@ class RabbitStatistics with _$RabbitStatistics {
 }
 
 @freezed
-class BreedStats with _$BreedStats {
+abstract class BreedStats with _$BreedStats {
   const factory BreedStats({
     @JsonKey(name: 'breed_id') @IntConverter() int? breedId,
     @JsonKey(name: 'breed_name') String? breedName,

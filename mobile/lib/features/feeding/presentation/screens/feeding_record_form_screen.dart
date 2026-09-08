@@ -155,7 +155,7 @@ class _FeedingRecordFormScreenState
     final cagesAsync = ref.watch(cageOptionsProvider);
 
     final feed =
-        feedsAsync.valueOrNull?.where((f) => f.id == _feedId).firstOrNull;
+        feedsAsync.value?.where((f) => f.id == _feedId).firstOrNull;
     final isBulk = !_isEditing && _recipientCount > 1;
 
     return AppFormScaffold(
@@ -425,7 +425,7 @@ class _CagesField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cages = cagesAsync.valueOrNull ?? const <CageModel>[];
+    final cages = cagesAsync.value ?? const <CageModel>[];
 
     return FormField<bool>(
       initialValue: selected.isNotEmpty,
@@ -679,7 +679,7 @@ class _CageField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cages = cagesAsync.valueOrNull ?? const <CageModel>[];
+    final cages = cagesAsync.value ?? const <CageModel>[];
 
     return DropdownButtonFormField<int>(
       initialValue: selected,
@@ -726,7 +726,7 @@ class _FeedField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final feeds = feedsAsync.valueOrNull ?? const <Feed>[];
+    final feeds = feedsAsync.value ?? const <Feed>[];
 
     return DropdownButtonFormField<int>(
       initialValue: selected,

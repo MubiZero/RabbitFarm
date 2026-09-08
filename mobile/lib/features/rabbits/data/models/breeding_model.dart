@@ -9,7 +9,7 @@ part 'breeding_model.freezed.dart';
 /// Содержит информацию о планируемой или завершенной случке,
 /// включая родителей, даты и статус беременности
 @freezed
-class BreedingModel with _$BreedingModel {
+abstract class BreedingModel with _$BreedingModel {
   const factory BreedingModel({
     required int id,
     @JsonKey(name: 'male_id') required int maleId,

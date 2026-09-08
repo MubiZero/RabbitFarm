@@ -4,7 +4,7 @@ part 'api_response.freezed.dart';
 part 'api_response.g.dart';
 
 @Freezed(genericArgumentFactories: true)
-class ApiResponse<T> with _$ApiResponse<T> {
+abstract class ApiResponse<T> with _$ApiResponse<T> {
   const factory ApiResponse({
     required bool success,
     required String message,
@@ -20,7 +20,7 @@ class ApiResponse<T> with _$ApiResponse<T> {
 }
 
 @Freezed(genericArgumentFactories: true)
-class PaginatedResponse<T> with _$PaginatedResponse<T> {
+abstract class PaginatedResponse<T> with _$PaginatedResponse<T> {
   const factory PaginatedResponse({
     required List<T> items,
     required int total,

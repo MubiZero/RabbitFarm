@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/task_model.dart';
@@ -294,7 +295,7 @@ class TaskActions {
 /// Живёт отдельно от постраничного [tasksListProvider]: тот принадлежит экрану
 /// со своими фильтрами, и перезагружать его ради одной галочки на «Сегодня»
 /// означало бы сбрасывать то, что человек там настроил.
-class TodayTasksNotifier extends AutoDisposeAsyncNotifier<List<Task>> {
+class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
   /// Столько строк помещается на «Сегодня», не оттесняя сводку по ферме за
   /// нижний край. Остальное — по ссылке «Все задачи».
   static const _limit = 5;
@@ -334,7 +335,7 @@ class TodayTasksNotifier extends AutoDisposeAsyncNotifier<List<Task>> {
   /// возвращает в прежний вид только эту строку — соседние отметки, сделанные
   /// пока шёл запрос, откатывать нельзя.
   Future<void> complete(int id) async {
-    final before = state.valueOrNull;
+    final before = state.value;
     if (before == null) return;
 
     final index = before.indexWhere((task) => task.id == id);
@@ -353,7 +354,7 @@ class TodayTasksNotifier extends AutoDisposeAsyncNotifier<List<Task>> {
       await ref.read(tasksRepositoryProvider).completeTask(id);
     } catch (_) {
       if (!_disposed) {
-        state = AsyncData(_replace(state.valueOrNull ?? before, original));
+        state = AsyncData(_replace(state.value ?? before, original));
       }
       rethrow;
     }

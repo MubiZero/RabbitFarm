@@ -48,7 +48,7 @@ extension VaccineTypeExtension on VaccineType {
 }
 
 @freezed
-class Vaccination with _$Vaccination {
+abstract class Vaccination with _$Vaccination {
   const factory Vaccination({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
@@ -119,7 +119,7 @@ class VaccinationRequest {
 
 /// Vaccination statistics model
 @freezed
-class VaccinationStatistics with _$VaccinationStatistics {
+abstract class VaccinationStatistics with _$VaccinationStatistics {
   const factory VaccinationStatistics({
     @JsonKey(name: 'total_vaccinations') required int totalVaccinations,
     @JsonKey(name: 'by_vaccine_type') required Map<String, int> byVaccineType,
@@ -133,7 +133,7 @@ class VaccinationStatistics with _$VaccinationStatistics {
 }
 
 @freezed
-class VaccinationUpcoming with _$VaccinationUpcoming {
+abstract class VaccinationUpcoming with _$VaccinationUpcoming {
   const factory VaccinationUpcoming({
     required int total,
     @JsonKey(name: 'next_30_days') required int next30Days,
@@ -146,7 +146,7 @@ class VaccinationUpcoming with _$VaccinationUpcoming {
 }
 
 @freezed
-class UpcomingVaccinationItem with _$UpcomingVaccinationItem {
+abstract class UpcomingVaccinationItem with _$UpcomingVaccinationItem {
   const factory UpcomingVaccinationItem({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,

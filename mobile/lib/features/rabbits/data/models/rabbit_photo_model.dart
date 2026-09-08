@@ -10,7 +10,7 @@ part 'rabbit_photo_model.g.dart';
 /// Один снимок в галерее кролика — в отличие от `photoUrl` на самой карточке,
 /// снимков может быть много.
 @freezed
-class RabbitPhoto with _$RabbitPhoto {
+abstract class RabbitPhoto with _$RabbitPhoto {
   const factory RabbitPhoto({
     @IntConverter() required int id,
     required String url,

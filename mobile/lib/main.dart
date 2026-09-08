@@ -12,6 +12,10 @@ import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
 import 'l10n/generated/app_localizations.dart';
 
+/// Тайр-офф для `ProviderScope.retry`: топ-левел функция, а не замыкание,
+/// нужна ради `const ProviderScope`.
+Duration? _noRetry(int retryCount, Object error) => null;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -39,6 +43,13 @@ void main() async {
 
   runApp(
     const ProviderScope(
+      // Riverpod 3.x по умолчанию сам молча ретраит упавший провайдер (до 10
+      // раз с растущей паузой) — пока идёт ретрай, `AsyncValue` держит и
+      // ошибку, и признак загрузки одновременно, и `.when()` в этом окне
+      // отдаёт `loading`, а не `error`. У приложения уже есть свой ответ на
+      // сбой сети — явная кнопка «Повторить» на каждом экране, — и тихий
+      // повтор поверх нёс бы только задержку показа настоящей ошибки.
+      retry: _noRetry,
       child: MyApp(),
     ),
   );

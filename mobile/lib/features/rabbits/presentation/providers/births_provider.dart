@@ -28,12 +28,15 @@ class BirthsState {
   }
 }
 
-/// StateNotifier для управления окролами
-class BirthsNotifier extends StateNotifier<BirthsState> {
-  final BirthsRepository _repository;
+/// Notifier для управления окролами
+class BirthsNotifier extends Notifier<BirthsState> {
+  late final BirthsRepository _repository;
 
-  BirthsNotifier(this._repository) : super(BirthsState()) {
+  @override
+  BirthsState build() {
+    _repository = ref.watch(birthsRepositoryProvider);
     loadBirths();
+    return BirthsState();
   }
 
   /// Загрузить список окролов
@@ -131,11 +134,8 @@ class BirthsNotifier extends StateNotifier<BirthsState> {
   }
 }
 
-/// Provider для StateNotifier окролов
-final birthsProvider = StateNotifierProvider<BirthsNotifier, BirthsState>((ref) {
-  final repository = ref.watch(birthsRepositoryProvider);
-  return BirthsNotifier(repository);
-});
+/// Provider для окролов
+final birthsProvider = NotifierProvider<BirthsNotifier, BirthsState>(BirthsNotifier.new);
 
 /// Provider для окролов конкретной самки
 final birthsByMotherProvider = FutureProvider.family<List<BirthModel>, int>((ref, motherId) async {

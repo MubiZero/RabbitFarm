@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../data/models/vaccination_model.dart';
 import '../../data/repositories/vaccinations_repository.dart';
 

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../../core/notifications/fcm_service.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';

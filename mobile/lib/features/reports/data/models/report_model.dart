@@ -7,7 +7,7 @@ part 'report_model.g.dart';
 
 /// Dashboard Report Model
 @freezed
-class DashboardReport with _$DashboardReport {
+abstract class DashboardReport with _$DashboardReport {
   const factory DashboardReport({
     required RabbitStats rabbits,
     required CageStats cages,
@@ -30,7 +30,7 @@ class DashboardReport with _$DashboardReport {
 
 /// Потребление фермы против пределов тарифа: кролики и участники.
 @freezed
-class PlanUsage with _$PlanUsage {
+abstract class PlanUsage with _$PlanUsage {
   const factory PlanUsage({
     required ResourceUsage rabbits,
     required ResourceUsage staff,
@@ -43,7 +43,7 @@ class PlanUsage with _$PlanUsage {
 /// Потребление одного ресурса тарифа. `limit: null` значит «без
 /// ограничения» — та же семантика, что и в `planService` на сервере.
 @freezed
-class ResourceUsage with _$ResourceUsage {
+abstract class ResourceUsage with _$ResourceUsage {
   const factory ResourceUsage({
     @IntConverter() required int used,
     @NullableIntConverter() int? limit,
@@ -54,7 +54,7 @@ class ResourceUsage with _$ResourceUsage {
 }
 
 @freezed
-class RabbitStats with _$RabbitStats {
+abstract class RabbitStats with _$RabbitStats {
   const factory RabbitStats({
     @IntConverter() required int total,
     @IntConverter() required int male,
@@ -67,7 +67,7 @@ class RabbitStats with _$RabbitStats {
 }
 
 @freezed
-class CageStats with _$CageStats {
+abstract class CageStats with _$CageStats {
   const factory CageStats({
     @IntConverter() required int total,
     @IntConverter() required int occupied,
@@ -79,7 +79,7 @@ class CageStats with _$CageStats {
 }
 
 @freezed
-class HealthStats with _$HealthStats {
+abstract class HealthStats with _$HealthStats {
   const factory HealthStats({
     @IntConverter()
     required int upcomingVaccinations,
@@ -92,7 +92,7 @@ class HealthStats with _$HealthStats {
 }
 
 @freezed
-class FinanceStats with _$FinanceStats {
+abstract class FinanceStats with _$FinanceStats {
   const factory FinanceStats({
     @DoubleConverter() required double income30days,
     @DoubleConverter() required double expenses30days,
@@ -104,7 +104,7 @@ class FinanceStats with _$FinanceStats {
 }
 
 @freezed
-class TaskStats with _$TaskStats {
+abstract class TaskStats with _$TaskStats {
   const factory TaskStats({
     @IntConverter() required int pending,
     @IntConverter() required int overdue,
@@ -116,7 +116,7 @@ class TaskStats with _$TaskStats {
 }
 
 @freezed
-class InventoryStats with _$InventoryStats {
+abstract class InventoryStats with _$InventoryStats {
   const factory InventoryStats({
     @IntConverter() required int lowStockFeeds,
   }) = _InventoryStats;
@@ -126,7 +126,7 @@ class InventoryStats with _$InventoryStats {
 }
 
 @freezed
-class BreedingStats with _$BreedingStats {
+abstract class BreedingStats with _$BreedingStats {
   const factory BreedingStats({
     @IntConverter() required int recentBirths,
     @Default([]) List<int> history,
@@ -138,7 +138,7 @@ class BreedingStats with _$BreedingStats {
 
 /// Farm Report Model
 @freezed
-class FarmReport with _$FarmReport {
+abstract class FarmReport with _$FarmReport {
   const factory FarmReport({
     required ReportPeriod period,
     required PopulationData population,
@@ -154,7 +154,7 @@ class FarmReport with _$FarmReport {
 }
 
 @freezed
-class ReportPeriod with _$ReportPeriod {
+abstract class ReportPeriod with _$ReportPeriod {
   const factory ReportPeriod({
     required String from,
     required String to,
@@ -165,7 +165,7 @@ class ReportPeriod with _$ReportPeriod {
 }
 
 @freezed
-class PopulationData with _$PopulationData {
+abstract class PopulationData with _$PopulationData {
   const factory PopulationData({
     @JsonKey(name: 'total_rabbits') @IntConverter() required int totalRabbits,
     @JsonKey(name: 'by_breed') required List<BreedCount> byBreed,
@@ -176,7 +176,7 @@ class PopulationData with _$PopulationData {
 }
 
 @freezed
-class BreedCount with _$BreedCount {
+abstract class BreedCount with _$BreedCount {
   const factory BreedCount({
     @JsonKey(name: 'breed_id') @IntConverter() required int breedId,
     @IntConverter() required int count,
@@ -187,7 +187,7 @@ class BreedCount with _$BreedCount {
 }
 
 @freezed
-class FinancialData with _$FinancialData {
+abstract class FinancialData with _$FinancialData {
   const factory FinancialData({
     required List<dynamic> transactions,
     required FinancialSummary summary,
@@ -198,7 +198,7 @@ class FinancialData with _$FinancialData {
 }
 
 @freezed
-class FinancialSummary with _$FinancialSummary {
+abstract class FinancialSummary with _$FinancialSummary {
   const factory FinancialSummary({
     @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
     @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
@@ -209,7 +209,7 @@ class FinancialSummary with _$FinancialSummary {
 }
 
 @freezed
-class HealthData with _$HealthData {
+abstract class HealthData with _$HealthData {
   const factory HealthData({
     @IntConverter() required int vaccinations,
     @JsonKey(name: 'medical_records') @IntConverter() required int medicalRecords,
@@ -220,7 +220,7 @@ class HealthData with _$HealthData {
 }
 
 @freezed
-class BreedingData with _$BreedingData {
+abstract class BreedingData with _$BreedingData {
   const factory BreedingData({
     @IntConverter() required int breedings,
     @IntConverter() required int births,
@@ -231,7 +231,7 @@ class BreedingData with _$BreedingData {
 }
 
 @freezed
-class FeedingData with _$FeedingData {
+abstract class FeedingData with _$FeedingData {
   const factory FeedingData({
     @JsonKey(name: 'total_feeding_records')
     @IntConverter()
@@ -253,7 +253,7 @@ class FeedingData with _$FeedingData {
 }
 
 @freezed
-class FeedConsumption with _$FeedConsumption {
+abstract class FeedConsumption with _$FeedConsumption {
   const factory FeedConsumption({
     required String unit,
     @DoubleConverter() required double total,
@@ -265,7 +265,7 @@ class FeedConsumption with _$FeedConsumption {
 
 /// Health Report Model
 @freezed
-class HealthReport with _$HealthReport {
+abstract class HealthReport with _$HealthReport {
   const factory HealthReport({
     required VaccinationsData vaccinations,
     @JsonKey(name: 'medical_records') required MedicalRecordsData medicalRecords,
@@ -276,7 +276,7 @@ class HealthReport with _$HealthReport {
 }
 
 @freezed
-class VaccinationsData with _$VaccinationsData {
+abstract class VaccinationsData with _$VaccinationsData {
   const factory VaccinationsData({
     @JsonKey(name: 'by_type') required List<VaccineTypeCount> byType,
     required List<dynamic> upcoming,
@@ -287,7 +287,7 @@ class VaccinationsData with _$VaccinationsData {
 }
 
 @freezed
-class VaccineTypeCount with _$VaccineTypeCount {
+abstract class VaccineTypeCount with _$VaccineTypeCount {
   const factory VaccineTypeCount({
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @IntConverter() required int count,
@@ -298,7 +298,7 @@ class VaccineTypeCount with _$VaccineTypeCount {
 }
 
 @freezed
-class MedicalRecordsData with _$MedicalRecordsData {
+abstract class MedicalRecordsData with _$MedicalRecordsData {
   /// Сервер группирует лечение по исходу, а не по виду записи. Модель ждала
   /// `by_type` с полем `record_type` — таких полей в ответе нет, и отчёт по
   /// здоровью падал при разборе целиком.
@@ -313,7 +313,7 @@ class MedicalRecordsData with _$MedicalRecordsData {
 }
 
 @freezed
-class RecordOutcomeCount with _$RecordOutcomeCount {
+abstract class RecordOutcomeCount with _$RecordOutcomeCount {
   /// Исход может быть не проставлен — в базе поле необязательное, и такие
   /// записи приходят отдельной группой с пустым исходом.
   const factory RecordOutcomeCount({
@@ -327,7 +327,7 @@ class RecordOutcomeCount with _$RecordOutcomeCount {
 
 /// Financial Report Model
 @freezed
-class FinancialReport with _$FinancialReport {
+abstract class FinancialReport with _$FinancialReport {
   const factory FinancialReport({
     required FinancialReportSummary summary,
     @JsonKey(name: 'by_category') required List<CategoryData> byCategory,
@@ -338,7 +338,7 @@ class FinancialReport with _$FinancialReport {
 }
 
 @freezed
-class FinancialReportSummary with _$FinancialReportSummary {
+abstract class FinancialReportSummary with _$FinancialReportSummary {
   const factory FinancialReportSummary({
     @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
     @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
@@ -350,7 +350,7 @@ class FinancialReportSummary with _$FinancialReportSummary {
 }
 
 @freezed
-class CategoryData with _$CategoryData {
+abstract class CategoryData with _$CategoryData {
   const factory CategoryData({
     required String type,
     required String category,

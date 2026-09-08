@@ -11,7 +11,7 @@ part 'user_ref.g.dart';
 /// объекте не разберётся. Лежит в core, а не в фиче: автор нужен и кормлениям,
 /// и задачам, и любой другой записи, у которой есть «кто это сделал».
 @freezed
-class UserRef with _$UserRef {
+abstract class UserRef with _$UserRef {
   const factory UserRef({
     @IntConverter() required int id,
     @JsonKey(name: 'full_name') required String fullName,

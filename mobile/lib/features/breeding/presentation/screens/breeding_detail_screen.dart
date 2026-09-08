@@ -17,7 +17,7 @@ class BreedingDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final breedingAsync = ref.watch(breedingDetailProvider(breedingId));
-    final breeding = breedingAsync.valueOrNull;
+    final breeding = breedingAsync.value;
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 

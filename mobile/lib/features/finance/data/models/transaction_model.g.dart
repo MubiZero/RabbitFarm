@@ -6,28 +6,27 @@ part of 'transaction_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TransactionImpl _$$TransactionImplFromJson(Map<String, dynamic> json) =>
-    _$TransactionImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
-      category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
-      amount: const DoubleConverter().fromJson(json['amount'] as Object),
-      transactionDate: const DateOnlyConverter().fromJson(
-        json['transaction_date'] as Object,
-      ),
-      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-      description: json['description'] as String?,
-      receiptUrl: json['receipt_url'] as String?,
-      createdBy: const NullableIntConverter().fromJson(json['created_by']),
-      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
-      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
-      rabbit: json['rabbit'] == null
-          ? null
-          : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
-    );
+_Transaction _$TransactionFromJson(Map<String, dynamic> json) => _Transaction(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
+  category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
+  amount: const DoubleConverter().fromJson(json['amount'] as Object),
+  transactionDate: const DateOnlyConverter().fromJson(
+    json['transaction_date'] as Object,
+  ),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+  description: json['description'] as String?,
+  receiptUrl: json['receipt_url'] as String?,
+  createdBy: const NullableIntConverter().fromJson(json['created_by']),
+  createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+  updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+  rabbit: json['rabbit'] == null
+      ? null
+      : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$TransactionImplToJson(
-  _$TransactionImpl instance,
+Map<String, dynamic> _$TransactionToJson(
+  _Transaction instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'type': _$TransactionTypeEnumMap[instance.type]!,
@@ -62,86 +61,86 @@ const _$TransactionCategoryEnumMap = {
   TransactionCategory.other: 'other',
 };
 
-_$TransactionCreateImpl _$$TransactionCreateImplFromJson(
-  Map<String, dynamic> json,
-) => _$TransactionCreateImpl(
-  type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
-  category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
-  amount: (json['amount'] as num).toDouble(),
-  transactionDate: const DateOnlyConverter().fromJson(
-    json['transaction_date'] as Object,
-  ),
-  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-  description: json['description'] as String?,
-  receiptUrl: json['receipt_url'] as String?,
-);
+_TransactionCreate _$TransactionCreateFromJson(Map<String, dynamic> json) =>
+    _TransactionCreate(
+      type: $enumDecode(_$TransactionTypeEnumMap, json['type']),
+      category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
+      amount: (json['amount'] as num).toDouble(),
+      transactionDate: const DateOnlyConverter().fromJson(
+        json['transaction_date'] as Object,
+      ),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      description: json['description'] as String?,
+      receiptUrl: json['receipt_url'] as String?,
+    );
 
-Map<String, dynamic> _$$TransactionCreateImplToJson(
-  _$TransactionCreateImpl instance,
-) => <String, dynamic>{
-  'type': _$TransactionTypeEnumMap[instance.type]!,
-  'category': _$TransactionCategoryEnumMap[instance.category]!,
-  'amount': instance.amount,
-  'transaction_date': const DateOnlyConverter().toJson(
-    instance.transactionDate,
-  ),
-  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
-  'description': instance.description,
-  'receipt_url': instance.receiptUrl,
-};
+Map<String, dynamic> _$TransactionCreateToJson(_TransactionCreate instance) =>
+    <String, dynamic>{
+      'type': _$TransactionTypeEnumMap[instance.type]!,
+      'category': _$TransactionCategoryEnumMap[instance.category]!,
+      'amount': instance.amount,
+      'transaction_date': const DateOnlyConverter().toJson(
+        instance.transactionDate,
+      ),
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'description': instance.description,
+      'receipt_url': instance.receiptUrl,
+    };
 
-_$TransactionUpdateImpl _$$TransactionUpdateImplFromJson(
-  Map<String, dynamic> json,
-) => _$TransactionUpdateImpl(
-  type: $enumDecodeNullable(_$TransactionTypeEnumMap, json['type']),
-  category: $enumDecodeNullable(_$TransactionCategoryEnumMap, json['category']),
-  amount: (json['amount'] as num?)?.toDouble(),
-  transactionDate: const NullableDateOnlyConverter().fromJson(
-    json['transaction_date'],
-  ),
-  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-  description: json['description'] as String?,
-  receiptUrl: json['receipt_url'] as String?,
-);
+_TransactionUpdate _$TransactionUpdateFromJson(Map<String, dynamic> json) =>
+    _TransactionUpdate(
+      type: $enumDecodeNullable(_$TransactionTypeEnumMap, json['type']),
+      category: $enumDecodeNullable(
+        _$TransactionCategoryEnumMap,
+        json['category'],
+      ),
+      amount: (json['amount'] as num?)?.toDouble(),
+      transactionDate: const NullableDateOnlyConverter().fromJson(
+        json['transaction_date'],
+      ),
+      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      description: json['description'] as String?,
+      receiptUrl: json['receipt_url'] as String?,
+    );
 
-Map<String, dynamic> _$$TransactionUpdateImplToJson(
-  _$TransactionUpdateImpl instance,
-) => <String, dynamic>{
-  'type': _$TransactionTypeEnumMap[instance.type],
-  'category': _$TransactionCategoryEnumMap[instance.category],
-  'amount': instance.amount,
-  'transaction_date': const NullableDateOnlyConverter().toJson(
-    instance.transactionDate,
-  ),
-  'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
-  'description': instance.description,
-  'receipt_url': instance.receiptUrl,
-};
+Map<String, dynamic> _$TransactionUpdateToJson(_TransactionUpdate instance) =>
+    <String, dynamic>{
+      'type': _$TransactionTypeEnumMap[instance.type],
+      'category': _$TransactionCategoryEnumMap[instance.category],
+      'amount': instance.amount,
+      'transaction_date': const NullableDateOnlyConverter().toJson(
+        instance.transactionDate,
+      ),
+      'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'description': instance.description,
+      'receipt_url': instance.receiptUrl,
+    };
 
-_$FinancialStatisticsImpl _$$FinancialStatisticsImplFromJson(
-  Map<String, dynamic> json,
-) => _$FinancialStatisticsImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
-  totalExpenses: const DoubleConverter().fromJson(
-    json['total_expenses'] as Object,
-  ),
-  netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
-  totalTransactions: const IntConverter().fromJson(
-    json['total_transactions'] as Object,
-  ),
-  incomeByCategory: (json['income_by_category'] as List<dynamic>)
-      .map((e) => CategoryStatistics.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  expensesByCategory: (json['expenses_by_category'] as List<dynamic>)
-      .map((e) => CategoryStatistics.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  recentTransactions: (json['recent_transactions'] as List<dynamic>)
-      .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
-      .toList(),
-);
+_FinancialStatistics _$FinancialStatisticsFromJson(Map<String, dynamic> json) =>
+    _FinancialStatistics(
+      totalIncome: const DoubleConverter().fromJson(
+        json['total_income'] as Object,
+      ),
+      totalExpenses: const DoubleConverter().fromJson(
+        json['total_expenses'] as Object,
+      ),
+      netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
+      totalTransactions: const IntConverter().fromJson(
+        json['total_transactions'] as Object,
+      ),
+      incomeByCategory: (json['income_by_category'] as List<dynamic>)
+          .map((e) => CategoryStatistics.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      expensesByCategory: (json['expenses_by_category'] as List<dynamic>)
+          .map((e) => CategoryStatistics.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      recentTransactions: (json['recent_transactions'] as List<dynamic>)
+          .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
-Map<String, dynamic> _$$FinancialStatisticsImplToJson(
-  _$FinancialStatisticsImpl instance,
+Map<String, dynamic> _$FinancialStatisticsToJson(
+  _FinancialStatistics instance,
 ) => <String, dynamic>{
   'total_income': const DoubleConverter().toJson(instance.totalIncome),
   'total_expenses': const DoubleConverter().toJson(instance.totalExpenses),
@@ -152,24 +151,22 @@ Map<String, dynamic> _$$FinancialStatisticsImplToJson(
   'recent_transactions': instance.recentTransactions,
 };
 
-_$CategoryStatisticsImpl _$$CategoryStatisticsImplFromJson(
-  Map<String, dynamic> json,
-) => _$CategoryStatisticsImpl(
-  category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
-  total: const DoubleConverter().fromJson(json['total'] as Object),
-  count: const IntConverter().fromJson(json['count'] as Object),
-);
+_CategoryStatistics _$CategoryStatisticsFromJson(Map<String, dynamic> json) =>
+    _CategoryStatistics(
+      category: $enumDecode(_$TransactionCategoryEnumMap, json['category']),
+      total: const DoubleConverter().fromJson(json['total'] as Object),
+      count: const IntConverter().fromJson(json['count'] as Object),
+    );
 
-Map<String, dynamic> _$$CategoryStatisticsImplToJson(
-  _$CategoryStatisticsImpl instance,
-) => <String, dynamic>{
-  'category': _$TransactionCategoryEnumMap[instance.category]!,
-  'total': const DoubleConverter().toJson(instance.total),
-  'count': const IntConverter().toJson(instance.count),
-};
+Map<String, dynamic> _$CategoryStatisticsToJson(_CategoryStatistics instance) =>
+    <String, dynamic>{
+      'category': _$TransactionCategoryEnumMap[instance.category]!,
+      'total': const DoubleConverter().toJson(instance.total),
+      'count': const IntConverter().toJson(instance.count),
+    };
 
-_$MonthlyReportImpl _$$MonthlyReportImplFromJson(Map<String, dynamic> json) =>
-    _$MonthlyReportImpl(
+_MonthlyReport _$MonthlyReportFromJson(Map<String, dynamic> json) =>
+    _MonthlyReport(
       period: ReportPeriod.fromJson(json['period'] as Map<String, dynamic>),
       summary: ReportSummary.fromJson(json['summary'] as Map<String, dynamic>),
       transactions: (json['transactions'] as List<dynamic>)
@@ -177,15 +174,15 @@ _$MonthlyReportImpl _$$MonthlyReportImplFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$$MonthlyReportImplToJson(_$MonthlyReportImpl instance) =>
+Map<String, dynamic> _$MonthlyReportToJson(_MonthlyReport instance) =>
     <String, dynamic>{
       'period': instance.period,
       'summary': instance.summary,
       'transactions': instance.transactions,
     };
 
-_$ReportPeriodImpl _$$ReportPeriodImplFromJson(Map<String, dynamic> json) =>
-    _$ReportPeriodImpl(
+_ReportPeriod _$ReportPeriodFromJson(Map<String, dynamic> json) =>
+    _ReportPeriod(
       year: const IntConverter().fromJson(json['year'] as Object),
       month: const IntConverter().fromJson(json['month'] as Object),
       startDate: const DateOnlyConverter().fromJson(
@@ -194,7 +191,7 @@ _$ReportPeriodImpl _$$ReportPeriodImplFromJson(Map<String, dynamic> json) =>
       endDate: const DateOnlyConverter().fromJson(json['end_date'] as Object),
     );
 
-Map<String, dynamic> _$$ReportPeriodImplToJson(_$ReportPeriodImpl instance) =>
+Map<String, dynamic> _$ReportPeriodToJson(_ReportPeriod instance) =>
     <String, dynamic>{
       'year': const IntConverter().toJson(instance.year),
       'month': const IntConverter().toJson(instance.month),
@@ -202,8 +199,8 @@ Map<String, dynamic> _$$ReportPeriodImplToJson(_$ReportPeriodImpl instance) =>
       'end_date': const DateOnlyConverter().toJson(instance.endDate),
     };
 
-_$ReportSummaryImpl _$$ReportSummaryImplFromJson(Map<String, dynamic> json) =>
-    _$ReportSummaryImpl(
+_ReportSummary _$ReportSummaryFromJson(Map<String, dynamic> json) =>
+    _ReportSummary(
       totalIncome: const DoubleConverter().fromJson(
         json['total_income'] as Object,
       ),
@@ -216,8 +213,8 @@ _$ReportSummaryImpl _$$ReportSummaryImplFromJson(Map<String, dynamic> json) =>
       ),
     );
 
-Map<String, dynamic> _$$ReportSummaryImplToJson(
-  _$ReportSummaryImpl instance,
+Map<String, dynamic> _$ReportSummaryToJson(
+  _ReportSummary instance,
 ) => <String, dynamic>{
   'total_income': const DoubleConverter().toJson(instance.totalIncome),
   'total_expenses': const DoubleConverter().toJson(instance.totalExpenses),
@@ -225,36 +222,36 @@ Map<String, dynamic> _$$ReportSummaryImplToJson(
   'transaction_count': const IntConverter().toJson(instance.transactionCount),
 };
 
-_$RabbitTransactionsSummaryImpl _$$RabbitTransactionsSummaryImplFromJson(
+_RabbitTransactionsSummary _$RabbitTransactionsSummaryFromJson(
   Map<String, dynamic> json,
-) => _$RabbitTransactionsSummaryImpl(
+) => _RabbitTransactionsSummary(
   transactions: (json['transactions'] as List<dynamic>)
       .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
       .toList(),
   summary: TransactionSummary.fromJson(json['summary'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$$RabbitTransactionsSummaryImplToJson(
-  _$RabbitTransactionsSummaryImpl instance,
+Map<String, dynamic> _$RabbitTransactionsSummaryToJson(
+  _RabbitTransactionsSummary instance,
 ) => <String, dynamic>{
   'transactions': instance.transactions,
   'summary': instance.summary,
 };
 
-_$TransactionSummaryImpl _$$TransactionSummaryImplFromJson(
-  Map<String, dynamic> json,
-) => _$TransactionSummaryImpl(
-  totalIncome: const DoubleConverter().fromJson(json['total_income'] as Object),
-  totalExpenses: const DoubleConverter().fromJson(
-    json['total_expenses'] as Object,
-  ),
-  netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
-);
+_TransactionSummary _$TransactionSummaryFromJson(Map<String, dynamic> json) =>
+    _TransactionSummary(
+      totalIncome: const DoubleConverter().fromJson(
+        json['total_income'] as Object,
+      ),
+      totalExpenses: const DoubleConverter().fromJson(
+        json['total_expenses'] as Object,
+      ),
+      netProfit: const DoubleConverter().fromJson(json['net_profit'] as Object),
+    );
 
-Map<String, dynamic> _$$TransactionSummaryImplToJson(
-  _$TransactionSummaryImpl instance,
-) => <String, dynamic>{
-  'total_income': const DoubleConverter().toJson(instance.totalIncome),
-  'total_expenses': const DoubleConverter().toJson(instance.totalExpenses),
-  'net_profit': const DoubleConverter().toJson(instance.netProfit),
-};
+Map<String, dynamic> _$TransactionSummaryToJson(_TransactionSummary instance) =>
+    <String, dynamic>{
+      'total_income': const DoubleConverter().toJson(instance.totalIncome),
+      'total_expenses': const DoubleConverter().toJson(instance.totalExpenses),
+      'net_profit': const DoubleConverter().toJson(instance.netProfit),
+    };

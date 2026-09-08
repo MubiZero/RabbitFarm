@@ -280,7 +280,7 @@ class _TodayTasks extends ConsumerWidget {
     // задач не должна съедать сводку по ферме, которая грузится отдельно.
     // Уже показанные строки при обновлении остаются на месте — иначе каждая
     // отметка галочкой сменялась бы миганием заглушек.
-    final loaded = tasks.valueOrNull;
+    final loaded = tasks.value;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

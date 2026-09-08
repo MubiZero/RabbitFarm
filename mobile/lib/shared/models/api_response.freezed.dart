@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'api_response.dart';
@@ -9,531 +9,582 @@ part of 'api_response.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-ApiResponse<T> _$ApiResponseFromJson<T>(
-  Map<String, dynamic> json,
-  T Function(Object?) fromJsonT,
-) {
-  return _ApiResponse<T>.fromJson(json, fromJsonT);
-}
 
 /// @nodoc
 mixin _$ApiResponse<T> {
-  bool get success => throw _privateConstructorUsedError;
-  String get message => throw _privateConstructorUsedError;
-  T? get data => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get errors => throw _privateConstructorUsedError;
+
+ bool get success; String get message; T? get data; Map<String, dynamic>? get errors;
+/// Create a copy of ApiResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ApiResponseCopyWith<T, ApiResponse<T>> get copyWith => _$ApiResponseCopyWithImpl<T, ApiResponse<T>>(this as ApiResponse<T>, _$identity);
 
   /// Serializes this ApiResponse to a JSON map.
-  Map<String, dynamic> toJson(Object? Function(T) toJsonT) =>
-      throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson(Object? Function(T) toJsonT);
 
-  /// Create a copy of ApiResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ApiResponseCopyWith<T, ApiResponse<T>> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ApiResponse<T>;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiResponse<T>&&(identical(other.success, _this.success) || other.success == _this.success)&&(identical(other.message, _this.message) || other.message == _this.message)&&const DeepCollectionEquality().equals(other.data, _this.data)&&const DeepCollectionEquality().equals(other.errors, _this.errors));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ApiResponse<T>;
+  return Object.hash(runtimeType,_this.success,_this.message,const DeepCollectionEquality().hash(_this.data),const DeepCollectionEquality().hash(_this.errors));
+}
+
+@override
+String toString() {
+  final _this = this as ApiResponse<T>;
+  return 'ApiResponse<$T>(success: ${_this.success}, message: ${_this.message}, data: ${_this.data}, errors: ${_this.errors})';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ApiResponseCopyWith<T, $Res> {
-  factory $ApiResponseCopyWith(
-    ApiResponse<T> value,
-    $Res Function(ApiResponse<T>) then,
-  ) = _$ApiResponseCopyWithImpl<T, $Res, ApiResponse<T>>;
-  @useResult
-  $Res call({
-    bool success,
-    String message,
-    T? data,
-    Map<String, dynamic>? errors,
-  });
-}
+abstract mixin class $ApiResponseCopyWith<T,$Res>  {
+  factory $ApiResponseCopyWith(ApiResponse<T> value, $Res Function(ApiResponse<T>) _then) = _$ApiResponseCopyWithImpl;
+@useResult
+$Res call({
+ bool success, String message, T? data, Map<String, dynamic>? errors
+});
 
+
+
+
+}
 /// @nodoc
-class _$ApiResponseCopyWithImpl<T, $Res, $Val extends ApiResponse<T>>
+class _$ApiResponseCopyWithImpl<T,$Res>
     implements $ApiResponseCopyWith<T, $Res> {
-  _$ApiResponseCopyWithImpl(this._value, this._then);
+  _$ApiResponseCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ApiResponse<T> _self;
+  final $Res Function(ApiResponse<T>) _then;
 
-  /// Create a copy of ApiResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? success = null,
-    Object? message = null,
-    Object? data = freezed,
-    Object? errors = freezed,
-  }) {
-    return _then(
-      _value.copyWith(
-            success: null == success
-                ? _value.success
-                : success // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            message: null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                      as String,
-            data: freezed == data
-                ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
-                      as T?,
-            errors: freezed == errors
-                ? _value.errors
-                : errors // ignore: cast_nullable_to_non_nullable
-                      as Map<String, dynamic>?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of ApiResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? message = null,Object? data = freezed,Object? errors = freezed,}) {
+  return _then(ApiResponse(
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as T?,errors: freezed == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$ApiResponseImplCopyWith<T, $Res>
-    implements $ApiResponseCopyWith<T, $Res> {
-  factory _$$ApiResponseImplCopyWith(
-    _$ApiResponseImpl<T> value,
-    $Res Function(_$ApiResponseImpl<T>) then,
-  ) = __$$ApiResponseImplCopyWithImpl<T, $Res>;
-  @override
-  @useResult
-  $Res call({
-    bool success,
-    String message,
-    T? data,
-    Map<String, dynamic>? errors,
-  });
 }
 
-/// @nodoc
-class __$$ApiResponseImplCopyWithImpl<T, $Res>
-    extends _$ApiResponseCopyWithImpl<T, $Res, _$ApiResponseImpl<T>>
-    implements _$$ApiResponseImplCopyWith<T, $Res> {
-  __$$ApiResponseImplCopyWithImpl(
-    _$ApiResponseImpl<T> _value,
-    $Res Function(_$ApiResponseImpl<T>) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of ApiResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? success = null,
-    Object? message = null,
-    Object? data = freezed,
-    Object? errors = freezed,
-  }) {
-    return _then(
-      _$ApiResponseImpl<T>(
-        success: null == success
-            ? _value.success
-            : success // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        message: null == message
-            ? _value.message
-            : message // ignore: cast_nullable_to_non_nullable
-                  as String,
-        data: freezed == data
-            ? _value.data
-            : data // ignore: cast_nullable_to_non_nullable
-                  as T?,
-        errors: freezed == errors
-            ? _value._errors
-            : errors // ignore: cast_nullable_to_non_nullable
-                  as Map<String, dynamic>?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [ApiResponse].
+extension ApiResponsePatterns<T> on ApiResponse<T> {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ApiResponse<T> value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ApiResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ApiResponse<T> value)  $default,){
+final _that = this;
+switch (_that) {
+case _ApiResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ApiResponse<T> value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ApiResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success,  String message,  T? data,  Map<String, dynamic>? errors)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ApiResponse() when $default != null:
+return $default(_that.success,_that.message,_that.data,_that.errors);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success,  String message,  T? data,  Map<String, dynamic>? errors)  $default,) {final _that = this;
+switch (_that) {
+case _ApiResponse():
+return $default(_that.success,_that.message,_that.data,_that.errors);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success,  String message,  T? data,  Map<String, dynamic>? errors)?  $default,) {final _that = this;
+switch (_that) {
+case _ApiResponse() when $default != null:
+return $default(_that.success,_that.message,_that.data,_that.errors);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable(genericArgumentFactories: true)
-class _$ApiResponseImpl<T> implements _ApiResponse<T> {
-  const _$ApiResponseImpl({
-    required this.success,
-    required this.message,
-    this.data,
-    final Map<String, dynamic>? errors,
-  }) : _errors = errors;
 
-  factory _$ApiResponseImpl.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
-  ) => _$$ApiResponseImplFromJson(json, fromJsonT);
+class _ApiResponse<T> implements ApiResponse<T> {
+  const _ApiResponse({required this.success, required this.message, this.data,  Map<String, dynamic>? errors}): _errors = errors;
+  factory _ApiResponse.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$ApiResponseFromJson(json,fromJsonT);
 
-  @override
-  final bool success;
-  @override
-  final String message;
-  @override
-  final T? data;
-  final Map<String, dynamic>? _errors;
-  @override
-  Map<String, dynamic>? get errors {
-    final value = _errors;
-    if (value == null) return null;
-    if (_errors is EqualUnmodifiableMapView) return _errors;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
+@override final  bool success;
+@override final  String message;
+@override final  T? data;
+ final  Map<String, dynamic>? _errors;
+@override Map<String, dynamic>? get errors {
+  final value = _errors;
+  if (value == null) return null;
+  if (_errors is EqualUnmodifiableMapView) return _errors;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
 
-  @override
-  String toString() {
+
+/// Create a copy of ApiResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ApiResponseCopyWith<T, _ApiResponse<T>> get copyWith => __$ApiResponseCopyWithImpl<T, _ApiResponse<T>>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
+  return _$ApiResponseToJson<T>(this, toJsonT);
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiResponse<T>&&(identical(other.success, success) || other.success == success)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.data, data)&&const DeepCollectionEquality().equals(other.errors, _errors));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,success,message,const DeepCollectionEquality().hash(data),const DeepCollectionEquality().hash(_errors));
+}
+
+@override
+String toString() {
     return 'ApiResponse<$T>(success: $success, message: $message, data: $data, errors: $errors)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ApiResponseImpl<T> &&
-            (identical(other.success, success) || other.success == success) &&
-            (identical(other.message, message) || other.message == message) &&
-            const DeepCollectionEquality().equals(other.data, data) &&
-            const DeepCollectionEquality().equals(other._errors, _errors));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    success,
-    message,
-    const DeepCollectionEquality().hash(data),
-    const DeepCollectionEquality().hash(_errors),
-  );
-
-  /// Create a copy of ApiResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ApiResponseImplCopyWith<T, _$ApiResponseImpl<T>> get copyWith =>
-      __$$ApiResponseImplCopyWithImpl<T, _$ApiResponseImpl<T>>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
-    return _$$ApiResponseImplToJson<T>(this, toJsonT);
-  }
 }
 
-abstract class _ApiResponse<T> implements ApiResponse<T> {
-  const factory _ApiResponse({
-    required final bool success,
-    required final String message,
-    final T? data,
-    final Map<String, dynamic>? errors,
-  }) = _$ApiResponseImpl<T>;
 
-  factory _ApiResponse.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
-  ) = _$ApiResponseImpl<T>.fromJson;
-
-  @override
-  bool get success;
-  @override
-  String get message;
-  @override
-  T? get data;
-  @override
-  Map<String, dynamic>? get errors;
-
-  /// Create a copy of ApiResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ApiResponseImplCopyWith<T, _$ApiResponseImpl<T>> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
-PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
-  Map<String, dynamic> json,
-  T Function(Object?) fromJsonT,
-) {
-  return _PaginatedResponse<T>.fromJson(json, fromJsonT);
+/// @nodoc
+abstract mixin class _$ApiResponseCopyWith<T,$Res> implements $ApiResponseCopyWith<T, $Res> {
+  factory _$ApiResponseCopyWith(_ApiResponse<T> value, $Res Function(_ApiResponse<T>) _then) = __$ApiResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ bool success, String message, T? data, Map<String, dynamic>? errors
+});
+
+
+
+
 }
+/// @nodoc
+class __$ApiResponseCopyWithImpl<T,$Res>
+    implements _$ApiResponseCopyWith<T, $Res> {
+  __$ApiResponseCopyWithImpl(this._self, this._then);
+
+  final _ApiResponse<T> _self;
+  final $Res Function(_ApiResponse<T>) _then;
+
+/// Create a copy of ApiResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? message = null,Object? data = freezed,Object? errors = freezed,}) {
+  return _then(_ApiResponse<T>(
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as T?,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$PaginatedResponse<T> {
-  List<T> get items => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
-  int get page => throw _privateConstructorUsedError;
-  int get limit => throw _privateConstructorUsedError;
-  @JsonKey(name: 'total_pages')
-  int get totalPages => throw _privateConstructorUsedError;
+
+ List<T> get items; int get total; int get page; int get limit;@JsonKey(name: 'total_pages') int get totalPages;
+/// Create a copy of PaginatedResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaginatedResponseCopyWith<T, PaginatedResponse<T>> get copyWith => _$PaginatedResponseCopyWithImpl<T, PaginatedResponse<T>>(this as PaginatedResponse<T>, _$identity);
 
   /// Serializes this PaginatedResponse to a JSON map.
-  Map<String, dynamic> toJson(Object? Function(T) toJsonT) =>
-      throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson(Object? Function(T) toJsonT);
 
-  /// Create a copy of PaginatedResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $PaginatedResponseCopyWith<T, PaginatedResponse<T>> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PaginatedResponse<T>;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaginatedResponse<T>&&const DeepCollectionEquality().equals(other.items, _this.items)&&(identical(other.total, _this.total) || other.total == _this.total)&&(identical(other.page, _this.page) || other.page == _this.page)&&(identical(other.limit, _this.limit) || other.limit == _this.limit)&&(identical(other.totalPages, _this.totalPages) || other.totalPages == _this.totalPages));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PaginatedResponse<T>;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.items),_this.total,_this.page,_this.limit,_this.totalPages);
+}
+
+@override
+String toString() {
+  final _this = this as PaginatedResponse<T>;
+  return 'PaginatedResponse<$T>(items: ${_this.items}, total: ${_this.total}, page: ${_this.page}, limit: ${_this.limit}, totalPages: ${_this.totalPages})';
+}
+
+
 }
 
 /// @nodoc
-abstract class $PaginatedResponseCopyWith<T, $Res> {
-  factory $PaginatedResponseCopyWith(
-    PaginatedResponse<T> value,
-    $Res Function(PaginatedResponse<T>) then,
-  ) = _$PaginatedResponseCopyWithImpl<T, $Res, PaginatedResponse<T>>;
-  @useResult
-  $Res call({
-    List<T> items,
-    int total,
-    int page,
-    int limit,
-    @JsonKey(name: 'total_pages') int totalPages,
-  });
-}
+abstract mixin class $PaginatedResponseCopyWith<T,$Res>  {
+  factory $PaginatedResponseCopyWith(PaginatedResponse<T> value, $Res Function(PaginatedResponse<T>) _then) = _$PaginatedResponseCopyWithImpl;
+@useResult
+$Res call({
+ List<T> items, int total, int page, int limit,@JsonKey(name: 'total_pages') int totalPages
+});
 
+
+
+
+}
 /// @nodoc
-class _$PaginatedResponseCopyWithImpl<
-  T,
-  $Res,
-  $Val extends PaginatedResponse<T>
->
+class _$PaginatedResponseCopyWithImpl<T,$Res>
     implements $PaginatedResponseCopyWith<T, $Res> {
-  _$PaginatedResponseCopyWithImpl(this._value, this._then);
+  _$PaginatedResponseCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final PaginatedResponse<T> _self;
+  final $Res Function(PaginatedResponse<T>) _then;
 
-  /// Create a copy of PaginatedResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-    Object? total = null,
-    Object? page = null,
-    Object? limit = null,
-    Object? totalPages = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            items: null == items
-                ? _value.items
-                : items // ignore: cast_nullable_to_non_nullable
-                      as List<T>,
-            total: null == total
-                ? _value.total
-                : total // ignore: cast_nullable_to_non_nullable
-                      as int,
-            page: null == page
-                ? _value.page
-                : page // ignore: cast_nullable_to_non_nullable
-                      as int,
-            limit: null == limit
-                ? _value.limit
-                : limit // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalPages: null == totalPages
-                ? _value.totalPages
-                : totalPages // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of PaginatedResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? total = null,Object? page = null,Object? limit = null,Object? totalPages = null,}) {
+  return _then(PaginatedResponse(
+items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as List<T>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,limit: null == limit ? _self.limit : limit // ignore: cast_nullable_to_non_nullable
+as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$PaginatedResponseImplCopyWith<T, $Res>
-    implements $PaginatedResponseCopyWith<T, $Res> {
-  factory _$$PaginatedResponseImplCopyWith(
-    _$PaginatedResponseImpl<T> value,
-    $Res Function(_$PaginatedResponseImpl<T>) then,
-  ) = __$$PaginatedResponseImplCopyWithImpl<T, $Res>;
-  @override
-  @useResult
-  $Res call({
-    List<T> items,
-    int total,
-    int page,
-    int limit,
-    @JsonKey(name: 'total_pages') int totalPages,
-  });
 }
 
-/// @nodoc
-class __$$PaginatedResponseImplCopyWithImpl<T, $Res>
-    extends _$PaginatedResponseCopyWithImpl<T, $Res, _$PaginatedResponseImpl<T>>
-    implements _$$PaginatedResponseImplCopyWith<T, $Res> {
-  __$$PaginatedResponseImplCopyWithImpl(
-    _$PaginatedResponseImpl<T> _value,
-    $Res Function(_$PaginatedResponseImpl<T>) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of PaginatedResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-    Object? total = null,
-    Object? page = null,
-    Object? limit = null,
-    Object? totalPages = null,
-  }) {
-    return _then(
-      _$PaginatedResponseImpl<T>(
-        items: null == items
-            ? _value._items
-            : items // ignore: cast_nullable_to_non_nullable
-                  as List<T>,
-        total: null == total
-            ? _value.total
-            : total // ignore: cast_nullable_to_non_nullable
-                  as int,
-        page: null == page
-            ? _value.page
-            : page // ignore: cast_nullable_to_non_nullable
-                  as int,
-        limit: null == limit
-            ? _value.limit
-            : limit // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalPages: null == totalPages
-            ? _value.totalPages
-            : totalPages // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [PaginatedResponse].
+extension PaginatedResponsePatterns<T> on PaginatedResponse<T> {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PaginatedResponse<T> value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PaginatedResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PaginatedResponse<T> value)  $default,){
+final _that = this;
+switch (_that) {
+case _PaginatedResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PaginatedResponse<T> value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PaginatedResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<T> items,  int total,  int page,  int limit, @JsonKey(name: 'total_pages')  int totalPages)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PaginatedResponse() when $default != null:
+return $default(_that.items,_that.total,_that.page,_that.limit,_that.totalPages);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<T> items,  int total,  int page,  int limit, @JsonKey(name: 'total_pages')  int totalPages)  $default,) {final _that = this;
+switch (_that) {
+case _PaginatedResponse():
+return $default(_that.items,_that.total,_that.page,_that.limit,_that.totalPages);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<T> items,  int total,  int page,  int limit, @JsonKey(name: 'total_pages')  int totalPages)?  $default,) {final _that = this;
+switch (_that) {
+case _PaginatedResponse() when $default != null:
+return $default(_that.items,_that.total,_that.page,_that.limit,_that.totalPages);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable(genericArgumentFactories: true)
-class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
-  const _$PaginatedResponseImpl({
-    required final List<T> items,
-    required this.total,
-    required this.page,
-    required this.limit,
-    @JsonKey(name: 'total_pages') required this.totalPages,
-  }) : _items = items;
 
-  factory _$PaginatedResponseImpl.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
-  ) => _$$PaginatedResponseImplFromJson(json, fromJsonT);
+class _PaginatedResponse<T> implements PaginatedResponse<T> {
+  const _PaginatedResponse({required  List<T> items, required this.total, required this.page, required this.limit, @JsonKey(name: 'total_pages') required this.totalPages}): _items = items;
+  factory _PaginatedResponse.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$PaginatedResponseFromJson(json,fromJsonT);
 
-  final List<T> _items;
-  @override
-  List<T> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
+ final  List<T> _items;
+@override List<T> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
 
-  @override
-  final int total;
-  @override
-  final int page;
-  @override
-  final int limit;
-  @override
-  @JsonKey(name: 'total_pages')
-  final int totalPages;
+@override final  int total;
+@override final  int page;
+@override final  int limit;
+@override@JsonKey(name: 'total_pages') final  int totalPages;
 
-  @override
-  String toString() {
+/// Create a copy of PaginatedResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaginatedResponseCopyWith<T, _PaginatedResponse<T>> get copyWith => __$PaginatedResponseCopyWithImpl<T, _PaginatedResponse<T>>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
+  return _$PaginatedResponseToJson<T>(this, toJsonT);
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaginatedResponse<T>&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.total, total) || other.total == total)&&(identical(other.page, page) || other.page == page)&&(identical(other.limit, limit) || other.limit == limit)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),total,page,limit,totalPages);
+}
+
+@override
+String toString() {
     return 'PaginatedResponse<$T>(items: $items, total: $total, page: $page, limit: $limit, totalPages: $totalPages)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$PaginatedResponseImpl<T> &&
-            const DeepCollectionEquality().equals(other._items, _items) &&
-            (identical(other.total, total) || other.total == total) &&
-            (identical(other.page, page) || other.page == page) &&
-            (identical(other.limit, limit) || other.limit == limit) &&
-            (identical(other.totalPages, totalPages) ||
-                other.totalPages == totalPages));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_items),
-    total,
-    page,
-    limit,
-    totalPages,
-  );
-
-  /// Create a copy of PaginatedResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$PaginatedResponseImplCopyWith<T, _$PaginatedResponseImpl<T>>
-  get copyWith =>
-      __$$PaginatedResponseImplCopyWithImpl<T, _$PaginatedResponseImpl<T>>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
-    return _$$PaginatedResponseImplToJson<T>(this, toJsonT);
-  }
 }
 
-abstract class _PaginatedResponse<T> implements PaginatedResponse<T> {
-  const factory _PaginatedResponse({
-    required final List<T> items,
-    required final int total,
-    required final int page,
-    required final int limit,
-    @JsonKey(name: 'total_pages') required final int totalPages,
-  }) = _$PaginatedResponseImpl<T>;
 
-  factory _PaginatedResponse.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
-  ) = _$PaginatedResponseImpl<T>.fromJson;
-
-  @override
-  List<T> get items;
-  @override
-  int get total;
-  @override
-  int get page;
-  @override
-  int get limit;
-  @override
-  @JsonKey(name: 'total_pages')
-  int get totalPages;
-
-  /// Create a copy of PaginatedResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PaginatedResponseImplCopyWith<T, _$PaginatedResponseImpl<T>>
-  get copyWith => throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+abstract mixin class _$PaginatedResponseCopyWith<T,$Res> implements $PaginatedResponseCopyWith<T, $Res> {
+  factory _$PaginatedResponseCopyWith(_PaginatedResponse<T> value, $Res Function(_PaginatedResponse<T>) _then) = __$PaginatedResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ List<T> items, int total, int page, int limit,@JsonKey(name: 'total_pages') int totalPages
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaginatedResponseCopyWithImpl<T,$Res>
+    implements _$PaginatedResponseCopyWith<T, $Res> {
+  __$PaginatedResponseCopyWithImpl(this._self, this._then);
+
+  final _PaginatedResponse<T> _self;
+  final $Res Function(_PaginatedResponse<T>) _then;
+
+/// Create a copy of PaginatedResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? total = null,Object? page = null,Object? limit = null,Object? totalPages = null,}) {
+  return _then(_PaginatedResponse<T>(
+items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<T>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,limit: null == limit ? _self.limit : limit // ignore: cast_nullable_to_non_nullable
+as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+// dart format on

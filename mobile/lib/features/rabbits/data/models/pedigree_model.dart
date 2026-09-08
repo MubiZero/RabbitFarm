@@ -8,7 +8,7 @@ part 'pedigree_model.freezed.dart';
 /// Рекурсивная структура, представляющая дерево предков до N поколений.
 /// Каждый узел может иметь отца (father) и мать (mother).
 @freezed
-class PedigreeModel with _$PedigreeModel {
+abstract class PedigreeModel with _$PedigreeModel {
   const factory PedigreeModel({
     required int id,
 

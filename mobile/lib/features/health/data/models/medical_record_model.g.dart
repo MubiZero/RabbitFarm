@@ -6,8 +6,8 @@ part of 'medical_record_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MedicalRecordImpl _$$MedicalRecordImplFromJson(Map<String, dynamic> json) =>
-    _$MedicalRecordImpl(
+_MedicalRecord _$MedicalRecordFromJson(Map<String, dynamic> json) =>
+    _MedicalRecord(
       id: const IntConverter().fromJson(json['id'] as Object),
       rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
       symptoms: json['symptoms'] as String,
@@ -35,8 +35,8 @@ _$MedicalRecordImpl _$$MedicalRecordImplFromJson(Map<String, dynamic> json) =>
           : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$MedicalRecordImplToJson(
-  _$MedicalRecordImpl instance,
+Map<String, dynamic> _$MedicalRecordToJson(
+  _MedicalRecord instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),
@@ -76,25 +76,26 @@ Json? _$JsonConverterToJson<Json, Value>(
   Json? Function(Value value) toJson,
 ) => value == null ? null : toJson(value);
 
-_$MedicalRecordCreateImpl _$$MedicalRecordCreateImplFromJson(
-  Map<String, dynamic> json,
-) => _$MedicalRecordCreateImpl(
-  rabbitId: (json['rabbit_id'] as num).toInt(),
-  symptoms: json['symptoms'] as String,
-  diagnosis: json['diagnosis'] as String?,
-  treatment: json['treatment'] as String?,
-  medication: json['medication'] as String?,
-  dosage: json['dosage'] as String?,
-  startedAt: const DateOnlyConverter().fromJson(json['started_at'] as Object),
-  endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
-  outcome: json['outcome'] as String? ?? 'ongoing',
-  cost: (json['cost'] as num?)?.toDouble(),
-  veterinarian: json['veterinarian'] as String?,
-  notes: json['notes'] as String?,
-);
+_MedicalRecordCreate _$MedicalRecordCreateFromJson(Map<String, dynamic> json) =>
+    _MedicalRecordCreate(
+      rabbitId: (json['rabbit_id'] as num).toInt(),
+      symptoms: json['symptoms'] as String,
+      diagnosis: json['diagnosis'] as String?,
+      treatment: json['treatment'] as String?,
+      medication: json['medication'] as String?,
+      dosage: json['dosage'] as String?,
+      startedAt: const DateOnlyConverter().fromJson(
+        json['started_at'] as Object,
+      ),
+      endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
+      outcome: json['outcome'] as String? ?? 'ongoing',
+      cost: (json['cost'] as num?)?.toDouble(),
+      veterinarian: json['veterinarian'] as String?,
+      notes: json['notes'] as String?,
+    );
 
-Map<String, dynamic> _$$MedicalRecordCreateImplToJson(
-  _$MedicalRecordCreateImpl instance,
+Map<String, dynamic> _$MedicalRecordCreateToJson(
+  _MedicalRecordCreate instance,
 ) => <String, dynamic>{
   'rabbit_id': instance.rabbitId,
   'symptoms': instance.symptoms,
@@ -110,25 +111,24 @@ Map<String, dynamic> _$$MedicalRecordCreateImplToJson(
   'notes': instance.notes,
 };
 
-_$MedicalRecordUpdateImpl _$$MedicalRecordUpdateImplFromJson(
-  Map<String, dynamic> json,
-) => _$MedicalRecordUpdateImpl(
-  rabbitId: (json['rabbit_id'] as num?)?.toInt(),
-  symptoms: json['symptoms'] as String?,
-  diagnosis: json['diagnosis'] as String?,
-  treatment: json['treatment'] as String?,
-  medication: json['medication'] as String?,
-  dosage: json['dosage'] as String?,
-  startedAt: const NullableDateOnlyConverter().fromJson(json['started_at']),
-  endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
-  outcome: json['outcome'] as String?,
-  cost: (json['cost'] as num?)?.toDouble(),
-  veterinarian: json['veterinarian'] as String?,
-  notes: json['notes'] as String?,
-);
+_MedicalRecordUpdate _$MedicalRecordUpdateFromJson(Map<String, dynamic> json) =>
+    _MedicalRecordUpdate(
+      rabbitId: (json['rabbit_id'] as num?)?.toInt(),
+      symptoms: json['symptoms'] as String?,
+      diagnosis: json['diagnosis'] as String?,
+      treatment: json['treatment'] as String?,
+      medication: json['medication'] as String?,
+      dosage: json['dosage'] as String?,
+      startedAt: const NullableDateOnlyConverter().fromJson(json['started_at']),
+      endedAt: const NullableDateOnlyConverter().fromJson(json['ended_at']),
+      outcome: json['outcome'] as String?,
+      cost: (json['cost'] as num?)?.toDouble(),
+      veterinarian: json['veterinarian'] as String?,
+      notes: json['notes'] as String?,
+    );
 
-Map<String, dynamic> _$$MedicalRecordUpdateImplToJson(
-  _$MedicalRecordUpdateImpl instance,
+Map<String, dynamic> _$MedicalRecordUpdateToJson(
+  _MedicalRecordUpdate instance,
 ) => <String, dynamic>{
   'rabbit_id': instance.rabbitId,
   'symptoms': instance.symptoms,
@@ -144,43 +144,40 @@ Map<String, dynamic> _$$MedicalRecordUpdateImplToJson(
   'notes': instance.notes,
 };
 
-_$MedicalStatisticsImpl _$$MedicalStatisticsImplFromJson(
-  Map<String, dynamic> json,
-) => _$MedicalStatisticsImpl(
-  totalRecords: (json['total_records'] as num).toInt(),
-  byOutcome: MedicalOutcomeStats.fromJson(
-    json['by_outcome'] as Map<String, dynamic>,
-  ),
-  ongoingTreatments: (json['ongoing_treatments'] as List<dynamic>)
-      .map((e) => OngoingTreatment.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  totalCost: (json['total_cost'] as num).toDouble(),
-  thisYear: (json['this_year'] as num).toInt(),
-  lastMonth: (json['last_month'] as num).toInt(),
-);
+_MedicalStatistics _$MedicalStatisticsFromJson(Map<String, dynamic> json) =>
+    _MedicalStatistics(
+      totalRecords: (json['total_records'] as num).toInt(),
+      byOutcome: MedicalOutcomeStats.fromJson(
+        json['by_outcome'] as Map<String, dynamic>,
+      ),
+      ongoingTreatments: (json['ongoing_treatments'] as List<dynamic>)
+          .map((e) => OngoingTreatment.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      totalCost: (json['total_cost'] as num).toDouble(),
+      thisYear: (json['this_year'] as num).toInt(),
+      lastMonth: (json['last_month'] as num).toInt(),
+    );
 
-Map<String, dynamic> _$$MedicalStatisticsImplToJson(
-  _$MedicalStatisticsImpl instance,
-) => <String, dynamic>{
-  'total_records': instance.totalRecords,
-  'by_outcome': instance.byOutcome,
-  'ongoing_treatments': instance.ongoingTreatments,
-  'total_cost': instance.totalCost,
-  'this_year': instance.thisYear,
-  'last_month': instance.lastMonth,
-};
+Map<String, dynamic> _$MedicalStatisticsToJson(_MedicalStatistics instance) =>
+    <String, dynamic>{
+      'total_records': instance.totalRecords,
+      'by_outcome': instance.byOutcome,
+      'ongoing_treatments': instance.ongoingTreatments,
+      'total_cost': instance.totalCost,
+      'this_year': instance.thisYear,
+      'last_month': instance.lastMonth,
+    };
 
-_$MedicalOutcomeStatsImpl _$$MedicalOutcomeStatsImplFromJson(
-  Map<String, dynamic> json,
-) => _$MedicalOutcomeStatsImpl(
-  recovered: (json['recovered'] as num?)?.toInt() ?? 0,
-  ongoing: (json['ongoing'] as num?)?.toInt() ?? 0,
-  died: (json['died'] as num?)?.toInt() ?? 0,
-  euthanized: (json['euthanized'] as num?)?.toInt() ?? 0,
-);
+_MedicalOutcomeStats _$MedicalOutcomeStatsFromJson(Map<String, dynamic> json) =>
+    _MedicalOutcomeStats(
+      recovered: (json['recovered'] as num?)?.toInt() ?? 0,
+      ongoing: (json['ongoing'] as num?)?.toInt() ?? 0,
+      died: (json['died'] as num?)?.toInt() ?? 0,
+      euthanized: (json['euthanized'] as num?)?.toInt() ?? 0,
+    );
 
-Map<String, dynamic> _$$MedicalOutcomeStatsImplToJson(
-  _$MedicalOutcomeStatsImpl instance,
+Map<String, dynamic> _$MedicalOutcomeStatsToJson(
+  _MedicalOutcomeStats instance,
 ) => <String, dynamic>{
   'recovered': instance.recovered,
   'ongoing': instance.ongoing,
@@ -188,33 +185,33 @@ Map<String, dynamic> _$$MedicalOutcomeStatsImplToJson(
   'euthanized': instance.euthanized,
 };
 
-_$OngoingTreatmentImpl _$$OngoingTreatmentImplFromJson(
-  Map<String, dynamic> json,
-) => _$OngoingTreatmentImpl(
-  id: const IntConverter().fromJson(json['id'] as Object),
-  rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
-  rabbitName: json['rabbit_name'] as String?,
-  diagnosis: json['diagnosis'] as String?,
-  startedAt: const DateOnlyConverter().fromJson(json['started_at'] as Object),
-  daysOngoing: (json['days_ongoing'] as num).toInt(),
-  symptoms: json['symptoms'] as String?,
-);
+_OngoingTreatment _$OngoingTreatmentFromJson(Map<String, dynamic> json) =>
+    _OngoingTreatment(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
+      rabbitName: json['rabbit_name'] as String?,
+      diagnosis: json['diagnosis'] as String?,
+      startedAt: const DateOnlyConverter().fromJson(
+        json['started_at'] as Object,
+      ),
+      daysOngoing: (json['days_ongoing'] as num).toInt(),
+      symptoms: json['symptoms'] as String?,
+    );
 
-Map<String, dynamic> _$$OngoingTreatmentImplToJson(
-  _$OngoingTreatmentImpl instance,
-) => <String, dynamic>{
-  'id': const IntConverter().toJson(instance.id),
-  'rabbit_id': const IntConverter().toJson(instance.rabbitId),
-  'rabbit_name': instance.rabbitName,
-  'diagnosis': instance.diagnosis,
-  'started_at': const DateOnlyConverter().toJson(instance.startedAt),
-  'days_ongoing': instance.daysOngoing,
-  'symptoms': instance.symptoms,
-};
+Map<String, dynamic> _$OngoingTreatmentToJson(_OngoingTreatment instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'rabbit_id': const IntConverter().toJson(instance.rabbitId),
+      'rabbit_name': instance.rabbitName,
+      'diagnosis': instance.diagnosis,
+      'started_at': const DateOnlyConverter().toJson(instance.startedAt),
+      'days_ongoing': instance.daysOngoing,
+      'symptoms': instance.symptoms,
+    };
 
-_$MedicalRecordWithDaysImpl _$$MedicalRecordWithDaysImplFromJson(
+_MedicalRecordWithDays _$MedicalRecordWithDaysFromJson(
   Map<String, dynamic> json,
-) => _$MedicalRecordWithDaysImpl(
+) => _MedicalRecordWithDays(
   id: const IntConverter().fromJson(json['id'] as Object),
   rabbitId: const IntConverter().fromJson(json['rabbit_id'] as Object),
   symptoms: json['symptoms'] as String,
@@ -239,8 +236,8 @@ _$MedicalRecordWithDaysImpl _$$MedicalRecordWithDaysImplFromJson(
       : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$$MedicalRecordWithDaysImplToJson(
-  _$MedicalRecordWithDaysImpl instance,
+Map<String, dynamic> _$MedicalRecordWithDaysToJson(
+  _MedicalRecordWithDays instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'rabbit_id': const IntConverter().toJson(instance.rabbitId),
@@ -262,16 +259,15 @@ Map<String, dynamic> _$$MedicalRecordWithDaysImplToJson(
   'rabbit': instance.rabbit,
 };
 
-_$CostReportImpl _$$CostReportImplFromJson(Map<String, dynamic> json) =>
-    _$CostReportImpl(
-      records: (json['records'] as List<dynamic>)
-          .map((e) => MedicalRecord.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      totalCost: (json['total_cost'] as num).toDouble(),
-      count: (json['count'] as num).toInt(),
-    );
+_CostReport _$CostReportFromJson(Map<String, dynamic> json) => _CostReport(
+  records: (json['records'] as List<dynamic>)
+      .map((e) => MedicalRecord.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  totalCost: (json['total_cost'] as num).toDouble(),
+  count: (json['count'] as num).toInt(),
+);
 
-Map<String, dynamic> _$$CostReportImplToJson(_$CostReportImpl instance) =>
+Map<String, dynamic> _$CostReportToJson(_CostReport instance) =>
     <String, dynamic>{
       'records': instance.records,
       'total_cost': instance.totalCost,

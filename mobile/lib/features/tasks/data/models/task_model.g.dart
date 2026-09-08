@@ -6,7 +6,7 @@ part of 'task_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
+_Task _$TaskFromJson(Map<String, dynamic> json) => _Task(
   id: const IntConverter().fromJson(json['id'] as Object),
   title: json['title'] as String,
   description: json['description'] as String?,
@@ -38,9 +38,7 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
       : UserRef.fromJson(json['creator'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$$TaskImplToJson(
-  _$TaskImpl instance,
-) => <String, dynamic>{
+Map<String, dynamic> _$TaskToJson(_Task instance) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'title': instance.title,
   'description': instance.description,
@@ -91,26 +89,25 @@ const _$TaskPriorityEnumMap = {
   TaskPriority.urgent: 'urgent',
 };
 
-_$TaskCreateImpl _$$TaskCreateImplFromJson(Map<String, dynamic> json) =>
-    _$TaskCreateImpl(
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      type: $enumDecode(_$TaskTypeEnumMap, json['type']),
-      status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
-      priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
-      dueDate: const DateTimeConverter().fromJson(json['due_date'] as Object),
-      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-      cageId: const NullableIntConverter().fromJson(json['cage_id']),
-      assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
-      isRecurring: json['is_recurring'] as bool?,
-      recurrenceRule: json['recurrence_rule'] as String?,
-      reminderBefore: const NullableIntConverter().fromJson(
-        json['reminder_before'],
-      ),
-      notes: json['notes'] as String?,
-    );
+_TaskCreate _$TaskCreateFromJson(Map<String, dynamic> json) => _TaskCreate(
+  title: json['title'] as String,
+  description: json['description'] as String?,
+  type: $enumDecode(_$TaskTypeEnumMap, json['type']),
+  status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
+  priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
+  dueDate: const DateTimeConverter().fromJson(json['due_date'] as Object),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+  cageId: const NullableIntConverter().fromJson(json['cage_id']),
+  assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
+  isRecurring: json['is_recurring'] as bool?,
+  recurrenceRule: json['recurrence_rule'] as String?,
+  reminderBefore: const NullableIntConverter().fromJson(
+    json['reminder_before'],
+  ),
+  notes: json['notes'] as String?,
+);
 
-Map<String, dynamic> _$$TaskCreateImplToJson(_$TaskCreateImpl instance) =>
+Map<String, dynamic> _$TaskCreateToJson(_TaskCreate instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
@@ -129,29 +126,26 @@ Map<String, dynamic> _$$TaskCreateImplToJson(_$TaskCreateImpl instance) =>
       'notes': instance.notes,
     };
 
-_$TaskUpdateImpl _$$TaskUpdateImplFromJson(Map<String, dynamic> json) =>
-    _$TaskUpdateImpl(
-      title: json['title'] as String?,
-      description: json['description'] as String?,
-      type: $enumDecodeNullable(_$TaskTypeEnumMap, json['type']),
-      status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
-      priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
-      dueDate: const NullableDateTimeConverter().fromJson(json['due_date']),
-      completedAt: const NullableDateTimeConverter().fromJson(
-        json['completed_at'],
-      ),
-      rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
-      cageId: const NullableIntConverter().fromJson(json['cage_id']),
-      assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
-      isRecurring: json['is_recurring'] as bool?,
-      recurrenceRule: json['recurrence_rule'] as String?,
-      reminderBefore: const NullableIntConverter().fromJson(
-        json['reminder_before'],
-      ),
-      notes: json['notes'] as String?,
-    );
+_TaskUpdate _$TaskUpdateFromJson(Map<String, dynamic> json) => _TaskUpdate(
+  title: json['title'] as String?,
+  description: json['description'] as String?,
+  type: $enumDecodeNullable(_$TaskTypeEnumMap, json['type']),
+  status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
+  priority: $enumDecodeNullable(_$TaskPriorityEnumMap, json['priority']),
+  dueDate: const NullableDateTimeConverter().fromJson(json['due_date']),
+  completedAt: const NullableDateTimeConverter().fromJson(json['completed_at']),
+  rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+  cageId: const NullableIntConverter().fromJson(json['cage_id']),
+  assignedTo: const NullableIntConverter().fromJson(json['assigned_to']),
+  isRecurring: json['is_recurring'] as bool?,
+  recurrenceRule: json['recurrence_rule'] as String?,
+  reminderBefore: const NullableIntConverter().fromJson(
+    json['reminder_before'],
+  ),
+  notes: json['notes'] as String?,
+);
 
-Map<String, dynamic> _$$TaskUpdateImplToJson(_$TaskUpdateImpl instance) =>
+Map<String, dynamic> _$TaskUpdateToJson(_TaskUpdate instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
@@ -173,9 +167,9 @@ Map<String, dynamic> _$$TaskUpdateImplToJson(_$TaskUpdateImpl instance) =>
       'notes': instance.notes,
     };
 
-_$TaskStatisticsImpl _$$TaskStatisticsImplFromJson(
+_TaskStatistics _$TaskStatisticsFromJson(
   Map<String, dynamic> json,
-) => _$TaskStatisticsImpl(
+) => _TaskStatistics(
   totalPending: const IntConverter().fromJson(json['total_pending'] as Object),
   totalInProgress: const IntConverter().fromJson(
     json['total_in_progress'] as Object,
@@ -196,8 +190,8 @@ _$TaskStatisticsImpl _$$TaskStatisticsImplFromJson(
       .toList(),
 );
 
-Map<String, dynamic> _$$TaskStatisticsImplToJson(
-  _$TaskStatisticsImpl instance,
+Map<String, dynamic> _$TaskStatisticsToJson(
+  _TaskStatistics instance,
 ) => <String, dynamic>{
   'total_pending': const IntConverter().toJson(instance.totalPending),
   'total_in_progress': const IntConverter().toJson(instance.totalInProgress),
@@ -209,28 +203,26 @@ Map<String, dynamic> _$$TaskStatisticsImplToJson(
   'tasks_by_priority': instance.tasksByPriority,
 };
 
-_$TaskTypeCountImpl _$$TaskTypeCountImplFromJson(Map<String, dynamic> json) =>
-    _$TaskTypeCountImpl(
+_TaskTypeCount _$TaskTypeCountFromJson(Map<String, dynamic> json) =>
+    _TaskTypeCount(
       type: $enumDecode(_$TaskTypeEnumMap, json['type']),
       count: const IntConverter().fromJson(json['count'] as Object),
     );
 
-Map<String, dynamic> _$$TaskTypeCountImplToJson(_$TaskTypeCountImpl instance) =>
+Map<String, dynamic> _$TaskTypeCountToJson(_TaskTypeCount instance) =>
     <String, dynamic>{
       'type': _$TaskTypeEnumMap[instance.type]!,
       'count': const IntConverter().toJson(instance.count),
     };
 
-_$TaskPriorityCountImpl _$$TaskPriorityCountImplFromJson(
-  Map<String, dynamic> json,
-) => _$TaskPriorityCountImpl(
-  priority: $enumDecode(_$TaskPriorityEnumMap, json['priority']),
-  count: const IntConverter().fromJson(json['count'] as Object),
-);
+_TaskPriorityCount _$TaskPriorityCountFromJson(Map<String, dynamic> json) =>
+    _TaskPriorityCount(
+      priority: $enumDecode(_$TaskPriorityEnumMap, json['priority']),
+      count: const IntConverter().fromJson(json['count'] as Object),
+    );
 
-Map<String, dynamic> _$$TaskPriorityCountImplToJson(
-  _$TaskPriorityCountImpl instance,
-) => <String, dynamic>{
-  'priority': _$TaskPriorityEnumMap[instance.priority]!,
-  'count': const IntConverter().toJson(instance.count),
-};
+Map<String, dynamic> _$TaskPriorityCountToJson(_TaskPriorityCount instance) =>
+    <String, dynamic>{
+      'priority': _$TaskPriorityEnumMap[instance.priority]!,
+      'count': const IntConverter().toJson(instance.count),
+    };

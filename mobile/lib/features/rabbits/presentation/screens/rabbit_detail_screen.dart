@@ -33,7 +33,7 @@ class RabbitDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(rabbitAsync.valueOrNull?.name ?? context.l10n.navRabbits),
+        title: Text(rabbitAsync.value?.name ?? context.l10n.navRabbits),
         actions: [
           if (canManage)
             rabbitAsync.whenOrNull(

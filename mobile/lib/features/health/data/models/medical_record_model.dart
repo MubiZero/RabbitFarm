@@ -37,7 +37,7 @@ extension MedicalOutcomeDisplay on MedicalOutcome {
 
 /// Medical Record model
 @freezed
-class MedicalRecord with _$MedicalRecord {
+abstract class MedicalRecord with _$MedicalRecord {
   const factory MedicalRecord({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
@@ -69,7 +69,7 @@ class MedicalRecord with _$MedicalRecord {
 
 /// Medical Record Create DTO
 @freezed
-class MedicalRecordCreate with _$MedicalRecordCreate {
+abstract class MedicalRecordCreate with _$MedicalRecordCreate {
   const factory MedicalRecordCreate({
     @JsonKey(name: 'rabbit_id') required int rabbitId,
     required String symptoms,
@@ -91,7 +91,7 @@ class MedicalRecordCreate with _$MedicalRecordCreate {
 
 /// Medical Record Update DTO
 @freezed
-class MedicalRecordUpdate with _$MedicalRecordUpdate {
+abstract class MedicalRecordUpdate with _$MedicalRecordUpdate {
   const factory MedicalRecordUpdate({
     @JsonKey(name: 'rabbit_id') int? rabbitId,
     String? symptoms,
@@ -113,7 +113,7 @@ class MedicalRecordUpdate with _$MedicalRecordUpdate {
 
 /// Medical Statistics model
 @freezed
-class MedicalStatistics with _$MedicalStatistics {
+abstract class MedicalStatistics with _$MedicalStatistics {
   const factory MedicalStatistics({
     @JsonKey(name: 'total_records') required int totalRecords,
     @JsonKey(name: 'by_outcome') required MedicalOutcomeStats byOutcome,
@@ -129,7 +129,7 @@ class MedicalStatistics with _$MedicalStatistics {
 
 /// Medical outcome statistics
 @freezed
-class MedicalOutcomeStats with _$MedicalOutcomeStats {
+abstract class MedicalOutcomeStats with _$MedicalOutcomeStats {
   const factory MedicalOutcomeStats({
     @JsonKey(defaultValue: 0) required int recovered,
     @JsonKey(defaultValue: 0) required int ongoing,
@@ -143,7 +143,7 @@ class MedicalOutcomeStats with _$MedicalOutcomeStats {
 
 /// Ongoing treatment info
 @freezed
-class OngoingTreatment with _$OngoingTreatment {
+abstract class OngoingTreatment with _$OngoingTreatment {
   const factory OngoingTreatment({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
@@ -160,7 +160,7 @@ class OngoingTreatment with _$OngoingTreatment {
 
 /// Medical record with days ongoing info
 @freezed
-class MedicalRecordWithDays with _$MedicalRecordWithDays {
+abstract class MedicalRecordWithDays with _$MedicalRecordWithDays {
   const factory MedicalRecordWithDays({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
@@ -191,7 +191,7 @@ class MedicalRecordWithDays with _$MedicalRecordWithDays {
 
 /// Cost report model
 @freezed
-class CostReport with _$CostReport {
+abstract class CostReport with _$CostReport {
   const factory CostReport({
     required List<MedicalRecord> records,
     @JsonKey(name: 'total_cost') required double totalCost,

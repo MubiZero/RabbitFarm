@@ -7,7 +7,7 @@ part 'rabbit_model.freezed.dart';
 part 'rabbit_model.g.dart';
 
 @freezed
-class RabbitModel with _$RabbitModel {
+abstract class RabbitModel with _$RabbitModel {
   const factory RabbitModel({
     @IntConverter() required int id,
 
@@ -62,7 +62,7 @@ class RabbitModel with _$RabbitModel {
 }
 
 @freezed
-class CageInfo with _$CageInfo {
+abstract class CageInfo with _$CageInfo {
   const factory CageInfo({
     @IntConverter() required int id,
     required String number,
@@ -84,7 +84,7 @@ class CageInfo with _$CageInfo {
 /// Имя и клеймо в базе необязательны, поэтому оба поля могут не приехать —
 /// строку для показа собирает [label], чтобы каждый экран не выдумывал свою.
 @freezed
-class RabbitRef with _$RabbitRef {
+abstract class RabbitRef with _$RabbitRef {
   const factory RabbitRef({
     @IntConverter() required int id,
     String? name,

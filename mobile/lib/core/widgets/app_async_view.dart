@@ -45,7 +45,7 @@ class AppAsyncView<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = value.valueOrNull;
+    final data = value.value;
 
     if (value.hasError && data == null) {
       return AppErrorState(

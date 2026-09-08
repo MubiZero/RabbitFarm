@@ -12,7 +12,7 @@ part 'feeding_record_model.g.dart';
 
 /// Feeding Record model
 @freezed
-class FeedingRecord with _$FeedingRecord {
+abstract class FeedingRecord with _$FeedingRecord {
   const factory FeedingRecord({
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
@@ -42,7 +42,7 @@ class FeedingRecord with _$FeedingRecord {
 
 /// Feeding Record Create DTO
 @freezed
-class FeedingRecordCreate with _$FeedingRecordCreate {
+abstract class FeedingRecordCreate with _$FeedingRecordCreate {
   const factory FeedingRecordCreate({
     @JsonKey(name: 'rabbit_id') int? rabbitId,
     @JsonKey(name: 'feed_id') required int feedId,
@@ -58,7 +58,7 @@ class FeedingRecordCreate with _$FeedingRecordCreate {
 
 /// Feeding Record Update DTO
 @freezed
-class FeedingRecordUpdate with _$FeedingRecordUpdate {
+abstract class FeedingRecordUpdate with _$FeedingRecordUpdate {
   const factory FeedingRecordUpdate({
     @JsonKey(name: 'rabbit_id') int? rabbitId,
     @JsonKey(name: 'feed_id') int? feedId,
@@ -78,7 +78,7 @@ class FeedingRecordUpdate with _$FeedingRecordUpdate {
 /// штуки — разные величины, общая сумма по ним ничего не значит. Ключи карт —
 /// коды с сервера (`kg`, `piece`, `pellets`), подписи подбираются в UI.
 @freezed
-class FeedingStatistics with _$FeedingStatistics {
+abstract class FeedingStatistics with _$FeedingStatistics {
   const factory FeedingStatistics({
     @JsonKey(name: 'total_feedings') required int totalFeedings,
     @JsonKey(name: 'quantity_by_unit') @Default({}) Map<String, double> quantityByUnit,
@@ -93,7 +93,7 @@ class FeedingStatistics with _$FeedingStatistics {
 
 /// Feeding by specific feed
 @freezed
-class FeedingByFeed with _$FeedingByFeed {
+abstract class FeedingByFeed with _$FeedingByFeed {
   const factory FeedingByFeed({
     required double quantity,
     required String unit,

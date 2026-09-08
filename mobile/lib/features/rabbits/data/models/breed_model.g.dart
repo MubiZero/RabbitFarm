@@ -6,24 +6,23 @@ part of 'breed_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BreedModelImpl _$$BreedModelImplFromJson(Map<String, dynamic> json) =>
-    _$BreedModelImpl(
-      id: const IntConverter().fromJson(json['id'] as Object),
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      averageWeight: (json['average_weight'] as num?)?.toDouble(),
-      averageLitterSize: _$JsonConverterFromJson<Object, int>(
-        json['average_litter_size'],
-        const IntConverter().fromJson,
-      ),
-      purpose: json['purpose'] as String?,
-      photoUrl: json['photo_url'] as String?,
-      createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
-      updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
-    );
+_BreedModel _$BreedModelFromJson(Map<String, dynamic> json) => _BreedModel(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  name: json['name'] as String,
+  description: json['description'] as String?,
+  averageWeight: (json['average_weight'] as num?)?.toDouble(),
+  averageLitterSize: _$JsonConverterFromJson<Object, int>(
+    json['average_litter_size'],
+    const IntConverter().fromJson,
+  ),
+  purpose: json['purpose'] as String?,
+  photoUrl: json['photo_url'] as String?,
+  createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
+  updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
+);
 
-Map<String, dynamic> _$$BreedModelImplToJson(
-  _$BreedModelImpl instance,
+Map<String, dynamic> _$BreedModelToJson(
+  _BreedModel instance,
 ) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'name': instance.name,

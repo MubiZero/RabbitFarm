@@ -49,7 +49,7 @@ enum TaskPriority {
 
 /// Task model
 @freezed
-class Task with _$Task {
+abstract class Task with _$Task {
   const factory Task({
     @IntConverter() required int id,
     required String title,
@@ -89,7 +89,7 @@ class Task with _$Task {
 
 /// Task create model
 @freezed
-class TaskCreate with _$TaskCreate {
+abstract class TaskCreate with _$TaskCreate {
   const factory TaskCreate({
     required String title,
     String? description,
@@ -112,7 +112,7 @@ class TaskCreate with _$TaskCreate {
 
 /// Task update model
 @freezed
-class TaskUpdate with _$TaskUpdate {
+abstract class TaskUpdate with _$TaskUpdate {
   const factory TaskUpdate({
     String? title,
     String? description,
@@ -136,7 +136,7 @@ class TaskUpdate with _$TaskUpdate {
 
 /// Task statistics model
 @freezed
-class TaskStatistics with _$TaskStatistics {
+abstract class TaskStatistics with _$TaskStatistics {
   const factory TaskStatistics({
     @JsonKey(name: 'total_pending') @IntConverter() required int totalPending,
     @JsonKey(name: 'total_in_progress') @IntConverter() required int totalInProgress,
@@ -154,7 +154,7 @@ class TaskStatistics with _$TaskStatistics {
 
 /// Task type count model
 @freezed
-class TaskTypeCount with _$TaskTypeCount {
+abstract class TaskTypeCount with _$TaskTypeCount {
   const factory TaskTypeCount({
     required TaskType type,
     @IntConverter() required int count,
@@ -166,7 +166,7 @@ class TaskTypeCount with _$TaskTypeCount {
 
 /// Task priority count model
 @freezed
-class TaskPriorityCount with _$TaskPriorityCount {
+abstract class TaskPriorityCount with _$TaskPriorityCount {
   const factory TaskPriorityCount({
     required TaskPriority priority,
     @IntConverter() required int count,

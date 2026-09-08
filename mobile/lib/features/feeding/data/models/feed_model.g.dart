@@ -6,7 +6,7 @@ part of 'feed_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$FeedImpl _$$FeedImplFromJson(Map<String, dynamic> json) => _$FeedImpl(
+_Feed _$FeedFromJson(Map<String, dynamic> json) => _Feed(
   id: const IntConverter().fromJson(json['id'] as Object),
   name: json['name'] as String,
   type: $enumDecode(_$FeedTypeEnumMap, json['type']),
@@ -25,9 +25,7 @@ _$FeedImpl _$$FeedImplFromJson(Map<String, dynamic> json) => _$FeedImpl(
   updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
 );
 
-Map<String, dynamic> _$$FeedImplToJson(
-  _$FeedImpl instance,
-) => <String, dynamic>{
+Map<String, dynamic> _$FeedToJson(_Feed instance) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'name': instance.name,
   'type': _$FeedTypeEnumMap[instance.type]!,
@@ -69,70 +67,66 @@ Json? _$JsonConverterToJson<Json, Value>(
   Json? Function(Value value) toJson,
 ) => value == null ? null : toJson(value);
 
-_$FeedCreateImpl _$$FeedCreateImplFromJson(Map<String, dynamic> json) =>
-    _$FeedCreateImpl(
-      name: json['name'] as String,
-      type: json['type'] as String,
-      brand: json['brand'] as String?,
-      unit: json['unit'] as String? ?? 'kg',
-      currentStock: (json['current_stock'] as num?)?.toDouble(),
-      minStock: (json['min_stock'] as num?)?.toDouble(),
-      costPerUnit: (json['cost_per_unit'] as num?)?.toDouble(),
-      notes: json['notes'] as String?,
-    );
-
-Map<String, dynamic> _$$FeedCreateImplToJson(_$FeedCreateImpl instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'type': instance.type,
-      'brand': instance.brand,
-      'unit': instance.unit,
-      'current_stock': instance.currentStock,
-      'min_stock': instance.minStock,
-      'cost_per_unit': instance.costPerUnit,
-      'notes': instance.notes,
-    };
-
-_$FeedUpdateImpl _$$FeedUpdateImplFromJson(Map<String, dynamic> json) =>
-    _$FeedUpdateImpl(
-      name: json['name'] as String?,
-      type: json['type'] as String?,
-      brand: json['brand'] as String?,
-      unit: json['unit'] as String?,
-      currentStock: (json['current_stock'] as num?)?.toDouble(),
-      minStock: (json['min_stock'] as num?)?.toDouble(),
-      costPerUnit: (json['cost_per_unit'] as num?)?.toDouble(),
-      notes: json['notes'] as String?,
-    );
-
-Map<String, dynamic> _$$FeedUpdateImplToJson(_$FeedUpdateImpl instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'type': instance.type,
-      'brand': instance.brand,
-      'unit': instance.unit,
-      'current_stock': instance.currentStock,
-      'min_stock': instance.minStock,
-      'cost_per_unit': instance.costPerUnit,
-      'notes': instance.notes,
-    };
-
-_$StockAdjustmentImpl _$$StockAdjustmentImplFromJson(
-  Map<String, dynamic> json,
-) => _$StockAdjustmentImpl(
-  quantity: (json['quantity'] as num).toDouble(),
-  operation: json['operation'] as String,
+_FeedCreate _$FeedCreateFromJson(Map<String, dynamic> json) => _FeedCreate(
+  name: json['name'] as String,
+  type: json['type'] as String,
+  brand: json['brand'] as String?,
+  unit: json['unit'] as String? ?? 'kg',
+  currentStock: (json['current_stock'] as num?)?.toDouble(),
+  minStock: (json['min_stock'] as num?)?.toDouble(),
+  costPerUnit: (json['cost_per_unit'] as num?)?.toDouble(),
+  notes: json['notes'] as String?,
 );
 
-Map<String, dynamic> _$$StockAdjustmentImplToJson(
-  _$StockAdjustmentImpl instance,
-) => <String, dynamic>{
-  'quantity': instance.quantity,
-  'operation': instance.operation,
-};
+Map<String, dynamic> _$FeedCreateToJson(_FeedCreate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'type': instance.type,
+      'brand': instance.brand,
+      'unit': instance.unit,
+      'current_stock': instance.currentStock,
+      'min_stock': instance.minStock,
+      'cost_per_unit': instance.costPerUnit,
+      'notes': instance.notes,
+    };
 
-_$FeedStatisticsImpl _$$FeedStatisticsImplFromJson(Map<String, dynamic> json) =>
-    _$FeedStatisticsImpl(
+_FeedUpdate _$FeedUpdateFromJson(Map<String, dynamic> json) => _FeedUpdate(
+  name: json['name'] as String?,
+  type: json['type'] as String?,
+  brand: json['brand'] as String?,
+  unit: json['unit'] as String?,
+  currentStock: (json['current_stock'] as num?)?.toDouble(),
+  minStock: (json['min_stock'] as num?)?.toDouble(),
+  costPerUnit: (json['cost_per_unit'] as num?)?.toDouble(),
+  notes: json['notes'] as String?,
+);
+
+Map<String, dynamic> _$FeedUpdateToJson(_FeedUpdate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'type': instance.type,
+      'brand': instance.brand,
+      'unit': instance.unit,
+      'current_stock': instance.currentStock,
+      'min_stock': instance.minStock,
+      'cost_per_unit': instance.costPerUnit,
+      'notes': instance.notes,
+    };
+
+_StockAdjustment _$StockAdjustmentFromJson(Map<String, dynamic> json) =>
+    _StockAdjustment(
+      quantity: (json['quantity'] as num).toDouble(),
+      operation: json['operation'] as String,
+    );
+
+Map<String, dynamic> _$StockAdjustmentToJson(_StockAdjustment instance) =>
+    <String, dynamic>{
+      'quantity': instance.quantity,
+      'operation': instance.operation,
+    };
+
+_FeedStatistics _$FeedStatisticsFromJson(Map<String, dynamic> json) =>
+    _FeedStatistics(
       totalFeeds: (json['total_feeds'] as num).toInt(),
       byType: FeedTypeStats.fromJson(json['by_type'] as Map<String, dynamic>),
       lowStockCount: (json['low_stock_count'] as num).toInt(),
@@ -142,18 +136,17 @@ _$FeedStatisticsImpl _$$FeedStatisticsImplFromJson(Map<String, dynamic> json) =>
       totalStockValue: (json['total_stock_value'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$FeedStatisticsImplToJson(
-  _$FeedStatisticsImpl instance,
-) => <String, dynamic>{
-  'total_feeds': instance.totalFeeds,
-  'by_type': instance.byType,
-  'low_stock_count': instance.lowStockCount,
-  'low_stock_items': instance.lowStockItems,
-  'total_stock_value': instance.totalStockValue,
-};
+Map<String, dynamic> _$FeedStatisticsToJson(_FeedStatistics instance) =>
+    <String, dynamic>{
+      'total_feeds': instance.totalFeeds,
+      'by_type': instance.byType,
+      'low_stock_count': instance.lowStockCount,
+      'low_stock_items': instance.lowStockItems,
+      'total_stock_value': instance.totalStockValue,
+    };
 
-_$FeedTypeStatsImpl _$$FeedTypeStatsImplFromJson(Map<String, dynamic> json) =>
-    _$FeedTypeStatsImpl(
+_FeedTypeStats _$FeedTypeStatsFromJson(Map<String, dynamic> json) =>
+    _FeedTypeStats(
       pellets: (json['pellets'] as num?)?.toInt() ?? 0,
       hay: (json['hay'] as num?)?.toInt() ?? 0,
       vegetables: (json['vegetables'] as num?)?.toInt() ?? 0,
@@ -162,7 +155,7 @@ _$FeedTypeStatsImpl _$$FeedTypeStatsImplFromJson(Map<String, dynamic> json) =>
       other: (json['other'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$$FeedTypeStatsImplToJson(_$FeedTypeStatsImpl instance) =>
+Map<String, dynamic> _$FeedTypeStatsToJson(_FeedTypeStats instance) =>
     <String, dynamic>{
       'pellets': instance.pellets,
       'hay': instance.hay,
@@ -172,8 +165,8 @@ Map<String, dynamic> _$$FeedTypeStatsImplToJson(_$FeedTypeStatsImpl instance) =>
       'other': instance.other,
     };
 
-_$LowStockItemImpl _$$LowStockItemImplFromJson(Map<String, dynamic> json) =>
-    _$LowStockItemImpl(
+_LowStockItem _$LowStockItemFromJson(Map<String, dynamic> json) =>
+    _LowStockItem(
       id: const IntConverter().fromJson(json['id'] as Object),
       name: json['name'] as String,
       currentStock: const DoubleConverter().fromJson(
@@ -183,7 +176,7 @@ _$LowStockItemImpl _$$LowStockItemImplFromJson(Map<String, dynamic> json) =>
       unit: json['unit'] as String,
     );
 
-Map<String, dynamic> _$$LowStockItemImplToJson(_$LowStockItemImpl instance) =>
+Map<String, dynamic> _$LowStockItemToJson(_LowStockItem instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
       'name': instance.name,
