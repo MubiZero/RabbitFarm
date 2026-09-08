@@ -16,6 +16,7 @@ const { Op, Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const planService = require('./planService');
 
 /**
  * Rabbit service
@@ -28,6 +29,8 @@ class RabbitService {
    * @returns {Object} Created rabbit
    */
   async createRabbit(rabbitData) {
+    await planService.assertRabbitLimit(rabbitData.farm_id);
+
     const transaction = await sequelize.transaction();
     try {
       // Порода принадлежит ферме, а не сервису: без фильтра по farm_id

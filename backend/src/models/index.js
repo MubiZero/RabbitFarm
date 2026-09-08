@@ -35,6 +35,7 @@ const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 const DeviceToken = require('./DeviceToken')(sequelize);
 const Payment = require('./Payment')(sequelize);
+const Plan = require('./Plan')(sequelize);
 
 // Define associations
 
@@ -176,6 +177,11 @@ Note.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 Farm.hasMany(Payment, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
 Payment.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 
+// Тариф — глобальная сущность, не хозяйства: ферма ссылается на план, а не
+// наоборот принадлежит ему.
+Plan.hasMany(Farm, { as: 'farms', foreignKey: 'plan_id', onDelete: 'SET NULL' });
+Farm.belongsTo(Plan, { as: 'plan', foreignKey: 'plan_id' });
+
 // Запрос к таблице фермы без условия по farm_id дальше не проходит.
 // Подключаем после того, как все модели определены и связаны.
 require('../utils/tenancy').attach({
@@ -209,5 +215,6 @@ module.exports = {
   Photo,
   Note,
   DeviceToken,
-  Payment
+  Payment,
+  Plan
 };

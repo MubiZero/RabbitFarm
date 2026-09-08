@@ -18,8 +18,10 @@ jest.mock('../../../src/models', () => {
   };
 });
 jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
+jest.mock('../../../src/services/planService');
 
 const { Rabbit, Breed, Cage, sequelize } = require('../../../src/models');
+const planService = require('../../../src/services/planService');
 const rabbitService = require('../../../src/services/rabbitService');
 const { createMockRabbit } = require('../../helpers/mockModels');
 
@@ -31,6 +33,14 @@ describe('RabbitService', () => {
 
     beforeEach(() => {
       sequelize.transaction.mockResolvedValue(mockTransaction);
+    });
+
+    it('должен бросать RABBIT_LIMIT_REACHED и не открывать транзакцию, если ферма упёрлась в лимит тарифа', async () => {
+      planService.assertRabbitLimit.mockRejectedValueOnce(new Error('RABBIT_LIMIT_REACHED'));
+
+      await expect(rabbitService.createRabbit({ breed_id: 1, farm_id: 1 }))
+        .rejects.toThrow('RABBIT_LIMIT_REACHED');
+      expect(sequelize.transaction).not.toHaveBeenCalled();
     });
 
     it('должен бросать BREED_NOT_FOUND если порода не существует', async () => {

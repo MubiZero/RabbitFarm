@@ -89,6 +89,23 @@ const authorize = (allowedRoles = []) => {
 };
 
 /**
+ * Платформенный админ — не роль фермы, отдельный флаг на пользователе
+ * (`users.is_platform_admin`). Проверяется поверх `authenticate`, отдельно
+ * от `authorize`, у которого речь только про роль внутри одной фермы.
+ */
+const requirePlatformAdmin = (req, res, next) => {
+  if (!req.user) {
+    return ApiResponse.unauthorized(res, 'Требуется авторизация');
+  }
+
+  if (!req.user.is_platform_admin) {
+    return ApiResponse.forbidden(res, 'Доступно только платформенному администратору');
+  }
+
+  next();
+};
+
+/**
  * Optional authentication
  * Attaches user if token is valid, but doesn't require it
  */
@@ -117,5 +134,6 @@ const optionalAuth = async (req, res, next) => {
 module.exports = {
   authenticate,
   authorize,
+  requirePlatformAdmin,
   optionalAuth
 };

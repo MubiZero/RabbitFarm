@@ -27,7 +27,8 @@ const modules = [
   ['/notes', require('./note.routes')],
   ['/device-tokens', require('./device-token.routes')],
   ['/payments', require('./payment.routes')],
-  ['/photos', require('./photo.routes')]
+  ['/photos', require('./photo.routes')],
+  ['/platform-admin', require('./platform-admin.routes')]
 ];
 
 // API Info

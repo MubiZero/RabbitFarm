@@ -35,6 +35,7 @@ jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
 }));
+jest.mock('../../../src/services/planService');
 
 const {
   Rabbit, Breed, Cage, RabbitWeight, Breeding, Birth, Vaccination,
