@@ -1,5 +1,4 @@
 const { Farm, User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../models');
-const crypto = require('crypto');
 const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
