@@ -74,6 +74,13 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
+    },
+    // Платформенный суперадмин — не роль фермы, а отдельный флаг: видит и
+    // администрирует все фермы сразу. Ставится вручную в БД.
+    is_platform_admin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     tableName: 'users',

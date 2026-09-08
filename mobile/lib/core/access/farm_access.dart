@@ -73,6 +73,16 @@ final farmRoleProvider = Provider<FarmRoleAccess>((ref) {
   return FarmRoleAccess.parse(user?.role);
 });
 
+/// Платформенный суперадмин — доступ поверх ролей фермы.
+///
+/// В [FarmRoleAccess] он намеренно не входит: это не «роль выше владельца», а
+/// другое измерение. Суперадмин распоряжается сервисом — тарифами и фермами, —
+/// но внутри своей фермы остаётся тем, кем записан; и наоборот, владелец
+/// фермы суперадмином от этого не становится.
+final isPlatformAdminProvider = Provider<bool>((ref) {
+  return ref.watch(authProvider).user?.isPlatformAdmin ?? false;
+});
+
 /// Доступна ли пользователю конкретная возможность.
 final canProvider = Provider.family<bool, FarmCapability>(
   (ref, capability) => ref.watch(farmRoleProvider).can(capability),

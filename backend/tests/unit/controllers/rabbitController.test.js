@@ -83,6 +83,17 @@ describe('RabbitController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
+    it('should return 400 when RABBIT_LIMIT_REACHED', async () => {
+      rabbitService.createRabbit.mockRejectedValue(new Error('RABBIT_LIMIT_REACHED'));
+      const req = mockReq({ body: { breed_id: 1 } });
+      const res = mockRes();
+
+      await rabbitController.create(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
     it('should return 404 when CAGE_NOT_FOUND', async () => {
       rabbitService.createRabbit.mockRejectedValue(new Error('CAGE_NOT_FOUND'));
       const req = mockReq({ body: { cage_id: 999 } });

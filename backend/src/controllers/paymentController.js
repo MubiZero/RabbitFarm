@@ -42,7 +42,7 @@ class PaymentController {
    */
   async webhook(req, res, next) {
     try {
-      const invoiceId = req.body && req.body.invoiceId;
+      const invoiceId = req.body && req.body.data && req.body.data.invoiceId;
       if (!invoiceId) {
         return res.sendStatus(200);
       }

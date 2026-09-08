@@ -12,7 +12,7 @@ jest.mock('../../../src/models', () => ({
 
 const JWTUtil = require('../../../src/utils/jwt');
 const { User, TokenBlacklist } = require('../../../src/models');
-const { authenticate, authorize, optionalAuth } = require('../../../src/middleware/auth');
+const { authenticate, authorize, requirePlatformAdmin, optionalAuth } = require('../../../src/middleware/auth');
 
 const mockRes = () => {
   const res = {};
@@ -213,6 +213,39 @@ describe('authorize middleware', () => {
     middleware(req, res, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(403);
+  });
+});
+
+describe('requirePlatformAdmin middleware', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('should return 401 if no user attached', () => {
+    const req = { user: null };
+    const res = mockRes();
+
+    requirePlatformAdmin(req, res, mockNext);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('should return 403 for a regular farm user (owner included — это не роль фермы)', () => {
+    const req = { user: { role: 'owner', is_platform_admin: false } };
+    const res = mockRes();
+
+    requirePlatformAdmin(req, res, mockNext);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('should call next() for a platform admin', () => {
+    const req = { user: { role: 'worker', is_platform_admin: true } };
+    const res = mockRes();
+
+    requirePlatformAdmin(req, res, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith();
   });
 });
 

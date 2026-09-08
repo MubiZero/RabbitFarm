@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { Op } = require('sequelize');
 const { User, Farm, Invitation, RefreshToken } = require('../models');
 const PasswordUtil = require('../utils/password');
+const planService = require('./planService');
 const logger = require('../utils/logger');
 
 const INVITE_TTL_DAYS = 7;
@@ -36,6 +37,8 @@ class StaffService {
    * @returns {Object} приглашение и код — код возвращается единственный раз
    */
   async createInvitation(farmId, authorId, { email, role }) {
+    await planService.assertStaffLimit(farmId);
+
     const normalizedEmail = email.trim().toLowerCase();
 
     const existingUser = await User.findOne({ where: { email: normalizedEmail } });
@@ -111,6 +114,10 @@ class StaffService {
     if (existingUser) {
       throw new Error('USER_EXISTS');
     }
+
+    // Лимит могли зачерпнуть уже после того, как приглашение выписали:
+    // за неделю его действия ферма могла добрать штат другим путём.
+    await planService.assertStaffLimit(invitation.farm_id);
 
     const user = await User.create({
       email: invitation.email,

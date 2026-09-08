@@ -26,6 +26,7 @@ mixin _$UserRef {
   @JsonKey(name: 'full_name')
   String get fullName => throw _privateConstructorUsedError;
   String? get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
 
   /// Serializes this UserRef to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,6 +46,7 @@ abstract class $UserRefCopyWith<$Res> {
     @IntConverter() int id,
     @JsonKey(name: 'full_name') String fullName,
     String? email,
+    String? phone,
   });
 }
 
@@ -66,6 +68,7 @@ class _$UserRefCopyWithImpl<$Res, $Val extends UserRef>
     Object? id = null,
     Object? fullName = null,
     Object? email = freezed,
+    Object? phone = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -80,6 +83,10 @@ class _$UserRefCopyWithImpl<$Res, $Val extends UserRef>
             email: freezed == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            phone: freezed == phone
+                ? _value.phone
+                : phone // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -99,6 +106,7 @@ abstract class _$$UserRefImplCopyWith<$Res> implements $UserRefCopyWith<$Res> {
     @IntConverter() int id,
     @JsonKey(name: 'full_name') String fullName,
     String? email,
+    String? phone,
   });
 }
 
@@ -119,6 +127,7 @@ class __$$UserRefImplCopyWithImpl<$Res>
     Object? id = null,
     Object? fullName = null,
     Object? email = freezed,
+    Object? phone = freezed,
   }) {
     return _then(
       _$UserRefImpl(
@@ -134,6 +143,10 @@ class __$$UserRefImplCopyWithImpl<$Res>
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
                   as String?,
+        phone: freezed == phone
+            ? _value.phone
+            : phone // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -146,6 +159,7 @@ class _$UserRefImpl implements _UserRef {
     @IntConverter() required this.id,
     @JsonKey(name: 'full_name') required this.fullName,
     this.email,
+    this.phone,
   });
 
   factory _$UserRefImpl.fromJson(Map<String, dynamic> json) =>
@@ -159,10 +173,12 @@ class _$UserRefImpl implements _UserRef {
   final String fullName;
   @override
   final String? email;
+  @override
+  final String? phone;
 
   @override
   String toString() {
-    return 'UserRef(id: $id, fullName: $fullName, email: $email)';
+    return 'UserRef(id: $id, fullName: $fullName, email: $email, phone: $phone)';
   }
 
   @override
@@ -173,12 +189,13 @@ class _$UserRefImpl implements _UserRef {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.fullName, fullName) ||
                 other.fullName == fullName) &&
-            (identical(other.email, email) || other.email == email));
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, fullName, email);
+  int get hashCode => Object.hash(runtimeType, id, fullName, email, phone);
 
   /// Create a copy of UserRef
   /// with the given fields replaced by the non-null parameter values.
@@ -199,6 +216,7 @@ abstract class _UserRef implements UserRef {
     @IntConverter() required final int id,
     @JsonKey(name: 'full_name') required final String fullName,
     final String? email,
+    final String? phone,
   }) = _$UserRefImpl;
 
   factory _UserRef.fromJson(Map<String, dynamic> json) = _$UserRefImpl.fromJson;
@@ -211,6 +229,8 @@ abstract class _UserRef implements UserRef {
   String get fullName;
   @override
   String? get email;
+  @override
+  String? get phone;
 
   /// Create a copy of UserRef
   /// with the given fields replaced by the non-null parameter values.

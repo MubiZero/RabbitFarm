@@ -30,7 +30,12 @@ mixin _$UserModel {
   @JsonKey(name: 'avatar_url')
   String? get avatarUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_active')
-  bool get isActive => throw _privateConstructorUsedError;
+  bool get isActive => throw _privateConstructorUsedError; // Платформенный суперадмин — это не роль на ферме, а отдельное
+  // измерение доступа: он администрирует сервис целиком. Флаг ставится
+  // вручную в базе, поэтому у обычного пользователя его в ответе может
+  // не быть вовсе — отсюда значение по умолчанию.
+  @JsonKey(name: 'is_platform_admin')
+  bool get isPlatformAdmin => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_login_at')
   @NullableDateTimeConverter()
   DateTime? get lastLoginAt => throw _privateConstructorUsedError;
@@ -64,6 +69,7 @@ abstract class $UserModelCopyWith<$Res> {
     String? phone,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,
     @JsonKey(name: 'last_login_at')
     @NullableDateTimeConverter()
     DateTime? lastLoginAt,
@@ -94,6 +100,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? phone = freezed,
     Object? avatarUrl = freezed,
     Object? isActive = null,
+    Object? isPlatformAdmin = null,
     Object? lastLoginAt = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -127,6 +134,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
             isActive: null == isActive
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isPlatformAdmin: null == isPlatformAdmin
+                ? _value.isPlatformAdmin
+                : isPlatformAdmin // ignore: cast_nullable_to_non_nullable
                       as bool,
             lastLoginAt: freezed == lastLoginAt
                 ? _value.lastLoginAt
@@ -163,6 +174,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String? phone,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,
     @JsonKey(name: 'last_login_at')
     @NullableDateTimeConverter()
     DateTime? lastLoginAt,
@@ -192,6 +204,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? phone = freezed,
     Object? avatarUrl = freezed,
     Object? isActive = null,
+    Object? isPlatformAdmin = null,
     Object? lastLoginAt = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -226,6 +239,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isPlatformAdmin: null == isPlatformAdmin
+            ? _value.isPlatformAdmin
+            : isPlatformAdmin // ignore: cast_nullable_to_non_nullable
+                  as bool,
         lastLoginAt: freezed == lastLoginAt
             ? _value.lastLoginAt
             : lastLoginAt // ignore: cast_nullable_to_non_nullable
@@ -254,6 +271,7 @@ class _$UserModelImpl implements _UserModel {
     this.phone,
     @JsonKey(name: 'avatar_url') this.avatarUrl,
     @JsonKey(name: 'is_active') required this.isActive,
+    @JsonKey(name: 'is_platform_admin') this.isPlatformAdmin = false,
     @JsonKey(name: 'last_login_at')
     @NullableDateTimeConverter()
     this.lastLoginAt,
@@ -281,6 +299,13 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(name: 'is_active')
   final bool isActive;
+  // Платформенный суперадмин — это не роль на ферме, а отдельное
+  // измерение доступа: он администрирует сервис целиком. Флаг ставится
+  // вручную в базе, поэтому у обычного пользователя его в ответе может
+  // не быть вовсе — отсюда значение по умолчанию.
+  @override
+  @JsonKey(name: 'is_platform_admin')
+  final bool isPlatformAdmin;
   @override
   @JsonKey(name: 'last_login_at')
   @NullableDateTimeConverter()
@@ -296,7 +321,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, fullName: $fullName, role: $role, phone: $phone, avatarUrl: $avatarUrl, isActive: $isActive, lastLoginAt: $lastLoginAt, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserModel(id: $id, email: $email, fullName: $fullName, role: $role, phone: $phone, avatarUrl: $avatarUrl, isActive: $isActive, isPlatformAdmin: $isPlatformAdmin, lastLoginAt: $lastLoginAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -314,6 +339,8 @@ class _$UserModelImpl implements _UserModel {
                 other.avatarUrl == avatarUrl) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
+            (identical(other.isPlatformAdmin, isPlatformAdmin) ||
+                other.isPlatformAdmin == isPlatformAdmin) &&
             (identical(other.lastLoginAt, lastLoginAt) ||
                 other.lastLoginAt == lastLoginAt) &&
             (identical(other.createdAt, createdAt) ||
@@ -333,6 +360,7 @@ class _$UserModelImpl implements _UserModel {
     phone,
     avatarUrl,
     isActive,
+    isPlatformAdmin,
     lastLoginAt,
     createdAt,
     updatedAt,
@@ -361,6 +389,7 @@ abstract class _UserModel implements UserModel {
     final String? phone,
     @JsonKey(name: 'avatar_url') final String? avatarUrl,
     @JsonKey(name: 'is_active') required final bool isActive,
+    @JsonKey(name: 'is_platform_admin') final bool isPlatformAdmin,
     @JsonKey(name: 'last_login_at')
     @NullableDateTimeConverter()
     final DateTime? lastLoginAt,
@@ -391,7 +420,13 @@ abstract class _UserModel implements UserModel {
   String? get avatarUrl;
   @override
   @JsonKey(name: 'is_active')
-  bool get isActive;
+  bool get isActive; // Платформенный суперадмин — это не роль на ферме, а отдельное
+  // измерение доступа: он администрирует сервис целиком. Флаг ставится
+  // вручную в базе, поэтому у обычного пользователя его в ответе может
+  // не быть вовсе — отсюда значение по умолчанию.
+  @override
+  @JsonKey(name: 'is_platform_admin')
+  bool get isPlatformAdmin;
   @override
   @JsonKey(name: 'last_login_at')
   @NullableDateTimeConverter()

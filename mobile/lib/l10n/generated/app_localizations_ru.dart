@@ -1353,7 +1353,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get medFormNotSet => 'Не указана';
 
   @override
-  String get medFormCostLabel => 'Затраты, ₽';
+  String medFormCostLabel(String currency) {
+    return 'Затраты, $currency';
+  }
 
   @override
   String get commonNumberInvalid => 'Введите число';
@@ -3328,6 +3330,194 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get reportsRecordsByOutcome => 'Лечение по исходу';
+
+  @override
+  String get farmSectionPlatform => 'Платформа';
+
+  @override
+  String get farmPlatformAdmin => 'Фермы и тарифы';
+
+  @override
+  String get platformTitle => 'Платформа';
+
+  @override
+  String get platformTabFarms => 'Фермы';
+
+  @override
+  String get platformTabPlans => 'Тарифы';
+
+  @override
+  String countFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count фермы',
+      many: '$count ферм',
+      few: '$count фермы',
+      one: '$count ферма',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get platformFarmsEmptyTitle => 'Ферм пока нет';
+
+  @override
+  String get platformFarmsEmptyBody =>
+      'Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.';
+
+  @override
+  String get platformOwnerMissing => 'Владелец не назначен';
+
+  @override
+  String get platformNoPlan => 'Без тарифа';
+
+  @override
+  String get platformNoPlanHint => 'Ограничений нет';
+
+  @override
+  String get platformRabbits => 'Кролики';
+
+  @override
+  String get platformStaff => 'Люди';
+
+  @override
+  String platformUsageOfLimit(int used, int limit) {
+    return '$used из $limit';
+  }
+
+  @override
+  String platformUsageUnlimited(int used) {
+    return '$used, без предела';
+  }
+
+  @override
+  String get platformAtLimit => 'Упёрлась в предел тарифа';
+
+  @override
+  String get platformNearLimit => 'Подходит к пределу тарифа';
+
+  @override
+  String get platformChangePlan => 'Сменить тариф';
+
+  @override
+  String get platformAssignPlan => 'Назначить тариф';
+
+  @override
+  String platformPlanSheetTitle(String farm) {
+    return 'Тариф хозяйства «$farm»';
+  }
+
+  @override
+  String get platformPlanOff => 'Без тарифа — работает без ограничений';
+
+  @override
+  String get platformPlanAssigned => 'Тариф обновлён';
+
+  @override
+  String get platformPlanInactive => 'выключен';
+
+  @override
+  String get platformPlansEmptyTitle => 'Тарифов пока нет';
+
+  @override
+  String get platformPlansEmptyBody =>
+      'Пока их нет, все фермы работают без ограничений. Создайте первый — и его можно будет назначать.';
+
+  @override
+  String get platformPlanNew => 'Новый тариф';
+
+  @override
+  String get platformPlanEdit => 'Изменить';
+
+  @override
+  String get platformPlanDeleteTitle => 'Удалить тариф?';
+
+  @override
+  String platformPlanDeleteBody(String name) {
+    return '«$name» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.';
+  }
+
+  @override
+  String get platformPlanDeleted => 'Тариф удалён';
+
+  @override
+  String get platformPlanUnlimited => 'Без ограничений';
+
+  @override
+  String get platformPlanFree => 'Бесплатный';
+
+  @override
+  String platformPlanLimitRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'до $count кроликов',
+      many: 'до $count кроликов',
+      few: 'до $count кроликов',
+      one: 'до $count кролика',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformPlanLimitStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'до $count человек',
+      many: 'до $count человек',
+      few: 'до $count человек',
+      one: 'до $count человека',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get platformPlanFormNewTitle => 'Новый тариф';
+
+  @override
+  String get platformPlanFormEditTitle => 'Тариф';
+
+  @override
+  String get platformPlanFormName => 'Название';
+
+  @override
+  String get platformPlanFormNameHint => 'Например, «Базовый»';
+
+  @override
+  String get platformPlanFormNameEmpty => 'Введите название';
+
+  @override
+  String get platformPlanFormPrice => 'Цена в месяц';
+
+  @override
+  String get platformPlanFormPriceHint => 'Пусто — бесплатно';
+
+  @override
+  String get platformPlanFormSectionLimits => 'Пределы';
+
+  @override
+  String get platformPlanFormMaxRabbits => 'Кроликов не больше';
+
+  @override
+  String get platformPlanFormMaxStaff => 'Людей не больше';
+
+  @override
+  String get platformPlanFormLimitHint => 'Пусто — без ограничения';
+
+  @override
+  String get platformPlanFormActive => 'Тариф в ходу';
+
+  @override
+  String get platformPlanFormActiveHint =>
+      'Выключенный тариф остаётся у ферм, которым уже назначен, но новым его не выдать.';
+
+  @override
+  String get platformPlanFormCreated => 'Тариф создан';
+
+  @override
+  String get platformPlanFormUpdated => 'Тариф обновлён';
 
   @override
   String get emptyNoRecordsTitle => 'Записей нет';

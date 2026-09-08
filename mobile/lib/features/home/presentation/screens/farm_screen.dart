@@ -29,6 +29,7 @@ class FarmScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
     final role = ref.watch(farmRoleProvider);
+    final isPlatformAdmin = ref.watch(isPlatformAdminProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -125,6 +126,19 @@ class FarmScreen extends ConsumerWidget {
                   _Item(Icons.groups_outlined, context.l10n.farmStaff, '/staff'),
               ],
             ),
+
+            // Платформенная админка — не про это хозяйство, а про сервис
+            // целиком, поэтому она отдельным разделом и только у суперадмина.
+            // Это не роль на ферме: владелец фермы её не видит.
+            if (isPlatformAdmin)
+              _Section(
+                title: context.l10n.farmSectionPlatform,
+                domain: AppDomain.admin,
+                items: [
+                  _Item(Icons.apartment_outlined,
+                      context.l10n.farmPlatformAdmin, '/platform-admin'),
+                ],
+              ),
 
             _Section(
               title: context.l10n.farmSectionApp,

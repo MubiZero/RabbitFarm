@@ -90,6 +90,9 @@ class StaffController {
         'Приглашение создано. Передайте код — второй раз он не покажется.'
       );
     } catch (error) {
+      if (error.message === 'STAFF_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы');
+      }
       if (error.message === 'USER_EXISTS') {
         return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');
       }
@@ -142,6 +145,9 @@ class StaffController {
           400,
           'INVITATION_INVALID'
         );
+      }
+      if (error.message === 'STAFF_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.');
       }
       if (error.message === 'USER_EXISTS') {
         return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');

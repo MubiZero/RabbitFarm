@@ -32,6 +32,7 @@ jest.mock('../../../src/utils/fileStorage', () => ({ deleteFile: jest.fn() }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
 }));
+jest.mock('../../../src/services/planService');
 
 const {
   Rabbit, RabbitWeight, Breeding, Birth, Vaccination, MedicalRecord, Transaction, sequelize

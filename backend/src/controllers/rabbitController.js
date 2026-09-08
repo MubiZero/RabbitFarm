@@ -27,6 +27,9 @@ class RabbitController {
 
       return ApiResponse.created(res, rabbit, 'Кролик успешно добавлен');
     } catch (error) {
+      if (error.message === 'RABBIT_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит кроликов по тарифу фермы');
+      }
       if (error.message === 'BREED_NOT_FOUND') {
         return ApiResponse.notFound(res, 'Порода не найдена');
       }

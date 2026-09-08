@@ -19,7 +19,7 @@ async function sendPasswordResetEmail({ to, code }) {
   const transporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
-    secure: false,
+    secure: config.secure,
     requireTLS: config.useStartTls,
     auth: { user: config.username, pass: config.password }
   });

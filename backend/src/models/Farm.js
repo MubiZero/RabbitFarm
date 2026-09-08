@@ -32,6 +32,13 @@ module.exports = (sequelize) => {
     owner_id: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    // Тариф фермы. NULL — план не назначен, ограничений нет (см.
+    // src/services/planService.js). Назначается только платформенным
+    // админом, сама ферма себе план не выбирает.
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'farms',
@@ -40,7 +47,8 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     indexes: [
-      { fields: ['owner_id'], name: 'idx_farms_owner' }
+      { fields: ['owner_id'], name: 'idx_farms_owner' },
+      { fields: ['plan_id'], name: 'idx_farms_plan' }
     ]
   });
 };

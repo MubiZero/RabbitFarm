@@ -16,6 +16,7 @@ _$UserModelImpl _$$UserModelImplFromJson(
   phone: json['phone'] as String?,
   avatarUrl: json['avatar_url'] as String?,
   isActive: json['is_active'] as bool,
+  isPlatformAdmin: json['is_platform_admin'] as bool? ?? false,
   lastLoginAt: const NullableDateTimeConverter().fromJson(
     json['last_login_at'],
   ),
@@ -32,6 +33,7 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'phone': instance.phone,
       'avatar_url': instance.avatarUrl,
       'is_active': instance.isActive,
+      'is_platform_admin': instance.isPlatformAdmin,
       'last_login_at': const NullableDateTimeConverter().toJson(
         instance.lastLoginAt,
       ),

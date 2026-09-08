@@ -315,7 +315,7 @@ class _MedicalRecordFormScreenState
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                labelText: l10n.medFormCostLabel,
+                labelText: l10n.medFormCostLabel(kCurrencySymbol),
                 prefixIcon: const Icon(Icons.payments_outlined),
                 // Сумма не просто хранится в карте: сервер заводит на неё
                 // расход. Пользователь должен знать об этом до сохранения.
