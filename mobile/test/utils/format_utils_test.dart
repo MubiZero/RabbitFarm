@@ -65,4 +65,24 @@ void main() {
       expect(formatMoney(42), endsWith(kCurrencySymbol));
     });
   });
+
+  group('Занятое место', () {
+    test('делится по 1024, как показывает место сама система', () {
+      expect(scaleBytes(512), (value: 512.0, power: 0));
+      expect(scaleBytes(2048), (value: 2.0, power: 1));
+      expect(scaleBytes(15728640), (value: 15.0, power: 2));
+    });
+
+    test('приставка не растёт дальше гигабайтов', () {
+      // Дальше словарь приставок не идёт: пусть ферма на терабайт покажет
+      // «1024 ГБ», а не пустое место вместо приставки.
+      final scaled = scaleBytes(1024 * 1024 * 1024 * 1024);
+      expect(scaled.power, 3);
+      expect(scaled.value, 1024.0);
+    });
+
+    test('пусто — это ноль, а не отсутствие ответа', () {
+      expect(scaleBytes(0), (value: 0.0, power: 0));
+    });
+  });
 }

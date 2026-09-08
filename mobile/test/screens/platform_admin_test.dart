@@ -208,6 +208,24 @@ void main() {
       expect(find.text('Владелец не назначен'), findsOneWidget);
     });
 
+    testWidgets('тап по карточке открывает карточку фермы', (tester) async {
+      // Проверяется вызов, а не переход: сам маршрут
+      // (`/platform-admin/farms/:id`) живёт в роутере приложения, а карточка
+      // в списке обязана его дёрнуть — раньше строка списка была тупиком.
+      var opened = 0;
+      await tester.pumpWidget(testApp(PlatformFarmCard(
+        farm: _farm(plan: _basic, rabbits: 48, staff: 2),
+        onChangePlan: () {},
+        onOpen: () => opened++,
+      )));
+      await _settle(tester);
+
+      await tester.tap(find.text('Зелёная поляна'));
+      await _settle(tester);
+
+      expect(opened, 1);
+    });
+
     testWidgets('пустой список объясняет, что здесь появится', (tester) async {
       await tester.pumpWidget(_farmsTab());
       await _settle(tester);
@@ -296,19 +314,53 @@ void main() {
       expect(repository.queries.last.filter, isNull);
     });
 
-    testWidgets('фильтр «упёрлась в предел» и фильтр «не заходили» видны как чипы',
-        (tester) async {
+    testWidgets('все срезы списка видны как чипы', (tester) async {
       await tester.pumpWidget(_farmsTab(farms: [_farm(rabbits: 1)]));
-      // Чипы лежат в горизонтальном списке: на обычной ширине телефона третий
-      // чип не построен вовсе, потому что закадрирован — здесь ширина шире,
-      // чтобы все три чипа реально попали во вьюпорт.
-      await tester.binding.setSurfaceSize(const Size(900, 2000));
+      // Чипы лежат в горизонтальном списке: на обычной ширине телефона
+      // дальние чипы не построены вовсе, потому что закадрированы — здесь
+      // ширина шире, чтобы все они реально попали во вьюпорт.
+      await tester.binding.setSurfaceSize(const Size(1400, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.widgetWithText(FilterChip, 'Упёрлась в предел тарифа'), findsOneWidget);
+      // Подпись та же, что у состояния фермы в её карточке — одно состояние
+      // не должно называться в списке иначе.
+      expect(find.widgetWithText(FilterChip, 'Доступ закрыт'), findsOneWidget);
+      expect(find.widgetWithText(FilterChip, 'Просрочен тариф'), findsOneWidget);
       expect(find.widgetWithText(FilterChip, 'Не заходили 30 дней'), findsOneWidget);
+    });
+
+    testWidgets('срезы «доступ закрыт» и «просрочен тариф» уходят на сервер',
+        (tester) async {
+      final repository = _FakeRepository(farms: [_farm(rabbits: 1)]);
+      await tester.pumpWidget(_farmsTab(repository: repository));
+      // Ширина остаётся большой на весь тест: `_settle` вернул бы телефонную,
+      // и дальние чипы перестали бы строиться посреди проверки.
+      await tester.binding.setSurfaceSize(const Size(1400, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      Future<void> pump() async {
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+      }
+
+      await pump();
+
+      await tester.tap(find.widgetWithText(FilterChip, 'Доступ закрыт'));
+      await pump();
+      expect(repository.queries.last.filter, 'suspended');
+
+      // Фильтр один: выбор другого чипа заменяет прежний, а не складывается
+      // с ним.
+      await tester.tap(find.widgetWithText(FilterChip, 'Просрочен тариф'));
+      await pump();
+      expect(repository.queries.last.filter, 'expired');
+
+      await tester.tap(find.widgetWithText(FilterChip, 'Просрочен тариф'));
+      await pump();
+      expect(repository.queries.last.filter, isNull);
     });
   });
 

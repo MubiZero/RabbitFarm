@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -71,6 +72,7 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
       itemBuilder: (context, farm, _) => PlatformFarmCard(
         farm: farm,
         onChangePlan: () => _changePlan(context, ref, farm),
+        onOpen: () => context.push('/platform-admin/farms/${farm.id}'),
       ),
     );
   }
@@ -163,6 +165,21 @@ class _Header extends ConsumerWidget {
               isSelected: state.filter == PlatformFarmFilter.atLimit,
               onTap: () => notifier.toggleFilter(PlatformFarmFilter.atLimit),
               color: AppColors.error,
+            ),
+            AppFilterChipData(
+              // Подпись та же, что у состояния фермы на её карточке: одно
+              // состояние — одно название, иначе «приостановлена» в списке и
+              // «доступ закрыт» в карточке читались бы как разные вещи.
+              label: l10n.platformFarmStatusSuspended,
+              isSelected: state.filter == PlatformFarmFilter.suspended,
+              onTap: () => notifier.toggleFilter(PlatformFarmFilter.suspended),
+              color: AppColors.error,
+            ),
+            AppFilterChipData(
+              label: l10n.platformFilterExpired,
+              isSelected: state.filter == PlatformFarmFilter.expired,
+              onTap: () => notifier.toggleFilter(PlatformFarmFilter.expired),
+              color: AppColors.warning,
             ),
             AppFilterChipData(
               // Порог фиксирован (30 дней) — чипу не нужен свой пикер, чтобы

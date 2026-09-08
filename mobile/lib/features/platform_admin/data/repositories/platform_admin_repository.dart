@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../../core/api/paginated.dart';
+import '../../../../core/json/date_time_converter.dart';
 import '../models/platform_admin_models.dart';
 
 /// Одна страница списка ферм: сами фермы и сведения о том, есть ли ещё.
@@ -106,6 +107,106 @@ class PlatformAdminRepository {
         data: {'plan_id': planId},
       );
       return PlatformFarm.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Одна ферма целиком: владелец, состав, платежи, поблажки, место.
+  Future<PlatformFarmDetail> getFarmDetail(int farmId) async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.platformFarm(farmId));
+      return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Уровень доступа фермы: `active`, `read_only` или `suspended`.
+  ///
+  /// Ответ — ферма целиком, той же формы, что у [getFarmDetail]: карточка
+  /// обновляется из ответа, а не перезапрашивает всё заново.
+  Future<PlatformFarmDetail> updateFarmStatus(int farmId, String status) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.platformFarmStatus(farmId),
+        data: {'status': status},
+      );
+      return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Разовая поблажка сверх тарифа. Сам тариф при этом не меняется.
+  ///
+  /// Все три поля уходят всегда, включая пустые: форма поблажки показывает её
+  /// целиком, поэтому пустое поле — это «добавки нет», а не «не менять».
+  /// Отдельного «снять поблажку» на уровне запроса не нужно — это та же
+  /// тройка пустых значений, и различать «не трогать» от «обнулить»
+  /// значениями-метками не приходится.
+  Future<PlatformFarmDetail> updateFarmExtras(
+    int farmId, {
+    int? extraRabbits,
+    int? extraStaff,
+    DateTime? extrasUntil,
+  }) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.platformFarmExtras(farmId),
+        data: {
+          'extra_rabbits': extraRabbits,
+          'extra_staff': extraStaff,
+          // Календарная дата без времени: срок поблажки — это день, и сдвиг
+          // на часовой пояс превратил бы «до 15-го» в «до 14-го».
+          'extras_until': const NullableDateOnlyConverter().toJson(extrasUntil),
+        },
+      );
+      return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Все записи фермы одним JSON — для просьбы «отдайте мои данные».
+  ///
+  /// Содержимое сознательно не типизируется: это снимок восемнадцати таблиц,
+  /// который никто не разбирает по полям — его показывают целиком и копируют.
+  /// Восемнадцать моделей ради этого жили бы отдельной жизнью и расходились с
+  /// сервером при первом же добавленном поле.
+  Future<Map<String, dynamic>> exportFarm(int farmId) async {
+    try {
+      final response =
+          await _apiClient.get(ApiEndpoints.platformFarmExport(farmId));
+      return Map<String, dynamic>.from(response.data['data'] as Map);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Мягкое удаление: доступ фермы закрывается сразу, записи физически уходят
+  /// позже. Название подтверждения проверяет сервер — не клиент: отказ
+  /// `CONFIRM_NAME_MISMATCH` приезжает как обычная ошибка формы.
+  ///
+  /// Ответ — ферма той же формы, что у [getFarmDetail], уже с `deleted_at`.
+  Future<PlatformFarmDetail> deleteFarm(int farmId, String confirmName) async {
+    try {
+      final response = await _apiClient.delete(
+        ApiEndpoints.platformFarm(farmId),
+        data: {'confirm_name': confirmName},
+      );
+      return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Отменить удаление, пока окно ожидания не вышло.
+  Future<PlatformFarmDetail> restoreFarm(int farmId) async {
+    try {
+      final response =
+          await _apiClient.post(ApiEndpoints.platformFarmRestore(farmId));
+      return PlatformFarmDetail.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

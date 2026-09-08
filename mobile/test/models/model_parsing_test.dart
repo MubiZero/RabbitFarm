@@ -189,4 +189,184 @@ void main() {
       expect(at(7).isNearLimit, isFalse);
     });
   });
+
+  group('Карточка одной фермы', () {
+    // Ровно та форма, которую отдаёт `GET /platform-admin/farms/:id`:
+    // DECIMAL приходит строкой, часть полей — пустыми.
+    Map<String, dynamic> farmJson({
+      Object? extraRabbits,
+      Object? extraStaff,
+      Object? extrasUntil,
+      String status = 'active',
+      Object? deletedAt,
+    }) =>
+        {
+          'id': 1,
+          'name': 'Ферма Иванова',
+          'owner': {
+            'id': 5,
+            'full_name': 'Иван Иванов',
+            'email': 'ivan@example.com',
+            'phone': '+992900000000',
+          },
+          'plan_id': 2,
+          'plan': {
+            'id': 2,
+            'name': 'Базовый',
+            'max_rabbits': 30,
+            'max_staff': 3,
+            'price': 50.0,
+            'is_active': true,
+            'is_default': false,
+          },
+          'plan_expires_at': '2026-10-01T00:00:00.000Z',
+          'status': status,
+          'extra_rabbits': extraRabbits,
+          'extra_staff': extraStaff,
+          'extras_until': extrasUntil,
+          'created_at': '2026-08-01T10:00:00.000Z',
+          'rabbits_count': 26,
+          'staff_count': 2,
+          'last_active': '2026-09-07T18:30:00.000Z',
+          'staff': [
+            {
+              'id': 5,
+              'full_name': 'Иван Иванов',
+              'email': 'ivan@example.com',
+              'phone': '+992900000000',
+              'role': 'owner',
+              'is_active': true,
+              'last_login_at': '2026-09-07T18:30:00.000Z',
+            },
+            {
+              'id': 9,
+              'full_name': 'Пётр Петров',
+              'email': null,
+              'phone': '+992900000001',
+              'role': 'worker',
+              'is_active': true,
+              'last_login_at': null,
+            },
+          ],
+          'payments': [
+            {
+              'id': 3,
+              'amount': '50.00',
+              'currency': '972',
+              'status': 'completed',
+              'description': 'Тариф Базовый',
+              'created_at': '2026-08-01T10:05:00.000Z',
+            },
+          ],
+          'storage_bytes': 15728640,
+          'deleted_at': deletedAt,
+        };
+
+    test('разбирает состав, платежи и место', () {
+      final farm = PlatformFarmDetail.fromJson(farmJson());
+
+      expect(farm.id, 1);
+      expect(farm.planId, 2);
+      expect(farm.plan?.maxRabbits, 30);
+      expect(farm.planExpiresAt, isNotNull);
+      expect(farm.isActive, isTrue);
+      expect(farm.staff, hasLength(2));
+      expect(farm.staff.first.role, 'owner');
+      // Ни разу не заходил — это `null`, а не выдуманная дата.
+      expect(farm.staff.last.lastLoginAt, isNull);
+      expect(farm.staff.last.email, isNull);
+      // Сумма остаётся строкой ровно такой, какой пришла из DECIMAL.
+      expect(farm.payments.single.amount, '50.00');
+      expect(farm.storageBytes, 15728640);
+    });
+
+    test('без поблажки предел равен пределу тарифа', () {
+      final farm = PlatformFarmDetail.fromJson(farmJson());
+
+      expect(farm.hasActiveExtras, isFalse);
+      expect(farm.hasExpiredExtras, isFalse);
+      expect(farm.effectiveRabbitsLimit, 30);
+      expect(farm.effectiveStaffLimit, 3);
+      expect(farm.isAtLimit, isFalse);
+    });
+
+    test('действующая поблажка складывается с тарифом, но не меняет его', () {
+      final farm = PlatformFarmDetail.fromJson(farmJson(
+        extraRabbits: 50,
+        extrasUntil: DateTime.now()
+            .add(const Duration(days: 30))
+            .toUtc()
+            .toIso8601String(),
+      ));
+
+      expect(farm.hasActiveExtras, isTrue);
+      expect(farm.effectiveRabbitsLimit, 80);
+      // Сам тариф остался прежним — поблажка живёт рядом, а не внутри него.
+      expect(farm.plan?.maxRabbits, 30);
+      // Добавки по людям не выдавали — там по-прежнему предел тарифа.
+      expect(farm.effectiveStaffLimit, 3);
+    });
+
+    test('поблажка без срока считается бессрочной', () {
+      final farm =
+          PlatformFarmDetail.fromJson(farmJson(extraStaff: 2, extrasUntil: null));
+
+      expect(farm.hasActiveExtras, isTrue);
+      expect(farm.effectiveStaffLimit, 5);
+    });
+
+    test('истёкшая поблажка не считается и названа истёкшей', () {
+      final farm = PlatformFarmDetail.fromJson(farmJson(
+        extraRabbits: 50,
+        extrasUntil: DateTime.now()
+            .subtract(const Duration(days: 1))
+            .toUtc()
+            .toIso8601String(),
+      ));
+
+      expect(farm.hasActiveExtras, isFalse);
+      expect(farm.hasExpiredExtras, isTrue);
+      expect(farm.effectiveRabbitsLimit, 30);
+    });
+
+    test('ферма без тарифа не выдумывает пределов даже с поблажкой', () {
+      final farm = PlatformFarmDetail.fromJson({
+        'id': 4,
+        'name': 'Новая',
+        'created_at': '2026-08-01T10:00:00.000Z',
+        'extra_rabbits': 10,
+      });
+
+      expect(farm.effectiveRabbitsLimit, isNull);
+      expect(farm.rabbitsUsage, isNull);
+      expect(farm.isAtLimit, isFalse);
+      // Состав и платежи не приехали — пусто, а не падение разбора.
+      expect(farm.staff, isEmpty);
+      expect(farm.payments, isEmpty);
+      expect(farm.storageBytes, 0);
+      // Состояние по умолчанию — обычная работа.
+      expect(farm.isActive, isTrue);
+    });
+
+    test('пометка на удаление разбирается и отличается от живой фермы', () {
+      expect(PlatformFarmDetail.fromJson(farmJson()).isDeleted, isFalse);
+
+      final deleted = PlatformFarmDetail.fromJson(
+        farmJson(deletedAt: '2026-09-08T12:00:00.000Z'),
+      );
+      expect(deleted.isDeleted, isTrue);
+      expect(deleted.deletedAt, isNotNull);
+    });
+
+    test('состояния доступа различимы', () {
+      expect(
+        PlatformFarmDetail.fromJson(farmJson(status: 'read_only')).isReadOnly,
+        isTrue,
+      );
+      expect(
+        PlatformFarmDetail.fromJson(farmJson(status: 'suspended')).isSuspended,
+        isTrue,
+      );
+    });
+  });
 }

@@ -13,14 +13,18 @@ import '../theme/theme.dart';
 class AppGroupLabel extends StatelessWidget {
   final String text;
 
-  const AppGroupLabel(this.text, {super.key});
+  /// Цвет подписи, когда группа под ней тревожная (например необратимое
+  /// действие). Пусто — обычная тихая подпись.
+  final Color? color;
+
+  const AppGroupLabel(this.text, {super.key, this.color});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text.toUpperCase(),
       style: AppTypography.labelSm.copyWith(
-        color: context.colors.onSurfaceVariant,
+        color: color ?? context.colors.onSurfaceVariant,
         letterSpacing: 1.2,
       ),
     );

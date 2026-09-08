@@ -68,6 +68,8 @@ import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/platform_admin/data/models/platform_admin_models.dart';
 import '../../features/platform_admin/presentation/screens/platform_admin_screen.dart';
 import '../../features/platform_admin/presentation/screens/plan_form_screen.dart';
+import '../../features/platform_admin/presentation/screens/farm_detail_screen.dart';
+import '../../features/platform_admin/presentation/screens/farm_export_screen.dart';
 import '../../features/staff/presentation/screens/join_farm_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
@@ -681,6 +683,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/platform-admin/plans/form',
         name: 'platform-plan-form',
         builder: (context, state) => PlanFormScreen(plan: state.extra as Plan?),
+      ),
+      // Карточка одной фермы — по id, а не через `extra`: сама ферма грузится
+      // целиком (состав, платежи, место), и строка из списка ей не подходит.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/platform-admin/farms/:id',
+        name: 'platform-farm',
+        builder: (context, state) => FarmDetailScreen(
+          farmId: int.parse(state.pathParameters['id']!),
+        ),
+      ),
+      // Выгрузка данных фермы. Название приходит в `extra` с карточки — только
+      // для заголовка; без него экран обходится подписью-заглушкой, а не
+      // вторым запросом.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/platform-admin/farms/:id/export',
+        name: 'platform-farm-export',
+        builder: (context, state) => FarmExportScreen(
+          farmId: int.parse(state.pathParameters['id']!),
+          farmName: state.extra as String?,
+        ),
       ),
 
     ],

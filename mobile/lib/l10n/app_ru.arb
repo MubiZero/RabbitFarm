@@ -12,6 +12,8 @@
   "commonAdd": "Добавить",
   "commonDelete": "Удалить",
   "commonClose": "Закрыть",
+  "commonCopy": "Скопировать",
+  "commonCopied": "Скопировано",
   "commonLoadFailed": "Не удалось загрузить",
   "commonUnknownError": "Неизвестная ошибка",
   "errorOffline": "Нет связи — проверьте интернет",
@@ -1120,8 +1122,6 @@
   "@staffValidUntil": {
     "placeholders": { "date": { "type": "String" } }
   },
-  "staffCopied": "Скопировано",
-  "staffCopy": "Скопировать",
   "staffMakeManager": "Сделать управляющим",
   "staffMakeWorker": "Сделать работником",
   "staffResetPassword": "Сбросить пароль",
@@ -1354,6 +1354,7 @@
       "days": { "type": "int" }
     }
   },
+  "platformFilterExpired": "Просрочен тариф",
   "platformChangePlan": "Сменить тариф",
   "platformAssignPlan": "Назначить тариф",
   "platformPlanSheetTitle": "Тариф хозяйства «{farm}»",
@@ -1409,6 +1410,161 @@
   "platformPlanFormDefaultHint": "Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.",
   "platformPlanFormCreated": "Тариф создан",
   "platformPlanFormUpdated": "Тариф обновлён",
+
+  "platformFarmTitleFallback": "Ферма",
+  "platformFarmSectionOwner": "Владелец и связь",
+  "platformFarmSectionAccess": "Доступ",
+  "platformFarmSectionPlan": "Тариф",
+  "platformFarmSectionExtras": "Поблажка",
+  "platformFarmSectionUsage": "Потребление",
+  "platformFarmSectionStaff": "Состав",
+  "platformFarmSectionPayments": "Платежи",
+  "platformFarmSectionFacts": "Ещё о ферме",
+  "platformFarmSectionExport": "Выгрузка данных",
+  "platformFarmSectionDanger": "Удаление фермы",
+
+  "platformFarmContactMissing": "Ни почты, ни телефона — связаться нечем",
+
+  "platformFarmStatusActive": "Работает как обычно",
+  "platformFarmStatusActiveHint": "Ферма читает и записывает всё своё без помех.",
+  "platformFarmStatusReadOnly": "Только чтение",
+  "platformFarmStatusReadOnlyHint": "Данные видны, записать ничего нельзя. Так поступают при неоплате: история хозяйства остаётся у фермера, а работать в ней нельзя, пока не заплатит.",
+  "platformFarmStatusSuspended": "Доступ закрыт",
+  "platformFarmStatusSuspendedHint": "Ферма не пускает никого — ни записать, ни посмотреть.",
+  "platformFarmStatusUnknown": "Неизвестное состояние: {status}",
+  "@platformFarmStatusUnknown": {
+    "placeholders": {
+      "status": { "type": "String" }
+    }
+  },
+  "platformFarmStatusChange": "Изменить доступ",
+  "platformFarmStatusSheetTitle": "Доступ хозяйства «{farm}»",
+  "@platformFarmStatusSheetTitle": {
+    "placeholders": {
+      "farm": { "type": "String" }
+    }
+  },
+  "platformFarmStatusConfirmTitle": "Изменить доступ?",
+  "platformFarmStatusConfirmBody": "Хозяйство перейдёт в состояние «{status}». Люди на ферме увидят это сразу же, без перезахода.",
+  "@platformFarmStatusConfirmBody": {
+    "placeholders": {
+      "status": { "type": "String" }
+    }
+  },
+  "platformFarmStatusApply": "Применить",
+  "platformFarmStatusUpdated": "Доступ обновлён",
+
+  "platformFarmPlanForever": "Бессрочно",
+  "platformFarmPlanExpires": "Действует до {date}",
+  "@platformFarmPlanExpires": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "platformFarmPlanExpired": "Срок истёк {date}",
+  "@platformFarmPlanExpired": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+
+  "platformFarmExtrasNone": "Поблажек нет — действуют пределы тарифа",
+  "platformFarmExtrasGrant": "Выдать поблажку",
+  "platformFarmExtrasEdit": "Изменить",
+  "platformFarmExtrasClear": "Снять поблажку",
+  "platformFarmExtrasRabbits": "{count, plural, one{+{count} кролик} few{+{count} кролика} many{+{count} кроликов} other{+{count} кролика}}",
+  "@platformFarmExtrasRabbits": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformFarmExtrasStaff": "{count, plural, one{+{count} человек} few{+{count} человека} many{+{count} человек} other{+{count} человека}}",
+  "@platformFarmExtrasStaff": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "platformFarmExtrasUntil": "до {date}",
+  "@platformFarmExtrasUntil": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "platformFarmExtrasEndless": "бессрочно",
+  "platformFarmExtrasExpired": "Поблажка истекла {date} — снова действуют пределы тарифа",
+  "@platformFarmExtrasExpired": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "platformFarmExtrasFormTitle": "Поблажка сверх тарифа",
+  "platformFarmExtrasFormBody": "Добавка к пределам одной этой фермы. Сам тариф не меняется — ни у неё, ни у остальных.",
+  "platformFarmExtrasFormRabbits": "Кроликов сверх тарифа",
+  "platformFarmExtrasFormStaff": "Людей сверх тарифа",
+  "platformFarmExtrasFormAmountHint": "Пусто — без добавки",
+  "platformFarmExtrasFormUntil": "Действует до",
+  "platformFarmExtrasFormSetDeadline": "Задать срок",
+  "platformFarmExtrasFormEndlessHint": "Без срока поблажка действует бессрочно.",
+  "platformFarmExtrasFormEmpty": "Укажите кроликов или людей — или снимите поблажку",
+  "platformFarmExtrasSaved": "Поблажка обновлена",
+  "platformFarmExtrasCleared": "Поблажка снята",
+
+  "platformFarmStaffNever": "Ещё не заходил",
+  "platformFarmStaffLastLogin": "Заходил {date}",
+  "@platformFarmStaffLastLogin": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "platformFarmStaffBlocked": "Вход закрыт",
+  "platformFarmStaffEmpty": "В составе никого — даже владельца",
+
+  "platformFarmPaymentsEmpty": "Платежей ещё не было",
+  "platformFarmPaymentNew": "Начат",
+  "platformFarmPaymentCompleted": "Оплачен",
+  "platformFarmPaymentFailed": "Не прошёл",
+
+  "platformFarmExport": "Экспортировать данные",
+  "platformFarmExportHint": "Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».",
+  "platformFarmExportGeneratedAt": "Снимок собран {date}",
+  "@platformFarmExportGeneratedAt": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+
+  "platformFarmDelete": "Удалить ферму",
+  "platformFarmDeleteHint": "Доступ закроется сразу же, а записи и файлы уйдут окончательно через 30 дней. До этого ферму можно вернуть.",
+  "platformFarmDeleteTitle": "Удалить ферму?",
+  "platformFarmDeleteBody": "Люди на ферме потеряют доступ сразу же. Кролики, лечение, фото и платежи будут окончательно удалены через 30 дней — до этого удаление можно отменить. Чтобы подтвердить, наберите название хозяйства.",
+  "platformFarmDeleteConfirmLabel": "Название фермы",
+  "platformFarmDeleteConfirmHint": "Наберите «{name}»",
+  "@platformFarmDeleteConfirmHint": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "platformFarmDeleteMismatch": "Название не совпадает с названием фермы",
+  "platformFarmDeleted": "Ферма удалена",
+  "platformFarmDeletedBanner": "Ферма удалена {date}. Записи и файлы будут окончательно очищены через 30 дней после удаления.",
+  "@platformFarmDeletedBanner": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "platformFarmDeletedLocked": "Пока ферма удалена, доступ и поблажки не меняются — сначала восстановите её.",
+  "platformFarmRestore": "Восстановить",
+  "platformFarmRestored": "Ферма восстановлена",
+
+  "platformFarmStorage": "Занятое место",
+  "platformFarmLastActive": "Последний вход",
+  "platformFarmNeverActive": "Ещё не заходили",
+  "platformFarmCreatedAt": "Ферма создана",
+
+  "storageUnitBytes": "Б",
+  "storageUnitKb": "КБ",
+  "storageUnitMb": "МБ",
+  "storageUnitGb": "ГБ",
 
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую."

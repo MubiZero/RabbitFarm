@@ -4,6 +4,7 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
+import 'farm_usage_row.dart';
 
 /// Одна ферма в платформенной админке: чья она, на каком тарифе и сколько уже
 /// израсходовала из своих пределов.
@@ -16,16 +17,22 @@ class PlatformFarmCard extends StatelessWidget {
     super.key,
     required this.farm,
     required this.onChangePlan,
+    this.onOpen,
   });
 
   final PlatformFarm farm;
   final VoidCallback onChangePlan;
+
+  /// Открыть карточку фермы. Всё, чего в строке списка нет — состав, платежи,
+  /// доступ, поблажки, — живёт там.
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
     final owner = farm.owner;
 
     return AppCard(
+      onTap: onOpen,
       variant:
           farm.isAtLimit ? AppCardVariant.error : AppCardVariant.default_,
       child: Column(
@@ -60,13 +67,13 @@ class PlatformFarmCard extends StatelessWidget {
                 .copyWith(color: context.colors.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.lg),
-          _UsageRow(
+          FarmUsageRow(
             icon: Icons.pets_outlined,
             label: context.l10n.platformRabbits,
             used: farm.rabbitsCount,
             limit: farm.plan?.maxRabbits,
           ),
-          _UsageRow(
+          FarmUsageRow(
             icon: Icons.groups_outlined,
             label: context.l10n.platformStaff,
             used: farm.staffCount,
@@ -123,64 +130,6 @@ class _PlanChip extends StatelessWidget {
         label,
         style: AppTypography.labelSm.copyWith(color: color),
       ),
-    );
-  }
-}
-
-/// Расход одного ресурса. Полоса рисуется только когда есть от чего считать
-/// долю: у фермы без предела делить не на что, и пустая полоса читалась бы
-/// как «ничего не израсходовано».
-class _UsageRow extends StatelessWidget {
-  const _UsageRow({
-    required this.icon,
-    required this.label,
-    required this.used,
-    required this.limit,
-  });
-
-  final IconData icon;
-  final String label;
-  final int used;
-  final int? limit;
-
-  @override
-  Widget build(BuildContext context) {
-    if (limit == null || limit! <= 0) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: context.colors.onSurfaceVariant),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTypography.bodyMd
-                    .copyWith(color: context.colors.onSurface),
-              ),
-            ),
-            Text(
-              context.l10n.platformUsageUnlimited(used),
-              style: AppTypography.labelLg
-                  .copyWith(color: context.colors.onSurfaceVariant),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final fraction = used / limit!;
-
-    return MetricBar(
-      icon: icon,
-      label: label,
-      value: context.l10n.platformUsageOfLimit(used, limit!),
-      fraction: fraction,
-      color: fraction >= 1
-          ? AppColors.error
-          : fraction >= 0.8
-              ? AppColors.warning
-              : context.accent,
     );
   }
 }

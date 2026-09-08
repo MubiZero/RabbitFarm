@@ -94,7 +94,13 @@ class ApiEndpoints {
   static const String platformPlans = '/platform-admin/plans';
   static String platformPlan(int id) => '/platform-admin/plans/$id';
   static const String platformFarms = '/platform-admin/farms';
+  static String platformFarm(int id) => '/platform-admin/farms/$id';
   static String platformFarmPlan(int id) => '/platform-admin/farms/$id/plan';
+  static String platformFarmStatus(int id) => '/platform-admin/farms/$id/status';
+  static String platformFarmExtras(int id) => '/platform-admin/farms/$id/extras';
+  static String platformFarmExport(int id) => '/platform-admin/farms/$id/export';
+  static String platformFarmRestore(int id) =>
+      '/platform-admin/farms/$id/restore';
 
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';

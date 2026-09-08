@@ -5,6 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/l10n/generated/app_localizations.dart';
 
+/// Тема приложения без чернильной волны от нажатий.
+///
+/// Волна Material 3 рисуется шейдером (`shaders/ink_sparkle.frag`), а в
+/// тестовом окружении он загружается из артефактов SDK и может оказаться
+/// несовместимым с движком — тогда любой тап валит тест сообщением про
+/// «runtime stages format version», не имеющим отношения к проверяемому
+/// поведению. Тесты про поведение, а не про анимацию нажатия.
+ThemeData _theme(Brightness brightness) => AppTheme.build(
+      brightness: brightness,
+      accent: const Color(0xFF10B981),
+    ).copyWith(splashFactory: NoSplash.splashFactory);
+
 /// Обёртка для виджет-тестов: та же тема и те же переводы, что в приложении.
 ///
 /// Без делегата переводов любой экран падает на первом же обращении к строке,
@@ -17,10 +29,7 @@ Widget testApp(
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
-      theme: AppTheme.build(
-        brightness: brightness,
-        accent: const Color(0xFF10B981),
-      ),
+      theme: _theme(brightness),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -42,10 +51,7 @@ Widget testAppScreen(
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
-      theme: AppTheme.build(
-        brightness: brightness,
-        accent: const Color(0xFF10B981),
-      ),
+      theme: _theme(brightness),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

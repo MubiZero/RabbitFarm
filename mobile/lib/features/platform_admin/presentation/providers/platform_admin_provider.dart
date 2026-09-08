@@ -20,12 +20,14 @@ final platformPlansProvider =
 /// Фильтр списка ферм — одно значение сразу, а не набор галочек: сервер
 /// принимает единственный `filter`, и совмещать «без тарифа» с «упёрлась в
 /// предел» всё равно было бы нечего — это взаимоисключающие срезы.
-enum PlatformFarmFilter { noPlan, atLimit, inactiveDays }
+enum PlatformFarmFilter { noPlan, atLimit, suspended, expired, inactiveDays }
 
 extension on PlatformFarmFilter {
   String get apiValue => switch (this) {
         PlatformFarmFilter.noPlan => 'no_plan',
         PlatformFarmFilter.atLimit => 'at_limit',
+        PlatformFarmFilter.suspended => 'suspended',
+        PlatformFarmFilter.expired => 'expired',
         PlatformFarmFilter.inactiveDays => 'inactive_days',
       };
 }
@@ -177,9 +179,127 @@ class PlatformFarmsNotifier extends StateNotifier<PlatformFarmsState> {
       return e;
     }
   }
+
+  /// Подтянуть в список то, что вернула карточка одной фермы.
+  ///
+  /// Список остаётся в памяти, пока открыта вкладка «Фермы», и вернувшийся с
+  /// карточки админ иначе видел бы цифры, снятые до его же правки.
+  /// Перечитывать страницу нельзя: это сбросило бы и поиск, и догруженные
+  /// страницы, — поэтому обновляется одна строка.
+  void applyFarmDetail(PlatformFarmDetail detail) {
+    final index = state.farms.indexWhere((farm) => farm.id == detail.id);
+    if (index < 0) return;
+
+    state = state.copyWith(
+      farms: [
+        for (final farm in state.farms)
+          if (farm.id == detail.id)
+            farm.copyWith(
+              name: detail.name,
+              owner: detail.owner,
+              plan: detail.plan,
+              rabbitsCount: detail.rabbitsCount,
+              staffCount: detail.staffCount,
+              lastActiveAt: detail.lastActiveAt,
+            )
+          else
+            farm,
+      ],
+    );
+  }
 }
 
 final platformFarmsProvider = StateNotifierProvider.autoDispose<
     PlatformFarmsNotifier, PlatformFarmsState>((ref) {
   return PlatformFarmsNotifier(ref.watch(platformAdminRepositoryProvider));
+});
+
+/// Одна ферма целиком — состояние её карточки в админке.
+///
+/// Оба действия (доступ и поблажка) получают в ответ ферму той же формы, что
+/// и загрузка, поэтому карточка обновляется из ответа и не перезапрашивает
+/// себя: пока шёл бы второй запрос, экран показывал бы прежнее состояние.
+class PlatformFarmDetailNotifier
+    extends AutoDisposeFamilyAsyncNotifier<PlatformFarmDetail, int> {
+  @override
+  Future<PlatformFarmDetail> build(int farmId) {
+    return ref.watch(platformAdminRepositoryProvider).getFarmDetail(farmId);
+  }
+
+  /// Сменить уровень доступа фермы. Возвращает причину неудачи или `null`,
+  /// если всё получилось, — как `assignPlan` в списке ферм.
+  Future<Object?> updateStatus(String status) {
+    return _apply(
+      () => ref.read(platformAdminRepositoryProvider).updateFarmStatus(arg, status),
+    );
+  }
+
+  /// Выдать, изменить или снять поблажку сверх тарифа. Три пустых значения —
+  /// это и есть «снять».
+  Future<Object?> updateExtras({
+    int? extraRabbits,
+    int? extraStaff,
+    DateTime? extrasUntil,
+  }) {
+    return _apply(
+      () => ref.read(platformAdminRepositoryProvider).updateFarmExtras(
+            arg,
+            extraRabbits: extraRabbits,
+            extraStaff: extraStaff,
+            extrasUntil: extrasUntil,
+          ),
+    );
+  }
+
+  /// Пометить ферму на удаление. Название набирается админом вручную и уходит
+  /// на сервер как есть: сверяет его сервер, у него и лежит настоящее имя.
+  ///
+  /// Уходить с экрана провайдер не решает — он только обновляет состояние;
+  /// куда деваться после удаления, знает вызвавший экран.
+  Future<Object?> deleteFarm(int farmId, String confirmName) {
+    return _apply(
+      () => ref
+          .read(platformAdminRepositoryProvider)
+          .deleteFarm(farmId, confirmName),
+    );
+  }
+
+  /// Отменить удаление. Подтверждения не требует: это возврат к прежнему
+  /// состоянию, а не разрушение.
+  Future<Object?> restoreFarm(int farmId) {
+    return _apply(
+      () => ref.read(platformAdminRepositoryProvider).restoreFarm(farmId),
+    );
+  }
+
+  Future<Object?> _apply(
+    Future<PlatformFarmDetail> Function() action,
+  ) async {
+    try {
+      final updated = await action();
+      state = AsyncData(updated);
+      // Список ферм трогаем только пока он жив: `ref.read` поднял бы его
+      // заново вместе с запросом страницы, которую никто не смотрит.
+      if (ref.exists(platformFarmsProvider)) {
+        ref.read(platformFarmsProvider.notifier).applyFarmDetail(updated);
+      }
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+}
+
+final platformFarmDetailProvider = AsyncNotifierProvider.autoDispose
+    .family<PlatformFarmDetailNotifier, PlatformFarmDetail, int>(
+        PlatformFarmDetailNotifier.new);
+
+/// Снимок всех записей одной фермы — то, что показывает экран выгрузки.
+///
+/// `autoDispose`: снимок фермы с историей весит немало, и держать его в памяти
+/// после закрытия экрана незачем. Разбирать по полям нечего — наружу уходит та
+/// же карта, что прислал сервер.
+final platformFarmExportProvider = FutureProvider.autoDispose
+    .family<Map<String, dynamic>, int>((ref, farmId) {
+  return ref.watch(platformAdminRepositoryProvider).exportFarm(farmId);
 });

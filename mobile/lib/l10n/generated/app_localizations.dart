@@ -136,6 +136,18 @@ abstract class AppLocalizations {
   /// **'Закрыть'**
   String get commonClose;
 
+  /// No description provided for @commonCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать'**
+  String get commonCopy;
+
+  /// No description provided for @commonCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировано'**
+  String get commonCopied;
+
   /// No description provided for @commonLoadFailed.
   ///
   /// In ru, this message translates to:
@@ -5170,18 +5182,6 @@ abstract class AppLocalizations {
   /// **'Действует до {date}'**
   String staffValidUntil(String date);
 
-  /// No description provided for @staffCopied.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скопировано'**
-  String get staffCopied;
-
-  /// No description provided for @staffCopy.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скопировать'**
-  String get staffCopy;
-
   /// No description provided for @staffMakeManager.
   ///
   /// In ru, this message translates to:
@@ -6214,6 +6214,12 @@ abstract class AppLocalizations {
   /// **'{days, plural, one{Не заходили {days} день} few{Не заходили {days} дня} many{Не заходили {days} дней} other{Не заходили {days} дней}}'**
   String platformFilterInactive(int days);
 
+  /// No description provided for @platformFilterExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просрочен тариф'**
+  String get platformFilterExpired;
+
   /// No description provided for @platformChangePlan.
   ///
   /// In ru, this message translates to:
@@ -6417,6 +6423,480 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Тариф обновлён'**
   String get platformPlanFormUpdated;
+
+  /// No description provided for @platformFarmTitleFallback.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма'**
+  String get platformFarmTitleFallback;
+
+  /// No description provided for @platformFarmSectionOwner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец и связь'**
+  String get platformFarmSectionOwner;
+
+  /// No description provided for @platformFarmSectionAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ'**
+  String get platformFarmSectionAccess;
+
+  /// No description provided for @platformFarmSectionPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get platformFarmSectionPlan;
+
+  /// No description provided for @platformFarmSectionExtras.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка'**
+  String get platformFarmSectionExtras;
+
+  /// No description provided for @platformFarmSectionUsage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Потребление'**
+  String get platformFarmSectionUsage;
+
+  /// No description provided for @platformFarmSectionStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состав'**
+  String get platformFarmSectionStaff;
+
+  /// No description provided for @platformFarmSectionPayments.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платежи'**
+  String get platformFarmSectionPayments;
+
+  /// No description provided for @platformFarmSectionFacts.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё о ферме'**
+  String get platformFarmSectionFacts;
+
+  /// No description provided for @platformFarmSectionExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выгрузка данных'**
+  String get platformFarmSectionExport;
+
+  /// No description provided for @platformFarmSectionDanger.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление фермы'**
+  String get platformFarmSectionDanger;
+
+  /// No description provided for @platformFarmContactMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ни почты, ни телефона — связаться нечем'**
+  String get platformFarmContactMissing;
+
+  /// No description provided for @platformFarmStatusActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Работает как обычно'**
+  String get platformFarmStatusActive;
+
+  /// No description provided for @platformFarmStatusActiveHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма читает и записывает всё своё без помех.'**
+  String get platformFarmStatusActiveHint;
+
+  /// No description provided for @platformFarmStatusReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только чтение'**
+  String get platformFarmStatusReadOnly;
+
+  /// No description provided for @platformFarmStatusReadOnlyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные видны, записать ничего нельзя. Так поступают при неоплате: история хозяйства остаётся у фермера, а работать в ней нельзя, пока не заплатит.'**
+  String get platformFarmStatusReadOnlyHint;
+
+  /// No description provided for @platformFarmStatusSuspended.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закрыт'**
+  String get platformFarmStatusSuspended;
+
+  /// No description provided for @platformFarmStatusSuspendedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма не пускает никого — ни записать, ни посмотреть.'**
+  String get platformFarmStatusSuspendedHint;
+
+  /// No description provided for @platformFarmStatusUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неизвестное состояние: {status}'**
+  String platformFarmStatusUnknown(String status);
+
+  /// No description provided for @platformFarmStatusChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить доступ'**
+  String get platformFarmStatusChange;
+
+  /// No description provided for @platformFarmStatusSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ хозяйства «{farm}»'**
+  String platformFarmStatusSheetTitle(String farm);
+
+  /// No description provided for @platformFarmStatusConfirmTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить доступ?'**
+  String get platformFarmStatusConfirmTitle;
+
+  /// No description provided for @platformFarmStatusConfirmBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство перейдёт в состояние «{status}». Люди на ферме увидят это сразу же, без перезахода.'**
+  String platformFarmStatusConfirmBody(String status);
+
+  /// No description provided for @platformFarmStatusApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить'**
+  String get platformFarmStatusApply;
+
+  /// No description provided for @platformFarmStatusUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ обновлён'**
+  String get platformFarmStatusUpdated;
+
+  /// No description provided for @platformFarmPlanForever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бессрочно'**
+  String get platformFarmPlanForever;
+
+  /// No description provided for @platformFarmPlanExpires.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует до {date}'**
+  String platformFarmPlanExpires(String date);
+
+  /// No description provided for @platformFarmPlanExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок истёк {date}'**
+  String platformFarmPlanExpired(String date);
+
+  /// No description provided for @platformFarmExtrasNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажек нет — действуют пределы тарифа'**
+  String get platformFarmExtrasNone;
+
+  /// No description provided for @platformFarmExtrasGrant.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдать поблажку'**
+  String get platformFarmExtrasGrant;
+
+  /// No description provided for @platformFarmExtrasEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get platformFarmExtrasEdit;
+
+  /// No description provided for @platformFarmExtrasClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять поблажку'**
+  String get platformFarmExtrasClear;
+
+  /// No description provided for @platformFarmExtrasRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{+{count} кролик} few{+{count} кролика} many{+{count} кроликов} other{+{count} кролика}}'**
+  String platformFarmExtrasRabbits(int count);
+
+  /// No description provided for @platformFarmExtrasStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{+{count} человек} few{+{count} человека} many{+{count} человек} other{+{count} человека}}'**
+  String platformFarmExtrasStaff(int count);
+
+  /// No description provided for @platformFarmExtrasUntil.
+  ///
+  /// In ru, this message translates to:
+  /// **'до {date}'**
+  String platformFarmExtrasUntil(String date);
+
+  /// No description provided for @platformFarmExtrasEndless.
+  ///
+  /// In ru, this message translates to:
+  /// **'бессрочно'**
+  String get platformFarmExtrasEndless;
+
+  /// No description provided for @platformFarmExtrasExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка истекла {date} — снова действуют пределы тарифа'**
+  String platformFarmExtrasExpired(String date);
+
+  /// No description provided for @platformFarmExtrasFormTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка сверх тарифа'**
+  String get platformFarmExtrasFormTitle;
+
+  /// No description provided for @platformFarmExtrasFormBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавка к пределам одной этой фермы. Сам тариф не меняется — ни у неё, ни у остальных.'**
+  String get platformFarmExtrasFormBody;
+
+  /// No description provided for @platformFarmExtrasFormRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кроликов сверх тарифа'**
+  String get platformFarmExtrasFormRabbits;
+
+  /// No description provided for @platformFarmExtrasFormStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Людей сверх тарифа'**
+  String get platformFarmExtrasFormStaff;
+
+  /// No description provided for @platformFarmExtrasFormAmountHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пусто — без добавки'**
+  String get platformFarmExtrasFormAmountHint;
+
+  /// No description provided for @platformFarmExtrasFormUntil.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует до'**
+  String get platformFarmExtrasFormUntil;
+
+  /// No description provided for @platformFarmExtrasFormSetDeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задать срок'**
+  String get platformFarmExtrasFormSetDeadline;
+
+  /// No description provided for @platformFarmExtrasFormEndlessHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без срока поблажка действует бессрочно.'**
+  String get platformFarmExtrasFormEndlessHint;
+
+  /// No description provided for @platformFarmExtrasFormEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите кроликов или людей — или снимите поблажку'**
+  String get platformFarmExtrasFormEmpty;
+
+  /// No description provided for @platformFarmExtrasSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка обновлена'**
+  String get platformFarmExtrasSaved;
+
+  /// No description provided for @platformFarmExtrasCleared.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка снята'**
+  String get platformFarmExtrasCleared;
+
+  /// No description provided for @platformFarmStaffNever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё не заходил'**
+  String get platformFarmStaffNever;
+
+  /// No description provided for @platformFarmStaffLastLogin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заходил {date}'**
+  String platformFarmStaffLastLogin(String date);
+
+  /// No description provided for @platformFarmStaffBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход закрыт'**
+  String get platformFarmStaffBlocked;
+
+  /// No description provided for @platformFarmStaffEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'В составе никого — даже владельца'**
+  String get platformFarmStaffEmpty;
+
+  /// No description provided for @platformFarmPaymentsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платежей ещё не было'**
+  String get platformFarmPaymentsEmpty;
+
+  /// No description provided for @platformFarmPaymentNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начат'**
+  String get platformFarmPaymentNew;
+
+  /// No description provided for @platformFarmPaymentCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплачен'**
+  String get platformFarmPaymentCompleted;
+
+  /// No description provided for @platformFarmPaymentFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не прошёл'**
+  String get platformFarmPaymentFailed;
+
+  /// No description provided for @platformFarmExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Экспортировать данные'**
+  String get platformFarmExport;
+
+  /// No description provided for @platformFarmExportHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».'**
+  String get platformFarmExportHint;
+
+  /// No description provided for @platformFarmExportGeneratedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снимок собран {date}'**
+  String platformFarmExportGeneratedAt(String date);
+
+  /// No description provided for @platformFarmDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить ферму'**
+  String get platformFarmDelete;
+
+  /// No description provided for @platformFarmDeleteHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закроется сразу же, а записи и файлы уйдут окончательно через 30 дней. До этого ферму можно вернуть.'**
+  String get platformFarmDeleteHint;
+
+  /// No description provided for @platformFarmDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить ферму?'**
+  String get platformFarmDeleteTitle;
+
+  /// No description provided for @platformFarmDeleteBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Люди на ферме потеряют доступ сразу же. Кролики, лечение, фото и платежи будут окончательно удалены через 30 дней — до этого удаление можно отменить. Чтобы подтвердить, наберите название хозяйства.'**
+  String get platformFarmDeleteBody;
+
+  /// No description provided for @platformFarmDeleteConfirmLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название фермы'**
+  String get platformFarmDeleteConfirmLabel;
+
+  /// No description provided for @platformFarmDeleteConfirmHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наберите «{name}»'**
+  String platformFarmDeleteConfirmHint(String name);
+
+  /// No description provided for @platformFarmDeleteMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название не совпадает с названием фермы'**
+  String get platformFarmDeleteMismatch;
+
+  /// No description provided for @platformFarmDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма удалена'**
+  String get platformFarmDeleted;
+
+  /// No description provided for @platformFarmDeletedBanner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма удалена {date}. Записи и файлы будут окончательно очищены через 30 дней после удаления.'**
+  String platformFarmDeletedBanner(String date);
+
+  /// No description provided for @platformFarmDeletedLocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока ферма удалена, доступ и поблажки не меняются — сначала восстановите её.'**
+  String get platformFarmDeletedLocked;
+
+  /// No description provided for @platformFarmRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить'**
+  String get platformFarmRestore;
+
+  /// No description provided for @platformFarmRestored.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма восстановлена'**
+  String get platformFarmRestored;
+
+  /// No description provided for @platformFarmStorage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Занятое место'**
+  String get platformFarmStorage;
+
+  /// No description provided for @platformFarmLastActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последний вход'**
+  String get platformFarmLastActive;
+
+  /// No description provided for @platformFarmNeverActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё не заходили'**
+  String get platformFarmNeverActive;
+
+  /// No description provided for @platformFarmCreatedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма создана'**
+  String get platformFarmCreatedAt;
+
+  /// No description provided for @storageUnitBytes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Б'**
+  String get storageUnitBytes;
+
+  /// No description provided for @storageUnitKb.
+  ///
+  /// In ru, this message translates to:
+  /// **'КБ'**
+  String get storageUnitKb;
+
+  /// No description provided for @storageUnitMb.
+  ///
+  /// In ru, this message translates to:
+  /// **'МБ'**
+  String get storageUnitMb;
+
+  /// No description provided for @storageUnitGb.
+  ///
+  /// In ru, this message translates to:
+  /// **'ГБ'**
+  String get storageUnitGb;
 
   /// No description provided for @emptyNoRecordsTitle.
   ///

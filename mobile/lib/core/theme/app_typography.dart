@@ -58,6 +58,18 @@ abstract class AppTypography {
     letterSpacing: 0.1,
   );
 
+  /// Машинный текст: JSON выгрузки, ключи, коды. Отдельный токен, потому что
+  /// такой текст читают глазами по строкам, и пропорциональный шрифт ломает
+  /// отступы, которыми он и структурирован. Семейство задано через фолбэки:
+  /// «monospace» разрешается только на Android.
+  static const mono = TextStyle(
+    fontFamily: 'monospace',
+    fontFamilyFallback: ['Menlo', 'Courier New', 'monospace'],
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 1.45,
+  );
+
   static const labelSm = TextStyle(
     fontFamily: _font,
     fontSize: 12,

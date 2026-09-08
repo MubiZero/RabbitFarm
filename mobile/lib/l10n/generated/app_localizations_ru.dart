@@ -30,6 +30,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonClose => 'Закрыть';
 
   @override
+  String get commonCopy => 'Скопировать';
+
+  @override
+  String get commonCopied => 'Скопировано';
+
+  @override
   String get commonLoadFailed => 'Не удалось загрузить';
 
   @override
@@ -2845,12 +2851,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get staffCopied => 'Скопировано';
-
-  @override
-  String get staffCopy => 'Скопировать';
-
-  @override
   String get staffMakeManager => 'Сделать управляющим';
 
   @override
@@ -3435,6 +3435,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get platformFilterExpired => 'Просрочен тариф';
+
+  @override
   String get platformChangePlan => 'Сменить тариф';
 
   @override
@@ -3562,6 +3565,298 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformPlanFormUpdated => 'Тариф обновлён';
+
+  @override
+  String get platformFarmTitleFallback => 'Ферма';
+
+  @override
+  String get platformFarmSectionOwner => 'Владелец и связь';
+
+  @override
+  String get platformFarmSectionAccess => 'Доступ';
+
+  @override
+  String get platformFarmSectionPlan => 'Тариф';
+
+  @override
+  String get platformFarmSectionExtras => 'Поблажка';
+
+  @override
+  String get platformFarmSectionUsage => 'Потребление';
+
+  @override
+  String get platformFarmSectionStaff => 'Состав';
+
+  @override
+  String get platformFarmSectionPayments => 'Платежи';
+
+  @override
+  String get platformFarmSectionFacts => 'Ещё о ферме';
+
+  @override
+  String get platformFarmSectionExport => 'Выгрузка данных';
+
+  @override
+  String get platformFarmSectionDanger => 'Удаление фермы';
+
+  @override
+  String get platformFarmContactMissing =>
+      'Ни почты, ни телефона — связаться нечем';
+
+  @override
+  String get platformFarmStatusActive => 'Работает как обычно';
+
+  @override
+  String get platformFarmStatusActiveHint =>
+      'Ферма читает и записывает всё своё без помех.';
+
+  @override
+  String get platformFarmStatusReadOnly => 'Только чтение';
+
+  @override
+  String get platformFarmStatusReadOnlyHint =>
+      'Данные видны, записать ничего нельзя. Так поступают при неоплате: история хозяйства остаётся у фермера, а работать в ней нельзя, пока не заплатит.';
+
+  @override
+  String get platformFarmStatusSuspended => 'Доступ закрыт';
+
+  @override
+  String get platformFarmStatusSuspendedHint =>
+      'Ферма не пускает никого — ни записать, ни посмотреть.';
+
+  @override
+  String platformFarmStatusUnknown(String status) {
+    return 'Неизвестное состояние: $status';
+  }
+
+  @override
+  String get platformFarmStatusChange => 'Изменить доступ';
+
+  @override
+  String platformFarmStatusSheetTitle(String farm) {
+    return 'Доступ хозяйства «$farm»';
+  }
+
+  @override
+  String get platformFarmStatusConfirmTitle => 'Изменить доступ?';
+
+  @override
+  String platformFarmStatusConfirmBody(String status) {
+    return 'Хозяйство перейдёт в состояние «$status». Люди на ферме увидят это сразу же, без перезахода.';
+  }
+
+  @override
+  String get platformFarmStatusApply => 'Применить';
+
+  @override
+  String get platformFarmStatusUpdated => 'Доступ обновлён';
+
+  @override
+  String get platformFarmPlanForever => 'Бессрочно';
+
+  @override
+  String platformFarmPlanExpires(String date) {
+    return 'Действует до $date';
+  }
+
+  @override
+  String platformFarmPlanExpired(String date) {
+    return 'Срок истёк $date';
+  }
+
+  @override
+  String get platformFarmExtrasNone =>
+      'Поблажек нет — действуют пределы тарифа';
+
+  @override
+  String get platformFarmExtrasGrant => 'Выдать поблажку';
+
+  @override
+  String get platformFarmExtrasEdit => 'Изменить';
+
+  @override
+  String get platformFarmExtrasClear => 'Снять поблажку';
+
+  @override
+  String platformFarmExtrasRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count кролика',
+      many: '+$count кроликов',
+      few: '+$count кролика',
+      one: '+$count кролик',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformFarmExtrasStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count человека',
+      many: '+$count человек',
+      few: '+$count человека',
+      one: '+$count человек',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformFarmExtrasUntil(String date) {
+    return 'до $date';
+  }
+
+  @override
+  String get platformFarmExtrasEndless => 'бессрочно';
+
+  @override
+  String platformFarmExtrasExpired(String date) {
+    return 'Поблажка истекла $date — снова действуют пределы тарифа';
+  }
+
+  @override
+  String get platformFarmExtrasFormTitle => 'Поблажка сверх тарифа';
+
+  @override
+  String get platformFarmExtrasFormBody =>
+      'Добавка к пределам одной этой фермы. Сам тариф не меняется — ни у неё, ни у остальных.';
+
+  @override
+  String get platformFarmExtrasFormRabbits => 'Кроликов сверх тарифа';
+
+  @override
+  String get platformFarmExtrasFormStaff => 'Людей сверх тарифа';
+
+  @override
+  String get platformFarmExtrasFormAmountHint => 'Пусто — без добавки';
+
+  @override
+  String get platformFarmExtrasFormUntil => 'Действует до';
+
+  @override
+  String get platformFarmExtrasFormSetDeadline => 'Задать срок';
+
+  @override
+  String get platformFarmExtrasFormEndlessHint =>
+      'Без срока поблажка действует бессрочно.';
+
+  @override
+  String get platformFarmExtrasFormEmpty =>
+      'Укажите кроликов или людей — или снимите поблажку';
+
+  @override
+  String get platformFarmExtrasSaved => 'Поблажка обновлена';
+
+  @override
+  String get platformFarmExtrasCleared => 'Поблажка снята';
+
+  @override
+  String get platformFarmStaffNever => 'Ещё не заходил';
+
+  @override
+  String platformFarmStaffLastLogin(String date) {
+    return 'Заходил $date';
+  }
+
+  @override
+  String get platformFarmStaffBlocked => 'Вход закрыт';
+
+  @override
+  String get platformFarmStaffEmpty => 'В составе никого — даже владельца';
+
+  @override
+  String get platformFarmPaymentsEmpty => 'Платежей ещё не было';
+
+  @override
+  String get platformFarmPaymentNew => 'Начат';
+
+  @override
+  String get platformFarmPaymentCompleted => 'Оплачен';
+
+  @override
+  String get platformFarmPaymentFailed => 'Не прошёл';
+
+  @override
+  String get platformFarmExport => 'Экспортировать данные';
+
+  @override
+  String get platformFarmExportHint =>
+      'Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».';
+
+  @override
+  String platformFarmExportGeneratedAt(String date) {
+    return 'Снимок собран $date';
+  }
+
+  @override
+  String get platformFarmDelete => 'Удалить ферму';
+
+  @override
+  String get platformFarmDeleteHint =>
+      'Доступ закроется сразу же, а записи и файлы уйдут окончательно через 30 дней. До этого ферму можно вернуть.';
+
+  @override
+  String get platformFarmDeleteTitle => 'Удалить ферму?';
+
+  @override
+  String get platformFarmDeleteBody =>
+      'Люди на ферме потеряют доступ сразу же. Кролики, лечение, фото и платежи будут окончательно удалены через 30 дней — до этого удаление можно отменить. Чтобы подтвердить, наберите название хозяйства.';
+
+  @override
+  String get platformFarmDeleteConfirmLabel => 'Название фермы';
+
+  @override
+  String platformFarmDeleteConfirmHint(String name) {
+    return 'Наберите «$name»';
+  }
+
+  @override
+  String get platformFarmDeleteMismatch =>
+      'Название не совпадает с названием фермы';
+
+  @override
+  String get platformFarmDeleted => 'Ферма удалена';
+
+  @override
+  String platformFarmDeletedBanner(String date) {
+    return 'Ферма удалена $date. Записи и файлы будут окончательно очищены через 30 дней после удаления.';
+  }
+
+  @override
+  String get platformFarmDeletedLocked =>
+      'Пока ферма удалена, доступ и поблажки не меняются — сначала восстановите её.';
+
+  @override
+  String get platformFarmRestore => 'Восстановить';
+
+  @override
+  String get platformFarmRestored => 'Ферма восстановлена';
+
+  @override
+  String get platformFarmStorage => 'Занятое место';
+
+  @override
+  String get platformFarmLastActive => 'Последний вход';
+
+  @override
+  String get platformFarmNeverActive => 'Ещё не заходили';
+
+  @override
+  String get platformFarmCreatedAt => 'Ферма создана';
+
+  @override
+  String get storageUnitBytes => 'Б';
+
+  @override
+  String get storageUnitKb => 'КБ';
+
+  @override
+  String get storageUnitMb => 'МБ';
+
+  @override
+  String get storageUnitGb => 'ГБ';
 
   @override
   String get emptyNoRecordsTitle => 'Записей нет';

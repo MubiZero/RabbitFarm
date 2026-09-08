@@ -499,7 +499,7 @@ class StaffScreen extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(dialogContext);
-              final copied = dialogContext.l10n.staffCopied;
+              final copied = dialogContext.l10n.commonCopied;
               await Clipboard.setData(ClipboardData(text: secret));
               await HapticFeedback.lightImpact();
               messenger.showSnackBar(
@@ -507,7 +507,7 @@ class StaffScreen extends ConsumerWidget {
               );
             },
             icon: const Icon(Icons.copy_all_outlined),
-            label: Text(context.l10n.staffCopy),
+            label: Text(context.l10n.commonCopy),
           ),
         ],
       ),
