@@ -1,5 +1,6 @@
 const staffService = require('../services/staffService');
 const authService = require('../services/authService');
+const farmAuditService = require('../services/farmAuditService');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
@@ -20,7 +21,12 @@ class StaffController {
   /** PATCH /staff/:id — роль и доступ работника */
   async updateMember(req, res, next) {
     try {
-      const member = await staffService.updateMember(req.farmId, req.params.id, req.body);
+      const member = await staffService.updateMember(
+        req.farmId,
+        req.user.id,
+        req.params.id,
+        req.body
+      );
       return ApiResponse.success(res, member, 'Работник обновлён');
     } catch (error) {
       if (error.message === 'MEMBER_NOT_FOUND') {
@@ -68,34 +74,67 @@ class StaffController {
     }
   }
 
-  /** POST /staff/invitations — выписать приглашение */
+  /** POST /staff/invitations — выписать приглашение (email или телефон) */
   async createInvitation(req, res, next) {
     try {
-      const { invitation, token } = await staffService.createInvitation(
+      const { invitation, token, smsSent } = await staffService.createInvitation(
         req.farmId,
         req.user.id,
         req.body
       );
 
-      // Код отдаётся ровно один раз: в базе лежит только его хеш.
+      // Код отдаётся ровно один раз: в базе лежит только его хеш. Отдаётся он
+      // и при удачной SMS — приглашение по телефону не отменяет возможности
+      // передать код на словах, если он не дошёл.
       return ApiResponse.created(
         res,
         {
           id: invitation.id,
           email: invitation.email,
+          phone: invitation.phone,
           role: invitation.role,
           expires_at: invitation.expires_at,
-          code: token
+          code: token,
+          sms_sent: smsSent
         },
-        'Приглашение создано. Передайте код — второй раз он не покажется.'
+        smsSent
+          ? 'Приглашение создано, код отправлен по SMS. Второй раз он не покажется.'
+          : 'Приглашение создано. Передайте код — второй раз он не покажется.'
       );
     } catch (error) {
       if (error.message === 'STAFF_LIMIT_REACHED') {
         return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы', 'STAFF_LIMIT_REACHED');
       }
       if (error.message === 'USER_EXISTS') {
-        return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');
+        return ApiResponse.conflict(
+          res,
+          req.body.phone
+            ? 'Работник с таким телефоном уже есть в ферме'
+            : 'Пользователь с таким email уже существует',
+          'USER_EXISTS'
+        );
       }
+      next(error);
+    }
+  }
+
+  /** GET /staff/audit — журнал кадровых действий фермы */
+  async listAudit(req, res, next) {
+    try {
+      const result = await farmAuditService.list(req.farmId, {
+        page: req.query.page,
+        limit: req.query.limit
+      });
+
+      return ApiResponse.paginated(
+        res,
+        result.items,
+        result.pagination.page,
+        result.pagination.limit,
+        result.pagination.total,
+        'Журнал действий получен'
+      );
+    } catch (error) {
       next(error);
     }
   }
@@ -144,6 +183,13 @@ class StaffController {
           'Приглашение недействительно или истекло. Попросите владельца выписать новое.',
           400,
           'INVITATION_INVALID'
+        );
+      }
+      if (error.message === 'EMAIL_REQUIRED') {
+        return ApiResponse.badRequest(
+          res,
+          'Приглашение выписано на телефон — укажите email, по нему вы будете входить.',
+          'EMAIL_REQUIRED'
         );
       }
       if (error.message === 'STAFF_LIMIT_REACHED') {
