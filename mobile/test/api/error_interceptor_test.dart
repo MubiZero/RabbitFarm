@@ -63,6 +63,17 @@ void main() {
       expect(seenStatus, 'suspended');
     });
 
+    test('сообщает об устаревшей версии по коду UPGRADE_REQUIRED', () async {
+      final dio = _buildDio(426, 'UPGRADE_REQUIRED', 'Обновитесь до 1.2.0 или новее');
+      final interceptor = dio.interceptors.whereType<ErrorInterceptor>().first;
+      var called = false;
+      interceptor.onUpgradeRequired = () => called = true;
+
+      await expectLater(dio.get('/rabbits'), throwsA(isA<DioException>()));
+
+      expect(called, isTrue);
+    });
+
     test('не срабатывает на посторонние коды ошибок', () async {
       final dio = _buildDio(400, 'RABBIT_LIMIT_REACHED', 'Предел кроликов исчерпан');
       final interceptor = dio.interceptors.whereType<ErrorInterceptor>().first;

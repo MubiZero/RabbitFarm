@@ -29,6 +29,18 @@
   "@offlineBanner": {
     "description": "Плашка поверх всего приложения, когда у устройства нет сети"
   },
+  "forceUpdateTitle": "Доступна новая версия",
+  "@forceUpdateTitle": {
+    "description": "Заголовок экрана обязательного обновления"
+  },
+  "forceUpdateHint": "Эта версия приложения больше не поддерживается. Обновите приложение, чтобы продолжить работу.",
+  "@forceUpdateHint": {
+    "description": "Пояснение на экране обязательного обновления"
+  },
+  "forceUpdateButton": "Обновить",
+  "@forceUpdateButton": {
+    "description": "Кнопка перехода в магазин приложений на экране обязательного обновления"
+  },
   "commonStaleData": "Не удалось обновить, показаны прежние данные",
   "commonRetryShort": "Ещё раз",
   "commonNotSpecified": "Не указано",

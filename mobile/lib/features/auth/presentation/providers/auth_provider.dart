@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/models/farm_ref.dart';
+import '../../../../core/providers/app_version.dart';
 import '../../../../core/notifications/fcm_service.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
@@ -90,6 +91,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // открыт — узнаём об этом по ответу на первый же неудавшийся запрос, не
     // дожидаясь следующего обновления профиля (см. `FarmStatusBanner`).
     _ref.read(apiClientProvider).onFarmAccessChanged = _handleFarmAccessChanged;
+    // Проверяется бэкендом на каждый запрос, включая незалогиненные (вход,
+    // регистрация) — поэтому висит здесь же, а не только для сессии.
+    _ref.read(apiClientProvider).onUpgradeRequired =
+        () => _ref.read(upgradeRequiredProvider.notifier).state = true;
     _checkAuthStatus();
   }
 

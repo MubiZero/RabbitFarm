@@ -73,6 +73,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get offlineBanner => 'Нет связи — новые записи не сохранятся';
 
   @override
+  String get forceUpdateTitle => 'Доступна новая версия';
+
+  @override
+  String get forceUpdateHint =>
+      'Эта версия приложения больше не поддерживается. Обновите приложение, чтобы продолжить работу.';
+
+  @override
+  String get forceUpdateButton => 'Обновить';
+
+  @override
   String get commonStaleData => 'Не удалось обновить, показаны прежние данные';
 
   @override

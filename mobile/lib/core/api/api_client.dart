@@ -33,6 +33,7 @@ class ApiClient {
     // одноразовый Dio терял таймауты и разбор ошибок.
     _authInterceptor.client = _dio;
     _dio.interceptors.add(_authInterceptor);
+    _dio.interceptors.add(AppVersionInterceptor());
     if (kDebugMode) _dio.interceptors.add(LoggingInterceptor());
     _errorInterceptor = ErrorInterceptor();
     _dio.interceptors.add(_errorInterceptor);
@@ -50,6 +51,11 @@ class ApiClient {
   /// `FarmStatusBanner`).
   set onFarmAccessChanged(void Function(String status)? callback) {
     _errorInterceptor.onFarmAccessChanged = callback;
+  }
+
+  /// Версия приложения ниже минимальной поддерживаемой бэкендом (426).
+  set onUpgradeRequired(void Function()? callback) {
+    _errorInterceptor.onUpgradeRequired = callback;
   }
 
   // Generic HTTP methods

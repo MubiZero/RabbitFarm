@@ -13,8 +13,10 @@ import 'core/analytics/analytics.dart';
 import 'core/cache/list_cache.dart';
 import 'core/error/error_handling.dart';
 import 'core/notifications/fcm_service.dart';
+import 'core/providers/app_version.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
@@ -105,6 +107,7 @@ class MyApp extends ConsumerWidget {
     final darkTheme  = ref.watch(darkThemeProvider);
     final lightTheme = ref.watch(lightThemeProvider);
     final router     = ref.watch(routerProvider);
+    final upgradeRequired = ref.watch(upgradeRequiredProvider);
 
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
@@ -119,11 +122,17 @@ class MyApp extends ConsumerWidget {
       // самого объемлющего к самому частному: вход под клиентом это режим
       // сеанса целиком, состояние фермы — факт внутри него, а отсутствие связи
       // проходит само и относится к устройству, а не к аккаунту.
-      builder: (context, child) => ImpersonationBanner(
-        child: FarmStatusBanner(
-          child: OfflineBanner(child: child ?? const SizedBox.shrink()),
-        ),
-      ),
+      //
+      // Устаревшая версия — снаружи всех трёх и замещает экран целиком, а не
+      // накладывается баннером: с сервером, который её не понимает, любой
+      // другой экран за плашкой всё равно ломается непредсказуемо.
+      builder: (context, child) => upgradeRequired
+          ? const ForceUpdateScreen()
+          : ImpersonationBanner(
+              child: FarmStatusBanner(
+                child: OfflineBanner(child: child ?? const SizedBox.shrink()),
+              ),
+            ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

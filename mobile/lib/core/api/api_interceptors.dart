@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 // Auth interceptor - adds JWT token to requests
 class AuthInterceptor extends Interceptor {
@@ -115,6 +116,33 @@ class AuthInterceptor extends Interceptor {
   }
 }
 
+/// Подписывает каждый запрос версией приложения — бэкенд сравнивает её с
+/// минимальной поддерживаемой (`MIN_APP_VERSION`) и отвечает 426, если
+/// сборка устарела. Версия читается один раз и кэшируется: `PackageInfo`
+/// не меняется на лету, а спрашивать его на каждый запрос незачем.
+class AppVersionInterceptor extends Interceptor {
+  static const _header = 'X-App-Version';
+  static Future<String>? _version;
+
+  static Future<String> _readVersion() {
+    return _version ??= PackageInfo.fromPlatform().then((info) => info.version);
+  }
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    try {
+      options.headers[_header] = await _readVersion();
+    } catch (_) {
+      // Версию не прочитать — запрос всё равно уходит: без заголовка бэкенд
+      // просто не проверяет минимальную версию (см. `middleware/appVersion.js`).
+    }
+    handler.next(options);
+  }
+}
+
 // Logging interceptor - logs requests and responses (dev mode only)
 class LoggingInterceptor extends Interceptor {
   // Токены и пароли не должны попадать в системный лог даже в отладке:
@@ -187,6 +215,11 @@ class ErrorInterceptor extends Interceptor {
   /// фермы, а не пользователя.
   void Function(String status)? onFarmAccessChanged;
 
+  /// Бэкенд ответил 426 UPGRADE_REQUIRED: версия приложения ниже минимальной
+  /// поддерживаемой (см. `middleware/appVersion.js`). Разбирается здесь же,
+  /// а не в каждом экране — тот же приём, что у `onFarmAccessChanged`.
+  void Function()? onUpgradeRequired;
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     String errorMessage = '';
@@ -214,6 +247,9 @@ class ErrorInterceptor extends Interceptor {
                 break;
               case 'FARM_SUSPENDED':
                 onFarmAccessChanged?.call('suspended');
+                break;
+              case 'UPGRADE_REQUIRED':
+                onUpgradeRequired?.call();
                 break;
             }
 

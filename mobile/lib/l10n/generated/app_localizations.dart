@@ -220,6 +220,24 @@ abstract class AppLocalizations {
   /// **'Нет связи — новые записи не сохранятся'**
   String get offlineBanner;
 
+  /// Заголовок экрана обязательного обновления
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступна новая версия'**
+  String get forceUpdateTitle;
+
+  /// Пояснение на экране обязательного обновления
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта версия приложения больше не поддерживается. Обновите приложение, чтобы продолжить работу.'**
+  String get forceUpdateHint;
+
+  /// Кнопка перехода в магазин приложений на экране обязательного обновления
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить'**
+  String get forceUpdateButton;
+
   /// No description provided for @commonStaleData.
   ///
   /// In ru, this message translates to:

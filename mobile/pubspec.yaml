@@ -54,6 +54,9 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   connectivity_plus: ^7.3.1
+  # Версия приложения в заголовке X-App-Version (см. core/api/api_client.dart)
+  # — бэкенд по ней отличает сборки ниже минимальной поддерживаемой.
+  package_info_plus: ^8.1.2
 
 dev_dependencies:
   flutter_test:
