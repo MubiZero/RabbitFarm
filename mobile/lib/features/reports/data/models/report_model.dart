@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../../core/json/double_converter.dart';
+import '../../../../core/json/date_time_converter.dart';
 
 part 'report_model.freezed.dart';
 part 'report_model.g.dart';
@@ -34,10 +35,33 @@ abstract class PlanUsage with _$PlanUsage {
   const factory PlanUsage({
     required ResourceUsage rabbits,
     required ResourceUsage staff,
+    /// Сам тариф — название, цена продления, срок (см.
+    /// docs/plans/PLATFORM-ADMIN.md, 4.1). `null`, если ферме не назначен
+    /// тариф вовсе.
+    PlanUsagePlan? plan,
   }) = _PlanUsage;
 
   factory PlanUsage.fromJson(Map<String, dynamic> json) =>
       _$PlanUsageFromJson(json);
+}
+
+/// Тариф фермы для экрана «Тариф»: только то, что нужно, чтобы показать
+/// цену и предложить продлить.
+@freezed
+abstract class PlanUsagePlan with _$PlanUsagePlan {
+  const factory PlanUsagePlan({
+    @IntConverter() required int id,
+    required String name,
+    // NULL у бесплатного тарифа — платить нечего.
+    @DoubleConverter() double? price,
+    @JsonKey(name: 'expires_at')
+    @NullableDateTimeConverter()
+    DateTime? expiresAt,
+    @JsonKey(name: 'is_expired') @Default(false) bool isExpired,
+  }) = _PlanUsagePlan;
+
+  factory PlanUsagePlan.fromJson(Map<String, dynamic> json) =>
+      _$PlanUsagePlanFromJson(json);
 }
 
 /// Потребление одного ресурса тарифа. `limit: null` значит «без

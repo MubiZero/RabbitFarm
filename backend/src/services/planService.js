@@ -9,6 +9,12 @@ const logger = require('../utils/logger');
  * Так же и с полями плана `max_rabbits`/`max_staff` — NULL в них означает
  * «без ограничения» на этот конкретный ресурс.
  */
+
+// Один платёж продлевает платный тариф на фиксированный период, а не на
+// календарный месяц (см. docs/plans/PLATFORM-ADMIN.md, 4.1) — минимум вместо
+// полного аппарата подписок с пропорциональным пересчётом.
+const RENEWAL_PERIOD_DAYS = 30;
+
 class PlanService {
   async list() {
     return Plan.findAll({ order: [['id', 'ASC']] });
@@ -169,8 +175,66 @@ class PlanService {
 
     return {
       rabbits: { used: rabbitsUsed, limit: this.getEffectiveLimit(farm, 'rabbits') },
-      staff: { used: staffUsed, limit: this.getEffectiveLimit(farm, 'staff') }
+      staff: { used: staffUsed, limit: this.getEffectiveLimit(farm, 'staff') },
+      plan: farm?.plan
+        ? {
+            id: farm.plan.id,
+            name: farm.plan.name,
+            price: farm.plan.price,
+            expires_at: farm.plan_expires_at,
+            is_expired: this.isExpired(farm)
+          }
+        : null
     };
+  }
+
+  /**
+   * Сколько ферме заплатить за продление текущего тарифа (см.
+   * docs/plans/PLATFORM-ADMIN.md, 4.1). Сумму считает сервер по тарифу
+   * фермы, а не берёт из тела запроса — иначе платящий сам бы назначал
+   * себе цену.
+   */
+  async getRenewalQuote(farmId) {
+    const farm = await this._getFarmWithPlan(farmId);
+    if (!farm?.plan) {
+      throw new Error('NO_PLAN');
+    }
+    if (!farm.plan.price) {
+      throw new Error('PLAN_FREE');
+    }
+
+    return {
+      amount: farm.plan.price,
+      description: `Тариф «${farm.plan.name}»`
+    };
+  }
+
+  /**
+   * Продлить платный тариф фермы после подтверждённой оплаты (см. 4.1).
+   * От текущего срока, если он ещё не истёк, иначе от «сейчас» — досрочная
+   * оплата не теряет уже оплаченное время.
+   *
+   * Ничего не делает, если у фермы уже нет платного тарифа: между созданием
+   * платежа и его подтверждением админ мог снять план или назначить
+   * бесплатный — деньги пришли, но продлевать нечего, это разбирается
+   * вручную, а не тихо продлевает не тот тариф.
+   */
+  async extendPlanExpiry(farmId) {
+    const farm = await this._getFarmWithPlan(farmId);
+    if (!farm?.plan?.price) {
+      logger.warn('Payment completed but farm has no billable plan to extend', { farmId });
+      return null;
+    }
+
+    const now = new Date();
+    const base = farm.plan_expires_at && new Date(farm.plan_expires_at) > now
+      ? new Date(farm.plan_expires_at)
+      : now;
+    const expiresAt = new Date(base.getTime() + RENEWAL_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+
+    await farm.update({ plan_expires_at: expiresAt });
+    logger.info('Plan expiry extended after payment', { farmId, expiresAt });
+    return expiresAt;
   }
 }
 

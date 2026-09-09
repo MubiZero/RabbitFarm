@@ -271,6 +271,23 @@ class PlatformAdminService {
   }
 
   /**
+   * Продлить платный тариф вручную (см. docs/plans/PLATFORM-ADMIN.md, 4.1) —
+   * например, клиент оплатил наличными, мимо `Payment`. Админ ставит точную
+   * дату, а не «плюс месяц»: это тот же ручной инструмент, что и `extras_until`
+   * в 2.3, а не автоматическое продление по оплате (см. `planService.extendPlanExpiry`).
+   */
+  async extendPlan(farmId, planExpiresAt) {
+    const farm = await Farm.findByPk(farmId);
+    if (!farm) {
+      throw new Error('FARM_NOT_FOUND');
+    }
+
+    await farm.update({ plan_expires_at: planExpiresAt });
+
+    return this.getFarm(farmId);
+  }
+
+  /**
    * Разовая поблажка сверх тарифа — не смена тарифа (см.
    * docs/plans/PLATFORM-ADMIN.md, 2.3): тариф остаётся тем же, а по
    * истечении `extras_until` предел сам возвращается к тарифному.

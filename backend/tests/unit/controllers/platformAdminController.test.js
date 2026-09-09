@@ -307,6 +307,45 @@ describe('PlatformAdminController', () => {
     });
   });
 
+  describe('extendPlan', () => {
+    it('возвращает 404 при FARM_NOT_FOUND', async () => {
+      platformAdminService.getFarm.mockRejectedValue(new Error('FARM_NOT_FOUND'));
+      const res = mockRes();
+
+      await platformAdminController.extendPlan(
+        mockReq({ params: { id: 99 }, body: { plan_expires_at: '2026-11-01T00:00:00.000Z' } }),
+        res,
+        mockNext
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+
+    it('пишет в журнал старый и новый срок тарифа', async () => {
+      platformAdminService.getFarm.mockResolvedValue({ id: 1, plan_expires_at: '2026-10-01T00:00:00.000Z' });
+      platformAdminService.extendPlan.mockResolvedValue({ id: 1, plan_expires_at: '2026-11-01T00:00:00.000Z' });
+      const res = mockRes();
+
+      await platformAdminController.extendPlan(
+        mockReq({ params: { id: 1 }, body: { plan_expires_at: '2026-11-01T00:00:00.000Z' } }),
+        res,
+        mockNext
+      );
+
+      expect(platformAdminService.extendPlan).toHaveBeenCalledWith(1, '2026-11-01T00:00:00.000Z');
+      expect(auditService.record).toHaveBeenCalledWith({
+        adminId: 1,
+        action: 'farm.extend_plan',
+        farmId: 1,
+        before: { plan_expires_at: '2026-10-01T00:00:00.000Z' },
+        after: { plan_expires_at: '2026-11-01T00:00:00.000Z' },
+        ip: '127.0.0.1'
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+  });
+
   describe('updateExtras', () => {
     it('возвращает 404 при FARM_NOT_FOUND', async () => {
       platformAdminService.getFarm.mockRejectedValue(new Error('FARM_NOT_FOUND'));

@@ -281,6 +281,16 @@ class PlatformFarmDetailNotifier
     );
   }
 
+  /// Продлить платный тариф вручную (см. docs/plans/PLATFORM-ADMIN.md, 4.1) —
+  /// например, оплатили наличными, мимо `Payment`.
+  Future<Object?> extendPlan(DateTime planExpiresAt) {
+    return _apply(
+      () => _ref
+          .read(platformAdminRepositoryProvider)
+          .updateFarmPlanExpiry(farmId, planExpiresAt),
+    );
+  }
+
   /// Пометить ферму на удаление. Название набирается админом вручную и уходит
   /// на сервер как есть: сверяет его сервер, у него и лежит настоящее имя.
   ///

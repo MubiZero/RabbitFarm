@@ -4048,6 +4048,102 @@ abstract class AppLocalizations {
   /// **'Тёмная'**
   String get settingsThemeDark;
 
+  /// No description provided for @settingsSubscription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get settingsSubscription;
+
+  /// No description provided for @subscriptionTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get subscriptionTitle;
+
+  /// No description provided for @subscriptionNoPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф не назначен'**
+  String get subscriptionNoPlan;
+
+  /// No description provided for @subscriptionNoPlanHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обратитесь в поддержку, чтобы подключить тариф.'**
+  String get subscriptionNoPlanHint;
+
+  /// No description provided for @subscriptionFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бесплатный тариф'**
+  String get subscriptionFree;
+
+  /// No description provided for @subscriptionForever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бессрочно'**
+  String get subscriptionForever;
+
+  /// No description provided for @subscriptionExpiresOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует до {date}'**
+  String subscriptionExpiresOn(String date);
+
+  /// No description provided for @subscriptionExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок истёк {date}'**
+  String subscriptionExpired(String date);
+
+  /// No description provided for @subscriptionPricePerPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'{price} с / 30 дней'**
+  String subscriptionPricePerPeriod(String price);
+
+  /// No description provided for @subscriptionPay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплатить'**
+  String get subscriptionPay;
+
+  /// No description provided for @subscriptionOpenPaymentPage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть страницу оплаты'**
+  String get subscriptionOpenPaymentPage;
+
+  /// No description provided for @subscriptionAfterPayingHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплатите по открывшейся ссылке, затем вернитесь сюда и нажмите «Проверить оплату».'**
+  String get subscriptionAfterPayingHint;
+
+  /// No description provided for @subscriptionCheckPayment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить оплату'**
+  String get subscriptionCheckPayment;
+
+  /// No description provided for @subscriptionPaymentCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплата прошла, тариф продлён'**
+  String get subscriptionPaymentCompleted;
+
+  /// No description provided for @subscriptionPaymentPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'**
+  String get subscriptionPaymentPending;
+
+  /// No description provided for @subscriptionCreateFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось создать заказ на оплату'**
+  String get subscriptionCreateFailed;
+
   /// No description provided for @joinTitle.
   ///
   /// In ru, this message translates to:
@@ -6615,6 +6711,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Срок истёк {date}'**
   String platformFarmPlanExpired(String date);
+
+  /// No description provided for @platformFarmPlanExtend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продлить вручную'**
+  String get platformFarmPlanExtend;
+
+  /// No description provided for @platformFarmPlanExtended.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок тарифа обновлён'**
+  String get platformFarmPlanExtended;
 
   /// No description provided for @platformFarmExtrasNone.
   ///

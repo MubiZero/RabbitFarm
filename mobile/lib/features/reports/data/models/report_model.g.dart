@@ -38,10 +38,52 @@ Map<String, dynamic> _$DashboardReportToJson(_DashboardReport instance) =>
 _PlanUsage _$PlanUsageFromJson(Map<String, dynamic> json) => _PlanUsage(
   rabbits: ResourceUsage.fromJson(json['rabbits'] as Map<String, dynamic>),
   staff: ResourceUsage.fromJson(json['staff'] as Map<String, dynamic>),
+  plan: json['plan'] == null
+      ? null
+      : PlanUsagePlan.fromJson(json['plan'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PlanUsageToJson(_PlanUsage instance) =>
-    <String, dynamic>{'rabbits': instance.rabbits, 'staff': instance.staff};
+    <String, dynamic>{
+      'rabbits': instance.rabbits,
+      'staff': instance.staff,
+      'plan': instance.plan,
+    };
+
+_PlanUsagePlan _$PlanUsagePlanFromJson(Map<String, dynamic> json) =>
+    _PlanUsagePlan(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      name: json['name'] as String,
+      price: _$JsonConverterFromJson<Object, double>(
+        json['price'],
+        const DoubleConverter().fromJson,
+      ),
+      expiresAt: const NullableDateTimeConverter().fromJson(json['expires_at']),
+      isExpired: json['is_expired'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$PlanUsagePlanToJson(
+  _PlanUsagePlan instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+  'price': _$JsonConverterToJson<Object, double>(
+    instance.price,
+    const DoubleConverter().toJson,
+  ),
+  'expires_at': const NullableDateTimeConverter().toJson(instance.expiresAt),
+  'is_expired': instance.isExpired,
+};
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);
 
 _ResourceUsage _$ResourceUsageFromJson(Map<String, dynamic> json) =>
     _ResourceUsage(

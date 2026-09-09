@@ -89,7 +89,14 @@ class FarmDetailScreen extends ConsumerWidget {
               ),
               _Section(
                 title: context.l10n.platformFarmSectionPlan,
-                child: _PlanCard(farm: farm),
+                child: _PlanCard(
+                  farm: farm,
+                  // Продлевать нечего без тарифа, и незачем — на пути к
+                  // удалению.
+                  onExtend: farm.isDeleted || farm.plan == null
+                      ? null
+                      : () => _extendPlan(context, ref, farm),
+                ),
               ),
               _Section(
                 title: context.l10n.platformFarmSectionExtras,
@@ -240,6 +247,36 @@ class FarmDetailScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  /// Ручное продление тарифа (см. docs/plans/PLATFORM-ADMIN.md, 4.1) —
+  /// например, клиент оплатил наличными, мимо `Payment`. Точная дата, как и
+  /// у поблажки: админ выбирает день, а не «плюс месяц».
+  Future<void> _extendPlan(
+    BuildContext context,
+    WidgetRef ref,
+    PlatformFarmDetail farm,
+  ) async {
+    final l10n = context.l10n;
+    final now = DateTime.now();
+    final initial = farm.planExpiresAt != null && farm.planExpiresAt!.isAfter(now)
+        ? farm.planExpiresAt!
+        : now.add(const Duration(days: 30));
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: now.subtract(const Duration(days: 365)),
+      lastDate: now.add(const Duration(days: 365 * 3)),
+    );
+    if (picked == null || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final error = await ref
+        .read(platformFarmDetailProvider(farm.id).notifier)
+        .extendPlan(picked);
+
+    _report(messenger, l10n, error: error, success: l10n.platformFarmPlanExtended);
   }
 
   Future<void> _editExtras(
@@ -507,9 +544,10 @@ class _AccessCard extends StatelessWidget {
 }
 
 class _PlanCard extends StatelessWidget {
-  const _PlanCard({required this.farm});
+  const _PlanCard({required this.farm, this.onExtend});
 
   final PlatformFarmDetail farm;
+  final VoidCallback? onExtend;
 
   @override
   Widget build(BuildContext context) {
@@ -583,6 +621,11 @@ class _PlanCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onExtend != null)
+                TextButton(
+                  onPressed: onExtend,
+                  child: Text(l10n.platformFarmPlanExtend),
+                ),
             ],
           ),
         ],

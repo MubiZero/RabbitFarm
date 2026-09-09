@@ -2,21 +2,27 @@ const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const { authenticate, authorize } = require('../middleware/auth');
-const validate = require('../middleware/validation');
-const { createPaymentSchema } = require('../validators/paymentValidator');
 
 /**
  * @route   POST /api/v1/payments
- * @desc    Создать заказ на оплату подписки
+ * @desc    Создать заказ на оплату продления тарифа. Тело пустое: сумму
+ *          считает сервер по тарифу фермы (см. docs/plans/PLATFORM-ADMIN.md,
+ *          4.1) — раньше клиент присылал произвольную сумму сам.
  * @access  Private (Owner only) — оплата фермы, не рабочий процесс
  */
 router.post(
   '/',
   authenticate,
   authorize(['owner']),
-  validate(createPaymentSchema),
   paymentController.create
 );
+
+/**
+ * @route   GET /api/v1/payments/:invoiceId
+ * @desc    Ручной опрос статуса своего платежа — без ожидания вебхука
+ * @access  Private (Owner only)
+ */
+router.get('/:invoiceId', authenticate, authorize(['owner']), paymentController.status);
 
 /**
  * @route   POST /api/v1/payments/webhook

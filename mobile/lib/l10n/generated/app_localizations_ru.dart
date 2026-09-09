@@ -2222,6 +2222,63 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeDark => 'Тёмная';
 
   @override
+  String get settingsSubscription => 'Тариф';
+
+  @override
+  String get subscriptionTitle => 'Тариф';
+
+  @override
+  String get subscriptionNoPlan => 'Тариф не назначен';
+
+  @override
+  String get subscriptionNoPlanHint =>
+      'Обратитесь в поддержку, чтобы подключить тариф.';
+
+  @override
+  String get subscriptionFree => 'Бесплатный тариф';
+
+  @override
+  String get subscriptionForever => 'Бессрочно';
+
+  @override
+  String subscriptionExpiresOn(String date) {
+    return 'Действует до $date';
+  }
+
+  @override
+  String subscriptionExpired(String date) {
+    return 'Срок истёк $date';
+  }
+
+  @override
+  String subscriptionPricePerPeriod(String price) {
+    return '$price с / 30 дней';
+  }
+
+  @override
+  String get subscriptionPay => 'Оплатить';
+
+  @override
+  String get subscriptionOpenPaymentPage => 'Открыть страницу оплаты';
+
+  @override
+  String get subscriptionAfterPayingHint =>
+      'Оплатите по открывшейся ссылке, затем вернитесь сюда и нажмите «Проверить оплату».';
+
+  @override
+  String get subscriptionCheckPayment => 'Проверить оплату';
+
+  @override
+  String get subscriptionPaymentCompleted => 'Оплата прошла, тариф продлён';
+
+  @override
+  String get subscriptionPaymentPending =>
+      'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту';
+
+  @override
+  String get subscriptionCreateFailed => 'Не удалось создать заказ на оплату';
+
+  @override
   String get joinTitle => 'Присоединиться к ферме';
 
   @override
@@ -3687,6 +3744,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String platformFarmPlanExpired(String date) {
     return 'Срок истёк $date';
   }
+
+  @override
+  String get platformFarmPlanExtend => 'Продлить вручную';
+
+  @override
+  String get platformFarmPlanExtended => 'Срок тарифа обновлён';
 
   @override
   String get platformFarmExtrasNone =>

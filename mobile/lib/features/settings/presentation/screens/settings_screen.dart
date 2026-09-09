@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -57,6 +58,24 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
+
+          // Тариф — своя оплата, только у владельца (см.
+          // docs/plans/PLATFORM-ADMIN.md, 4.1): ферма сама себе план не
+          // выбирает, но продлить уже назначенный может.
+          if (user?.role == 'owner') ...[
+            _GroupCard(
+              context: context,
+              children: [
+                _SettingsTile(
+                  icon: Icons.workspace_premium_outlined,
+                  label: context.l10n.settingsSubscription,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/subscription'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
 
           // About
           _SectionLabel(context.l10n.settingsAbout),
@@ -217,16 +236,18 @@ class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final Widget? trailing;
+  final VoidCallback? onTap;
 
   const _SettingsTile({
     required this.icon,
     required this.label,
     this.trailing,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final content = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
@@ -248,6 +269,8 @@ class _SettingsTile extends StatelessWidget {
         ],
       ),
     );
+
+    return onTap == null ? content : InkWell(onTap: onTap, child: content);
   }
 }
 

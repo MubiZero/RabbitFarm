@@ -177,6 +177,28 @@ class PlatformAdminController {
     }
   }
 
+  /** PATCH /platform-admin/farms/:id/plan-expiry */
+  async extendPlan(req, res, next) {
+    try {
+      const before = await platformAdminService.getFarm(req.params.id);
+      const farm = await platformAdminService.extendPlan(req.params.id, req.body.plan_expires_at);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'farm.extend_plan',
+        farmId: req.params.id,
+        before: { plan_expires_at: before.plan_expires_at },
+        after: { plan_expires_at: farm.plan_expires_at },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, farm, 'Срок тарифа обновлён');
+    } catch (error) {
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Ферма не найдена');
+      }
+      next(error);
+    }
+  }
+
   /** PATCH /platform-admin/farms/:id/extras */
   async updateExtras(req, res, next) {
     try {

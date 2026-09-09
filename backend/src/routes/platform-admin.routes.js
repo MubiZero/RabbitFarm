@@ -9,6 +9,7 @@ const {
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
+  extendPlanSchema,
   impersonateFarmSchema,
   deleteFarmSchema,
   createAnnouncementSchema
@@ -93,6 +94,15 @@ router.patch('/farms/:id/status', validate(updateFarmStatusSchema), platformAdmi
  *     tags: [PlatformAdmin]
  */
 router.patch('/farms/:id/extras', validate(updateFarmExtrasSchema), platformAdminController.updateExtras);
+
+/**
+ * @swagger
+ * /platform-admin/farms/{id}/plan-expiry:
+ *   patch:
+ *     summary: Продлить платный тариф вручную (например, оплатили наличными)
+ *     tags: [PlatformAdmin]
+ */
+router.patch('/farms/:id/plan-expiry', validate(extendPlanSchema), platformAdminController.extendPlan);
 
 /**
  * @swagger

@@ -884,6 +884,38 @@
   "settingsThemeSystem": "Как в системе",
   "settingsThemeDark": "Тёмная",
 
+  "settingsSubscription": "Тариф",
+
+  "subscriptionTitle": "Тариф",
+  "subscriptionNoPlan": "Тариф не назначен",
+  "subscriptionNoPlanHint": "Обратитесь в поддержку, чтобы подключить тариф.",
+  "subscriptionFree": "Бесплатный тариф",
+  "subscriptionForever": "Бессрочно",
+  "subscriptionExpiresOn": "Действует до {date}",
+  "@subscriptionExpiresOn": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "subscriptionExpired": "Срок истёк {date}",
+  "@subscriptionExpired": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "subscriptionPricePerPeriod": "{price} с / 30 дней",
+  "@subscriptionPricePerPeriod": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "subscriptionPay": "Оплатить",
+  "subscriptionOpenPaymentPage": "Открыть страницу оплаты",
+  "subscriptionAfterPayingHint": "Оплатите по открывшейся ссылке, затем вернитесь сюда и нажмите «Проверить оплату».",
+  "subscriptionCheckPayment": "Проверить оплату",
+  "subscriptionPaymentCompleted": "Оплата прошла, тариф продлён",
+  "subscriptionPaymentPending": "Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту",
+
   "joinTitle": "Присоединиться к ферме",
   "joinIntro": "Код выдаёт владелец фермы. После входа вы увидите её хозяйство — поголовье, корма и задачи.",
   "joinCode": "Код приглашения",
@@ -1481,6 +1513,8 @@
       "date": { "type": "String" }
     }
   },
+  "platformFarmPlanExtend": "Продлить вручную",
+  "platformFarmPlanExtended": "Срок тарифа обновлён",
 
   "platformFarmExtrasNone": "Поблажек нет — действуют пределы тарифа",
   "platformFarmExtrasGrant": "Выдать поблажку",

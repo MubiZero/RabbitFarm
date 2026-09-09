@@ -98,6 +98,8 @@ class ApiEndpoints {
   static String platformFarmPlan(int id) => '/platform-admin/farms/$id/plan';
   static String platformFarmStatus(int id) => '/platform-admin/farms/$id/status';
   static String platformFarmExtras(int id) => '/platform-admin/farms/$id/extras';
+  static String platformFarmPlanExpiry(int id) =>
+      '/platform-admin/farms/$id/plan-expiry';
   static String platformFarmExport(int id) => '/platform-admin/farms/$id/export';
   static String platformFarmImpersonate(int id) =>
       '/platform-admin/farms/$id/impersonate';
@@ -110,4 +112,8 @@ class ApiEndpoints {
   static const String reportFarm = '/reports/farm';
   static const String reportHealth = '/reports/health';
   static const String reportFinancial = '/reports/financial';
+
+  // Оплата продления тарифа (см. docs/plans/PLATFORM-ADMIN.md, 4.1)
+  static const String payments = '/payments';
+  static String paymentStatus(String invoiceId) => '/payments/$invoiceId';
 }

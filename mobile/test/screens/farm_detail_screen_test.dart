@@ -107,6 +107,7 @@ class _FakeRepository extends PlatformAdminRepository {
   /// Что ушло в запросы — по этому видно, дошло ли решение админа до сервера.
   final statusCalls = <String>[];
   final extrasCalls = <({int? rabbits, int? staff, DateTime? until})>[];
+  final extendPlanCalls = <DateTime>[];
   final deleteCalls = <String>[];
   final impersonateCalls = <String>[];
   int restoreCalls = 0;
@@ -163,6 +164,16 @@ class _FakeRepository extends PlatformAdminRepository {
       extraStaff: extraStaff,
       extrasUntil: extrasUntil,
     );
+    return farm;
+  }
+
+  @override
+  Future<PlatformFarmDetail> updateFarmPlanExpiry(
+    int farmId,
+    DateTime planExpiresAt,
+  ) async {
+    extendPlanCalls.add(planExpiresAt);
+    farm = farm.copyWith(planExpiresAt: planExpiresAt);
     return farm;
   }
 
@@ -474,6 +485,46 @@ void main() {
       expect(find.textContaining('Поблажка истекла'), findsOneWidget);
       // Предел снова тарифный, а не расширенный.
       expect(find.text('26 из 30'), findsOneWidget);
+    });
+  });
+
+  group('Продление тарифа вручную', () {
+    testWidgets('выбранная в календаре дата уходит на сервер', (tester) async {
+      final repository = _FakeRepository();
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Продлить вручную'));
+      await tester.pumpAndSettle();
+
+      // Не меняем день — принимаем предложенный срок как есть, этого
+      // достаточно, чтобы проверить, что выбор из календаря доходит до
+      // сервера.
+      await tester.tap(find.text('ОК'));
+      await tester.pumpAndSettle();
+
+      expect(repository.extendPlanCalls, hasLength(1));
+      expect(find.text('Срок тарифа обновлён'), findsOneWidget);
+    });
+
+    testWidgets('кнопки нет на ферме без тарифа', (tester) async {
+      final repository = _FakeRepository(
+        farm: _farm().copyWith(planId: null, plan: null),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      expect(find.text('Продлить вручную'), findsNothing);
+    });
+
+    testWidgets('кнопки нет на ферме, помеченной на удаление', (tester) async {
+      final repository = _FakeRepository(
+        farm: _farm(deletedAt: DateTime(2026, 9, 9)),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      expect(find.text('Продлить вручную'), findsNothing);
     });
   });
 

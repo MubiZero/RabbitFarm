@@ -171,6 +171,26 @@ class PlatformAdminRepository {
     }
   }
 
+  /// Продлить платный тариф вручную (см. docs/plans/PLATFORM-ADMIN.md, 4.1) —
+  /// например, клиент оплатил наличными, мимо `Payment`. Календарная дата,
+  /// как и `extras_until`: срок — это день, а не момент времени.
+  Future<PlatformFarmDetail> updateFarmPlanExpiry(
+    int farmId,
+    DateTime planExpiresAt,
+  ) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.platformFarmPlanExpiry(farmId),
+        data: {
+          'plan_expires_at': const DateOnlyConverter().toJson(planExpiresAt),
+        },
+      );
+      return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   /// Токен входа под клиентом, только чтение (см.
   /// docs/plans/PLATFORM-ADMIN.md, 3.2). `reason` обязателен — это
   /// единственное, что отличает в журнале осмысленный вход от «зашёл

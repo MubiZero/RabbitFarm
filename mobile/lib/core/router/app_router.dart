@@ -64,6 +64,7 @@ import '../../features/rabbits/presentation/screens/herd_screen.dart';
 import '../../features/breeding/presentation/screens/breeding_cycle_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/platform_admin/data/models/platform_admin_models.dart';
 import '../../features/platform_admin/presentation/screens/platform_admin_screen.dart';
@@ -662,6 +663,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      // Тариф самой фермы — оплата продления (см.
+      // docs/plans/PLATFORM-ADMIN.md, 4.1). Доступ на сервере ограничен
+      // владельцем, маршрут сам по себе ничего не открывает.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/subscription',
+        name: 'subscription',
+        builder: (context, state) => const SubscriptionScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

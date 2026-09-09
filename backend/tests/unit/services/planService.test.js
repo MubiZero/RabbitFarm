@@ -291,12 +291,18 @@ describe('PlanService', () => {
 
       expect(usage).toEqual({
         rabbits: { used: 26, limit: null },
-        staff: { used: 2, limit: null }
+        staff: { used: 2, limit: null },
+        plan: null
       });
     });
 
     it('отдаёт лимиты из плана рядом с фактическим потреблением', async () => {
-      Farm.findByPk.mockResolvedValue({ id: 1, plan: { max_rabbits: 30, max_staff: null } });
+      Farm.findByPk.mockResolvedValue({
+        id: 1,
+        plan_id: 7,
+        plan_expires_at: null,
+        plan: { id: 7, name: 'Базовый', price: 50, max_rabbits: 30, max_staff: null }
+      });
       Rabbit.count.mockResolvedValue(26);
       User.count.mockResolvedValue(2);
 
@@ -304,7 +310,8 @@ describe('PlanService', () => {
 
       expect(usage).toEqual({
         rabbits: { used: 26, limit: 30 },
-        staff: { used: 2, limit: null }
+        staff: { used: 2, limit: null },
+        plan: { id: 7, name: 'Базовый', price: 50, expires_at: null, is_expired: false }
       });
     });
 
@@ -312,7 +319,9 @@ describe('PlanService', () => {
       const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       Farm.findByPk.mockResolvedValue({
         id: 1,
-        plan: { max_rabbits: 30, max_staff: 2 },
+        plan_id: 7,
+        plan_expires_at: null,
+        plan: { id: 7, name: 'Базовый', price: 50, max_rabbits: 30, max_staff: 2 },
         extra_rabbits: 50,
         extra_staff: 1,
         extras_until: future
@@ -324,7 +333,8 @@ describe('PlanService', () => {
 
       expect(usage).toEqual({
         rabbits: { used: 40, limit: 80 },
-        staff: { used: 2, limit: 3 }
+        staff: { used: 2, limit: 3 },
+        plan: { id: 7, name: 'Базовый', price: 50, expires_at: null, is_expired: false }
       });
     });
 
@@ -342,6 +352,77 @@ describe('PlanService', () => {
 
       expect(usage.rabbits.limit).toBe(30);
       expect(usage.staff.limit).toBe(2);
+    });
+  });
+
+  describe('getRenewalQuote', () => {
+    it('бросает NO_PLAN, если ферме не назначен тариф', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: null });
+
+      await expect(planService.getRenewalQuote(1)).rejects.toThrow('NO_PLAN');
+    });
+
+    it('бросает PLAN_FREE, если у тарифа нет цены', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: { name: 'Бесплатный', price: null } });
+
+      await expect(planService.getRenewalQuote(1)).rejects.toThrow('PLAN_FREE');
+    });
+
+    it('считает сумму и описание по тарифу фермы, а не по телу запроса', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: { name: 'Базовый', price: 50 } });
+
+      const quote = await planService.getRenewalQuote(1);
+
+      expect(quote).toEqual({ amount: 50, description: 'Тариф «Базовый»' });
+    });
+  });
+
+  describe('extendPlanExpiry', () => {
+    it('ничего не делает, если у фермы уже нет платного тарифа', async () => {
+      const farm = { id: 1, plan: null, update: jest.fn() };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      const result = await planService.extendPlanExpiry(1);
+
+      expect(result).toBeNull();
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('продлевает от текущего срока, если он ещё не истёк', async () => {
+      const future = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+      const farm = {
+        id: 1,
+        plan: { price: 50 },
+        plan_expires_at: future.toISOString(),
+        update: jest.fn().mockResolvedValue(undefined)
+      };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      const result = await planService.extendPlanExpiry(1);
+
+      const expected = new Date(future.getTime() + 30 * 24 * 60 * 60 * 1000);
+      expect(result.getTime()).toBe(expected.getTime());
+      expect(farm.update).toHaveBeenCalledWith({ plan_expires_at: result });
+    });
+
+    it('продлевает от «сейчас», если срок уже истёк', async () => {
+      const past = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+      const farm = {
+        id: 1,
+        plan: { price: 50 },
+        plan_expires_at: past.toISOString(),
+        update: jest.fn().mockResolvedValue(undefined)
+      };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      const before = Date.now();
+      const result = await planService.extendPlanExpiry(1);
+      const after = Date.now();
+
+      const minExpected = before + 30 * 24 * 60 * 60 * 1000;
+      const maxExpected = after + 30 * 24 * 60 * 60 * 1000;
+      expect(result.getTime()).toBeGreaterThanOrEqual(minExpected);
+      expect(result.getTime()).toBeLessThanOrEqual(maxExpected);
     });
   });
 });

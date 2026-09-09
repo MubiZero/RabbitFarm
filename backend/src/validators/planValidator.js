@@ -34,6 +34,12 @@ const updateFarmExtrasSchema = Joi.object({
   extras_until: Joi.date().iso().allow(null)
 }).min(1);
 
+// Точная дата, а не «плюс месяц» — ручное продление (4.1), не автоматическое
+// по оплате.
+const extendPlanSchema = Joi.object({
+  plan_expires_at: Joi.date().iso().required()
+});
+
 // Причина обязательна — это единственное, что отличает в журнале осмысленный
 // вход под клиентом от «зашёл посмотреть от скуки» (см. 3.2).
 const impersonateFarmSchema = Joi.object({
@@ -67,6 +73,7 @@ module.exports = {
   assignPlanSchema,
   updateFarmStatusSchema,
   updateFarmExtrasSchema,
+  extendPlanSchema,
   impersonateFarmSchema,
   deleteFarmSchema,
   createAnnouncementSchema

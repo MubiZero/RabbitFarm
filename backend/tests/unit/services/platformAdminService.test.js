@@ -495,6 +495,36 @@ describe('PlatformAdminService', () => {
     });
   });
 
+  describe('extendPlan', () => {
+    beforeEach(() => {
+      User.max.mockResolvedValue(null);
+      Rabbit.count.mockResolvedValue(0);
+      User.count.mockResolvedValue(1);
+    });
+
+    it('бросает FARM_NOT_FOUND для несуществующей фермы', async () => {
+      Farm.findByPk.mockResolvedValue(null);
+
+      await expect(platformAdminService.extendPlan(999, '2026-11-01T00:00:00.000Z'))
+        .rejects.toThrow('FARM_NOT_FOUND');
+    });
+
+    it('ставит точную дату — не «плюс месяц» — и отдаёт ферму той же формы, что и getFarm', async () => {
+      const farm = { id: 1, update: jest.fn().mockResolvedValue(undefined) };
+      Farm.findByPk
+        .mockResolvedValueOnce(farm)
+        .mockResolvedValueOnce({
+          id: 1,
+          toJSON: () => ({ id: 1, plan_expires_at: '2026-11-01T00:00:00.000Z' })
+        });
+
+      const result = await platformAdminService.extendPlan(1, '2026-11-01T00:00:00.000Z');
+
+      expect(farm.update).toHaveBeenCalledWith({ plan_expires_at: '2026-11-01T00:00:00.000Z' });
+      expect(result.plan_expires_at).toBe('2026-11-01T00:00:00.000Z');
+    });
+  });
+
   describe('updateExtras', () => {
     beforeEach(() => {
       User.max.mockResolvedValue(null);

@@ -473,7 +473,10 @@ $PlanUsageCopyWith<$Res>? get planUsage {
 /// @nodoc
 mixin _$PlanUsage {
 
- ResourceUsage get rabbits; ResourceUsage get staff;
+ ResourceUsage get rabbits; ResourceUsage get staff;/// Сам тариф — название, цена продления, срок (см.
+/// docs/plans/PLATFORM-ADMIN.md, 4.1). `null`, если ферме не назначен
+/// тариф вовсе.
+ PlanUsagePlan? get plan;
 /// Create a copy of PlanUsage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -487,20 +490,20 @@ $PlanUsageCopyWith<PlanUsage> get copyWith => _$PlanUsageCopyWithImpl<PlanUsage>
 @override
 bool operator ==(Object other) {
   final _this = this as PlanUsage;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlanUsage&&(identical(other.rabbits, _this.rabbits) || other.rabbits == _this.rabbits)&&(identical(other.staff, _this.staff) || other.staff == _this.staff));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlanUsage&&(identical(other.rabbits, _this.rabbits) || other.rabbits == _this.rabbits)&&(identical(other.staff, _this.staff) || other.staff == _this.staff)&&(identical(other.plan, _this.plan) || other.plan == _this.plan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PlanUsage;
-  return Object.hash(runtimeType,_this.rabbits,_this.staff);
+  return Object.hash(runtimeType,_this.rabbits,_this.staff,_this.plan);
 }
 
 @override
 String toString() {
   final _this = this as PlanUsage;
-  return 'PlanUsage(rabbits: ${_this.rabbits}, staff: ${_this.staff})';
+  return 'PlanUsage(rabbits: ${_this.rabbits}, staff: ${_this.staff}, plan: ${_this.plan})';
 }
 
 
@@ -511,11 +514,11 @@ abstract mixin class $PlanUsageCopyWith<$Res>  {
   factory $PlanUsageCopyWith(PlanUsage value, $Res Function(PlanUsage) _then) = _$PlanUsageCopyWithImpl;
 @useResult
 $Res call({
- ResourceUsage rabbits, ResourceUsage staff
+ ResourceUsage rabbits, ResourceUsage staff, PlanUsagePlan? plan
 });
 
 
-$ResourceUsageCopyWith<$Res> get rabbits;$ResourceUsageCopyWith<$Res> get staff;
+$ResourceUsageCopyWith<$Res> get rabbits;$ResourceUsageCopyWith<$Res> get staff;$PlanUsagePlanCopyWith<$Res>? get plan;
 
 }
 /// @nodoc
@@ -528,11 +531,12 @@ class _$PlanUsageCopyWithImpl<$Res>
 
 /// Create a copy of PlanUsage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? rabbits = null,Object? staff = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? rabbits = null,Object? staff = null,Object? plan = freezed,}) {
   return _then(PlanUsage(
 rabbits: null == rabbits ? _self.rabbits : rabbits // ignore: cast_nullable_to_non_nullable
 as ResourceUsage,staff: null == staff ? _self.staff : staff // ignore: cast_nullable_to_non_nullable
-as ResourceUsage,
+as ResourceUsage,plan: freezed == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
+as PlanUsagePlan?,
   ));
 }
 /// Create a copy of PlanUsage
@@ -552,6 +556,18 @@ $ResourceUsageCopyWith<$Res> get staff {
   
   return $ResourceUsageCopyWith<$Res>(_self.staff, (value) {
     return _then(_self.copyWith(staff: value));
+  });
+}/// Create a copy of PlanUsage
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlanUsagePlanCopyWith<$Res>? get plan {
+    if (_self.plan == null) {
+    return null;
+  }
+
+  return $PlanUsagePlanCopyWith<$Res>(_self.plan!, (value) {
+    return _then(_self.copyWith(plan: value));
   });
 }
 }
@@ -635,10 +651,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ResourceUsage rabbits,  ResourceUsage staff)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ResourceUsage rabbits,  ResourceUsage staff,  PlanUsagePlan? plan)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PlanUsage() when $default != null:
-return $default(_that.rabbits,_that.staff);case _:
+return $default(_that.rabbits,_that.staff,_that.plan);case _:
   return orElse();
 
 }
@@ -656,10 +672,10 @@ return $default(_that.rabbits,_that.staff);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ResourceUsage rabbits,  ResourceUsage staff)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ResourceUsage rabbits,  ResourceUsage staff,  PlanUsagePlan? plan)  $default,) {final _that = this;
 switch (_that) {
 case _PlanUsage():
-return $default(_that.rabbits,_that.staff);case _:
+return $default(_that.rabbits,_that.staff,_that.plan);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -676,10 +692,10 @@ return $default(_that.rabbits,_that.staff);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ResourceUsage rabbits,  ResourceUsage staff)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ResourceUsage rabbits,  ResourceUsage staff,  PlanUsagePlan? plan)?  $default,) {final _that = this;
 switch (_that) {
 case _PlanUsage() when $default != null:
-return $default(_that.rabbits,_that.staff);case _:
+return $default(_that.rabbits,_that.staff,_that.plan);case _:
   return null;
 
 }
@@ -691,11 +707,15 @@ return $default(_that.rabbits,_that.staff);case _:
 @JsonSerializable()
 
 class _PlanUsage implements PlanUsage {
-  const _PlanUsage({required this.rabbits, required this.staff});
+  const _PlanUsage({required this.rabbits, required this.staff, this.plan});
   factory _PlanUsage.fromJson(Map<String, dynamic> json) => _$PlanUsageFromJson(json);
 
 @override final  ResourceUsage rabbits;
 @override final  ResourceUsage staff;
+/// Сам тариф — название, цена продления, срок (см.
+/// docs/plans/PLATFORM-ADMIN.md, 4.1). `null`, если ферме не назначен
+/// тариф вовсе.
+@override final  PlanUsagePlan? plan;
 
 /// Create a copy of PlanUsage
 /// with the given fields replaced by the non-null parameter values.
@@ -710,18 +730,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlanUsage&&(identical(other.rabbits, rabbits) || other.rabbits == rabbits)&&(identical(other.staff, staff) || other.staff == staff));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlanUsage&&(identical(other.rabbits, rabbits) || other.rabbits == rabbits)&&(identical(other.staff, staff) || other.staff == staff)&&(identical(other.plan, plan) || other.plan == plan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,rabbits,staff);
+    return Object.hash(runtimeType,rabbits,staff,plan);
 }
 
 @override
 String toString() {
-    return 'PlanUsage(rabbits: $rabbits, staff: $staff)';
+    return 'PlanUsage(rabbits: $rabbits, staff: $staff, plan: $plan)';
 }
 
 
@@ -732,11 +752,11 @@ abstract mixin class _$PlanUsageCopyWith<$Res> implements $PlanUsageCopyWith<$Re
   factory _$PlanUsageCopyWith(_PlanUsage value, $Res Function(_PlanUsage) _then) = __$PlanUsageCopyWithImpl;
 @override @useResult
 $Res call({
- ResourceUsage rabbits, ResourceUsage staff
+ ResourceUsage rabbits, ResourceUsage staff, PlanUsagePlan? plan
 });
 
 
-@override $ResourceUsageCopyWith<$Res> get rabbits;@override $ResourceUsageCopyWith<$Res> get staff;
+@override $ResourceUsageCopyWith<$Res> get rabbits;@override $ResourceUsageCopyWith<$Res> get staff;@override $PlanUsagePlanCopyWith<$Res>? get plan;
 
 }
 /// @nodoc
@@ -749,11 +769,12 @@ class __$PlanUsageCopyWithImpl<$Res>
 
 /// Create a copy of PlanUsage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? rabbits = null,Object? staff = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? rabbits = null,Object? staff = null,Object? plan = freezed,}) {
   return _then(_PlanUsage(
 rabbits: null == rabbits ? _self.rabbits : rabbits // ignore: cast_nullable_to_non_nullable
 as ResourceUsage,staff: null == staff ? _self.staff : staff // ignore: cast_nullable_to_non_nullable
-as ResourceUsage,
+as ResourceUsage,plan: freezed == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
+as PlanUsagePlan?,
   ));
 }
 
@@ -775,7 +796,301 @@ $ResourceUsageCopyWith<$Res> get staff {
   return $ResourceUsageCopyWith<$Res>(_self.staff, (value) {
     return _then(_self.copyWith(staff: value));
   });
+}/// Create a copy of PlanUsage
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlanUsagePlanCopyWith<$Res>? get plan {
+    if (_self.plan == null) {
+    return null;
+  }
+
+  return $PlanUsagePlanCopyWith<$Res>(_self.plan!, (value) {
+    return _then(_self.copyWith(plan: value));
+  });
 }
+}
+
+
+/// @nodoc
+mixin _$PlanUsagePlan {
+
+@IntConverter() int get id; String get name;@DoubleConverter() double? get price;@JsonKey(name: 'expires_at')@NullableDateTimeConverter() DateTime? get expiresAt;@JsonKey(name: 'is_expired') bool get isExpired;
+/// Create a copy of PlanUsagePlan
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PlanUsagePlanCopyWith<PlanUsagePlan> get copyWith => _$PlanUsagePlanCopyWithImpl<PlanUsagePlan>(this as PlanUsagePlan, _$identity);
+
+  /// Serializes this PlanUsagePlan to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PlanUsagePlan;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlanUsagePlan&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.price, _this.price) || other.price == _this.price)&&(identical(other.expiresAt, _this.expiresAt) || other.expiresAt == _this.expiresAt)&&(identical(other.isExpired, _this.isExpired) || other.isExpired == _this.isExpired));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PlanUsagePlan;
+  return Object.hash(runtimeType,_this.id,_this.name,_this.price,_this.expiresAt,_this.isExpired);
+}
+
+@override
+String toString() {
+  final _this = this as PlanUsagePlan;
+  return 'PlanUsagePlan(id: ${_this.id}, name: ${_this.name}, price: ${_this.price}, expiresAt: ${_this.expiresAt}, isExpired: ${_this.isExpired})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PlanUsagePlanCopyWith<$Res>  {
+  factory $PlanUsagePlanCopyWith(PlanUsagePlan value, $Res Function(PlanUsagePlan) _then) = _$PlanUsagePlanCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int id, String name,@DoubleConverter() double? price,@JsonKey(name: 'expires_at')@NullableDateTimeConverter() DateTime? expiresAt,@JsonKey(name: 'is_expired') bool isExpired
+});
+
+
+
+
+}
+/// @nodoc
+class _$PlanUsagePlanCopyWithImpl<$Res>
+    implements $PlanUsagePlanCopyWith<$Res> {
+  _$PlanUsagePlanCopyWithImpl(this._self, this._then);
+
+  final PlanUsagePlan _self;
+  final $Res Function(PlanUsagePlan) _then;
+
+/// Create a copy of PlanUsagePlan
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? price = freezed,Object? expiresAt = freezed,Object? isExpired = null,}) {
+  return _then(PlanUsagePlan(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,isExpired: null == isExpired ? _self.isExpired : isExpired // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PlanUsagePlan].
+extension PlanUsagePlanPatterns on PlanUsagePlan {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PlanUsagePlan value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PlanUsagePlan() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PlanUsagePlan value)  $default,){
+final _that = this;
+switch (_that) {
+case _PlanUsagePlan():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PlanUsagePlan value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PlanUsagePlan() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @DoubleConverter()  double? price, @JsonKey(name: 'expires_at')@NullableDateTimeConverter()  DateTime? expiresAt, @JsonKey(name: 'is_expired')  bool isExpired)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PlanUsagePlan() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.expiresAt,_that.isExpired);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @DoubleConverter()  double? price, @JsonKey(name: 'expires_at')@NullableDateTimeConverter()  DateTime? expiresAt, @JsonKey(name: 'is_expired')  bool isExpired)  $default,) {final _that = this;
+switch (_that) {
+case _PlanUsagePlan():
+return $default(_that.id,_that.name,_that.price,_that.expiresAt,_that.isExpired);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name, @DoubleConverter()  double? price, @JsonKey(name: 'expires_at')@NullableDateTimeConverter()  DateTime? expiresAt, @JsonKey(name: 'is_expired')  bool isExpired)?  $default,) {final _that = this;
+switch (_that) {
+case _PlanUsagePlan() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.expiresAt,_that.isExpired);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PlanUsagePlan implements PlanUsagePlan {
+  const _PlanUsagePlan({@IntConverter() required this.id, required this.name, @DoubleConverter() this.price, @JsonKey(name: 'expires_at')@NullableDateTimeConverter() this.expiresAt, @JsonKey(name: 'is_expired') this.isExpired = false});
+  factory _PlanUsagePlan.fromJson(Map<String, dynamic> json) => _$PlanUsagePlanFromJson(json);
+
+@override@IntConverter() final  int id;
+@override final  String name;
+@override@DoubleConverter() final  double? price;
+@override@JsonKey(name: 'expires_at')@NullableDateTimeConverter() final  DateTime? expiresAt;
+@override@JsonKey(name: 'is_expired') final  bool isExpired;
+
+/// Create a copy of PlanUsagePlan
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PlanUsagePlanCopyWith<_PlanUsagePlan> get copyWith => __$PlanUsagePlanCopyWithImpl<_PlanUsagePlan>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PlanUsagePlanToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlanUsagePlan&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.isExpired, isExpired) || other.isExpired == isExpired));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,name,price,expiresAt,isExpired);
+}
+
+@override
+String toString() {
+    return 'PlanUsagePlan(id: $id, name: $name, price: $price, expiresAt: $expiresAt, isExpired: $isExpired)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PlanUsagePlanCopyWith<$Res> implements $PlanUsagePlanCopyWith<$Res> {
+  factory _$PlanUsagePlanCopyWith(_PlanUsagePlan value, $Res Function(_PlanUsagePlan) _then) = __$PlanUsagePlanCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int id, String name,@DoubleConverter() double? price,@JsonKey(name: 'expires_at')@NullableDateTimeConverter() DateTime? expiresAt,@JsonKey(name: 'is_expired') bool isExpired
+});
+
+
+
+
+}
+/// @nodoc
+class __$PlanUsagePlanCopyWithImpl<$Res>
+    implements _$PlanUsagePlanCopyWith<$Res> {
+  __$PlanUsagePlanCopyWithImpl(this._self, this._then);
+
+  final _PlanUsagePlan _self;
+  final $Res Function(_PlanUsagePlan) _then;
+
+/// Create a copy of PlanUsagePlan
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? price = freezed,Object? expiresAt = freezed,Object? isExpired = null,}) {
+  return _then(_PlanUsagePlan(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,isExpired: null == isExpired ? _self.isExpired : isExpired // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
 }
 
 
