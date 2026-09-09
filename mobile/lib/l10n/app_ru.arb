@@ -16,6 +16,8 @@
   "commonCopied": "Скопировано",
   "commonLoadFailed": "Не удалось загрузить",
   "commonUnknownError": "Неизвестная ошибка",
+  "commonSomethingWrong": "Что-то пошло не так",
+  "commonSomethingWrongHint": "Не удалось показать этот экран. Вернитесь назад или перезапустите приложение.",
   "errorOffline": "Нет связи — проверьте интернет",
   "errorTimeout": "Сервер не ответил, попробуйте ещё раз",
   "errorUnauthorized": "Нужно войти заново",

@@ -160,6 +160,18 @@ abstract class AppLocalizations {
   /// **'Неизвестная ошибка'**
   String get commonUnknownError;
 
+  /// No description provided for @commonSomethingWrong.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что-то пошло не так'**
+  String get commonSomethingWrong;
+
+  /// No description provided for @commonSomethingWrongHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось показать этот экран. Вернитесь назад или перезапустите приложение.'**
+  String get commonSomethingWrongHint;
+
   /// No description provided for @errorOffline.
   ///
   /// In ru, this message translates to:

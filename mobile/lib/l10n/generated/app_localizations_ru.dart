@@ -42,6 +42,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonUnknownError => 'Неизвестная ошибка';
 
   @override
+  String get commonSomethingWrong => 'Что-то пошло не так';
+
+  @override
+  String get commonSomethingWrongHint =>
+      'Не удалось показать этот экран. Вернитесь назад или перезапустите приложение.';
+
+  @override
   String get errorOffline => 'Нет связи — проверьте интернет';
 
   @override
