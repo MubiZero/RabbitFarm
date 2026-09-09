@@ -9,6 +9,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/rabbit_picker.dart';
+import '../../../../core/analytics/analytics.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
@@ -270,6 +271,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             .read(rabbitsRepositoryProvider)
             .createRabbit(data);
         rabbitId = createdRabbit.id;
+        Analytics.rabbitAdded();
       }
 
       if (_selectedImage != null) {
