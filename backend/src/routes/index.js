@@ -28,6 +28,7 @@ const modules = [
   ['/device-tokens', require('./device-token.routes')],
   ['/payments', require('./payment.routes')],
   ['/photos', require('./photo.routes')],
+  ['/support-requests', require('./support-request.routes')],
   ['/platform-admin', require('./platform-admin.routes')]
 ];
 

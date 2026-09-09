@@ -39,6 +39,7 @@ const Plan = require('./Plan')(sequelize);
 const AdminAuditLog = require('./AdminAuditLog')(sequelize);
 const FarmAuditLog = require('./FarmAuditLog')(sequelize);
 const Announcement = require('./Announcement')(sequelize);
+const SupportRequest = require('./SupportRequest')(sequelize);
 
 // Define associations
 
@@ -204,6 +205,14 @@ Announcement.belongsTo(User, { as: 'admin', foreignKey: 'admin_id' });
 Farm.hasMany(Announcement, { as: 'announcements', foreignKey: 'target_farm_id', onDelete: 'SET NULL' });
 Announcement.belongsTo(Farm, { as: 'targetFarm', foreignKey: 'target_farm_id' });
 
+// Обращение в поддержку — принадлежит ферме, но читает его платформенный
+// админ по всем фермам сразу, как и журнал действий. Поэтому пара связей
+// есть, а мультитенантного хука ниже нет.
+Farm.hasMany(SupportRequest, { as: 'supportRequests', foreignKey: 'farm_id', onDelete: 'CASCADE' });
+SupportRequest.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
+User.hasMany(SupportRequest, { as: 'supportRequests', foreignKey: 'user_id', onDelete: 'CASCADE' });
+SupportRequest.belongsTo(User, { as: 'author', foreignKey: 'user_id' });
+
 // Запрос к таблице фермы без условия по farm_id дальше не проходит.
 // Подключаем после того, как все модели определены и связаны.
 require('../utils/tenancy').attach({
@@ -241,5 +250,6 @@ module.exports = {
   Plan,
   AdminAuditLog,
   FarmAuditLog,
-  Announcement
+  Announcement,
+  SupportRequest
 };
