@@ -5,8 +5,9 @@ const notificationService = require('../services/notificationService');
 const { sendAnnouncementEmail } = require('../services/notifications/emailTransport');
 const logger = require('../utils/logger');
 
-// Тем же часом, что и notificationDigestJob — время сервера, не «раз в сутки
-// от старта», чтобы не плыть вместе с рестартами.
+// Тем же часом, что и notificationDigestJob — время сервера (пояс задан через
+// TZ, см. backend/Dockerfile), не «раз в сутки от старта», чтобы не плыть
+// вместе с рестартами.
 const CRON_SCHEDULE = '0 8 * * *';
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 

@@ -4,7 +4,8 @@ const { Farm, Vaccination, Task, Feed } = require('../models');
 const notificationService = require('../services/notificationService');
 const logger = require('../utils/logger');
 
-// 08:00 каждый день, время сервера. Не «раз в 24 часа от старта», как
+// 08:00 каждый день, время сервера (пояс задан через TZ, см. backend/Dockerfile:
+// без него контейнер живёт в UTC). Не «раз в 24 часа от старта», как
 // tokenCleanup — важно бить в одно и то же время суток, а не плыть вместе
 // с рестартами.
 const CRON_SCHEDULE = '0 8 * * *';

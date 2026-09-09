@@ -17,8 +17,13 @@ FROM node:20-alpine AS runtime
 RUN apk add --no-cache tini
 
 WORKDIR /app
+# Время контейнера — душанбинское: cron-задачи (дайджест уведомлений,
+# напоминания об окончании тарифа) назначены на 08:00 местного времени, без TZ
+# контейнер живёт в UTC и они срабатывают в 13:00. Пакет tzdata не нужен —
+# node берёт базу поясов из встроенного ICU.
 ENV NODE_ENV=production \
-    PORT=4567
+    PORT=4567 \
+    TZ=Asia/Dushanbe
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --chown=node:node . .
