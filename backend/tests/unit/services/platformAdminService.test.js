@@ -352,7 +352,7 @@ describe('PlatformAdminService', () => {
       expect(farm.payments.map((payment) => payment.id)).toEqual([2, 1]);
       expect(Payment.findAll).toHaveBeenCalledWith({
         where: { farm_id: 7 },
-        attributes: ['id', 'amount', 'currency', 'status', 'description', 'created_at'],
+        attributes: ['id', 'amount', 'currency', 'status', 'description', 'plan', 'created_at'],
         order: [['created_at', 'DESC']],
         limit: 20
       });

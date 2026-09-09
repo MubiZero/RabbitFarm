@@ -397,7 +397,7 @@ describe('PlanService', () => {
 
       const quote = await planService.getRenewalQuote(1);
 
-      expect(quote).toEqual({ amount: 50, description: 'Тариф «Базовый»' });
+      expect(quote).toEqual({ amount: 50, description: 'Тариф «Базовый»', plan: 'Базовый' });
     });
   });
 

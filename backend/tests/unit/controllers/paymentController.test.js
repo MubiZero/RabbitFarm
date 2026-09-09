@@ -30,7 +30,7 @@ describe('PaymentController', () => {
 
   describe('create', () => {
     it('считает сумму по тарифу фермы и создаёт заказ на неё, а не на тело запроса', async () => {
-      planService.getRenewalQuote.mockResolvedValue({ amount: 50, description: 'Тариф «Базовый»' });
+      planService.getRenewalQuote.mockResolvedValue({ amount: 50, description: 'Тариф «Базовый»', plan: 'Базовый' });
       paymentService.createPayment.mockResolvedValue({
         success: true,
         payment: { invoice_id: 'inv1' },
@@ -44,7 +44,11 @@ describe('PaymentController', () => {
       await paymentController.create(req, res, mockNext);
 
       expect(planService.getRenewalQuote).toHaveBeenCalledWith(1);
-      expect(paymentService.createPayment).toHaveBeenCalledWith(1, { amount: 50, description: 'Тариф «Базовый»' });
+      expect(paymentService.createPayment).toHaveBeenCalledWith(1, {
+        amount: 50,
+        description: 'Тариф «Базовый»',
+        plan: 'Базовый'
+      });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,

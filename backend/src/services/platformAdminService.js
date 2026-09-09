@@ -229,7 +229,7 @@ class PlatformAdminService {
         // в ответе на просмотр карточки клиента.
         Payment.findAll({
           where: { farm_id: farmId },
-          attributes: ['id', 'amount', 'currency', 'status', 'description', 'created_at'],
+          attributes: ['id', 'amount', 'currency', 'status', 'description', 'plan', 'created_at'],
           order: [['created_at', 'DESC']],
           limit: 20
         }),

@@ -28,13 +28,14 @@ describe('PaymentService', () => {
       const created = { id: 1, invoice_id: 'generated' };
       Payment.create.mockResolvedValue(created);
 
-      const result = await paymentService.createPayment(5, { amount: 100, description: 'Подписка' });
+      const result = await paymentService.createPayment(5, { amount: 100, description: 'Подписка', plan: 'Базовый' });
 
       expect(Payment.create).toHaveBeenCalledWith(expect.objectContaining({
         farm_id: 5,
         order_id: 'o1',
         pos_id: 12,
         amount: 100,
+        plan: 'Базовый',
         status: 'new'
       }));
       expect(result).toEqual({
@@ -44,6 +45,18 @@ describe('PaymentService', () => {
         invoiceUrl: 'https://x/invoices/1',
         deepLink: 'eskhata://pay/mock'
       });
+    });
+
+    it('пишет plan: null, если тариф вызывающий код не передал — MRR потом считается по тем платежам, где он есть', async () => {
+      eskhataClient.createOrder.mockResolvedValue({
+        httpStatus: 200,
+        body: { status: true, data: { orderId: 'o1', posId: 12, qr: 'qr', invoiceUrl: 'https://x/1' } }
+      });
+      Payment.create.mockResolvedValue({ id: 1 });
+
+      await paymentService.createPayment(5, { amount: 100, description: 'Подписка' });
+
+      expect(Payment.create).toHaveBeenCalledWith(expect.objectContaining({ plan: null }));
     });
 
     it('does NOT create a Payment row when the bank declines at creation (status:false)', async () => {
