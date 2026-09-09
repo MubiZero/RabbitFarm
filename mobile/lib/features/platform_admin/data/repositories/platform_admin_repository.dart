@@ -13,6 +13,9 @@ typedef FarmsPage = ({List<PlatformFarm> items, PageInfo page});
 /// То же для истории объявлений.
 typedef AnnouncementsPage = ({List<Announcement> items, PageInfo page});
 
+/// То же для обращений в поддержку.
+typedef SupportRequestsPage = ({List<SupportRequest> items, PageInfo page});
+
 /// Тарифы и фермы всего сервиса — то, чем распоряжается платформенный админ.
 ///
 /// Единственный репозиторий приложения, который работает не внутри одной
@@ -303,6 +306,41 @@ class PlatformAdminRepository {
         data: draft.toJson(),
       );
       return Announcement.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Обращения ферм в поддержку — необработанные сверху (сервер сортирует по
+  /// статусу, см. `supportRequestService.list`).
+  Future<SupportRequestsPage> getSupportRequests({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.platformSupportRequests,
+        queryParameters: {'page': page, 'limit': limit},
+      );
+
+      final data = response.data['data'];
+      final items = [
+        for (final item in itemsOf(data))
+          SupportRequest.fromJson(item as Map<String, dynamic>),
+      ];
+      return (items: items, page: PageInfo.of(data, fallbackCount: items.length));
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Отметить обращение разобранным. Повторный вызов не ошибка — сервер
+  /// просто возвращает то же обращение (см. `supportRequestService.resolve`).
+  Future<SupportRequest> resolveSupportRequest(int id) async {
+    try {
+      final response =
+          await _apiClient.patch(ApiEndpoints.platformSupportRequestResolve(id));
+      return SupportRequest.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

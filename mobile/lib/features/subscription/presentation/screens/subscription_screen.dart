@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -88,6 +89,14 @@ class _Content extends ConsumerWidget {
                   l10n.subscriptionNoPlanHint,
                   style: AppTypography.bodyMd
                       .copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => context.push('/support'),
+                    child: Text(l10n.subscriptionContactSupport),
+                  ),
                 ),
               ],
             ),

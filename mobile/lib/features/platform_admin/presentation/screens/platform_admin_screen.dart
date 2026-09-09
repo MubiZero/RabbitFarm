@@ -6,6 +6,7 @@ import 'platform_announcements_tab.dart';
 import 'platform_farms_tab.dart';
 import 'platform_plans_tab.dart';
 import 'platform_summary_tab.dart';
+import 'platform_support_requests_tab.dart';
 
 /// Платформенная админка — то, чем распоряжаются на уровне сервиса, а не
 /// внутри одного хозяйства.
@@ -36,9 +37,9 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
   @override
   void initState() {
     super.initState();
-    // Кнопка внизу справа своя у каждой вкладки, а на сводке и списке ферм её
-    // нет вовсе — поэтому экран следит за переключением.
-    _tabs = TabController(length: 4, vsync: this)
+    // Кнопка внизу справа своя у каждой вкладки, а на сводке, списке ферм и
+    // обращениях её нет вовсе — поэтому экран следит за переключением.
+    _tabs = TabController(length: 5, vsync: this)
       ..addListener(() => setState(() {}));
   }
 
@@ -62,6 +63,7 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
             Tab(text: l10n.platformTabFarms),
             Tab(text: l10n.platformTabPlans),
             Tab(text: l10n.platformTabAnnouncements),
+            Tab(text: l10n.platformTabSupport),
           ],
         ),
       ),
@@ -77,8 +79,9 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
             icon: const Icon(Icons.campaign_outlined),
             label: Text(l10n.platformAnnouncementNew),
           ),
-        // На сводке и списке ферм создавать нечего: сводка ничего не заводит,
-        // а фермы появляются сами, когда кто-нибудь регистрируется.
+        // На сводке, списке ферм и обращениях создавать нечего: сводка ничего
+        // не заводит, фермы появляются сами при регистрации, а обращения
+        // заводит фермер — админ их только читает и закрывает.
         _ => null,
       },
       body: TabBarView(
@@ -88,6 +91,7 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
           PlatformFarmsTab(),
           PlatformPlansTab(),
           PlatformAnnouncementsTab(),
+          PlatformSupportRequestsTab(),
         ],
       ),
     );

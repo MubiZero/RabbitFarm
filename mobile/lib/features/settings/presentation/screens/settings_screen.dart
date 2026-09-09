@@ -84,6 +84,12 @@ class SettingsScreen extends ConsumerWidget {
             context: context,
             children: [
               _SettingsTile(
+                icon: Icons.support_agent_outlined,
+                label: context.l10n.settingsSupport,
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/support'),
+              ),
+              _SettingsTile(
                 icon: Icons.info_outline,
                 label: context.l10n.settingsVersion,
                 trailing: Text(

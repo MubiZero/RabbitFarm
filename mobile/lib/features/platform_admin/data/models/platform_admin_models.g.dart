@@ -370,3 +370,41 @@ Map<String, dynamic> _$AnnouncementToJson(
   'stats': instance.stats,
   'created_at': const DateTimeConverter().toJson(instance.createdAt),
 };
+
+_SupportRequestFarm _$SupportRequestFarmFromJson(Map<String, dynamic> json) =>
+    _SupportRequestFarm(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      name: json['name'] as String,
+    );
+
+Map<String, dynamic> _$SupportRequestFarmToJson(_SupportRequestFarm instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'name': instance.name,
+    };
+
+_SupportRequest _$SupportRequestFromJson(Map<String, dynamic> json) =>
+    _SupportRequest(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      text: json['text'] as String,
+      status: json['status'] as String? ?? 'new',
+      farm: json['farm'] == null
+          ? null
+          : SupportRequestFarm.fromJson(json['farm'] as Map<String, dynamic>),
+      author: json['author'] == null
+          ? null
+          : UserRef.fromJson(json['author'] as Map<String, dynamic>),
+      createdAt: const DateTimeConverter().fromJson(
+        json['created_at'] as Object,
+      ),
+    );
+
+Map<String, dynamic> _$SupportRequestToJson(_SupportRequest instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'text': instance.text,
+      'status': instance.status,
+      'farm': instance.farm,
+      'author': instance.author,
+      'created_at': const DateTimeConverter().toJson(instance.createdAt),
+    };

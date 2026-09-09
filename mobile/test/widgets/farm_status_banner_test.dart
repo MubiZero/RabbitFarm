@@ -73,6 +73,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.widgetWithText(TextButton, 'Тариф'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Поддержка'), findsNothing);
     });
 
     testWidgets('suspended показывает баннер без кнопки «Тариф»', (tester) async {
@@ -84,6 +85,7 @@ void main() {
 
       expect(find.text('Доступ закрыт — обратитесь в поддержку'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Тариф'), findsNothing);
+      expect(find.widgetWithText(TextButton, 'Поддержка'), findsOneWidget);
     });
 
     testWidgets('без фермы вовсе ничего не показывает', (tester) async {

@@ -897,6 +897,13 @@
   "settingsAccent": "Цвет акцента",
   "settingsAbout": "О приложении",
   "settingsVersion": "Версия",
+  "settingsSupport": "Написать в поддержку",
+  "supportRequestTitle": "Поддержка",
+  "supportRequestHint": "Опишите, что случилось, — ответим по тому же аккаунту, с которого пришло обращение.",
+  "supportRequestPlaceholder": "Например: не получается добавить кролика — приложение зависает на сохранении",
+  "supportRequestTooShort": "Опишите проблему подробнее — хотя бы 10 символов",
+  "supportRequestSend": "Отправить",
+  "supportRequestSent": "Обращение отправлено",
   "settingsPrivacyPolicy": "Политика конфиденциальности",
   "settingsLogout": "Выйти из аккаунта",
   "settingsThemeLight": "Светлая",
@@ -908,6 +915,7 @@
   "subscriptionTitle": "Тариф",
   "subscriptionNoPlan": "Тариф не назначен",
   "subscriptionNoPlanHint": "Обратитесь в поддержку, чтобы подключить тариф.",
+  "subscriptionContactSupport": "Написать в поддержку",
   "subscriptionFree": "Бесплатный тариф",
   "subscriptionForever": "Бессрочно",
   "subscriptionExpiresOn": "Действует до {date}",
@@ -1368,6 +1376,7 @@
   "platformTabFarms": "Фермы",
   "platformTabPlans": "Тарифы",
   "platformTabAnnouncements": "Объявления",
+  "platformTabSupport": "Обращения",
 
   "platformSummarySectionFarms": "Фермы",
   "platformSummarySectionStatus": "Состояние",
@@ -1630,6 +1639,7 @@
   "farmStatusBannerReadOnly": "Доступ только для чтения — продлите тариф, чтобы снова вносить записи",
   "farmStatusBannerSuspended": "Доступ закрыт — обратитесь в поддержку",
   "farmStatusBannerAction": "Тариф",
+  "farmStatusBannerContactSupport": "Поддержка",
 
   "platformFarmExport": "Экспортировать данные",
   "platformFarmExportHint": "Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».",
@@ -1667,6 +1677,18 @@
   "platformFarmLastActive": "Последний вход",
   "platformFarmNeverActive": "Ещё не заходили",
   "platformFarmCreatedAt": "Ферма создана",
+
+  "platformSupportRequestsEmptyTitle": "Обращений пока нет",
+  "platformSupportRequestsEmptyBody": "Здесь появятся вопросы от ферм — фермер пишет через Настройки → Написать в поддержку.",
+  "platformSupportRequestNew": "новое",
+  "platformSupportRequestResolved": "разобрано",
+  "platformSupportRequestResolve": "Отметить разобранным",
+  "countSupportRequests": "{count, plural, one{{count} обращение} few{{count} обращения} many{{count} обращений} other{{count} обращения}}",
+  "@countSupportRequests": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
 
   "platformAnnouncementsEmptyTitle": "Объявлений ещё не было",
   "platformAnnouncementsEmptyBody": "Здесь останется история рассылок: что отправляли, кому и сколько дошло. Отправленное не исправить и не отозвать, поэтому список пригодится, чтобы не повторить одно и то же дважды.",

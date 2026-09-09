@@ -107,6 +107,15 @@ class ApiEndpoints {
   static String platformFarmRestore(int id) =>
       '/platform-admin/farms/$id/restore';
   static const String platformAnnouncements = '/platform-admin/announcements';
+  static const String platformSupportRequests =
+      '/platform-admin/support-requests';
+  static String platformSupportRequestResolve(int id) =>
+      '/platform-admin/support-requests/$id/resolve';
+
+  // Обращение фермы в поддержку — доступно любой роли, работает даже при
+  // закрытом доступе (см. backend/src/middleware/auth.js,
+  // authenticateEvenIfFarmBlocked).
+  static const String supportRequests = '/support-requests';
 
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';

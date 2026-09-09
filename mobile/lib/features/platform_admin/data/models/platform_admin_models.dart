@@ -447,3 +447,41 @@ abstract class AnnouncementDraft with _$AnnouncementDraft {
         if (targetType == 'filter') 'target_filter': targetFilter,
       };
 }
+
+/// Ферма-автор обращения в поддержку — только то, что нужно для подписи в
+/// списке (см. `AnnouncementTargetFarm`, тот же приём и та же причина: сервер
+/// отдаёт обращению лишь имя фермы, не весь `PlatformFarm`).
+@freezed
+abstract class SupportRequestFarm with _$SupportRequestFarm {
+  const factory SupportRequestFarm({
+    @IntConverter() required int id,
+    required String name,
+  }) = _SupportRequestFarm;
+
+  factory SupportRequestFarm.fromJson(Map<String, dynamic> json) =>
+      _$SupportRequestFarmFromJson(json);
+}
+
+/// Обращение фермы в поддержку — видно платформенному админу.
+///
+/// Ни темы, ни переписки: одно сообщение и статус `new`/`resolved`. Автор
+/// [UserRef] уже есть в `core/models` — то же самое урезанное «кто это
+/// сделал», что у записи кормления или задачи.
+@freezed
+abstract class SupportRequest with _$SupportRequest {
+  const factory SupportRequest({
+    @IntConverter() required int id,
+    required String text,
+    @Default('new') String status,
+    SupportRequestFarm? farm,
+    UserRef? author,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+  }) = _SupportRequest;
+
+  const SupportRequest._();
+
+  bool get isResolved => status == 'resolved';
+
+  factory SupportRequest.fromJson(Map<String, dynamic> json) =>
+      _$SupportRequestFromJson(json);
+}

@@ -68,6 +68,15 @@ class FarmStatusBanner extends ConsumerWidget {
                       style: TextButton.styleFrom(foregroundColor: Colors.white),
                       child: Text(l10n.farmStatusBannerAction),
                     ),
+                  // Приостановленной ферме продлевать нечего — доступ закрыт
+                  // целиком, поэтому вместо «Тариф» здесь путь к тому, что
+                  // единственно доступно: написать и спросить почему.
+                  if (status == 'suspended' && !auth.isImpersonating)
+                    TextButton(
+                      onPressed: () => context.push('/support'),
+                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      child: Text(l10n.farmStatusBannerContactSupport),
+                    ),
                 ],
               ),
             ),

@@ -2230,6 +2230,30 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsVersion => 'Версия';
 
   @override
+  String get settingsSupport => 'Написать в поддержку';
+
+  @override
+  String get supportRequestTitle => 'Поддержка';
+
+  @override
+  String get supportRequestHint =>
+      'Опишите, что случилось, — ответим по тому же аккаунту, с которого пришло обращение.';
+
+  @override
+  String get supportRequestPlaceholder =>
+      'Например: не получается добавить кролика — приложение зависает на сохранении';
+
+  @override
+  String get supportRequestTooShort =>
+      'Опишите проблему подробнее — хотя бы 10 символов';
+
+  @override
+  String get supportRequestSend => 'Отправить';
+
+  @override
+  String get supportRequestSent => 'Обращение отправлено';
+
+  @override
   String get settingsPrivacyPolicy => 'Политика конфиденциальности';
 
   @override
@@ -2256,6 +2280,9 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get subscriptionNoPlanHint =>
       'Обратитесь в поддержку, чтобы подключить тариф.';
+
+  @override
+  String get subscriptionContactSupport => 'Написать в поддержку';
 
   @override
   String get subscriptionFree => 'Бесплатный тариф';
@@ -3444,6 +3471,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformTabAnnouncements => 'Объявления';
 
   @override
+  String get platformTabSupport => 'Обращения';
+
+  @override
   String get platformSummarySectionFarms => 'Фермы';
 
   @override
@@ -3977,6 +4007,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get farmStatusBannerAction => 'Тариф';
 
   @override
+  String get farmStatusBannerContactSupport => 'Поддержка';
+
+  @override
   String get platformFarmExport => 'Экспортировать данные';
 
   @override
@@ -4043,6 +4076,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFarmCreatedAt => 'Ферма создана';
+
+  @override
+  String get platformSupportRequestsEmptyTitle => 'Обращений пока нет';
+
+  @override
+  String get platformSupportRequestsEmptyBody =>
+      'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Написать в поддержку.';
+
+  @override
+  String get platformSupportRequestNew => 'новое';
+
+  @override
+  String get platformSupportRequestResolved => 'разобрано';
+
+  @override
+  String get platformSupportRequestResolve => 'Отметить разобранным';
+
+  @override
+  String countSupportRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count обращения',
+      many: '$count обращений',
+      few: '$count обращения',
+      one: '$count обращение',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get platformAnnouncementsEmptyTitle => 'Объявлений ещё не было';

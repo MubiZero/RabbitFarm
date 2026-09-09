@@ -4060,6 +4060,48 @@ abstract class AppLocalizations {
   /// **'Версия'**
   String get settingsVersion;
 
+  /// No description provided for @settingsSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать в поддержку'**
+  String get settingsSupport;
+
+  /// No description provided for @supportRequestTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддержка'**
+  String get supportRequestTitle;
+
+  /// No description provided for @supportRequestHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите, что случилось, — ответим по тому же аккаунту, с которого пришло обращение.'**
+  String get supportRequestHint;
+
+  /// No description provided for @supportRequestPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: не получается добавить кролика — приложение зависает на сохранении'**
+  String get supportRequestPlaceholder;
+
+  /// No description provided for @supportRequestTooShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите проблему подробнее — хотя бы 10 символов'**
+  String get supportRequestTooShort;
+
+  /// No description provided for @supportRequestSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get supportRequestSend;
+
+  /// No description provided for @supportRequestSent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение отправлено'**
+  String get supportRequestSent;
+
   /// No description provided for @settingsPrivacyPolicy.
   ///
   /// In ru, this message translates to:
@@ -4113,6 +4155,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обратитесь в поддержку, чтобы подключить тариф.'**
   String get subscriptionNoPlanHint;
+
+  /// No description provided for @subscriptionContactSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать в поддержку'**
+  String get subscriptionContactSupport;
 
   /// No description provided for @subscriptionFree.
   ///
@@ -6262,6 +6310,12 @@ abstract class AppLocalizations {
   /// **'Объявления'**
   String get platformTabAnnouncements;
 
+  /// No description provided for @platformTabSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращения'**
+  String get platformTabSupport;
+
   /// No description provided for @platformSummarySectionFarms.
   ///
   /// In ru, this message translates to:
@@ -7090,6 +7144,12 @@ abstract class AppLocalizations {
   /// **'Тариф'**
   String get farmStatusBannerAction;
 
+  /// No description provided for @farmStatusBannerContactSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддержка'**
+  String get farmStatusBannerContactSupport;
+
   /// No description provided for @platformFarmExport.
   ///
   /// In ru, this message translates to:
@@ -7203,6 +7263,42 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ферма создана'**
   String get platformFarmCreatedAt;
+
+  /// No description provided for @platformSupportRequestsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращений пока нет'**
+  String get platformSupportRequestsEmptyTitle;
+
+  /// No description provided for @platformSupportRequestsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Написать в поддержку.'**
+  String get platformSupportRequestsEmptyBody;
+
+  /// No description provided for @platformSupportRequestNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'новое'**
+  String get platformSupportRequestNew;
+
+  /// No description provided for @platformSupportRequestResolved.
+  ///
+  /// In ru, this message translates to:
+  /// **'разобрано'**
+  String get platformSupportRequestResolved;
+
+  /// No description provided for @platformSupportRequestResolve.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить разобранным'**
+  String get platformSupportRequestResolve;
+
+  /// No description provided for @countSupportRequests.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} обращение} few{{count} обращения} many{{count} обращений} other{{count} обращения}}'**
+  String countSupportRequests(int count);
 
   /// No description provided for @platformAnnouncementsEmptyTitle.
   ///

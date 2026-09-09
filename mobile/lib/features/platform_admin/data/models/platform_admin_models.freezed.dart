@@ -3975,4 +3975,610 @@ as String?,
 
 }
 
+
+/// @nodoc
+mixin _$SupportRequestFarm {
+
+@IntConverter() int get id; String get name;
+/// Create a copy of SupportRequestFarm
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SupportRequestFarmCopyWith<SupportRequestFarm> get copyWith => _$SupportRequestFarmCopyWithImpl<SupportRequestFarm>(this as SupportRequestFarm, _$identity);
+
+  /// Serializes this SupportRequestFarm to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as SupportRequestFarm;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupportRequestFarm&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as SupportRequestFarm;
+  return Object.hash(runtimeType,_this.id,_this.name);
+}
+
+@override
+String toString() {
+  final _this = this as SupportRequestFarm;
+  return 'SupportRequestFarm(id: ${_this.id}, name: ${_this.name})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SupportRequestFarmCopyWith<$Res>  {
+  factory $SupportRequestFarmCopyWith(SupportRequestFarm value, $Res Function(SupportRequestFarm) _then) = _$SupportRequestFarmCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int id, String name
+});
+
+
+
+
+}
+/// @nodoc
+class _$SupportRequestFarmCopyWithImpl<$Res>
+    implements $SupportRequestFarmCopyWith<$Res> {
+  _$SupportRequestFarmCopyWithImpl(this._self, this._then);
+
+  final SupportRequestFarm _self;
+  final $Res Function(SupportRequestFarm) _then;
+
+/// Create a copy of SupportRequestFarm
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,}) {
+  return _then(SupportRequestFarm(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SupportRequestFarm].
+extension SupportRequestFarmPatterns on SupportRequestFarm {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SupportRequestFarm value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SupportRequestFarm() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SupportRequestFarm value)  $default,){
+final _that = this;
+switch (_that) {
+case _SupportRequestFarm():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SupportRequestFarm value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SupportRequestFarm() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SupportRequestFarm() when $default != null:
+return $default(_that.id,_that.name);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name)  $default,) {final _that = this;
+switch (_that) {
+case _SupportRequestFarm():
+return $default(_that.id,_that.name);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name)?  $default,) {final _that = this;
+switch (_that) {
+case _SupportRequestFarm() when $default != null:
+return $default(_that.id,_that.name);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SupportRequestFarm implements SupportRequestFarm {
+  const _SupportRequestFarm({@IntConverter() required this.id, required this.name});
+  factory _SupportRequestFarm.fromJson(Map<String, dynamic> json) => _$SupportRequestFarmFromJson(json);
+
+@override@IntConverter() final  int id;
+@override final  String name;
+
+/// Create a copy of SupportRequestFarm
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SupportRequestFarmCopyWith<_SupportRequestFarm> get copyWith => __$SupportRequestFarmCopyWithImpl<_SupportRequestFarm>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SupportRequestFarmToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupportRequestFarm&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,name);
+}
+
+@override
+String toString() {
+    return 'SupportRequestFarm(id: $id, name: $name)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SupportRequestFarmCopyWith<$Res> implements $SupportRequestFarmCopyWith<$Res> {
+  factory _$SupportRequestFarmCopyWith(_SupportRequestFarm value, $Res Function(_SupportRequestFarm) _then) = __$SupportRequestFarmCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int id, String name
+});
+
+
+
+
+}
+/// @nodoc
+class __$SupportRequestFarmCopyWithImpl<$Res>
+    implements _$SupportRequestFarmCopyWith<$Res> {
+  __$SupportRequestFarmCopyWithImpl(this._self, this._then);
+
+  final _SupportRequestFarm _self;
+  final $Res Function(_SupportRequestFarm) _then;
+
+/// Create a copy of SupportRequestFarm
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,}) {
+  return _then(_SupportRequestFarm(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$SupportRequest {
+
+@IntConverter() int get id; String get text; String get status; SupportRequestFarm? get farm; UserRef? get author;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SupportRequestCopyWith<SupportRequest> get copyWith => _$SupportRequestCopyWithImpl<SupportRequest>(this as SupportRequest, _$identity);
+
+  /// Serializes this SupportRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as SupportRequest;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupportRequest&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.farm, _this.farm) || other.farm == _this.farm)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as SupportRequest;
+  return Object.hash(runtimeType,_this.id,_this.text,_this.status,_this.farm,_this.author,_this.createdAt);
+}
+
+@override
+String toString() {
+  final _this = this as SupportRequest;
+  return 'SupportRequest(id: ${_this.id}, text: ${_this.text}, status: ${_this.status}, farm: ${_this.farm}, author: ${_this.author}, createdAt: ${_this.createdAt})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SupportRequestCopyWith<$Res>  {
+  factory $SupportRequestCopyWith(SupportRequest value, $Res Function(SupportRequest) _then) = _$SupportRequestCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int id, String text, String status, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+});
+
+
+$SupportRequestFarmCopyWith<$Res>? get farm;$UserRefCopyWith<$Res>? get author;
+
+}
+/// @nodoc
+class _$SupportRequestCopyWithImpl<$Res>
+    implements $SupportRequestCopyWith<$Res> {
+  _$SupportRequestCopyWithImpl(this._self, this._then);
+
+  final SupportRequest _self;
+  final $Res Function(SupportRequest) _then;
+
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? text = null,Object? status = null,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
+  return _then(SupportRequest(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as SupportRequestFarm?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SupportRequestFarmCopyWith<$Res>? get farm {
+    if (_self.farm == null) {
+    return null;
+  }
+
+  return $SupportRequestFarmCopyWith<$Res>(_self.farm!, (value) {
+    return _then(_self.copyWith(farm: value));
+  });
+}/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.author!, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [SupportRequest].
+extension SupportRequestPatterns on SupportRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SupportRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SupportRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SupportRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _SupportRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SupportRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SupportRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SupportRequest() when $default != null:
+return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _SupportRequest():
+return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _SupportRequest() when $default != null:
+return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SupportRequest extends SupportRequest {
+  const _SupportRequest({@IntConverter() required this.id, required this.text, this.status = 'new', this.farm, this.author, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt}): super._();
+  factory _SupportRequest.fromJson(Map<String, dynamic> json) => _$SupportRequestFromJson(json);
+
+@override@IntConverter() final  int id;
+@override final  String text;
+@override@JsonKey() final  String status;
+@override final  SupportRequestFarm? farm;
+@override final  UserRef? author;
+@override@JsonKey(name: 'created_at')@DateTimeConverter() final  DateTime createdAt;
+
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SupportRequestCopyWith<_SupportRequest> get copyWith => __$SupportRequestCopyWithImpl<_SupportRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SupportRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupportRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text)&&(identical(other.status, status) || other.status == status)&&(identical(other.farm, farm) || other.farm == farm)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,text,status,farm,author,createdAt);
+}
+
+@override
+String toString() {
+    return 'SupportRequest(id: $id, text: $text, status: $status, farm: $farm, author: $author, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SupportRequestCopyWith<$Res> implements $SupportRequestCopyWith<$Res> {
+  factory _$SupportRequestCopyWith(_SupportRequest value, $Res Function(_SupportRequest) _then) = __$SupportRequestCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int id, String text, String status, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+});
+
+
+@override $SupportRequestFarmCopyWith<$Res>? get farm;@override $UserRefCopyWith<$Res>? get author;
+
+}
+/// @nodoc
+class __$SupportRequestCopyWithImpl<$Res>
+    implements _$SupportRequestCopyWith<$Res> {
+  __$SupportRequestCopyWithImpl(this._self, this._then);
+
+  final _SupportRequest _self;
+  final $Res Function(_SupportRequest) _then;
+
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? text = null,Object? status = null,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
+  return _then(_SupportRequest(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as SupportRequestFarm?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SupportRequestFarmCopyWith<$Res>? get farm {
+    if (_self.farm == null) {
+    return null;
+  }
+
+  return $SupportRequestFarmCopyWith<$Res>(_self.farm!, (value) {
+    return _then(_self.copyWith(farm: value));
+  });
+}/// Create a copy of SupportRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.author!, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
+}
+
 // dart format on

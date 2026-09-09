@@ -464,6 +464,118 @@ final platformAnnouncementsProvider = StateNotifierProvider.autoDispose<
   return PlatformAnnouncementsNotifier(ref.watch(platformAdminRepositoryProvider));
 });
 
+/// Обращения ферм в поддержку с постраничной подгрузкой — тот же приём, что
+/// у истории объявлений: список сверху вниз, без поиска и фильтров.
+class PlatformSupportRequestsState {
+  const PlatformSupportRequestsState({
+    this.items = const [],
+    this.isLoading = false,
+    this.error,
+    this.page = 1,
+    this.totalPages = 1,
+    this.total = 0,
+  });
+
+  final List<SupportRequest> items;
+  final bool isLoading;
+  final Object? error;
+  final int page;
+  final int totalPages;
+  final int total;
+
+  bool get hasMore => page < totalPages;
+
+  PlatformSupportRequestsState copyWith({
+    List<SupportRequest>? items,
+    bool? isLoading,
+    Object? error,
+    int? page,
+    int? totalPages,
+    int? total,
+  }) {
+    return PlatformSupportRequestsState(
+      items: items ?? this.items,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      page: page ?? this.page,
+      totalPages: totalPages ?? this.totalPages,
+      total: total ?? this.total,
+    );
+  }
+}
+
+class PlatformSupportRequestsNotifier
+    extends StateNotifier<PlatformSupportRequestsState> {
+  PlatformSupportRequestsNotifier(this._repository)
+      : super(const PlatformSupportRequestsState()) {
+    load();
+  }
+
+  final PlatformAdminRepository _repository;
+
+  static const _pageSize = 20;
+
+  Future<void> load() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getSupportRequests(page: 1, limit: _pageSize);
+      state = state.copyWith(
+        items: result.items,
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getSupportRequests(
+        page: state.page + 1,
+        limit: _pageSize,
+      );
+      state = state.copyWith(
+        items: [...state.items, ...result.items],
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  /// Отметить обращение разобранным. Обновляет запись на месте — как и
+  /// история объявлений, список не перезагружается целиком ради одной
+  /// строки.
+  Future<Object?> resolve(int id) async {
+    try {
+      final resolved = await _repository.resolveSupportRequest(id);
+      state = state.copyWith(
+        items: [
+          for (final item in state.items)
+            if (item.id == id) resolved else item,
+        ],
+      );
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+}
+
+final platformSupportRequestsProvider = StateNotifierProvider.autoDispose<
+    PlatformSupportRequestsNotifier, PlatformSupportRequestsState>((ref) {
+  return PlatformSupportRequestsNotifier(ref.watch(platformAdminRepositoryProvider));
+});
+
 /// Фермы для выбора адресата объявления, по поисковой строке.
 ///
 /// Отдельный запрос, а не срез уже загруженного списка ферм: тот держит в
