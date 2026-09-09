@@ -173,4 +173,22 @@ router.get('/audit', platformAdminController.listAudit);
 router.get('/announcements', platformAdminController.listAnnouncements);
 router.post('/announcements', validate(createAnnouncementSchema), platformAdminController.createAnnouncement);
 
+/**
+ * @swagger
+ * /platform-admin/support-requests:
+ *   get:
+ *     summary: Обращения ферм в поддержку, постранично — необработанные сверху
+ *     tags: [PlatformAdmin]
+ */
+router.get('/support-requests', platformAdminController.listSupportRequests);
+
+/**
+ * @swagger
+ * /platform-admin/support-requests/{id}/resolve:
+ *   patch:
+ *     summary: Отметить обращение разобранным
+ *     tags: [PlatformAdmin]
+ */
+router.patch('/support-requests/:id/resolve', platformAdminController.resolveSupportRequest);
+
 module.exports = router;

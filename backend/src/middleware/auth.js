@@ -5,8 +5,13 @@ const { User, TokenBlacklist, Farm } = require('../models');
 /**
  * Authentication middleware
  * Verifies JWT token and attaches user to request
+ *
+ * @param {Object} options
+ * @param {Boolean} options.allowBlockedFarm — пропускать ферму, которой
+ *   закрыт доступ (`suspended`, `read_only`, помечена на удаление). Нужно
+ *   ровно одному маршруту — обращению в поддержку, см. ниже.
  */
-const authenticate = async (req, res, next) => {
+const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, res, next) => {
   try {
     // Get token from header
     const authHeader = req.headers.authorization;
@@ -75,7 +80,7 @@ const authenticate = async (req, res, next) => {
     // Платформенный админ не должен потерять доступ к своей же панели из-за
     // статуса собственной фермы — приостановка/read_only это рычаг для чужих
     // хозяйств, не для себя.
-    if (user.farm && !user.is_platform_admin) {
+    if (user.farm && !user.is_platform_admin && !allowBlockedFarm) {
       // Удаление сильнее любого статуса: пока идут 30 дней до физической
       // зачистки (см. 2.4), данные ещё на месте, но работать с ними нельзя.
       if (user.farm.deleted_at) {
@@ -107,6 +112,20 @@ const authenticate = async (req, res, next) => {
     next(error);
   }
 };
+
+const authenticate = createAuthenticate();
+
+/**
+ * То же самое, но статус хозяйства не закрывает дорогу.
+ *
+ * Единственный потребитель — POST /support-requests. Все три отказа выше
+ * («приостановлено», «только чтение», «удалено») советуют обратиться в
+ * поддержку; под обычным `authenticate` форма обращения упиралась бы ровно
+ * в тот отказ, из-за которого её и открыли. Проверка входа под клиентом
+ * (`read_only` в токене) остаётся в силе: обращение пишет ферма, а не
+ * заглянувший к ней админ.
+ */
+const authenticateEvenIfFarmBlocked = createAuthenticate({ allowBlockedFarm: true });
 
 /**
  * Authorization middleware
@@ -178,6 +197,7 @@ const optionalAuth = async (req, res, next) => {
 
 module.exports = {
   authenticate,
+  authenticateEvenIfFarmBlocked,
   authorize,
   requirePlatformAdmin,
   optionalAuth

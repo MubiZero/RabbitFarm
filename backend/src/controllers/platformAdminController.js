@@ -2,6 +2,7 @@ const planService = require('../services/planService');
 const platformAdminService = require('../services/platformAdminService');
 const farmExportService = require('../services/farmExportService');
 const announcementService = require('../services/announcementService');
+const supportRequestService = require('../services/supportRequestService');
 const auditService = require('../services/auditService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -427,6 +428,46 @@ class PlatformAdminController {
         'Список объявлений получен'
       );
     } catch (error) {
+      next(error);
+    }
+  }
+
+  /** GET /platform-admin/support-requests */
+  async listSupportRequests(req, res, next) {
+    try {
+      const result = await supportRequestService.list({
+        page: req.query.page,
+        limit: req.query.limit
+      });
+      return ApiResponse.paginated(
+        res,
+        result.items,
+        result.pagination.page,
+        result.pagination.limit,
+        result.pagination.total,
+        'Список обращений получен'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /** PATCH /platform-admin/support-requests/:id/resolve */
+  async resolveSupportRequest(req, res, next) {
+    try {
+      const resolved = await supportRequestService.resolve(req.params.id);
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'support_request.resolve',
+        farmId: resolved.farm_id,
+        after: { id: resolved.id, status: resolved.status },
+        ip: req.ip
+      });
+      return ApiResponse.success(res, resolved, 'Обращение отмечено разобранным');
+    } catch (error) {
+      if (error.message === 'SUPPORT_REQUEST_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Обращение не найдено');
+      }
       next(error);
     }
   }
