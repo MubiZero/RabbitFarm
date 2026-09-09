@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../core/api/load_all_pages.dart';
+import '../../../../core/cache/cache_scope.dart';
+import '../../../../core/cache/list_cache.dart';
 import '../../data/models/cage_model.dart';
 import '../../data/repositories/cages_repository.dart';
 
@@ -88,18 +92,48 @@ class CagesState {
   }
 }
 
+/// Последние виденные клетки на диске.
+const cagesCache = ListCache<CageModel>(
+  boxName: ListCacheBoxes.cages,
+  fromJson: CageModel.fromJson,
+  toJson: _cageToJson,
+);
+
+Map<String, dynamic> _cageToJson(CageModel cage) => cage.toJson();
+
 /// StateNotifier для управления клетками
 class CagesNotifier extends StateNotifier<CagesState> {
   final CagesRepository _repository;
+  final String? _cacheScope;
 
-  CagesNotifier(this._repository) : super(CagesState()) {
+  /// Свежий ответ уже приходил — прошлому списку с диска здесь больше не место.
+  bool _hasFreshData = false;
+
+  CagesNotifier(this._repository, this._cacheScope) : super(CagesState()) {
+    _restoreFromCache();
     loadCages();
   }
 
   static const _pageSize = 30;
 
+  /// Показать клетки, виденные в прошлый раз, не дожидаясь сервера. Полосу
+  /// «данные устарели» над ними поставит `PagedListView`, как только запрос
+  /// не удастся.
+  Future<void> _restoreFromCache() async {
+    final cached = await cagesCache.read(_cacheScope);
+    if (!mounted || cached.isEmpty) return;
+
+    // Пока читали диск, могли приехать свежие клетки или включиться фильтр.
+    if (_hasFreshData || state.cages.isNotEmpty || state.hasFilters) return;
+
+    // Ошибку переносим руками: `copyWith` без неё сбрасывает ошибку в null, а
+    // именно она вместе с непустым списком включает полосу «данные устарели».
+    state = state.copyWith(cages: cached, error: state.error);
+  }
+
   /// Загрузить первую страницу списка по текущим фильтрам.
   Future<void> loadCages() async {
+    final hadFilters = state.hasFilters;
     state = state.copyWith(isLoading: true, error: null, currentPage: 1);
 
     try {
@@ -112,12 +146,19 @@ class CagesNotifier extends StateNotifier<CagesState> {
         search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
         onlyAvailable: state.onlyAvailable ? true : null,
       );
+      _hasFreshData = true;
       state = state.copyWith(
         cages: cages,
         isLoading: false,
         currentPage: 1,
         hasMore: cages.length >= _pageSize,
       );
+
+      // На диск кладётся только список без фильтров: иначе «только свободные»
+      // при следующем запуске выглядели бы как все клетки фермы.
+      if (!hadFilters) {
+        unawaited(cagesCache.write(_cacheScope, cages));
+      }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -266,7 +307,9 @@ class CagesNotifier extends StateNotifier<CagesState> {
 /// Provider для StateNotifier клеток
 final cagesProvider = StateNotifierProvider<CagesNotifier, CagesState>((ref) {
   final repository = ref.watch(cagesRepositoryProvider);
-  return CagesNotifier(repository);
+  // Владелец кэша читается один раз при создании списка: сменился
+  // пользователь — поднялся номер сессии, и список пересоздался целиком.
+  return CagesNotifier(repository, ref.read(cacheScopeProvider));
 });
 
 /// Одна клетка со списком жителей.

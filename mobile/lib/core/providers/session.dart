@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+
+import '../cache/list_cache.dart';
 
 /// Номер текущей сессии.
 ///
@@ -14,6 +18,11 @@ import 'package:flutter_riverpod/legacy.dart';
 final sessionRevisionProvider = StateProvider<int>((ref) => 0);
 
 /// Забыть данные предыдущего пользователя.
+///
+/// Кэш списков на диске уезжает вместе с памятью: он для того и сохранён,
+/// чтобы пережить перезапуск, — а значит после выхода пережил бы и смену
+/// пользователя.
 void resetSessionData(Ref ref) {
   ref.read(sessionRevisionProvider.notifier).state++;
+  unawaited(clearListCaches());
 }

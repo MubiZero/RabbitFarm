@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/cache/cache_scope.dart';
+import '../../../../core/cache/list_cache.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
@@ -103,15 +107,51 @@ class RabbitsListState {
   }
 }
 
+/// Последнее виденное поголовье на диске.
+const rabbitsCache = ListCache<RabbitModel>(
+  boxName: ListCacheBoxes.rabbits,
+  fromJson: RabbitModel.fromJson,
+  toJson: _rabbitToJson,
+);
+
+Map<String, dynamic> _rabbitToJson(RabbitModel rabbit) => rabbit.toJson();
+
 // Rabbits List Notifier
 class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
   final RabbitsRepository _repository;
+  final String? _cacheScope;
 
-  RabbitsListNotifier(this._repository) : super(RabbitsListState()) {
+  /// Свежий ответ уже приходил — прошлому списку с диска здесь больше не место.
+  bool _hasFreshData = false;
+
+  RabbitsListNotifier(this._repository, this._cacheScope)
+      : super(RabbitsListState()) {
+    _restoreFromCache();
     loadRabbits();
   }
 
   static const _pageSize = 10;
+
+  /// Показать то, что человек видел в прошлый раз, не дожидаясь сервера.
+  ///
+  /// В сарае без связи это разница между списком месячной фермы и пустым
+  /// экраном с кнопкой «Повторить». Как только запрос провалится, над списком
+  /// появится полоса «данные устарели» — за это отвечает `PagedListView`, ему
+  /// достаточно непустого списка и ошибки.
+  Future<void> _restoreFromCache() async {
+    final cached = await rabbitsCache.read(_cacheScope);
+    if (!mounted || cached.isEmpty) return;
+
+    // Пока читали диск, могло приехать что угодно: свежая страница, отбор,
+    // добавленный кролик. Подставлять прошлый список поверх нельзя.
+    if (_hasFreshData || state.rabbits.isNotEmpty || !state.filter.isEmpty) {
+      return;
+    }
+
+    // Ошибку переносим руками: `copyWith` без неё сбрасывает ошибку в null, а
+    // именно она вместе с непустым списком включает полосу «данные устарели».
+    state = state.copyWith(rabbits: cached, error: state.error);
+  }
 
   /// Сменить отбор и перечитать список с первой страницы.
   Future<void> applyFilter(RabbitsFilter filter) {
@@ -121,11 +161,13 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
 
   // Load rabbits (first page or refresh)
   Future<void> loadRabbits() async {
+    final filter = state.filter;
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final result = await _load(page: 1);
 
+      _hasFreshData = true;
       state = state.copyWith(
         rabbits: result.items,
         isLoading: false,
@@ -134,6 +176,13 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
         total: result.total,
         hasMore: result.page < result.totalPages,
       );
+
+      // На диск кладётся только список без отбора: иначе после «самцы,
+      // на племя» человек при следующем запуске увидел бы эту выборку как
+      // всё поголовье.
+      if (filter.isEmpty) {
+        unawaited(rabbitsCache.write(_cacheScope, result.items));
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -215,7 +264,10 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
 final rabbitsListProvider =
     StateNotifierProvider<RabbitsListNotifier, RabbitsListState>((ref) {
   final repository = ref.watch(rabbitsRepositoryProvider);
-  return RabbitsListNotifier(repository);
+  // Владелец кэша читается один раз при создании списка: следить за ним
+  // незачем — сменился пользователь, значит поднялся номер сессии, и список
+  // пересоздался целиком.
+  return RabbitsListNotifier(repository, ref.read(cacheScopeProvider));
 });
 
 // Statistics State

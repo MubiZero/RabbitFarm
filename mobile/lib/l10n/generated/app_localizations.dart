@@ -214,6 +214,12 @@ abstract class AppLocalizations {
   /// **'На сервере сбой, попробуйте позже'**
   String get errorServer;
 
+  /// Плашка поверх всего приложения, когда у устройства нет сети
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет связи — новые записи не сохранятся'**
+  String get offlineBanner;
+
   /// No description provided for @commonStaleData.
   ///
   /// In ru, this message translates to:

@@ -9,10 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import 'core/cache/list_cache.dart';
 import 'core/error/error_handling.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -34,6 +36,16 @@ void main() {
 Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
   installErrorHandlers();
+
+  // Кэш последних виденных списков. Без него в сарае без связи после
+  // перезапуска поголовье, клетки и задачи встречали пустым экраном. Хранилище
+  // может не подняться (нет места, сломанный файл) — это не повод не запускать
+  // приложение: тогда списки просто работают только по сети, как раньше.
+  try {
+    await initListCache();
+  } catch (e) {
+    debugPrint('Кэш списков недоступен, работаем только по сети: $e');
+  }
 
   // Web пока без push — нужен отдельный VAPID-ключ и service worker.
   // До того как в проект добавлен google-services.json (Android) или
@@ -97,13 +109,16 @@ class MyApp extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: themeState.mode,
       routerConfig: router,
-      // Обе плашки должны быть видны на любом экране, а не только там, где
-      // начался просмотр или выяснилось состояние доступа — поэтому
-      // оборачивают весь роутер, а не один маршрут. Вход под клиентом
-      // снаружи: это режим сеанса целиком, а состояние конкретной фермы —
-      // вложенный факт внутри него.
+      // Все три плашки должны быть видны на любом экране, а не только там, где
+      // начался просмотр, выяснилось состояние доступа или отвалилась сеть —
+      // поэтому оборачивают весь роутер, а не один маршрут. Порядок — от
+      // самого объемлющего к самому частному: вход под клиентом это режим
+      // сеанса целиком, состояние фермы — факт внутри него, а отсутствие связи
+      // проходит само и относится к устройству, а не к аккаунту.
       builder: (context, child) => ImpersonationBanner(
-        child: FarmStatusBanner(child: child ?? const SizedBox.shrink()),
+        child: FarmStatusBanner(
+          child: OfflineBanner(child: child ?? const SizedBox.shrink()),
+        ),
       ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
