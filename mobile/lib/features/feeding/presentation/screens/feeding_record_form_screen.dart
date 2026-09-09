@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/analytics/analytics.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
@@ -129,6 +130,7 @@ class _FeedingRecordFormScreenState
               _mode == _FeedingMode.cage ? _cageIds.toList() : const <int>[],
           notes: notes,
         );
+        Analytics.feedingRecorded();
       }
       // Склад изменился вместе с записью, поэтому обновляем и его.
       await notifier.refresh();

@@ -3,17 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/access/farm_access.dart';
+import '../../../../core/analytics/analytics.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../widgets/quick_entry_sheet.dart';
 
 /// Вкладка нижнего меню.
 class NavTab {
+  /// Постоянное имя вкладки для аналитики. Не подпись (её переводят) и не
+  /// путь: «Хозяйство» владельца и «Профиль» работника живут на одном
+  /// `/farm`, а в отчёте это разные места.
+  final String id;
   final String path;
   final IconData icon;
   final IconData active;
   final String Function(BuildContext) label;
 
   const NavTab({
+    required this.id,
     required this.path,
     required this.icon,
     required this.active,
@@ -27,7 +33,7 @@ class NavTab {
 /// заводить их ему нечем, а «Хозяйство» это деньги и люди, куда его и так
 /// не пускает сервер. Показывать вкладку, за которой для человека пусто,
 /// хуже, чем не показывать её вовсе.
-class MainNavigationScreen extends ConsumerWidget {
+class MainNavigationScreen extends ConsumerStatefulWidget {
   final Widget child;
   final String currentPath;
 
@@ -38,6 +44,7 @@ class MainNavigationScreen extends ConsumerWidget {
   });
 
   static final _today = NavTab(
+    id: 'today',
     path: '/today',
     icon: Icons.today_outlined,
     active: Icons.today,
@@ -45,6 +52,7 @@ class MainNavigationScreen extends ConsumerWidget {
   );
 
   static final _herd = NavTab(
+    id: 'herd',
     path: '/herd',
     icon: Icons.pets_outlined,
     active: Icons.pets,
@@ -52,6 +60,7 @@ class MainNavigationScreen extends ConsumerWidget {
   );
 
   static final _breeding = NavTab(
+    id: 'breeding',
     path: '/breeding',
     icon: Icons.favorite_outline,
     active: Icons.favorite,
@@ -59,6 +68,7 @@ class MainNavigationScreen extends ConsumerWidget {
   );
 
   static final _farm = NavTab(
+    id: 'farm',
     path: '/farm',
     icon: Icons.inventory_outlined,
     active: Icons.inventory,
@@ -66,6 +76,7 @@ class MainNavigationScreen extends ConsumerWidget {
   );
 
   static final _journal = NavTab(
+    id: 'journal',
     path: '/journal',
     icon: Icons.assignment_outlined,
     active: Icons.assignment,
@@ -73,6 +84,7 @@ class MainNavigationScreen extends ConsumerWidget {
   );
 
   static final _profile = NavTab(
+    id: 'profile',
     path: '/farm',
     icon: Icons.person_outline,
     active: Icons.person,
@@ -85,14 +97,45 @@ class MainNavigationScreen extends ConsumerWidget {
           ? [_today, _journal, _profile]
           : [_today, _herd, _breeding, _farm];
 
+  /// Совпадение по началу пути: карточки и формы лежат под теми же
+  /// префиксами, и подсветка вкладки не должна с них слетать.
+  static int selectedIndex(List<NavTab> tabs, String path) {
+    for (var i = tabs.length - 1; i >= 0; i--) {
+      if (path.startsWith(tabs[i].path)) return i;
+    }
+    return 0;
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainNavigationScreen> createState() =>
+      _MainNavigationScreenState();
+}
+
+class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
+  /// Вкладка, о посещении которой уже отправлено событие. Считаем именно
+  /// вкладку, а не путь: переход из списка стада в карточку кролика — это
+  /// та же вкладка, второе событие там было бы шумом.
+  String? _reportedTab;
+
+  void _reportTab(NavTab tab) {
+    if (_reportedTab == tab.id) return;
+    _reportedTab = tab.id;
+    Analytics.tabViewed(tab.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final role = ref.watch(farmRoleProvider);
-    final tabs = tabsFor(role);
-    final index = selectedIndex(tabs, currentPath);
+    final tabs = MainNavigationScreen.tabsFor(role);
+    final index = MainNavigationScreen.selectedIndex(tabs, widget.currentPath);
+
+    // Вкладку открывают не только нижним меню: на неё уводят карточки
+    // «Сегодня», уведомления и лист быстрой записи — поэтому событие пишется
+    // по факту показанной вкладки, а не по нажатию на кнопку меню.
+    _reportTab(tabs[index]);
 
     return Scaffold(
-      body: child,
+      body: widget.child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (i) => context.go(tabs[i].path),
@@ -112,14 +155,5 @@ class MainNavigationScreen extends ConsumerWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-  }
-
-  /// Совпадение по началу пути: карточки и формы лежат под теми же
-  /// префиксами, и подсветка вкладки не должна с них слетать.
-  static int selectedIndex(List<NavTab> tabs, String path) {
-    for (var i = tabs.length - 1; i >= 0; i--) {
-      if (path.startsWith(tabs[i].path)) return i;
-    }
-    return 0;
   }
 }

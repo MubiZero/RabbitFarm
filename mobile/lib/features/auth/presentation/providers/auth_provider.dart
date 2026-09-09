@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/analytics/analytics.dart';
 import '../../../../core/models/farm_ref.dart';
 import '../../../../core/notifications/fcm_service.dart';
 import '../../../../core/providers/api_providers.dart';
@@ -273,6 +274,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
+      Analytics.signUpCompleted();
       _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
       state = state.copyWith(

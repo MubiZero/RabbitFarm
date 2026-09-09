@@ -27,33 +27,41 @@ class StatTile extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final color = accent ?? cs.primary;
 
-    return AppCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+    // Для голосового доступа плитка — одна фраза «Кроликов: 12», а не три
+    // разрозненных узла (иконка, число, подпись), между которыми ещё надо
+    // догадаться о связи. Иконка декоративная: она повторяет подпись.
+    return Semantics(
+      container: true,
+      label: '$label: $value',
+      excludeSemantics: true,
+      child: AppCard(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: color),
             ),
-            child: Icon(icon, size: 18, color: color),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: AppTypography.titleLg.copyWith(color: color),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
-            maxLines: 2,
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: AppTypography.titleLg.copyWith(color: color),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+              maxLines: 2,
+            ),
+          ],
+        ),
       ),
     );
   }

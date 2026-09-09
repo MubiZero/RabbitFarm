@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import 'core/analytics/analytics.dart';
 import 'core/cache/list_cache.dart';
 import 'core/error/error_handling.dart';
 import 'core/notifications/fcm_service.dart';
@@ -59,6 +60,9 @@ Future<void> _bootstrap() async {
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       listenForForegroundMessages();
       listenForMessageTaps();
+      // Аналитика живёт на том же Firebase-приложении: не поднялось оно —
+      // не пишутся и события (см. `Analytics`).
+      Analytics.enable();
       firebaseReady = true;
     } catch (e) {
       debugPrint('Firebase: инициализация не удалась, push отключён: $e');
