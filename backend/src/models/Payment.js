@@ -54,6 +54,14 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    // Название тарифа на момент оплаты — снимок, а не ссылка на `plans`:
+    // тариф фермы к моменту разбора выручки уже может быть другим, а сам
+    // план — переименован или удалён. NULL только у платежей, созданных до
+    // появления колонки.
+    plan: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
     status: {
       type: DataTypes.ENUM('new', 'completed', 'failed'),
       allowNull: false,

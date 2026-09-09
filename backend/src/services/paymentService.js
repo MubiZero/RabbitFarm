@@ -22,7 +22,7 @@ class PaymentService {
    * Создать заказ на оплату для фермы.
    * @returns {{success:true, payment, qr, invoiceUrl, deepLink} | {success:false, message}}
    */
-  async createPayment(farmId, { amount, description }) {
+  async createPayment(farmId, { amount, description, plan }) {
     const invoiceId = crypto.randomUUID();
 
     const { body } = await eskhataClient.createOrder({ invoiceId, amount, description });
@@ -39,6 +39,10 @@ class PaymentService {
       pos_id: body.data.posId,
       amount,
       description,
+      // Тариф фермы на этот момент, а не на момент подтверждения: между
+      // созданием заказа и оплатой админ мог сменить план, а заплачено
+      // будет за тот, по которому посчитана сумма.
+      plan: plan || null,
       status: 'new',
       raw_response: body.data
     });

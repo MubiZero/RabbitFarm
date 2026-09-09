@@ -219,9 +219,13 @@ class PlanService {
       throw new Error('PLAN_FREE');
     }
 
+    // `plan` отдельным полем, а не разбором `description`: его сохраняет
+    // платёж, чтобы потом было видно, за какой тариф платили (см.
+    // src/models/Payment.js).
     return {
       amount: farm.plan.price,
-      description: `Тариф «${farm.plan.name}»`
+      description: `Тариф «${farm.plan.name}»`,
+      plan: farm.plan.name
     };
   }
 

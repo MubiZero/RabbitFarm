@@ -1,5 +1,6 @@
 /**
- * Напоминания о продлении тарифа и перевод в read_only при истечении (см.
+ * Напоминания о продлении тарифа — до истечения и после, — а также перевод
+ * в read_only с запасом на подтверждение банка (см.
  * docs/plans/PLATFORM-ADMIN.md, 4.2).
  */
 jest.mock('../../../src/models', () => ({
@@ -21,10 +22,12 @@ const { Farm, User } = require('../../../src/models');
 const notificationService = require('../../../src/services/notificationService');
 const { sendAnnouncementEmail } = require('../../../src/services/notifications/emailTransport');
 const logger = require('../../../src/utils/logger');
-const { runReminders, daysUntil } = require('../../../src/jobs/planExpiryReminderJob');
+const { runReminders, daysUntil, graceHours } = require('../../../src/jobs/planExpiryReminderJob');
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MS_PER_HOUR = 60 * 60 * 1000;
 const inDays = (n) => new Date(Date.now() + n * MS_PER_DAY);
+const inHours = (n) => new Date(Date.now() + n * MS_PER_HOUR);
 
 const mockFarm = ({ id = 1, status = 'active', plan = { name: 'Базовый' }, plan_expires_at }) => ({
   id,
@@ -40,6 +43,11 @@ describe('planExpiryReminderJob', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockOwners([{ id: 9, email: 'owner@example.com' }]);
+    delete process.env.PLAN_EXPIRY_GRACE_HOURS;
+  });
+
+  afterAll(() => {
+    delete process.env.PLAN_EXPIRY_GRACE_HOURS;
   });
 
   describe('daysUntil', () => {
@@ -112,8 +120,8 @@ describe('planExpiryReminderJob', () => {
       expect(farm.update).not.toHaveBeenCalled();
     });
 
-    it('в день истечения переводит активную ферму в read_only и уведомляет', async () => {
-      const farm = mockFarm({ status: 'active', plan_expires_at: inDays(0) });
+    it('когда запас на подтверждение банка прошёл — переводит активную ферму в read_only и уведомляет', async () => {
+      const farm = mockFarm({ status: 'active', plan_expires_at: inHours(-7) });
       Farm.findAll.mockResolvedValue([farm]);
 
       await runReminders();
@@ -124,6 +132,26 @@ describe('planExpiryReminderJob', () => {
         [9],
         expect.objectContaining({ title: 'Тариф истёк' })
       );
+    });
+
+    it('внутри запаса на подтверждение банка ферма остаётся активной и без уведомлений', async () => {
+      const farm = mockFarm({ status: 'active', plan_expires_at: inHours(-2) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(farm.update).not.toHaveBeenCalled();
+      expect(notificationService.sendToUsers).not.toHaveBeenCalled();
+    });
+
+    it('размер запаса берётся из PLAN_EXPIRY_GRACE_HOURS', async () => {
+      process.env.PLAN_EXPIRY_GRACE_HOURS = '1';
+      const farm = mockFarm({ status: 'active', plan_expires_at: inHours(-2) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(farm.update).toHaveBeenCalledWith({ status: 'read_only' });
     });
 
     it('самовосстанавливается для просроченной фермы, если день истечения был пропущен', async () => {
@@ -166,7 +194,7 @@ describe('planExpiryReminderJob', () => {
 
     it('переводит в read_only даже без владельца — доступ закрывается независимо от того, кого удалось уведомить', async () => {
       mockOwners([]);
-      const farm = mockFarm({ status: 'active', plan_expires_at: inDays(0) });
+      const farm = mockFarm({ status: 'active', plan_expires_at: inHours(-7) });
       Farm.findAll.mockResolvedValue([farm]);
 
       await runReminders();
@@ -187,6 +215,99 @@ describe('planExpiryReminderJob', () => {
 
       expect(logger.error).toHaveBeenCalled();
       expect(notificationService.sendToUsers).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('напоминания после перехода в read_only', () => {
+    it('на 3-й день просрочки — пуш и письмо, статус не трогает', async () => {
+      const farm = mockFarm({ status: 'read_only', plan_expires_at: inDays(-3) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(notificationService.sendToUsers).toHaveBeenCalledWith(
+        farm.id,
+        [9],
+        expect.objectContaining({ title: 'Ферма работает только на чтение' })
+      );
+      expect(sendAnnouncementEmail).toHaveBeenCalledWith(expect.objectContaining({
+        to: 'owner@example.com',
+        subject: 'Ферма работает только на чтение'
+      }));
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('на 14-й день просрочки — отдельный текст про две недели', async () => {
+      const farm = mockFarm({ status: 'read_only', plan_expires_at: inDays(-14) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(notificationService.sendToUsers).toHaveBeenCalledWith(
+        farm.id,
+        [9],
+        expect.objectContaining({ title: 'Тариф не продлён две недели' })
+      );
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('в остальные дни просрочки молчит — по одному напоминанию на порог', async () => {
+      for (const days of [-2, -4, -13, -15, -30]) {
+        jest.clearAllMocks();
+        Farm.findAll.mockResolvedValue([mockFarm({ status: 'read_only', plan_expires_at: inDays(days) })]);
+
+        await runReminders();
+
+        expect(notificationService.sendToUsers).not.toHaveBeenCalled();
+      }
+    });
+
+    it('ферму, которую задача пропустила, сперва переводит в read_only, а не шлёт напоминание о просрочке', async () => {
+      const farm = mockFarm({ status: 'active', plan_expires_at: inDays(-3) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(farm.update).toHaveBeenCalledWith({ status: 'read_only' });
+      expect(notificationService.sendToUsers).toHaveBeenCalledTimes(1);
+      expect(notificationService.sendToUsers).toHaveBeenCalledWith(
+        farm.id,
+        [9],
+        expect.objectContaining({ title: 'Тариф истёк' })
+      );
+    });
+
+    it('приостановленной ферме не напоминает — продление ей доступа всё равно не откроет', async () => {
+      const farm = mockFarm({ status: 'suspended', plan_expires_at: inDays(-3) });
+      Farm.findAll.mockResolvedValue([farm]);
+
+      await runReminders();
+
+      expect(notificationService.sendToUsers).not.toHaveBeenCalled();
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+  });
+
+  describe('graceHours', () => {
+    it('по умолчанию 6 часов', () => {
+      expect(graceHours()).toBe(6);
+    });
+
+    it('пустая или нечисловая переменная не отключает запас', () => {
+      process.env.PLAN_EXPIRY_GRACE_HOURS = '';
+      expect(graceHours()).toBe(6);
+
+      process.env.PLAN_EXPIRY_GRACE_HOURS = 'полдня';
+      expect(graceHours()).toBe(6);
+
+      process.env.PLAN_EXPIRY_GRACE_HOURS = '-3';
+      expect(graceHours()).toBe(6);
+    });
+
+    it('явный ноль отключает запас — перевод день в день', () => {
+      process.env.PLAN_EXPIRY_GRACE_HOURS = '0';
+      expect(graceHours()).toBe(0);
     });
   });
 });
