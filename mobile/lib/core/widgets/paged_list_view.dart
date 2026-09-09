@@ -40,6 +40,13 @@ class PagedListView<T> extends StatelessWidget {
 
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
 
+  /// Альтернативная раскладка «есть данные» целиком — например, таблица
+  /// вместо столбика карточек на широком экране. Получает уже загруженные
+  /// [items] сам и решает, как их разложить; в этом случае [itemBuilder] не
+  /// вызывается. Пагинация, `onRefresh`, `header`, скелетон, пустое состояние
+  /// и ошибка остаются общими — переопределяется только сама раскладка списка.
+  final Widget Function(BuildContext context, List<T> items)? contentBuilder;
+
   /// Что показать, когда записей нет. Пустой экран обязан подсказывать
   /// следующее действие, а не просто сообщать о пустоте.
   final Widget empty;
@@ -65,6 +72,7 @@ class PagedListView<T> extends StatelessWidget {
     this.error,
     this.hasMore = false,
     this.onLoadMore,
+    this.contentBuilder,
     this.skeleton,
     this.header,
     this.padding = const EdgeInsets.fromLTRB(
@@ -124,14 +132,17 @@ class PagedListView<T> extends StatelessWidget {
     }
 
     return [
-      SliverPadding(
-        padding: padding,
-        sliver: SliverList.separated(
-          itemCount: items.length,
-          separatorBuilder: (_, __) => SizedBox(height: separator),
-          itemBuilder: (context, i) => itemBuilder(context, items[i], i),
+      if (contentBuilder != null)
+        SliverToBoxAdapter(child: contentBuilder!(context, items))
+      else
+        SliverPadding(
+          padding: padding,
+          sliver: SliverList.separated(
+            itemCount: items.length,
+            separatorBuilder: (_, __) => SizedBox(height: separator),
+            itemBuilder: (context, i) => itemBuilder(context, items[i], i),
+          ),
         ),
-      ),
       if (isLoading)
         const SliverToBoxAdapter(
           child: Padding(

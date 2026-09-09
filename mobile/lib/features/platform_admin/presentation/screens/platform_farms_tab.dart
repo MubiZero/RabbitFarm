@@ -13,6 +13,7 @@ import '../providers/platform_admin_provider.dart';
 import '../widgets/farm_filter_labels.dart';
 import '../widgets/plan_picker_sheet.dart';
 import '../widgets/platform_farm_card.dart';
+import '../widgets/platform_farms_table.dart';
 
 /// Все хозяйства сервиса: кто на каком тарифе и сколько израсходовал.
 class PlatformFarmsTab extends ConsumerStatefulWidget {
@@ -75,6 +76,16 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
         onChangePlan: () => _changePlan(context, ref, farm),
         onOpen: () => context.push('/platform-admin/farms/${farm.id}'),
       ),
+      // На широком экране (rabbitfarm-web на большом мониторе) карточка в
+      // столбик — не формат: вопрос админа обычно про сравнение ферм
+      // взглядом, а не про чтение одной за другой. См. AppBreakpoints.
+      contentBuilder: context.isWideScreen
+          ? (context, farms) => PlatformFarmsTable(
+                farms: farms,
+                onChangePlan: (farm) => _changePlan(context, ref, farm),
+                onOpen: (farm) => context.push('/platform-admin/farms/${farm.id}'),
+              )
+          : null,
     );
   }
 

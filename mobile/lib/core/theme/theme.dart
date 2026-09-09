@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+export 'app_breakpoints.dart';
 export 'app_colors.dart';
 export 'app_duration.dart';
 export 'app_radius.dart';

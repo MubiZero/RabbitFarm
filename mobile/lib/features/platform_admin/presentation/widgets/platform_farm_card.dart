@@ -50,7 +50,7 @@ class PlatformFarmCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              _PlanChip(plan: farm.plan),
+              PlanChip(plan: farm.plan),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -102,8 +102,12 @@ class PlatformFarmCard extends StatelessWidget {
 
 /// Тариф фермы ярлыком. Без тарифа — тоже состояние, и молчать о нём нельзя:
 /// такая ферма работает без ограничений.
-class _PlanChip extends StatelessWidget {
-  const _PlanChip({required this.plan});
+///
+/// Публичный — переиспользуется и в табличном виде списка ферм на широком
+/// экране ([PlatformFarmsTable]), чтобы тариф выглядел одинаково в обеих
+/// раскладках.
+class PlanChip extends StatelessWidget {
+  const PlanChip({super.key, required this.plan});
 
   final Plan? plan;
 
