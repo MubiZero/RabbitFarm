@@ -11,7 +11,6 @@ module.exports = {
     '!src/utils/logger.js',
     '!src/config/validateEnv.js',
     '!src/config/database.js',
-    '!src/config/multer.js',
     '!src/config/minio.js',
     '!src/config/swagger.js',
     '!src/routes/**',

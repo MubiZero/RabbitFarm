@@ -15,12 +15,9 @@ async function objectExists(relativeUrl) {
   }
 }
 
-// Крошечный валидный PNG (1x1), чтобы multer принял файл как настоящее
-// изображение — content-type определяется supertest по расширению файла.
-const PNG_1PX = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
-  'base64'
-);
+// Настоящие файлы, а не произвольные байты: сервер проверяет тип по
+// содержимому, поэтому заглушка не прошла бы загрузку.
+const { PNG_1PX, WINDOWS_EXECUTABLE, SVG_WITH_SCRIPT } = require('../helpers/fileFixtures');
 
 describe('Галерея фото кролика', () => {
   let ownerToken;
@@ -111,6 +108,24 @@ describe('Галерея фото кролика', () => {
         .post(`/api/v1/rabbits/${rabbitId}/photos`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('исполняемый файл с подделанным mimetype не проходит', async () => {
+      const res = await request(app)
+        .post(`/api/v1/rabbits/${rabbitId}/photos`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .attach('photo', WINDOWS_EXECUTABLE, { filename: 'rabbit.png', contentType: 'image/png' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('SVG не проходит даже под видом PNG', async () => {
+      const res = await request(app)
+        .post(`/api/v1/rabbits/${rabbitId}/photos`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .attach('photo', SVG_WITH_SCRIPT, { filename: 'rabbit.png', contentType: 'image/png' });
 
       expect(res.status).toBe(400);
     });
