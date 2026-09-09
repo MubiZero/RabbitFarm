@@ -88,7 +88,7 @@ class PlatformAdminService {
     const [rabbitCounts, staffCounts, lastActiveByFarm] = await Promise.all([
       farmIds.length ? Rabbit.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
       farmIds.length ? User.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
-      farmIds.length ? this._lastActiveByFarm(farmIds) : {}
+      farmIds.length ? this.lastActiveByFarm(farmIds) : {}
     ]);
 
     const rabbitsByFarm = Object.fromEntries(rabbitCounts.map((row) => [row.farm_id, Number(row.count)]));
@@ -158,8 +158,16 @@ class PlatformAdminService {
     return sorted;
   }
 
-  /** `max(last_login_at)` по каждой из перечисленных ферм одним запросом. */
-  async _lastActiveByFarm(farmIds) {
+  /**
+   * `max(last_login_at)` по каждой из перечисленных ферм одним запросом —
+   * единственное определение «когда фермой в последний раз пользовались».
+   *
+   * Публичное, потому что тем же признаком живёт задача возврата неактивных
+   * ферм (`jobs/inactivityWinbackJob`): она автоматизирует ровно то, что
+   * админ видит здесь фильтром `inactive_days`, и своё второе определение
+   * активности завела бы только затем, чтобы однажды с этим разойтись.
+   */
+  async lastActiveByFarm(farmIds) {
     const rows = await User.findAll({
       attributes: ['farm_id', [fn('MAX', col('last_login_at')), 'last_active']],
       where: { farm_id: farmIds },
@@ -391,7 +399,7 @@ class PlatformAdminService {
     const [rabbitCounts, staffCounts, lastActiveByFarm] = await Promise.all([
       farmIds.length ? Rabbit.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
       farmIds.length ? User.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
-      farmIds.length ? this._lastActiveByFarm(farmIds) : {}
+      farmIds.length ? this.lastActiveByFarm(farmIds) : {}
     ]);
     const rabbitsByFarm = Object.fromEntries(rabbitCounts.map((row) => [row.farm_id, Number(row.count)]));
     const staffByFarm = Object.fromEntries(staffCounts.map((row) => [row.farm_id, Number(row.count)]));
