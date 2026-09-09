@@ -80,6 +80,14 @@ module.exports = (sequelize) => {
     deleted_at: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    // Порог неактивности, по которому ферме уже отправлено приглашение
+    // вернуться (см. `jobs/inactivityWinbackJob`): NULL — заходят, звать
+    // некого; 14 или 30 — на этом пороге уведомление уже ушло. Сбрасывается
+    // в NULL, как только по ферме снова видна активность.
+    inactivity_notified_days: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'farms',

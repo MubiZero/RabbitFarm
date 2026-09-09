@@ -1,8 +1,7 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Farm, Plan, User } = require('../models');
-const notificationService = require('../services/notificationService');
-const { sendAnnouncementEmail } = require('../services/notifications/emailTransport');
+const { Farm, Plan } = require('../models');
+const { notifyFarmOwners } = require('../services/notifications/farmOwnerNotifier');
 const logger = require('../utils/logger');
 
 // Тем же часом, что и notificationDigestJob — время сервера, не «раз в сутки
@@ -21,26 +20,11 @@ function daysUntil(date, now = new Date()) {
 }
 
 async function _notifyFarm(farm, { title, body }) {
-  const owners = await User.findAll({
-    where: { farm_id: farm.id, role: 'owner', is_active: true },
-    attributes: ['id', 'email']
-  });
-  if (owners.length === 0) return;
-
-  await notificationService.sendToUsers(farm.id, owners.map((u) => u.id), {
+  await notifyFarmOwners(farm.id, {
     title,
     body,
     data: { type: 'plan_expiry', route: '/subscription' }
   });
-
-  for (const owner of owners) {
-    if (!owner.email) continue;
-    try {
-      await sendAnnouncementEmail({ to: owner.email, subject: title, text: body });
-    } catch (error) {
-      logger.error('Plan expiry email failed', { farmId: farm.id, error: error.message });
-    }
-  }
 }
 
 /**
