@@ -9,6 +9,7 @@ library;
 export 'alert_card.dart';
 export 'app_async_view.dart';
 export 'app_card.dart';
+export 'app_crash_view.dart';
 export 'app_date_field.dart';
 export 'app_empty_state.dart';
 export 'app_error_state.dart';

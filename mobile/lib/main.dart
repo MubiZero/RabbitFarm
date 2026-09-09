@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import 'core/error/error_handling.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
@@ -18,8 +21,19 @@ import 'l10n/generated/app_localizations.dart';
 /// нужна ради `const ProviderScope`.
 Duration? _noRetry(int retryCount, Object error) => null;
 
-void main() async {
+void main() {
+  // Асинхронная ошибка, упавшая мимо дерева виджетов, всплывает в ту зону, где
+  // родилась, — поэтому и запуск, и вся инициализация живут внутри одной общей
+  // зоны, иначе такая ошибка просто исчезает. По той же причине привязка
+  // Flutter создаётся здесь же, а не снаружи.
+  runZonedGuarded(_bootstrap, (error, stack) {
+    logUncaughtError(error, stack, source: 'zone');
+  });
+}
+
+Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+  installErrorHandlers();
 
   // Web пока без push — нужен отдельный VAPID-ключ и service worker.
   // До того как в проект добавлен google-services.json (Android) или
