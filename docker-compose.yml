@@ -50,6 +50,9 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+      # Cron-задачи считают «08:00» по времени контейнера, поэтому пояс задан
+      # явно и совпадает с продом (см. backend/Dockerfile).
+      - TZ=${TZ:-Asia/Dushanbe}
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=rabbitfarm

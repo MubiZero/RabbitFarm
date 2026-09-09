@@ -50,11 +50,13 @@ const logger = winston.createLogger({
   ]
 });
 
-// Add console transport in development
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: consoleFormat
-  }));
-}
+// Консоль подключается всегда, в том числе в продакшене: контейнер живёт
+// недолго (пересоздаётся при каждом деплое), и файлы в /app/logs исчезают
+// вместе с ним. Единственное, что переживает контейнер, — stdout, который
+// собирает Docker и показывает Coolify. В проде пишем тем же json-форматом,
+// что и в файлы: собиратель логов разбирает строку, а не глазами читает.
+logger.add(new winston.transports.Console({
+  format: process.env.NODE_ENV === 'production' ? logFormat : consoleFormat
+}));
 
 module.exports = logger;

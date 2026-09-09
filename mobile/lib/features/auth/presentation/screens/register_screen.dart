@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
+import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -25,6 +26,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Название фермы уже спросили в онбординге и показали «... готова к
+    // работе!». Пустое поле здесь означало бы, что бэкенд заведёт ферму под
+    // дефолтным «Ферма {имя}» — не тем названием, которое человек только что
+    // видел. Через `.future`, а не `.value`: если экран открыт до того, как
+    // провайдер дочитал SharedPreferences, значение всё равно доедет.
+    ref.read(onboardingProvider.future).then((onboarding) {
+      if (!mounted || _farmNameController.text.isNotEmpty) return;
+      _farmNameController.text = onboarding.farmName.trim();
+    });
+  }
 
   @override
   void dispose() {

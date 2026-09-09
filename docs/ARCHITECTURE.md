@@ -959,11 +959,19 @@ logger.info('User logged in', { userId: user.id });
 logger.error('Database error', { error: err.message, stack: err.stack });
 ```
 
+### Куда попадают логи
+- **stdout** — во всех окружениях, включая продакшен (`src/utils/logger.js`): контейнер пересоздаётся при каждом деплое, и только stdout переживает это — его собирает Docker и показывает Coolify
+- **Файлы** `logs/combined.log` и `logs/error.log` внутри контейнера, ротация по размеру (10 МБ, 5 файлов), а не по дням. Без смонтированного тома исчезают вместе с контейнером — см. `docs/DEPLOY.md`
+
 ### Error Tracking
 - **Sentry** не подключён (ни в `backend/package.json`, ни в `mobile/pubspec.yaml`) — в проде ошибки видны только по логам и жалобам пользователей
-- **Log files** with rotation (7 days retention)
 
-### Metrics
+### Metrics (план, не реализовано)
+
+Ни prometheus/`prom-client`, ни Datadog, ни New Relic в зависимостях бэкенда
+нет — метрик сейчас не собирается никаких, ниже список того, что имеет смысл
+снимать, когда до этого дойдут руки:
+
 - API response times
 - Error rates
 - Active users
