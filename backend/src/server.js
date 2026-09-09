@@ -13,6 +13,7 @@ const { ensureBucket } = require('./config/minio');
 const { startTokenCleanupJob } = require('./jobs/tokenCleanup');
 const { startNotificationDigestJob } = require('./jobs/notificationDigestJob');
 const { startFarmPurgeJob } = require('./jobs/farmPurgeJob');
+const { startPlanExpiryReminderJob } = require('./jobs/planExpiryReminderJob');
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -57,6 +58,7 @@ async function startServer() {
       startTokenCleanupJob();
       startNotificationDigestJob();
       startFarmPurgeJob();
+      startPlanExpiryReminderJob();
     }
 
     // Start listening
