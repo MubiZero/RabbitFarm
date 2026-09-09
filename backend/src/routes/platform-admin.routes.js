@@ -52,6 +52,15 @@ router.delete('/plans/:id', platformAdminController.deletePlan);
 
 /**
  * @swagger
+ * /platform-admin/summary:
+ *   get:
+ *     summary: Сводка платформы целиком — фермы по категориям, регистрации, поголовье, место в MinIO
+ *     tags: [PlatformAdmin]
+ */
+router.get('/summary', platformAdminController.getSummary);
+
+/**
+ * @swagger
  * /platform-admin/farms:
  *   get:
  *     summary: Все фермы платформы с их тарифом и текущим потреблением

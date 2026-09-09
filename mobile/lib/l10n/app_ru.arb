@@ -1345,9 +1345,21 @@
   "farmPlatformAdmin": "Фермы и тарифы",
 
   "platformTitle": "Платформа",
+  "platformTabSummary": "Сводка",
   "platformTabFarms": "Фермы",
   "platformTabPlans": "Тарифы",
   "platformTabAnnouncements": "Объявления",
+
+  "platformSummarySectionFarms": "Фермы",
+  "platformSummarySectionStatus": "Состояние",
+  "platformSummarySectionActivity": "Активность",
+  "platformSummarySectionData": "Данные",
+  "platformSummaryTotalFarms": "Всего ферм",
+  "platformSummaryFree": "На бесплатном",
+  "platformSummaryPaid": "На платном",
+  "platformSummaryRegistrations30d": "Регистраций за 30 дней",
+  "platformSummaryRabbitsTotal": "Поголовье всего",
+  "platformSummaryStorageTotal": "Место в MinIO",
 
   "countFarms": "{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}",
   "@countFarms": {

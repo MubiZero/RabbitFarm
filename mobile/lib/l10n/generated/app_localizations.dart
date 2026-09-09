@@ -6196,6 +6196,12 @@ abstract class AppLocalizations {
   /// **'Платформа'**
   String get platformTitle;
 
+  /// No description provided for @platformTabSummary.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка'**
+  String get platformTabSummary;
+
   /// No description provided for @platformTabFarms.
   ///
   /// In ru, this message translates to:
@@ -6213,6 +6219,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Объявления'**
   String get platformTabAnnouncements;
+
+  /// No description provided for @platformSummarySectionFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фермы'**
+  String get platformSummarySectionFarms;
+
+  /// No description provided for @platformSummarySectionStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состояние'**
+  String get platformSummarySectionStatus;
+
+  /// No description provided for @platformSummarySectionActivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активность'**
+  String get platformSummarySectionActivity;
+
+  /// No description provided for @platformSummarySectionData.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные'**
+  String get platformSummarySectionData;
+
+  /// No description provided for @platformSummaryTotalFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всего ферм'**
+  String get platformSummaryTotalFarms;
+
+  /// No description provided for @platformSummaryFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'На бесплатном'**
+  String get platformSummaryFree;
+
+  /// No description provided for @platformSummaryPaid.
+  ///
+  /// In ru, this message translates to:
+  /// **'На платном'**
+  String get platformSummaryPaid;
+
+  /// No description provided for @platformSummaryRegistrations30d.
+  ///
+  /// In ru, this message translates to:
+  /// **'Регистраций за 30 дней'**
+  String get platformSummaryRegistrations30d;
+
+  /// No description provided for @platformSummaryRabbitsTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поголовье всего'**
+  String get platformSummaryRabbitsTotal;
+
+  /// No description provided for @platformSummaryStorageTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Место в MinIO'**
+  String get platformSummaryStorageTotal;
 
   /// No description provided for @countFarms.
   ///

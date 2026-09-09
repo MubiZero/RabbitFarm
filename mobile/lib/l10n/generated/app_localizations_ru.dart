@@ -3409,6 +3409,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformTitle => 'Платформа';
 
   @override
+  String get platformTabSummary => 'Сводка';
+
+  @override
   String get platformTabFarms => 'Фермы';
 
   @override
@@ -3416,6 +3419,36 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformTabAnnouncements => 'Объявления';
+
+  @override
+  String get platformSummarySectionFarms => 'Фермы';
+
+  @override
+  String get platformSummarySectionStatus => 'Состояние';
+
+  @override
+  String get platformSummarySectionActivity => 'Активность';
+
+  @override
+  String get platformSummarySectionData => 'Данные';
+
+  @override
+  String get platformSummaryTotalFarms => 'Всего ферм';
+
+  @override
+  String get platformSummaryFree => 'На бесплатном';
+
+  @override
+  String get platformSummaryPaid => 'На платном';
+
+  @override
+  String get platformSummaryRegistrations30d => 'Регистраций за 30 дней';
+
+  @override
+  String get platformSummaryRabbitsTotal => 'Поголовье всего';
+
+  @override
+  String get platformSummaryStorageTotal => 'Место в MinIO';
 
   @override
   String countFarms(int count) {

@@ -10,6 +10,7 @@ import 'package:mobile/features/platform_admin/data/repositories/platform_admin_
 import 'package:mobile/features/platform_admin/presentation/providers/platform_admin_provider.dart';
 import 'package:mobile/features/platform_admin/presentation/screens/platform_farms_tab.dart';
 import 'package:mobile/features/platform_admin/presentation/screens/platform_plans_tab.dart';
+import 'package:mobile/features/platform_admin/presentation/screens/platform_summary_tab.dart';
 import 'package:mobile/features/platform_admin/presentation/widgets/platform_farm_card.dart';
 
 import '../support/test_app.dart';
@@ -130,6 +131,16 @@ Widget _plansTab(List<Plan> plans) => testApp(
       const PlatformPlansTab(),
       overrides: [
         platformPlansProvider.overrideWith((ref) async => plans),
+      ],
+    );
+
+Widget _summaryTab({PlatformSummary? summary, Object? error}) => testApp(
+      const PlatformSummaryTab(),
+      overrides: [
+        platformSummaryProvider.overrideWith((ref) async {
+          if (error != null) throw error;
+          return summary ?? const PlatformSummary();
+        }),
       ],
     );
 
@@ -406,6 +417,75 @@ void main() {
 
       expect(find.text('Тарифов пока нет'), findsOneWidget);
       expect(find.text('Новый тариф'), findsOneWidget);
+    });
+  });
+
+  group('Сводка', () {
+    testWidgets('показывает фермы по тарифу', (tester) async {
+      await tester.pumpWidget(_summaryTab(
+        summary: const PlatformSummary(
+          farms: PlatformFarmsSummary(
+            total: 12,
+            free: 7,
+            paid: 3,
+            noPlan: 2,
+          ),
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Всего ферм'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+      expect(find.text('7'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('показывает просроченные, приостановленные и упёршиеся в предел',
+        (tester) async {
+      await tester.pumpWidget(_summaryTab(
+        summary: const PlatformSummary(
+          farms: PlatformFarmsSummary(expired: 4, suspended: 1, atLimit: 5),
+        ),
+      ));
+      await _settle(tester);
+
+      // Те же подписи, что у срезов списка ферм (farm_filter_labels.dart) —
+      // одно состояние должно называться одинаково везде.
+      expect(find.text('Просрочен тариф'), findsOneWidget);
+      expect(find.text('Доступ закрыт'), findsOneWidget);
+      expect(find.text('Упёрлась в предел тарифа'), findsOneWidget);
+      expect(find.text('4'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+    });
+
+    testWidgets('показывает регистрации, неактивность, поголовье и место',
+        (tester) async {
+      await tester.pumpWidget(_summaryTab(
+        summary: const PlatformSummary(
+          registrations30d: 9,
+          inactive30d: 6,
+          rabbitsTotal: 340,
+          storageBytes: 15728640, // 15 МБ
+        ),
+      ));
+      await _settle(tester);
+
+      expect(find.text('Регистраций за 30 дней'), findsOneWidget);
+      expect(find.text('9'), findsOneWidget);
+      expect(find.text('Не заходили 30 дней'), findsOneWidget);
+      expect(find.text('6'), findsOneWidget);
+      expect(find.text('Поголовье всего'), findsOneWidget);
+      expect(find.text('340'), findsOneWidget);
+      expect(find.text('15 МБ'), findsOneWidget);
+    });
+
+    testWidgets('на ошибке без данных предлагает повторить', (tester) async {
+      await tester.pumpWidget(_summaryTab(error: Exception('нет сети')));
+      await _settle(tester);
+
+      expect(find.text('Повторить'), findsOneWidget);
     });
   });
 }

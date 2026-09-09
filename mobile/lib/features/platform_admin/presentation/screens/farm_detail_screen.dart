@@ -928,7 +928,7 @@ class _FactsCard extends StatelessWidget {
           _Fact(
             icon: Icons.folder_outlined,
             label: l10n.platformFarmStorage,
-            value: _storageLabel(context, farm.storageBytes),
+            value: storageLabel(context, farm.storageBytes),
           ),
           _Fact(
             icon: Icons.login_outlined,
@@ -945,19 +945,6 @@ class _FactsCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// Место человеческим языком. Приставка — из словаря, деление — из общей
-  /// утилиты: «МБ» на других языках пишется иначе, а сама арифметика нет.
-  static String _storageLabel(BuildContext context, int bytes) {
-    final scaled = scaleBytes(bytes);
-    final unit = switch (scaled.power) {
-      0 => context.l10n.storageUnitBytes,
-      1 => context.l10n.storageUnitKb,
-      2 => context.l10n.storageUnitMb,
-      _ => context.l10n.storageUnitGb,
-    };
-    return formatQuantity(scaled.value, unit);
   }
 }
 

@@ -363,6 +363,89 @@ class PlatformAdminService {
   }
 
   /**
+   * Сводка платформы целиком (см. docs/plans/PLATFORM-ADMIN.md, этап 5) —
+   * один агрегирующий запрос вместо подсчёта по загруженным страницам
+   * списка ферм: иначе «12 ферм» означало бы «столько успело догрузиться».
+   *
+   * Мягко удалённые фермы не входят ни в одну из «ферм всего» категорий —
+   * тот же скоуп, что и в `listFarms` по умолчанию. Место в MinIO — исключение:
+   * их файлы физически ещё не зачищены (ждут `jobs/farmPurgeJob`), значит
+   * это реально занятые байты, и они всё равно посчитаны через `Photo`/
+   * `Rabbit`, не привязанные к скоупу удаления фермы.
+   */
+  async getSummary() {
+    const cutoff = new Date(Date.now() - DEFAULT_INACTIVE_DAYS * MS_PER_DAY);
+
+    const [farms, registrations30d, rabbitsTotal, photoBytes, rabbitPhotoBytes] = await Promise.all([
+      Farm.findAll({ where: { deleted_at: null }, include: [{ model: Plan, as: 'plan' }] }),
+      Farm.count({ where: { deleted_at: null, created_at: { [Op.gte]: cutoff } } }),
+      // Явный { tenantScope: 'all' } — это и правда сводка по всем фермам
+      // сразу, а не забытый farm_id (см. src/utils/tenancy.js): без него
+      // хук на Rabbit/Photo отказывает в запросе без условия по ферме.
+      Rabbit.count({ tenantScope: 'all' }),
+      Photo.sum('size_bytes', { tenantScope: 'all' }),
+      Rabbit.sum('photo_size_bytes', { tenantScope: 'all' })
+    ]);
+
+    const farmIds = farms.map((farm) => farm.id);
+    const [rabbitCounts, staffCounts, lastActiveByFarm] = await Promise.all([
+      farmIds.length ? Rabbit.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
+      farmIds.length ? User.count({ where: { farm_id: farmIds }, group: ['farm_id'] }) : [],
+      farmIds.length ? this._lastActiveByFarm(farmIds) : {}
+    ]);
+    const rabbitsByFarm = Object.fromEntries(rabbitCounts.map((row) => [row.farm_id, Number(row.count)]));
+    const staffByFarm = Object.fromEntries(staffCounts.map((row) => [row.farm_id, Number(row.count)]));
+
+    const summary = {
+      total: farms.length,
+      free: 0,
+      paid: 0,
+      no_plan: 0,
+      expired: 0,
+      suspended: 0,
+      at_limit: 0
+    };
+    let inactive30d = 0;
+    const cutoffTime = cutoff.getTime();
+
+    for (const farm of farms) {
+      if (!farm.plan) {
+        summary.no_plan += 1;
+      } else if (Number(farm.plan.price) === 0) {
+        summary.free += 1;
+      } else {
+        summary.paid += 1;
+      }
+
+      if (planService.isExpired(farm)) summary.expired += 1;
+      if (farm.status === 'suspended') summary.suspended += 1;
+      if (isAtLimit({
+        plan: farm.plan,
+        rabbits_count: rabbitsByFarm[farm.id] || 0,
+        staff_count: staffByFarm[farm.id] || 0,
+        extra_rabbits: farm.extra_rabbits,
+        extra_staff: farm.extra_staff,
+        extras_until: farm.extras_until
+      })) {
+        summary.at_limit += 1;
+      }
+
+      const lastActive = lastActiveByFarm[farm.id] || null;
+      if (!lastActive || new Date(lastActive).getTime() < cutoffTime) {
+        inactive30d += 1;
+      }
+    }
+
+    return {
+      farms: summary,
+      registrations_30d: registrations30d,
+      inactive_30d: inactive30d,
+      rabbits_total: rabbitsTotal,
+      storage_bytes: (photoBytes || 0) + (rabbitPhotoBytes || 0)
+    };
+  }
+
+  /**
    * Отменить мягкое удаление. Срок 30 дней здесь не проверяется намеренно:
    * если запись ещё существует, значит зачистка до неё не дошла — а раз
    * данные на месте, возвращать их можно.

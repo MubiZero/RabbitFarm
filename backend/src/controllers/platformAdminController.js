@@ -334,6 +334,20 @@ class PlatformAdminController {
     }
   }
 
+  /**
+   * GET /platform-admin/summary
+   * Сводка платформы целиком (см. docs/plans/PLATFORM-ADMIN.md, этап 5) —
+   * читающее действие, в журнал не пишется, как и listFarms/getFarm.
+   */
+  async getSummary(req, res, next) {
+    try {
+      const summary = await platformAdminService.getSummary();
+      return ApiResponse.success(res, summary, 'Сводка платформы получена');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   /** GET /platform-admin/audit */
   async listAudit(req, res, next) {
     try {

@@ -18,6 +18,13 @@ final platformPlansProvider =
   return ref.watch(platformAdminRepositoryProvider).getPlans();
 });
 
+/// Сводка платформы целиком — вкладка «Сводка» (см.
+/// docs/plans/PLATFORM-ADMIN.md, этап 5).
+final platformSummaryProvider =
+    FutureProvider.autoDispose<PlatformSummary>((ref) async {
+  return ref.watch(platformAdminRepositoryProvider).getSummary();
+});
+
 /// Фильтр списка ферм — одно значение сразу, а не набор галочек: сервер
 /// принимает единственный `filter`, и совмещать «без тарифа» с «упёрлась в
 /// предел» всё равно было бы нечего — это взаимоисключающие срезы.

@@ -266,6 +266,46 @@ abstract class PlatformFarmDetail with _$PlatformFarmDetail {
       _$PlatformFarmDetailFromJson(json);
 }
 
+/// Фермы платформы по категориям — часть [PlatformSummary].
+///
+/// Категории тарифа не пересекаются и в сумме дают `total`: каждая ферма
+/// попадает ровно в одну из `free`/`paid`/`noPlan`. `expired`/`suspended`/
+/// `atLimit` — независимые срезы поверх них, ферма может входить сразу в
+/// несколько (просроченный платный тариф почти всегда означает и
+/// `read_only`, но это не одно и то же поле).
+@freezed
+abstract class PlatformFarmsSummary with _$PlatformFarmsSummary {
+  const factory PlatformFarmsSummary({
+    @IntConverter() @Default(0) int total,
+    @IntConverter() @Default(0) int free,
+    @IntConverter() @Default(0) int paid,
+    @JsonKey(name: 'no_plan') @IntConverter() @Default(0) int noPlan,
+    @IntConverter() @Default(0) int expired,
+    @IntConverter() @Default(0) int suspended,
+    @JsonKey(name: 'at_limit') @IntConverter() @Default(0) int atLimit,
+  }) = _PlatformFarmsSummary;
+
+  factory PlatformFarmsSummary.fromJson(Map<String, dynamic> json) =>
+      _$PlatformFarmsSummaryFromJson(json);
+}
+
+/// Сводка платформы целиком (см. docs/plans/PLATFORM-ADMIN.md, этап 5) — один
+/// агрегирующий запрос вместо подсчёта по загруженным страницам списка ферм,
+/// иначе «12 ферм» означало бы «столько успело догрузиться».
+@freezed
+abstract class PlatformSummary with _$PlatformSummary {
+  const factory PlatformSummary({
+    @Default(PlatformFarmsSummary()) PlatformFarmsSummary farms,
+    @JsonKey(name: 'registrations_30d') @IntConverter() @Default(0) int registrations30d,
+    @JsonKey(name: 'inactive_30d') @IntConverter() @Default(0) int inactive30d,
+    @JsonKey(name: 'rabbits_total') @IntConverter() @Default(0) int rabbitsTotal,
+    @JsonKey(name: 'storage_bytes') @IntConverter() @Default(0) int storageBytes,
+  }) = _PlatformSummary;
+
+  factory PlatformSummary.fromJson(Map<String, dynamic> json) =>
+      _$PlatformSummaryFromJson(json);
+}
+
 /// Итог отправки по одному каналу.
 ///
 /// Неудачи — такая же часть результата, как и удачи: объявление, дошедшее до

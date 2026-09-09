@@ -154,6 +154,46 @@ describe('PlatformAdminController', () => {
     });
   });
 
+  describe('getSummary', () => {
+    it('отдаёт сводку платформы', async () => {
+      const summary = {
+        farms: { total: 3, free: 1, paid: 1, no_plan: 1, expired: 0, suspended: 0, at_limit: 0 },
+        registrations_30d: 2,
+        inactive_30d: 1,
+        rabbits_total: 42,
+        storage_bytes: 1500
+      };
+      platformAdminService.getSummary.mockResolvedValue(summary);
+      const res = mockRes();
+
+      await platformAdminController.getSummary(mockReq(), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: summary
+      }));
+    });
+
+    it('не пишет в журнал — читающее действие', async () => {
+      platformAdminService.getSummary.mockResolvedValue({});
+      const res = mockRes();
+
+      await platformAdminController.getSummary(mockReq(), res, mockNext);
+
+      expect(auditService.record).not.toHaveBeenCalled();
+    });
+
+    it('передаёт ошибку дальше через next', async () => {
+      platformAdminService.getSummary.mockRejectedValue(new Error('DB_DOWN'));
+      const res = mockRes();
+
+      await platformAdminController.getSummary(mockReq(), res, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
   describe('getFarm', () => {
     it('возвращает ферму при успешном поиске', async () => {
       platformAdminService.getFarm.mockResolvedValue({ id: 1, name: 'Ферма 1', last_active: null });

@@ -91,6 +91,7 @@ class ApiEndpoints {
   static const String photos = '/photos';
 
   // Платформенная админка (суперадмин): тарифы и все фермы сервиса
+  static const String platformSummary = '/platform-admin/summary';
   static const String platformPlans = '/platform-admin/plans';
   static String platformPlan(int id) => '/platform-admin/plans/$id';
   static const String platformFarms = '/platform-admin/farms';

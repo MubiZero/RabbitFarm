@@ -1,4 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+
+import '../l10n/l10n_context.dart';
 
 final _money = NumberFormat('#,##0', 'ru_RU');
 final _quantity = NumberFormat('#,##0.##', 'ru_RU');
@@ -46,6 +49,21 @@ String formatQuantity(num value, [String? unit]) {
     power++;
   }
   return (value: bytes.isNegative ? -value : value, power: power);
+}
+
+/// Занятое место человеческим языком: «15 МБ». Приставка — из словаря
+/// (на других языках пишется иначе), деление — [scaleBytes]. Общая для
+/// карточки фермы и сводки платформы, чтобы одно и то же число не считалось
+/// в двух местах по-разному после первой же правки одного из них.
+String storageLabel(BuildContext context, int bytes) {
+  final scaled = scaleBytes(bytes);
+  final unit = switch (scaled.power) {
+    0 => context.l10n.storageUnitBytes,
+    1 => context.l10n.storageUnitKb,
+    2 => context.l10n.storageUnitMb,
+    _ => context.l10n.storageUnitGb,
+  };
+  return formatQuantity(scaled.value, unit);
 }
 
 /// Разбирает число, введённое человеком.

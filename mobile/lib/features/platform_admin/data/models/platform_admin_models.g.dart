@@ -213,6 +213,75 @@ Map<String, dynamic> _$PlatformFarmDetailToJson(
   'deleted_at': const NullableDateTimeConverter().toJson(instance.deletedAt),
 };
 
+_PlatformFarmsSummary _$PlatformFarmsSummaryFromJson(
+  Map<String, dynamic> json,
+) => _PlatformFarmsSummary(
+  total: json['total'] == null
+      ? 0
+      : const IntConverter().fromJson(json['total'] as Object),
+  free: json['free'] == null
+      ? 0
+      : const IntConverter().fromJson(json['free'] as Object),
+  paid: json['paid'] == null
+      ? 0
+      : const IntConverter().fromJson(json['paid'] as Object),
+  noPlan: json['no_plan'] == null
+      ? 0
+      : const IntConverter().fromJson(json['no_plan'] as Object),
+  expired: json['expired'] == null
+      ? 0
+      : const IntConverter().fromJson(json['expired'] as Object),
+  suspended: json['suspended'] == null
+      ? 0
+      : const IntConverter().fromJson(json['suspended'] as Object),
+  atLimit: json['at_limit'] == null
+      ? 0
+      : const IntConverter().fromJson(json['at_limit'] as Object),
+);
+
+Map<String, dynamic> _$PlatformFarmsSummaryToJson(
+  _PlatformFarmsSummary instance,
+) => <String, dynamic>{
+  'total': const IntConverter().toJson(instance.total),
+  'free': const IntConverter().toJson(instance.free),
+  'paid': const IntConverter().toJson(instance.paid),
+  'no_plan': const IntConverter().toJson(instance.noPlan),
+  'expired': const IntConverter().toJson(instance.expired),
+  'suspended': const IntConverter().toJson(instance.suspended),
+  'at_limit': const IntConverter().toJson(instance.atLimit),
+};
+
+_PlatformSummary _$PlatformSummaryFromJson(Map<String, dynamic> json) =>
+    _PlatformSummary(
+      farms: json['farms'] == null
+          ? const PlatformFarmsSummary()
+          : PlatformFarmsSummary.fromJson(
+              json['farms'] as Map<String, dynamic>,
+            ),
+      registrations30d: json['registrations_30d'] == null
+          ? 0
+          : const IntConverter().fromJson(json['registrations_30d'] as Object),
+      inactive30d: json['inactive_30d'] == null
+          ? 0
+          : const IntConverter().fromJson(json['inactive_30d'] as Object),
+      rabbitsTotal: json['rabbits_total'] == null
+          ? 0
+          : const IntConverter().fromJson(json['rabbits_total'] as Object),
+      storageBytes: json['storage_bytes'] == null
+          ? 0
+          : const IntConverter().fromJson(json['storage_bytes'] as Object),
+    );
+
+Map<String, dynamic> _$PlatformSummaryToJson(
+  _PlatformSummary instance,
+) => <String, dynamic>{
+  'farms': instance.farms,
+  'registrations_30d': const IntConverter().toJson(instance.registrations30d),
+  'inactive_30d': const IntConverter().toJson(instance.inactive30d),
+  'rabbits_total': const IntConverter().toJson(instance.rabbitsTotal),
+  'storage_bytes': const IntConverter().toJson(instance.storageBytes),
+};
+
 _ChannelDelivery _$ChannelDeliveryFromJson(Map<String, dynamic> json) =>
     _ChannelDelivery(
       sent: json['sent'] == null

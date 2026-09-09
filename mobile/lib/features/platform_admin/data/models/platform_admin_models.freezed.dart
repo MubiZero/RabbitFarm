@@ -1880,6 +1880,594 @@ $PlanCopyWith<$Res>? get plan {
 
 
 /// @nodoc
+mixin _$PlatformFarmsSummary {
+
+@IntConverter() int get total;@IntConverter() int get free;@IntConverter() int get paid;@JsonKey(name: 'no_plan')@IntConverter() int get noPlan;@IntConverter() int get expired;@IntConverter() int get suspended;@JsonKey(name: 'at_limit')@IntConverter() int get atLimit;
+/// Create a copy of PlatformFarmsSummary
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PlatformFarmsSummaryCopyWith<PlatformFarmsSummary> get copyWith => _$PlatformFarmsSummaryCopyWithImpl<PlatformFarmsSummary>(this as PlatformFarmsSummary, _$identity);
+
+  /// Serializes this PlatformFarmsSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PlatformFarmsSummary;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlatformFarmsSummary&&(identical(other.total, _this.total) || other.total == _this.total)&&(identical(other.free, _this.free) || other.free == _this.free)&&(identical(other.paid, _this.paid) || other.paid == _this.paid)&&(identical(other.noPlan, _this.noPlan) || other.noPlan == _this.noPlan)&&(identical(other.expired, _this.expired) || other.expired == _this.expired)&&(identical(other.suspended, _this.suspended) || other.suspended == _this.suspended)&&(identical(other.atLimit, _this.atLimit) || other.atLimit == _this.atLimit));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PlatformFarmsSummary;
+  return Object.hash(runtimeType,_this.total,_this.free,_this.paid,_this.noPlan,_this.expired,_this.suspended,_this.atLimit);
+}
+
+@override
+String toString() {
+  final _this = this as PlatformFarmsSummary;
+  return 'PlatformFarmsSummary(total: ${_this.total}, free: ${_this.free}, paid: ${_this.paid}, noPlan: ${_this.noPlan}, expired: ${_this.expired}, suspended: ${_this.suspended}, atLimit: ${_this.atLimit})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PlatformFarmsSummaryCopyWith<$Res>  {
+  factory $PlatformFarmsSummaryCopyWith(PlatformFarmsSummary value, $Res Function(PlatformFarmsSummary) _then) = _$PlatformFarmsSummaryCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int total,@IntConverter() int free,@IntConverter() int paid,@JsonKey(name: 'no_plan')@IntConverter() int noPlan,@IntConverter() int expired,@IntConverter() int suspended,@JsonKey(name: 'at_limit')@IntConverter() int atLimit
+});
+
+
+
+
+}
+/// @nodoc
+class _$PlatformFarmsSummaryCopyWithImpl<$Res>
+    implements $PlatformFarmsSummaryCopyWith<$Res> {
+  _$PlatformFarmsSummaryCopyWithImpl(this._self, this._then);
+
+  final PlatformFarmsSummary _self;
+  final $Res Function(PlatformFarmsSummary) _then;
+
+/// Create a copy of PlatformFarmsSummary
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? total = null,Object? free = null,Object? paid = null,Object? noPlan = null,Object? expired = null,Object? suspended = null,Object? atLimit = null,}) {
+  return _then(PlatformFarmsSummary(
+total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,free: null == free ? _self.free : free // ignore: cast_nullable_to_non_nullable
+as int,paid: null == paid ? _self.paid : paid // ignore: cast_nullable_to_non_nullable
+as int,noPlan: null == noPlan ? _self.noPlan : noPlan // ignore: cast_nullable_to_non_nullable
+as int,expired: null == expired ? _self.expired : expired // ignore: cast_nullable_to_non_nullable
+as int,suspended: null == suspended ? _self.suspended : suspended // ignore: cast_nullable_to_non_nullable
+as int,atLimit: null == atLimit ? _self.atLimit : atLimit // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PlatformFarmsSummary].
+extension PlatformFarmsSummaryPatterns on PlatformFarmsSummary {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PlatformFarmsSummary value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PlatformFarmsSummary value)  $default,){
+final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PlatformFarmsSummary value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int total, @IntConverter()  int free, @IntConverter()  int paid, @JsonKey(name: 'no_plan')@IntConverter()  int noPlan, @IntConverter()  int expired, @IntConverter()  int suspended, @JsonKey(name: 'at_limit')@IntConverter()  int atLimit)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary() when $default != null:
+return $default(_that.total,_that.free,_that.paid,_that.noPlan,_that.expired,_that.suspended,_that.atLimit);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int total, @IntConverter()  int free, @IntConverter()  int paid, @JsonKey(name: 'no_plan')@IntConverter()  int noPlan, @IntConverter()  int expired, @IntConverter()  int suspended, @JsonKey(name: 'at_limit')@IntConverter()  int atLimit)  $default,) {final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary():
+return $default(_that.total,_that.free,_that.paid,_that.noPlan,_that.expired,_that.suspended,_that.atLimit);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int total, @IntConverter()  int free, @IntConverter()  int paid, @JsonKey(name: 'no_plan')@IntConverter()  int noPlan, @IntConverter()  int expired, @IntConverter()  int suspended, @JsonKey(name: 'at_limit')@IntConverter()  int atLimit)?  $default,) {final _that = this;
+switch (_that) {
+case _PlatformFarmsSummary() when $default != null:
+return $default(_that.total,_that.free,_that.paid,_that.noPlan,_that.expired,_that.suspended,_that.atLimit);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PlatformFarmsSummary implements PlatformFarmsSummary {
+  const _PlatformFarmsSummary({@IntConverter() this.total = 0, @IntConverter() this.free = 0, @IntConverter() this.paid = 0, @JsonKey(name: 'no_plan')@IntConverter() this.noPlan = 0, @IntConverter() this.expired = 0, @IntConverter() this.suspended = 0, @JsonKey(name: 'at_limit')@IntConverter() this.atLimit = 0});
+  factory _PlatformFarmsSummary.fromJson(Map<String, dynamic> json) => _$PlatformFarmsSummaryFromJson(json);
+
+@override@JsonKey()@IntConverter() final  int total;
+@override@JsonKey()@IntConverter() final  int free;
+@override@JsonKey()@IntConverter() final  int paid;
+@override@JsonKey(name: 'no_plan')@IntConverter() final  int noPlan;
+@override@JsonKey()@IntConverter() final  int expired;
+@override@JsonKey()@IntConverter() final  int suspended;
+@override@JsonKey(name: 'at_limit')@IntConverter() final  int atLimit;
+
+/// Create a copy of PlatformFarmsSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PlatformFarmsSummaryCopyWith<_PlatformFarmsSummary> get copyWith => __$PlatformFarmsSummaryCopyWithImpl<_PlatformFarmsSummary>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PlatformFarmsSummaryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlatformFarmsSummary&&(identical(other.total, total) || other.total == total)&&(identical(other.free, free) || other.free == free)&&(identical(other.paid, paid) || other.paid == paid)&&(identical(other.noPlan, noPlan) || other.noPlan == noPlan)&&(identical(other.expired, expired) || other.expired == expired)&&(identical(other.suspended, suspended) || other.suspended == suspended)&&(identical(other.atLimit, atLimit) || other.atLimit == atLimit));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,total,free,paid,noPlan,expired,suspended,atLimit);
+}
+
+@override
+String toString() {
+    return 'PlatformFarmsSummary(total: $total, free: $free, paid: $paid, noPlan: $noPlan, expired: $expired, suspended: $suspended, atLimit: $atLimit)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PlatformFarmsSummaryCopyWith<$Res> implements $PlatformFarmsSummaryCopyWith<$Res> {
+  factory _$PlatformFarmsSummaryCopyWith(_PlatformFarmsSummary value, $Res Function(_PlatformFarmsSummary) _then) = __$PlatformFarmsSummaryCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int total,@IntConverter() int free,@IntConverter() int paid,@JsonKey(name: 'no_plan')@IntConverter() int noPlan,@IntConverter() int expired,@IntConverter() int suspended,@JsonKey(name: 'at_limit')@IntConverter() int atLimit
+});
+
+
+
+
+}
+/// @nodoc
+class __$PlatformFarmsSummaryCopyWithImpl<$Res>
+    implements _$PlatformFarmsSummaryCopyWith<$Res> {
+  __$PlatformFarmsSummaryCopyWithImpl(this._self, this._then);
+
+  final _PlatformFarmsSummary _self;
+  final $Res Function(_PlatformFarmsSummary) _then;
+
+/// Create a copy of PlatformFarmsSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? total = null,Object? free = null,Object? paid = null,Object? noPlan = null,Object? expired = null,Object? suspended = null,Object? atLimit = null,}) {
+  return _then(_PlatformFarmsSummary(
+total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,free: null == free ? _self.free : free // ignore: cast_nullable_to_non_nullable
+as int,paid: null == paid ? _self.paid : paid // ignore: cast_nullable_to_non_nullable
+as int,noPlan: null == noPlan ? _self.noPlan : noPlan // ignore: cast_nullable_to_non_nullable
+as int,expired: null == expired ? _self.expired : expired // ignore: cast_nullable_to_non_nullable
+as int,suspended: null == suspended ? _self.suspended : suspended // ignore: cast_nullable_to_non_nullable
+as int,atLimit: null == atLimit ? _self.atLimit : atLimit // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$PlatformSummary {
+
+ PlatformFarmsSummary get farms;@JsonKey(name: 'registrations_30d')@IntConverter() int get registrations30d;@JsonKey(name: 'inactive_30d')@IntConverter() int get inactive30d;@JsonKey(name: 'rabbits_total')@IntConverter() int get rabbitsTotal;@JsonKey(name: 'storage_bytes')@IntConverter() int get storageBytes;
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PlatformSummaryCopyWith<PlatformSummary> get copyWith => _$PlatformSummaryCopyWithImpl<PlatformSummary>(this as PlatformSummary, _$identity);
+
+  /// Serializes this PlatformSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PlatformSummary;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlatformSummary&&(identical(other.farms, _this.farms) || other.farms == _this.farms)&&(identical(other.registrations30d, _this.registrations30d) || other.registrations30d == _this.registrations30d)&&(identical(other.inactive30d, _this.inactive30d) || other.inactive30d == _this.inactive30d)&&(identical(other.rabbitsTotal, _this.rabbitsTotal) || other.rabbitsTotal == _this.rabbitsTotal)&&(identical(other.storageBytes, _this.storageBytes) || other.storageBytes == _this.storageBytes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PlatformSummary;
+  return Object.hash(runtimeType,_this.farms,_this.registrations30d,_this.inactive30d,_this.rabbitsTotal,_this.storageBytes);
+}
+
+@override
+String toString() {
+  final _this = this as PlatformSummary;
+  return 'PlatformSummary(farms: ${_this.farms}, registrations30d: ${_this.registrations30d}, inactive30d: ${_this.inactive30d}, rabbitsTotal: ${_this.rabbitsTotal}, storageBytes: ${_this.storageBytes})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PlatformSummaryCopyWith<$Res>  {
+  factory $PlatformSummaryCopyWith(PlatformSummary value, $Res Function(PlatformSummary) _then) = _$PlatformSummaryCopyWithImpl;
+@useResult
+$Res call({
+ PlatformFarmsSummary farms,@JsonKey(name: 'registrations_30d')@IntConverter() int registrations30d,@JsonKey(name: 'inactive_30d')@IntConverter() int inactive30d,@JsonKey(name: 'rabbits_total')@IntConverter() int rabbitsTotal,@JsonKey(name: 'storage_bytes')@IntConverter() int storageBytes
+});
+
+
+$PlatformFarmsSummaryCopyWith<$Res> get farms;
+
+}
+/// @nodoc
+class _$PlatformSummaryCopyWithImpl<$Res>
+    implements $PlatformSummaryCopyWith<$Res> {
+  _$PlatformSummaryCopyWithImpl(this._self, this._then);
+
+  final PlatformSummary _self;
+  final $Res Function(PlatformSummary) _then;
+
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? farms = null,Object? registrations30d = null,Object? inactive30d = null,Object? rabbitsTotal = null,Object? storageBytes = null,}) {
+  return _then(PlatformSummary(
+farms: null == farms ? _self.farms : farms // ignore: cast_nullable_to_non_nullable
+as PlatformFarmsSummary,registrations30d: null == registrations30d ? _self.registrations30d : registrations30d // ignore: cast_nullable_to_non_nullable
+as int,inactive30d: null == inactive30d ? _self.inactive30d : inactive30d // ignore: cast_nullable_to_non_nullable
+as int,rabbitsTotal: null == rabbitsTotal ? _self.rabbitsTotal : rabbitsTotal // ignore: cast_nullable_to_non_nullable
+as int,storageBytes: null == storageBytes ? _self.storageBytes : storageBytes // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlatformFarmsSummaryCopyWith<$Res> get farms {
+  
+  return $PlatformFarmsSummaryCopyWith<$Res>(_self.farms, (value) {
+    return _then(_self.copyWith(farms: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [PlatformSummary].
+extension PlatformSummaryPatterns on PlatformSummary {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PlatformSummary value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PlatformSummary() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PlatformSummary value)  $default,){
+final _that = this;
+switch (_that) {
+case _PlatformSummary():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PlatformSummary value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PlatformSummary() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PlatformFarmsSummary farms, @JsonKey(name: 'registrations_30d')@IntConverter()  int registrations30d, @JsonKey(name: 'inactive_30d')@IntConverter()  int inactive30d, @JsonKey(name: 'rabbits_total')@IntConverter()  int rabbitsTotal, @JsonKey(name: 'storage_bytes')@IntConverter()  int storageBytes)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PlatformSummary() when $default != null:
+return $default(_that.farms,_that.registrations30d,_that.inactive30d,_that.rabbitsTotal,_that.storageBytes);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PlatformFarmsSummary farms, @JsonKey(name: 'registrations_30d')@IntConverter()  int registrations30d, @JsonKey(name: 'inactive_30d')@IntConverter()  int inactive30d, @JsonKey(name: 'rabbits_total')@IntConverter()  int rabbitsTotal, @JsonKey(name: 'storage_bytes')@IntConverter()  int storageBytes)  $default,) {final _that = this;
+switch (_that) {
+case _PlatformSummary():
+return $default(_that.farms,_that.registrations30d,_that.inactive30d,_that.rabbitsTotal,_that.storageBytes);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PlatformFarmsSummary farms, @JsonKey(name: 'registrations_30d')@IntConverter()  int registrations30d, @JsonKey(name: 'inactive_30d')@IntConverter()  int inactive30d, @JsonKey(name: 'rabbits_total')@IntConverter()  int rabbitsTotal, @JsonKey(name: 'storage_bytes')@IntConverter()  int storageBytes)?  $default,) {final _that = this;
+switch (_that) {
+case _PlatformSummary() when $default != null:
+return $default(_that.farms,_that.registrations30d,_that.inactive30d,_that.rabbitsTotal,_that.storageBytes);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PlatformSummary implements PlatformSummary {
+  const _PlatformSummary({this.farms = const PlatformFarmsSummary(), @JsonKey(name: 'registrations_30d')@IntConverter() this.registrations30d = 0, @JsonKey(name: 'inactive_30d')@IntConverter() this.inactive30d = 0, @JsonKey(name: 'rabbits_total')@IntConverter() this.rabbitsTotal = 0, @JsonKey(name: 'storage_bytes')@IntConverter() this.storageBytes = 0});
+  factory _PlatformSummary.fromJson(Map<String, dynamic> json) => _$PlatformSummaryFromJson(json);
+
+@override@JsonKey() final  PlatformFarmsSummary farms;
+@override@JsonKey(name: 'registrations_30d')@IntConverter() final  int registrations30d;
+@override@JsonKey(name: 'inactive_30d')@IntConverter() final  int inactive30d;
+@override@JsonKey(name: 'rabbits_total')@IntConverter() final  int rabbitsTotal;
+@override@JsonKey(name: 'storage_bytes')@IntConverter() final  int storageBytes;
+
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PlatformSummaryCopyWith<_PlatformSummary> get copyWith => __$PlatformSummaryCopyWithImpl<_PlatformSummary>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PlatformSummaryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlatformSummary&&(identical(other.farms, farms) || other.farms == farms)&&(identical(other.registrations30d, registrations30d) || other.registrations30d == registrations30d)&&(identical(other.inactive30d, inactive30d) || other.inactive30d == inactive30d)&&(identical(other.rabbitsTotal, rabbitsTotal) || other.rabbitsTotal == rabbitsTotal)&&(identical(other.storageBytes, storageBytes) || other.storageBytes == storageBytes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,farms,registrations30d,inactive30d,rabbitsTotal,storageBytes);
+}
+
+@override
+String toString() {
+    return 'PlatformSummary(farms: $farms, registrations30d: $registrations30d, inactive30d: $inactive30d, rabbitsTotal: $rabbitsTotal, storageBytes: $storageBytes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PlatformSummaryCopyWith<$Res> implements $PlatformSummaryCopyWith<$Res> {
+  factory _$PlatformSummaryCopyWith(_PlatformSummary value, $Res Function(_PlatformSummary) _then) = __$PlatformSummaryCopyWithImpl;
+@override @useResult
+$Res call({
+ PlatformFarmsSummary farms,@JsonKey(name: 'registrations_30d')@IntConverter() int registrations30d,@JsonKey(name: 'inactive_30d')@IntConverter() int inactive30d,@JsonKey(name: 'rabbits_total')@IntConverter() int rabbitsTotal,@JsonKey(name: 'storage_bytes')@IntConverter() int storageBytes
+});
+
+
+@override $PlatformFarmsSummaryCopyWith<$Res> get farms;
+
+}
+/// @nodoc
+class __$PlatformSummaryCopyWithImpl<$Res>
+    implements _$PlatformSummaryCopyWith<$Res> {
+  __$PlatformSummaryCopyWithImpl(this._self, this._then);
+
+  final _PlatformSummary _self;
+  final $Res Function(_PlatformSummary) _then;
+
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? farms = null,Object? registrations30d = null,Object? inactive30d = null,Object? rabbitsTotal = null,Object? storageBytes = null,}) {
+  return _then(_PlatformSummary(
+farms: null == farms ? _self.farms : farms // ignore: cast_nullable_to_non_nullable
+as PlatformFarmsSummary,registrations30d: null == registrations30d ? _self.registrations30d : registrations30d // ignore: cast_nullable_to_non_nullable
+as int,inactive30d: null == inactive30d ? _self.inactive30d : inactive30d // ignore: cast_nullable_to_non_nullable
+as int,rabbitsTotal: null == rabbitsTotal ? _self.rabbitsTotal : rabbitsTotal // ignore: cast_nullable_to_non_nullable
+as int,storageBytes: null == storageBytes ? _self.storageBytes : storageBytes // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+/// Create a copy of PlatformSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlatformFarmsSummaryCopyWith<$Res> get farms {
+  
+  return $PlatformFarmsSummaryCopyWith<$Res>(_self.farms, (value) {
+    return _then(_self.copyWith(farms: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$ChannelDelivery {
 
 @IntConverter() int get sent;@IntConverter() int get failed;

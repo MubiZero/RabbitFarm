@@ -1,7 +1,8 @@
 jest.mock('../../../src/models', () => ({
   Farm: {
     findAll: jest.fn(),
-    findByPk: jest.fn()
+    findByPk: jest.fn(),
+    count: jest.fn()
   },
   Plan: {
     findByPk: jest.fn()
@@ -690,6 +691,176 @@ describe('PlatformAdminService', () => {
 
       expect(farm.update).toHaveBeenCalledWith({ deleted_at: null });
       expect(result.deleted_at).toBeNull();
+    });
+  });
+
+  describe('getSummary', () => {
+    beforeEach(() => {
+      Farm.count.mockResolvedValue(0);
+      Rabbit.sum.mockResolvedValue(null);
+      Photo.sum.mockResolvedValue(null);
+    });
+
+    it('не запрашивает счётчики по фермам и отдаёт нули, если ферм нет', async () => {
+      Farm.findAll.mockResolvedValue([]);
+      Rabbit.count.mockResolvedValue(0);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(Rabbit.count).toHaveBeenCalledTimes(1); // только rabbits_total, без group по фермам
+      expect(User.count).not.toHaveBeenCalled();
+      expect(User.findAll).not.toHaveBeenCalled();
+      expect(result).toEqual({
+        farms: { total: 0, free: 0, paid: 0, no_plan: 0, expired: 0, suspended: 0, at_limit: 0 },
+        registrations_30d: 0,
+        inactive_30d: 0,
+        rabbits_total: 0,
+        storage_bytes: 0
+      });
+    });
+
+    it('распределяет фермы по бесплатному/платному тарифу и без тарифа', async () => {
+      Farm.findAll.mockResolvedValue([
+        { id: 1, plan: { price: 0 }, status: 'active', extras_until: null, toJSON: () => ({}) },
+        { id: 2, plan: { price: 500 }, status: 'active', extras_until: null, toJSON: () => ({}) },
+        { id: 3, plan: null, status: 'active', extras_until: null, toJSON: () => ({}) }
+      ]);
+      Rabbit.count.mockImplementation((opts) => Promise.resolve(opts?.group ? [] : 0));
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms).toEqual(
+        expect.objectContaining({ total: 3, free: 1, paid: 1, no_plan: 1 })
+      );
+    });
+
+    it('считает просроченные и приостановленные фермы через planService.isExpired и farm.status', async () => {
+      Farm.findAll.mockResolvedValue([
+        {
+          id: 1,
+          plan: { price: 500 },
+          plan_expires_at: '2020-01-01T00:00:00.000Z',
+          status: 'active',
+          extras_until: null,
+          toJSON: () => ({})
+        },
+        {
+          id: 2,
+          plan: { price: 500 },
+          plan_expires_at: null,
+          status: 'suspended',
+          extras_until: null,
+          toJSON: () => ({})
+        }
+      ]);
+      Rabbit.count.mockImplementation((opts) => Promise.resolve(opts?.group ? [] : 0));
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms.expired).toBe(1);
+      expect(result.farms.suspended).toBe(1);
+    });
+
+    it('считает ферму упёршейся в предел по фактическому потреблению, включая активную поблажку', async () => {
+      Farm.findAll.mockResolvedValue([
+        {
+          id: 1,
+          plan: { price: 500, max_rabbits: 10, max_staff: null },
+          status: 'active',
+          extra_rabbits: null,
+          extras_until: null,
+          toJSON: () => ({})
+        }
+      ]);
+      Rabbit.count.mockImplementation((opts) =>
+        Promise.resolve(opts?.group ? [{ farm_id: 1, count: 10 }] : 10)
+      );
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms.at_limit).toBe(1);
+    });
+
+    it('считает ферму не заходившей 30 дней при отсутствии или устаревшей последней активности', async () => {
+      Farm.findAll.mockResolvedValue([
+        { id: 1, plan: null, status: 'active', extras_until: null, toJSON: () => ({}) },
+        { id: 2, plan: null, status: 'active', extras_until: null, toJSON: () => ({}) }
+      ]);
+      Rabbit.count.mockImplementation((opts) => Promise.resolve(opts?.group ? [] : 0));
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([
+        { farm_id: 1, last_active: null },
+        { farm_id: 2, last_active: '2020-01-01T00:00:00.000Z' }
+      ]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.inactive_30d).toBe(2);
+    });
+
+    it('считает регистрации за 30 дней отдельным запросом с cutoff', async () => {
+      Farm.findAll.mockResolvedValue([]);
+      Farm.count.mockResolvedValue(4);
+      Rabbit.count.mockResolvedValue(0);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(Farm.count).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ deleted_at: null, created_at: expect.any(Object) })
+        })
+      );
+      expect(result.registrations_30d).toBe(4);
+    });
+
+    it('суммирует место фото галереи и фото кроликов в storage_bytes', async () => {
+      Farm.findAll.mockResolvedValue([]);
+      Rabbit.count.mockResolvedValue(0);
+      Photo.sum.mockResolvedValue(1000);
+      Rabbit.sum.mockResolvedValue(500);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.storage_bytes).toBe(1500);
+    });
+
+    it('передаёт tenantScope: "all" в кросс-фермовые агрегаты Rabbit/Photo', async () => {
+      // Без этого хук tenancy (src/utils/tenancy.js) отказывает в запросе
+      // без farm_id в where — живой прогон против докера поймал это там, где
+      // замоканные модели в юнит-тестах молчат.
+      Farm.findAll.mockResolvedValue([]);
+      Rabbit.count.mockResolvedValue(0);
+
+      await platformAdminService.getSummary();
+
+      expect(Rabbit.count).toHaveBeenCalledWith(
+        expect.objectContaining({ tenantScope: 'all' })
+      );
+      expect(Photo.sum).toHaveBeenCalledWith(
+        'size_bytes',
+        expect.objectContaining({ tenantScope: 'all' })
+      );
+      expect(Rabbit.sum).toHaveBeenCalledWith(
+        'photo_size_bytes',
+        expect.objectContaining({ tenantScope: 'all' })
+      );
+    });
+
+    it('не включает мягко удалённые фермы в выборку для подсчёта категорий', async () => {
+      Farm.findAll.mockResolvedValue([]);
+      Rabbit.count.mockResolvedValue(0);
+
+      await platformAdminService.getSummary();
+
+      expect(Farm.findAll).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { deleted_at: null } })
+      );
     });
   });
 });

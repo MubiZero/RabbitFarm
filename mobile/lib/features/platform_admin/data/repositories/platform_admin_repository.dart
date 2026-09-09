@@ -24,6 +24,17 @@ class PlatformAdminRepository {
 
   PlatformAdminRepository(this._apiClient);
 
+  /// Сводка платформы целиком (см. docs/plans/PLATFORM-ADMIN.md, этап 5) —
+  /// фермы по категориям, регистрации, поголовье, место в MinIO.
+  Future<PlatformSummary> getSummary() async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.platformSummary);
+      return PlatformSummary.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   /// Все тарифы, включая выключенные: админ должен видеть и их, чтобы
   /// включить обратно.
   Future<List<Plan>> getPlans() async {
