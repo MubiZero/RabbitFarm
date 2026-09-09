@@ -71,6 +71,11 @@ curl http://localhost:4567/api/v1
 
 ### 1. Register
 
+Registration doesn't take a `role` — there's nothing to choose yet. It
+always creates a brand-new farm and makes the new user its `owner`; anyone
+who joins later comes in by invitation with whatever role the owner assigns
+(see [README.md#accounts](../README.md#accounts)).
+
 ```bash
 curl -X POST http://localhost:4567/api/v1/auth/register \
   -H "Content-Type: application/json" \
@@ -78,8 +83,7 @@ curl -X POST http://localhost:4567/api/v1/auth/register \
     "email": "test@example.com",
     "password": "password123",
     "full_name": "Test User",
-    "phone": "+79991234567",
-    "role": "worker"
+    "phone": "+79991234567"
   }'
 ```
 
@@ -92,7 +96,7 @@ curl -X POST http://localhost:4567/api/v1/auth/register \
       "id": 4,
       "email": "test@example.com",
       "full_name": "Test User",
-      "role": "worker",
+      "role": "owner",
       ...
     },
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -534,7 +538,9 @@ npm run migrate
 ### "File upload error"
 - Check file size (max 5MB)
 - Check file type (only images)
-- Ensure uploads directory exists
+- Files go straight to MinIO now, not the API container's disk (`multer`
+  uses `memoryStorage`) — if uploads fail, check that MinIO is up and
+  reachable from `api`, not a local directory
 
 ---
 

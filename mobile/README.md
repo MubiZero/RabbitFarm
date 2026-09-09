@@ -1,16 +1,13 @@
-# mobile
+# RabbitFarm — mobile client
 
-A new Flutter project.
+Flutter client for the RabbitFarm rabbit-farm management service. One
+codebase for Android, iOS and web.
 
-## Getting Started
+This isn't a starting-point template — see the repo root instead:
 
-This project is a starting point for a Flutter application.
+- [../README.md](../README.md) — quick start, running the client, project layout
+- [../docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) — Flutter app architecture, state management, navigation
+- [../docs/MOBILE.md](../docs/MOBILE.md) — building and signing for phones, CI
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If you're looking for general Flutter docs instead of anything specific to
+this project: [docs.flutter.dev](https://docs.flutter.dev/).

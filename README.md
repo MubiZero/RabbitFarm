@@ -26,6 +26,8 @@ stack.
 | Journal | Feeding, treatments, vaccinations, closed tasks and free-form notes in one timeline |
 | Staff | Invite by code, assign roles, hand the whole farm to someone else |
 | Notifications | Push (Android): daily digest of overdue vaccinations/tasks/feed stock, instant push on task assignment and new notes |
+| Billing | Plans with rabbit/staff limits, paid subscriptions via Эсхата Мерчант, renewal reminders, read-only lockout on non-payment |
+| Platform admin | A separate, flag-gated view across every farm on the install — plans, usage, suspend/read-only, one-off limit grants, broadcast announcements, read-only impersonation for support, an audit log, and a service-wide summary. See [Accounts](#accounts) and [docs/plans/PLATFORM-ADMIN.md](docs/plans/PLATFORM-ADMIN.md) |
 
 One installation is multi-tenant: it can host many independent farms, each
 fully isolated from the others at the database level (every farm-owned table
@@ -39,8 +41,9 @@ existing farm only by invitation — see [Accounts](#accounts).
 **Backend** — Node 20, Express, Sequelize, MySQL 8, JWT auth, Joi validation,
 Swagger reference, Jest.
 
-**Client** — Flutter 3.41, Riverpod, go_router, freezed + json_serializable,
-Dio. One codebase for Android, iOS and web.
+**Client** — Flutter 3.47, Riverpod, go_router, freezed + json_serializable,
+Dio. One codebase for Android, iOS and web — the web build doubles as the
+platform admin's desktop view, no separate app.
 
 **Runtime** — Docker Compose: `db`, `minio` (S3-compatible file storage),
 `api`, and `web` (nginx serving the Flutter web build).
@@ -50,11 +53,11 @@ Dio. One codebase for Android, iOS and web.
 You need Docker and Docker Compose. For client work you also need the Flutter
 SDK — **exactly the version CI uses** (`FLUTTER_VERSION` in
 [.github/workflows/mobile-release.yml](.github/workflows/mobile-release.yml),
-`3.41.6` at the time of writing). A newer stable Flutter ships a newer `analyzer`
-than this project's pinned `freezed`/`build_runner` support, and code
-generation fails outright (`Missing implementation of visitDotShorthand...`).
-If you installed Flutter via git, check out that exact tag:
-`git -C <flutter-dir> checkout 3.41.6 && flutter --version`.
+`3.47.0` at the time of writing, required by the pinned `freezed`/
+`build_runner`: anything older ships a Dart SDK below the `>=3.13.0` they
+need, and `flutter pub get` refuses outright). If you installed Flutter via
+git, check out that exact tag:
+`git -C <flutter-dir> checkout 3.47.0 && flutter --version`.
 
 ```bash
 git clone https://github.com/MubiZero/RabbitFarm.git
@@ -146,6 +149,12 @@ talks to people, and a forgotten password is reset by the owner rather than
 by email. Codes and temporary passwords are shown once — only their hashes
 are stored.
 
+`is_platform_admin` is a separate flag, unrelated to farm roles and set by
+hand in the database — it opens a "Платформа" section covering every farm on
+the install, not just the admin's own. See
+[docs/plans/PLATFORM-ADMIN.md](docs/plans/PLATFORM-ADMIN.md) for what it can
+do.
+
 ## Deployment
 
 [docs/DEPLOY.md](docs/DEPLOY.md) covers deploying the whole stack to a server
@@ -166,7 +175,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 1156 tests
+npm test                 # 1539 tests, 7 fail unless MinIO is reachable from the host (see docs/HANDOFF.md)
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change
@@ -180,7 +189,7 @@ Client:
 ```bash
 cd mobile
 flutter analyze
-flutter test             # 207 tests
+flutter test             # 326 tests
 dart run build_runner build --delete-conflicting-outputs   # after model changes
 ```
 
@@ -195,9 +204,13 @@ Building the app for phones — signing, CI, App Store — is in
 The running API serves an interactive reference at `/api-docs`.
 [docs/API_TESTING.md](docs/API_TESTING.md) has ready-made curl requests.
 
-Everything except `/auth/register`, `/auth/login`, `/auth/refresh` and
-`/health` requires `Authorization: Bearer <access token>`. Errors come back in
-one shape:
+Everything requires `Authorization: Bearer <access token>` except `/health`,
+the `/auth` endpoints you by definition don't have one for yet (`register`,
+`login`, `refresh`, `logout`, `accept-invitation`, `forgot-password`,
+`reset-password`), the bank's `/payments/webhook`, and `/files/*` (object
+keys are unguessable timestamp+random names, not enumerable — the same
+protection static file serving would have had). Errors come back in one
+shape:
 
 ```json
 {
