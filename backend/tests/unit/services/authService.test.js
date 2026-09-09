@@ -50,7 +50,28 @@ describe('AuthService', () => {
       expect(result).toHaveProperty('access_token');
       expect(result).toHaveProperty('refresh_token');
       expect(result).toHaveProperty('user');
-      expect(User.findOne).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
+      expect(User.findOne).toHaveBeenCalledWith(expect.objectContaining({
+        where: { email: 'test@example.com' }
+      }));
+    });
+
+    // Клиент должен узнать про read_only/suspended сразу при входе, а не по
+    // отказу первой же попытки что-то записать (см. `middleware/auth.js`).
+    it('запрашивает статус фермы вместе с пользователем', async () => {
+      const mockUser = createMockUser({
+        password_hash: validPasswordHash,
+        farm: { id: 1, status: 'read_only' }
+      });
+      mockUser.update = jest.fn().mockResolvedValue(true);
+      User.findOne.mockResolvedValue(mockUser);
+      RefreshToken.create.mockResolvedValue({});
+
+      const result = await authService.login('test@example.com', 'password123');
+
+      expect(User.findOne).toHaveBeenCalledWith(expect.objectContaining({
+        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+      }));
+      expect(result.user.farm).toEqual({ id: 1, status: 'read_only' });
     });
 
     it('должен бросать INVALID_CREDENTIALS если пользователь не найден', async () => {
@@ -142,6 +163,28 @@ describe('AuthService', () => {
       expect(mockTransaction.commit).toHaveBeenCalled();
     });
 
+    // Свежая ферма создаётся без `include` (см. `login`/`getProfile`), поэтому
+    // статус проставляется в ответ руками — сразу после регистрации он
+    // всегда `active`.
+    it('отдаёт статус свежей фермы в ответе, хотя она создана без include', async () => {
+      const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+      User.sequelize.transaction.mockResolvedValue(mockTransaction);
+      User.findOne.mockResolvedValue(null);
+
+      const farm = { id: 80, status: 'active', update: jest.fn().mockResolvedValue(true) };
+      Farm.create.mockResolvedValue(farm);
+      User.create.mockResolvedValue(createMockUser({ id: 45, farm_id: 80 }));
+      RefreshToken.create.mockResolvedValue({});
+
+      const result = await authService.register({
+        email: 'fourth@example.com',
+        password: 'password123',
+        full_name: 'Четвёртый Фермер'
+      });
+
+      expect(result.user.farm).toEqual({ id: 80, status: 'active' });
+    });
+
     it('назначает новой ферме тариф по умолчанию, если он заведён', async () => {
       const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
       User.sequelize.transaction.mockResolvedValue(mockTransaction);
@@ -206,7 +249,8 @@ describe('AuthService', () => {
       const user = await authService.getProfile(1);
       expect(user).toEqual(mockUser);
       expect(User.findByPk).toHaveBeenCalledWith(1, expect.objectContaining({
-        attributes: expect.objectContaining({ exclude: ['password_hash'] })
+        attributes: expect.objectContaining({ exclude: ['password_hash'] }),
+        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
       }));
     });
 

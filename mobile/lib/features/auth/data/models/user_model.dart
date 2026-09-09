@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/models/farm_ref.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -22,6 +23,10 @@ abstract class UserModel with _$UserModel {
     @JsonKey(name: 'last_login_at') @NullableDateTimeConverter() DateTime? lastLoginAt,
     @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() required DateTime updatedAt,
+    // Статус доступа хозяйства (см. `FarmStatusBanner`) — сервер отдаёт его
+    // вместе с профилем начиная с 4.2. У платформенного админа вне фермы
+    // может не быть вовсе.
+    FarmRef? farm,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

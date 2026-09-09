@@ -20,6 +20,9 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   ),
   createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
   updatedAt: const DateTimeConverter().fromJson(json['updated_at'] as Object),
+  farm: json['farm'] == null
+      ? null
+      : FarmRef.fromJson(json['farm'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -37,4 +40,5 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       ),
       'created_at': const DateTimeConverter().toJson(instance.createdAt),
       'updated_at': const DateTimeConverter().toJson(instance.updatedAt),
+      'farm': instance.farm,
     };

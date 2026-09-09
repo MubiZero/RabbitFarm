@@ -1594,6 +1594,10 @@
   "impersonationExit": "Выйти",
   "impersonationExpired": "Сеанс просмотра истёк — вы снова в своём аккаунте",
 
+  "farmStatusBannerReadOnly": "Доступ только для чтения — продлите тариф, чтобы снова вносить записи",
+  "farmStatusBannerSuspended": "Доступ закрыт — обратитесь в поддержку",
+  "farmStatusBannerAction": "Тариф",
+
   "platformFarmExport": "Экспортировать данные",
   "platformFarmExportHint": "Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».",
   "platformFarmExportGeneratedAt": "Снимок собран {date}",

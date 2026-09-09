@@ -2276,9 +2276,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту';
 
   @override
-  String get subscriptionCreateFailed => 'Не удалось создать заказ на оплату';
-
-  @override
   String get joinTitle => 'Присоединиться к ферме';
 
   @override
@@ -3905,6 +3902,17 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get impersonationExpired =>
       'Сеанс просмотра истёк — вы снова в своём аккаунте';
+
+  @override
+  String get farmStatusBannerReadOnly =>
+      'Доступ только для чтения — продлите тариф, чтобы снова вносить записи';
+
+  @override
+  String get farmStatusBannerSuspended =>
+      'Доступ закрыт — обратитесь в поддержку';
+
+  @override
+  String get farmStatusBannerAction => 'Тариф';
 
   @override
   String get platformFarmExport => 'Экспортировать данные';

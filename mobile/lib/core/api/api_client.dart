@@ -8,6 +8,7 @@ import 'api_interceptors.dart';
 class ApiClient {
   late final Dio _dio;
   late final AuthInterceptor _authInterceptor;
+  late final ErrorInterceptor _errorInterceptor;
   final FlutterSecureStorage _storage;
 
   ApiClient({
@@ -33,7 +34,8 @@ class ApiClient {
     _authInterceptor.client = _dio;
     _dio.interceptors.add(_authInterceptor);
     if (kDebugMode) _dio.interceptors.add(LoggingInterceptor());
-    _dio.interceptors.add(ErrorInterceptor());
+    _errorInterceptor = ErrorInterceptor();
+    _dio.interceptors.add(_errorInterceptor);
   }
 
   Dio get dio => _dio;
@@ -41,6 +43,13 @@ class ApiClient {
   /// Сессия окончательно потеряна: обновить токен не удалось.
   set onSessionExpired(void Function()? callback) {
     _authInterceptor.onSessionExpired = callback;
+  }
+
+  /// Доступ хозяйства изменился (`read_only`/`suspended`) — увидели по ответу
+  /// на любой запрос, а не только по обновлению профиля (см.
+  /// `FarmStatusBanner`).
+  set onFarmAccessChanged(void Function(String status)? callback) {
+    _errorInterceptor.onFarmAccessChanged = callback;
   }
 
   // Generic HTTP methods

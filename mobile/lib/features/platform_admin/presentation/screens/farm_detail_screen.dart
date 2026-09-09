@@ -16,7 +16,7 @@ import '../providers/platform_admin_provider.dart';
 import '../widgets/farm_delete_dialog.dart';
 import '../widgets/farm_extras_dialog.dart';
 import '../widgets/farm_impersonate_dialog.dart';
-import '../widgets/farm_status_labels.dart';
+import '../../../../core/utils/farm_status_labels.dart';
 import '../widgets/farm_status_sheet.dart';
 import '../widgets/farm_usage_row.dart';
 import '../widgets/plan_summary.dart';

@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
+import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
 import 'l10n/generated/app_localizations.dart';
 
@@ -82,11 +83,14 @@ class MyApp extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: themeState.mode,
       routerConfig: router,
-      // Плашка входа под клиентом должна быть видна на любом экране, а не
-      // только на том, с которого начался просмотр — поэтому оборачивает
-      // весь роутер, а не один маршрут.
-      builder: (context, child) =>
-          ImpersonationBanner(child: child ?? const SizedBox.shrink()),
+      // Обе плашки должны быть видны на любом экране, а не только там, где
+      // начался просмотр или выяснилось состояние доступа — поэтому
+      // оборачивают весь роутер, а не один маршрут. Вход под клиентом
+      // снаружи: это режим сеанса целиком, а состояние конкретной фермы —
+      // вложенный факт внутри него.
+      builder: (context, child) => ImpersonationBanner(
+        child: FarmStatusBanner(child: child ?? const SizedBox.shrink()),
+      ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

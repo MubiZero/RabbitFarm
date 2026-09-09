@@ -118,6 +118,10 @@ class AuthService {
 
       // Remove password hash from response
       const userResponse = user.toJSON();
+      // Свежая ферма создаётся без `include`, поэтому статус (см. `login`/
+      // `getProfile`, откуда мобильный клиент узнаёт про read_only/suspended)
+      // приходится проставить руками — здесь он всегда `active`.
+      userResponse.farm = { id: farm.id, status: farm.status };
 
       return {
         user: userResponse,
@@ -139,7 +143,13 @@ class AuthService {
    */
   async login(email, password) {
     try {
-      const user = await User.findOne({ where: { email } });
+      // `farm` — чтобы мобильный клиент сразу знал про read_only/suspended
+      // (см. `middleware/auth.js`), а не узнавал об этом только по отказу
+      // первой же попытки что-то записать.
+      const user = await User.findOne({
+        where: { email },
+        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+      });
 
       // Порядок проверок важен. Раньше отключённый аккаунт отвечал отдельным
       // 403 ещё до сверки пароля, то есть любой желающий мог узнать, какие
@@ -300,8 +310,12 @@ class AuthService {
    */
   async getProfile(userId) {
     try {
+      // `farm` — та же причина, что и в `login`: клиент должен узнать про
+      // read_only/suspended сразу при обновлении профиля (в частности, при
+      // каждом холодном старте), а не по отказу очередной записи.
       const user = await User.findByPk(userId, {
-        attributes: { exclude: ['password_hash'] }
+        attributes: { exclude: ['password_hash'] },
+        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
       });
 
       if (!user) {

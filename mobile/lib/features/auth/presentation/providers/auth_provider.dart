@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/models/farm_ref.dart';
 import '../../../../core/notifications/fcm_service.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
@@ -84,7 +85,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // все экраны писали «не авторизован», и выйти можно было только
     // перезапуском.
     _ref.read(apiClientProvider).onSessionExpired = _handleSessionExpired;
+    // Ферму могли приостановить или её тариф истёк, пока сеанс уже был
+    // открыт — узнаём об этом по ответу на первый же неудавшийся запрос, не
+    // дожидаясь следующего обновления профиля (см. `FarmStatusBanner`).
+    _ref.read(apiClientProvider).onFarmAccessChanged = _handleFarmAccessChanged;
     _checkAuthStatus();
+  }
+
+  void _handleFarmAccessChanged(String status) {
+    if (!mounted) return;
+    final user = state.user;
+    if (user == null) return;
+
+    state = state.copyWith(
+      user: user.copyWith(
+        farm: (user.farm ?? FarmRef(id: user.id, status: status))
+            .copyWith(status: status),
+      ),
+    );
   }
 
   void _handleSessionExpired() {

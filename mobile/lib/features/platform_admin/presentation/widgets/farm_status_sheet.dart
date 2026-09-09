@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import 'farm_status_labels.dart';
+import '../../../../core/utils/farm_status_labels.dart';
 
 /// Выбор уровня доступа фермы.
 ///

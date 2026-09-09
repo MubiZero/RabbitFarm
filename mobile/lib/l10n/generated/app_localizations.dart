@@ -4138,12 +4138,6 @@ abstract class AppLocalizations {
   /// **'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'**
   String get subscriptionPaymentPending;
 
-  /// No description provided for @subscriptionCreateFailed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не удалось создать заказ на оплату'**
-  String get subscriptionCreateFailed;
-
   /// No description provided for @joinTitle.
   ///
   /// In ru, this message translates to:
@@ -6957,6 +6951,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сеанс просмотра истёк — вы снова в своём аккаунте'**
   String get impersonationExpired;
+
+  /// No description provided for @farmStatusBannerReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ только для чтения — продлите тариф, чтобы снова вносить записи'**
+  String get farmStatusBannerReadOnly;
+
+  /// No description provided for @farmStatusBannerSuspended.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закрыт — обратитесь в поддержку'**
+  String get farmStatusBannerSuspended;
+
+  /// No description provided for @farmStatusBannerAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get farmStatusBannerAction;
 
   /// No description provided for @platformFarmExport.
   ///

@@ -179,6 +179,14 @@ class LoggingInterceptor extends Interceptor {
 
 // Error interceptor - handles common errors
 class ErrorInterceptor extends Interceptor {
+  /// Код ошибки говорит, что состояние доступа хозяйства изменилось с
+  /// прошлого раза, когда клиент об этом знал (см. `FarmStatusBanner`) —
+  /// админ мог приостановить ферму, или истёк тариф, пока сеанс уже был
+  /// открыт. Разбирается здесь, а не в каждом экране: это тот же глобальный
+  /// признак, что и обновление токена в `AuthInterceptor`, только про доступ
+  /// фермы, а не пользователя.
+  void Function(String status)? onFarmAccessChanged;
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     String errorMessage = '';
@@ -199,7 +207,16 @@ class ErrorInterceptor extends Interceptor {
           if (data['error'] is Map) {
             final errorObj = data['error'];
             errorMessage = errorObj['message'] ?? 'Произошла ошибка';
-            
+
+            switch (errorObj['code']) {
+              case 'FARM_READ_ONLY':
+                onFarmAccessChanged?.call('read_only');
+                break;
+              case 'FARM_SUSPENDED':
+                onFarmAccessChanged?.call('suspended');
+                break;
+            }
+
             // Handle validation details
             if (errorObj['details'] is List) {
               final details = errorObj['details'] as List;
