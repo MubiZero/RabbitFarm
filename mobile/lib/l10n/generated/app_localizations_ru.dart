@@ -2224,6 +2224,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAccent => 'Цвет акцента';
 
   @override
+  String get settingsNotifications => 'Уведомления';
+
+  @override
+  String get settingsDigestToggle => 'Дайджест по хозяйству';
+
+  @override
   String get settingsAbout => 'О приложении';
 
   @override

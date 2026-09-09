@@ -4048,6 +4048,18 @@ abstract class AppLocalizations {
   /// **'Цвет акцента'**
   String get settingsAccent;
 
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsDigestToggle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дайджест по хозяйству'**
+  String get settingsDigestToggle;
+
   /// No description provided for @settingsAbout.
   ///
   /// In ru, this message translates to:

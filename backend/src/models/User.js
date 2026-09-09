@@ -81,6 +81,14 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    // Единственная настройка уведомлений на сейчас: получать ли ежедневный
+    // дайджест (см. `jobs/notificationDigestJob.js`). По умолчанию включён —
+    // молчание не должно быть дефолтом там, где раньше выбора не было вовсе.
+    digest_enabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
     }
   }, {
     tableName: 'users',

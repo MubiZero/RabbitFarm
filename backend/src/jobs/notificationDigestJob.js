@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { Op, col } = require('sequelize');
-const { Farm, Vaccination, Task, Feed } = require('../models');
+const { Farm, User, Vaccination, Task, Feed } = require('../models');
 const notificationService = require('../services/notificationService');
 const logger = require('../utils/logger');
 
@@ -11,6 +11,20 @@ const logger = require('../utils/logger');
 const CRON_SCHEDULE = '0 8 * * *';
 
 /**
+ * Кому в этой ферме уходит дайджест: владельцы и менеджеры, кто его не
+ * выключил (`digest_enabled`, см. Настройки на клиенте). Персональный пуш по
+ * своей задаче (ниже) этим списком не ограничен — это не дайджест, а прямое
+ * назначение, и своя настройка выключения ему не нужна.
+ */
+async function _digestRecipients(farmId) {
+  const members = await User.findAll({
+    where: { farm_id: farmId, role: { [Op.in]: ['owner', 'manager'] }, is_active: true, digest_enabled: true },
+    attributes: ['id']
+  });
+  return members.map(m => m.id);
+}
+
+/**
  * Дайджест по одной ферме.
  *
  * Раз в сутки, а не по одному пушу на каждый простроченный пункт — иначе на
@@ -19,13 +33,14 @@ const CRON_SCHEDULE = '0 8 * * *';
  */
 async function runDigestForFarm(farmId) {
   const now = new Date();
+  const recipients = await _digestRecipients(farmId);
 
   // То же условие, что и в vaccinationController.getStatistics (overdue).
   const overdueVaccinations = await Vaccination.count({
     where: { farm_id: farmId, next_vaccination_date: { [Op.lt]: now, [Op.not]: null } }
   });
-  if (overdueVaccinations > 0) {
-    await notificationService.sendToRoles(farmId, ['owner', 'manager'], {
+  if (overdueVaccinations > 0 && recipients.length > 0) {
+    await notificationService.sendToUsers(farmId, recipients, {
       title: 'Просроченные вакцинации',
       body: `Просрочено: ${overdueVaccinations}`,
       data: { type: 'vaccination_digest', route: '/vaccinations' }
@@ -36,8 +51,8 @@ async function runDigestForFarm(farmId) {
   const lowStockFeeds = await Feed.count({
     where: { farm_id: farmId, [Op.and]: [{ current_stock: { [Op.lte]: col('min_stock') } }] }
   });
-  if (lowStockFeeds > 0) {
-    await notificationService.sendToRoles(farmId, ['owner', 'manager'], {
+  if (lowStockFeeds > 0 && recipients.length > 0) {
+    await notificationService.sendToUsers(farmId, recipients, {
       title: 'Низкий остаток корма',
       body: `Кормов ниже минимума: ${lowStockFeeds}`,
       data: { type: 'feed_digest', route: '/feeds' }
@@ -61,8 +76,8 @@ async function runDigestForFarm(farmId) {
     });
   }
 
-  if (withoutAssignee > 0) {
-    await notificationService.sendToRoles(farmId, ['owner', 'manager'], {
+  if (withoutAssignee > 0 && recipients.length > 0) {
+    await notificationService.sendToUsers(farmId, recipients, {
       title: 'Просроченные задачи без исполнителя',
       body: `Просрочено: ${withoutAssignee}`,
       data: { type: 'task_digest', route: '/tasks' }

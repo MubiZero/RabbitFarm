@@ -390,6 +390,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Включить/выключить ежедневный дайджест (см. Настройки). Возвращает
+  /// причину неудачи или `null` — как и остальные действия из форм, чтобы
+  /// экран сам решил, что показать, вместо разбора состояния провайдера.
+  ///
+  /// Переключатель обновляется сразу, не дожидаясь ответа сервера: это
+  /// обратимая настройка без побочных эффектов для остальной фермы — ждать
+  /// здесь ответа сервера ради сотни миллисекунд не за чем. При отказе
+  /// значение возвращается назад.
+  Future<Object?> setDigestEnabled(bool enabled) async {
+    final user = state.user;
+    if (user == null) return null;
+
+    final previous = user.digestEnabled;
+    state = state.copyWith(user: user.copyWith(digestEnabled: enabled));
+
+    try {
+      final updated =
+          await _authRepository.updateProfile({'digest_enabled': enabled});
+      if (!mounted) return null;
+      state = state.copyWith(user: updated);
+      return null;
+    } catch (e) {
+      if (!mounted) return null;
+      state = state.copyWith(user: user.copyWith(digestEnabled: previous));
+      return e;
+    }
+  }
+
   // Clear error
   void clearError() {
     state = state.copyWith(error: null);

@@ -112,7 +112,13 @@ const updateProfileSchema = Joi.object({
     .allow(null, '')
     .messages({
       'string.uri': 'Неверный формат URL'
-    })
+    }),
+
+  // Единственная настройка уведомлений на сейчас (см.
+  // notificationDigestJob.js) — включён/выключен ежедневный дайджест
+  // (просроченные вакцинации, низкий остаток корма, задачи без исполнителя).
+  // Персональный пуш по своей же задаче этим не выключается.
+  digest_enabled: Joi.boolean().optional()
 });
 
 // Change password validation

@@ -895,6 +895,8 @@
   "settingsAppearance": "Внешний вид",
   "settingsTheme": "Тема",
   "settingsAccent": "Цвет акцента",
+  "settingsNotifications": "Уведомления",
+  "settingsDigestToggle": "Дайджест по хозяйству",
   "settingsAbout": "О приложении",
   "settingsVersion": "Версия",
   "settingsSupport": "Написать в поддержку",

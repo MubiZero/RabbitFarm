@@ -21,6 +21,11 @@ abstract class UserModel with _$UserModel {
     // не быть вовсе — отсюда значение по умолчанию.
     @JsonKey(name: 'is_platform_admin') @Default(false) bool isPlatformAdmin,
     @JsonKey(name: 'last_login_at') @NullableDateTimeConverter() DateTime? lastLoginAt,
+    // Единственная настройка уведомлений на сейчас — получать ли ежедневный
+    // дайджест (см. Настройки, `notificationDigestJob.js`). По умолчанию
+    // включён: молчание не должно стать дефолтом там, где выбора раньше не
+    // было вовсе.
+    @JsonKey(name: 'digest_enabled') @Default(true) bool digestEnabled,
     @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
     @JsonKey(name: 'updated_at') @DateTimeConverter() required DateTime updatedAt,
     // Статус доступа хозяйства (см. `FarmStatusBanner`) — сервер отдаёт его

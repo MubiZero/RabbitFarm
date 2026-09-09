@@ -18,6 +18,7 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   lastLoginAt: const NullableDateTimeConverter().fromJson(
     json['last_login_at'],
   ),
+  digestEnabled: json['digest_enabled'] as bool? ?? true,
   createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
   updatedAt: const DateTimeConverter().fromJson(json['updated_at'] as Object),
   farm: json['farm'] == null
@@ -38,6 +39,7 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'last_login_at': const NullableDateTimeConverter().toJson(
         instance.lastLoginAt,
       ),
+      'digest_enabled': instance.digestEnabled,
       'created_at': const DateTimeConverter().toJson(instance.createdAt),
       'updated_at': const DateTimeConverter().toJson(instance.updatedAt),
       'farm': instance.farm,

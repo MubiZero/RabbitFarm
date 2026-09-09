@@ -188,6 +188,26 @@ class AuthRepository {
     return user;
   }
 
+  /// Обновить профиль — сейчас только настройка дайджеста (см. Настройки).
+  /// `PUT`, а не `PATCH`: так уже был заведён маршрут на сервере
+  /// (`PUT /auth/profile`), менять его контракт ради одного поля незачем.
+  Future<UserModel> updateProfile(Map<String, dynamic> data) async {
+    final response = await _apiClient.updateProfile(data);
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data,
+      (json) => json as Map<String, dynamic>,
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+    }
+
+    final user = UserModel.fromJson(apiResponse.data!);
+    await _cacheProfile(apiResponse.data!);
+    return user;
+  }
+
   /// Профиль хранится рядом с токенами, чтобы приложение знало роль человека
   /// и без сети.
   ///

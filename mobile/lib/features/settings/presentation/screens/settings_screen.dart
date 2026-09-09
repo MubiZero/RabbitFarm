@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
+import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -54,6 +55,38 @@ class SettingsScreen extends ConsumerWidget {
                   selectedIndex: themeState.accentIndex,
                   onChanged: (i) =>
                       ref.read(themeProvider.notifier).setAccent(i),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Уведомления. Один переключатель, без канала и категории —
+          // остальное по факту жалоб, когда появятся (см.
+          // docs/plans/BEST-PRACTICES-BACKLOG.md, «Уведомления»).
+          _SectionLabel(context.l10n.settingsNotifications),
+          _GroupCard(
+            context: context,
+            children: [
+              _SettingsTile(
+                icon: Icons.notifications_outlined,
+                label: context.l10n.settingsDigestToggle,
+                trailing: Switch(
+                  value: user?.digestEnabled ?? true,
+                  onChanged: (value) async {
+                    final l10n = context.l10n;
+                    final messenger = ScaffoldMessenger.of(context);
+                    final error =
+                        await ref.read(authProvider.notifier).setDigestEnabled(value);
+                    if (error != null) {
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(errorText(l10n, error)),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
             ],
