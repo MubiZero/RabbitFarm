@@ -736,6 +736,22 @@ describe('PlatformAdminService', () => {
       );
     });
 
+    it('считает тариф бесплатным и когда цена ровно 0 приходит строкой из MySQL DECIMAL', async () => {
+      // Регресс на расхождение с planService: там же тариф с ценой '0.00'
+      // раньше считался платным (`!price` на непустой строке — false) —
+      // теперь оба места идут через один planService.isPlanFree().
+      Farm.findAll.mockResolvedValue([
+        { id: 1, plan: { price: '0.00' }, status: 'active', extras_until: null, toJSON: () => ({}) }
+      ]);
+      Rabbit.count.mockImplementation((opts) => Promise.resolve(opts?.group ? [] : 0));
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms).toEqual(expect.objectContaining({ free: 1, paid: 0 }));
+    });
+
     it('считает просроченные и приостановленные фермы через planService.isExpired и farm.status', async () => {
       Farm.findAll.mockResolvedValue([
         {

@@ -411,7 +411,7 @@ class PlatformAdminService {
     for (const farm of farms) {
       if (!farm.plan) {
         summary.no_plan += 1;
-      } else if (Number(farm.plan.price) === 0) {
+      } else if (planService.isPlanFree(farm.plan)) {
         summary.free += 1;
       } else {
         summary.paid += 1;

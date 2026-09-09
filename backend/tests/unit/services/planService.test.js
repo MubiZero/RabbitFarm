@@ -355,6 +355,24 @@ describe('PlanService', () => {
     });
   });
 
+  describe('isPlanFree', () => {
+    it('тариф без цены (null) — бесплатный', () => {
+      expect(planService.isPlanFree({ price: null })).toBe(true);
+    });
+
+    it('тариф с ценой ровно 0 — бесплатный, даже если price пришёл строкой из MySQL DECIMAL', () => {
+      // mysql2 без decimalNumbers: true (см. src/config/database.js) отдаёт
+      // DECIMAL строкой — наивное `!price` ошиблось бы здесь: "0.00" truthy.
+      expect(planService.isPlanFree({ price: '0.00' })).toBe(true);
+      expect(planService.isPlanFree({ price: 0 })).toBe(true);
+    });
+
+    it('тариф с ненулевой ценой — не бесплатный, строка или число одинаково', () => {
+      expect(planService.isPlanFree({ price: '50.00' })).toBe(false);
+      expect(planService.isPlanFree({ price: 50 })).toBe(false);
+    });
+  });
+
   describe('getRenewalQuote', () => {
     it('бросает NO_PLAN, если ферме не назначен тариф', async () => {
       Farm.findByPk.mockResolvedValue({ id: 1, plan: null });
@@ -364,6 +382,12 @@ describe('PlanService', () => {
 
     it('бросает PLAN_FREE, если у тарифа нет цены', async () => {
       Farm.findByPk.mockResolvedValue({ id: 1, plan: { name: 'Бесплатный', price: null } });
+
+      await expect(planService.getRenewalQuote(1)).rejects.toThrow('PLAN_FREE');
+    });
+
+    it('бросает PLAN_FREE и для тарифа с ценой ровно 0, пришедшей строкой из MySQL', async () => {
+      Farm.findByPk.mockResolvedValue({ id: 1, plan: { name: 'Бесплатный', price: '0.00' } });
 
       await expect(planService.getRenewalQuote(1)).rejects.toThrow('PLAN_FREE');
     });
@@ -380,6 +404,16 @@ describe('PlanService', () => {
   describe('extendPlanExpiry', () => {
     it('ничего не делает, если у фермы уже нет платного тарифа', async () => {
       const farm = { id: 1, plan: null, update: jest.fn() };
+      Farm.findByPk.mockResolvedValue(farm);
+
+      const result = await planService.extendPlanExpiry(1);
+
+      expect(result).toBeNull();
+      expect(farm.update).not.toHaveBeenCalled();
+    });
+
+    it('ничего не делает и для тарифа с ценой ровно 0, пришедшей строкой из MySQL', async () => {
+      const farm = { id: 1, plan: { price: '0.00' }, update: jest.fn() };
       Farm.findByPk.mockResolvedValue(farm);
 
       const result = await planService.extendPlanExpiry(1);

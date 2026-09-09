@@ -100,6 +100,22 @@ class PlanService {
     return new Date(farm.plan_expires_at) < new Date();
   }
 
+  /**
+   * `true`, если у тарифа нет цены — то есть он бесплатный.
+   *
+   * `price` — MySQL DECIMAL, mysql2 без `decimalNumbers: true` (см.
+   * src/config/database.js) отдаёт его строкой ("0.00"), а не числом.
+   * Наивное `!plan.price` ошибается ровно на явном нуле: непустая строка
+   * truthy, и «бесплатный» тариф с ценой, вписанной буквально как 0 (а не
+   * оставленной пустой), читался бы как платный. Единая точка для всех
+   * мест, которым нужно решить «платить за это или нет» — расхождение
+   * между ними уже однажды приводило к тому, что одна и та же ферма
+   * считалась то бесплатной, то платной в зависимости от того, кто спрашивал.
+   */
+  isPlanFree(plan) {
+    return plan.price == null || Number(plan.price) === 0;
+  }
+
   /** Ферма вместе с её текущим планом — единая точка для проверок лимита. */
   async _getFarmWithPlan(farmId) {
     return Farm.findByPk(farmId, { include: [{ model: Plan, as: 'plan' }] });
@@ -199,7 +215,7 @@ class PlanService {
     if (!farm?.plan) {
       throw new Error('NO_PLAN');
     }
-    if (!farm.plan.price) {
+    if (this.isPlanFree(farm.plan)) {
       throw new Error('PLAN_FREE');
     }
 
@@ -221,7 +237,7 @@ class PlanService {
    */
   async extendPlanExpiry(farmId) {
     const farm = await this._getFarmWithPlan(farmId);
-    if (!farm?.plan?.price) {
+    if (!farm?.plan || this.isPlanFree(farm.plan)) {
       logger.warn('Payment completed but farm has no billable plan to extend', { farmId });
       return null;
     }
