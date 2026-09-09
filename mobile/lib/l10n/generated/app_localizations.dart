@@ -4024,6 +4024,12 @@ abstract class AppLocalizations {
   /// **'Версия'**
   String get settingsVersion;
 
+  /// No description provided for @settingsPrivacyPolicy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Политика конфиденциальности'**
+  String get settingsPrivacyPolicy;
+
   /// No description provided for @settingsLogout.
   ///
   /// In ru, this message translates to:

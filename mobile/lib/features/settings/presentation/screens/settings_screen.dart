@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -90,6 +91,18 @@ class SettingsScreen extends ConsumerWidget {
                   style: AppTypography.bodyMd.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+                ),
+              ),
+              _SettingsTile(
+                icon: Icons.privacy_tip_outlined,
+                label: context.l10n.settingsPrivacyPolicy,
+                trailing: const Icon(Icons.open_in_new, size: 18),
+                // Страница живёт на домене веб-сборки (nginx отдаёт статику
+                // из mobile/web/), а не на домене API — поэтому не через
+                // ApiEndpoints.baseUrl, у него другой хост.
+                onTap: () => launchUrl(
+                  Uri.parse('https://rabbitfarm.mubi.dev/privacy.html'),
+                  mode: LaunchMode.externalApplication,
                 ),
               ),
             ],

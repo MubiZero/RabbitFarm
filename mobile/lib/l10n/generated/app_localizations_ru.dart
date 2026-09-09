@@ -2210,6 +2210,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsVersion => 'Версия';
 
   @override
+  String get settingsPrivacyPolicy => 'Политика конфиденциальности';
+
+  @override
   String get settingsLogout => 'Выйти из аккаунта';
 
   @override
