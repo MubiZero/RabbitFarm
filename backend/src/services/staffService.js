@@ -3,6 +3,8 @@ const { Op } = require('sequelize');
 const { User, Farm, Invitation, RefreshToken } = require('../models');
 const PasswordUtil = require('../utils/password');
 const planService = require('./planService');
+const farmAuditService = require('./farmAuditService');
+const payomSmsTransport = require('./notifications/payomSmsTransport');
 const logger = require('../utils/logger');
 
 const INVITE_TTL_DAYS = 7;
@@ -10,9 +12,19 @@ const INVITE_TTL_DAYS = 7;
 /**
  * Работники фермы и приглашения.
  *
- * Почты у сервиса нет, поэтому приглашение — код, который владелец передаёт
- * человеку сам. В базе лежит только хеш кода: показывается он один раз,
- * при создании. Потерянное приглашение отзывается и выписывается заново.
+ * Приглашение — код, который приглашённый вводит при вступлении. В базе
+ * лежит только хеш кода: сам код показывается один раз, при создании.
+ * Потерянное приглашение отзывается и выписывается заново.
+ *
+ * Код доходит до человека двумя путями. Если приглашение выписано на
+ * телефон — уходит SMS-кой через шлюз Payom; если на email — владелец
+ * передаёт его сам, как и раньше (рассылки приглашений по почте нет).
+ * Целевой работник фермы чаще имеет телефон, чем почтовый ящик, поэтому
+ * телефон — полноценная альтернатива адресу, а не довесок к нему.
+ *
+ * Кадровые изменения (роль, доступ, передача хозяйства) пишутся в журнал
+ * фермы (`farmAuditService`): владельцу нужен ответ на «кто и когда понизил
+ * Петра», а стдаут сервера ему недоступен.
  */
 class StaffService {
   /** Хеш кода: тот же алгоритм при создании и при активации. */
@@ -33,23 +45,38 @@ class StaffService {
   }
 
   /**
-   * Создать приглашение.
-   * @returns {Object} приглашение и код — код возвращается единственный раз
+   * Создать приглашение — на email или на телефон.
+   *
+   * Валидатор пропускает ровно одно из двух и приводит номер к виду
+   * `+992XXXXXXXXX`, который принимает шлюз (см. `utils/phone.js`).
+   *
+   * @returns {Object} приглашение, код (возвращается единственный раз) и
+   *   `smsSent` — ушла ли SMS. Код отдаётся всегда, в том числе когда SMS не
+   *   ушла: тогда владелец передаёт его сам, как при приглашении по почте.
    */
-  async createInvitation(farmId, authorId, { email, role }) {
+  async createInvitation(farmId, authorId, { email, phone, role }) {
     await planService.assertStaffLimit(farmId);
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = email ? email.trim().toLowerCase() : null;
+    const normalizedPhone = phone ? phone.trim() : null;
 
-    const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+    // Адрес уникален на всю базу — второго пользователя с ним всё равно не
+    // создать, поэтому проверка глобальная. Номер не уникален (у семьи бывает
+    // один телефон), и глобальный запрет отказывал бы приглашению без
+    // причины — смотрим только внутри фермы: звать своего же работника незачем.
+    const existingUser = normalizedEmail
+      ? await User.findOne({ where: { email: normalizedEmail } })
+      : await User.findOne({ where: { farm_id: farmId, phone: normalizedPhone } });
     if (existingUser) {
       throw new Error('USER_EXISTS');
     }
 
-    // Второе действующее приглашение на тот же адрес только путает:
+    // Второе действующее приглашение на тот же контакт только путает:
     // старое отзываем молча.
     await Invitation.destroy({
-      where: { farm_id: farmId, email: normalizedEmail, accepted_at: null }
+      where: normalizedEmail
+        ? { farm_id: farmId, email: normalizedEmail, accepted_at: null }
+        : { farm_id: farmId, phone: normalizedPhone, accepted_at: null }
     });
 
     const token = crypto.randomBytes(24).toString('base64url');
@@ -59,21 +86,60 @@ class StaffService {
     const invitation = await Invitation.create({
       farm_id: farmId,
       email: normalizedEmail,
+      phone: normalizedPhone,
       role,
       token_hash: this.hashToken(token),
       expires_at: expiresAt,
       created_by: authorId
     });
 
-    logger.info('Invitation created', { invitationId: invitation.id, farmId, role });
-    return { invitation, token };
+    logger.info('Invitation created', {
+      invitationId: invitation.id,
+      farmId,
+      role,
+      channel: normalizedPhone ? 'sms' : 'manual'
+    });
+
+    const smsSent = normalizedPhone ? await this._sendInvitationSms(invitation, token) : false;
+    return { invitation, token, smsSent };
+  }
+
+  /**
+   * Отправить код приглашения SMS-кой.
+   *
+   * Доставка best-effort, как у кода сброса пароля: не настроен шаблон или
+   * шлюз отказал — приглашение всё равно выписано, а код владелец видит в
+   * ответе и передаёт человеку сам. Поэтому же результат возвращается, а не
+   * бросается: клиенту есть что сказать («SMS отправлена» или «продиктуйте
+   * код»), вместо того чтобы гадать.
+   *
+   * Шаблон `staff.invitation` должен быть заведён в кабинете Payom и попасть
+   * в `SMS_TEMPLATE_IDS` — шлюз свободный текст не принимает. Код длиннее
+   * шестизначного, поэтому сообщение уходит двумя сегментами.
+   */
+  async _sendInvitationSms(invitation, token) {
+    try {
+      await payomSmsTransport.sendTemplateSms({
+        templateKey: 'staff.invitation',
+        telephone: invitation.phone,
+        variables: { 'text-1': 'RabbitFarm', 'code-1': token }
+      });
+      logger.info('Invitation SMS sent', { invitationId: invitation.id });
+      return true;
+    } catch (error) {
+      logger.warn('Invitation SMS dispatch failed', {
+        invitationId: invitation.id,
+        error: error.message
+      });
+      return false;
+    }
   }
 
   /** Действующие приглашения фермы. */
   async listInvitations(farmId) {
     return Invitation.findAll({
       where: { farm_id: farmId, accepted_at: null },
-      attributes: ['id', 'email', 'role', 'expires_at', 'created_at'],
+      attributes: ['id', 'email', 'phone', 'role', 'expires_at', 'created_at'],
       order: [['created_at', 'DESC']]
     });
   }
@@ -96,7 +162,7 @@ class StaffService {
    * Активировать приглашение: создаёт работника в ферме приглашающего.
    * @param {String} token - код из приглашения
    */
-  async acceptInvitation(token, { password, full_name: fullName, phone }) {
+  async acceptInvitation(token, { email, password, full_name: fullName, phone }) {
     // Приглашённый ещё ни к одной ферме не привязан — искать его можно
     // только по коду, без условия по farm_id.
     const invitation = await Invitation.findOne({
@@ -110,7 +176,16 @@ class StaffService {
       throw new Error('INVITATION_INVALID');
     }
 
-    const existingUser = await User.findOne({ where: { email: invitation.email } });
+    // Приглашение по телефону адреса не несёт, а вход в сервис пока только
+    // по email — поэтому его называет сам приглашённый. У приглашения по
+    // почте адрес уже есть, и подменить его нельзя: иначе кодом, выписанным
+    // на один адрес, заводили бы учётку на любой другой.
+    const targetEmail = invitation.email || (email ? email.trim().toLowerCase() : null);
+    if (!targetEmail) {
+      throw new Error('EMAIL_REQUIRED');
+    }
+
+    const existingUser = await User.findOne({ where: { email: targetEmail } });
     if (existingUser) {
       throw new Error('USER_EXISTS');
     }
@@ -120,10 +195,12 @@ class StaffService {
     await planService.assertStaffLimit(invitation.farm_id);
 
     const user = await User.create({
-      email: invitation.email,
+      email: targetEmail,
       password_hash: await PasswordUtil.hash(password),
       full_name: fullName,
-      phone: phone || null,
+      // Номер, на который звали, уже проверен владельцем — он и остаётся у
+      // работника, если тот не назвал другой.
+      phone: phone || invitation.phone || null,
       role: invitation.role,
       farm_id: invitation.farm_id
     });
@@ -171,7 +248,7 @@ class StaffService {
    * собой: у владельца `owner_id` был пуст, и условие его не находило.
    * Теперь ферма записана у всех, включая хозяина, поэтому отказ явный.
    */
-  async updateMember(farmId, memberId, { role, is_active: isActive }) {
+  async updateMember(farmId, actorId, memberId, { role, is_active: isActive }) {
     const member = await User.findOne({
       where: { id: memberId, farm_id: farmId, role: { [Op.ne]: 'owner' } }
     });
@@ -179,12 +256,40 @@ class StaffService {
       throw new Error('MEMBER_NOT_FOUND');
     }
 
+    const previous = { role: member.role, is_active: member.is_active };
+
     const changes = {};
     if (role !== undefined) changes.role = role;
     if (isActive !== undefined) changes.is_active = isActive;
 
     await member.update(changes);
     logger.info('Staff member updated', { memberId, farmId, changes });
+
+    // В журнал идёт только то, что действительно поменялось: повторная
+    // отправка той же роли — не событие, а шум, за которым потом не найти
+    // настоящее понижение.
+    if (changes.role !== undefined && changes.role !== previous.role) {
+      await farmAuditService.record({
+        farmId,
+        actorId,
+        action: 'staff.role_changed',
+        targetUserId: member.id,
+        before: { role: previous.role },
+        after: { role: member.role }
+      });
+    }
+
+    if (changes.is_active !== undefined && changes.is_active !== previous.is_active) {
+      await farmAuditService.record({
+        farmId,
+        actorId,
+        action: member.is_active ? 'staff.activated' : 'staff.deactivated',
+        targetUserId: member.id,
+        before: { is_active: previous.is_active },
+        after: { is_active: member.is_active }
+      });
+    }
+
     return member;
   }
 
@@ -205,6 +310,8 @@ class StaffService {
       throw new Error('MEMBER_NOT_FOUND');
     }
 
+    const previousRole = newOwner.role;
+
     const transaction = await User.sequelize.transaction();
     try {
       await Farm.update({ owner_id: newOwner.id }, { where: { id: farmId }, transaction });
@@ -221,6 +328,16 @@ class StaffService {
       fromUserId: currentOwner.id,
       toUserId: newOwner.id
     });
+
+    await farmAuditService.record({
+      farmId,
+      actorId: currentOwner.id,
+      action: 'staff.ownership_transferred',
+      targetUserId: newOwner.id,
+      before: { owner_id: currentOwner.id, target_role: previousRole },
+      after: { owner_id: newOwner.id, target_role: newOwner.role, actor_role: currentOwner.role }
+    });
+
     return newOwner;
   }
 }

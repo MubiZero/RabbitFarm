@@ -37,6 +37,7 @@ const DeviceToken = require('./DeviceToken')(sequelize);
 const Payment = require('./Payment')(sequelize);
 const Plan = require('./Plan')(sequelize);
 const AdminAuditLog = require('./AdminAuditLog')(sequelize);
+const FarmAuditLog = require('./FarmAuditLog')(sequelize);
 const Announcement = require('./Announcement')(sequelize);
 
 // Define associations
@@ -190,6 +191,13 @@ AdminAuditLog.belongsTo(User, { as: 'admin', foreignKey: 'admin_id' });
 Farm.hasMany(AdminAuditLog, { as: 'auditLog', foreignKey: 'farm_id', onDelete: 'SET NULL' });
 AdminAuditLog.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 
+// Журнал кадровых действий — наоборот, имущество фермы: читает его владелец
+// своей фермы, а не платформа.
+Farm.hasMany(FarmAuditLog, { as: 'staffAuditLog', foreignKey: 'farm_id', onDelete: 'CASCADE' });
+FarmAuditLog.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
+FarmAuditLog.belongsTo(User, { as: 'actor', foreignKey: 'actor_id' });
+FarmAuditLog.belongsTo(User, { as: 'target', foreignKey: 'target_user_id' });
+
 // Объявления платформенного админа — глобальная сущность, как и Plan.
 User.hasMany(Announcement, { as: 'announcements', foreignKey: 'admin_id' });
 Announcement.belongsTo(User, { as: 'admin', foreignKey: 'admin_id' });
@@ -201,7 +209,7 @@ Announcement.belongsTo(Farm, { as: 'targetFarm', foreignKey: 'target_farm_id' })
 require('../utils/tenancy').attach({
   Breed, Cage, Feed, Rabbit, RabbitWeight, Breeding, Birth,
   Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note,
-  Invitation, DeviceToken, Payment
+  Invitation, DeviceToken, Payment, FarmAuditLog
 });
 
 // Export models and sequelize instance
@@ -232,5 +240,6 @@ module.exports = {
   Payment,
   Plan,
   AdminAuditLog,
+  FarmAuditLog,
   Announcement
 };

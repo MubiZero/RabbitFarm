@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize');
+const { TJ_PHONE_PATTERN } = require('../utils/phone');
 
 module.exports = (sequelize) => {
   const Invitation = sequelize.define('Invitation', {
@@ -12,11 +13,23 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    // Куда звали: адрес или номер. Заполнено ровно одно из двух — приглашение
+    // без контакта некому передать, а с двумя непонятно, куда слать код.
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       validate: {
         isEmail: { msg: 'Введите корректный email' }
+      }
+    },
+    phone: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      validate: {
+        is: {
+          args: TJ_PHONE_PATTERN,
+          msg: 'Телефон должен быть таджикским номером: +992XXXXXXXXX'
+        }
       }
     },
     role: {
@@ -46,7 +59,24 @@ module.exports = (sequelize) => {
     underscored: true,
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
+    validate: {
+      // База обе колонки разрешает пустыми, поэтому «ровно один контакт»
+      // держится здесь: приглашение без адреса и без номера — мусор, который
+      // никому не отдать, а с двумя сразу непонятно, каким каналом слать.
+      //
+      // Оба `undefined` (не `null`) — значит, это частичный bulk `.update()`,
+      // который email/phone не трогает вовсе: Sequelize валидирует такой
+      // апдейт на «пустом» инстансе из одних только переданных полей, и без
+      // этой проверки любой `Invitation.update({expires_at}, {where})`
+      // ловил бы ложное «нужен ровно один контакт».
+      exactlyOneContact() {
+        if (this.email === undefined && this.phone === undefined) return;
+        if (Boolean(this.email) === Boolean(this.phone)) {
+          throw new Error('Приглашение выписывается на email или на телефон — что-то одно');
+        }
+      }
+    }
   });
 
   return Invitation;

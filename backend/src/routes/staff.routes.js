@@ -5,7 +5,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const {
   createInvitationSchema,
-  updateMemberSchema
+  updateMemberSchema,
+  listAuditQuerySchema
 } = require('../validators/staffValidator');
 
 // Всё, кроме активации приглашения, доступно только внутри фермы.
@@ -41,6 +42,30 @@ router.post(
   staffController.createInvitation
 );
 router.delete('/invitations/:id', authorize(['owner']), staffController.revokeInvitation);
+
+/**
+ * @swagger
+ * /staff/audit:
+ *   get:
+ *     summary: Журнал кадровых действий фермы — смена ролей, доступ, передача хозяйства
+ *     tags: [Staff]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, minimum: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, minimum: 1, maximum: 100 }
+ *     responses:
+ *       200:
+ *         description: Записи журнала, свежие сверху
+ */
+router.get(
+  '/audit',
+  authorize(['manager', 'owner']),
+  validate(listAuditQuerySchema, 'query'),
+  staffController.listAudit
+);
 
 /**
  * @swagger
