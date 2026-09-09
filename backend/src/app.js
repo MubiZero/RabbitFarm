@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const logger = require('./utils/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { generalLimiter } = require('./middleware/rateLimiter');
+const { checkAppVersion } = require('./middleware/appVersion');
 const routes = require('./routes');
 const filesRoutes = require('./routes/files.routes');
 const swaggerUi = require('swagger-ui-express');
@@ -131,6 +132,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'RabbitFarm API Docs'
 }));
 app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
+
+// Минимальная поддерживаемая версия мобильного приложения. Стоит перед
+// маршрутами, но после /health: наблюдение за сервисом не должно зависеть от
+// версии клиента, который в него постучался.
+app.use('/api/', checkAppVersion);
 
 // API routes
 app.use(`/api/${process.env.API_VERSION || 'v1'}`, routes);
