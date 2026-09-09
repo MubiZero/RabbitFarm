@@ -14,7 +14,10 @@ on:
         default: 'https://api.rabbitfarm.mubi.dev/api/v1'
 
 env:
-  FLUTTER_VERSION: '3.41.6'
+  # 3.47.0, не более раннюю: freezed ^4.0.1 (docs/HANDOFF.md, апгрейд
+  # кодогенерации) требует Dart >=3.13.0, которого более ранние тройки ещё
+  # не несут, — на них `flutter pub get` отказывает.
+  FLUTTER_VERSION: '3.47.0'
   # Адрес API попадает в бандл при сборке: рантайм-конфигурации у Flutter нет.
   API_URL: ${{ github.event.inputs.api_url || vars.API_URL || 'https://api.rabbitfarm.mubi.dev/api/v1' }}
 
