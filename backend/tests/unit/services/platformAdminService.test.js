@@ -765,7 +765,7 @@ describe('PlatformAdminService', () => {
       expect(result.farms.suspended).toBe(1);
     });
 
-    it('считает ферму упёршейся в предел по фактическому потреблению, включая активную поблажку', async () => {
+    it('считает ферму упёршейся в предел по фактическому потреблению', async () => {
       Farm.findAll.mockResolvedValue([
         {
           id: 1,
@@ -780,6 +780,73 @@ describe('PlatformAdminService', () => {
         Promise.resolve(opts?.group ? [{ farm_id: 1, count: 10 }] : 10)
       );
       User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms.at_limit).toBe(1);
+    });
+
+    it('активная поблажка отодвигает предел — ферма с ней не считается упёршейся', async () => {
+      Farm.findAll.mockResolvedValue([
+        {
+          id: 1,
+          plan: { price: 500, max_rabbits: 10, max_staff: null },
+          status: 'active',
+          extra_rabbits: 5,
+          // Поблажка ещё действует — эффективный предел 15, а не 10.
+          extras_until: '2099-01-01T00:00:00.000Z',
+          toJSON: () => ({})
+        }
+      ]);
+      Rabbit.count.mockImplementation((opts) =>
+        Promise.resolve(opts?.group ? [{ farm_id: 1, count: 10 }] : 10)
+      );
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms.at_limit).toBe(0);
+    });
+
+    it('истёкшая поблажка не спасает от предела — считается тарифный лимит как есть', async () => {
+      Farm.findAll.mockResolvedValue([
+        {
+          id: 1,
+          plan: { price: 500, max_rabbits: 10, max_staff: null },
+          status: 'active',
+          extra_rabbits: 5,
+          extras_until: '2020-01-01T00:00:00.000Z',
+          toJSON: () => ({})
+        }
+      ]);
+      Rabbit.count.mockImplementation((opts) =>
+        Promise.resolve(opts?.group ? [{ farm_id: 1, count: 10 }] : 10)
+      );
+      User.count.mockResolvedValue([]);
+      User.findAll.mockResolvedValue([]);
+
+      const result = await platformAdminService.getSummary();
+
+      expect(result.farms.at_limit).toBe(1);
+    });
+
+    it('считает ферму упёршейся в предел и по составу (staff), не только по кроликам', async () => {
+      Farm.findAll.mockResolvedValue([
+        {
+          id: 1,
+          plan: { price: 500, max_rabbits: null, max_staff: 3 },
+          status: 'active',
+          extra_staff: null,
+          extras_until: null,
+          toJSON: () => ({})
+        }
+      ]);
+      Rabbit.count.mockImplementation((opts) => Promise.resolve(opts?.group ? [] : 0));
+      User.count.mockImplementation((opts) =>
+        Promise.resolve(opts?.group ? [{ farm_id: 1, count: 3 }] : [])
+      );
       User.findAll.mockResolvedValue([]);
 
       const result = await platformAdminService.getSummary();

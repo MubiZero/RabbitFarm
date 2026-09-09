@@ -6262,6 +6262,18 @@ abstract class AppLocalizations {
   /// **'На платном'**
   String get platformSummaryPaid;
 
+  /// No description provided for @platformSummaryExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Просрочка тарифа'**
+  String get platformSummaryExpired;
+
+  /// No description provided for @platformSummaryAtLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'У предела тарифа'**
+  String get platformSummaryAtLimit;
+
   /// No description provided for @platformSummaryRegistrations30d.
   ///
   /// In ru, this message translates to:
@@ -6277,7 +6289,7 @@ abstract class AppLocalizations {
   /// No description provided for @platformSummaryStorageTotal.
   ///
   /// In ru, this message translates to:
-  /// **'Место в MinIO'**
+  /// **'Место всего'**
   String get platformSummaryStorageTotal;
 
   /// No description provided for @countFarms.

@@ -7,6 +7,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
+import '../widgets/farm_filter_labels.dart';
 
 /// Сводка платформы целиком (см. docs/plans/PLATFORM-ADMIN.md, этап 5).
 ///
@@ -63,81 +64,95 @@ class _SummaryContent extends StatelessWidget {
       ),
       children: [
         AppSectionTitle(l10n.platformSummarySectionFarms),
-        _TileRow(tiles: [
-          StatTile(
-            icon: Icons.holiday_village_outlined,
-            label: l10n.platformSummaryTotalFarms,
-            value: '${farms.total}',
-          ),
-          StatTile(
-            icon: Icons.block_outlined,
-            label: l10n.platformNoPlan,
-            value: '${farms.noPlan}',
-          ),
-        ]),
+        StatTile(
+          icon: Icons.holiday_village_outlined,
+          label: l10n.platformSummaryTotalFarms,
+          value: formatQuantity(farms.total),
+        ),
         const SizedBox(height: AppSpacing.md),
-        _TileRow(tiles: [
+        // Три плитки в сумме и дают «Всего ферм» выше — каждая ферма попадает
+        // ровно в одну из них (см. PlatformFarmsSummary), поэтому они стоят
+        // одним рядом, как и независимые срезы в «Состоянии» ниже, а не
+        // парами вперемешку с итогом.
+        StatTileRow(tiles: [
           StatTile(
             icon: Icons.card_giftcard_outlined,
             label: l10n.platformSummaryFree,
-            value: '${farms.free}',
+            value: formatQuantity(farms.free),
           ),
           StatTile(
             icon: Icons.payments_outlined,
             label: l10n.platformSummaryPaid,
-            value: '${farms.paid}',
+            value: formatQuantity(farms.paid),
             accent: AppColors.success,
+          ),
+          StatTile(
+            icon: Icons.block_outlined,
+            label: l10n.platformNoPlan,
+            value: formatQuantity(farms.noPlan),
           ),
         ]),
         const SizedBox(height: AppSpacing.xl),
 
-        // Подписи и смысл — те же, что у срезов списка ферм и адресатов
-        // объявления (см. farm_filter_labels.dart): одно состояние — одно
-        // название везде, а не три версии одного и того же.
+        // Смысл каждого среза и его цвет — общие с фильтрами списка ферм
+        // (см. farm_filter_labels.dart): одно состояние должно и называться,
+        // и подсвечиваться одинаково везде, а не по-разному на разных
+        // экранах. Подписи здесь свои — «Просрочка тарифа» вместо «Просрочен
+        // тариф»: под числом-счётчиком это существительное, а не фраза,
+        // согласованная с подразумеваемой единственной фермой.
         AppSectionTitle(l10n.platformSummarySectionStatus),
-        _TileRow(tiles: [
+        StatTileRow(tiles: [
           StatTile(
             icon: Icons.event_busy_outlined,
-            label: l10n.platformFilterExpired,
-            value: '${farms.expired}',
-            accent: farms.expired > 0 ? AppColors.warning : null,
+            label: l10n.platformSummaryExpired,
+            value: formatQuantity(farms.expired),
+            accent: farms.expired > 0
+                ? farmFilterColor(PlatformFarmFilter.expired)
+                : null,
           ),
           StatTile(
             icon: Icons.do_not_disturb_on_outlined,
             label: l10n.platformFarmStatusSuspended,
-            value: '${farms.suspended}',
-            accent: farms.suspended > 0 ? AppColors.error : null,
+            value: formatQuantity(farms.suspended),
+            accent: farms.suspended > 0
+                ? farmFilterColor(PlatformFarmFilter.suspended)
+                : null,
           ),
           StatTile(
             icon: Icons.warning_amber_outlined,
-            label: l10n.platformAtLimit,
-            value: '${farms.atLimit}',
-            accent: farms.atLimit > 0 ? AppColors.error : null,
+            label: l10n.platformSummaryAtLimit,
+            value: formatQuantity(farms.atLimit),
+            accent: farms.atLimit > 0
+                ? farmFilterColor(PlatformFarmFilter.atLimit)
+                : null,
           ),
         ]),
         const SizedBox(height: AppSpacing.xl),
 
         AppSectionTitle(l10n.platformSummarySectionActivity),
-        _TileRow(tiles: [
+        StatTileRow(tiles: [
           StatTile(
             icon: Icons.person_add_alt_outlined,
             label: l10n.platformSummaryRegistrations30d,
-            value: '${summary.registrations30d}',
+            value: formatQuantity(summary.registrations30d),
           ),
           StatTile(
             icon: Icons.person_off_outlined,
             label: l10n.platformFilterInactive(30),
-            value: '${summary.inactive30d}',
+            value: formatQuantity(summary.inactive30d),
           ),
         ]),
         const SizedBox(height: AppSpacing.xl),
 
         AppSectionTitle(l10n.platformSummarySectionData),
-        _TileRow(tiles: [
+        StatTileRow(tiles: [
           StatTile(
             icon: Icons.pets_outlined,
             label: l10n.platformSummaryRabbitsTotal,
-            value: '${summary.rabbitsTotal}',
+            // Сумма по всей платформе, не по одной ферме — реалистично
+            // растёт до пяти-шести знаков, поэтому с разделителями разрядов,
+            // как и везде, где число не гарантированно маленькое.
+            value: formatQuantity(summary.rabbitsTotal),
             accent: AppColors.domainLivestock,
           ),
           StatTile(
@@ -146,27 +161,6 @@ class _SummaryContent extends StatelessWidget {
             value: storageLabel(context, summary.storageBytes),
           ),
         ]),
-      ],
-    );
-  }
-}
-
-/// Ряд плиток поровну делит ширину — общий макет для строк из двух и трёх
-/// значений на этом экране.
-class _TileRow extends StatelessWidget {
-  const _TileRow({required this.tiles});
-
-  final List<Widget> tiles;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var i = 0; i < tiles.length; i++) ...[
-          if (i > 0) const SizedBox(width: AppSpacing.md),
-          Expanded(child: tiles[i]),
-        ],
       ],
     );
   }
@@ -189,9 +183,9 @@ class _SummarySkeleton extends StatelessWidget {
       children: const [
         SkeletonBox(width: 120, height: 12),
         SizedBox(height: AppSpacing.md),
-        SkeletonStatRow(),
+        SkeletonBox(height: 116, borderRadius: AppRadius.lgAll),
         SizedBox(height: AppSpacing.md),
-        SkeletonStatRow(),
+        SkeletonStatRow(count: 3),
         SizedBox(height: AppSpacing.xl),
         SkeletonBox(width: 120, height: 12),
         SizedBox(height: AppSpacing.md),

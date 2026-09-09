@@ -1357,9 +1357,11 @@
   "platformSummaryTotalFarms": "Всего ферм",
   "platformSummaryFree": "На бесплатном",
   "platformSummaryPaid": "На платном",
+  "platformSummaryExpired": "Просрочка тарифа",
+  "platformSummaryAtLimit": "У предела тарифа",
   "platformSummaryRegistrations30d": "Регистраций за 30 дней",
   "platformSummaryRabbitsTotal": "Поголовье всего",
-  "platformSummaryStorageTotal": "Место в MinIO",
+  "platformSummaryStorageTotal": "Место всего",
 
   "countFarms": "{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}",
   "@countFarms": {

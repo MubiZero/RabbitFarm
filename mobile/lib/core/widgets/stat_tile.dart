@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import 'app_card.dart';
 
@@ -54,6 +55,30 @@ class StatTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Ряд из нескольких [StatTile], поровну делящих ширину.
+///
+/// `Row([Expanded(StatTile), SizedBox(width: AppSpacing.md), ...])` был
+/// вручную повторён на доброй половине экранов со статистикой — вынесен
+/// сюда, чтобы новые экраны не писали его в восьмой раз.
+class StatTileRow extends StatelessWidget {
+  final List<Widget> tiles;
+
+  const StatTileRow({super.key, required this.tiles});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < tiles.length; i++) ...[
+          if (i > 0) const SizedBox(width: AppSpacing.md),
+          Expanded(child: tiles[i]),
+        ],
+      ],
     );
   }
 }

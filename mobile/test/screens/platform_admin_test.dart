@@ -450,11 +450,12 @@ void main() {
       ));
       await _settle(tester);
 
-      // Те же подписи, что у срезов списка ферм (farm_filter_labels.dart) —
-      // одно состояние должно называться одинаково везде.
-      expect(find.text('Просрочен тариф'), findsOneWidget);
+      // Смысл и цвет — те же, что у срезов списка ферм
+      // (farm_filter_labels.dart), а подписи свои: под числом-счётчиком
+      // нужно существительное, а не фраза про одну конкретную ферму.
+      expect(find.text('Просрочка тарифа'), findsOneWidget);
       expect(find.text('Доступ закрыт'), findsOneWidget);
-      expect(find.text('Упёрлась в предел тарифа'), findsOneWidget);
+      expect(find.text('У предела тарифа'), findsOneWidget);
       expect(find.text('4'), findsOneWidget);
       expect(find.text('1'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);

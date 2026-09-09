@@ -3442,13 +3442,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformSummaryPaid => 'На платном';
 
   @override
+  String get platformSummaryExpired => 'Просрочка тарифа';
+
+  @override
+  String get platformSummaryAtLimit => 'У предела тарифа';
+
+  @override
   String get platformSummaryRegistrations30d => 'Регистраций за 30 дней';
 
   @override
   String get platformSummaryRabbitsTotal => 'Поголовье всего';
 
   @override
-  String get platformSummaryStorageTotal => 'Место в MinIO';
+  String get platformSummaryStorageTotal => 'Место всего';
 
   @override
   String countFarms(int count) {
