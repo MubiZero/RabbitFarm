@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/cache/cache_scope.dart';
+import '../../../../core/cache/list_cache.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/task_model.dart';
@@ -42,6 +46,13 @@ class TasksListState {
     this.todayOnly = false,
   });
 
+  bool get hasFilters =>
+      typeFilter != null ||
+      statusFilter != null ||
+      priorityFilter != null ||
+      overdueOnly ||
+      todayOnly;
+
   TasksListState copyWith({
     List<Task>? tasks,
     bool? isLoading,
@@ -76,16 +87,47 @@ class TasksListState {
   }
 }
 
+/// Последние виденные задачи на диске.
+const tasksCache = ListCache<Task>(
+  boxName: ListCacheBoxes.tasks,
+  fromJson: Task.fromJson,
+  toJson: _taskToJson,
+);
+
+Map<String, dynamic> _taskToJson(Task task) => task.toJson();
+
 /// Tasks list notifier with infinite scroll support
 class TasksListNotifier extends StateNotifier<TasksListState> {
   final TasksRepository _repository;
+  final String? _cacheScope;
 
-  TasksListNotifier(this._repository) : super(TasksListState()) {
+  /// Свежий ответ уже приходил — прошлому списку с диска здесь больше не место.
+  bool _hasFreshData = false;
+
+  TasksListNotifier(this._repository, this._cacheScope)
+      : super(TasksListState()) {
+    _restoreFromCache();
     loadTasks();
+  }
+
+  /// Показать задачи, виденные в прошлый раз, не дожидаясь сервера. Полосу
+  /// «данные устарели» над ними поставит `PagedListView`, как только запрос не
+  /// удастся.
+  Future<void> _restoreFromCache() async {
+    final cached = await tasksCache.read(_cacheScope);
+    if (!mounted || cached.isEmpty) return;
+
+    // Пока читали диск, могли приехать свежие задачи или включиться фильтр.
+    if (_hasFreshData || state.tasks.isNotEmpty || state.hasFilters) return;
+
+    // Ошибку переносим руками: `copyWith` без неё сбрасывает ошибку в null, а
+    // именно она вместе с непустым списком включает полосу «данные устарели».
+    state = state.copyWith(tasks: cached, error: state.error);
   }
 
   /// Load tasks (first page or refresh)
   Future<void> loadTasks() async {
+    final hadFilters = state.hasFilters;
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -107,6 +149,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
       final totalPages = pagination['pages'] as int;
       final total = pagination['total'] as int? ?? 0;
 
+      _hasFreshData = true;
       state = state.copyWith(
         tasks: tasks,
         isLoading: false,
@@ -115,6 +158,12 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
         total: total,
         hasMore: page < totalPages,
       );
+
+      // На диск кладётся только список без фильтров: иначе «просроченные»
+      // при следующем запуске выглядели бы как все задачи фермы.
+      if (!hadFilters) {
+        unawaited(tasksCache.write(_cacheScope, tasks));
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -215,7 +264,9 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
 final tasksListProvider =
     StateNotifierProvider<TasksListNotifier, TasksListState>((ref) {
   final repository = ref.watch(tasksRepositoryProvider);
-  return TasksListNotifier(repository);
+  // Владелец кэша читается один раз при создании списка: сменился
+  // пользователь — поднялся номер сессии, и список пересоздался целиком.
+  return TasksListNotifier(repository, ref.read(cacheScopeProvider));
 });
 
 /// Single task provider

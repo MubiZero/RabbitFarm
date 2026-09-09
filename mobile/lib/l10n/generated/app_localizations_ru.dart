@@ -63,6 +63,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errorServer => 'На сервере сбой, попробуйте позже';
 
   @override
+  String get offlineBanner => 'Нет связи — новые записи не сохранятся';
+
+  @override
   String get commonStaleData => 'Не удалось обновить, показаны прежние данные';
 
   @override

@@ -261,7 +261,7 @@ void main() {
         // Список кроликов общий с экраном «Кролики»: заходим на вкладку так,
         // будто там уже отобрали откорм.
         rabbitsListProvider.overrideWith((ref) {
-          final notifier = RabbitsListNotifier(repository);
+          final notifier = RabbitsListNotifier(repository, null);
           notifier.applyFilter(const RabbitsFilter(purpose: 'meat'));
           return notifier;
         }),
