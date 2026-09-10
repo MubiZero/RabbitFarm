@@ -234,6 +234,17 @@
 Актуальные плейсхолдеры и комментарии — в `backend/.env.example`. Значения
 самих секретов у пользователя (не хранятся в репозитории намеренно).
 
+`mobile/ios/Runner/GoogleService-Info.plist` (гитигнорится, как и
+`android/app/google-services.json`) — конфиг Firebase-проекта
+`rabbitfarmho` для bundle ID `dev.mubi.rabbitfarm`, добавлен в таргет
+`Runner` (2026-09-10). Скачивается заново на каждой машине, где собирается
+iOS-таргет: Firebase Console → тот же проект → Project settings → iOS-
+приложение `dev.mubi.rabbitfarm` → скачать GoogleService-Info.plist.
+APNs-ключ (`.p8`) для push там же — Cloud Messaging → APNs Authentication
+Key, отдельно заведён в Apple Developer Portal (Team ID/Key ID пользователя,
+не хранится в репозитории). Живая проверка push с APNs не сделана —
+симулятор не может получить настоящий APNs-токен, нужен реальный iPhone.
+
 ## Известное ограничение окружения
 
 Эсхата (`connecttest.eskhata.com`) банит доступ по IP с обычной сети
