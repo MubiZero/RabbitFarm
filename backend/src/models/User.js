@@ -129,6 +129,10 @@ module.exports = (sequelize) => {
   // Instance methods
   User.prototype.toJSON = function() {
     const values = { ...this.get() };
+    // Клиенту нужно знать, задан ли пароль вообще (вход мог быть только по
+    // OTP) — чтобы предложить «Задать пароль» или «Изменить пароль», не сам
+    // хеш конечно.
+    values.has_password = !!values.password_hash;
     delete values.password_hash;
     return values;
   };

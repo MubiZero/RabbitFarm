@@ -53,7 +53,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.resetPasswordSuccessMessage)),
       );
-      router.go('/login');
+      router.go('/login-password');
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(

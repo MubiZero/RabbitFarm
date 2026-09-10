@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/widgets/app_brand_mark.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -70,19 +71,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: cs.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.pets,
-                  size: 40,
-                  color: cs.primary,
-                ),
-              ),
+              const AppBrandMark(size: 80),
               const SizedBox(height: 20),
               Text(
                 'RabbitFarm',

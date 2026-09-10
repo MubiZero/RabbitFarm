@@ -138,7 +138,7 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed:
-                      _isSubmitting ? null : () => context.go('/login'),
+                      _isSubmitting ? null : () => context.go('/login-password'),
                   child: Text(context.l10n.joinHaveAccount),
                 ),
               ],

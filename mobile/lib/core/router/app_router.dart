@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/login_password_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
@@ -64,6 +65,7 @@ import '../../features/rabbits/presentation/screens/herd_screen.dart';
 import '../../features/breeding/presentation/screens/breeding_cycle_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/auth/presentation/screens/password_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/support/presentation/screens/support_request_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
@@ -94,6 +96,7 @@ class RouterNotifier extends ChangeNotifier {
     final isAuthenticated = authState.isAuthenticated;
     final loc = state.matchedLocation;
     final isPublic = loc == '/login' ||
+        loc == '/login-password' ||
         loc == '/register' ||
         loc == '/join' ||
         loc == '/forgot-password' ||
@@ -108,6 +111,7 @@ class RouterNotifier extends ChangeNotifier {
     // Authenticated on a public page -> home
     if (isAuthenticated &&
         (loc == '/login' ||
+            loc == '/login-password' ||
             loc == '/register' ||
             loc == '/join' ||
             loc == '/forgot-password' ||
@@ -152,7 +156,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) =>
+            LoginScreen(prefilledPhone: state.extra as String?),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/login-password',
+        name: 'login-password',
+        builder: (context, state) => const LoginPasswordScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -633,6 +644,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/password',
+        name: 'password',
+        builder: (context, state) => const PasswordScreen(),
       ),
       // Тариф самой фермы — оплата продления (см.
       // docs/plans/PLATFORM-ADMIN.md, 4.1). Доступ на сервере ограничен

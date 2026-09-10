@@ -15,6 +15,9 @@ abstract class UserModel with _$UserModel {
     String? phone,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'is_active') required bool isActive,
+    // Вход мог быть только по OTP — тогда пароля ещё нет вовсе, и Настройки
+    // должны предложить «Задать пароль», а не «Изменить».
+    @JsonKey(name: 'has_password') @Default(false) bool hasPassword,
     // Платформенный суперадмин — это не роль на ферме, а отдельное
     // измерение доступа: он администрирует сервис целиком. Флаг ставится
     // вручную в базе, поэтому у обычного пользователя его в ответе может

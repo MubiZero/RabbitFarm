@@ -35,14 +35,21 @@ class StaffRepository {
     }
   }
 
-  /// Выписать приглашение. Код в ответе приходит один раз — сервер его не хранит.
+  /// Выписать приглашение — на email или на телефон (ровно одно из двух).
+  /// `fullName` обязателен для приглашения по телефону — вход активирует его
+  /// сразу кодом, без отдельной формы, где имя мог бы назвать сам приглашённый.
+  /// Код в ответе приходит один раз — сервер его не хранит.
   Future<CreatedInvitation> createInvitation({
-    required String email,
+    String? email,
+    String? phone,
+    String? fullName,
     required FarmRole role,
   }) async {
     try {
       final response = await _apiClient.post('/staff/invitations', data: {
-        'email': email,
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+        if (fullName != null) 'full_name': fullName,
         'role': role.name,
       });
       return CreatedInvitation.fromJson(response.data['data']);

@@ -104,6 +104,9 @@ class AppLocalizationsTg extends AppLocalizations {
   String get commonEmail => 'Почта';
 
   @override
+  String get commonPhone => 'Телефон';
+
+  @override
   String get quickGroupOften => 'Зуд-зуд';
 
   @override
@@ -190,6 +193,47 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get loginForgotPassword => 'Паролро фаромӯш кардед?';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Рақами телефонро ворид кунед';
+
+  @override
+  String get loginPhoneInvalid =>
+      'Телефон бояд рақами тоҷикистонӣ бошад: +992XXXXXXXXX';
+
+  @override
+  String get loginRequestCode => 'Рамз гирифтан';
+
+  @override
+  String get loginOtpTitle => 'Рамзро ворид кунед';
+
+  @override
+  String loginOtpSentTo(String phone) {
+    return 'Рамз ба $phone фиристода шуд';
+  }
+
+  @override
+  String get loginOtpHint => 'Рамзи 6-рақама аз SMS';
+
+  @override
+  String loginOtpResendIn(int seconds) {
+    return 'Такрор баъди $seconds сония';
+  }
+
+  @override
+  String get loginOtpResend => 'Рамзро дубора фиристодан';
+
+  @override
+  String get loginOtpChangeNumber => 'Рақамро иваз кардан';
+
+  @override
+  String get loginUsePassword => 'Бо почта ва парол ворид шудан';
+
+  @override
+  String get loginBackToPhone => 'Бо рақами телефон ворид шудан';
 
   @override
   String get forgotPasswordTitle => 'Паролро фаромӯш кардед?';
@@ -2213,6 +2257,29 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsDigestToggle => 'Хулосаи ҳаррӯзаи хоҷагӣ';
 
   @override
+  String get settingsPassword => 'Парол';
+
+  @override
+  String get passwordSetTitle => 'Парол гузоштан';
+
+  @override
+  String get passwordChangeTitle => 'Паролро иваз кардан';
+
+  @override
+  String get passwordSetHint =>
+      'Парол — роҳи эҳтиётии ворид шудан, агар дастрасӣ ба телефон набошад.';
+
+  @override
+  String get passwordCurrentLabel => 'Пароли ҳозира';
+
+  @override
+  String get passwordCurrentEmpty => 'Пароли ҳозираро ворид кунед';
+
+  @override
+  String get passwordSetSuccess =>
+      'Парол гузошта шуд — ҳоло метавонед бо он ҳамчун роҳи эҳтиётӣ ворид шавед';
+
+  @override
   String get settingsAbout => 'Дар бораи барнома';
 
   @override
@@ -2849,8 +2916,8 @@ class AppLocalizationsTg extends AppLocalizations {
   String get staffRevokeTitle => 'Даъватномаро бекор кунем?';
 
   @override
-  String staffRevokeBody(String email) {
-    return 'Рамз барои $email кор намекунад. Ҳар вақт хоҳед, рамзи нав баровардан мумкин аст.';
+  String staffRevokeBody(String contact) {
+    return 'Рамз барои $contact кор намекунад. Ҳар вақт хоҳед, рамзи нав баровардан мумкин аст.';
   }
 
   @override
@@ -2873,7 +2940,22 @@ class AppLocalizationsTg extends AppLocalizations {
   String get staffInviteTitle => 'Ба ферма даъват кардан';
 
   @override
+  String get staffInviteMethodEmail => 'Бо почта';
+
+  @override
+  String get staffInviteMethodPhone => 'Бо телефон';
+
+  @override
   String get staffInviteEmailHint => 'Одам аз ин почта ворид мешавад';
+
+  @override
+  String get staffInviteFullNameLabel => 'Ном';
+
+  @override
+  String get staffInviteFullNameHint => 'Ба корманд чӣ гуна муроҷиат кардан';
+
+  @override
+  String get staffInviteFullNameEmpty => 'Номро ворид кунед';
 
   @override
   String get staffRole => 'Вазифа';
@@ -2885,8 +2967,8 @@ class AppLocalizationsTg extends AppLocalizations {
   String get staffInviteCode => 'Рамзи даъватнома';
 
   @override
-  String staffInviteCodeBody(String email) {
-    return 'Ин рамзро ба $email бо роҳи мувофиқ расонед. Дуюмбор нишон дода намешавад: сервер танҳо изи онро нигоҳ медорад.';
+  String staffInviteCodeBody(String contact) {
+    return 'Ин рамзро ба $contact бо роҳи мувофиқ расонед. Дуюмбор нишон дода намешавад: сервер танҳо изи онро нигоҳ медорад.';
   }
 
   @override

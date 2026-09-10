@@ -11,6 +11,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'core/analytics/analytics.dart';
 import 'core/cache/list_cache.dart';
+import 'core/deep_links/deep_link_listener.dart';
 import 'core/error/error_handling.dart';
 import 'core/l10n/date_locale.dart';
 import 'core/l10n/framework_locale_fallback.dart';
@@ -121,11 +122,30 @@ Future<void> _bootstrap() async {
   }
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  late final DeepLinkListener _deepLinks;
+
+  @override
+  void initState() {
+    super.initState();
+    _deepLinks = DeepLinkListener(ref.read(routerProvider));
+  }
+
+  @override
+  void dispose() {
+    _deepLinks.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeState = ref.watch(themeProvider);
     final darkTheme = ref.watch(darkThemeProvider);
     final lightTheme = ref.watch(lightThemeProvider);

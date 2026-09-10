@@ -61,6 +61,8 @@ dependencies:
   # него SDK инициализируется в выключенном режиме, ошибки остаются только
   # в логе устройства, как и раньше.
   sentry_flutter: ^9.29.0
+  pinput: ^6.0.2
+  app_links: ^7.2.1
 
 dev_dependencies:
   flutter_test:

@@ -20,7 +20,9 @@ class _LimitedStaffRepository extends StaffRepository {
 
   @override
   Future<CreatedInvitation> createInvitation({
-    required String email,
+    String? email,
+    String? phone,
+    String? fullName,
     required FarmRole role,
   }) async {
     throw const ApiFailure(ApiFailureKind.invalid, code: 'STAFF_LIMIT_REACHED');
@@ -153,5 +155,31 @@ void main() {
       find.textContaining('Состав фермы достиг лимита участников'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('приглашение по телефону без имени не отправляется',
+      (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('По телефону'));
+    await tester.pumpAndSettle();
+
+    // Переключение метода показывает телефон и обязательное имя вместо почты.
+    expect(find.text('Имя'), findsOneWidget);
+    expect(find.text('Почта'), findsNothing);
+
+    await tester.enterText(find.byType(TextField).first, '901234567');
+    await tester.tap(find.text('Выписать код'));
+    await tester.pumpAndSettle();
+
+    // Диалог остался открыт — без имени отправлять нечего.
+    expect(find.text('Пригласить на ферму'), findsOneWidget);
   });
 }

@@ -104,6 +104,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get commonEmail => 'Pochta';
 
   @override
+  String get commonPhone => 'Telefon';
+
+  @override
   String get quickGroupOften => 'Tez-tez';
 
   @override
@@ -191,6 +194,47 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get loginForgotPassword => 'Parolni unutdingizmi?';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Telefon raqamingizni kiriting';
+
+  @override
+  String get loginPhoneInvalid =>
+      'Telefon Tojikiston raqami bo\'lishi kerak: +992XXXXXXXXX';
+
+  @override
+  String get loginRequestCode => 'Kod olish';
+
+  @override
+  String get loginOtpTitle => 'Kodni kiriting';
+
+  @override
+  String loginOtpSentTo(String phone) {
+    return 'Kod $phone raqamiga yuborildi';
+  }
+
+  @override
+  String get loginOtpHint => 'SMS\'dagi 6 xonali kod';
+
+  @override
+  String loginOtpResendIn(int seconds) {
+    return '$seconds soniyadan keyin qayta';
+  }
+
+  @override
+  String get loginOtpResend => 'Kodni qayta yuborish';
+
+  @override
+  String get loginOtpChangeNumber => 'Raqamni o\'zgartirish';
+
+  @override
+  String get loginUsePassword => 'Email va parol bilan kirish';
+
+  @override
+  String get loginBackToPhone => 'Telefon raqami bilan kirish';
 
   @override
   String get forgotPasswordTitle => 'Parolni unutdingizmi?';
@@ -2229,6 +2273,29 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsDigestToggle => 'Xo\'jalik bo\'yicha kunlik xulosa';
 
   @override
+  String get settingsPassword => 'Parol';
+
+  @override
+  String get passwordSetTitle => 'Parol o\'rnatish';
+
+  @override
+  String get passwordChangeTitle => 'Parolni o\'zgartirish';
+
+  @override
+  String get passwordSetHint =>
+      'Parol — telefonga kirish imkoni bo\'lmasa, zaxira kirish usuli.';
+
+  @override
+  String get passwordCurrentLabel => 'Joriy parol';
+
+  @override
+  String get passwordCurrentEmpty => 'Joriy parolni kiriting';
+
+  @override
+  String get passwordSetSuccess =>
+      'Parol o\'rnatildi — endi uni zaxira kirish usuli sifatida ishlatsa bo\'ladi';
+
+  @override
   String get settingsAbout => 'Ilova haqida';
 
   @override
@@ -2871,8 +2938,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffRevokeTitle => 'Taklif bekor qilinsinmi?';
 
   @override
-  String staffRevokeBody(String email) {
-    return '$email uchun kod ishlamay qoladi. Istalgan payt yangisini chiqarish mumkin.';
+  String staffRevokeBody(String contact) {
+    return '$contact uchun kod ishlamay qoladi. Istalgan payt yangisini chiqarish mumkin.';
   }
 
   @override
@@ -2895,7 +2962,22 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffInviteTitle => 'Fermaga taklif qilish';
 
   @override
+  String get staffInviteMethodEmail => 'Email orqali';
+
+  @override
+  String get staffInviteMethodPhone => 'Telefon orqali';
+
+  @override
   String get staffInviteEmailHint => 'Odam shu pochta orqali kiradi';
+
+  @override
+  String get staffInviteFullNameLabel => 'Ism';
+
+  @override
+  String get staffInviteFullNameHint => 'Xodimga qanday murojaat qilish';
+
+  @override
+  String get staffInviteFullNameEmpty => 'Ismni kiriting';
 
   @override
   String get staffRole => 'Roli';
@@ -2907,8 +2989,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffInviteCode => 'Taklif kodi';
 
   @override
-  String staffInviteCodeBody(String email) {
-    return 'Bu kodni ${email}ga qulay usulda yetkazing. Ikkinchi marta u ko\'rsatilmaydi: server faqat uning izini saqlaydi.';
+  String staffInviteCodeBody(String contact) {
+    return 'Bu kodni ${contact}ga qulay usulda yetkazing. Ikkinchi marta u ko\'rsatilmaydi: server faqat uning izini saqlaydi.';
   }
 
   @override

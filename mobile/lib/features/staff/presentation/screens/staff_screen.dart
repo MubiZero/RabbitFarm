@@ -11,7 +11,10 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/api/api_failure.dart';
+import '../../../../core/utils/phone_utils.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+
+enum _InviteMethod { email, phone }
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -279,7 +282,7 @@ class StaffScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(context.l10n.staffRevokeTitle),
-        content: Text(context.l10n.staffRevokeBody(invitation.email)),
+        content: Text(context.l10n.staffRevokeBody(invitation.contact)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -312,6 +315,9 @@ class StaffScreen extends ConsumerWidget {
 
   Future<void> _inviteDialog(BuildContext context, WidgetRef ref) async {
     final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    final fullNameController = TextEditingController();
+    var method = _InviteMethod.email;
     var role = FarmRole.worker;
 
     final created = await showDialog<CreatedInvitation>(
@@ -321,19 +327,41 @@ class StaffScreen extends ConsumerWidget {
           var isSending = false;
 
           Future<void> submit() async {
-            final email = emailController.text.trim();
-            if (email.isEmpty || !email.contains('@')) return;
+            final l10n = context.l10n;
+            final String? email;
+            final String? phone;
+            final String? fullName;
+
+            if (method == _InviteMethod.email) {
+              final value = emailController.text.trim();
+              if (value.isEmpty || !value.contains('@')) return;
+              email = value;
+              phone = null;
+              fullName = null;
+            } else {
+              final normalizedPhone = normalizeTjPhone(phoneController.text);
+              final name = fullNameController.text.trim();
+              if (!isTjPhone(normalizedPhone) || name.isEmpty) {
+                setDialogState(() {});
+                return;
+              }
+              email = null;
+              phone = normalizedPhone;
+              fullName = name;
+            }
 
             // Берём до отправки: после await диалог может быть уже закрыт.
             final messenger = ScaffoldMessenger.of(dialogContext);
             final navigator = Navigator.of(dialogContext);
-            final l10n = context.l10n;
 
             setDialogState(() => isSending = true);
             try {
-              final invitation = await ref
-                  .read(staffRepositoryProvider)
-                  .createInvitation(email: email, role: role);
+              final invitation = await ref.read(staffRepositoryProvider).createInvitation(
+                    email: email,
+                    phone: phone,
+                    fullName: fullName,
+                    role: role,
+                  );
               navigator.pop(invitation);
             } catch (e) {
               // Лимит тарифа не лечится другим email — приглашать больше
@@ -366,15 +394,52 @@ class StaffScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.commonEmail,
-                    hintText: context.l10n.staffInviteEmailHint,
-                  ),
+                SegmentedButton<_InviteMethod>(
+                  segments: [
+                    ButtonSegment(
+                      value: _InviteMethod.email,
+                      label: Text(context.l10n.staffInviteMethodEmail),
+                    ),
+                    ButtonSegment(
+                      value: _InviteMethod.phone,
+                      label: Text(context.l10n.staffInviteMethodPhone),
+                    ),
+                  ],
+                  selected: {method},
+                  onSelectionChanged: (selection) =>
+                      setDialogState(() => method = selection.first),
                 ),
+                const SizedBox(height: 20),
+                if (method == _InviteMethod.email)
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.commonEmail,
+                      hintText: context.l10n.staffInviteEmailHint,
+                    ),
+                  )
+                else ...[
+                  TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    autofocus: true,
+                    inputFormatters: [TjPhoneInputFormatter()],
+                    decoration: InputDecoration(
+                      labelText: context.l10n.commonPhone,
+                      hintText: context.l10n.loginPhoneHint,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: fullNameController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.staffInviteFullNameLabel,
+                      hintText: context.l10n.staffInviteFullNameHint,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 Text(
                   context.l10n.staffRole,
@@ -443,7 +508,7 @@ class StaffScreen extends ConsumerWidget {
     await _showSecretDialog(
       context,
       title: context.l10n.staffInviteCode,
-      explanation: context.l10n.staffInviteCodeBody(invitation.email),
+      explanation: context.l10n.staffInviteCodeBody(invitation.contact),
       secret: invitation.code,
       footnote: context.l10n.staffValidUntil(
           DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
@@ -666,7 +731,7 @@ class _InvitationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    invitation.email,
+                    invitation.contact,
                     style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

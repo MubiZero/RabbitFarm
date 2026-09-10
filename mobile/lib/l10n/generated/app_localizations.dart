@@ -282,6 +282,12 @@ abstract class AppLocalizations {
   /// **'Почта'**
   String get commonEmail;
 
+  /// No description provided for @commonPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон'**
+  String get commonPhone;
+
   /// No description provided for @quickGroupOften.
   ///
   /// In ru, this message translates to:
@@ -455,6 +461,78 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Забыли пароль?'**
   String get loginForgotPassword;
+
+  /// No description provided for @loginPhoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'+992 XX XXX XX XX'**
+  String get loginPhoneHint;
+
+  /// No description provided for @loginPhoneEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите номер телефона'**
+  String get loginPhoneEmpty;
+
+  /// No description provided for @loginPhoneInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон должен быть таджикским номером: +992XXXXXXXXX'**
+  String get loginPhoneInvalid;
+
+  /// No description provided for @loginRequestCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получить код'**
+  String get loginRequestCode;
+
+  /// No description provided for @loginOtpTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get loginOtpTitle;
+
+  /// No description provided for @loginOtpSentTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код отправлен на {phone}'**
+  String loginOtpSentTo(String phone);
+
+  /// No description provided for @loginOtpHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'6-значный код из SMS'**
+  String get loginOtpHint;
+
+  /// No description provided for @loginOtpResendIn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё раз через {seconds} с'**
+  String loginOtpResendIn(int seconds);
+
+  /// No description provided for @loginOtpResend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить код ещё раз'**
+  String get loginOtpResend;
+
+  /// No description provided for @loginOtpChangeNumber.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить номер'**
+  String get loginOtpChangeNumber;
+
+  /// No description provided for @loginUsePassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти по email и паролю'**
+  String get loginUsePassword;
+
+  /// No description provided for @loginBackToPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти по номеру телефона'**
+  String get loginBackToPhone;
 
   /// No description provided for @forgotPasswordTitle.
   ///
@@ -4104,6 +4182,48 @@ abstract class AppLocalizations {
   /// **'Дайджест по хозяйству'**
   String get settingsDigestToggle;
 
+  /// No description provided for @settingsPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get settingsPassword;
+
+  /// No description provided for @passwordSetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задать пароль'**
+  String get passwordSetTitle;
+
+  /// No description provided for @passwordChangeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить пароль'**
+  String get passwordChangeTitle;
+
+  /// No description provided for @passwordSetHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль — запасной способ входа, если вдруг не будет доступа к телефону.'**
+  String get passwordSetHint;
+
+  /// No description provided for @passwordCurrentLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущий пароль'**
+  String get passwordCurrentLabel;
+
+  /// No description provided for @passwordCurrentEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текущий пароль'**
+  String get passwordCurrentEmpty;
+
+  /// No description provided for @passwordSetSuccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль задан — теперь можно входить им как запасным способом'**
+  String get passwordSetSuccess;
+
   /// No description provided for @settingsAbout.
   ///
   /// In ru, this message translates to:
@@ -5265,8 +5385,8 @@ abstract class AppLocalizations {
   /// No description provided for @staffRevokeBody.
   ///
   /// In ru, this message translates to:
-  /// **'Код для {email} перестанет работать. Выписать новый можно в любой момент.'**
-  String staffRevokeBody(String email);
+  /// **'Код для {contact} перестанет работать. Выписать новый можно в любой момент.'**
+  String staffRevokeBody(String contact);
 
   /// No description provided for @staffKeep.
   ///
@@ -5304,11 +5424,41 @@ abstract class AppLocalizations {
   /// **'Пригласить на ферму'**
   String get staffInviteTitle;
 
+  /// No description provided for @staffInviteMethodEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'По email'**
+  String get staffInviteMethodEmail;
+
+  /// No description provided for @staffInviteMethodPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'По телефону'**
+  String get staffInviteMethodPhone;
+
   /// No description provided for @staffInviteEmailHint.
   ///
   /// In ru, this message translates to:
   /// **'На эту почту человек и будет входить'**
   String get staffInviteEmailHint;
+
+  /// No description provided for @staffInviteFullNameLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя'**
+  String get staffInviteFullNameLabel;
+
+  /// No description provided for @staffInviteFullNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как обращаться к сотруднику'**
+  String get staffInviteFullNameHint;
+
+  /// No description provided for @staffInviteFullNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите имя'**
+  String get staffInviteFullNameEmpty;
 
   /// No description provided for @staffRole.
   ///
@@ -5331,8 +5481,8 @@ abstract class AppLocalizations {
   /// No description provided for @staffInviteCodeBody.
   ///
   /// In ru, this message translates to:
-  /// **'Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.'**
-  String staffInviteCodeBody(String email);
+  /// **'Передайте этот код {contact} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.'**
+  String staffInviteCodeBody(String contact);
 
   /// No description provided for @staffValidUntil.
   ///

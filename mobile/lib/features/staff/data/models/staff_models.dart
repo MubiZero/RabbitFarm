@@ -56,15 +56,24 @@ abstract class FarmMember with _$FarmMember {
       _$FarmMemberFromJson(json);
 }
 
-/// Выписанное, но ещё не использованное приглашение.
+/// Выписанное, но ещё не использованное приглашение. Ровно одно из
+/// [email]/[phone] заполнено — сервер принимает только одно из двух
+/// (`.xor('email', 'phone')` в `staffValidator`).
 @freezed
 abstract class FarmInvitation with _$FarmInvitation {
   const factory FarmInvitation({
     @IntConverter() required int id,
-    required String email,
+    String? email,
+    String? phone,
+    @JsonKey(name: 'full_name') String? fullName,
     required FarmRole role,
     @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _FarmInvitation;
+
+  const FarmInvitation._();
+
+  /// Контакт для отображения — почта или телефон, что бы ни было заполнено.
+  String get contact => email ?? phone ?? '';
 
   factory FarmInvitation.fromJson(Map<String, dynamic> json) =>
       _$FarmInvitationFromJson(json);
@@ -75,11 +84,17 @@ abstract class FarmInvitation with _$FarmInvitation {
 abstract class CreatedInvitation with _$CreatedInvitation {
   const factory CreatedInvitation({
     @IntConverter() required int id,
-    required String email,
+    String? email,
+    String? phone,
     required FarmRole role,
     required String code,
     @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _CreatedInvitation;
+
+  const CreatedInvitation._();
+
+  /// Контакт для отображения — почта или телефон, что бы ни было заполнено.
+  String get contact => email ?? phone ?? '';
 
   factory CreatedInvitation.fromJson(Map<String, dynamic> json) =>
       _$CreatedInvitationFromJson(json);

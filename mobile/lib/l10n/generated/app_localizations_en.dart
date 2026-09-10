@@ -103,6 +103,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonEmail => 'Email';
 
   @override
+  String get commonPhone => 'Phone';
+
+  @override
   String get quickGroupOften => 'Frequent';
 
   @override
@@ -189,6 +192,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginForgotPassword => 'Forgot your password?';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Enter your phone number';
+
+  @override
+  String get loginPhoneInvalid =>
+      'Phone must be a Tajikistan number: +992XXXXXXXXX';
+
+  @override
+  String get loginRequestCode => 'Get code';
+
+  @override
+  String get loginOtpTitle => 'Enter the code';
+
+  @override
+  String loginOtpSentTo(String phone) {
+    return 'Code sent to $phone';
+  }
+
+  @override
+  String get loginOtpHint => '6-digit code from SMS';
+
+  @override
+  String loginOtpResendIn(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get loginOtpResend => 'Resend code';
+
+  @override
+  String get loginOtpChangeNumber => 'Change number';
+
+  @override
+  String get loginUsePassword => 'Sign in with email and password';
+
+  @override
+  String get loginBackToPhone => 'Sign in with phone number';
 
   @override
   String get forgotPasswordTitle => 'Forgot your password?';
@@ -2221,6 +2265,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDigestToggle => 'Daily farm digest';
 
   @override
+  String get settingsPassword => 'Password';
+
+  @override
+  String get passwordSetTitle => 'Set a password';
+
+  @override
+  String get passwordChangeTitle => 'Change password';
+
+  @override
+  String get passwordSetHint =>
+      'A password is a backup way to sign in if you ever lose access to your phone.';
+
+  @override
+  String get passwordCurrentLabel => 'Current password';
+
+  @override
+  String get passwordCurrentEmpty => 'Enter your current password';
+
+  @override
+  String get passwordSetSuccess =>
+      'Password set — you can now use it as a backup way to sign in';
+
+  @override
   String get settingsAbout => 'About';
 
   @override
@@ -2858,8 +2925,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffRevokeTitle => 'Revoke invite?';
 
   @override
-  String staffRevokeBody(String email) {
-    return 'The code for $email will stop working. You can issue a new one anytime.';
+  String staffRevokeBody(String contact) {
+    return 'The code for $contact will stop working. You can issue a new one anytime.';
   }
 
   @override
@@ -2882,7 +2949,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffInviteTitle => 'Invite to the farm';
 
   @override
+  String get staffInviteMethodEmail => 'By email';
+
+  @override
+  String get staffInviteMethodPhone => 'By phone';
+
+  @override
   String get staffInviteEmailHint => 'The person will sign in with this email';
+
+  @override
+  String get staffInviteFullNameLabel => 'Name';
+
+  @override
+  String get staffInviteFullNameHint => 'How to address the employee';
+
+  @override
+  String get staffInviteFullNameEmpty => 'Enter a name';
 
   @override
   String get staffRole => 'Role';
@@ -2894,8 +2976,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffInviteCode => 'Invite code';
 
   @override
-  String staffInviteCodeBody(String email) {
-    return 'Share this code with $email however is convenient. It won\'t be shown again — the server only stores its hash.';
+  String staffInviteCodeBody(String contact) {
+    return 'Share this code with $contact however is convenient. It won\'t be shown again — the server only stores its hash.';
   }
 
   @override

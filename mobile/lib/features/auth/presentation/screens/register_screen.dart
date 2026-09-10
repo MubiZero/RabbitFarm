@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_brand_mark.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
@@ -100,7 +101,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ? SnackBarAction(
                       label: context.l10n.loginSubmit,
                       textColor: Colors.white,
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.go('/login-password'),
                     )
                   : null,
             ),
@@ -120,7 +121,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         leading: IconButton(
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/login'),
+          onPressed: () => context.go('/login-password'),
         ),
         actions: const [LanguagePickerButton()],
       ),
@@ -132,22 +133,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icon
-                Icon(
-                  Icons.person_add,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-
-                // Title
-                Text(
-                  context.l10n.registerTitle,
-                  style: AppTypography.displayMd
-                      .copyWith(color: context.colors.onSurface),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.sm),
+                const Center(child: AppBrandMark()),
+                const SizedBox(height: AppSpacing.xl),
                 Text(
                   context.l10n.registerSubtitle,
                   style: AppTypography.bodyMd
@@ -358,7 +345,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     TextButton(
                       onPressed: authState.isLoading
                           ? null
-                          : () => context.go('/login'),
+                          : () => context.go('/login-password'),
                       child: Text(context.l10n.loginSubmit),
                     ),
                   ],

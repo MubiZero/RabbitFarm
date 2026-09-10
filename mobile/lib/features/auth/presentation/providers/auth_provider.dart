@@ -290,6 +290,45 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Запросить код входа по телефону — первый шаг основного способа входа.
+  Future<void> requestOtp(String phone) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      await _authRepository.requestOtp(phone: phone);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+      rethrow;
+    }
+  }
+
+  /// Проверить код и войти — второй шаг. Для номера с активным приглашением
+  /// сервер заводит работника на лету и сразу выдаёт токены.
+  Future<void> verifyOtp({required String phone, required String code}) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final authResponse = await _authRepository.verifyOtp(
+        phone: phone,
+        code: code,
+      );
+
+      state = state.copyWith(
+        user: authResponse.user,
+        isAuthenticated: true,
+        isLoading: false,
+      );
+      _ref.read(fcmServiceProvider).registerCurrentToken();
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
   /// Присоединиться к ферме по коду приглашения.
   Future<void> acceptInvitation({
     required String code,
@@ -378,6 +417,46 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final user = await _authRepository.getProfile();
     state = AuthState(user: user, isAuthenticated: true);
     resetSessionData(_ref);
+  }
+
+  /// Первичная установка пароля тому, кто входил только по OTP — сессия не
+  /// прерывается, просто у профиля появляется способ входа про запас.
+  Future<void> setPassword(String newPassword) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      await _authRepository.setPassword(newPassword);
+      final user = state.user;
+      state = state.copyWith(
+        isLoading: false,
+        user: user == null ? null : user.copyWith(hasPassword: true),
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+      rethrow;
+    }
+  }
+
+  /// Сменить уже заданный пароль. Сервер отзывает токены на всех
+  /// устройствах — сразу вслед за успехом выходим и здесь, а не только
+  /// доверяем следующему запросу упасть на 401.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      await _authRepository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+      rethrow;
+    }
+
+    await logout();
   }
 
   // Refresh profile

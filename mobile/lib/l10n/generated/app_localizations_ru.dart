@@ -103,6 +103,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonEmail => 'Почта';
 
   @override
+  String get commonPhone => 'Телефон';
+
+  @override
   String get quickGroupOften => 'Часто';
 
   @override
@@ -189,6 +192,47 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginForgotPassword => 'Забыли пароль?';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Введите номер телефона';
+
+  @override
+  String get loginPhoneInvalid =>
+      'Телефон должен быть таджикским номером: +992XXXXXXXXX';
+
+  @override
+  String get loginRequestCode => 'Получить код';
+
+  @override
+  String get loginOtpTitle => 'Введите код';
+
+  @override
+  String loginOtpSentTo(String phone) {
+    return 'Код отправлен на $phone';
+  }
+
+  @override
+  String get loginOtpHint => '6-значный код из SMS';
+
+  @override
+  String loginOtpResendIn(int seconds) {
+    return 'Ещё раз через $seconds с';
+  }
+
+  @override
+  String get loginOtpResend => 'Отправить код ещё раз';
+
+  @override
+  String get loginOtpChangeNumber => 'Изменить номер';
+
+  @override
+  String get loginUsePassword => 'Войти по email и паролю';
+
+  @override
+  String get loginBackToPhone => 'Войти по номеру телефона';
 
   @override
   String get forgotPasswordTitle => 'Забыли пароль?';
@@ -2248,6 +2292,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDigestToggle => 'Дайджест по хозяйству';
 
   @override
+  String get settingsPassword => 'Пароль';
+
+  @override
+  String get passwordSetTitle => 'Задать пароль';
+
+  @override
+  String get passwordChangeTitle => 'Изменить пароль';
+
+  @override
+  String get passwordSetHint =>
+      'Пароль — запасной способ входа, если вдруг не будет доступа к телефону.';
+
+  @override
+  String get passwordCurrentLabel => 'Текущий пароль';
+
+  @override
+  String get passwordCurrentEmpty => 'Введите текущий пароль';
+
+  @override
+  String get passwordSetSuccess =>
+      'Пароль задан — теперь можно входить им как запасным способом';
+
+  @override
   String get settingsAbout => 'О приложении';
 
   @override
@@ -2891,8 +2958,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffRevokeTitle => 'Отозвать приглашение?';
 
   @override
-  String staffRevokeBody(String email) {
-    return 'Код для $email перестанет работать. Выписать новый можно в любой момент.';
+  String staffRevokeBody(String contact) {
+    return 'Код для $contact перестанет работать. Выписать новый можно в любой момент.';
   }
 
   @override
@@ -2915,7 +2982,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffInviteTitle => 'Пригласить на ферму';
 
   @override
+  String get staffInviteMethodEmail => 'По email';
+
+  @override
+  String get staffInviteMethodPhone => 'По телефону';
+
+  @override
   String get staffInviteEmailHint => 'На эту почту человек и будет входить';
+
+  @override
+  String get staffInviteFullNameLabel => 'Имя';
+
+  @override
+  String get staffInviteFullNameHint => 'Как обращаться к сотруднику';
+
+  @override
+  String get staffInviteFullNameEmpty => 'Введите имя';
 
   @override
   String get staffRole => 'Роль';
@@ -2927,8 +3009,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffInviteCode => 'Код приглашения';
 
   @override
-  String staffInviteCodeBody(String email) {
-    return 'Передайте этот код $email любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.';
+  String staffInviteCodeBody(String contact) {
+    return 'Передайте этот код $contact любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.';
   }
 
   @override

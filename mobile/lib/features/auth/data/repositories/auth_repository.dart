@@ -169,6 +169,86 @@ class AuthRepository {
     }
   }
 
+  /// Запросить код входа по телефону — основной способ входа. Сервер всегда
+  /// отвечает успехом независимо от того, есть ли за номером аккаунт или
+  /// приглашение (та же логика, что у [forgotPassword]).
+  Future<void> requestOtp({required String phone}) async {
+    try {
+      await _apiClient.post(ApiEndpoints.otpRequest, data: {'phone': phone});
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Проверить код и войти. Для номера с активным приглашением сервер сам
+  /// заводит работника и сразу выдаёт токены — отдельного шага активации нет.
+  Future<AuthResponse> verifyOtp({
+    required String phone,
+    required String code,
+  }) async {
+    try {
+      final response = await _apiClient.post(ApiEndpoints.otpVerify, data: {
+        'phone': phone,
+        'code': code,
+      });
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+      }
+
+      final authResponse = AuthResponse.fromJson(apiResponse.data!);
+
+      await _storage.write(
+        key: 'access_token',
+        value: authResponse.accessToken,
+      );
+      await _storage.write(
+        key: 'refresh_token',
+        value: authResponse.refreshToken,
+      );
+      await _cacheProfile(authResponse.user.toJson());
+
+      return authResponse;
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Первичная установка пароля тому, кто входил только по OTP. Сессия
+  /// продолжается как есть — сервер не отзывает токены (в отличие от
+  /// [changePassword]): раньше пароля не было вовсе, отзывать нечего.
+  Future<void> setPassword(String newPassword) async {
+    try {
+      await _apiClient.post(ApiEndpoints.setPassword, data: {
+        'new_password': newPassword,
+      });
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Сменить уже заданный пароль. Сервер отзывает все токены на всех
+  /// устройствах и ждёт повторного входа — вызывающая сторона обязана
+  /// после успеха разлогинить (см. `AuthNotifier.changePassword`).
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiClient.post(ApiEndpoints.changePassword, data: {
+        'current_password': currentPassword,
+        'new_password': newPassword,
+      });
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   // Get current user profile
   Future<UserModel> getProfile() async {
     // DioException пробрасывается напрямую для корректной обработки в AuthNotifier

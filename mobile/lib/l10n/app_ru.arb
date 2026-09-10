@@ -50,6 +50,7 @@
   "commonNotSpecified": "Не указано",
   "commonActions": "Действия",
   "commonEmail": "Почта",
+  "commonPhone": "Телефон",
 
   "quickGroupOften": "Часто",
   "journalPeriodToday": "Сегодня",
@@ -81,6 +82,24 @@
   "loginHasInvite": "У меня есть код приглашения",
   "loginCreateFarm": "Завести свою ферму",
   "loginForgotPassword": "Забыли пароль?",
+  "loginPhoneHint": "+992 XX XXX XX XX",
+  "loginPhoneEmpty": "Введите номер телефона",
+  "loginPhoneInvalid": "Телефон должен быть таджикским номером: +992XXXXXXXXX",
+  "loginRequestCode": "Получить код",
+  "loginOtpTitle": "Введите код",
+  "loginOtpSentTo": "Код отправлен на {phone}",
+  "@loginOtpSentTo": {
+    "placeholders": { "phone": { "type": "String" } }
+  },
+  "loginOtpHint": "6-значный код из SMS",
+  "loginOtpResendIn": "Ещё раз через {seconds} с",
+  "@loginOtpResendIn": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "loginOtpResend": "Отправить код ещё раз",
+  "loginOtpChangeNumber": "Изменить номер",
+  "loginUsePassword": "Войти по email и паролю",
+  "loginBackToPhone": "Войти по номеру телефона",
 
   "forgotPasswordTitle": "Забыли пароль?",
   "forgotPasswordIntro": "Укажите почту, с которой входите в ферму. Если аккаунт есть, пришлём код — по SMS или на почту.",
@@ -906,6 +925,13 @@
   "settingsLanguage": "Язык",
   "settingsNotifications": "Уведомления",
   "settingsDigestToggle": "Дайджест по хозяйству",
+  "settingsPassword": "Пароль",
+  "passwordSetTitle": "Задать пароль",
+  "passwordChangeTitle": "Изменить пароль",
+  "passwordSetHint": "Пароль — запасной способ входа, если вдруг не будет доступа к телефону.",
+  "passwordCurrentLabel": "Текущий пароль",
+  "passwordCurrentEmpty": "Введите текущий пароль",
+  "passwordSetSuccess": "Пароль задан — теперь можно входить им как запасным способом",
   "settingsAbout": "О приложении",
   "settingsVersion": "Версия",
   "settingsSupport": "Написать в поддержку",
@@ -1154,9 +1180,9 @@
     "placeholders": { "name": { "type": "String" } }
   },
   "staffRevokeTitle": "Отозвать приглашение?",
-  "staffRevokeBody": "Код для {email} перестанет работать. Выписать новый можно в любой момент.",
+  "staffRevokeBody": "Код для {contact} перестанет работать. Выписать новый можно в любой момент.",
   "@staffRevokeBody": {
-    "placeholders": { "email": { "type": "String" } }
+    "placeholders": { "contact": { "type": "String" } }
   },
   "staffKeep": "Оставить",
   "staffRevoke": "Отозвать",
@@ -1164,13 +1190,18 @@
   "planLimitStaffTitle": "Лимит участников по тарифу",
   "planLimitStaffBody": "Состав фермы достиг лимита участников, разрешённого текущим тарифом. Чтобы пригласить ещё, нужен тариф с большим лимитом.",
   "staffInviteTitle": "Пригласить на ферму",
+  "staffInviteMethodEmail": "По email",
+  "staffInviteMethodPhone": "По телефону",
   "staffInviteEmailHint": "На эту почту человек и будет входить",
+  "staffInviteFullNameLabel": "Имя",
+  "staffInviteFullNameHint": "Как обращаться к сотруднику",
+  "staffInviteFullNameEmpty": "Введите имя",
   "staffRole": "Роль",
   "staffIssueCode": "Выписать код",
   "staffInviteCode": "Код приглашения",
-  "staffInviteCodeBody": "Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.",
+  "staffInviteCodeBody": "Передайте этот код {contact} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.",
   "@staffInviteCodeBody": {
-    "placeholders": { "email": { "type": "String" } }
+    "placeholders": { "contact": { "type": "String" } }
   },
   "staffValidUntil": "Действует до {date}",
   "@staffValidUntil": {

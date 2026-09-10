@@ -32,7 +32,15 @@ class SettingsScreen extends ConsumerWidget {
           // Profile card
           _GroupCard(
             context: context,
-            children: [_ProfileCard(user?.fullName, user?.email)],
+            children: [
+              _ProfileCard(user?.fullName, user?.email),
+              _SettingsTile(
+                icon: Icons.lock_outline,
+                label: context.l10n.settingsPassword,
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/password'),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
