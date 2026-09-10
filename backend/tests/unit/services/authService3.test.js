@@ -62,6 +62,23 @@ describe('AuthService — password reset & token cleanup', () => {
       expect(emailTransport.sendPasswordResetEmail).not.toHaveBeenCalled();
     });
 
+    it('должен отправить код по email, если телефон не в таджикском формате (шлюз SMS его бы отклонил)', async () => {
+      User.findOne.mockResolvedValue({ id: 5, email: 'ru-phone@example.com', phone: '+79991234567', is_active: true });
+      PasswordResetToken.destroy.mockResolvedValue(1);
+      PasswordResetToken.create.mockResolvedValue({});
+
+      const result = await authService.forgotPassword('ru-phone@example.com');
+
+      expect(result).toEqual({ success: true });
+      expect(PasswordResetToken.create).toHaveBeenCalledWith(
+        expect.objectContaining({ user_id: 5, channel: 'email' })
+      );
+      expect(emailTransport.sendPasswordResetEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ to: 'ru-phone@example.com' })
+      );
+      expect(payomSmsTransport.sendTemplateSms).not.toHaveBeenCalled();
+    });
+
     it('должен отправить код по email, если телефона нет', async () => {
       User.findOne.mockResolvedValue({ id: 3, email: 'nophone@example.com', phone: null, is_active: true });
       PasswordResetToken.destroy.mockResolvedValue(1);

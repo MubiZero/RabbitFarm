@@ -3,6 +3,7 @@ const PasswordUtil = require('../utils/password');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
 const { generateOtp, hashOtp } = require('../utils/otp');
+const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 const payomSmsTransport = require('./notifications/payomSmsTransport');
 const emailTransport = require('./notifications/emailTransport');
 const planService = require('./planService');
@@ -425,7 +426,16 @@ class AuthService {
 
       const code = generateOtp();
       const tokenHash = hashOtp(code);
-      const channel = user.phone ? 'sms' : 'email';
+
+      // Телефон при регистрации/в профиле принимается в общем международном
+      // формате (см. authValidator.js), а не строго таджикском — шлюз Payom
+      // же принимает только `+992XXXXXXXXX` (utils/phone.js). Без этой
+      // проверки канал 'sms' выбирался бы по одному факту наличия телефона,
+      // отправка молча падала бы у любого нетаджикского номера, и человек
+      // оставался бы без кода вовсе — форма всё равно отвечает `success`,
+      // чтобы не палить существование аккаунта.
+      const normalizedPhone = user.phone ? normalizeTjPhone(user.phone) : null;
+      const channel = normalizedPhone && isTjPhone(normalizedPhone) ? 'sms' : 'email';
 
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + RESET_CODE_TTL_MINUTES);
@@ -446,7 +456,7 @@ class AuthService {
         if (channel === 'sms') {
           await payomSmsTransport.sendTemplateSms({
             templateKey: 'user.verification_code',
-            telephone: user.phone,
+            telephone: normalizedPhone,
             variables: { 'text-1': 'RabbitFarm', 'code-1': code }
           });
         } else {
