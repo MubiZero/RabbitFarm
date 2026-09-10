@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -116,6 +118,32 @@ class _FeedingRecordFormScreenState
           ),
         );
       } else {
+        final rabbitIds = _mode == _FeedingMode.rabbit
+            ? [for (final rabbit in _rabbits) rabbit.id]
+            : const <int>[];
+        final cageIds = _mode == _FeedingMode.cage
+            ? _cageIds.toList()
+            : const <int>[];
+
+        if (!(ref.read(isOnlineProvider).value ?? true)) {
+          // Нет сети — запись не теряется, а уходит в офлайн-очередь и
+          // досылается сама, как только связь вернётся. Склад до этого
+          // момента не трогаем: сходить за его текущим остатком всё равно
+          // не с кем.
+          await ref
+              .read(offlineQueueProvider.notifier)
+              .enqueue(OfflineActionType.feedingRecord, {
+                'feed_id': _feedId,
+                'quantity': quantity,
+                'fed_at': _fedAt.toIso8601String(),
+                if (notes != null) 'notes': notes,
+                'rabbit_ids': rabbitIds,
+                'cage_ids': cageIds,
+              });
+          Analytics.feedingRecorded();
+          return null;
+        }
+
         // Один путь и для одного получателя, и для сорока: сервер принимает
         // пачку из одного так же, как из сорока, и форме не нужно выбирать
         // между двумя видами запроса.
@@ -123,11 +151,8 @@ class _FeedingRecordFormScreenState
           feedId: _feedId!,
           quantityPerRecipient: quantity,
           fedAt: _fedAt,
-          rabbitIds: _mode == _FeedingMode.rabbit
-              ? [for (final rabbit in _rabbits) rabbit.id]
-              : const [],
-          cageIds:
-              _mode == _FeedingMode.cage ? _cageIds.toList() : const <int>[],
+          rabbitIds: rabbitIds,
+          cageIds: cageIds,
           notes: notes,
         );
         Analytics.feedingRecorded();
@@ -155,18 +180,23 @@ class _FeedingRecordFormScreenState
     final l10n = context.l10n;
     final feedsAsync = ref.watch(feedOptionsProvider);
     final cagesAsync = ref.watch(cageOptionsProvider);
+    final online = ref.watch(isOnlineProvider).value ?? true;
 
-    final feed =
-        feedsAsync.value?.where((f) => f.id == _feedId).firstOrNull;
+    final feed = feedsAsync.value?.where((f) => f.id == _feedId).firstOrNull;
     final isBulk = !_isEditing && _recipientCount > 1;
 
     return AppFormScaffold(
       title: _isEditing ? l10n.feedingFormEditTitle : l10n.feedingFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
+      // Пока связи нет, запись при сохранении уйдёт в очередь, а не на
+      // сервер — сообщение об успехе должно говорить именно это, а не
+      // притворяться, что кормление уже дошло.
       successMessage: _isEditing
           ? l10n.feedingFormUpdated
-          : l10n.feedingBulkCreated(_recipientCount),
+          : (online
+                ? l10n.feedingBulkCreated(_recipientCount)
+                : l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       children: [
@@ -178,16 +208,20 @@ class _FeedingRecordFormScreenState
                 ButtonSegment(
                   value: _FeedingMode.rabbit,
                   icon: const Icon(Icons.pets_outlined),
-                  label: Text(_isEditing
-                      ? l10n.feedingFormModeRabbit
-                      : l10n.feedingBulkModeRabbits),
+                  label: Text(
+                    _isEditing
+                        ? l10n.feedingFormModeRabbit
+                        : l10n.feedingBulkModeRabbits,
+                  ),
                 ),
                 ButtonSegment(
                   value: _FeedingMode.cage,
                   icon: const Icon(Icons.grid_view_outlined),
-                  label: Text(_isEditing
-                      ? l10n.feedingFormModeCage
-                      : l10n.feedingBulkModeCages),
+                  label: Text(
+                    _isEditing
+                        ? l10n.feedingFormModeCage
+                        : l10n.feedingBulkModeCages,
+                  ),
                 ),
               ],
               selected: {_mode},
@@ -212,8 +246,9 @@ class _FeedingRecordFormScreenState
             ),
             TextFormField(
               controller: _quantity,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 // Подпись прямо говорит, что означает число: при нескольких
                 // получателях «сколько» без уточнения читается и как норма на
@@ -393,8 +428,9 @@ class _RabbitsField extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 error,
-                style: AppTypography.labelSm
-                    .copyWith(color: context.colors.error),
+                style: AppTypography.labelSm.copyWith(
+                  color: context.colors.error,
+                ),
               ),
             ],
           ],
@@ -441,8 +477,7 @@ class _CagesField extends StatelessWidget {
             final picked = await showModalBottomSheet<Set<int>>(
               context: context,
               isScrollControlled: true,
-              builder: (_) =>
-                  _CagePickerSheet(
+              builder: (_) => _CagePickerSheet(
                 cages: cages,
                 selected: selected,
                 error: cagesAsync.error,
@@ -471,8 +506,9 @@ class _CagesField extends StatelessWidget {
                 ? null
                 : Text(
                     _text(context, cages),
-                    style: AppTypography.bodyLg
-                        .copyWith(color: context.colors.onSurface),
+                    style: AppTypography.bodyLg.copyWith(
+                      color: context.colors.onSurface,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -519,14 +555,14 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
   }
 
   void _toggleRow(List<CageModel> row, bool select) => setState(() {
-        for (final cage in row) {
-          if (select) {
-            _selected.add(cage.id);
-          } else {
-            _selected.remove(cage.id);
-          }
-        }
-      });
+    for (final cage in row) {
+      if (select) {
+        _selected.add(cage.id);
+      } else {
+        _selected.remove(cage.id);
+      }
+    }
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -550,14 +586,16 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
                   Expanded(
                     child: Text(
                       l10n.feedingBulkCagesPickTitle,
-                      style: AppTypography.titleLg
-                          .copyWith(color: context.colors.onSurface),
+                      style: AppTypography.titleLg.copyWith(
+                        color: context.colors.onSurface,
+                      ),
                     ),
                   ),
                   Text(
                     l10n.feedingBulkCagesSelected(_selected.length),
-                    style: AppTypography.labelSm
-                        .copyWith(color: context.colors.onSurfaceVariant),
+                    style: AppTypography.labelSm.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -569,9 +607,11 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
               child: Row(
                 children: [
                   TextButton.icon(
-                    onPressed: () => setState(() => _selected
-                      ..clear()
-                      ..addAll(widget.cages.map((c) => c.id))),
+                    onPressed: () => setState(
+                      () => _selected
+                        ..clear()
+                        ..addAll(widget.cages.map((c) => c.id)),
+                    ),
                     icon: const Icon(Icons.select_all),
                     label: Text(l10n.feedingBulkWholeFarm),
                   ),
@@ -595,11 +635,11 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
                       subtitle: errorText(l10n, widget.error),
                     )
                   : widget.cages.isEmpty
-                      ? AppEmptyState(
-                          icon: Icons.grid_view_outlined,
-                          title: l10n.feedingBulkNoCagesTitle,
-                          subtitle: l10n.feedingBulkNoCagesBody,
-                        )
+                  ? AppEmptyState(
+                      icon: Icons.grid_view_outlined,
+                      title: l10n.feedingBulkNoCagesTitle,
+                      subtitle: l10n.feedingBulkNoCagesBody,
+                    )
                   : ListView(
                       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                       children: [
@@ -632,14 +672,15 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
         value: chosen == cages.length
             ? true
             : chosen == 0
-                ? false
-                : null,
+            ? false
+            : null,
         tristate: true,
         controlAffinity: ListTileControlAffinity.leading,
         title: Text(
           row ?? context.l10n.feedingBulkRowUnnamed,
-          style: AppTypography.titleMd
-              .copyWith(color: context.colors.onSurface),
+          style: AppTypography.titleMd.copyWith(
+            color: context.colors.onSurface,
+          ),
         ),
         subtitle: Text(context.l10n.feedingBulkCagesSelected(chosen)),
         onChanged: (_) => _toggleRow(cages, chosen != cages.length),
@@ -765,7 +806,8 @@ class _FeedField extends StatelessWidget {
                 // корма, которого на складе уже нет.
                 Text(
                   context.l10n.feedingFormStockLeft(
-                      formatQuantity(feed.currentStock, feed.unit.displayName)),
+                    formatQuantity(feed.currentStock, feed.unit.displayName),
+                  ),
                   style: AppTypography.labelSm.copyWith(
                     color: feed.currentStock <= feed.minStock
                         ? AppColors.warning

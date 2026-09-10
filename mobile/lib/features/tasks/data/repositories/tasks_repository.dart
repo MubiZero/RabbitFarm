@@ -1,7 +1,10 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
+import '../../../../core/api/api_failure.dart';
 import '../models/task_model.dart';
 
 /// Tasks repository
@@ -123,13 +126,21 @@ class TasksRepository {
   }
 
   /// Complete task
+  ///
+  /// В отличие от остальных методов этого репозитория, ошибка отдаётся как
+  /// [ApiFailure], а не общим `Exception` через `guardRequest`: очередь
+  /// офлайн-действий (`OfflineQueueController`) должна отличить «сети нет,
+  /// повторить позже» от настоящего отказа сервера, а `guardRequest` эту
+  /// разницу стирает.
   Future<Task> completeTask(int id) async {
-    return guardRequest(() async {
+    try {
       final response = await _apiClient.post(
         '${ApiEndpoints.tasks}/$id/complete',
       );
       return Task.fromJson(response.data['data']);
-    }, 'Не удалось отметить задачу выполненной');
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
   }
 
   // Helper methods to convert enums to strings

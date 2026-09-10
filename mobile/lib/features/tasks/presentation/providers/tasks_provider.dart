@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../../core/api/api_failure.dart';
 import '../../../../core/cache/cache_scope.dart';
 import '../../../../core/cache/list_cache.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../data/models/task_model.dart';
@@ -79,8 +82,12 @@ class TasksListState {
       total: total ?? this.total,
       hasMore: hasMore ?? this.hasMore,
       typeFilter: clearTypeFilter ? null : (typeFilter ?? this.typeFilter),
-      statusFilter: clearStatusFilter ? null : (statusFilter ?? this.statusFilter),
-      priorityFilter: clearPriorityFilter ? null : (priorityFilter ?? this.priorityFilter),
+      statusFilter: clearStatusFilter
+          ? null
+          : (statusFilter ?? this.statusFilter),
+      priorityFilter: clearPriorityFilter
+          ? null
+          : (priorityFilter ?? this.priorityFilter),
       overdueOnly: overdueOnly ?? this.overdueOnly,
       todayOnly: todayOnly ?? this.todayOnly,
     );
@@ -105,7 +112,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
   bool _hasFreshData = false;
 
   TasksListNotifier(this._repository, this._cacheScope)
-      : super(TasksListState()) {
+    : super(TasksListState()) {
     _restoreFromCache();
     loadTasks();
   }
@@ -165,10 +172,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
         unawaited(tasksCache.write(_cacheScope, tasks));
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
     }
   }
 
@@ -206,10 +210,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
         hasMore: page < totalPages,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
     }
   }
 
@@ -263,32 +264,35 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
 /// Tasks list provider with infinite scroll
 final tasksListProvider =
     StateNotifierProvider<TasksListNotifier, TasksListState>((ref) {
-  final repository = ref.watch(tasksRepositoryProvider);
-  // Владелец кэша читается один раз при создании списка: сменился
-  // пользователь — поднялся номер сессии, и список пересоздался целиком.
-  return TasksListNotifier(repository, ref.read(cacheScopeProvider));
-});
+      final repository = ref.watch(tasksRepositoryProvider);
+      // Владелец кэша читается один раз при создании списка: сменился
+      // пользователь — поднялся номер сессии, и список пересоздался целиком.
+      return TasksListNotifier(repository, ref.read(cacheScopeProvider));
+    });
 
 /// Single task provider
-final taskProvider =
-    FutureProvider.autoDispose.family<Task, int>((ref, id) async {
+final taskProvider = FutureProvider.autoDispose.family<Task, int>((
+  ref,
+  id,
+) async {
   final repository = ref.watch(tasksRepositoryProvider);
   return repository.getTaskById(id);
 });
 
 /// Task statistics provider
-final taskStatisticsProvider =
-    FutureProvider.autoDispose<TaskStatistics>((ref) async {
+final taskStatisticsProvider = FutureProvider.autoDispose<TaskStatistics>((
+  ref,
+) async {
   final repository = ref.watch(tasksRepositoryProvider);
   return repository.getStatistics();
 });
 
 /// Upcoming tasks provider
-final upcomingTasksProvider =
-    FutureProvider.autoDispose.family<List<Task>, int>((ref, days) async {
-  final repository = ref.watch(tasksRepositoryProvider);
-  return repository.getUpcoming(days: days);
-});
+final upcomingTasksProvider = FutureProvider.autoDispose
+    .family<List<Task>, int>((ref, days) async {
+      final repository = ref.watch(tasksRepositoryProvider);
+      return repository.getUpcoming(days: days);
+    });
 
 /// Task actions provider
 final taskActionsProvider = Provider<TaskActions>((ref) {
@@ -330,8 +334,19 @@ class TaskActions {
     _ref.invalidate(taskStatisticsProvider);
   }
 
-  /// Complete task
-  Future<Task> completeTask(int id) async {
+  /// Complete task.
+  ///
+  /// `null` означает «отправка отложена»: сети нет, отметка ушла в офлайн-
+  /// очередь и будет отправлена сама, как только связь вернётся.
+  Future<Task?> completeTask(int id) async {
+    if (!(_ref.read(isOnlineProvider).value ?? true)) {
+      await _ref.read(offlineQueueProvider.notifier).enqueue(
+        OfflineActionType.taskComplete,
+        {'task_id': id},
+      );
+      return null;
+    }
+
     final result = await _repository.completeTask(id);
     await _ref.read(tasksListProvider.notifier).refresh();
     _ref.invalidate(taskProvider(id));
@@ -339,7 +354,6 @@ class TaskActions {
     return result;
   }
 }
-
 
 /// Задачи, которые горят сегодня: просроченные и сегодняшние, ранние сверху.
 ///
@@ -364,7 +378,9 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
     // а `overdue_only`/`today_only` он сейчас не применяет вовсе. Сортировка
     // по сроку по возрастанию и так ставит просроченные и сегодняшние первыми,
     // остаётся отсечь будущее.
-    final result = await ref.watch(tasksRepositoryProvider).getTasks(
+    final result = await ref
+        .watch(tasksRepositoryProvider)
+        .getTasks(
           page: 1,
           limit: _limit,
           sortBy: 'due_date',
@@ -385,6 +401,11 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
   /// ожидания читаются как «не нажалось», и задачу отмечают второй раз. Отказ
   /// возвращает в прежний вид только эту строку — соседние отметки, сделанные
   /// пока шёл запрос, откатывать нельзя.
+  ///
+  /// Если сети нет вовсе, отметка не откатывается: она уходит в офлайн-
+  /// очередь (`OfflineQueueController`) и досылается сама, как только связь
+  /// вернётся, — откатывать здесь нечего, действие не провалилось, а
+  /// отложено.
   Future<void> complete(int id) async {
     final before = state.value;
     if (before == null) return;
@@ -393,17 +414,38 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
     if (index < 0) return;
     final original = before[index];
 
-    state = AsyncData(_replace(
-      before,
-      original.copyWith(
-        status: TaskStatus.completed,
-        completedAt: DateTime.now(),
+    state = AsyncData(
+      _replace(
+        before,
+        original.copyWith(
+          status: TaskStatus.completed,
+          completedAt: DateTime.now(),
+        ),
       ),
-    ));
+    );
+
+    if (!(ref.read(isOnlineProvider).value ?? true)) {
+      await ref.read(offlineQueueProvider.notifier).enqueue(
+        OfflineActionType.taskComplete,
+        {'task_id': id},
+      );
+      return;
+    }
 
     try {
       await ref.read(tasksRepositoryProvider).completeTask(id);
-    } catch (_) {
+    } catch (e) {
+      // Сеть пропала между проверкой выше и самим запросом — тот же исход,
+      // что и на явном офлайне: не откат, а очередь.
+      if (e is ApiFailure &&
+          (e.kind == ApiFailureKind.offline ||
+              e.kind == ApiFailureKind.timeout)) {
+        await ref.read(offlineQueueProvider.notifier).enqueue(
+          OfflineActionType.taskComplete,
+          {'task_id': id},
+        );
+        return;
+      }
       if (!_disposed) {
         state = AsyncData(_replace(state.value ?? before, original));
       }
@@ -411,8 +453,9 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
     }
   }
 
-  List<Task> _replace(List<Task> tasks, Task task) =>
-      [for (final item in tasks) item.id == task.id ? task : item];
+  List<Task> _replace(List<Task> tasks, Task task) => [
+    for (final item in tasks) item.id == task.id ? task : item,
+  ];
 
   static DateTime _endOfToday() {
     final now = DateTime.now();
@@ -423,4 +466,5 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
 /// Задачи для экрана «Сегодня».
 final todayTasksProvider =
     AsyncNotifierProvider.autoDispose<TodayTasksNotifier, List<Task>>(
-        TodayTasksNotifier.new);
+      TodayTasksNotifier.new,
+    );

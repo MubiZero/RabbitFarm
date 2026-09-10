@@ -4,20 +4,24 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'core/analytics/analytics.dart';
 import 'core/cache/list_cache.dart';
 import 'core/error/error_handling.dart';
+import 'core/l10n/date_locale.dart';
+import 'core/l10n/framework_locale_fallback.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/app_version.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
+import 'core/widgets/offline_queue_gate.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -36,8 +40,25 @@ void main() {
   });
 }
 
+/// Пустая строка по умолчанию — без DSN Sentry инициализируется в
+/// выключенном режиме, ничего никуда не отправляет.
+/// flutter build ... --dart-define=SENTRY_DSN=https://...@sentry.io/...
+const _sentryDsn = String.fromEnvironment('SENTRY_DSN');
+
 Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // До `installErrorHandlers()`: наши обработчики ставятся поверх и
+  // полностью владеют `FlutterError.onError`/`PlatformDispatcher.onError`
+  // (см. `error_handling.dart`) — иначе оба перехвата спорили бы за
+  // FlutterError.onError, и часть ошибок либо дублировалась, либо терялась.
+  await SentryFlutter.init((options) {
+    options.dsn = _sentryDsn;
+    options.environment = kReleaseMode ? 'production' : 'development';
+    // Только ошибки: performance-трейсинг на этом масштабе не нужен, а на
+    // бесплатном тарифе Sentry именно он лимитирован.
+    options.tracesSampleRate = 0;
+  });
   installErrorHandlers();
 
   // Кэш последних виденных списков. Без него в сарае без связи после
@@ -93,7 +114,9 @@ Future<void> _bootstrap() async {
   if (firebaseReady) {
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => handleMessageTap(initialMessage));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => handleMessageTap(initialMessage),
+      );
     }
   }
 }
@@ -104,10 +127,17 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeState = ref.watch(themeProvider);
-    final darkTheme  = ref.watch(darkThemeProvider);
+    final darkTheme = ref.watch(darkThemeProvider);
     final lightTheme = ref.watch(lightThemeProvider);
-    final router     = ref.watch(routerProvider);
+    final router = ref.watch(routerProvider);
     final upgradeRequired = ref.watch(upgradeRequiredProvider);
+    // Пока `SharedPreferences` ещё не прочитан — русский, тот же выбор, что
+    // и в самом провайдере до его первого разрешения.
+    final locale = ref.watch(localeProvider).value ?? const Locale('ru');
+    // Догоняет любой `DateFormat`/форматирование без явной локали до
+    // выбранного языка — иначе такие места молча остались бы русскими,
+    // сколько бы языков в приложении ни было.
+    Intl.defaultLocale = dateSymbolsLocale(locale);
 
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
@@ -116,6 +146,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: themeState.mode,
       routerConfig: router,
+      locale: locale,
       // Все три плашки должны быть видны на любом экране, а не только там, где
       // начался просмотр, выяснилось состояние доступа или отвалилась сеть —
       // поэтому оборачивают весь роутер, а не один маршрут. Порядок — от
@@ -130,14 +161,20 @@ class MyApp extends ConsumerWidget {
           ? const ForceUpdateScreen()
           : ImpersonationBanner(
               child: FarmStatusBanner(
-                child: OfflineBanner(child: child ?? const SizedBox.shrink()),
+                child: OfflineQueueGate(
+                  child: OfflineBanner(child: child ?? const SizedBox.shrink()),
+                ),
               ),
             ),
+      // Обёртки вместо Global*Delegate напрямую: `flutter_localizations` не
+      // знает таджикский вовсе (см. `framework_locale_fallback.dart`) — без
+      // них выбор таджикского ронял бы любой системный диалог (календарь,
+      // выделение текста) с «No MaterialLocalizations found».
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        TgAwareMaterialLocalizationsDelegate(),
+        TgAwareWidgetsLocalizationsDelegate(),
+        TgAwareCupertinoLocalizationsDelegate(),
       ],
       // Список языков берётся из переводов, а не пишется руками: раньше здесь
       // значился английский, которого в приложении никогда не было.

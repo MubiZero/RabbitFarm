@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../cages/presentation/providers/cages_provider.dart';
@@ -74,11 +76,22 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
           ),
         );
       } else {
-        await repo.createNote(NoteCreate(
+        final note = NoteCreate(
           content: _content.text.trim(),
           rabbitId: _rabbitId,
           cageId: _cageId,
-        ));
+        );
+
+        if (!(ref.read(isOnlineProvider).value ?? true)) {
+          // Нет сети — заметка не теряется, а уходит в офлайн-очередь и
+          // досылается сама, как только связь вернётся.
+          await ref
+              .read(offlineQueueProvider.notifier)
+              .enqueue(OfflineActionType.note, note.toJson());
+          return null;
+        }
+
+        await repo.createNote(note);
       }
       ref.invalidate(journalFeedProvider);
       return null;
@@ -128,6 +141,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
   @override
   Widget build(BuildContext context) {
     final canDelete = ref.watch(canProvider(FarmCapability.deleteDailyRecords));
+    final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
       title: _isEditing
@@ -137,9 +151,13 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
       submitLabel: _isEditing
           ? context.l10n.commonSave
           : context.l10n.noteFormCreate,
+      // Пока связи нет, заметка при сохранении уйдёт в очередь, а не на
+      // сервер — сообщение об успехе должно говорить именно это.
       successMessage: _isEditing
           ? context.l10n.noteFormUpdated
-          : context.l10n.noteFormCreated,
+          : (online
+                ? context.l10n.noteFormCreated
+                : context.l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       actions: [

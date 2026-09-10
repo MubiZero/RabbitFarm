@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../widgets/app_crash_view.dart';
 
@@ -11,9 +13,11 @@ import '../widgets/app_crash_view.dart';
 /// виджетов не попадал никуда — ни в консоль, ни в отчёт, — и разбирать жалобу
 /// «у меня просто ничего не произошло» было не по чему.
 ///
-/// Отправки во внешний сервис здесь пока нет: crash-репортер — отдельное
-/// решение. Задача этого слоя — чтобы ошибка существовала хотя бы в логе
-/// устройства и место для такой отправки было ровно одно.
+/// Отправка в Sentry идёт отсюда же, а не через собственные интеграции SDK
+/// (`SentryFlutter.init` вызывается в `main.dart` без автоматического
+/// перехвата `FlutterError`/`PlatformDispatcher` — наши обработчики ставятся
+/// после и полностью владеют обоими хуками): единственная точка, которая
+/// решает, что делать с необработанной ошибкой, — эта.
 void installErrorHandlers() {
   // Ошибка внутри Flutter: сборка, отрисовка, жесты, колбэки фреймворка.
   FlutterError.onError = (details) {
@@ -54,4 +58,12 @@ void logUncaughtError(Object error, StackTrace stack, {String? source}) {
     error: error,
     stackTrace: stack,
   );
+
+  // No-op без DSN (см. `SentryFlutter.init` в `main.dart`) — как и раньше,
+  // без него единственный след ошибки остаётся в логе устройства выше.
+  unawaited(Sentry.captureException(
+    error,
+    stackTrace: stack,
+    hint: source == null ? null : Hint.withMap({'source': source}),
+  ));
 }

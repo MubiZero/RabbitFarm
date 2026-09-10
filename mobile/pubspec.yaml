@@ -57,6 +57,10 @@ dependencies:
   # Версия приложения в заголовке X-App-Version (см. core/api/api_client.dart)
   # — бэкенд по ней отличает сборки ниже минимальной поддерживаемой.
   package_info_plus: ^8.1.2
+  # Крэш-репортинг. DSN опционален (см. `--dart-define=SENTRY_DSN`) — без
+  # него SDK инициализируется в выключенном режиме, ошибки остаются только
+  # в логе устройства, как и раньше.
+  sentry_flutter: ^8.14.2
 
 dev_dependencies:
   flutter_test:
