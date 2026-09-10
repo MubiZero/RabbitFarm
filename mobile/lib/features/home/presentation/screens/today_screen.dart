@@ -4,15 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/date_labels.dart';
-import '../../../../core/widgets/coach_mark.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../onboarding/presentation/providers/onboarding_provider.dart';
-import '../../../onboarding/presentation/providers/tour_provider.dart';
+import '../../../onboarding/presentation/widgets/activation_checklist_card.dart';
 import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 import '../../../tasks/data/models/task_model.dart';
@@ -38,37 +37,6 @@ class TodayScreen extends ConsumerStatefulWidget {
 }
 
 class _TodayScreenState extends ConsumerState<TodayScreen> {
-  final _alertsKey = GlobalKey();
-  final _statsKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartTour());
-  }
-
-  /// Шаги обучения собираются в build, а не в initState: переводы берутся из
-  /// дерева виджетов и в initState ещё недоступны.
-  List<CoachMarkStep> _tourSteps(BuildContext context) => [
-        CoachMarkStep(
-          targetKey: _alertsKey,
-          title: context.l10n.todayTourAlertsTitle,
-          description: context.l10n.todayTourAlertsBody,
-        ),
-        CoachMarkStep(
-          targetKey: _statsKey,
-          title: context.l10n.todayTourStatsTitle,
-          description: context.l10n.todayTourStatsBody,
-        ),
-      ];
-
-  Future<void> _maybeStartTour() async {
-    final onboarding = await ref.read(onboardingProvider.future);
-    if (!onboarding.tourDone && mounted) {
-      ref.read(tourProvider.notifier).start();
-    }
-  }
-
   Future<void> _refresh() async {
     ref.invalidate(dashboardReportProvider);
     ref.invalidate(todayTasksProvider);
@@ -86,34 +54,18 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     final dashboardAsync = ref.watch(dashboardReportProvider);
-    final tourState = ref.watch(tourProvider);
-    final tourSteps = _tourSteps(context);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              child: AppAsyncView<DashboardReport>(
-                value: dashboardAsync,
-                onRetry: _refresh,
-                skeleton: (_) => const _TodaySkeleton(),
-                builder: (dashboard) => _content(dashboard),
-              ),
-            ),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: AppAsyncView<DashboardReport>(
+            value: dashboardAsync,
+            onRetry: _refresh,
+            skeleton: (_) => const _TodaySkeleton(),
+            builder: (dashboard) => _content(dashboard),
           ),
-          if (tourState.isActive && tourState.step < tourSteps.length)
-            Positioned.fill(
-              child: CoachMarkOverlay(
-                steps: tourSteps,
-                currentStep: tourState.step,
-                onNext: () =>
-                    ref.read(tourProvider.notifier).advance(tourSteps.length),
-                onSkip: () => ref.read(tourProvider.notifier).skip(),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -134,10 +86,14 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         const _Greeting(),
         const SizedBox(height: AppSpacing.xl),
 
+        ActivationChecklistCard(
+          cagesTotal: d.cages.total,
+          rabbitsTotal: d.rabbits.total,
+        ),
+
         // Всё, что горит сегодня, — один блок: дела, которые можно закрыть
         // отсюда же, и тревоги, за которыми надо идти в другой раздел.
         Column(
-          key: _alertsKey,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _TodayTasks(quietWhenEmpty: alerts.isNotEmpty),
@@ -155,7 +111,6 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         const SizedBox(height: AppSpacing.xl),
 
         Column(
-          key: _statsKey,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppSectionTitle(context.l10n.todayFarmNow),
@@ -476,7 +431,8 @@ class _Greeting extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          DateFormat('d MMMM, EEEE', 'ru').format(now),
+          DateFormat('d MMMM, EEEE', dateSymbolsLocale(Localizations.localeOf(context)))
+              .format(now),
           style: AppTypography.bodyMd
               .copyWith(color: context.colors.onSurfaceVariant),
         ),

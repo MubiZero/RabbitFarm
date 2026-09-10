@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/onboarding_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -48,17 +47,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
 
     final authState = ref.read(authProvider);
-    final onboarding = await ref.read(onboardingProvider.future);
 
     if (!mounted) return;
 
-    if (authState.isAuthenticated) {
-      context.go('/today');
-    } else if (!onboarding.isDone) {
-      context.go('/onboarding');
-    } else {
-      context.go('/login');
-    }
+    context.go(authState.isAuthenticated ? '/today' : '/login');
   }
 
   @override

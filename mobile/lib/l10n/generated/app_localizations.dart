@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_en.dart';
 import 'app_localizations_ru.dart';
+import 'app_localizations_tg.dart';
+import 'app_localizations_uz.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +95,12 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('ru')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('ru'),
+    Locale('tg'),
+    Locale('uz'),
+  ];
 
   /// Название приложения
   ///
@@ -217,8 +225,14 @@ abstract class AppLocalizations {
   /// Плашка поверх всего приложения, когда у устройства нет сети
   ///
   /// In ru, this message translates to:
-  /// **'Нет связи — новые записи не сохранятся'**
+  /// **'Нет связи — кормление, задачи и заметки сохранятся и отправятся позже'**
   String get offlineBanner;
+
+  /// Сообщение об успехе вместо обычного, когда действие (кормление, заметка) сохранено офлайн и ждёт отправки
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранено на устройстве — отправится, когда появится связь'**
+  String get offlineActionQueued;
 
   /// Заголовок экрана обязательного обновления
   ///
@@ -622,29 +636,35 @@ abstract class AppLocalizations {
   /// **'Скоро вакцинация'**
   String get todayAlertUpcomingVaccination;
 
-  /// No description provided for @todayTourAlertsTitle.
+  /// No description provided for @activationChecklistTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Что требует внимания'**
-  String get todayTourAlertsTitle;
+  /// **'Начало работы'**
+  String get activationChecklistTitle;
 
-  /// No description provided for @todayTourAlertsBody.
+  /// No description provided for @activationChecklistDismiss.
   ///
   /// In ru, this message translates to:
-  /// **'Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.'**
-  String get todayTourAlertsBody;
+  /// **'Скрыть'**
+  String get activationChecklistDismiss;
 
-  /// No description provided for @todayTourStatsTitle.
+  /// No description provided for @activationChecklistAddCage.
   ///
   /// In ru, this message translates to:
-  /// **'Состояние фермы'**
-  String get todayTourStatsTitle;
+  /// **'Добавьте клетку'**
+  String get activationChecklistAddCage;
 
-  /// No description provided for @todayTourStatsBody.
+  /// No description provided for @activationChecklistAddRabbit.
   ///
   /// In ru, this message translates to:
-  /// **'Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.'**
-  String get todayTourStatsBody;
+  /// **'Добавьте кролика'**
+  String get activationChecklistAddRabbit;
+
+  /// No description provided for @activationChecklistFirstFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внесите первое кормление'**
+  String get activationChecklistFirstFeeding;
 
   /// No description provided for @menuProfile.
   ///
@@ -4066,6 +4086,12 @@ abstract class AppLocalizations {
   /// **'Цвет акцента'**
   String get settingsAccent;
 
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Язык'**
+  String get settingsLanguage;
+
   /// No description provided for @settingsNotifications.
   ///
   /// In ru, this message translates to:
@@ -4131,6 +4157,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обращение отправлено'**
   String get supportRequestSent;
+
+  /// No description provided for @supportContactHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Или свяжитесь напрямую:'**
+  String get supportContactHint;
 
   /// No description provided for @settingsPrivacyPolicy.
   ///
@@ -4324,108 +4356,6 @@ abstract class AppLocalizations {
   /// **'У меня уже есть аккаунт'**
   String get joinHaveAccount;
 
-  /// No description provided for @onboardWelcomeTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ферма под рукой'**
-  String get onboardWelcomeTitle;
-
-  /// No description provided for @onboardWelcomeBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Кролики, кормление, здоровье и деньги — в одном месте'**
-  String get onboardWelcomeBody;
-
-  /// No description provided for @onboardStart.
-  ///
-  /// In ru, this message translates to:
-  /// **'Начать'**
-  String get onboardStart;
-
-  /// No description provided for @onboardHaveAccount.
-  ///
-  /// In ru, this message translates to:
-  /// **'Уже есть аккаунт? Войти'**
-  String get onboardHaveAccount;
-
-  /// No description provided for @onboardFarmNameTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как называется ваша ферма?'**
-  String get onboardFarmNameTitle;
-
-  /// No description provided for @onboardFarmNameHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Например, Ферма «Берёзки»'**
-  String get onboardFarmNameHint;
-
-  /// No description provided for @onboardNext.
-  ///
-  /// In ru, this message translates to:
-  /// **'Далее'**
-  String get onboardNext;
-
-  /// No description provided for @onboardSkip.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пропустить'**
-  String get onboardSkip;
-
-  /// No description provided for @onboardFarmTypeTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Кто ведёт хозяйство?'**
-  String get onboardFarmTypeTitle;
-
-  /// No description provided for @onboardSoloTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Только я'**
-  String get onboardSoloTitle;
-
-  /// No description provided for @onboardSoloBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Веду ферму сам'**
-  String get onboardSoloBody;
-
-  /// No description provided for @onboardTeamTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Я и работники'**
-  String get onboardTeamTitle;
-
-  /// No description provided for @onboardTeamBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'У каждого своя роль и свой доступ'**
-  String get onboardTeamBody;
-
-  /// No description provided for @onboardReadyNamed.
-  ///
-  /// In ru, this message translates to:
-  /// **'«{name}»\nготова к работе!'**
-  String onboardReadyNamed(String name);
-
-  /// No description provided for @onboardReadyPlain.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ферма готова к работе!'**
-  String get onboardReadyPlain;
-
-  /// No description provided for @onboardReadyBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Остальное настроим по ходу — приложение подскажет, что делать дальше'**
-  String get onboardReadyBody;
-
-  /// No description provided for @onboardRegister.
-  ///
-  /// In ru, this message translates to:
-  /// **'Зарегистрироваться'**
-  String get onboardRegister;
-
   /// No description provided for @splashTagline.
   ///
   /// In ru, this message translates to:
@@ -4557,6 +4487,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось зарегистрироваться'**
   String get registerFailed;
+
+  /// No description provided for @registerConsentPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я принимаю '**
+  String get registerConsentPrefix;
+
+  /// No description provided for @registerConsentLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'политику конфиденциальности'**
+  String get registerConsentLink;
+
+  /// No description provided for @registerConsentRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужно принять политику конфиденциальности, чтобы продолжить'**
+  String get registerConsentRequired;
 
   /// No description provided for @birthsTitle.
   ///
@@ -5835,24 +5783,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'На выставку'**
   String get purposeShow;
-
-  /// No description provided for @tourSkip.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пропустить'**
-  String get tourSkip;
-
-  /// No description provided for @tourNext.
-  ///
-  /// In ru, this message translates to:
-  /// **'Дальше'**
-  String get tourNext;
-
-  /// No description provided for @tourDone.
-  ///
-  /// In ru, this message translates to:
-  /// **'Понятно'**
-  String get tourDone;
 
   /// No description provided for @periodDays.
   ///
@@ -7618,7 +7548,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['ru'].contains(locale.languageCode);
+      <String>['en', 'ru', 'tg', 'uz'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -7627,8 +7557,14 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
     case 'ru':
       return AppLocalizationsRu();
+    case 'tg':
+      return AppLocalizationsTg();
+    case 'uz':
+      return AppLocalizationsUz();
   }
 
   throw FlutterError(

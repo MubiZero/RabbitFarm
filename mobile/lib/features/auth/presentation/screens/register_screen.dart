@@ -1,11 +1,13 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/auth_provider.dart';
-import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
 
@@ -26,23 +28,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _acceptedPrivacy = false;
+  late final TapGestureRecognizer _privacyLinkRecognizer;
 
   @override
   void initState() {
     super.initState();
-    // Название фермы уже спросили в онбординге и показали «... готова к
-    // работе!». Пустое поле здесь означало бы, что бэкенд заведёт ферму под
-    // дефолтным «Ферма {имя}» — не тем названием, которое человек только что
-    // видел. Через `.future`, а не `.value`: если экран открыт до того, как
-    // провайдер дочитал SharedPreferences, значение всё равно доедет.
-    ref.read(onboardingProvider.future).then((onboarding) {
-      if (!mounted || _farmNameController.text.isNotEmpty) return;
-      _farmNameController.text = onboarding.farmName.trim();
-    });
+    _privacyLinkRecognizer = TapGestureRecognizer()
+      ..onTap = () => launchUrl(
+            Uri.parse('https://rabbitfarm.mubi.dev/privacy.html'),
+            mode: LaunchMode.externalApplication,
+          );
   }
 
   @override
   void dispose() {
+    _privacyLinkRecognizer.dispose();
     _farmNameController.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
@@ -54,6 +55,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     final l10n = context.l10n;
+    if (!_acceptedPrivacy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.registerConsentRequired),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
     if (_formKey.currentState!.validate()) {
       try {
         await ref.read(authProvider.notifier).register(
@@ -112,6 +122,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
         ),
+        actions: const [LanguagePickerButton()],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -209,7 +220,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: context.l10n.registerPhone,
-                    hintText: '+7 (XXX) XXX-XX-XX',
+                    hintText: '+992 XX XXX XX XX',
                     prefixIcon: const Icon(Icons.phone),
                   ),
                 ),
@@ -285,7 +296,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 8),
+
+                // Privacy policy consent
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _acceptedPrivacy,
+                      onChanged: (value) =>
+                          setState(() => _acceptedPrivacy = value ?? false),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTypography.bodyMd
+                                .copyWith(color: context.colors.onSurface),
+                            children: [
+                              TextSpan(text: context.l10n.registerConsentPrefix),
+                              TextSpan(
+                                text: context.l10n.registerConsentLink,
+                                recognizer: _privacyLinkRecognizer,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
 
                 // Register button
                 ElevatedButton(

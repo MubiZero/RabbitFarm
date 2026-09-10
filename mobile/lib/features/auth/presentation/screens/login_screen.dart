@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
@@ -57,6 +58,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final busy = authState.isLoading;
 
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: const [LanguagePickerButton()],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

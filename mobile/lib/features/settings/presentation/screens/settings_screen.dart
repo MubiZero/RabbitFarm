@@ -10,6 +10,8 @@ import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/providers/locale_provider.dart';
+import '../../../../core/widgets/language_picker.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -56,6 +58,25 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (i) =>
                       ref.read(themeProvider.notifier).setAccent(i),
                 ),
+              ),
+              _SettingsTile(
+                icon: Icons.language,
+                label: context.l10n.settingsLanguage,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localeEndonym(
+                        ref.watch(localeProvider).value ?? const Locale('ru'),
+                      ),
+                      style: AppTypography.bodyMd.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+                onTap: () => showLanguagePicker(context, ref),
               ),
             ],
           ),

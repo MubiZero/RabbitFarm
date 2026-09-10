@@ -70,7 +70,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errorServer => 'На сервере сбой, попробуйте позже';
 
   @override
-  String get offlineBanner => 'Нет связи — новые записи не сохранятся';
+  String get offlineBanner =>
+      'Нет связи — кормление, задачи и заметки сохранятся и отправятся позже';
+
+  @override
+  String get offlineActionQueued =>
+      'Сохранено на устройстве — отправится, когда появится связь';
 
   @override
   String get forceUpdateTitle => 'Доступна новая версия';
@@ -283,18 +288,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayAlertUpcomingVaccination => 'Скоро вакцинация';
 
   @override
-  String get todayTourAlertsTitle => 'Что требует внимания';
+  String get activationChecklistTitle => 'Начало работы';
 
   @override
-  String get todayTourAlertsBody =>
-      'Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.';
+  String get activationChecklistDismiss => 'Скрыть';
 
   @override
-  String get todayTourStatsTitle => 'Состояние фермы';
+  String get activationChecklistAddCage => 'Добавьте клетку';
 
   @override
-  String get todayTourStatsBody =>
-      'Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.';
+  String get activationChecklistAddRabbit => 'Добавьте кролика';
+
+  @override
+  String get activationChecklistFirstFeeding => 'Внесите первое кормление';
 
   @override
   String get menuProfile => 'Профиль';
@@ -2233,6 +2239,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAccent => 'Цвет акцента';
 
   @override
+  String get settingsLanguage => 'Язык';
+
+  @override
   String get settingsNotifications => 'Уведомления';
 
   @override
@@ -2267,6 +2276,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get supportRequestSent => 'Обращение отправлено';
+
+  @override
+  String get supportContactHint => 'Или свяжитесь напрямую:';
 
   @override
   String get settingsPrivacyPolicy => 'Политика конфиденциальности';
@@ -2375,61 +2387,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get joinHaveAccount => 'У меня уже есть аккаунт';
 
   @override
-  String get onboardWelcomeTitle => 'Ферма под рукой';
-
-  @override
-  String get onboardWelcomeBody =>
-      'Кролики, кормление, здоровье и деньги — в одном месте';
-
-  @override
-  String get onboardStart => 'Начать';
-
-  @override
-  String get onboardHaveAccount => 'Уже есть аккаунт? Войти';
-
-  @override
-  String get onboardFarmNameTitle => 'Как называется ваша ферма?';
-
-  @override
-  String get onboardFarmNameHint => 'Например, Ферма «Берёзки»';
-
-  @override
-  String get onboardNext => 'Далее';
-
-  @override
-  String get onboardSkip => 'Пропустить';
-
-  @override
-  String get onboardFarmTypeTitle => 'Кто ведёт хозяйство?';
-
-  @override
-  String get onboardSoloTitle => 'Только я';
-
-  @override
-  String get onboardSoloBody => 'Веду ферму сам';
-
-  @override
-  String get onboardTeamTitle => 'Я и работники';
-
-  @override
-  String get onboardTeamBody => 'У каждого своя роль и свой доступ';
-
-  @override
-  String onboardReadyNamed(String name) {
-    return '«$name»\nготова к работе!';
-  }
-
-  @override
-  String get onboardReadyPlain => 'Ферма готова к работе!';
-
-  @override
-  String get onboardReadyBody =>
-      'Остальное настроим по ходу — приложение подскажет, что делать дальше';
-
-  @override
-  String get onboardRegister => 'Зарегистрироваться';
-
-  @override
   String get splashTagline => 'Управление фермой';
 
   @override
@@ -2496,6 +2453,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get registerFailed => 'Не удалось зарегистрироваться';
+
+  @override
+  String get registerConsentPrefix => 'Я принимаю ';
+
+  @override
+  String get registerConsentLink => 'политику конфиденциальности';
+
+  @override
+  String get registerConsentRequired =>
+      'Нужно принять политику конфиденциальности, чтобы продолжить';
 
   @override
   String get birthsTitle => 'Окролы';
@@ -3197,15 +3164,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get purposeShow => 'На выставку';
-
-  @override
-  String get tourSkip => 'Пропустить';
-
-  @override
-  String get tourNext => 'Дальше';
-
-  @override
-  String get tourDone => 'Понятно';
 
   @override
   String periodDays(int count) {

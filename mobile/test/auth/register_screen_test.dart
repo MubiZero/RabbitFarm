@@ -31,6 +31,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   Future<void> pumpRegister(WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(testAppScreen(
       const RegisterScreen(),
       overrides: [storageProvider.overrideWithValue(_FakeStorage())],
@@ -38,30 +39,30 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Finder farmNameField() => find.ancestor(
-        of: find.text('Название фермы'),
-        matching: find.byType(TextFormField),
-      );
-
-  testWidgets('подставляет название фермы из онбординга', (tester) async {
-    SharedPreferences.setMockInitialValues({'farm_name': '  Ферма Заря  '});
-
+  testWidgets(
+      'не даёт зарегистрироваться, пока не принята политика конфиденциальности',
+      (tester) async {
     await pumpRegister(tester);
+    final submitButton = find.text('Завести ферму');
+    await tester.ensureVisible(submitButton);
+    await tester.tap(submitButton);
+    await tester.pump();
 
-    // Название показали на экране «... готова к работе!» — на регистрации оно
-    // должно быть уже в поле, иначе бэкенд заведёт ферму под другим именем.
     expect(
-      tester.widget<TextFormField>(farmNameField()).controller!.text,
-      'Ферма Заря',
+      find.text('Нужно принять политику конфиденциальности, чтобы продолжить'),
+      findsOneWidget,
     );
   });
 
-  testWidgets('оставляет поле пустым, если онбординг не проходили',
-      (tester) async {
-    SharedPreferences.setMockInitialValues({});
-
+  testWidgets('отмечает согласие по тапу на чекбокс', (tester) async {
     await pumpRegister(tester);
+    final checkbox = find.byType(Checkbox);
+    await tester.ensureVisible(checkbox);
+    expect(tester.widget<Checkbox>(checkbox).value, isFalse);
 
-    expect(tester.widget<TextFormField>(farmNameField()).controller!.text, '');
+    await tester.tap(checkbox);
+    await tester.pump();
+
+    expect(tester.widget<Checkbox>(checkbox).value, isTrue);
   });
 }

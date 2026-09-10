@@ -75,10 +75,6 @@ import '../../features/platform_admin/presentation/screens/farm_detail_screen.da
 import '../../features/platform_admin/presentation/screens/farm_export_screen.dart';
 import '../../features/staff/presentation/screens/join_farm_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
-import '../../features/onboarding/presentation/screens/onboarding_welcome_screen.dart';
-import '../../features/onboarding/presentation/screens/onboarding_farm_name_screen.dart';
-import '../../features/onboarding/presentation/screens/onboarding_farm_type_screen.dart';
-import '../../features/onboarding/presentation/screens/onboarding_ready_screen.dart';
 
 /// Notifies GoRouter when auth state changes.
 /// Correct pattern: GoRouter is created once, redirect is re-evaluated on notification.
@@ -102,8 +98,7 @@ class RouterNotifier extends ChangeNotifier {
         loc == '/join' ||
         loc == '/forgot-password' ||
         loc == '/reset-password' ||
-        loc == '/splash' ||
-        loc.startsWith('/onboarding');
+        loc == '/splash';
 
     // Not authenticated on a protected page -> splash
     if (!isAuthenticated && !isPublic) {
@@ -150,32 +145,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
-      ),
-
-      // Onboarding routes
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/onboarding',
-        name: 'onboarding',
-        builder: (context, state) => const OnboardingWelcomeScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/onboarding/farm-name',
-        name: 'onboarding-farm-name',
-        builder: (context, state) => const OnboardingFarmNameScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/onboarding/farm-type',
-        name: 'onboarding-farm-type',
-        builder: (context, state) => const OnboardingFarmTypeScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/onboarding/ready',
-        name: 'onboarding-ready',
-        builder: (context, state) => const OnboardingReadyScreen(),
       ),
 
       // Auth routes

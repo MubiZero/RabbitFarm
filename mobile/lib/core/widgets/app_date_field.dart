@@ -28,7 +28,7 @@ class AppDateField extends StatelessWidget {
       initialDate: value,
       firstDate: firstDate ?? DateTime(2020),
       lastDate: lastDate ?? now.add(const Duration(days: 365 * 3)),
-      locale: const Locale('ru'),
+      locale: Localizations.localeOf(context),
     );
     if (date == null || !context.mounted) return;
 

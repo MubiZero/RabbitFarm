@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/core/access/farm_access.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/api/api_failure.dart';
+import 'package:mobile/core/providers/connectivity.dart';
 import 'package:mobile/features/home/presentation/screens/today_screen.dart';
 import 'package:mobile/features/reports/data/models/report_model.dart';
 import 'package:mobile/features/reports/presentation/providers/reports_provider.dart';
@@ -23,8 +25,11 @@ const _calmDashboard = DashboardReport(
   rabbits: RabbitStats(total: 48, male: 12, female: 36),
   cages: CageStats(total: 30, occupied: 22, available: 8),
   health: HealthStats(upcomingVaccinations: 0, overdueVaccinations: 0),
-  finance:
-      FinanceStats(income30days: 184500, expenses30days: 96200, profit30days: 88300),
+  finance: FinanceStats(
+    income30days: 184500,
+    expenses30days: 96200,
+    profit30days: 88300,
+  ),
   tasks: TaskStats(pending: 7, overdue: 2, urgent: 1),
   inventory: InventoryStats(lowStockFeeds: 0),
   breeding: BreedingStats(recentBirths: 5),
@@ -34,26 +39,30 @@ Task _task({
   required int id,
   required String title,
   required DateTime dueDate,
-}) =>
-    Task(
-      id: id,
-      title: title,
-      type: TaskType.feeding,
-      status: TaskStatus.pending,
-      priority: TaskPriority.high,
-      dueDate: dueDate,
-    );
+}) => Task(
+  id: id,
+  title: title,
+  type: TaskType.feeding,
+  status: TaskStatus.pending,
+  priority: TaskPriority.high,
+  dueDate: dueDate,
+);
 
 DateTime _daysAgo(int days) {
   final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day, 9).subtract(Duration(days: days));
+  return DateTime(
+    now.year,
+    now.month,
+    now.day,
+    9,
+  ).subtract(Duration(days: days));
 }
 
 /// Репозиторий без сети: подменяется целиком, чтобы под тестом оставалась
 /// настоящая логика провайдера — и порядок строк, и откат отметки.
 class _FakeTasksRepository extends TasksRepository {
   _FakeTasksRepository(this.tasks, {this.completeError})
-      : super(ApiClient(storage: const FlutterSecureStorage()));
+    : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<Task> tasks;
   final Object? completeError;
@@ -146,16 +155,28 @@ Widget _wrap({
   DashboardReport dashboard = _calmDashboard,
   TasksRepository? repository,
   FarmRoleAccess role = FarmRoleAccess.owner,
-}) =>
-    testAppScreen(
-      const TodayScreen(),
-      overrides: <Override>[
-        dashboardReportProvider.overrideWith((ref) async => dashboard),
-        tasksRepositoryProvider
-            .overrideWithValue(repository ?? _FakeTasksRepository(const [])),
-        farmRoleProvider.overrideWithValue(role),
-      ],
-    );
+  bool online = true,
+}) => testAppScreen(
+  // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
+  // на каждом экране с самого первого кадра (см. `main.dart`) — здесь
+  // экран собирается без него, и без прогрева провайдер только начинал
+  // бы подписку на поток в момент самого нажатия, а `.value` в этот
+  // момент ещё `null` и код читал бы связь как «есть» по умолчанию.
+  Consumer(
+    builder: (context, ref, _) {
+      ref.watch(isOnlineProvider);
+      return const TodayScreen();
+    },
+  ),
+  overrides: <Override>[
+    dashboardReportProvider.overrideWith((ref) async => dashboard),
+    tasksRepositoryProvider.overrideWithValue(
+      repository ?? _FakeTasksRepository(const []),
+    ),
+    farmRoleProvider.overrideWithValue(role),
+    isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+  ],
+);
 
 void main() {
   setUpAll(() async {
@@ -165,13 +186,18 @@ void main() {
   });
 
   setUp(() {
-    // Экран сам решает, показывать ли обучение; без подложки настроек
-    // SharedPreferences падает, а подсказки перекрыли бы задачи.
-    SharedPreferences.setMockInitialValues({'tour_done': true});
+    // Без подложки настроек SharedPreferences падает. Чек-лист активации
+    // отмечаем скрытым: он не тема этих тестов, а без этого полез бы в сеть
+    // за кормлениями и путал бы список того, что нарисовано на экране (см.
+    // activation_checklist_card_test.dart для его собственных тестов).
+    SharedPreferences.setMockInitialValues({
+      'activation_checklist_dismissed': true,
+    });
   });
 
-  testWidgets('задачи видны строками — просроченные выше сегодняшних',
-      (tester) async {
+  testWidgets('задачи видны строками — просроченные выше сегодняшних', (
+    tester,
+  ) async {
     final repository = _FakeTasksRepository([
       _task(id: 1, title: 'Почистить клетки', dueDate: _daysAgo(2)),
       _task(id: 2, title: 'Раздать корм', dueDate: _daysAgo(0)),
@@ -205,8 +231,9 @@ void main() {
     expect(find.text('Все задачи'), findsOneWidget);
   });
 
-  testWidgets('галочка встаёт сразу и с экрана никуда не уводит',
-      (tester) async {
+  testWidgets('галочка встаёт сразу и с экрана никуда не уводит', (
+    tester,
+  ) async {
     final repository = _FakeTasksRepository([
       _task(id: 1, title: 'Почистить клетки', dueDate: _daysAgo(2)),
     ]);
@@ -227,8 +254,32 @@ void main() {
     expect(repository.completed, [1]);
   });
 
-  testWidgets('отказ сервера возвращает отметку и объясняет причину',
-      (tester) async {
+  testWidgets(
+    'без сети галочка встаёт и остаётся — отметка уходит в очередь, а не на сервер',
+    (tester) async {
+      final repository = _FakeTasksRepository([
+        _task(id: 1, title: 'Почистить клетки', dueDate: _daysAgo(2)),
+      ]);
+
+      await tester.pumpWidget(_wrap(repository: repository, online: false));
+      await _settle(tester);
+
+      await tester.tap(find.byType(Checkbox));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      // Отметка держится сама — без ответа сервера, откатывать нечего.
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      expect(find.byType(Checkbox), findsNothing);
+      // И без обращения к серверу: пока сети нет, запрос не уходит вовсе —
+      // отметка ждёт в офлайн-очереди (см. `test/core/offline_queue`).
+      expect(repository.completed, isEmpty);
+    },
+  );
+
+  testWidgets('отказ сервера возвращает отметку и объясняет причину', (
+    tester,
+  ) async {
     final repository = _FakeTasksRepository(
       [_task(id: 1, title: 'Почистить клетки', dueDate: _daysAgo(2))],
       completeError: const ApiFailure(
@@ -277,13 +328,19 @@ void main() {
     expect(find.text('На сегодня задач нет'), findsNothing);
   });
 
-  testWidgets('пустой список задач не отменяет остальных тревог',
-      (tester) async {
-    await tester.pumpWidget(_wrap(
-      dashboard: _calmDashboard.copyWith(
-        health: const HealthStats(upcomingVaccinations: 0, overdueVaccinations: 3),
+  testWidgets('пустой список задач не отменяет остальных тревог', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        dashboard: _calmDashboard.copyWith(
+          health: const HealthStats(
+            upcomingVaccinations: 0,
+            overdueVaccinations: 3,
+          ),
+        ),
       ),
-    ));
+    );
     await _settle(tester);
 
     expect(find.text('На сегодня задач нет'), findsOneWidget);
@@ -303,8 +360,9 @@ void main() {
     expect(find.text('48'), findsOneWidget);
   });
 
-  testWidgets('«Ферма сейчас» — три плитки без денег за 30 дней',
-      (tester) async {
+  testWidgets('«Ферма сейчас» — три плитки без денег за 30 дней', (
+    tester,
+  ) async {
     await tester.pumpWidget(_wrap());
     await _settle(tester);
 
@@ -321,72 +379,83 @@ void main() {
 
   group('Лимит кроликов по тарифу', () {
     testWidgets('без тарифа полоса не показывается', (tester) async {
-      await tester.pumpWidget(_wrap(
-        dashboard: _calmDashboard.copyWith(planUsage: null),
-      ));
+      await tester.pumpWidget(
+        _wrap(dashboard: _calmDashboard.copyWith(planUsage: null)),
+      );
       await _settle(tester);
 
       expect(find.text('Кролики'), findsNothing);
     });
 
     testWidgets('далеко от предела полоса не показывается', (tester) async {
-      await tester.pumpWidget(_wrap(
-        dashboard: _calmDashboard.copyWith(
-          planUsage: const PlanUsage(
-            rabbits: ResourceUsage(used: 10, limit: 30),
-            staff: ResourceUsage(used: 1, limit: null),
+      await tester.pumpWidget(
+        _wrap(
+          dashboard: _calmDashboard.copyWith(
+            planUsage: const PlanUsage(
+              rabbits: ResourceUsage(used: 10, limit: 30),
+              staff: ResourceUsage(used: 1, limit: null),
+            ),
           ),
         ),
-      ));
+      );
       await _settle(tester);
 
       expect(find.text('Кролики'), findsNothing);
     });
 
     testWidgets('на подходе к пределу показывает «26 из 30»', (tester) async {
-      await tester.pumpWidget(_wrap(
-        dashboard: _calmDashboard.copyWith(
-          planUsage: const PlanUsage(
-            rabbits: ResourceUsage(used: 26, limit: 30),
-            staff: ResourceUsage(used: 1, limit: null),
+      await tester.pumpWidget(
+        _wrap(
+          dashboard: _calmDashboard.copyWith(
+            planUsage: const PlanUsage(
+              rabbits: ResourceUsage(used: 26, limit: 30),
+              staff: ResourceUsage(used: 1, limit: null),
+            ),
           ),
         ),
-      ));
+      );
       await _settle(tester);
 
       expect(find.text('Кролики'), findsOneWidget);
       expect(find.text('26 из 30'), findsOneWidget);
     });
 
-    testWidgets('на пределе показывает предел тоже — не только «почти»',
-        (tester) async {
-      await tester.pumpWidget(_wrap(
-        dashboard: _calmDashboard.copyWith(
-          planUsage: const PlanUsage(
-            rabbits: ResourceUsage(used: 30, limit: 30),
-            staff: ResourceUsage(used: 1, limit: null),
+    testWidgets('на пределе показывает предел тоже — не только «почти»', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          dashboard: _calmDashboard.copyWith(
+            planUsage: const PlanUsage(
+              rabbits: ResourceUsage(used: 30, limit: 30),
+              staff: ResourceUsage(used: 1, limit: null),
+            ),
           ),
         ),
-      ));
+      );
       await _settle(tester);
 
       expect(find.text('Кролики'), findsOneWidget);
       expect(find.text('30 из 30'), findsOneWidget);
     });
 
-    testWidgets('лимит не задан (null) — полоса не показывается, потребление есть',
-        (tester) async {
-      await tester.pumpWidget(_wrap(
-        dashboard: _calmDashboard.copyWith(
-          planUsage: const PlanUsage(
-            rabbits: ResourceUsage(used: 48, limit: null),
-            staff: ResourceUsage(used: 2, limit: null),
+    testWidgets(
+      'лимит не задан (null) — полоса не показывается, потребление есть',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            dashboard: _calmDashboard.copyWith(
+              planUsage: const PlanUsage(
+                rabbits: ResourceUsage(used: 48, limit: null),
+                staff: ResourceUsage(used: 2, limit: null),
+              ),
+            ),
           ),
-        ),
-      ));
-      await _settle(tester);
+        );
+        await _settle(tester);
 
-      expect(find.text('Кролики'), findsNothing);
-    });
+        expect(find.text('Кролики'), findsNothing);
+      },
+    );
   });
 }

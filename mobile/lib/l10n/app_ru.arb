@@ -25,9 +25,13 @@
   "errorNotFound": "Запись не найдена — возможно, её удалили",
   "errorInvalid": "Сервер не принял данные",
   "errorServer": "На сервере сбой, попробуйте позже",
-  "offlineBanner": "Нет связи — новые записи не сохранятся",
+  "offlineBanner": "Нет связи — кормление, задачи и заметки сохранятся и отправятся позже",
   "@offlineBanner": {
     "description": "Плашка поверх всего приложения, когда у устройства нет сети"
+  },
+  "offlineActionQueued": "Сохранено на устройстве — отправится, когда появится связь",
+  "@offlineActionQueued": {
+    "description": "Сообщение об успехе вместо обычного, когда действие (кормление, заметка) сохранено офлайн и ждёт отправки"
   },
   "forceUpdateTitle": "Доступна новая версия",
   "@forceUpdateTitle": {
@@ -121,10 +125,11 @@
   "todayAlertOverdueVaccination": "Вакцинация просрочена",
   "todayAlertLowFeed": "Заканчивается корм",
   "todayAlertUpcomingVaccination": "Скоро вакцинация",
-  "todayTourAlertsTitle": "Что требует внимания",
-  "todayTourAlertsBody": "Задачи на сегодня, вакцинация и заканчивающийся корм — всё срочное собирается здесь. Выполненную задачу отметьте галочкой, не уходя с экрана.",
-  "todayTourStatsTitle": "Состояние фермы",
-  "todayTourStatsBody": "Поголовье, незакрытые задачи и свободные клетки. Потяните экран вниз, чтобы обновить цифры.",
+  "activationChecklistTitle": "Начало работы",
+  "activationChecklistDismiss": "Скрыть",
+  "activationChecklistAddCage": "Добавьте клетку",
+  "activationChecklistAddRabbit": "Добавьте кролика",
+  "activationChecklistFirstFeeding": "Внесите первое кормление",
 
   "menuProfile": "Профиль",
 
@@ -898,6 +903,7 @@
   "settingsAppearance": "Внешний вид",
   "settingsTheme": "Тема",
   "settingsAccent": "Цвет акцента",
+  "settingsLanguage": "Язык",
   "settingsNotifications": "Уведомления",
   "settingsDigestToggle": "Дайджест по хозяйству",
   "settingsAbout": "О приложении",
@@ -909,6 +915,7 @@
   "supportRequestTooShort": "Опишите проблему подробнее — хотя бы 10 символов",
   "supportRequestSend": "Отправить",
   "supportRequestSent": "Обращение отправлено",
+  "supportContactHint": "Или свяжитесь напрямую:",
   "settingsPrivacyPolicy": "Политика конфиденциальности",
   "settingsLogout": "Выйти из аккаунта",
   "settingsThemeLight": "Светлая",
@@ -960,26 +967,6 @@
   "joinSubmit": "Присоединиться",
   "joinHaveAccount": "У меня уже есть аккаунт",
 
-  "onboardWelcomeTitle": "Ферма под рукой",
-  "onboardWelcomeBody": "Кролики, кормление, здоровье и деньги — в одном месте",
-  "onboardStart": "Начать",
-  "onboardHaveAccount": "Уже есть аккаунт? Войти",
-  "onboardFarmNameTitle": "Как называется ваша ферма?",
-  "onboardFarmNameHint": "Например, Ферма «Берёзки»",
-  "onboardNext": "Далее",
-  "onboardSkip": "Пропустить",
-  "onboardFarmTypeTitle": "Кто ведёт хозяйство?",
-  "onboardSoloTitle": "Только я",
-  "onboardSoloBody": "Веду ферму сам",
-  "onboardTeamTitle": "Я и работники",
-  "onboardTeamBody": "У каждого своя роль и свой доступ",
-  "onboardReadyNamed": "«{name}»\nготова к работе!",
-  "@onboardReadyNamed": {
-    "placeholders": { "name": { "type": "String" } }
-  },
-  "onboardReadyPlain": "Ферма готова к работе!",
-  "onboardReadyBody": "Остальное настроим по ходу — приложение подскажет, что делать дальше",
-  "onboardRegister": "Зарегистрироваться",
   "splashTagline": "Управление фермой",
 
   "registerTitle": "Своя ферма",
@@ -1003,6 +990,9 @@
   "registerSubmit": "Завести ферму",
   "registerHaveAccount": "Уже есть аккаунт?",
   "registerFailed": "Не удалось зарегистрироваться",
+  "registerConsentPrefix": "Я принимаю ",
+  "registerConsentLink": "политику конфиденциальности",
+  "registerConsentRequired": "Нужно принять политику конфиденциальности, чтобы продолжить",
 
   "birthsTitle": "Окролы",
   "birthsEmptyTitle": "Окролов пока нет",
@@ -1272,9 +1262,6 @@
   "statusDead": "Погиб",
   "purposeShow": "На выставку",
 
-  "tourSkip": "Пропустить",
-  "tourNext": "Дальше",
-  "tourDone": "Понятно",
   "periodDays": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}",
   "@periodDays": {
     "placeholders": { "count": { "type": "int" } }
