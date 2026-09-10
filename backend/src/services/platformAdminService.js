@@ -2,6 +2,13 @@ const { Op, fn, col } = require('sequelize');
 const { Farm, Payment, Photo, Plan, Rabbit, User } = require('../models');
 const planService = require('./planService');
 const JWTUtil = require('../utils/jwt');
+const cache = require('../utils/cache');
+
+// Пересчитывается по каждому запросу без Redis — как и раньше. С Redis
+// сглаживает как раз то, что и обещано в бэклоге («не считать заново на
+// каждый заход в панель»), а не гонится за секундной свежестью: один админ
+// смотрит на эти цифры не чаще раза в минуту.
+const SUMMARY_CACHE_TTL_SECONDS = 60;
 
 /**
  * Платформенная админка: список ферм со сводкой по использованию и
@@ -382,6 +389,10 @@ class PlatformAdminService {
    * `Rabbit`, не привязанные к скоупу удаления фермы.
    */
   async getSummary() {
+    return cache.getOrSet('platform-admin:summary', SUMMARY_CACHE_TTL_SECONDS, () => this._computeSummary());
+  }
+
+  async _computeSummary() {
     const cutoff = new Date(Date.now() - DEFAULT_INACTIVE_DAYS * MS_PER_DAY);
 
     const [farms, registrations30d, rabbitsTotal, photoBytes, rabbitPhotoBytes] = await Promise.all([

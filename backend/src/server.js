@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./instrument'); // Sentry — до всех остальных require, см. комментарий в файле
 const validateEnv = require('./config/validateEnv');
 
 // Validate environment variables before anything else

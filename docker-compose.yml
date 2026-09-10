@@ -42,6 +42,21 @@ services:
       timeout: 5s
       retries: 10
 
+  # Кэш агрегирующих запросов (см. backend/src/utils/cache.js). Без пароля —
+  # порт наружу не публикуется, к нему ходит только api по внутренней сети
+  # compose, как и minio выше.
+  redis:
+    image: redis:7-alpine
+    container_name: rabbitfarm-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: ./backend
@@ -107,6 +122,14 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:?задайте MINIO_ROOT_USER в .env}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:?задайте MINIO_ROOT_PASSWORD в .env}
       - MINIO_BUCKET=${MINIO_BUCKET:-rabbitfarm-uploads}
+      # Кэш агрегирующих запросов — опционально, см. backend/.env.example.
+      - REDIS_URL=redis://redis:6379
+      # Sentry (краш-репортинг) — опционально, см. backend/.env.example.
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-}
+      # Telegram-алерты — опционально, см. backend/.env.example.
+      - TELEGRAM_ALERT_BOT_TOKEN=${TELEGRAM_ALERT_BOT_TOKEN:-}
+      - TELEGRAM_ALERT_CHAT_ID=${TELEGRAM_ALERT_CHAT_ID:-}
       # Демо-данные для разработки: три учётные записи с общеизвестными
       # паролями, породы, клетки и корма. В продакшене сидер откажется работать.
       # - RUN_SEEDS=true
@@ -116,6 +139,8 @@ services:
       db:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     volumes:
       - ./backend/logs:/app/logs
@@ -134,3 +159,4 @@ services:
 volumes:
   mysql_data:
   minio_data:
+  redis_data:

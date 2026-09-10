@@ -1,5 +1,6 @@
 const winston = require('winston');
 const path = require('path');
+const AlertTransport = require('./alertTransport');
 
 // Ensure logs directory exists
 const fs = require('fs');
@@ -58,5 +59,10 @@ const logger = winston.createLogger({
 logger.add(new winston.transports.Console({
   format: process.env.NODE_ENV === 'production' ? logFormat : consoleFormat
 }));
+
+// Sentry и Telegram-алерты — на каждую строку уровня error, откуда бы она
+// ни пришла (см. `utils/alertTransport.js`). Обе интеграции опциональны и
+// no-op без своих переменных окружения.
+logger.add(new AlertTransport());
 
 module.exports = logger;
