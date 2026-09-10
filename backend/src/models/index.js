@@ -33,6 +33,7 @@ const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
 const TokenBlacklist = require('./TokenBlacklist')(sequelize);
 const PasswordResetToken = require('./PasswordResetToken')(sequelize);
+const LoginOtp = require('./LoginOtp')(sequelize);
 const DeviceToken = require('./DeviceToken')(sequelize);
 const Payment = require('./Payment')(sequelize);
 const Plan = require('./Plan')(sequelize);
@@ -232,6 +233,7 @@ module.exports = {
   RefreshToken,
   TokenBlacklist,
   PasswordResetToken,
+  LoginOtp,
   Breed,
   Cage,
   Rabbit,

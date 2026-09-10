@@ -37,6 +37,14 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: 'worker'
     },
+    // Имя приглашённого. При активации приглашения по телефону через
+    // OTP-вход отдельной формы для ввода имени больше нет — владелец вводит
+    // его сразу при создании приглашения (см. `createInvitationSchema`,
+    // где оно обязательно для приглашений по телефону).
+    full_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
     // Сам код не хранится: в базе лежит только его хеш.
     token_hash: {
       type: DataTypes.STRING(255),

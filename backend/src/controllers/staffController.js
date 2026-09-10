@@ -95,7 +95,13 @@ class StaffController {
           role: invitation.role,
           expires_at: invitation.expires_at,
           code: token,
-          sms_sent: smsSent
+          sms_sent: smsSent,
+          // Для приглашения по телефону вход теперь по номеру+коду из SMS —
+          // диплинк просто открывает приложение на экране входа с уже
+          // подставленным номером, ничего секретного (код) в ссылке нет.
+          invite_link: invitation.phone
+            ? `rabbitfarm://join?phone=${encodeURIComponent(invitation.phone)}`
+            : null
         },
         smsSent
           ? 'Приглашение создано, код отправлен по SMS. Второй раз он не покажется.'

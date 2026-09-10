@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const otpAuthService = require('../services/otpAuthService');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
@@ -24,6 +25,9 @@ class AuthController {
       }
       if (error.message === 'USER_EXISTS' || error.name === 'SequelizeUniqueConstraintError') {
         return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');
+      }
+      if (error.message === 'PHONE_EXISTS') {
+        return ApiResponse.conflict(res, 'Пользователь с таким телефоном уже существует', 'PHONE_EXISTS');
       }
       next(error);
     }
@@ -186,6 +190,77 @@ class AuthController {
       }
       if (error.message === 'INVALID_CURRENT_PASSWORD') {
         return ApiResponse.badRequest(res, 'Неверный текущий пароль');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Request a login OTP by phone
+   * POST /api/v1/auth/otp/request
+   */
+  async requestOtp(req, res, next) {
+    try {
+      await otpAuthService.requestOtp(req.body.phone);
+      // Всегда 200: по ответу нельзя понять, есть ли аккаунт/приглашение
+      // на этот номер — та же логика, что у forgot-password.
+      return ApiResponse.success(res, null, 'Если номер известен, код отправлен');
+    } catch (error) {
+      if (error.message === 'INVALID_PHONE') {
+        return ApiResponse.badRequest(res, 'Телефон должен быть таджикским номером: +992XXXXXXXXX', 'INVALID_PHONE');
+      }
+      if (error.message === 'OTP_RATE_LIMITED') {
+        return ApiResponse.error(res, 'Слишком много запросов кода — попробуйте позже', 429, 'OTP_RATE_LIMITED');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Verify a login OTP and issue tokens (creating the user from a pending
+   * invitation on first login, if that's what matched the phone)
+   * POST /api/v1/auth/otp/verify
+   */
+  async verifyOtp(req, res, next) {
+    try {
+      const { phone, code } = req.body;
+      const result = await otpAuthService.verifyOtp(phone, code);
+
+      return ApiResponse.success(res, result, 'Вход выполнен успешно');
+    } catch (error) {
+      if (error.message === 'OTP_INVALID') {
+        return ApiResponse.badRequest(res, 'Неверный код', 'OTP_INVALID');
+      }
+      if (error.message === 'OTP_EXPIRED') {
+        return ApiResponse.badRequest(res, 'Срок действия кода истёк', 'OTP_EXPIRED');
+      }
+      if (error.message === 'OTP_LOCKED') {
+        return ApiResponse.error(res, 'Слишком много попыток — запросите новый код', 429, 'OTP_LOCKED');
+      }
+      if (error.message === 'USER_INACTIVE') {
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
+      }
+      if (error.message === 'STAFF_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.', 'STAFF_LIMIT_REACHED');
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Set an initial password for an account that only ever logged in via OTP
+   * POST /api/v1/auth/set-password
+   */
+  async setPassword(req, res, next) {
+    try {
+      await authService.setPassword(req.user.id, req.body.new_password);
+      return ApiResponse.success(res, null, 'Пароль установлен. Теперь можно входить им как запасным способом.');
+    } catch (error) {
+      if (error.message === 'PASSWORD_ALREADY_SET') {
+        return ApiResponse.badRequest(res, 'Пароль уже задан — смените его через «Изменить пароль»', 'PASSWORD_ALREADY_SET');
+      }
+      if (error.message === 'USER_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Пользователь не найден');
       }
       next(error);
     }

@@ -54,19 +54,22 @@ class StaffService {
    *   `smsSent` — ушла ли SMS. Код отдаётся всегда, в том числе когда SMS не
    *   ушла: тогда владелец передаёт его сам, как при приглашении по почте.
    */
-  async createInvitation(farmId, authorId, { email, phone, role }) {
+  async createInvitation(farmId, authorId, { email, phone, role, full_name: fullName }) {
     await planService.assertStaffLimit(farmId);
 
     const normalizedEmail = email ? email.trim().toLowerCase() : null;
     const normalizedPhone = phone ? phone.trim() : null;
 
-    // Адрес уникален на всю базу — второго пользователя с ним всё равно не
-    // создать, поэтому проверка глобальная. Номер не уникален (у семьи бывает
-    // один телефон), и глобальный запрет отказывал бы приглашению без
-    // причины — смотрим только внутри фермы: звать своего же работника незачем.
-    const existingUser = normalizedEmail
-      ? await User.findOne({ where: { email: normalizedEmail } })
-      : await User.findOne({ where: { farm_id: farmId, phone: normalizedPhone } });
+    // И адрес, и номер уникальны на всю базу — телефон стал основным
+    // способом входа (OTP), у `users.phone` теперь тоже глобальный
+    // unique-индекс, второго пользователя с ним не создать. Раньше здесь
+    // была только проверка в пределах фермы («у семьи бывает один телефон») —
+    // это было верно, пока номер был просто каналом доставки кода, а не
+    // идентификатором аккаунта; теперь та же логика пустила бы приглашение,
+    // которое на активации упало бы конфликтом уникальности.
+    const existingUser = await User.findOne({
+      where: normalizedEmail ? { email: normalizedEmail } : { phone: normalizedPhone }
+    });
     if (existingUser) {
       throw new Error('USER_EXISTS');
     }
@@ -88,6 +91,7 @@ class StaffService {
       email: normalizedEmail,
       phone: normalizedPhone,
       role,
+      full_name: fullName ? fullName.trim() : null,
       token_hash: this.hashToken(token),
       expires_at: expiresAt,
       created_by: authorId

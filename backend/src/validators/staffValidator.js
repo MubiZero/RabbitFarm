@@ -24,12 +24,22 @@ const invitePhone = Joi.string()
 const createInvitationSchema = Joi.object({
   email: Joi.string().email(),
   phone: invitePhone,
-  role: Joi.string().valid('manager', 'worker').default('worker')
+  role: Joi.string().valid('manager', 'worker').default('worker'),
+  // Обязательно для приглашения по телефону: OTP-вход активирует его без
+  // отдельной формы, имя взять больше неоткуда, кроме как от владельца
+  // сейчас. У приглашения по email имя по-прежнему называет сам приглашённый
+  // на `/join`.
+  full_name: Joi.string().max(255).when('phone', {
+    is: Joi.exist(),
+    then: Joi.required(),
+    otherwise: Joi.optional()
+  })
 })
   .xor('email', 'phone')
   .messages({
     'object.missing': 'Укажите email или телефон работника',
-    'object.xor': 'Укажите что-то одно — email или телефон'
+    'object.xor': 'Укажите что-то одно — email или телефон',
+    'any.required': 'Укажите имя приглашённого'
   });
 
 const updateMemberSchema = Joi.object({

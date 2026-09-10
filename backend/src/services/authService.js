@@ -69,6 +69,20 @@ class AuthService {
         throw new Error('USER_EXISTS');
       }
 
+      // Телефон теперь тоже уникален на всю базу (основной способ входа) —
+      // та же проверка заранее, что и для email, вместо падения на
+      // unique-индексе при `User.create`. Телефон при регистрации не
+      // обязателен, поэтому проверяем только когда его прислали.
+      if (userData.phone) {
+        const existingPhone = await User.findOne({
+          where: { phone: userData.phone },
+          transaction
+        });
+        if (existingPhone) {
+          throw new Error('PHONE_EXISTS');
+        }
+      }
+
       // Hash password
       const passwordHash = await PasswordUtil.hash(userData.password);
 
@@ -158,6 +172,15 @@ class AuthService {
       // кто уже назвал верный пароль, а для неизвестного адреса тратится
       // столько же времени, сколько на настоящую проверку.
       if (!user) {
+        await PasswordUtil.fakeCompare(password);
+        throw new Error('INVALID_CREDENTIALS');
+      }
+
+      // Пароль теперь не обязателен (основной вход — по телефону): у
+      // аккаунта, заведённого через OTP и ни разу не задавшего пароль,
+      // `password_hash` пуст — `bcrypt.compare` на пустом хеше бросит
+      // исключение вместо честного «неверный пароль».
+      if (!user.password_hash) {
         await PasswordUtil.fakeCompare(password);
         throw new Error('INVALID_CREDENTIALS');
       }
@@ -549,6 +572,30 @@ class AuthService {
       logger.error('Reset password error', { error: error.message });
       throw error;
     }
+  }
+
+  /**
+   * Задать пароль тому, кто вошёл по OTP и никогда его не задавал —
+   * запасной способ входа иначе неоткуда взять. Не путать с
+   * `changePassword`: там нужен текущий пароль, здесь его по определению
+   * нет. Сменить уже существующий пароль этим методом нельзя.
+   * @param {Number} userId
+   * @param {String} newPassword
+   */
+  async setPassword(userId, newPassword) {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error('USER_NOT_FOUND');
+    }
+    if (user.password_hash) {
+      throw new Error('PASSWORD_ALREADY_SET');
+    }
+
+    const passwordHash = await PasswordUtil.hash(newPassword);
+    await user.update({ password_hash: passwordHash });
+
+    logger.info('Password set for OTP-only account', { userId });
+    return { success: true };
   }
 
   /**

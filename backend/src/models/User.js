@@ -7,9 +7,12 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    // Основной вход — по телефону (см. `phone` ниже), email остаётся
+    // опциональным запасным способом. Пусто бывает у работника, заведённого
+    // через OTP-вход по приглашению и ни разу не задавшего пароль.
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       unique: true,
       validate: {
         isEmail: { msg: 'Введите корректный email' }
@@ -17,7 +20,7 @@ module.exports = (sequelize) => {
     },
     password_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     full_name: {
       type: DataTypes.STRING(255),
@@ -100,8 +103,27 @@ module.exports = (sequelize) => {
       { fields: ['farm_id'], name: 'idx_users_farm' },
       { fields: ['email'] },
       { fields: ['role'] },
-      { fields: ['is_active'] }
-    ]
+      { fields: ['is_active'] },
+      { fields: ['phone'], unique: true, name: 'uniq_users_phone' }
+    ],
+    validate: {
+      // Учётная запись без единого способа связаться с человеком — мусор:
+      // ни войти самому (email/пароль или телефон/OTP), ни владельцу его
+      // найти. Оба сразу — обычное дело, запрещена только пустота.
+      //
+      // Оба `undefined` (не `null`) значит частичный bulk `.update()`,
+      // который email/phone не трогает вовсе — Sequelize валидирует такой
+      // апдейт на «пустом» инстансе из одних только переданных полей (тот же
+      // случай разобран в `Invitation.exactlyOneContact`), и без этой
+      // проверки любой `User.update({role}, {where})` ловил бы ложное
+      // «нужен email или телефон».
+      hasIdentity() {
+        if (this.email === undefined && this.phone === undefined) return;
+        if (!this.email && !this.phone) {
+          throw new Error('Нужен email или телефон');
+        }
+      }
+    }
   });
 
   // Instance methods

@@ -1,8 +1,49 @@
 const Joi = require('joi');
+const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 
 /**
  * Authentication validation schemas
  */
+
+const otpPhone = Joi.string()
+  .custom((value, helpers) => {
+    const normalized = normalizeTjPhone(value);
+    return isTjPhone(normalized) ? normalized : helpers.error('string.pattern.base');
+  })
+  .messages({
+    'string.pattern.base': 'Телефон должен быть таджикским номером: +992XXXXXXXXX',
+    'any.required': 'Телефон обязателен'
+  });
+
+// Запрос кода входа по телефону
+const requestOtpSchema = Joi.object({
+  phone: otpPhone.required()
+});
+
+// Проверка кода входа по телефону
+const verifyOtpSchema = Joi.object({
+  phone: otpPhone.required(),
+  code: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Код должен состоять из 6 цифр',
+      'any.required': 'Код обязателен'
+    })
+});
+
+// Первичная установка пароля тому, кто вошёл по OTP и ни разу его не задавал
+const setPasswordSchema = Joi.object({
+  new_password: Joi.string()
+    .min(8)
+    .max(100)
+    .required()
+    .messages({
+      'string.min': 'Пароль должен быть минимум 8 символов',
+      'string.max': 'Пароль должен быть максимум 100 символов',
+      'any.required': 'Пароль обязателен'
+    })
+});
 
 // Register validation
 const registerSchema = Joi.object({
@@ -34,13 +75,11 @@ const registerSchema = Joi.object({
       'any.required': 'Имя обязательно'
     }),
 
-  phone: Joi.string()
-    .pattern(/^[+]?[(]?[0-9]{1,3}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/)
-    .optional()
-    .allow(null, '')
-    .messages({
-      'string.pattern.base': 'Неверный формат телефона'
-    }),
+  // Не обязателен при регистрации — email+пароль сам по себе рабочий способ
+  // входа (запасной, но полноценный). Кто хочет войти по SMS-коду, добавит
+  // телефон позже через профиль (`updateProfileSchema` ниже) — заставлять
+  // указывать его прямо на форме регистрации незачем.
+  phone: otpPhone.optional().allow(null, ''),
 
   // Название хозяйства. Не обязательно: если его не прислали, ферма
   // называется по имени владельца — пустое название читалось бы в списках
@@ -191,5 +230,8 @@ module.exports = {
   updateProfileSchema,
   changePasswordSchema,
   forgotPasswordSchema,
-  resetPasswordSchema
+  resetPasswordSchema,
+  requestOtpSchema,
+  verifyOtpSchema,
+  setPasswordSchema
 };

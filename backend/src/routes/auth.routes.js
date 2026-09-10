@@ -12,7 +12,10 @@ const {
   updateProfileSchema,
   changePasswordSchema,
   forgotPasswordSchema,
-  resetPasswordSchema
+  resetPasswordSchema,
+  requestOtpSchema,
+  verifyOtpSchema,
+  setPasswordSchema
 } = require('../validators/authValidator');
 const { acceptInvitationSchema } = require('../validators/staffValidator');
 
@@ -91,6 +94,66 @@ router.post(
   authLimiter,
   validate(registerSchema),
   authController.register
+);
+
+/**
+ * @swagger
+ * /auth/otp/request:
+ *   post:
+ *     summary: Запросить код входа по телефону
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Если номер известен, код отправлен
+ */
+router.post(
+  '/otp/request',
+  authLimiter,
+  validate(requestOtpSchema),
+  authController.requestOtp
+);
+
+/**
+ * @swagger
+ * /auth/otp/verify:
+ *   post:
+ *     summary: Подтвердить код и войти (или активировать приглашение по телефону)
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone, code]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Вход выполнен, возвращает токены
+ *       400:
+ *         description: Неверный или просроченный код
+ */
+router.post(
+  '/otp/verify',
+  authLimiter,
+  validate(verifyOtpSchema),
+  authController.verifyOtp
 );
 
 /**
@@ -317,6 +380,36 @@ router.post(
   authLimiter,
   validate(resetPasswordSchema),
   authController.resetPassword
+);
+
+/**
+ * @swagger
+ * /auth/set-password:
+ *   post:
+ *     summary: Задать первый пароль тому, кто вошёл по OTP и его не задавал
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [new_password]
+ *             properties:
+ *               new_password:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       200:
+ *         description: Пароль установлен
+ *       400:
+ *         description: Пароль уже был задан ранее
+ */
+router.post(
+  '/set-password',
+  authenticate,
+  validate(setPasswordSchema),
+  authController.setPassword
 );
 
 module.exports = router;
