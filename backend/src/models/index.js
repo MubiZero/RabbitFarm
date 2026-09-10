@@ -40,6 +40,7 @@ const AdminAuditLog = require('./AdminAuditLog')(sequelize);
 const FarmAuditLog = require('./FarmAuditLog')(sequelize);
 const Announcement = require('./Announcement')(sequelize);
 const SupportRequest = require('./SupportRequest')(sequelize);
+const SupportContact = require('./SupportContact')(sequelize);
 
 // Define associations
 
@@ -251,5 +252,6 @@ module.exports = {
   AdminAuditLog,
   FarmAuditLog,
   Announcement,
-  SupportRequest
+  SupportRequest,
+  SupportContact
 };

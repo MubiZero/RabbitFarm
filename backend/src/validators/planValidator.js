@@ -67,6 +67,15 @@ const createAnnouncementSchema = Joi.object({
     .when('target_type', { is: 'filter', then: Joi.required(), otherwise: Joi.forbidden() })
 });
 
+// Оба поля можно обнулить явным null — «канала пока нет», а не оставлять
+// прежнее значение.
+const updateSupportContactSchema = Joi.object({
+  email: Joi.string().trim().email().allow(null),
+  phone: Joi.string().trim().pattern(/^\+[0-9 ]{6,20}$/).allow(null).messages({
+    'string.pattern.base': 'Телефон должен начинаться с "+" и содержать только цифры и пробелы'
+  })
+}).min(1);
+
 module.exports = {
   createPlanSchema,
   updatePlanSchema,
@@ -76,5 +85,6 @@ module.exports = {
   extendPlanSchema,
   impersonateFarmSchema,
   deleteFarmSchema,
-  createAnnouncementSchema
+  createAnnouncementSchema,
+  updateSupportContactSchema
 };

@@ -43,4 +43,13 @@ router.post(
   supportRequestController.create
 );
 
+/**
+ * @swagger
+ * /support-requests/contact:
+ *   get:
+ *     summary: Официальный email/телефон поддержки, если заданы платформенным админом
+ *     tags: [SupportRequests]
+ */
+router.get('/contact', authenticateEvenIfFarmBlocked, supportRequestController.getContact);
+
 module.exports = router;

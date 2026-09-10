@@ -12,7 +12,8 @@ const {
   extendPlanSchema,
   impersonateFarmSchema,
   deleteFarmSchema,
-  createAnnouncementSchema
+  createAnnouncementSchema,
+  updateSupportContactSchema
 } = require('../validators/planValidator');
 
 /**
@@ -190,5 +191,18 @@ router.get('/support-requests', platformAdminController.listSupportRequests);
  *     tags: [PlatformAdmin]
  */
 router.patch('/support-requests/:id/resolve', platformAdminController.resolveSupportRequest);
+
+/**
+ * @swagger
+ * /platform-admin/support-contact:
+ *   get:
+ *     summary: Официальный контакт поддержки (email/телефон)
+ *     tags: [PlatformAdmin]
+ *   patch:
+ *     summary: Задать или обнулить контакт поддержки
+ *     tags: [PlatformAdmin]
+ */
+router.get('/support-contact', platformAdminController.getSupportContact);
+router.patch('/support-contact', validate(updateSupportContactSchema), platformAdminController.updateSupportContact);
 
 module.exports = router;

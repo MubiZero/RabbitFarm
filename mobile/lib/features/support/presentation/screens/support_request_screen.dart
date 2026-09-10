@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../data/repositories/support_repository.dart';
 import '../providers/support_provider.dart';
 
 /// Написать в поддержку — одно поле, без темы и категории: выбирать раздел
@@ -79,6 +81,7 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final contact = ref.watch(supportContactProvider).value;
 
     return PopScope(
       canPop: !_isDirty && !_sending,
@@ -98,6 +101,10 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
               style: AppTypography.bodyMd
                   .copyWith(color: context.colors.onSurfaceVariant),
             ),
+            if (contact != null && !contact.isEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              _ContactCard(contact: contact),
+            ],
             const SizedBox(height: AppSpacing.lg),
             TextField(
               controller: _text,
@@ -121,6 +128,82 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
           label: l10n.supportRequestSend,
           busy: _sending,
           onPressed: _isValid ? _submit : null,
+        ),
+      ),
+    );
+  }
+}
+
+/// Официальный email/телефон поддержки — рядом с формой обращения, не
+/// вместо неё: платформенный админ мог их не задать, тогда карточка не
+/// показывается вовсе (см. `supportContactProvider`).
+class _ContactCard extends StatelessWidget {
+  final SupportContact contact;
+
+  const _ContactCard({required this.contact});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.supportContactHint,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          if (contact.phone != null)
+            _ContactRow(
+              icon: Icons.phone_outlined,
+              label: contact.phone!,
+              onTap: () => launchUrl(Uri(scheme: 'tel', path: contact.phone)),
+            ),
+          if (contact.email != null)
+            _ContactRow(
+              icon: Icons.email_outlined,
+              label: contact.email!,
+              onTap: () => launchUrl(Uri(scheme: 'mailto', path: contact.email)),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContactRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ContactRow({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.sm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              label,
+              style: AppTypography.bodyMd.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ],
         ),
       ),
     );

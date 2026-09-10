@@ -24,4 +24,25 @@ class SupportRepository {
       throw ApiFailure.from(e);
     }
   }
+
+  /// Официальный email/телефон поддержки, если платформенный админ их задал.
+  /// Пустые поля — норма, не ошибка: контакт может быть не настроен.
+  Future<SupportContact> getContact() async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.supportContact);
+      final data = response.data['data'] as Map<String, dynamic>;
+      return SupportContact(email: data['email'] as String?, phone: data['phone'] as String?);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+}
+
+class SupportContact {
+  final String? email;
+  final String? phone;
+
+  const SupportContact({this.email, this.phone});
+
+  bool get isEmpty => email == null && phone == null;
 }

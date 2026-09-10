@@ -116,6 +116,7 @@ class ApiEndpoints {
   // закрытом доступе (см. backend/src/middleware/auth.js,
   // authenticateEvenIfFarmBlocked).
   static const String supportRequests = '/support-requests';
+  static const String supportContact = '/support-requests/contact';
 
   // Reports endpoints
   static const String reportDashboard = '/reports/dashboard';

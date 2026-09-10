@@ -3,6 +3,7 @@ const platformAdminService = require('../services/platformAdminService');
 const farmExportService = require('../services/farmExportService');
 const announcementService = require('../services/announcementService');
 const supportRequestService = require('../services/supportRequestService');
+const supportContactService = require('../services/supportContactService');
 const auditService = require('../services/auditService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -468,6 +469,36 @@ class PlatformAdminController {
       if (error.message === 'SUPPORT_REQUEST_NOT_FOUND') {
         return ApiResponse.notFound(res, 'Обращение не найдено');
       }
+      next(error);
+    }
+  }
+
+  /** GET /platform-admin/support-contact */
+  async getSupportContact(req, res, next) {
+    try {
+      const contact = await supportContactService.get();
+      return ApiResponse.success(res, { email: contact.email, phone: contact.phone }, 'Контакт поддержки получен');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /** PATCH /platform-admin/support-contact */
+  async updateSupportContact(req, res, next) {
+    try {
+      const previous = await supportContactService.get();
+      const before = { email: previous.email, phone: previous.phone };
+      const updated = await supportContactService.update(req.body);
+      const after = { email: updated.email, phone: updated.phone };
+      await auditService.record({
+        adminId: req.user.id,
+        action: 'support_contact.update',
+        before,
+        after,
+        ip: req.ip
+      });
+      return ApiResponse.success(res, after, 'Контакт поддержки обновлён');
+    } catch (error) {
       next(error);
     }
   }

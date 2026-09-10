@@ -181,4 +181,64 @@ describe('Обращения в поддержку (интеграция)', () =
 
     expect(res.status).toBe(404);
   });
+
+  describe('Официальный контакт поддержки', () => {
+    it('пока админ не задал контакт, ферма получает пустые email/телефон', async () => {
+      const res = await request(app)
+        .get('/api/v1/support-requests/contact')
+        .set('Authorization', `Bearer ${ownerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toEqual({ email: null, phone: null });
+    });
+
+    it('обычный владелец не может менять контакт поддержки', async () => {
+      const res = await request(app)
+        .patch('/api/v1/platform-admin/support-contact')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ email: 'hack@example.com' });
+
+      expect(res.status).toBe(403);
+    });
+
+    it('невалидный телефон отклоняется', async () => {
+      const res = await request(app)
+        .patch('/api/v1/platform-admin/support-contact')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ phone: 'позвоните мне' });
+
+      expect(res.status).toBe(422);
+    });
+
+    it('админ задаёт контакт, и он сразу виден ферме — включая приостановленную', async () => {
+      const updated = await request(app)
+        .patch('/api/v1/platform-admin/support-contact')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ email: 'info@mubi.dev', phone: '+992 18 666 33 33' });
+
+      expect(updated.status).toBe(200);
+      expect(updated.body.data).toEqual({ email: 'info@mubi.dev', phone: '+992 18 666 33 33' });
+
+      const seenByOwner = await request(app)
+        .get('/api/v1/support-requests/contact')
+        .set('Authorization', `Bearer ${ownerToken}`);
+      expect(seenByOwner.body.data).toEqual({ email: 'info@mubi.dev', phone: '+992 18 666 33 33' });
+
+      const seenBySuspended = await request(app)
+        .get('/api/v1/support-requests/contact')
+        .set('Authorization', `Bearer ${suspendedOwnerToken}`);
+      expect(seenBySuspended.status).toBe(200);
+      expect(seenBySuspended.body.data).toEqual({ email: 'info@mubi.dev', phone: '+992 18 666 33 33' });
+    });
+
+    it('админ может обнулить контакт обратно', async () => {
+      const res = await request(app)
+        .patch('/api/v1/platform-admin/support-contact')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ email: null, phone: null });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toEqual({ email: null, phone: null });
+    });
+  });
 });
