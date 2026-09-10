@@ -110,6 +110,9 @@ class _JoinFarmScreenState extends ConsumerState<JoinFarmScreen> {
                     labelText: context.l10n.joinPassword,
                     helperText: context.l10n.joinPasswordHint,
                     suffixIcon: IconButton(
+                      tooltip: _obscurePassword
+                          ? context.l10n.commonPasswordShow
+                          : context.l10n.commonPasswordHide,
                       icon: Icon(_obscurePassword
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined),

@@ -165,10 +165,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginPasswordEmpty => 'Введите пароль';
 
   @override
-  String get loginPasswordShow => 'Показать пароль';
+  String get commonPasswordShow => 'Показать пароль';
 
   @override
-  String get loginPasswordHide => 'Скрыть пароль';
+  String get commonPasswordHide => 'Скрыть пароль';
 
   @override
   String get loginSubmit => 'Войти';
@@ -507,6 +507,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get commonNameMissing => 'Имя не указано';
+
+  @override
+  String get commonOpenCard => 'Открыть карточку';
+
+  @override
+  String get commonEdit => 'Изменить';
+
+  @override
+  String get commonClearSearch => 'Очистить поиск';
 
   @override
   String get breedingStatusPlanned => 'Запланирована';

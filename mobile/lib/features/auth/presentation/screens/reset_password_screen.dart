@@ -101,6 +101,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   decoration: InputDecoration(
                     labelText: context.l10n.resetPasswordNewPasswordHint,
                     suffixIcon: IconButton(
+                      tooltip: _obscurePassword
+                          ? context.l10n.commonPasswordShow
+                          : context.l10n.commonPasswordHide,
                       icon: Icon(_obscurePassword
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined),

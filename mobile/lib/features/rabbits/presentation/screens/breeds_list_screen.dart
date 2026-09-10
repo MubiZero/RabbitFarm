@@ -51,6 +51,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
+                        tooltip: context.l10n.commonClearSearch,
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();

@@ -108,6 +108,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         title: Text(context.l10n.registerTitle),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
         ),
@@ -223,6 +224,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: context.l10n.registerPasswordHint,
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
+                      tooltip: _obscurePassword
+                          ? context.l10n.commonPasswordShow
+                          : context.l10n.commonPasswordHide,
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility
@@ -256,6 +260,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: context.l10n.registerPasswordRepeatEmpty,
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
+                      tooltip: _obscureConfirmPassword
+                          ? context.l10n.commonPasswordShow
+                          : context.l10n.commonPasswordHide,
                       icon: Icon(
                         _obscureConfirmPassword
                             ? Icons.visibility

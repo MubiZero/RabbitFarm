@@ -400,17 +400,17 @@ abstract class AppLocalizations {
   /// **'Введите пароль'**
   String get loginPasswordEmpty;
 
-  /// No description provided for @loginPasswordShow.
+  /// No description provided for @commonPasswordShow.
   ///
   /// In ru, this message translates to:
   /// **'Показать пароль'**
-  String get loginPasswordShow;
+  String get commonPasswordShow;
 
-  /// No description provided for @loginPasswordHide.
+  /// No description provided for @commonPasswordHide.
   ///
   /// In ru, this message translates to:
   /// **'Скрыть пароль'**
-  String get loginPasswordHide;
+  String get commonPasswordHide;
 
   /// No description provided for @loginSubmit.
   ///
@@ -1011,6 +1011,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Имя не указано'**
   String get commonNameMissing;
+
+  /// No description provided for @commonOpenCard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть карточку'**
+  String get commonOpenCard;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get commonEdit;
+
+  /// No description provided for @commonClearSearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистить поиск'**
+  String get commonClearSearch;
 
   /// No description provided for @breedingStatusPlanned.
   ///

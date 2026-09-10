@@ -188,6 +188,7 @@ class _Header extends StatelessWidget {
               suffixIcon: controller.text.isEmpty
                   ? null
                   : IconButton(
+                      tooltip: l10n.commonClearSearch,
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         controller.clear();

@@ -583,6 +583,7 @@ class RabbitDetailScreen extends ConsumerWidget {
               top: 10,
               right: 10,
               child: IconButton(
+                tooltip: context.l10n.commonClose,
                 icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.of(context).pop(),
                 style: IconButton.styleFrom(

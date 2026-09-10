@@ -137,8 +137,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           tooltip: _obscurePassword
-                              ? context.l10n.loginPasswordShow
-                              : context.l10n.loginPasswordHide,
+                              ? context.l10n.commonPasswordShow
+                              : context.l10n.commonPasswordHide,
                           icon: Icon(
                             _obscurePassword
                                 ? Icons.visibility_outlined

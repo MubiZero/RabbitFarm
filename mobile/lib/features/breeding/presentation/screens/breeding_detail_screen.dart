@@ -27,6 +27,7 @@ class BreedingDetailScreen extends ConsumerWidget {
         actions: [
           if (canManage)
             IconButton(
+              tooltip: context.l10n.commonEdit,
               icon: const Icon(Icons.edit),
               onPressed: breeding == null
                   ? null
@@ -160,6 +161,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     IconButton(
+                      tooltip: context.l10n.commonOpenCard,
                       icon: const Icon(Icons.arrow_forward),
                       onPressed: () => context.push('/rabbits/${breeding.maleId}'),
                     ),
@@ -192,6 +194,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     IconButton(
+                      tooltip: context.l10n.commonOpenCard,
                       icon: const Icon(Icons.arrow_forward),
                       onPressed: () => context.push('/rabbits/${breeding.femaleId}'),
                     ),

@@ -182,6 +182,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
               top: 10,
               right: 10,
               child: IconButton(
+                tooltip: dialogContext.l10n.commonClose,
                 icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.of(dialogContext).pop(),
                 style: IconButton.styleFrom(
@@ -398,6 +399,7 @@ class _PhotoTile extends StatelessWidget {
                 top: 4,
                 right: 4,
                 child: IconButton(
+                  tooltip: context.l10n.commonDelete,
                   icon: const Icon(Icons.delete_outline,
                       color: Colors.white, size: 20),
                   style: IconButton.styleFrom(

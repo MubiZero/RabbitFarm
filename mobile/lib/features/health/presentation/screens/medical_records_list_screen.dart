@@ -462,6 +462,7 @@ class _DetailsSheet extends ConsumerWidget {
                   ),
                   if (canRecord)
                     IconButton(
+                      tooltip: context.l10n.commonEdit,
                       icon: const Icon(Icons.edit_outlined),
                       onPressed: () {
                         Navigator.pop(context);
@@ -470,6 +471,7 @@ class _DetailsSheet extends ConsumerWidget {
                     ),
                   if (canDelete)
                     IconButton(
+                      tooltip: context.l10n.commonDelete,
                       icon: const Icon(Icons.delete_outline),
                       color: AppColors.error,
                       onPressed: () => _delete(context, ref),

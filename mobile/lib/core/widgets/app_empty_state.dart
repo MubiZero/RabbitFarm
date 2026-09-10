@@ -31,27 +31,39 @@ class AppEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 72,
-              color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              title,
-              style: AppTypography.titleMd
-                  .copyWith(color: context.colors.onSurface),
-              textAlign: TextAlign.center,
-            ),
-            if (subtitle != null) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                subtitle!,
-                style: AppTypography.bodyMd
-                    .copyWith(color: context.colors.onSurfaceVariant),
-                textAlign: TextAlign.center,
+            // Заголовок и подсказка — одно сообщение, а не два отдельных
+            // свайпа TalkBack/VoiceOver: значок декоративный и без подписи
+            // и так молчит, а вот заголовок с подсказкой стоит слышать
+            // одной фразой. Кнопка ниже — вне слияния, у неё остаётся свой
+            // отдельный фокус и объявление.
+            MergeSemantics(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 72,
+                    color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    title,
+                    style: AppTypography.titleMd
+                        .copyWith(color: context.colors.onSurface),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      subtitle!,
+                      style: AppTypography.bodyMd
+                          .copyWith(color: context.colors.onSurfaceVariant),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: AppSpacing.xl),
               FilledButton(

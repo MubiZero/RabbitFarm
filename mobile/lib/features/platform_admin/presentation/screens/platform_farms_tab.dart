@@ -152,6 +152,7 @@ class _Header extends ConsumerWidget {
               suffixIcon: state.searchQuery.isEmpty
                   ? null
                   : IconButton(
+                      tooltip: l10n.commonClearSearch,
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         controller.clear();
