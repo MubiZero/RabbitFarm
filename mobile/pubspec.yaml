@@ -60,7 +60,7 @@ dependencies:
   # Крэш-репортинг. DSN опционален (см. `--dart-define=SENTRY_DSN`) — без
   # него SDK инициализируется в выключенном режиме, ошибки остаются только
   # в логе устройства, как и раньше.
-  sentry_flutter: ^8.14.2
+  sentry_flutter: ^9.29.0
 
 dev_dependencies:
   flutter_test:
