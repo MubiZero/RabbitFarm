@@ -1,11 +1,14 @@
 jest.mock('../../../src/services/paymentService');
 jest.mock('../../../src/services/planService');
+jest.mock('../../../src/services/notifications/farmOwnerNotifier');
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), warn: jest.fn(), error: jest.fn()
 }));
 
 const paymentService = require('../../../src/services/paymentService');
 const planService = require('../../../src/services/planService');
+const { notifyFarmOwners } = require('../../../src/services/notifications/farmOwnerNotifier');
+const logger = require('../../../src/utils/logger');
 const paymentController = require('../../../src/controllers/paymentController');
 
 const mockReq = (overrides = {}) => ({
@@ -123,6 +126,59 @@ describe('PaymentController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ status: 'completed' })
       }));
+    });
+
+    it('шлёт квитанцию владельцам фермы, когда тариф реально продлён', async () => {
+      const expiresAt = new Date('2026-10-10T00:00:00Z');
+      paymentService.reconcile.mockResolvedValue({
+        found: true,
+        changed: true,
+        payment: { id: 7, farm_id: 1, amount: '150.00', order_id: 'o1', status: 'completed' }
+      });
+      planService.extendPlanExpiry.mockResolvedValue(expiresAt);
+      const req = mockReq({ params: { invoiceId: 'inv1' } });
+      const res = mockRes();
+
+      await paymentController.status(req, res, mockNext);
+
+      expect(notifyFarmOwners).toHaveBeenCalledWith(1, expect.objectContaining({
+        data: { type: 'payment_receipt', payment_id: '7' }
+      }));
+    });
+
+    it('не шлёт квитанцию, если extendPlanExpiry не продлил тариф (нет платного плана)', async () => {
+      paymentService.reconcile.mockResolvedValue({
+        found: true,
+        changed: true,
+        payment: { id: 7, farm_id: 1, amount: '150.00', order_id: 'o1', status: 'completed' }
+      });
+      planService.extendPlanExpiry.mockResolvedValue(null);
+      const req = mockReq({ params: { invoiceId: 'inv1' } });
+      const res = mockRes();
+
+      await paymentController.status(req, res, mockNext);
+
+      expect(notifyFarmOwners).not.toHaveBeenCalled();
+    });
+
+    it('не роняет запрос, если отправка квитанции упала', async () => {
+      paymentService.reconcile.mockResolvedValue({
+        found: true,
+        changed: true,
+        payment: { id: 7, farm_id: 1, amount: '150.00', order_id: 'o1', status: 'completed' }
+      });
+      planService.extendPlanExpiry.mockResolvedValue(new Date('2026-10-10T00:00:00Z'));
+      notifyFarmOwners.mockRejectedValue(new Error('push down'));
+      const req = mockReq({ params: { invoiceId: 'inv1' } });
+      const res = mockRes();
+
+      await paymentController.status(req, res, mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ status: 'completed' })
+      }));
+      expect(logger.error).toHaveBeenCalled();
     });
 
     it('не продлевает тариф, если статус не менялся', async () => {

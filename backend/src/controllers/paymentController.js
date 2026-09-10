@@ -1,7 +1,27 @@
 const paymentService = require('../services/paymentService');
 const planService = require('../services/planService');
+const { notifyFarmOwners } = require('../services/notifications/farmOwnerNotifier');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
+
+/**
+ * Письмо-квитанция владельцам фермы после подтверждённой оплаты. Не
+ * блокирует ответ клиенту сбоем канала уведомлений — деньги уже приняты,
+ * потеря квитанции не повод возвращать ошибку по оплате.
+ */
+async function sendReceipt(payment, expiresAt) {
+  if (!expiresAt) return;
+  try {
+    await notifyFarmOwners(payment.farm_id, {
+      title: 'Оплата получена',
+      body: `Сумма: ${payment.amount} сомони. Заказ №${payment.order_id}. `
+        + `Тариф продлён до ${expiresAt.toLocaleDateString('ru-RU')}.`,
+      data: { type: 'payment_receipt', payment_id: String(payment.id) }
+    });
+  } catch (error) {
+    logger.error('Payment receipt failed', { paymentId: payment.id, error: error.message });
+  }
+}
 
 /**
  * Payment controller — оплата подписки через Эсхата Мерчант.
@@ -57,7 +77,8 @@ class PaymentController {
       }
 
       if (result.changed) {
-        await planService.extendPlanExpiry(req.farmId);
+        const expiresAt = await planService.extendPlanExpiry(req.farmId);
+        await sendReceipt(result.payment, expiresAt);
       }
 
       return ApiResponse.success(res, { status: result.payment.status });
@@ -88,7 +109,8 @@ class PaymentController {
       if (!result.found) {
         logger.info('Webhook for unknown invoice, ignoring', { invoiceId });
       } else if (result.changed) {
-        await planService.extendPlanExpiry(result.payment.farm_id);
+        const expiresAt = await planService.extendPlanExpiry(result.payment.farm_id);
+        await sendReceipt(result.payment, expiresAt);
       }
 
       return res.sendStatus(200);
