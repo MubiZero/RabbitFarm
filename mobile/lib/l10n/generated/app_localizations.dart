@@ -378,6 +378,120 @@ abstract class AppLocalizations {
   /// **'Вход в вашу ферму'**
   String get loginSubtitle;
 
+  /// No description provided for @loginPhoneLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон'**
+  String get loginPhoneLabel;
+
+  /// No description provided for @loginPhoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'+992 XX XXX XX XX'**
+  String get loginPhoneHint;
+
+  /// No description provided for @loginPhoneEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите номер телефона'**
+  String get loginPhoneEmpty;
+
+  /// No description provided for @loginPhoneInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер как +992 90 123 45 67'**
+  String get loginPhoneInvalid;
+
+  /// No description provided for @loginPhoneIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пришлём код в SMS — пароль не нужен.'**
+  String get loginPhoneIntro;
+
+  /// No description provided for @loginRequestCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получить код'**
+  String get loginRequestCode;
+
+  /// No description provided for @loginWithPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти по почте и паролю'**
+  String get loginWithPassword;
+
+  /// No description provided for @loginCodeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get loginCodeTitle;
+
+  /// No description provided for @loginCodeSentTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправили код на {phone}'**
+  String loginCodeSentTo(String phone);
+
+  /// No description provided for @loginCodeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код из SMS'**
+  String get loginCodeLabel;
+
+  /// No description provided for @loginCodeEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get loginCodeEmpty;
+
+  /// No description provided for @loginCodeInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код — это 6 цифр'**
+  String get loginCodeInvalid;
+
+  /// No description provided for @loginCodeSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти'**
+  String get loginCodeSubmit;
+
+  /// No description provided for @loginCodeResend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить код ещё раз'**
+  String get loginCodeResend;
+
+  /// No description provided for @loginCodeResendIn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить ещё раз через {seconds} с'**
+  String loginCodeResendIn(int seconds);
+
+  /// No description provided for @loginCodeResent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код отправлен ещё раз'**
+  String get loginCodeResent;
+
+  /// No description provided for @loginCodeChangePhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить номер'**
+  String get loginCodeChangePhone;
+
+  /// No description provided for @passwordLoginTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход по почте и паролю'**
+  String get passwordLoginTitle;
+
+  /// No description provided for @passwordLoginIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запасной способ — для тех, кто завёл ферму на почту.'**
+  String get passwordLoginIntro;
+
   /// No description provided for @loginEmailLabel.
   ///
   /// In ru, this message translates to:
@@ -5327,6 +5441,54 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Код приглашения'**
   String get staffInviteCode;
+
+  /// No description provided for @staffInviteChannelPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'По телефону'**
+  String get staffInviteChannelPhone;
+
+  /// No description provided for @staffInviteChannelEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'По почте'**
+  String get staffInviteChannelEmail;
+
+  /// No description provided for @staffInvitePhoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'+992 XX XXX XX XX'**
+  String get staffInvitePhoneHint;
+
+  /// No description provided for @staffInvitePhoneInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер как +992 90 123 45 67'**
+  String get staffInvitePhoneInvalid;
+
+  /// No description provided for @staffInviteNameLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя работника'**
+  String get staffInviteNameLabel;
+
+  /// No description provided for @staffInviteNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Под этим именем он появится в ферме'**
+  String get staffInviteNameHint;
+
+  /// No description provided for @staffInviteNameEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите имя работника'**
+  String get staffInviteNameEmpty;
+
+  /// No description provided for @staffInviteCodeSmsBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код ушёл по SMS на {phone}. Работник вводит этот номер на входе и код из сообщения — больше ничего не нужно. Если SMS не дошла, передайте код сами: второй раз он не покажется.'**
+  String staffInviteCodeSmsBody(String phone);
 
   /// No description provided for @staffInviteCodeBody.
   ///

@@ -2,63 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/features/auth/data/repositories/auth_repository.dart';
-
-/// Хранилище в памяти — то же, что в profile_cache_test.dart: настоящее
-/// ходит в платформенный канал, которого в тестах нет.
-class _FakeStorage extends FlutterSecureStorage {
-  _FakeStorage([Map<String, String>? values])
-      : values = values ?? {},
-        super();
-
-  final Map<String, String> values;
-
-  @override
-  Future<String?> read({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async =>
-      values[key];
-
-  @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    if (value == null) {
-      values.remove(key);
-    } else {
-      values[key] = value;
-    }
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    values.remove(key);
-  }
-}
+import '../support/fake_storage.dart';
 
 class _FakeAdapter implements HttpClientAdapter {
   _FakeAdapter(this.profile);
@@ -98,14 +45,14 @@ Map<String, dynamic> _profile({required int id, required String fullName}) => {
 /// собственная сессия админа откладывается на диске, а не стирается — её
 /// нужно вернуть по кнопке «Выйти» или когда истечёт 15-минутный токен.
 void main() {
-  AuthRepository build(_FakeStorage storage, Map<String, dynamic> profile) {
+  AuthRepository build(FakeStorage storage, Map<String, dynamic> profile) {
     final client = ApiClient(storage: storage);
     client.dio.httpClientAdapter = _FakeAdapter(profile);
     return AuthRepository(apiClient: client, storage: storage);
   }
 
   test('вход под клиентом откладывает токены и профиль админа', () async {
-    final storage = _FakeStorage({
+    final storage = FakeStorage({
       'access_token': 'admin-access',
       'refresh_token': 'admin-refresh',
       'profile': jsonEncode(_profile(id: 1, fullName: 'Админ')),
@@ -131,7 +78,7 @@ void main() {
   test('без сохранённого refresh-токена админа не путает его отсутствие с чужим', () async {
     // У админа мог не быть refresh-токена на момент входа под клиентом
     // (маловероятно, но откладывать нечего — значит и не пишем).
-    final storage = _FakeStorage({
+    final storage = FakeStorage({
       'access_token': 'admin-access',
       'profile': jsonEncode(_profile(id: 1, fullName: 'Админ')),
     });
@@ -146,7 +93,7 @@ void main() {
   });
 
   test('восстановление возвращает токены и профиль админа, снимает пометки просмотра', () async {
-    final storage = _FakeStorage({
+    final storage = FakeStorage({
       'access_token': 'owner-access',
       'admin_access_token': 'admin-access',
       'admin_refresh_token': 'admin-refresh',
@@ -169,14 +116,14 @@ void main() {
   });
 
   test('восстанавливать нечего — вне сеанса просмотра', () async {
-    final repository = build(_FakeStorage(), _profile(id: 1, fullName: 'Админ'));
+    final repository = build(FakeStorage(), _profile(id: 1, fullName: 'Админ'));
 
     expect(await repository.restoreFromImpersonation(), isFalse);
     expect(await repository.isImpersonating(), isFalse);
   });
 
   test('обычный выход стирает и отложенную сессию просмотра — не только текущую', () async {
-    final storage = _FakeStorage({
+    final storage = FakeStorage({
       'access_token': 'owner-access',
       'refresh_token': 'r',
       'profile': 'p',

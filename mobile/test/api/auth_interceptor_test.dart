@@ -3,59 +3,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/core/api/api_interceptors.dart';
-
-/// Хранилище в памяти: настоящее обращается к платформенному каналу,
-/// которого в тестах нет.
-class _FakeStorage extends FlutterSecureStorage {
-  _FakeStorage(this._values) : super();
-
-  final Map<String, String> _values;
-
-  @override
-  Future<String?> read({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async =>
-      _values[key];
-
-  @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    if (value == null) {
-      _values.remove(key);
-    } else {
-      _values[key] = value;
-    }
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    _values.remove(key);
-  }
-}
+import '../support/fake_storage.dart';
 
 /// Сервер-заглушка: защищённый маршрут отвечает 401, пока не предъявлен
 /// свежий токен; обновление считает свои вызовы.
@@ -124,7 +73,7 @@ Dio _buildDio(_FakeServer server, AuthInterceptor interceptor) {
 void main() {
   group('AuthInterceptor', () {
     test('несколько одновременных 401 обновляют токен один раз', () async {
-      final storage = _FakeStorage({
+      final storage = FakeStorage({
         'access_token': 'stale',
         'refresh_token': 'valid-refresh',
       });
@@ -155,7 +104,7 @@ void main() {
 
     test('неудачное обновление сообщает о потере сессии и чистит токены',
         () async {
-      final storage = _FakeStorage({
+      final storage = FakeStorage({
         'access_token': 'stale',
         'refresh_token': 'expired-refresh',
       });
@@ -178,7 +127,7 @@ void main() {
 
     test('повторный 401 после обновления не уходит в бесконечный круг',
         () async {
-      final storage = _FakeStorage({
+      final storage = FakeStorage({
         'access_token': 'stale',
         'refresh_token': 'valid-refresh',
       });

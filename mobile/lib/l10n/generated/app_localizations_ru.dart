@@ -152,6 +152,68 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginSubtitle => 'Вход в вашу ферму';
 
   @override
+  String get loginPhoneLabel => 'Телефон';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Введите номер телефона';
+
+  @override
+  String get loginPhoneInvalid => 'Номер как +992 90 123 45 67';
+
+  @override
+  String get loginPhoneIntro => 'Пришлём код в SMS — пароль не нужен.';
+
+  @override
+  String get loginRequestCode => 'Получить код';
+
+  @override
+  String get loginWithPassword => 'Войти по почте и паролю';
+
+  @override
+  String get loginCodeTitle => 'Введите код';
+
+  @override
+  String loginCodeSentTo(String phone) {
+    return 'Отправили код на $phone';
+  }
+
+  @override
+  String get loginCodeLabel => 'Код из SMS';
+
+  @override
+  String get loginCodeEmpty => 'Введите код';
+
+  @override
+  String get loginCodeInvalid => 'Код — это 6 цифр';
+
+  @override
+  String get loginCodeSubmit => 'Войти';
+
+  @override
+  String get loginCodeResend => 'Отправить код ещё раз';
+
+  @override
+  String loginCodeResendIn(int seconds) {
+    return 'Отправить ещё раз через $seconds с';
+  }
+
+  @override
+  String get loginCodeResent => 'Код отправлен ещё раз';
+
+  @override
+  String get loginCodeChangePhone => 'Изменить номер';
+
+  @override
+  String get passwordLoginTitle => 'Вход по почте и паролю';
+
+  @override
+  String get passwordLoginIntro =>
+      'Запасной способ — для тех, кто завёл ферму на почту.';
+
+  @override
   String get loginEmailLabel => 'Почта';
 
   @override
@@ -2925,6 +2987,32 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get staffInviteCode => 'Код приглашения';
+
+  @override
+  String get staffInviteChannelPhone => 'По телефону';
+
+  @override
+  String get staffInviteChannelEmail => 'По почте';
+
+  @override
+  String get staffInvitePhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get staffInvitePhoneInvalid => 'Номер как +992 90 123 45 67';
+
+  @override
+  String get staffInviteNameLabel => 'Имя работника';
+
+  @override
+  String get staffInviteNameHint => 'Под этим именем он появится в ферме';
+
+  @override
+  String get staffInviteNameEmpty => 'Укажите имя работника';
+
+  @override
+  String staffInviteCodeSmsBody(String phone) {
+    return 'Код ушёл по SMS на $phone. Работник вводит этот номер на входе и код из сообщения — больше ничего не нужно. Если SMS не дошла, передайте код сами: второй раз он не покажется.';
+  }
 
   @override
   String staffInviteCodeBody(String email) {

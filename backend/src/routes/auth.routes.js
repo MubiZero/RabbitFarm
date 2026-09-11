@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 const staffController = require('../controllers/staffController');
 const { authenticate } = require('../middleware/auth');
 const validate = require('../middleware/validation');
-const { authLimiter } = require('../middleware/rateLimiter');
+const { authLimiter, otpLimiter } = require('../middleware/rateLimiter');
 const {
   registerSchema,
   loginSchema,
@@ -119,7 +119,7 @@ router.post(
  */
 router.post(
   '/otp/request',
-  authLimiter,
+  otpLimiter,
   validate(requestOtpSchema),
   authController.requestOtp
 );
@@ -151,7 +151,7 @@ router.post(
  */
 router.post(
   '/otp/verify',
-  authLimiter,
+  otpLimiter,
   validate(verifyOtpSchema),
   authController.verifyOtp
 );

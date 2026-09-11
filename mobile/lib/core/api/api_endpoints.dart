@@ -37,6 +37,11 @@ class ApiEndpoints {
   static const String changePassword = '/auth/change-password';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
+  // Вход по телефону — основной способ (см. docs/HANDOFF.md). Email+пароль
+  // остаётся запасным.
+  static const String otpRequest = '/auth/otp/request';
+  static const String otpVerify = '/auth/otp/verify';
+  static const String setPassword = '/auth/set-password';
 
   // Rabbits endpoints
   static const String rabbits = '/rabbits';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,25 +6,7 @@ import 'package:mobile/core/providers/api_providers.dart';
 import 'package:mobile/features/auth/presentation/screens/register_screen.dart';
 
 import '../support/test_app.dart';
-
-/// Хранилище в памяти — как в farm_status_reactive_test.dart: настоящее ходит
-/// в платформенный канал, которого в тестах нет, а `AuthNotifier` лезет за
-/// токенами прямо при создании.
-class _FakeStorage extends FlutterSecureStorage {
-  _FakeStorage() : super();
-
-  @override
-  Future<String?> read({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async =>
-      null;
-}
+import '../support/fake_storage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +15,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(testAppScreen(
       const RegisterScreen(),
-      overrides: [storageProvider.overrideWithValue(_FakeStorage())],
+      overrides: [storageProvider.overrideWithValue(FakeStorage())],
     ));
     await tester.pumpAndSettle();
   }

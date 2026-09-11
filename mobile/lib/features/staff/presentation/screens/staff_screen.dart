@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/phone_utils.dart';
 import '../../data/models/staff_models.dart';
 import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -279,7 +280,7 @@ class StaffScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(context.l10n.staffRevokeTitle),
-        content: Text(context.l10n.staffRevokeBody(invitation.email)),
+        content: Text(context.l10n.staffRevokeBody(invitation.contact)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -312,31 +313,61 @@ class StaffScreen extends ConsumerWidget {
 
   Future<void> _inviteDialog(BuildContext context, WidgetRef ref) async {
     final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    final nameController = TextEditingController();
     var role = FarmRole.worker;
+    // Телефон первым: вход в приложение теперь по номеру и коду из SMS, и
+    // приглашение по почте нужно только тем, кого зовут к паролю.
+    var byPhone = true;
+    // Состояние отправки живёт снаружи builder: внутри оно пересоздавалось
+    // на каждой перерисовке, кнопка не блокировалась, и приглашение можно
+    // было выписать дважды подряд.
+    var isSending = false;
+    String? fieldError;
 
     final created = await showDialog<CreatedInvitation>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) {
-          var isSending = false;
-
           Future<void> submit() async {
+            final l10n = context.l10n;
             final email = emailController.text.trim();
-            if (email.isEmpty || !email.contains('@')) return;
+            final phone = normalizeTjPhone(phoneController.text);
+            final fullName = nameController.text.trim();
+
+            if (byPhone) {
+              if (!isTjPhone(phone)) {
+                setDialogState(() => fieldError = l10n.staffInvitePhoneInvalid);
+                return;
+              }
+              if (fullName.isEmpty) {
+                setDialogState(() => fieldError = l10n.staffInviteNameEmpty);
+                return;
+              }
+            } else if (email.isEmpty || !email.contains('@')) {
+              setDialogState(() => fieldError = l10n.loginEmailInvalid);
+              return;
+            }
 
             // Берём до отправки: после await диалог может быть уже закрыт.
             final messenger = ScaffoldMessenger.of(dialogContext);
             final navigator = Navigator.of(dialogContext);
-            final l10n = context.l10n;
 
-            setDialogState(() => isSending = true);
+            setDialogState(() {
+              isSending = true;
+              fieldError = null;
+            });
             try {
-              final invitation = await ref
-                  .read(staffRepositoryProvider)
-                  .createInvitation(email: email, role: role);
+              final invitation =
+                  await ref.read(staffRepositoryProvider).createInvitation(
+                        email: byPhone ? null : email,
+                        phone: byPhone ? phone : null,
+                        fullName: byPhone ? fullName : null,
+                        role: role,
+                      );
               navigator.pop(invitation);
             } catch (e) {
-              // Лимит тарифа не лечится другим email — приглашать больше
+              // Лимит тарифа не лечится другим адресом — приглашать больше
               // некуда, пока не сменится тариф. Диалог с полем ввода тут
               // бесполезен: закрываем его и объясняем отдельно.
               if (e is ApiFailure && e.code == 'STAFF_LIMIT_REACHED') {
@@ -362,50 +393,104 @@ class StaffScreen extends ConsumerWidget {
 
           return AlertDialog(
             title: Text(context.l10n.staffInviteTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.commonEmail,
-                    hintText: context.l10n.staffInviteEmailHint,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  context.l10n.staffRole,
-                  style: AppTypography.labelSm.copyWith(
-                    color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                RadioGroup<FarmRole>(
-                  groupValue: role,
-                  onChanged: (value) {
-                    if (value != null) setDialogState(() => role = value);
-                  },
-                  child: Column(
-                    children: [
-                      RadioListTile<FarmRole>(
-                        value: FarmRole.worker,
-                        title: Text(context.l10n.roleWorker),
-                        subtitle: Text(FarmRole.worker.description),
-                        contentPadding: EdgeInsets.zero,
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SegmentedButton<bool>(
+                    segments: [
+                      ButtonSegment(
+                        value: true,
+                        label: Text(context.l10n.staffInviteChannelPhone),
                       ),
-                      RadioListTile<FarmRole>(
-                        value: FarmRole.manager,
-                        title: Text(context.l10n.roleManager),
-                        subtitle: Text(FarmRole.manager.description),
-                        contentPadding: EdgeInsets.zero,
+                      ButtonSegment(
+                        value: false,
+                        label: Text(context.l10n.staffInviteChannelEmail),
                       ),
                     ],
+                    selected: {byPhone},
+                    onSelectionChanged: isSending
+                        ? null
+                        : (selection) => setDialogState(() {
+                              byPhone = selection.first;
+                              fieldError = null;
+                            }),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  if (byPhone) ...[
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      autofocus: true,
+                      enabled: !isSending,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.loginPhoneLabel,
+                        hintText: context.l10n.staffInvitePhoneHint,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: nameController,
+                      textCapitalization: TextCapitalization.words,
+                      enabled: !isSending,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.staffInviteNameLabel,
+                        hintText: context.l10n.staffInviteNameHint,
+                      ),
+                    ),
+                  ] else
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      autofocus: true,
+                      enabled: !isSending,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.commonEmail,
+                        hintText: context.l10n.staffInviteEmailHint,
+                      ),
+                    ),
+                  if (fieldError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      fieldError!,
+                      style: AppTypography.labelSm
+                          .copyWith(color: AppColors.error),
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  Text(
+                    context.l10n.staffRole,
+                    style: AppTypography.labelSm.copyWith(
+                      color:
+                          Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  RadioGroup<FarmRole>(
+                    groupValue: role,
+                    onChanged: (value) {
+                      if (value != null) setDialogState(() => role = value);
+                    },
+                    child: Column(
+                      children: [
+                        RadioListTile<FarmRole>(
+                          value: FarmRole.worker,
+                          title: Text(context.l10n.roleWorker),
+                          subtitle: Text(FarmRole.worker.description),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        RadioListTile<FarmRole>(
+                          value: FarmRole.manager,
+                          title: Text(context.l10n.roleManager),
+                          subtitle: Text(FarmRole.manager.description),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -443,7 +528,11 @@ class StaffScreen extends ConsumerWidget {
     await _showSecretDialog(
       context,
       title: context.l10n.staffInviteCode,
-      explanation: context.l10n.staffInviteCodeBody(invitation.email),
+      // Приглашённому по телефону код придёт сам — объяснение другое:
+      // владельцу важно знать, что диктовать код обычно не придётся.
+      explanation: invitation.phone != null
+          ? context.l10n.staffInviteCodeSmsBody(formatTjPhone(invitation.phone!))
+          : context.l10n.staffInviteCodeBody(invitation.contact),
       secret: invitation.code,
       footnote: context.l10n.staffValidUntil(
           DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
@@ -565,7 +654,7 @@ class _MemberCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    member.email,
+                    member.contact,
                     style: AppTypography.labelSm
                         .copyWith(color: cs.onSurfaceVariant),
                     maxLines: 1,
@@ -659,14 +748,19 @@ class _InvitationCard extends StatelessWidget {
       child: AppCard(
         child: Row(
           children: [
-            Icon(Icons.mark_email_unread_outlined, color: cs.onSurfaceVariant),
+            Icon(
+              invitation.phone != null
+                  ? Icons.sms_outlined
+                  : Icons.mark_email_unread_outlined,
+              color: cs.onSurfaceVariant,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    invitation.email,
+                    invitation.contact,
                     style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

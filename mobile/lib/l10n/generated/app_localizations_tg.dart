@@ -153,6 +153,68 @@ class AppLocalizationsTg extends AppLocalizations {
   String get loginSubtitle => 'Вуруд ба фермаи шумо';
 
   @override
+  String get loginPhoneLabel => 'Телефон';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Рақами телефонро ворид кунед';
+
+  @override
+  String get loginPhoneInvalid => 'Рақам ба монанди +992 90 123 45 67';
+
+  @override
+  String get loginPhoneIntro => 'Рамзро бо SMS мефиристем — парол лозим нест.';
+
+  @override
+  String get loginRequestCode => 'Рамз гирифтан';
+
+  @override
+  String get loginWithPassword => 'Бо почта ва парол ворид шудан';
+
+  @override
+  String get loginCodeTitle => 'Рамзро ворид кунед';
+
+  @override
+  String loginCodeSentTo(String phone) {
+    return 'Рамзро ба $phone фиристодем';
+  }
+
+  @override
+  String get loginCodeLabel => 'Рамз аз SMS';
+
+  @override
+  String get loginCodeEmpty => 'Рамзро ворид кунед';
+
+  @override
+  String get loginCodeInvalid => 'Рамз аз 6 рақам иборат аст';
+
+  @override
+  String get loginCodeSubmit => 'Ворид шудан';
+
+  @override
+  String get loginCodeResend => 'Рамзро аз нав фиристодан';
+
+  @override
+  String loginCodeResendIn(int seconds) {
+    return 'Аз нав фиристодан пас аз $seconds с';
+  }
+
+  @override
+  String get loginCodeResent => 'Рамз аз нав фиристода шуд';
+
+  @override
+  String get loginCodeChangePhone => 'Рақамро иваз кардан';
+
+  @override
+  String get passwordLoginTitle => 'Вуруд бо почта ва парол';
+
+  @override
+  String get passwordLoginIntro =>
+      'Роҳи эҳтиётӣ — барои онҳое, ки фермаро бо почта кушодаанд.';
+
+  @override
   String get loginEmailLabel => 'Почта';
 
   @override
@@ -2883,6 +2945,32 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get staffInviteCode => 'Рамзи даъватнома';
+
+  @override
+  String get staffInviteChannelPhone => 'Бо телефон';
+
+  @override
+  String get staffInviteChannelEmail => 'Бо почта';
+
+  @override
+  String get staffInvitePhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get staffInvitePhoneInvalid => 'Рақам ба монанди +992 90 123 45 67';
+
+  @override
+  String get staffInviteNameLabel => 'Номи коргар';
+
+  @override
+  String get staffInviteNameHint => 'Бо ҳамин ном дар ферма пайдо мешавад';
+
+  @override
+  String get staffInviteNameEmpty => 'Номи коргарро нишон диҳед';
+
+  @override
+  String staffInviteCodeSmsBody(String phone) {
+    return 'Рамз бо SMS ба $phone фиристода шуд. Коргар ҳангоми вуруд ҳамин рақам ва рамзи паёмро ворид мекунад — дигар чизе лозим нест. Агар SMS нарасад, рамзро худатон расонед: дуюмбор нишон дода намешавад.';
+  }
 
   @override
   String staffInviteCodeBody(String email) {

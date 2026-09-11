@@ -20,7 +20,9 @@ class _LimitedStaffRepository extends StaffRepository {
 
   @override
   Future<CreatedInvitation> createInvitation({
-    required String email,
+    String? email,
+    String? phone,
+    String? fullName,
     required FarmRole role,
   }) async {
     throw const ApiFailure(ApiFailureKind.invalid, code: 'STAFF_LIMIT_REACHED');
@@ -141,12 +143,14 @@ void main() {
     await tester.tap(find.text('Пригласить'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'new@example.com');
+    // Приглашение по телефону — способ по умолчанию: номер и имя работника.
+    await tester.enterText(find.byType(TextField).at(0), '+992901234567');
+    await tester.enterText(find.byType(TextField).at(1), 'Новый Работник');
     await tester.tap(find.text('Выписать код'));
     await tester.pumpAndSettle();
 
-    // Форма приглашения закрыта — почта сама по себе тут ни при чём, а
-    // повторный ввод другого адреса лимит не снимет.
+    // Форма приглашения закрыта — номер сам по себе тут ни при чём, а
+    // повторный ввод другого контакта лимит не снимет.
     expect(find.byType(TextField), findsNothing);
     expect(find.text('Лимит участников по тарифу'), findsOneWidget);
     expect(

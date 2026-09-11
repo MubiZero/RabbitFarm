@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/json/int_converter.dart';
+import '../../../../core/utils/phone_utils.dart';
 
 part 'staff_models.freezed.dart';
 part 'staff_models.g.dart';
@@ -35,7 +36,9 @@ extension FarmRoleLabels on FarmRole {
 abstract class FarmMember with _$FarmMember {
   const factory FarmMember({
     @IntConverter() required int id,
-    required String email,
+    // Почты может не быть вовсе: работника приглашают по телефону, и входит
+    // он кодом из SMS (см. docs/HANDOFF.md). Контакт для показа — `contact`.
+    String? email,
     @JsonKey(name: 'full_name') required String fullName,
     String? phone,
     required FarmRole role,
@@ -52,6 +55,10 @@ abstract class FarmMember with _$FarmMember {
   /// вопрос прямо, а не через отсутствие поля.
   bool get isOwner => role == FarmRole.owner;
 
+  /// Контакт для показа в составе фермы: почта, а если её нет — телефон.
+  /// Хотя бы одно есть всегда (сервер требует при заведении учётки).
+  String get contact => email ?? (phone == null ? '' : formatTjPhone(phone!));
+
   factory FarmMember.fromJson(Map<String, dynamic> json) =>
       _$FarmMemberFromJson(json);
 }
@@ -61,10 +68,17 @@ abstract class FarmMember with _$FarmMember {
 abstract class FarmInvitation with _$FarmInvitation {
   const factory FarmInvitation({
     @IntConverter() required int id,
-    required String email,
+    String? email,
+    String? phone,
     required FarmRole role,
     @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _FarmInvitation;
+
+  const FarmInvitation._();
+
+  /// Кому выписано — почта или телефон. Приглашение всегда ровно на одно из
+  /// двух (сервер принимает только одно), поэтому одно поле для показа.
+  String get contact => email ?? (phone == null ? '' : formatTjPhone(phone!));
 
   factory FarmInvitation.fromJson(Map<String, dynamic> json) =>
       _$FarmInvitationFromJson(json);
@@ -75,11 +89,19 @@ abstract class FarmInvitation with _$FarmInvitation {
 abstract class CreatedInvitation with _$CreatedInvitation {
   const factory CreatedInvitation({
     @IntConverter() required int id,
-    required String email,
+    String? email,
+    String? phone,
     required FarmRole role,
     required String code,
+    // Приглашение по телефону сервер пытается отправить SMS сам. Не дошла —
+    // код всё равно вернулся, и владелец передаёт его на словах.
+    @JsonKey(name: 'sms_sent') @Default(false) bool smsSent,
     @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _CreatedInvitation;
+
+  const CreatedInvitation._();
+
+  String get contact => email ?? (phone == null ? '' : formatTjPhone(phone!));
 
   factory CreatedInvitation.fromJson(Map<String, dynamic> json) =>
       _$CreatedInvitationFromJson(json);

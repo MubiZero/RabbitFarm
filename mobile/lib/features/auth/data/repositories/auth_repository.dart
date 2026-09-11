@@ -37,17 +37,7 @@ class AuthRepository {
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
-
-      // Save tokens to secure storage
-      await _storage.write(
-        key: 'access_token',
-        value: authResponse.accessToken,
-      );
-      await _storage.write(
-        key: 'refresh_token',
-        value: authResponse.refreshToken,
-      );
-      await _cacheProfile(authResponse.user.toJson());
+      await _persistSession(authResponse);
 
       return authResponse;
     } on DioException catch (e) {
@@ -82,17 +72,7 @@ class AuthRepository {
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
-
-      // Save tokens to secure storage
-      await _storage.write(
-        key: 'access_token',
-        value: authResponse.accessToken,
-      );
-      await _storage.write(
-        key: 'refresh_token',
-        value: authResponse.refreshToken,
-      );
-      await _cacheProfile(authResponse.user.toJson());
+      await _persistSession(authResponse);
 
       return authResponse;
     } on DioException catch (e) {
@@ -124,18 +104,66 @@ class AuthRepository {
       }
 
       final authResponse = AuthResponse.fromJson(apiResponse.data!);
-
-      await _storage.write(
-        key: 'access_token',
-        value: authResponse.accessToken,
-      );
-      await _storage.write(
-        key: 'refresh_token',
-        value: authResponse.refreshToken,
-      );
-      await _cacheProfile(authResponse.user.toJson());
+      await _persistSession(authResponse);
 
       return authResponse;
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Запросить код входа по телефону — основной способ входа.
+  ///
+  /// Как и сброс пароля, отвечает успехом всегда: по ответу нельзя понять,
+  /// есть ли за номером аккаунт или приглашение.
+  Future<void> requestOtp({required String phone}) async {
+    try {
+      await _apiClient.post(ApiEndpoints.otpRequest, data: {'phone': phone});
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Войти по коду из SMS. Если за номером было приглашение, сервер заводит
+  /// по нему учётку прямо здесь — отдельного экрана «код приглашения» для
+  /// такого сотрудника нет.
+  Future<AuthResponse> verifyOtp({
+    required String phone,
+    required String code,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.otpVerify,
+        data: {'phone': phone, 'code': code},
+      );
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+      }
+
+      final authResponse = AuthResponse.fromJson(apiResponse.data!);
+      await _persistSession(authResponse);
+
+      return authResponse;
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Задать первый пароль тому, кто входил только по коду из SMS, — иначе
+  /// «пароль как запасной способ» недостижим. Сессия уже есть, токены не
+  /// меняются.
+  Future<void> setPassword({required String newPassword}) async {
+    try {
+      await _apiClient.post(
+        ApiEndpoints.setPassword,
+        data: {'new_password': newPassword},
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
@@ -219,6 +247,18 @@ class AuthRepository {
 
   Future<void> _cacheProfile(Map<String, dynamic> json) async {
     await _storage.write(key: _profileKey, value: jsonEncode(json));
+  }
+
+  /// Сессия на диск: токены и профиль. Один путь на все способы входа —
+  /// вход паролем, регистрация, приглашение и код из SMS кладут одно и то
+  /// же, и забыть здесь профиль (см. выше, почему он важен) нельзя.
+  Future<void> _persistSession(AuthResponse authResponse) async {
+    await _storage.write(key: 'access_token', value: authResponse.accessToken);
+    await _storage.write(
+      key: 'refresh_token',
+      value: authResponse.refreshToken,
+    );
+    await _cacheProfile(authResponse.user.toJson());
   }
 
   /// Последний известный профиль. Возвращает null, если его нет или он

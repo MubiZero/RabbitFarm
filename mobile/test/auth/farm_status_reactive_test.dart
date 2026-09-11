@@ -3,63 +3,12 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/providers/api_providers.dart';
 import 'package:mobile/features/auth/presentation/providers/auth_provider.dart';
-
-/// Хранилище в памяти — то же, что в impersonation_test.dart: настоящее
-/// ходит в платформенный канал, которого в тестах нет.
-class _FakeStorage extends FlutterSecureStorage {
-  _FakeStorage() : super();
-
-  final values = <String, String>{};
-
-  @override
-  Future<String?> read({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async =>
-      values[key];
-
-  @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    if (value == null) {
-      values.remove(key);
-    } else {
-      values[key] = value;
-    }
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    values.remove(key);
-  }
-}
+import '../support/fake_storage.dart';
 
 /// Вход всегда удаётся с профилем на активной ферме; любой другой запрос —
 /// заранее заданный отказ (см. docs/plans/PLATFORM-ADMIN.md, 4.2: узнать
@@ -125,7 +74,7 @@ void main() {
     // Один и тот же экземпляр — клиенту (там читает `AuthInterceptor`) и
     // репозиторию (там кладёт токены `AuthRepository`) нужно одно и то же
     // хранилище, а не два независимых.
-    final storage = _FakeStorage();
+    final storage = FakeStorage();
     final client = ApiClient(storage: storage);
     client.dio.httpClientAdapter = adapter;
 

@@ -154,6 +154,68 @@ class AppLocalizationsUz extends AppLocalizations {
   String get loginSubtitle => 'Fermangizga kirish';
 
   @override
+  String get loginPhoneLabel => 'Telefon';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Telefon raqamini kiriting';
+
+  @override
+  String get loginPhoneInvalid => 'Raqam +992 90 123 45 67 ko\'rinishida';
+
+  @override
+  String get loginPhoneIntro => 'SMS orqali kod yuboramiz — parol kerak emas.';
+
+  @override
+  String get loginRequestCode => 'Kod olish';
+
+  @override
+  String get loginWithPassword => 'Pochta va parol bilan kirish';
+
+  @override
+  String get loginCodeTitle => 'Kodni kiriting';
+
+  @override
+  String loginCodeSentTo(String phone) {
+    return 'Kod $phone raqamiga yuborildi';
+  }
+
+  @override
+  String get loginCodeLabel => 'SMSdagi kod';
+
+  @override
+  String get loginCodeEmpty => 'Kodni kiriting';
+
+  @override
+  String get loginCodeInvalid => 'Kod — 6 ta raqam';
+
+  @override
+  String get loginCodeSubmit => 'Kirish';
+
+  @override
+  String get loginCodeResend => 'Kodni qayta yuborish';
+
+  @override
+  String loginCodeResendIn(int seconds) {
+    return '$seconds s dan keyin qayta yuborish';
+  }
+
+  @override
+  String get loginCodeResent => 'Kod qayta yuborildi';
+
+  @override
+  String get loginCodeChangePhone => 'Raqamni o\'zgartirish';
+
+  @override
+  String get passwordLoginTitle => 'Pochta va parol bilan kirish';
+
+  @override
+  String get passwordLoginIntro =>
+      'Zaxira usul — fermani pochta orqali ochganlar uchun.';
+
+  @override
   String get loginEmailLabel => 'Pochta';
 
   @override
@@ -2905,6 +2967,32 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get staffInviteCode => 'Taklif kodi';
+
+  @override
+  String get staffInviteChannelPhone => 'Telefon orqali';
+
+  @override
+  String get staffInviteChannelEmail => 'Pochta orqali';
+
+  @override
+  String get staffInvitePhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get staffInvitePhoneInvalid => 'Raqam +992 90 123 45 67 ko\'rinishida';
+
+  @override
+  String get staffInviteNameLabel => 'Ishchining ismi';
+
+  @override
+  String get staffInviteNameHint => 'U fermada shu nom bilan ko\'rinadi';
+
+  @override
+  String get staffInviteNameEmpty => 'Ishchining ismini kiriting';
+
+  @override
+  String staffInviteCodeSmsBody(String phone) {
+    return 'Kod $phone raqamiga SMS orqali yuborildi. Ishchi kirishda shu raqamni va xabardagi kodni kiritadi — boshqa hech narsa kerak emas. Agar SMS yetib bormasa, kodni o\'zingiz yetkazing: ikkinchi marta u ko\'rsatilmaydi.';
+  }
 
   @override
   String staffInviteCodeBody(String email) {

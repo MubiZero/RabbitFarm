@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- int get id; String get email;@JsonKey(name: 'full_name') String get fullName; String get role; String? get phone;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'is_active') bool get isActive;@JsonKey(name: 'is_platform_admin') bool get isPlatformAdmin;@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? get lastLoginAt;@JsonKey(name: 'digest_enabled') bool get digestEnabled;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime get updatedAt; FarmRef? get farm;
+ int get id; String? get email;@JsonKey(name: 'full_name') String get fullName; String get role; String? get phone;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'is_active') bool get isActive;@JsonKey(name: 'is_platform_admin') bool get isPlatformAdmin;@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? get lastLoginAt;@JsonKey(name: 'digest_enabled') bool get digestEnabled;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime get updatedAt; FarmRef? get farm;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -54,7 +54,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- int id, String email,@JsonKey(name: 'full_name') String fullName, String role, String? phone,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? lastLoginAt,@JsonKey(name: 'digest_enabled') bool digestEnabled,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime updatedAt, FarmRef? farm
+ int id, String? email,@JsonKey(name: 'full_name') String fullName, String role, String? phone,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? lastLoginAt,@JsonKey(name: 'digest_enabled') bool digestEnabled,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime updatedAt, FarmRef? farm
 });
 
 
@@ -71,11 +71,11 @@ class _$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? fullName = null,Object? role = null,Object? phone = freezed,Object? avatarUrl = freezed,Object? isActive = null,Object? isPlatformAdmin = null,Object? lastLoginAt = freezed,Object? digestEnabled = null,Object? createdAt = null,Object? updatedAt = null,Object? farm = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = freezed,Object? fullName = null,Object? role = null,Object? phone = freezed,Object? avatarUrl = freezed,Object? isActive = null,Object? isPlatformAdmin = null,Object? lastLoginAt = freezed,Object? digestEnabled = null,Object? createdAt = null,Object? updatedAt = null,Object? farm = freezed,}) {
   return _then(UserModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as int,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
@@ -183,7 +183,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String? email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that.avatarUrl,_that.isActive,_that.isPlatformAdmin,_that.lastLoginAt,_that.digestEnabled,_that.createdAt,_that.updatedAt,_that.farm);case _:
@@ -204,7 +204,7 @@ return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String? email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
 return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that.avatarUrl,_that.isActive,_that.isPlatformAdmin,_that.lastLoginAt,_that.digestEnabled,_that.createdAt,_that.updatedAt,_that.farm);case _:
@@ -224,7 +224,7 @@ return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String? email, @JsonKey(name: 'full_name')  String fullName,  String role,  String? phone, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_platform_admin')  bool isPlatformAdmin, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter()  DateTime? lastLoginAt, @JsonKey(name: 'digest_enabled')  bool digestEnabled, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter()  DateTime updatedAt,  FarmRef? farm)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that.avatarUrl,_that.isActive,_that.isPlatformAdmin,_that.lastLoginAt,_that.digestEnabled,_that.createdAt,_that.updatedAt,_that.farm);case _:
@@ -238,12 +238,12 @@ return $default(_that.id,_that.email,_that.fullName,_that.role,_that.phone,_that
 /// @nodoc
 @JsonSerializable()
 
-class _UserModel implements UserModel {
-  const _UserModel({required this.id, required this.email, @JsonKey(name: 'full_name') required this.fullName, required this.role, this.phone, @JsonKey(name: 'avatar_url') this.avatarUrl, @JsonKey(name: 'is_active') required this.isActive, @JsonKey(name: 'is_platform_admin') this.isPlatformAdmin = false, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter() this.lastLoginAt, @JsonKey(name: 'digest_enabled') this.digestEnabled = true, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter() required this.updatedAt, this.farm});
+class _UserModel extends UserModel {
+  const _UserModel({required this.id, this.email, @JsonKey(name: 'full_name') required this.fullName, required this.role, this.phone, @JsonKey(name: 'avatar_url') this.avatarUrl, @JsonKey(name: 'is_active') required this.isActive, @JsonKey(name: 'is_platform_admin') this.isPlatformAdmin = false, @JsonKey(name: 'last_login_at')@NullableDateTimeConverter() this.lastLoginAt, @JsonKey(name: 'digest_enabled') this.digestEnabled = true, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt, @JsonKey(name: 'updated_at')@DateTimeConverter() required this.updatedAt, this.farm}): super._();
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  int id;
-@override final  String email;
+@override final  String? email;
 @override@JsonKey(name: 'full_name') final  String fullName;
 @override final  String role;
 @override final  String? phone;
@@ -291,7 +291,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String email,@JsonKey(name: 'full_name') String fullName, String role, String? phone,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? lastLoginAt,@JsonKey(name: 'digest_enabled') bool digestEnabled,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime updatedAt, FarmRef? farm
+ int id, String? email,@JsonKey(name: 'full_name') String fullName, String role, String? phone,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_platform_admin') bool isPlatformAdmin,@JsonKey(name: 'last_login_at')@NullableDateTimeConverter() DateTime? lastLoginAt,@JsonKey(name: 'digest_enabled') bool digestEnabled,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'updated_at')@DateTimeConverter() DateTime updatedAt, FarmRef? farm
 });
 
 
@@ -308,11 +308,11 @@ class __$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? fullName = null,Object? role = null,Object? phone = freezed,Object? avatarUrl = freezed,Object? isActive = null,Object? isPlatformAdmin = null,Object? lastLoginAt = freezed,Object? digestEnabled = null,Object? createdAt = null,Object? updatedAt = null,Object? farm = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = freezed,Object? fullName = null,Object? role = null,Object? phone = freezed,Object? avatarUrl = freezed,Object? isActive = null,Object? isPlatformAdmin = null,Object? lastLoginAt = freezed,Object? digestEnabled = null,Object? createdAt = null,Object? updatedAt = null,Object? farm = freezed,}) {
   return _then(_UserModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as int,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable

@@ -57,7 +57,7 @@ class FarmScreen extends ConsumerWidget {
 
             _ProfileCard(
               name: user?.fullName,
-              email: user?.email,
+              email: user?.contact,
               roleLabel: _roleLabel(context, role),
               onTap: () => context.push('/settings'),
             ),

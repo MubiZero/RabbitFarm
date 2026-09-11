@@ -2,63 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/features/auth/data/repositories/auth_repository.dart';
-
-/// Хранилище в памяти: настоящее ходит в платформенный канал, которого в
-/// тестах нет.
-class _FakeStorage extends FlutterSecureStorage {
-  _FakeStorage([Map<String, String>? values])
-      : values = values ?? {},
-        super();
-
-  final Map<String, String> values;
-
-  @override
-  Future<String?> read({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async =>
-      values[key];
-
-  @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    if (value == null) {
-      values.remove(key);
-    } else {
-      values[key] = value;
-    }
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    IOSOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    MacOsOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    values.remove(key);
-  }
-}
+import '../support/fake_storage.dart';
 
 /// Сервер-заглушка: отдаёт профиль владельца на /auth/profile и принимает
 /// выход.
@@ -100,14 +47,14 @@ Map<String, dynamic> _owner({String role = 'owner'}) => {
 /// вычислялась из пустоты, а неизвестная роль трактуется как самая узкая —
 /// владелец без связи получал интерфейс работника.
 void main() {
-  AuthRepository build(_FakeStorage storage, Map<String, dynamic> profile) {
+  AuthRepository build(FakeStorage storage, Map<String, dynamic> profile) {
     final client = ApiClient(storage: storage);
     client.dio.httpClientAdapter = _FakeAdapter(profile);
     return AuthRepository(apiClient: client, storage: storage);
   }
 
   test('успешный запрос профиля сохраняет его на устройстве', () async {
-    final storage = _FakeStorage();
+    final storage = FakeStorage();
     final repository = build(storage, _owner());
 
     await repository.getProfile();
@@ -119,12 +66,12 @@ void main() {
   });
 
   test('без сохранённого профиля честно возвращает ничего', () async {
-    final repository = build(_FakeStorage(), _owner());
+    final repository = build(FakeStorage(), _owner());
     expect(await repository.cachedProfile(), isNull);
   });
 
   test('испорченная запись не выдаётся за профиль и вычищается', () async {
-    final storage = _FakeStorage({'profile': 'не json'});
+    final storage = FakeStorage({'profile': 'не json'});
     final repository = build(storage, _owner());
 
     expect(await repository.cachedProfile(), isNull);
@@ -132,7 +79,7 @@ void main() {
   });
 
   test('выход стирает профиль вместе с токенами', () async {
-    final storage = _FakeStorage({
+    final storage = FakeStorage({
       'access_token': 'a',
       'refresh_token': 'r',
       'profile': jsonEncode(_owner()),

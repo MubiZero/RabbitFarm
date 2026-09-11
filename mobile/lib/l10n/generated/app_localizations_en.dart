@@ -152,6 +152,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginSubtitle => 'Sign in to your farm';
 
   @override
+  String get loginPhoneLabel => 'Phone';
+
+  @override
+  String get loginPhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get loginPhoneEmpty => 'Enter your phone number';
+
+  @override
+  String get loginPhoneInvalid => 'A number like +992 90 123 45 67';
+
+  @override
+  String get loginPhoneIntro =>
+      'We\'ll send a code by SMS — no password needed.';
+
+  @override
+  String get loginRequestCode => 'Get a code';
+
+  @override
+  String get loginWithPassword => 'Sign in with email and password';
+
+  @override
+  String get loginCodeTitle => 'Enter the code';
+
+  @override
+  String loginCodeSentTo(String phone) {
+    return 'We sent a code to $phone';
+  }
+
+  @override
+  String get loginCodeLabel => 'Code from the SMS';
+
+  @override
+  String get loginCodeEmpty => 'Enter the code';
+
+  @override
+  String get loginCodeInvalid => 'The code is 6 digits';
+
+  @override
+  String get loginCodeSubmit => 'Sign in';
+
+  @override
+  String get loginCodeResend => 'Send the code again';
+
+  @override
+  String loginCodeResendIn(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get loginCodeResent => 'Code sent again';
+
+  @override
+  String get loginCodeChangePhone => 'Change number';
+
+  @override
+  String get passwordLoginTitle => 'Sign in with email and password';
+
+  @override
+  String get passwordLoginIntro =>
+      'A backup way in — for farms that were set up with an email.';
+
+  @override
   String get loginEmailLabel => 'Email';
 
   @override
@@ -2892,6 +2955,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staffInviteCode => 'Invite code';
+
+  @override
+  String get staffInviteChannelPhone => 'By phone';
+
+  @override
+  String get staffInviteChannelEmail => 'By email';
+
+  @override
+  String get staffInvitePhoneHint => '+992 XX XXX XX XX';
+
+  @override
+  String get staffInvitePhoneInvalid => 'A number like +992 90 123 45 67';
+
+  @override
+  String get staffInviteNameLabel => 'Worker\'s name';
+
+  @override
+  String get staffInviteNameHint =>
+      'This is the name they\'ll appear under on the farm';
+
+  @override
+  String get staffInviteNameEmpty => 'Enter the worker\'s name';
+
+  @override
+  String staffInviteCodeSmsBody(String phone) {
+    return 'The code went out by SMS to $phone. The worker enters this number at sign-in along with the code from the message — nothing else is needed. If the SMS doesn\'t arrive, pass the code along yourself: it won\'t be shown again.';
+  }
 
   @override
   String staffInviteCodeBody(String email) {

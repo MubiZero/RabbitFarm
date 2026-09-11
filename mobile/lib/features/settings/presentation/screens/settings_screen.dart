@@ -32,7 +32,7 @@ class SettingsScreen extends ConsumerWidget {
           // Profile card
           _GroupCard(
             context: context,
-            children: [_ProfileCard(user?.fullName, user?.email)],
+            children: [_ProfileCard(user?.fullName, user?.contact)],
           ),
           const SizedBox(height: 24),
 

@@ -255,6 +255,41 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Запросить код входа по телефону. Состояние входа не трогаем: сессии
+  /// ещё нет, а форма сама показывает занятость на время запроса.
+  Future<void> requestOtp({required String phone}) async {
+    await _authRepository.requestOtp(phone: phone);
+  }
+
+  /// Вход по коду из SMS — основной способ. Приглашённому сотруднику этот же
+  /// шаг заводит учётку (сервер активирует приглашение по номеру).
+  Future<void> loginWithOtp({
+    required String phone,
+    required String code,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final authResponse = await _authRepository.verifyOtp(
+        phone: phone,
+        code: code,
+      );
+
+      state = state.copyWith(
+        user: authResponse.user,
+        isAuthenticated: true,
+        isLoading: false,
+      );
+      _ref.read(fcmServiceProvider).registerCurrentToken();
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
   // Register
   Future<void> register({
     required String email,

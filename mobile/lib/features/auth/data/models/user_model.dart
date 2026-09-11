@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../../core/utils/phone_utils.dart';
 import '../../../../core/json/date_time_converter.dart';
 import '../../../../core/models/farm_ref.dart';
 
@@ -9,7 +10,10 @@ part 'user_model.g.dart';
 abstract class UserModel with _$UserModel {
   const factory UserModel({
     required int id,
-    required String email,
+    // Пусто у того, кто вошёл по телефону и почту не называл: с переходом на
+    // вход по номеру (см. docs/HANDOFF.md) `users.email` стал необязательным
+    // на сервере, и у приглашённого по SMS работника его действительно нет.
+    String? email,
     @JsonKey(name: 'full_name') required String fullName,
     required String role,
     String? phone,
@@ -33,6 +37,13 @@ abstract class UserModel with _$UserModel {
     // может не быть вовсе.
     FarmRef? farm,
   }) = _UserModel;
+
+  const UserModel._();
+
+  /// Контакт для показа в профиле: почта, а у вошедшего по номеру — телефон.
+  /// Хотя бы одно есть всегда — сервер не заводит учётку без того и другого.
+  String? get contact =>
+      email ?? (phone == null ? null : formatTjPhone(phone!));
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);

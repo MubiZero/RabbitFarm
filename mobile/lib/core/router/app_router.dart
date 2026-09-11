@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/password_login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
@@ -85,6 +86,19 @@ class RouterNotifier extends ChangeNotifier {
     _ref.listen<AuthState>(authProvider, (_, __) => notifyListeners());
   }
 
+  /// Экраны до входа. Один список на обе проверки: раньше он был выписан
+  /// дважды, и новый экран легко оказывался публичным в одну сторону и
+  /// закрытым в другую.
+  static const _publicRoutes = {
+    '/login',
+    '/login/password',
+    '/register',
+    '/join',
+    '/forgot-password',
+    '/reset-password',
+    '/splash',
+  };
+
   String? redirect(BuildContext context, GoRouterState state) {
     final authState = _ref.read(authProvider);
 
@@ -93,12 +107,7 @@ class RouterNotifier extends ChangeNotifier {
 
     final isAuthenticated = authState.isAuthenticated;
     final loc = state.matchedLocation;
-    final isPublic = loc == '/login' ||
-        loc == '/register' ||
-        loc == '/join' ||
-        loc == '/forgot-password' ||
-        loc == '/reset-password' ||
-        loc == '/splash';
+    final isPublic = _publicRoutes.contains(loc);
 
     // Not authenticated on a protected page -> splash
     if (!isAuthenticated && !isPublic) {
@@ -106,13 +115,7 @@ class RouterNotifier extends ChangeNotifier {
     }
 
     // Authenticated on a public page -> home
-    if (isAuthenticated &&
-        (loc == '/login' ||
-            loc == '/register' ||
-            loc == '/join' ||
-            loc == '/forgot-password' ||
-            loc == '/reset-password' ||
-            loc == '/splash')) {
+    if (isAuthenticated && isPublic) {
       return '/today';
     }
 
@@ -153,6 +156,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/login/password',
+        name: 'login-password',
+        builder: (context, state) => const PasswordLoginScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

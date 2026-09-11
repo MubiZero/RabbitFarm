@@ -68,6 +68,31 @@
   "journalNoneInViewBody": "Смените вид записи или срок.",
 
   "loginSubtitle": "Вход в вашу ферму",
+  "loginPhoneLabel": "Телефон",
+  "loginPhoneHint": "+992 XX XXX XX XX",
+  "loginPhoneEmpty": "Введите номер телефона",
+  "loginPhoneInvalid": "Номер как +992 90 123 45 67",
+  "loginPhoneIntro": "Пришлём код в SMS — пароль не нужен.",
+  "loginRequestCode": "Получить код",
+  "loginWithPassword": "Войти по почте и паролю",
+  "loginCodeTitle": "Введите код",
+  "loginCodeSentTo": "Отправили код на {phone}",
+  "@loginCodeSentTo": {
+    "placeholders": { "phone": { "type": "String" } }
+  },
+  "loginCodeLabel": "Код из SMS",
+  "loginCodeEmpty": "Введите код",
+  "loginCodeInvalid": "Код — это 6 цифр",
+  "loginCodeSubmit": "Войти",
+  "loginCodeResend": "Отправить код ещё раз",
+  "loginCodeResendIn": "Отправить ещё раз через {seconds} с",
+  "@loginCodeResendIn": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "loginCodeResent": "Код отправлен ещё раз",
+  "loginCodeChangePhone": "Изменить номер",
+  "passwordLoginTitle": "Вход по почте и паролю",
+  "passwordLoginIntro": "Запасной способ — для тех, кто завёл ферму на почту.",
   "loginEmailLabel": "Почта",
   "loginEmailHint": "name@example.com",
   "loginEmailEmpty": "Введите почту",
@@ -1168,6 +1193,17 @@
   "staffRole": "Роль",
   "staffIssueCode": "Выписать код",
   "staffInviteCode": "Код приглашения",
+  "staffInviteChannelPhone": "По телефону",
+  "staffInviteChannelEmail": "По почте",
+  "staffInvitePhoneHint": "+992 XX XXX XX XX",
+  "staffInvitePhoneInvalid": "Номер как +992 90 123 45 67",
+  "staffInviteNameLabel": "Имя работника",
+  "staffInviteNameHint": "Под этим именем он появится в ферме",
+  "staffInviteNameEmpty": "Укажите имя работника",
+  "staffInviteCodeSmsBody": "Код ушёл по SMS на {phone}. Работник вводит этот номер на входе и код из сообщения — больше ничего не нужно. Если SMS не дошла, передайте код сами: второй раз он не покажется.",
+  "@staffInviteCodeSmsBody": {
+    "placeholders": { "phone": { "type": "String" } }
+  },
   "staffInviteCodeBody": "Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.",
   "@staffInviteCodeBody": {
     "placeholders": { "email": { "type": "String" } }
