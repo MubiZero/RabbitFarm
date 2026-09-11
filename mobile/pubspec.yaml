@@ -46,6 +46,10 @@ dependencies:
   # Открыть страницу оплаты банка во внешнем браузере/приложении (см.
   # docs/plans/PLATFORM-ADMIN.md, 4.1)
   url_launcher: ^6.3.1
+  # Приглашение сотрудника по телефону приходит ссылкой
+  # `rabbitfarm://join?phone=…` — она открывает приложение на экране входа с
+  # уже подставленным номером (см. core/router/deep_links.dart).
+  app_links: ^6.3.2
 
   # Utils
   freezed_annotation: ^3.1.0

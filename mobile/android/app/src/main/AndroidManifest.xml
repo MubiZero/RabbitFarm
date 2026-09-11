@@ -25,6 +25,16 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Ссылка-приглашение из SMS: rabbitfarm://join?phone=+992…
+                 Открывает вход с подставленным номером (см.
+                 lib/core/router/deep_links.dart). Своя схема, а не App Links:
+                 для последних нужен домен с /.well-known. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="rabbitfarm" android:host="join"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

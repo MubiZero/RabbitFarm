@@ -19,6 +19,7 @@ import 'core/providers/app_version.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/router/deep_links.dart';
 import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
 import 'core/widgets/offline_queue_gate.dart';
@@ -108,6 +109,11 @@ Future<void> _bootstrap() async {
       child: MyApp(),
     ),
   );
+
+  // Ссылка-приглашение `rabbitfarm://join?phone=…`: и та, которой приложение
+  // запустили, и приходящие потом. Подписка живёт всё время работы
+  // приложения — отменять её негде и незачем.
+  unawaited(initDeepLinks());
 
   // Приложение было запущено тапом по уведомлению из полностью закрытого
   // состояния — навигация ждёт первого кадра, роутер ещё не готов раньше.

@@ -24,6 +24,23 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<!-- Ссылка-приглашение из SMS: rabbitfarm://join?phone=+992… Открывает
+	     вход с подставленным номером (см. lib/core/router/deep_links.dart).
+	     Своя схема, а не Universal Links: для них нужен домен с
+	     /.well-known/apple-app-site-association и Associated Domains. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>dev.mubi.rabbitfarm</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rabbitfarm</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

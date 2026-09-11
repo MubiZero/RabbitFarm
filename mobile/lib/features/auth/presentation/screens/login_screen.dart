@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/router/deep_links.dart';
 import '../../../../core/utils/phone_utils.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
@@ -21,7 +22,12 @@ import '../providers/auth_provider.dart';
 /// возвращается к номеру, не теряя введённого. Вход по почте и паролю уехал
 /// на отдельный запасной экран (`/login/password`).
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.initialPhone});
+
+  /// Номер из ссылки-приглашения (`rabbitfarm://join?phone=…`), если она
+  /// пришла маршрутом. Подставляется в поле, но код сам не запрашивается:
+  /// SMS уходит по осознанному нажатию, а не потому что открыли ссылку.
+  final String? initialPhone;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -41,6 +47,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _requesting = false;
   Timer? _resendTimer;
   int _resendSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ссылка, открывшая приложение из закрытого состояния, приходит раньше
+    // роутера — номер из неё ждёт здесь (см. `deep_links.dart`).
+    final initial = widget.initialPhone ?? takePendingInvitePhone();
+    if (initial != null && initial.isNotEmpty) {
+      _phoneController.text = formatTjPhone(normalizeTjPhone(initial));
+    }
+  }
 
   @override
   void dispose() {

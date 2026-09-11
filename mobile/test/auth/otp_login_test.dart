@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/core/providers/api_providers.dart';
+import 'package:mobile/core/router/deep_links.dart';
 import 'package:mobile/features/auth/data/models/auth_response.dart';
 import 'package:mobile/features/auth/data/repositories/auth_repository.dart';
 import 'package:mobile/features/auth/presentation/providers/auth_provider.dart';
@@ -164,6 +165,39 @@ void main() {
         tester.widget<TextField>(find.byType(TextField)).controller?.text,
         isEmpty,
       );
+    });
+
+    testWidgets('номер из ссылки-приглашения уже стоит в поле',
+        (tester) async {
+      final repository = _RecordingAuthRepository();
+      await tester.pumpWidget(testAppScreen(
+        const LoginScreen(initialPhone: '+992901234567'),
+        overrides: [
+          storageProvider.overrideWithValue(FakeStorage()),
+          authRepositoryProvider.overrideWithValue(repository),
+        ],
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('+992 90 123 45 67'), findsOneWidget);
+      // Сам код по ссылке не запрашивается: SMS уходит по нажатию, а не
+      // потому что человек открыл ссылку.
+      expect(repository.requestedPhones, isEmpty);
+      expect(find.text('Получить код'), findsOneWidget);
+    });
+
+    testWidgets('номер из ссылки, открывшей приложение, доезжает до поля',
+        (tester) async {
+      // Ссылка приходит раньше роутера: экран забирает номер сам, а не
+      // получает его маршрутом (см. `deep_links.dart`).
+      pendingInvitePhone.value = '+992905550777';
+      addTearDown(() => pendingInvitePhone.value = null);
+
+      await pumpLogin(tester);
+
+      expect(find.text('+992 90 555 07 77'), findsOneWidget);
+      // Забирается ровно один раз — следующий показ входа поля не подставит.
+      expect(pendingInvitePhone.value, isNull);
     });
 
     testWidgets('«Изменить номер» возвращает к вводу телефона',

@@ -155,7 +155,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        // `phone` приходит из ссылки-приглашения `rabbitfarm://join?phone=…`
+        // (см. `deep_links.dart`) — номер сразу стоит в поле, человеку
+        // остаётся нажать «Получить код».
+        builder: (context, state) =>
+            LoginScreen(initialPhone: state.uri.queryParameters['phone']),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
