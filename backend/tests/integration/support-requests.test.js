@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm, login: signIn } = require('./helpers/auth');
 const { User } = require('../../src/models');
 
 /**
@@ -22,41 +23,33 @@ describe('Обращения в поддержку (интеграция)', () =
   beforeAll(async () => {
     await syncTestDb();
 
-    const admin = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'support_admin@example.com', password: 'Password123!', full_name: 'Суперадмин' });
-    adminToken = admin.body.data.access_token;
+    const admin = await registerFarm(app, { email: 'support_admin@example.com', full_name: 'Суперадмин' });
+    adminToken = admin.accessToken;
     await User.update(
       { is_platform_admin: true },
-      { where: { id: admin.body.data.user.id } }
+      { where: { id: admin.user.id } }
     );
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'support_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
-    farmId = owner.body.data.user.farm_id;
+    const owner = await registerFarm(app, { email: 'support_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
+    farmId = owner.user.farm_id;
 
     // Работник той же фермы — заводится напрямую, как в тестах состава фермы.
     await request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'support_worker@example.com', password: 'Password123!', full_name: 'Работник' });
+      .send({ email: 'support_worker@example.com', full_name: 'Работник' });
     await User.update(
       { farm_id: farmId, role: 'worker' },
       { where: { email: 'support_worker@example.com' } }
     );
-    const workerLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'support_worker@example.com', password: 'Password123!' });
-    workerToken = workerLogin.body.data.access_token;
+    const workerLogin = await signIn(app, { email: 'support_worker@example.com' })
+    workerToken = workerLogin.accessToken;
 
     // Отдельная ферма под приостановку: закрывать доступ основной значило бы
     // ломать остальные проверки этого же файла.
-    const suspendedOwner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'support_suspended@example.com', password: 'Password123!', full_name: 'Отключённый' });
-    suspendedOwnerToken = suspendedOwner.body.data.access_token;
-    suspendedFarmId = suspendedOwner.body.data.user.farm_id;
+    const suspendedOwner = await registerFarm(app, { email: 'support_suspended@example.com', full_name: 'Отключённый' });
+    suspendedOwnerToken = suspendedOwner.accessToken;
+    suspendedFarmId = suspendedOwner.user.farm_id;
   });
 
   afterAll(async () => {

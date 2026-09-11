@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -101,7 +100,6 @@ class StaffScreen extends ConsumerWidget {
                   member,
                   isActive: !member.isActive,
                 ),
-                onResetPassword: () => _resetPassword(context, ref, member),
                 onTransferOwnership: () =>
                     _transferOwnership(context, ref, member),
               ),
@@ -166,56 +164,6 @@ class StaffScreen extends ConsumerWidget {
     }
   }
 
-  /// Сброс пароля работнику: почты у сервиса нет, поэтому владелец
-  /// получает временный пароль и передаёт его сам.
-  Future<void> _resetPassword(
-    BuildContext context,
-    WidgetRef ref,
-    FarmMember member,
-  ) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final l10n = context.l10n;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.staffResetPasswordTitle),
-        content: Text(context.l10n.staffResetPasswordBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(context.l10n.staffReset),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true || !context.mounted) return;
-
-    try {
-      final password =
-          await ref.read(staffRepositoryProvider).resetMemberPassword(member.id);
-      if (!context.mounted) return;
-      await _showSecretDialog(
-        context,
-        title: context.l10n.staffTempPassword,
-        explanation: context.l10n.staffTempPasswordBody(member.fullName),
-        secret: password,
-      );
-    } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
-  }
-
-  /// Передача хозяйства мгновенна и необратима действием одной кнопки —
   /// поэтому подтверждение здесь жёстче, чем у смены роли.
   Future<void> _transferOwnership(
     BuildContext context,
@@ -517,91 +465,53 @@ class StaffScreen extends ConsumerWidget {
     if (created == null || !context.mounted) return;
 
     ref.invalidate(farmInvitationsProvider);
-    await _showCodeDialog(context, created);
+    await _showInvitedDialog(context, created);
   }
 
-  /// Код показывается единственный раз — сервер хранит только его хеш.
-  Future<void> _showCodeDialog(
+  /// Приглашение выписано: объясняем владельцу, что делать работнику.
+  /// Диктовать нечего — код придёт самому работнику, когда он введёт свой
+  /// номер или почту на экране входа.
+  Future<void> _showInvitedDialog(
     BuildContext context,
     CreatedInvitation invitation,
   ) async {
-    await _showSecretDialog(
-      context,
-      title: context.l10n.staffInviteCode,
-      // Приглашённому по телефону код придёт сам — объяснение другое:
-      // владельцу важно знать, что диктовать код обычно не придётся.
-      explanation: invitation.phone != null
-          ? context.l10n.staffInviteCodeSmsBody(formatTjPhone(invitation.phone!))
-          : context.l10n.staffInviteCodeBody(invitation.contact),
-      secret: invitation.code,
-      footnote: context.l10n.staffValidUntil(
-          DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
-    );
-  }
-
-  /// Одноразовый секрет: показать, дать скопировать и не обещать повтора.
-  Future<void> _showSecretDialog(
-    BuildContext context, {
-    required String title,
-    required String explanation,
-    required String secret,
-    String? footnote,
-  }) async {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(title),
+        title: Text(context.l10n.staffInvitedTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              explanation,
+              invitation.phone != null
+                  ? context.l10n
+                      .staffInvitedPhoneBody(formatTjPhone(invitation.phone!))
+                  : context.l10n.staffInvitedEmailBody(invitation.contact),
               style: AppTypography.bodyMd.copyWith(
                 color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 16),
-            SelectableText(
-              secret,
-              style: AppTypography.titleMd.copyWith(
-                fontFamily: 'monospace',
-                color: Theme.of(dialogContext).colorScheme.onSurface,
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.staffValidUntil(
+                  DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
+              style: AppTypography.labelSm.copyWith(
+                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
               ),
             ),
-            if (footnote != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                footnote,
-                style: AppTypography.labelSm.copyWith(
-                  color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
           ],
         ),
         actions: [
-          TextButton(
+          FilledButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.l10n.commonClose),
-          ),
-          FilledButton.icon(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(dialogContext);
-              final copied = dialogContext.l10n.commonCopied;
-              await Clipboard.setData(ClipboardData(text: secret));
-              await HapticFeedback.lightImpact();
-              messenger.showSnackBar(
-                SnackBar(content: Text(copied)),
-              );
-            },
-            icon: const Icon(Icons.copy_all_outlined),
-            label: Text(context.l10n.commonCopy),
           ),
         ],
       ),
     );
   }
+
 }
 
 
@@ -609,14 +519,12 @@ class _MemberCard extends StatelessWidget {
   final FarmMember member;
   final ValueChanged<FarmRole>? onChangeRole;
   final VoidCallback? onToggleAccess;
-  final VoidCallback? onResetPassword;
   final VoidCallback? onTransferOwnership;
 
   const _MemberCard({
     required this.member,
     this.onChangeRole,
     this.onToggleAccess,
-    this.onResetPassword,
     this.onTransferOwnership,
   });
 
@@ -682,8 +590,6 @@ class _MemberCard extends StatelessWidget {
                       onChangeRole?.call(FarmRole.manager);
                     case 'access':
                       onToggleAccess?.call();
-                    case 'password':
-                      onResetPassword?.call();
                     case 'transfer-ownership':
                       onTransferOwnership?.call();
                   }
@@ -699,10 +605,6 @@ class _MemberCard extends StatelessWidget {
                       value: 'worker',
                       child: Text(context.l10n.staffMakeWorker),
                     ),
-                  PopupMenuItem(
-                    value: 'password',
-                    child: Text(context.l10n.staffResetPassword),
-                  ),
                   PopupMenuItem(
                     value: 'access',
                     child: Text(inactive ? context.l10n.staffOpenAccess : context.l10n.staffCloseAccess),

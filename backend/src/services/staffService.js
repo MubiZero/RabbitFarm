@@ -1,10 +1,7 @@
-const crypto = require('crypto');
 const { Op } = require('sequelize');
 const { User, Farm, Invitation, RefreshToken } = require('../models');
-const PasswordUtil = require('../utils/password');
 const planService = require('./planService');
 const farmAuditService = require('./farmAuditService');
-const payomSmsTransport = require('./notifications/payomSmsTransport');
 const logger = require('../utils/logger');
 
 const INVITE_TTL_DAYS = 7;
@@ -12,26 +9,20 @@ const INVITE_TTL_DAYS = 7;
 /**
  * Работники фермы и приглашения.
  *
- * Приглашение — код, который приглашённый вводит при вступлении. В базе
- * лежит только хеш кода: сам код показывается один раз, при создании.
- * Потерянное приглашение отзывается и выписывается заново.
+ * Приглашение — это запись «такого-то человека ждут в этой ферме с такой-то
+ * ролью», без собственного кода. Приглашённый входит обычным кодом на свой
+ * контакт (`otpAuthService`), и первый же такой вход заводит ему учётку в
+ * ферме, которая его позвала. Отдельного шага «введите код приглашения»
+ * нет ни для телефона, ни для почты.
  *
- * Код доходит до человека двумя путями. Если приглашение выписано на
- * телефон — уходит SMS-кой через шлюз Payom; если на email — владелец
- * передаёт его сам, как и раньше (рассылки приглашений по почте нет).
- * Целевой работник фермы чаще имеет телефон, чем почтовый ящик, поэтому
- * телефон — полноценная альтернатива адресу, а не довесок к нему.
+ * Телефон — основной контакт: у работника фермы он есть чаще, чем почтовый
+ * ящик, и код входа доходит SMS-кой.
  *
  * Кадровые изменения (роль, доступ, передача хозяйства) пишутся в журнал
  * фермы (`farmAuditService`): владельцу нужен ответ на «кто и когда понизил
  * Петра», а стдаут сервера ему недоступен.
  */
 class StaffService {
-  /** Хеш кода: тот же алгоритм при создании и при активации. */
-  hashToken(token) {
-    return crypto.createHash('sha256').update(token).digest('hex');
-  }
-
   /**
    * Состав фермы: владелец и его работники.
    * @param {Number} farmId - id хозяйства
@@ -50,9 +41,12 @@ class StaffService {
    * Валидатор пропускает ровно одно из двух и приводит номер к виду
    * `+992XXXXXXXXX`, который принимает шлюз (см. `utils/phone.js`).
    *
-   * @returns {Object} приглашение, код (возвращается единственный раз) и
-   *   `smsSent` — ушла ли SMS. Код отдаётся всегда, в том числе когда SMS не
-   *   ушла: тогда владелец передаёт его сам, как при приглашении по почте.
+   * Кода у приглашения нет: приглашённый входит обычным кодом на свой
+   * контакт (`/auth/otp/*`), и этот же вход активирует приглашение. Раньше
+   * здесь выписывался отдельный длинный токен, который показывался владельцу
+   * и уходил SMS-кой, — вводить его стало некуда, и он только путал.
+   *
+   * @returns {Object} приглашение.
    */
   async createInvitation(farmId, authorId, { email, phone, role, full_name: fullName }) {
     await planService.assertStaffLimit(farmId);
@@ -82,7 +76,6 @@ class StaffService {
         : { farm_id: farmId, phone: normalizedPhone, accepted_at: null }
     });
 
-    const token = crypto.randomBytes(24).toString('base64url');
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + INVITE_TTL_DAYS);
 
@@ -92,7 +85,6 @@ class StaffService {
       phone: normalizedPhone,
       role,
       full_name: fullName ? fullName.trim() : null,
-      token_hash: this.hashToken(token),
       expires_at: expiresAt,
       created_by: authorId
     });
@@ -101,42 +93,10 @@ class StaffService {
       invitationId: invitation.id,
       farmId,
       role,
-      channel: normalizedPhone ? 'sms' : 'manual'
+      channel: normalizedPhone ? 'phone' : 'email'
     });
 
-    const smsSent = normalizedPhone ? await this._sendInvitationSms(invitation, token) : false;
-    return { invitation, token, smsSent };
-  }
-
-  /**
-   * Отправить код приглашения SMS-кой.
-   *
-   * Доставка best-effort, как у кода сброса пароля: не настроен шаблон или
-   * шлюз отказал — приглашение всё равно выписано, а код владелец видит в
-   * ответе и передаёт человеку сам. Поэтому же результат возвращается, а не
-   * бросается: клиенту есть что сказать («SMS отправлена» или «продиктуйте
-   * код»), вместо того чтобы гадать.
-   *
-   * Шаблон `staff.invitation` должен быть заведён в кабинете Payom и попасть
-   * в `SMS_TEMPLATE_IDS` — шлюз свободный текст не принимает. Код длиннее
-   * шестизначного, поэтому сообщение уходит двумя сегментами.
-   */
-  async _sendInvitationSms(invitation, token) {
-    try {
-      await payomSmsTransport.sendTemplateSms({
-        templateKey: 'staff.invitation',
-        telephone: invitation.phone,
-        variables: { 'text-1': 'RabbitFarm', 'code-1': token }
-      });
-      logger.info('Invitation SMS sent', { invitationId: invitation.id });
-      return true;
-    } catch (error) {
-      logger.warn('Invitation SMS dispatch failed', {
-        invitationId: invitation.id,
-        error: error.message
-      });
-      return false;
-    }
+    return { invitation };
   }
 
   /** Действующие приглашения фермы. */
@@ -160,89 +120,6 @@ class StaffService {
     await invitation.destroy();
     logger.info('Invitation revoked', { invitationId, farmId });
     return { success: true };
-  }
-
-  /**
-   * Активировать приглашение: создаёт работника в ферме приглашающего.
-   * @param {String} token - код из приглашения
-   */
-  async acceptInvitation(token, { email, password, full_name: fullName, phone }) {
-    // Приглашённый ещё ни к одной ферме не привязан — искать его можно
-    // только по коду, без условия по farm_id.
-    const invitation = await Invitation.findOne({
-      where: { token_hash: this.hashToken(token), accepted_at: null },
-      tenantScope: 'all'
-    });
-
-    // Просроченное и несуществующее приглашение неотличимы снаружи:
-    // так код нельзя подобрать перебором.
-    if (!invitation || invitation.expires_at < new Date()) {
-      throw new Error('INVITATION_INVALID');
-    }
-
-    // Приглашение по телефону адреса не несёт, а вход в сервис пока только
-    // по email — поэтому его называет сам приглашённый. У приглашения по
-    // почте адрес уже есть, и подменить его нельзя: иначе кодом, выписанным
-    // на один адрес, заводили бы учётку на любой другой.
-    const targetEmail = invitation.email || (email ? email.trim().toLowerCase() : null);
-    if (!targetEmail) {
-      throw new Error('EMAIL_REQUIRED');
-    }
-
-    const existingUser = await User.findOne({ where: { email: targetEmail } });
-    if (existingUser) {
-      throw new Error('USER_EXISTS');
-    }
-
-    // Лимит могли зачерпнуть уже после того, как приглашение выписали:
-    // за неделю его действия ферма могла добрать штат другим путём.
-    await planService.assertStaffLimit(invitation.farm_id);
-
-    const user = await User.create({
-      email: targetEmail,
-      password_hash: await PasswordUtil.hash(password),
-      full_name: fullName,
-      // Номер, на который звали, уже проверен владельцем — он и остаётся у
-      // работника, если тот не назвал другой.
-      phone: phone || invitation.phone || null,
-      role: invitation.role,
-      farm_id: invitation.farm_id
-    });
-
-    await invitation.update({ accepted_at: new Date() });
-
-    logger.info('Invitation accepted', { invitationId: invitation.id, userId: user.id });
-    return user;
-  }
-
-  /**
-   * Сбросить пароль работнику.
-   *
-   * Почтового сервера нет, поэтому самостоятельное восстановление невозможно:
-   * временный пароль задаёт владелец и передаёт человеку сам. Возвращается
-   * он один раз — в базе, как обычно, лежит только хеш.
-   */
-  async resetMemberPassword(farmId, memberId) {
-    const member = await User.findOne({
-      where: { id: memberId, farm_id: farmId, role: { [Op.ne]: 'owner' } }
-    });
-    if (!member) {
-      throw new Error('MEMBER_NOT_FOUND');
-    }
-
-    const temporaryPassword = crypto.randomBytes(9).toString('base64url');
-
-    // Старые сессии работника перестают действовать: иначе смена пароля
-    // не отбирает доступ у того, кто уже вошёл. Отметка времени закрывает и
-    // уже выданные access-токены, которые живут ещё несколько минут.
-    await member.update({
-      password_hash: await PasswordUtil.hash(temporaryPassword),
-      token_version: (member.token_version || 0) + 1
-    });
-    await RefreshToken.destroy({ where: { user_id: member.id } });
-
-    logger.info('Staff password reset', { memberId, farmId });
-    return { member, temporaryPassword };
   }
 
   /**

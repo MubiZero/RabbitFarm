@@ -10,7 +10,7 @@ import 'package:mobile/core/providers/api_providers.dart';
 import 'package:mobile/features/auth/presentation/providers/auth_provider.dart';
 import '../support/fake_storage.dart';
 
-/// Вход всегда удаётся с профилем на активной ферме; любой другой запрос —
+/// Вход по коду всегда удаётся, с профилем на активной ферме; любой другой запрос —
 /// заранее заданный отказ (см. docs/plans/PLATFORM-ADMIN.md, 4.2: узнать
 /// про read_only/suspended можно и по ответу на обычный запрос, не
 /// дожидаясь следующего обновления профиля).
@@ -36,7 +36,7 @@ class _FakeAdapter implements HttpClientAdapter {
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
-    if (options.path.contains('/auth/login')) {
+    if (options.path.contains('/auth/otp/verify')) {
       return _json({
         'success': true,
         'message': 'ok',
@@ -84,9 +84,9 @@ void main() {
     ]);
     addTearDown(container.dispose);
 
-    await container.read(authProvider.notifier).login(
-          email: 'ivan@farm.test',
-          password: 'password123',
+    await container.read(authProvider.notifier).loginWithOtp(
+          phone: '+992901234567',
+          code: '123456',
         );
     return container;
   }

@@ -1,7 +1,6 @@
 const createMockUser = (overrides = {}) => ({
   id: 1,
   email: 'test@example.com',
-  password_hash: '$2b$10$hashedpassword',
   full_name: 'Test User',
   role: 'owner',
   farm_id: 1,

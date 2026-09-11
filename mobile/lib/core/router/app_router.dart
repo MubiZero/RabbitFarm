@@ -3,10 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/password_login_screen.dart';
+import '../../features/auth/presentation/screens/pin_setup_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
-import '../../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_detail_screen.dart';
@@ -74,7 +72,6 @@ import '../../features/platform_admin/presentation/screens/announcement_form_scr
 import '../../features/platform_admin/presentation/screens/plan_form_screen.dart';
 import '../../features/platform_admin/presentation/screens/farm_detail_screen.dart';
 import '../../features/platform_admin/presentation/screens/farm_export_screen.dart';
-import '../../features/staff/presentation/screens/join_farm_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
 
 /// Notifies GoRouter when auth state changes.
@@ -91,11 +88,7 @@ class RouterNotifier extends ChangeNotifier {
   /// закрытым в другую.
   static const _publicRoutes = {
     '/login',
-    '/login/password',
     '/register',
-    '/join',
-    '/forgot-password',
-    '/reset-password',
     '/splash',
   };
 
@@ -155,17 +148,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/login',
         name: 'login',
-        // `phone` приходит из ссылки-приглашения `rabbitfarm://join?phone=…`
-        // (см. `deep_links.dart`) — номер сразу стоит в поле, человеку
-        // остаётся нажать «Получить код».
-        builder: (context, state) =>
-            LoginScreen(initialPhone: state.uri.queryParameters['phone']),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/login/password',
-        name: 'login-password',
-        builder: (context, state) => const PasswordLoginScreen(),
+        // `phone`/`email` приходят из ссылки-приглашения
+        // (`rabbitfarm://join?phone=…`, см. `deep_links.dart`) или после
+        // регистрации — контакт сразу стоит в поле. `code_sent` ставит
+        // только что зарегистрировавшийся: код ему уже отправлен, и экран
+        // открывается на шаге ввода кода.
+        builder: (context, state) => LoginScreen(
+          initialPhone: state.uri.queryParameters['phone'],
+          initialEmail: state.uri.queryParameters['email'],
+          codeAlreadySent: state.uri.queryParameters['code_sent'] == '1',
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -173,24 +165,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
       ),
+
+      // Код быстрого входа: заводится сразу после входа по SMS и меняется
+      // из Настроек. Сессия для этого уже нужна — маршрут не публичный.
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/join',
-        name: 'join-farm',
-        builder: (context, state) => const JoinFarmScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/forgot-password',
-        name: 'forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '/reset-password',
-        name: 'reset-password',
+        path: '/pin/setup',
+        name: 'pin-setup',
         builder: (context, state) =>
-            ResetPasswordScreen(email: state.extra as String),
+            PinSetupScreen(fromSettings: state.extra == true),
       ),
 
       // Root redirect

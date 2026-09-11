@@ -261,7 +261,7 @@ backend/
 │   │   ├── minio.js                # Клиент MinIO + ensureBucket() при старте
 │   │   ├── firebase.js             # Firebase Admin SDK (push), молчит без ключей
 │   │   ├── eskhata.js               # Эсхата Мерчант: id организации, merchID, hash key
-│   │   ├── mailer.js               # SMTP (Stalwart) — сброс пароля и объявления по email
+│   │   ├── mailer.js               # SMTP (Stalwart) — коды входа и объявления по email
 │   │   ├── payom.js                # Payom SMS: токен API, маппинг шаблонов
 │   │   ├── swagger.js              # OpenAPI-схема
 │   │   └── validateEnv.js          # Проверка обязательных переменных окружения при старте
@@ -294,7 +294,6 @@ backend/
 │   │   ├── DeviceToken.js          # FCM-токены устройств для push-уведомлений
 │   │   ├── RefreshToken.js         # Refresh-токены
 │   │   ├── TokenBlacklist.js       # Отозванные access-токены
-│   │   ├── PasswordResetToken.js   # Сброс паролей
 │   │   ├── Plan.js                 # Тарифный план (глобальная сущность, не хозяйства)
 │   │   ├── Payment.js              # Платёж фермы через Эсхата Мерчант (tenant-scoped)
 │   │   ├── AdminAuditLog.js        # Журнал действий платформенного админа (глобальная)
@@ -400,8 +399,7 @@ backend/
 │   │
 │   └── utils/
 │       ├── jwt.js                  # JWT helpers
-│       ├── password.js             # Password hashing
-│       ├── otp.js                  # 6-значный код (сброс пароля по SMS/email)
+│       ├── otp.js                  # 6-значный код входа (SMS/email)
 │       ├── tenancy.js              # Страховка изоляции ферм (см. «Многоарендность»)
 │       ├── dateRange.js
 │       ├── apiResponse.js          # Standardized responses
@@ -472,13 +470,26 @@ backend/
 
 ### Authentication Flow
 
+Пароля в сервисе нет. Вход — одноразовый код: телефон основной путь, почта
+запасной. Короткий ПИН, которым закрывается приложение, живёт на самом
+устройстве и до сервера не доходит (`mobile/lib/features/auth/data/pin_repository.dart`).
+
 ```
 1. User Login
-   ├─► POST /api/v1/auth/login
-   │   Body: { email, password }
-   ├─► Backend validates credentials
+   ├─► POST /api/v1/auth/otp/request
+   │   Body: { phone } | { email }      — ответ одинаков для любого контакта
+   ├─► Backend ищет пользователя или активное приглашение, шлёт код (SMS/email)
+   ├─► POST /api/v1/auth/otp/verify
+   │   Body: { phone|email, code }
+   ├─► Приглашение на этот контакт активируется здесь же — учётка заводится на лету
    ├─► Generate JWT access token (15min) + refresh token (7days)
    └─► Response: { accessToken, refreshToken, user }
+
+1a. Регистрация фермы
+   ├─► POST /api/v1/auth/register
+   │   Body: { full_name, phone|email, farm_name? }
+   ├─► Заводит ферму и владельца, сессию НЕ открывает
+   └─► Отправляет код — дальше обычный шаг 1 (otp/verify)
 
 2. Authenticated Request
    ├─► GET /api/v1/rabbits
@@ -873,7 +884,7 @@ router.delete('/:id', authorize(['owner']), deleteRabbit);   // удаление
 | Удалять кормление/заметку/задачу | ❌ | ✅ | ✅ |
 | Удалять кролика/клетку/породу/корм/случку/рождение/вакцинацию/медкарту/транзакцию | ❌ | ❌ | ✅ |
 | Работники: список, приглашения (просмотр) | ❌ | ✅ | ✅ |
-| Работники: пригласить, отозвать приглашение, сбросить пароль, изменить роль, передать хозяйство | ❌ | ❌ | ✅ |
+| Работники: пригласить, отозвать приглашение, изменить роль, передать хозяйство | ❌ | ❌ | ✅ |
 
 Она не выведена из абстрактного правила («owner может всё, manager —
 хозяйство без кадров и без удалений, worker — только текучка») — это
@@ -1006,7 +1017,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 | # | Модуль | Backend | Mobile | Возможности |
 |---|--------|---------|--------|-------------|
 | 1 | **Auth & Farm** | ✅ | ✅ | JWT токены, Login, Register (с названием фермы), Refresh, Change Password |
-| 2 | **Staff** | ✅ | ✅ | Приглашения, роли, сброс пароля, передача хозяйства фермы |
+| 2 | **Staff** | ✅ | ✅ | Приглашения, роли, передача хозяйства фермы |
 | 3 | **Rabbits** | ✅ | ✅ | CRUD, Статистика, Фильтрация, Родословная, Галерея фото |
 | 4 | **Breeds** | ✅ | ✅ | CRUD пород, Характеристики |
 | 5 | **Cages** | ✅ | ✅ | CRUD, Автоматические статусы (occupied/available) |

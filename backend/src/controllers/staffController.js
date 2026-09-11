@@ -1,5 +1,4 @@
 const staffService = require('../services/staffService');
-const authService = require('../services/authService');
 const farmAuditService = require('../services/farmAuditService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -36,27 +35,6 @@ class StaffController {
     }
   }
 
-  /** POST /staff/:id/reset-password — задать работнику временный пароль */
-  async resetMemberPassword(req, res, next) {
-    try {
-      const { member, temporaryPassword } = await staffService.resetMemberPassword(
-        req.farmId,
-        req.params.id
-      );
-
-      return ApiResponse.success(
-        res,
-        { id: member.id, email: member.email, temporary_password: temporaryPassword },
-        'Временный пароль создан. Передайте его — второй раз он не покажется.'
-      );
-    } catch (error) {
-      if (error.message === 'MEMBER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Работник не найден');
-      }
-      next(error);
-    }
-  }
-
   /** POST /staff/:id/transfer-ownership — передать хозяйство фермы */
   async transferOwnership(req, res, next) {
     try {
@@ -77,35 +55,33 @@ class StaffController {
   /** POST /staff/invitations — выписать приглашение (email или телефон) */
   async createInvitation(req, res, next) {
     try {
-      const { invitation, token, smsSent } = await staffService.createInvitation(
+      const { invitation } = await staffService.createInvitation(
         req.farmId,
         req.user.id,
         req.body
       );
 
-      // Код отдаётся ровно один раз: в базе лежит только его хеш. Отдаётся он
-      // и при удачной SMS — приглашение по телефону не отменяет возможности
-      // передать код на словах, если он не дошёл.
+      // Кода в ответе нет: приглашённый входит обычным кодом на свой
+      // контакт, и этот вход сам активирует приглашение. Владельцу
+      // показывать и диктовать нечего.
       return ApiResponse.created(
         res,
         {
           id: invitation.id,
           email: invitation.email,
           phone: invitation.phone,
+          full_name: invitation.full_name,
           role: invitation.role,
           expires_at: invitation.expires_at,
-          code: token,
-          sms_sent: smsSent,
-          // Для приглашения по телефону вход теперь по номеру+коду из SMS —
-          // диплинк просто открывает приложение на экране входа с уже
-          // подставленным номером, ничего секретного (код) в ссылке нет.
+          // Ссылка открывает приложение на экране входа с подставленным
+          // номером — ничего секретного в ней нет.
           invite_link: invitation.phone
             ? `rabbitfarm://join?phone=${encodeURIComponent(invitation.phone)}`
             : null
         },
-        smsSent
-          ? 'Приглашение создано, код отправлен по SMS. Второй раз он не покажется.'
-          : 'Приглашение создано. Передайте код — второй раз он не покажется.'
+        invitation.phone
+          ? 'Приглашение создано. Работник войдёт по своему номеру — код придёт ему в SMS.'
+          : 'Приглашение создано. Работник войдёт по своей почте — код придёт письмом.'
       );
     } catch (error) {
       if (error.message === 'STAFF_LIMIT_REACHED') {
@@ -168,45 +144,6 @@ class StaffController {
     }
   }
 
-  /** POST /auth/accept-invitation — вступить в ферму по коду (без авторизации) */
-  async acceptInvitation(req, res, next) {
-    try {
-      const { code, ...userData } = req.body;
-      const user = await staffService.acceptInvitation(code, userData);
-
-      // Сразу выдаём токены: отдельный вход после активации — лишний шаг.
-      const tokens = await authService.issueTokens(user);
-
-      return ApiResponse.created(
-        res,
-        { user: user.toJSON(), ...tokens },
-        'Вы присоединились к ферме'
-      );
-    } catch (error) {
-      if (error.message === 'INVITATION_INVALID') {
-        return ApiResponse.error(
-          res,
-          'Приглашение недействительно или истекло. Попросите владельца выписать новое.',
-          400,
-          'INVITATION_INVALID'
-        );
-      }
-      if (error.message === 'EMAIL_REQUIRED') {
-        return ApiResponse.badRequest(
-          res,
-          'Приглашение выписано на телефон — укажите email, по нему вы будете входить.',
-          'EMAIL_REQUIRED'
-        );
-      }
-      if (error.message === 'STAFF_LIMIT_REACHED') {
-        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.', 'STAFF_LIMIT_REACHED');
-      }
-      if (error.message === 'USER_EXISTS') {
-        return ApiResponse.conflict(res, 'Пользователь с таким email уже существует', 'USER_EXISTS');
-      }
-      next(error);
-    }
-  }
 }
 
 module.exports = new StaffController();

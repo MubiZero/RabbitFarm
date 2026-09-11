@@ -80,44 +80,50 @@ who joins later comes in by invitation with whatever role the owner assigns
 curl -X POST http://localhost:4567/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "test@example.com",
-    "password": "password123",
+    "phone": "+992901234567",
     "full_name": "Test User",
-    "phone": "+79991234567"
+    "farm_name": "Тестовая ферма"
   }'
 ```
+
+Пароля нет: регистрация заводит ферму и отправляет код для входа. Вместо
+телефона можно указать `email` — код придёт письмом.
 
 **Response:**
 ```json
 {
   "success": true,
-  "data": {
-    "user": {
-      "id": 4,
-      "email": "test@example.com",
-      "full_name": "Test User",
-      "role": "owner",
-      ...
-    },
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  },
-  "message": "Пользователь успешно зарегистрирован"
+  "data": { "user_id": 4, "farm_id": 2, "channel": "phone" },
+  "message": "Ферма создана. Код для входа отправлен по SMS."
 }
 ```
 
-### 2. Login
+### 2. Login — код и вход
 
 ```bash
-curl -X POST http://localhost:4567/api/v1/auth/login \
+curl -X POST http://localhost:4567/api/v1/auth/otp/request \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@rabbitfarm.com",
-    "password": "admin123"
-  }'
+  -d '{"phone": "+992901234567"}'
+
+curl -X POST http://localhost:4567/api/v1/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+992901234567", "code": "123456"}'
 ```
 
+Ответ на запрос кода одинаков для любого контакта — по нему нельзя понять,
+заведён ли аккаунт. Успешный `verify` отдаёт `access_token`, `refresh_token`
+и профиль; этим же кодом активируется приглашение сотрудника.
+
 **Save the access_token for subsequent requests!**
+
+Кода из SMS на стенде может не быть (шлюз не настроен) — подменить его можно
+прямо в базе:
+
+```bash
+docker exec rabbitfarm-db mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e \
+  "use rabbitfarm; UPDATE login_otps \
+   SET token_hash = SHA2('123456', 256) WHERE identifier = '+992901234567';"
+```
 
 ### 3. Get Current User Profile
 
@@ -138,19 +144,7 @@ curl -X PUT http://localhost:4567/api/v1/auth/profile \
   }'
 ```
 
-### 5. Change Password
-
-```bash
-curl -X POST http://localhost:4567/api/v1/auth/change-password \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_password": "admin123",
-    "new_password": "newpassword123"
-  }'
-```
-
-### 6. Refresh Token
+### 5. Refresh Token
 
 ```bash
 curl -X POST http://localhost:4567/api/v1/auth/refresh \
@@ -437,10 +431,15 @@ Then in other requests, use: `{{access_token}}` in Authorization header.
 ### 1. Initial Setup
 
 ```bash
-# 1. Login as admin
-curl -X POST http://localhost:4567/api/v1/auth/login \
+# 1. Запросить код входа для админа
+curl -X POST http://localhost:4567/api/v1/auth/otp/request \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@rabbitfarm.com","password":"admin123"}'
+  -d '{"email":"admin@rabbitfarm.com"}'
+
+# 2. Ввести код (на стенде его можно подменить в login_otps, см. выше)
+curl -X POST http://localhost:4567/api/v1/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@rabbitfarm.com","code":"123456"}'
 
 # Save the access_token from response
 export TOKEN="your_access_token_here"

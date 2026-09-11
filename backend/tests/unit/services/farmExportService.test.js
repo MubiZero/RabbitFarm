@@ -66,14 +66,14 @@ describe('FarmExportService', () => {
     }
   });
 
-  it('не выгружает хеш пароля и поколение токенов сотрудников', async () => {
+  it('не выгружает поколение токенов сотрудников', async () => {
     Farm.findByPk.mockResolvedValue({ id: 7, toJSON: () => ({ id: 7 }) });
 
     await farmExportService.exportFarm(7);
 
     expect(User.findAll).toHaveBeenCalledWith({
       where: { farm_id: 7 },
-      attributes: { exclude: ['password_hash', 'token_version'] }
+      attributes: { exclude: ['token_version'] }
     });
   });
 

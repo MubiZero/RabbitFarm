@@ -1,8 +1,6 @@
 jest.mock('../../../src/services/staffService');
-jest.mock('../../../src/services/authService');
 
 const staffService = require('../../../src/services/staffService');
-const authService = require('../../../src/services/authService');
 const staffController = require('../../../src/controllers/staffController');
 
 const mockReq = (overrides = {}) => ({
@@ -16,6 +14,12 @@ const mockRes = () => {
 };
 const mockNext = jest.fn();
 
+// Имя приглашённого называет владелец: активация идёт кодом на экране входа,
+// формы, где человек представился бы сам, больше нет.
+const inviteBody = (overrides = {}) => ({
+  email: 'a@x.com', role: 'worker', full_name: 'Пётр Иванов', ...overrides
+});
+
 describe('StaffController', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -24,7 +28,7 @@ describe('StaffController', () => {
       staffService.createInvitation.mockRejectedValue(new Error('STAFF_LIMIT_REACHED'));
       const res = mockRes();
 
-      await staffController.createInvitation(mockReq({ body: { email: 'a@x.com', role: 'worker' } }), res, mockNext);
+      await staffController.createInvitation(mockReq({ body: inviteBody() }), res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(mockNext).not.toHaveBeenCalled();
@@ -35,58 +39,41 @@ describe('StaffController', () => {
       staffService.createInvitation.mockRejectedValue(new Error('USER_EXISTS'));
       const res = mockRes();
 
-      await staffController.createInvitation(mockReq({ body: { email: 'a@x.com', role: 'worker' } }), res, mockNext);
+      await staffController.createInvitation(mockReq({ body: inviteBody() }), res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(409);
     });
 
-    it('возвращает 201 с кодом приглашения при успехе', async () => {
+    it('возвращает 201 и не показывает никакого кода — его больше нет',
+      async () => {
       staffService.createInvitation.mockResolvedValue({
-        invitation: { id: 1, email: 'a@x.com', role: 'worker', expires_at: '2026-01-01' },
-        token: 'plain-code'
+        invitation: {
+          id: 1,
+          email: 'a@x.com',
+          full_name: 'Пётр',
+          role: 'worker',
+          expires_at: '2026-01-01'
+        }
       });
       const res = mockRes();
+      const req = mockReq({ body: inviteBody() });
 
-      await staffController.createInvitation(mockReq({ body: { email: 'a@x.com', role: 'worker' } }), res, mockNext);
+      await staffController.createInvitation(req, res, mockNext);
 
+      expect(staffService.createInvitation).toHaveBeenCalledWith(1, 1, req.body);
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ code: 'plain-code' })
-      }));
-    });
-  });
-
-  describe('acceptInvitation', () => {
-    it('возвращает 400 при STAFF_LIMIT_REACHED', async () => {
-      staffService.acceptInvitation.mockRejectedValue(new Error('STAFF_LIMIT_REACHED'));
-      const res = mockRes();
-
-      await staffController.acceptInvitation(mockReq({ body: { code: 'x', password: 'pw' } }), res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(authService.issueTokens).not.toHaveBeenCalled();
-      expect(res.json.mock.calls[0][0].error.code).toBe('STAFF_LIMIT_REACHED');
-    });
-
-    it('возвращает 400 при INVITATION_INVALID', async () => {
-      staffService.acceptInvitation.mockRejectedValue(new Error('INVITATION_INVALID'));
-      const res = mockRes();
-
-      await staffController.acceptInvitation(mockReq({ body: { code: 'x', password: 'pw' } }), res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it('выдаёт токены и возвращает 201 при успешной активации', async () => {
-      const user = { toJSON: () => ({ id: 5, email: 'a@x.com' }) };
-      staffService.acceptInvitation.mockResolvedValue(user);
-      authService.issueTokens.mockResolvedValue({ accessToken: 'a', refreshToken: 'r' });
-      const res = mockRes();
-
-      await staffController.acceptInvitation(mockReq({ body: { code: 'x', password: 'pw' } }), res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(authService.issueTokens).toHaveBeenCalledWith(user);
+      const payload = res.json.mock.calls[0][0];
+      expect(payload.data).toEqual({
+        id: 1,
+        email: 'a@x.com',
+        phone: undefined,
+        full_name: 'Пётр',
+        role: 'worker',
+        expires_at: '2026-01-01',
+        invite_link: null
+      });
+      // Диктовать работнику нечего: он войдёт кодом на свой же контакт.
+      expect(payload.message).toContain('код придёт письмом');
     });
   });
 });

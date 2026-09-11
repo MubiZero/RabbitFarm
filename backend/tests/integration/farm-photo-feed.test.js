@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 const PNG_1PX = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
@@ -15,10 +16,8 @@ describe('Лента фото по ферме', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'feed_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'feed_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')
@@ -37,10 +36,8 @@ describe('Лента фото по ферме', () => {
       .field('caption', 'На выставке')
       .attach('photo', PNG_1PX, 'rabbit.png');
 
-    const stranger = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'feed_stranger@example.com', password: 'Password123!', full_name: 'Сосед' });
-    strangerToken = stranger.body.data.access_token;
+    const stranger = await registerFarm(app, { email: 'feed_stranger@example.com', full_name: 'Сосед' });
+    strangerToken = stranger.accessToken;
   });
 
   afterAll(async () => {

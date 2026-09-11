@@ -149,7 +149,90 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journalNoneInViewBody => 'Try a different view or time range.';
 
   @override
-  String get loginSubtitle => 'Sign in to your farm';
+  String get pinSetupTitle => 'Quick sign-in code';
+
+  @override
+  String get pinChangeTitle => 'Change the code';
+
+  @override
+  String get pinSetupPrompt => 'Pick a 4-digit code';
+
+  @override
+  String get pinRepeatPrompt => 'Enter the code again';
+
+  @override
+  String get pinSetupExplanation =>
+      'You\'ll open the app on this phone with this code — no more waiting for an SMS.';
+
+  @override
+  String get pinSkip => 'Not now';
+
+  @override
+  String get pinSaved => 'Code saved';
+
+  @override
+  String get pinMismatch => 'The codes didn\'t match — try again';
+
+  @override
+  String get pinLockPrompt => 'Enter your code';
+
+  @override
+  String get pinWrong => 'Wrong code';
+
+  @override
+  String get pinDelete => 'Delete digit';
+
+  @override
+  String pinAttemptsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count attempts left',
+      one: '$count attempt left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinForgot => 'Forgot your code?';
+
+  @override
+  String get pinForgotTitle => 'Forgot your code?';
+
+  @override
+  String get pinForgotBody =>
+      'The code is kept only on this phone, so there\'s nothing to recover. We\'ll sign you out, and you\'ll sign in again with a code from an SMS or email.';
+
+  @override
+  String get pinForgotConfirm => 'Sign out and sign in again';
+
+  @override
+  String get settingsPinTitle => 'Quick sign-in code';
+
+  @override
+  String get settingsPinOn => 'The app opens with a code';
+
+  @override
+  String get settingsPinOff => 'The app opens without a code';
+
+  @override
+  String get settingsPinChange => 'Change the code';
+
+  @override
+  String get loginByPhone => 'Phone';
+
+  @override
+  String get loginByEmail => 'Email';
+
+  @override
+  String get loginEmailIntro =>
+      'We\'ll send a code to your email — no password needed.';
+
+  @override
+  String get loginCodeChangeEmail => 'Change email';
+
+  @override
+  String get registerContactHelper => 'Your sign-in code will come here';
 
   @override
   String get loginPhoneLabel => 'Phone';
@@ -169,12 +252,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginRequestCode => 'Get a code';
-
-  @override
-  String get loginWithPassword => 'Sign in with email and password';
-
-  @override
-  String get loginCodeTitle => 'Enter the code';
 
   @override
   String loginCodeSentTo(String phone) {
@@ -208,13 +285,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginCodeChangePhone => 'Change number';
 
   @override
-  String get passwordLoginTitle => 'Sign in with email and password';
-
-  @override
-  String get passwordLoginIntro =>
-      'A backup way in — for farms that were set up with an email.';
-
-  @override
   String get loginEmailLabel => 'Email';
 
   @override
@@ -227,79 +297,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginEmailInvalid => 'That email address looks off';
 
   @override
-  String get loginPasswordLabel => 'Password';
-
-  @override
-  String get loginPasswordEmpty => 'Enter your password';
-
-  @override
-  String get commonPasswordShow => 'Show password';
-
-  @override
-  String get commonPasswordHide => 'Hide password';
-
-  @override
   String get loginSubmit => 'Sign in';
 
   @override
-  String get loginFailed => 'Couldn\'t sign in';
-
-  @override
-  String get loginHasInvite => 'I have an invite code';
-
-  @override
   String get loginCreateFarm => 'Set up my own farm';
-
-  @override
-  String get loginForgotPassword => 'Forgot your password?';
-
-  @override
-  String get forgotPasswordTitle => 'Forgot your password?';
-
-  @override
-  String get forgotPasswordIntro =>
-      'Enter the email you use to sign in to your farm. If there\'s an account, we\'ll send a code — by SMS or email.';
-
-  @override
-  String get forgotPasswordEmailHint => 'Enter your email';
-
-  @override
-  String get forgotPasswordSubmit => 'Send code';
-
-  @override
-  String get forgotPasswordSentMessage =>
-      'If an account exists, a code has been sent';
-
-  @override
-  String get forgotPasswordBackToLogin => 'Remembered your password? Sign in';
-
-  @override
-  String get resetPasswordTitle => 'Enter the code';
-
-  @override
-  String get resetPasswordCodeHint => '6-digit code from SMS or email';
-
-  @override
-  String get resetPasswordCodeEmpty => 'Enter the code';
-
-  @override
-  String get resetPasswordCodeInvalid => 'The code is 6 digits';
-
-  @override
-  String get resetPasswordNewPasswordHint => 'New password';
-
-  @override
-  String get resetPasswordConfirmHint => 'Repeat the new password';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Passwords don\'t match';
-
-  @override
-  String get resetPasswordSubmit => 'Change password';
-
-  @override
-  String get resetPasswordSuccessMessage =>
-      'Password changed. Sign in with your new password.';
 
   @override
   String get todayGreetingMorning => 'Good morning';
@@ -2388,40 +2389,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'The bank hasn\'t confirmed the payment yet — try again in a minute';
 
   @override
-  String get joinTitle => 'Join a farm';
-
-  @override
-  String get joinIntro =>
-      'The code is issued by the farm owner. After signing in, you\'ll see the farm\'s data — livestock, feed, and tasks.';
-
-  @override
-  String get joinCode => 'Invite code';
-
-  @override
-  String get joinCodeHint => 'Enter the code the owner gave you';
-
-  @override
-  String get joinName => 'Your name';
-
-  @override
-  String get joinNameHint => 'What should we call you?';
-
-  @override
-  String get joinPassword => 'Password';
-
-  @override
-  String get joinPasswordHint => 'At least 8 characters';
-
-  @override
-  String get joinPasswordShort => 'Password must be at least 8 characters';
-
-  @override
-  String get joinSubmit => 'Join';
-
-  @override
-  String get joinHaveAccount => 'I already have an account';
-
-  @override
   String get splashTagline => 'Farm management';
 
   @override
@@ -2458,27 +2425,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerEmailInvalid => 'That email address looks off';
-
-  @override
-  String get registerPhone => 'Phone, if needed';
-
-  @override
-  String get registerPasswordHint => 'At least 8 characters';
-
-  @override
-  String get registerPasswordEmpty => 'Choose a password';
-
-  @override
-  String get registerPasswordShort => 'Password must be at least 8 characters';
-
-  @override
-  String get registerPasswordRepeat => 'Repeat password';
-
-  @override
-  String get registerPasswordRepeatEmpty => 'Enter your password again';
-
-  @override
-  String get registerPasswordMismatch => 'Passwords don\'t match';
 
   @override
   String get registerSubmit => 'Create farm';
@@ -2900,24 +2846,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffSaved => 'Changes saved';
 
   @override
-  String get staffResetPasswordTitle => 'Reset password?';
-
-  @override
-  String get staffResetPasswordBody =>
-      'The previous password will stop working. The app will issue a temporary one — pass it along to the person.';
-
-  @override
-  String get staffReset => 'Reset';
-
-  @override
-  String get staffTempPassword => 'Temporary password';
-
-  @override
-  String staffTempPasswordBody(String name) {
-    return 'Pass this password to $name. It won\'t be shown again — reset it once more if needed.';
-  }
-
-  @override
   String get staffRevokeTitle => 'Revoke invite?';
 
   @override
@@ -2951,10 +2879,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffRole => 'Role';
 
   @override
-  String get staffIssueCode => 'Issue code';
+  String get staffIssueCode => 'Invite worker';
 
   @override
-  String get staffInviteCode => 'Invite code';
+  String get staffInvitedTitle => 'Worker invited';
+
+  @override
+  String staffInvitedPhoneBody(String phone) {
+    return 'They enter the number $phone at sign-in, plus the code that arrives by SMS. Theres nothing for you to pass on.';
+  }
+
+  @override
+  String staffInvitedEmailBody(String email) {
+    return 'They enter the email $email at sign-in, plus the code that arrives by mail. Theres nothing for you to pass on.';
+  }
 
   @override
   String get staffInviteChannelPhone => 'By phone';
@@ -2979,16 +2917,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffInviteNameEmpty => 'Enter the worker\'s name';
 
   @override
-  String staffInviteCodeSmsBody(String phone) {
-    return 'The code went out by SMS to $phone. The worker enters this number at sign-in along with the code from the message — nothing else is needed. If the SMS doesn\'t arrive, pass the code along yourself: it won\'t be shown again.';
-  }
-
-  @override
-  String staffInviteCodeBody(String email) {
-    return 'Share this code with $email however is convenient. It won\'t be shown again — the server only stores its hash.';
-  }
-
-  @override
   String staffValidUntil(String date) {
     return 'Valid until $date';
   }
@@ -2998,9 +2926,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staffMakeWorker => 'Make worker';
-
-  @override
-  String get staffResetPassword => 'Reset password';
 
   @override
   String get staffOpenAccess => 'Open access';

@@ -19,47 +19,26 @@ class AuthRepository {
   })  : _apiClient = apiClient,
         _storage = storage;
 
-  // Login
-  Future<AuthResponse> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await _apiClient.login(email, password);
-
-      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-        response.data,
-        (json) => json as Map<String, dynamic>,
-      );
-
-      if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
-      }
-
-      final authResponse = AuthResponse.fromJson(apiResponse.data!);
-      await _persistSession(authResponse);
-
-      return authResponse;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
-  // Register
-  Future<AuthResponse> register({
-    required String email,
-    required String password,
+  /// Завести ферму. Сессию регистрация не открывает: пароля в сервисе нет,
+  /// и войти можно только кодом на названный контакт — так и подтверждается,
+  /// что номер (он же логин) принадлежит тому, кто его вписал.
+  ///
+  /// Возвращает канал, которым ушёл код, — экран кода говорит «SMS» или
+  /// «письмо», не гадая по тому, какое поле заполнили.
+  Future<String> register({
     required String fullName,
-    String? farmName,
     String? phone,
+    String? email,
+    String? farmName,
   }) async {
+    assert((phone == null) != (email == null),
+        'Регистрация идёт либо по телефону, либо по почте');
     try {
       final response = await _apiClient.register({
-        'email': email,
-        'password': password,
         'full_name': fullName,
-        if (farmName != null) 'farm_name': farmName,
         if (phone != null) 'phone': phone,
+        if (email != null) 'email': email,
+        if (farmName != null) 'farm_name': farmName,
       });
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -71,70 +50,46 @@ class AuthRepository {
         throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
       }
 
-      final authResponse = AuthResponse.fromJson(apiResponse.data!);
-      await _persistSession(authResponse);
-
-      return authResponse;
+      return apiResponse.data!['channel'] as String? ??
+          (phone != null ? 'phone' : 'email');
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
   }
 
-  /// Присоединиться к ферме по коду приглашения.
-  /// Токены сохраняются так же, как при регистрации: человек сразу внутри.
-  Future<AuthResponse> acceptInvitation({
-    required String code,
-    required String password,
-    required String fullName,
-  }) async {
-    try {
-      final response = await _apiClient.post('/auth/accept-invitation', data: {
-        'code': code,
-        'password': password,
-        'full_name': fullName,
-      });
-
-      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-        response.data,
-        (json) => json as Map<String, dynamic>,
-      );
-
-      if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
-      }
-
-      final authResponse = AuthResponse.fromJson(apiResponse.data!);
-      await _persistSession(authResponse);
-
-      return authResponse;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
-  /// Запросить код входа по телефону — основной способ входа.
+  /// Запросить код входа. Контакт — телефон (основной путь) или почта
+  /// (запасной); ровно один из двух.
   ///
-  /// Как и сброс пароля, отвечает успехом всегда: по ответу нельзя понять,
-  /// есть ли за номером аккаунт или приглашение.
-  Future<void> requestOtp({required String phone}) async {
+  /// Отвечает успехом всегда: по ответу нельзя понять, есть ли за контактом
+  /// аккаунт или приглашение.
+  Future<void> requestOtp({String? phone, String? email}) async {
+    assert((phone == null) != (email == null), 'Нужен ровно один контакт');
     try {
-      await _apiClient.post(ApiEndpoints.otpRequest, data: {'phone': phone});
+      await _apiClient.post(ApiEndpoints.otpRequest, data: {
+        if (phone != null) 'phone': phone,
+        if (email != null) 'email': email,
+      });
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
   }
 
-  /// Войти по коду из SMS. Если за номером было приглашение, сервер заводит
-  /// по нему учётку прямо здесь — отдельного экрана «код приглашения» для
-  /// такого сотрудника нет.
+  /// Войти по коду. Если за контактом было приглашение, сервер заводит по
+  /// нему учётку прямо здесь — отдельного экрана «код приглашения» нет.
   Future<AuthResponse> verifyOtp({
-    required String phone,
+    String? phone,
+    String? email,
     required String code,
   }) async {
+    assert((phone == null) != (email == null), 'Нужен ровно один контакт');
     try {
       final response = await _apiClient.post(
         ApiEndpoints.otpVerify,
-        data: {'phone': phone, 'code': code},
+        data: {
+          if (phone != null) 'phone': phone,
+          if (email != null) 'email': email,
+          'code': code,
+        },
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -150,48 +105,6 @@ class AuthRepository {
       await _persistSession(authResponse);
 
       return authResponse;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
-  /// Задать первый пароль тому, кто входил только по коду из SMS, — иначе
-  /// «пароль как запасной способ» недостижим. Сессия уже есть, токены не
-  /// меняются.
-  Future<void> setPassword({required String newPassword}) async {
-    try {
-      await _apiClient.post(
-        ApiEndpoints.setPassword,
-        data: {'new_password': newPassword},
-      );
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
-  /// Запросить код сброса пароля — сервер сам решает, слать SMS или email,
-  /// и ничего не сообщает о том, существует ли аккаунт (ответ всегда success).
-  Future<void> forgotPassword({required String email}) async {
-    try {
-      await _apiClient.post(ApiEndpoints.forgotPassword, data: {'email': email});
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
-  /// Сменить пароль по коду, присланному [forgotPassword]. Сессии нет —
-  /// токены не сохраняются, дальше — обычный вход по новому паролю.
-  Future<void> resetPassword({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) async {
-    try {
-      await _apiClient.post(ApiEndpoints.resetPassword, data: {
-        'email': email,
-        'code': code,
-        'new_password': newPassword,
-      });
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

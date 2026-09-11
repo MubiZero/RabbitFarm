@@ -1,6 +1,6 @@
 /**
  * Additional AuthService tests covering methods not tested in authService.test.js
- * Covers: refreshAccessToken, logout, getProfile, updateProfile, changePassword
+ * Covers: refreshAccessToken, logout, getProfile, updateProfile
  */
 jest.mock('../../../src/models', () => ({
   User: {
@@ -16,11 +16,6 @@ jest.mock('../../../src/models', () => ({
     destroy: jest.fn()
   },
   TokenBlacklist: {
-    create: jest.fn()
-  },
-  PasswordResetToken: {
-    findOne: jest.fn(),
-    destroy: jest.fn(),
     create: jest.fn()
   }
 }));
@@ -38,13 +33,7 @@ jest.mock('../../../src/utils/jwt', () => ({
   verifyAccessToken: jest.fn(() => ({ id: 1, jti: 'token-jti', exp: Math.floor(Date.now() / 1000) + 3600 }))
 }));
 
-jest.mock('../../../src/utils/password', () => ({
-  hash: jest.fn((pw) => Promise.resolve(`hashed-${pw}`)),
-  compare: jest.fn()
-}));
-
 const { User, RefreshToken, TokenBlacklist } = require('../../../src/models');
-const PasswordUtil = require('../../../src/utils/password');
 const authService = require('../../../src/services/authService');
 
 describe('AuthService - extended methods', () => {
@@ -160,48 +149,6 @@ describe('AuthService - extended methods', () => {
 
       await expect(authService.updateProfile(999, { full_name: 'Test' }))
         .rejects.toThrow('USER_NOT_FOUND');
-    });
-  });
-
-  describe('changePassword', () => {
-    const mockTx = { commit: jest.fn(), rollback: jest.fn(), LOCK: { UPDATE: 'UPDATE' } };
-
-    beforeEach(() => {
-      User.sequelize.transaction.mockResolvedValue(mockTx);
-    });
-
-    it('should change password successfully', async () => {
-      const user = {
-        id: 1,
-        password_hash: 'hashed-oldpass',
-        update: jest.fn().mockResolvedValue(true)
-      };
-      User.findByPk.mockResolvedValue(user);
-      PasswordUtil.compare.mockResolvedValue(true);
-      RefreshToken.destroy.mockResolvedValue(1);
-
-      const result = await authService.changePassword(1, 'oldpass', 'newpass');
-
-      expect(result).toHaveProperty('success', true);
-      expect(mockTx.commit).toHaveBeenCalled();
-    });
-
-    it('should throw USER_NOT_FOUND if user does not exist', async () => {
-      User.findByPk.mockResolvedValue(null);
-
-      await expect(authService.changePassword(999, 'old', 'new'))
-        .rejects.toThrow('USER_NOT_FOUND');
-      expect(mockTx.rollback).toHaveBeenCalled();
-    });
-
-    it('should throw INVALID_CURRENT_PASSWORD if current password is wrong', async () => {
-      const user = { id: 1, password_hash: 'hashed-oldpass' };
-      User.findByPk.mockResolvedValue(user);
-      PasswordUtil.compare.mockResolvedValue(false);
-
-      await expect(authService.changePassword(1, 'wrongpass', 'newpass'))
-        .rejects.toThrow('INVALID_CURRENT_PASSWORD');
-      expect(mockTx.rollback).toHaveBeenCalled();
     });
   });
 });

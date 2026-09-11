@@ -151,7 +151,90 @@ class AppLocalizationsUz extends AppLocalizations {
       'Yozuv turini yoki muddatini almashtiring.';
 
   @override
-  String get loginSubtitle => 'Fermangizga kirish';
+  String get pinSetupTitle => 'Tez kirish kodi';
+
+  @override
+  String get pinChangeTitle => 'Kodni o\'zgartirish';
+
+  @override
+  String get pinSetupPrompt => '4 raqamli kod o\'ylab toping';
+
+  @override
+  String get pinRepeatPrompt => 'Kodni takrorlang';
+
+  @override
+  String get pinSetupExplanation =>
+      'Bu kod bilan ilovani shu telefonda ochasiz — endi SMS kutib o\'tirmaysiz.';
+
+  @override
+  String get pinSkip => 'Hozir emas';
+
+  @override
+  String get pinSaved => 'Kod saqlandi';
+
+  @override
+  String get pinMismatch => 'Kodlar mos kelmadi — yana urinib ko\'ring';
+
+  @override
+  String get pinLockPrompt => 'Kodni kiriting';
+
+  @override
+  String get pinWrong => 'Kod noto\'g\'ri';
+
+  @override
+  String get pinDelete => 'Raqamni o\'chirish';
+
+  @override
+  String pinAttemptsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta urinish qoldi',
+      few: '$count ta urinish qoldi',
+      one: '$count ta urinish qoldi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinForgot => 'Kodni unutdingizmi?';
+
+  @override
+  String get pinForgotTitle => 'Kodni unutdingizmi?';
+
+  @override
+  String get pinForgotBody =>
+      'Kod faqat shu telefonda saqlanadi, uni tiklashning iloji yo\'q. Akkauntdan chiqamiz — va siz SMS yoki xatdagi kod bilan qaytadan kirasiz.';
+
+  @override
+  String get pinForgotConfirm => 'Chiqish va qaytadan kirish';
+
+  @override
+  String get settingsPinTitle => 'Tez kirish kodi';
+
+  @override
+  String get settingsPinOn => 'Ilova kod bilan ochiladi';
+
+  @override
+  String get settingsPinOff => 'Ilova kodsiz ochiladi';
+
+  @override
+  String get settingsPinChange => 'Kodni o\'zgartirish';
+
+  @override
+  String get loginByPhone => 'Telefon';
+
+  @override
+  String get loginByEmail => 'Pochta';
+
+  @override
+  String get loginEmailIntro => 'Pochtaga kod yuboramiz — parol kerak emas.';
+
+  @override
+  String get loginCodeChangeEmail => 'Pochtani o\'zgartirish';
+
+  @override
+  String get registerContactHelper => 'Unga kirish uchun kod keladi';
 
   @override
   String get loginPhoneLabel => 'Telefon';
@@ -170,12 +253,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get loginRequestCode => 'Kod olish';
-
-  @override
-  String get loginWithPassword => 'Pochta va parol bilan kirish';
-
-  @override
-  String get loginCodeTitle => 'Kodni kiriting';
 
   @override
   String loginCodeSentTo(String phone) {
@@ -209,13 +286,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get loginCodeChangePhone => 'Raqamni o\'zgartirish';
 
   @override
-  String get passwordLoginTitle => 'Pochta va parol bilan kirish';
-
-  @override
-  String get passwordLoginIntro =>
-      'Zaxira usul — fermani pochta orqali ochganlar uchun.';
-
-  @override
   String get loginEmailLabel => 'Pochta';
 
   @override
@@ -228,79 +298,10 @@ class AppLocalizationsUz extends AppLocalizations {
   String get loginEmailInvalid => 'Manzilda xatolik bo\'lsa kerak';
 
   @override
-  String get loginPasswordLabel => 'Parol';
-
-  @override
-  String get loginPasswordEmpty => 'Parolni kiriting';
-
-  @override
-  String get commonPasswordShow => 'Parolni ko\'rsatish';
-
-  @override
-  String get commonPasswordHide => 'Parolni yashirish';
-
-  @override
   String get loginSubmit => 'Kirish';
 
   @override
-  String get loginFailed => 'Kirib bo\'lmadi';
-
-  @override
-  String get loginHasInvite => 'Mening taklif kodim bor';
-
-  @override
   String get loginCreateFarm => 'O\'z fermamni ochish';
-
-  @override
-  String get loginForgotPassword => 'Parolni unutdingizmi?';
-
-  @override
-  String get forgotPasswordTitle => 'Parolni unutdingizmi?';
-
-  @override
-  String get forgotPasswordIntro =>
-      'Fermaga kiradigan pochtangizni ko\'rsating. Agar akkaunt bo\'lsa, kod yuboramiz — SMS orqali yoki pochtaga.';
-
-  @override
-  String get forgotPasswordEmailHint => 'Pochtani kiriting';
-
-  @override
-  String get forgotPasswordSubmit => 'Kod yuborish';
-
-  @override
-  String get forgotPasswordSentMessage =>
-      'Agar akkaunt mavjud bo\'lsa, kod yuborildi';
-
-  @override
-  String get forgotPasswordBackToLogin => 'Parolni esladingizmi? Kirish';
-
-  @override
-  String get resetPasswordTitle => 'Kodni kiriting';
-
-  @override
-  String get resetPasswordCodeHint => 'SMS yoki xatdagi 6 xonali kod';
-
-  @override
-  String get resetPasswordCodeEmpty => 'Kodni kiriting';
-
-  @override
-  String get resetPasswordCodeInvalid => 'Kod — 6 ta raqam';
-
-  @override
-  String get resetPasswordNewPasswordHint => 'Yangi parol';
-
-  @override
-  String get resetPasswordConfirmHint => 'Yangi parolni qayta kiriting';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Parollar mos kelmadi';
-
-  @override
-  String get resetPasswordSubmit => 'Parolni almashtirish';
-
-  @override
-  String get resetPasswordSuccessMessage =>
-      'Parol o\'zgartirildi. Yangi parol bilan kiring.';
 
   @override
   String get todayGreetingMorning => 'Xayrli tong';
@@ -2397,41 +2398,6 @@ class AppLocalizationsUz extends AppLocalizations {
       'Bank to\'lovni hali tasdiqlamadi — bir daqiqadan keyin qayta urinib ko\'ring';
 
   @override
-  String get joinTitle => 'Fermaga qo\'shilish';
-
-  @override
-  String get joinIntro =>
-      'Kodni ferma egasi beradi. Kirgandan so\'ng uning xo\'jaligini ko\'rasiz — jonivorlar, emlar va vazifalar.';
-
-  @override
-  String get joinCode => 'Taklif kodi';
-
-  @override
-  String get joinCodeHint => 'Egasi bergan kodni kiriting';
-
-  @override
-  String get joinName => 'Ismingiz';
-
-  @override
-  String get joinNameHint => 'Sizga qanday murojaat qilaylik?';
-
-  @override
-  String get joinPassword => 'Parol';
-
-  @override
-  String get joinPasswordHint => 'Kamida 8 ta belgi';
-
-  @override
-  String get joinPasswordShort =>
-      'Parol kamida 8 ta belgidan iborat bo\'lishi kerak';
-
-  @override
-  String get joinSubmit => 'Qo\'shilish';
-
-  @override
-  String get joinHaveAccount => 'Mening akkauntim allaqachon bor';
-
-  @override
   String get splashTagline => 'Fermani boshqarish';
 
   @override
@@ -2468,28 +2434,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get registerEmailInvalid => 'Manzilda xatolik bo\'lsa kerak';
-
-  @override
-  String get registerPhone => 'Kerak bo\'lsa, telefon';
-
-  @override
-  String get registerPasswordHint => 'Kamida 8 ta belgi';
-
-  @override
-  String get registerPasswordEmpty => 'Parol o\'ylab toping';
-
-  @override
-  String get registerPasswordShort =>
-      'Parol kamida 8 ta belgidan iborat bo\'lishi kerak';
-
-  @override
-  String get registerPasswordRepeat => 'Parolni qayta kiriting';
-
-  @override
-  String get registerPasswordRepeatEmpty => 'Parolni yana bir bor kiriting';
-
-  @override
-  String get registerPasswordMismatch => 'Parollar mos kelmadi';
 
   @override
   String get registerSubmit => 'Fermani ochish';
@@ -2912,24 +2856,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffSaved => 'O\'zgarishlar saqlandi';
 
   @override
-  String get staffResetPasswordTitle => 'Parol tiklansinmi?';
-
-  @override
-  String get staffResetPasswordBody =>
-      'Avvalgi parol ishlamay qoladi. O\'rniga ilova vaqtinchalik parol beradi — uni odamga yetkazish kerak.';
-
-  @override
-  String get staffReset => 'Tiklash';
-
-  @override
-  String get staffTempPassword => 'Vaqtinchalik parol';
-
-  @override
-  String staffTempPasswordBody(String name) {
-    return 'Parolni ${name}ga yetkazing. Ikkinchi marta u ko\'rsatilmaydi — kerak bo\'lsa, yana tiklang.';
-  }
-
-  @override
   String get staffRevokeTitle => 'Taklif bekor qilinsinmi?';
 
   @override
@@ -2963,10 +2889,20 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffRole => 'Roli';
 
   @override
-  String get staffIssueCode => 'Kod chiqarish';
+  String get staffIssueCode => 'Ishchini taklif qilish';
 
   @override
-  String get staffInviteCode => 'Taklif kodi';
+  String get staffInvitedTitle => 'Ishchi taklif qilindi';
+
+  @override
+  String staffInvitedPhoneBody(String phone) {
+    return 'U kirishda $phone raqamini va SMS orqali keladigan kodni kiritadi. Hech narsa yetkazish shart emas.';
+  }
+
+  @override
+  String staffInvitedEmailBody(String email) {
+    return 'U kirishda $email pochtasini va xat orqali keladigan kodni kiritadi. Hech narsa yetkazish shart emas.';
+  }
 
   @override
   String get staffInviteChannelPhone => 'Telefon orqali';
@@ -2990,16 +2926,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get staffInviteNameEmpty => 'Ishchining ismini kiriting';
 
   @override
-  String staffInviteCodeSmsBody(String phone) {
-    return 'Kod $phone raqamiga SMS orqali yuborildi. Ishchi kirishda shu raqamni va xabardagi kodni kiritadi — boshqa hech narsa kerak emas. Agar SMS yetib bormasa, kodni o\'zingiz yetkazing: ikkinchi marta u ko\'rsatilmaydi.';
-  }
-
-  @override
-  String staffInviteCodeBody(String email) {
-    return 'Bu kodni ${email}ga qulay usulda yetkazing. Ikkinchi marta u ko\'rsatilmaydi: server faqat uning izini saqlaydi.';
-  }
-
-  @override
   String staffValidUntil(String date) {
     return '${date}gacha amal qiladi';
   }
@@ -3009,9 +2935,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get staffMakeWorker => 'Ishchi qilish';
-
-  @override
-  String get staffResetPassword => 'Parolni tiklash';
 
   @override
   String get staffOpenAccess => 'Kirishni ochish';

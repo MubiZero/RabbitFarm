@@ -1,23 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const staffController = require('../controllers/staffController');
 const { authenticate } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 const { authLimiter, otpLimiter } = require('../middleware/rateLimiter');
 const {
   registerSchema,
-  loginSchema,
   refreshTokenSchema,
   updateProfileSchema,
-  changePasswordSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
   requestOtpSchema,
-  verifyOtpSchema,
-  setPasswordSchema
+  verifyOtpSchema
 } = require('../validators/authValidator');
-const { acceptInvitationSchema } = require('../validators/staffValidator');
 
 /**
  * @swagger
@@ -30,7 +23,7 @@ const { acceptInvitationSchema } = require('../validators/staffValidator');
  * @swagger
  * /auth/register:
  *   post:
- *     summary: Регистрация нового пользователя
+ *     summary: Завести ферму (сессию не открывает — отправляет код для входа)
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -39,23 +32,22 @@ const { acceptInvitationSchema } = require('../validators/staffValidator');
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email, password, full_name]
+ *             required: [full_name]
  *             properties:
+ *               phone:
+ *                 type: string
+ *                 description: +992XXXXXXXXX — основной способ входа
  *               email:
  *                 type: string
  *                 format: email
- *               password:
- *                 type: string
- *                 minLength: 8
+ *                 description: запасной способ входа; нужен хотя бы один контакт
  *               full_name:
  *                 type: string
- *               role:
+ *               farm_name:
  *                 type: string
- *                 enum: [owner, manager, worker]
- *                 default: worker
  *     responses:
  *       201:
- *         description: Пользователь зарегистрирован
+ *         description: Ферма создана, код для входа отправлен на контакт
  *       400:
  *         description: Невалидные данные
  *         content:
@@ -69,26 +61,6 @@ const { acceptInvitationSchema } = require('../validators/staffValidator');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-/**
- * @swagger
- * /auth/accept-invitation:
- *   post:
- *     summary: Присоединиться к ферме по коду приглашения
- *     tags: [Auth]
- *     security: []
- *     responses:
- *       201:
- *         description: Учётная запись создана, выданы токены
- *       400:
- *         description: Приглашение недействительно или истекло
- */
-router.post(
-  '/accept-invitation',
-  authLimiter,
-  validate(acceptInvitationSchema),
-  staffController.acceptInvitation
-);
-
 router.post(
   '/register',
   authLimiter,
@@ -154,39 +126,6 @@ router.post(
   otpLimiter,
   validate(verifyOtpSchema),
   authController.verifyOtp
-);
-
-/**
- * @swagger
- * /auth/login:
- *   post:
- *     summary: Вход пользователя
- *     tags: [Auth]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [email, password]
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Успешный вход, возвращает токены
- *       401:
- *         description: Неверные учётные данные
- */
-router.post(
-  '/login',
-  authLimiter,
-  validate(loginSchema),
-  authController.login
 );
 
 /**
@@ -288,128 +227,6 @@ router.put(
   authenticate,
   validate(updateProfileSchema),
   authController.updateProfile
-);
-
-/**
- * @swagger
- * /auth/change-password:
- *   post:
- *     summary: Изменить пароль
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [current_password, new_password]
- *             properties:
- *               current_password:
- *                 type: string
- *               new_password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Пароль изменён
- *       400:
- *         description: Неверный текущий пароль
- */
-router.post(
-  '/change-password',
-  authenticate,
-  validate(changePasswordSchema),
-  authController.changePassword
-);
-
-/**
- * @swagger
- * /auth/forgot-password:
- *   post:
- *     summary: Запросить сброс пароля
- *     tags: [Auth]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [email]
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *     responses:
- *       200:
- *         description: Инструкции отправлены (если аккаунт существует)
- */
-router.post(
-  '/forgot-password',
-  authLimiter,
-  validate(forgotPasswordSchema),
-  authController.forgotPassword
-);
-
-/**
- * @swagger
- * /auth/reset-password:
- *   post:
- *     summary: Сбросить пароль по токену
- *     tags: [Auth]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [token, new_password]
- *             properties:
- *               token:
- *                 type: string
- *               new_password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Пароль сброшен успешно
- *       400:
- *         description: Недействительный или просроченный токен
- */
-router.post(
-  '/reset-password',
-  authLimiter,
-  validate(resetPasswordSchema),
-  authController.resetPassword
-);
-
-/**
- * @swagger
- * /auth/set-password:
- *   post:
- *     summary: Задать первый пароль тому, кто вошёл по OTP и его не задавал
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [new_password]
- *             properties:
- *               new_password:
- *                 type: string
- *                 minLength: 8
- *     responses:
- *       200:
- *         description: Пароль установлен
- *       400:
- *         description: Пароль уже был задан ранее
- */
-router.post(
-  '/set-password',
-  authenticate,
-  validate(setPasswordSchema),
-  authController.setPassword
 );
 
 module.exports = router;

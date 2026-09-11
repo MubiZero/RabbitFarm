@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Reports API', () => {
   let accessToken;
@@ -8,10 +9,8 @@ describe('Reports API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'reportowner@example.com', password: 'Password123!', full_name: 'Report Owner', role: 'owner' });
-    accessToken = res.body.data.access_token;
+    const res = await registerFarm(app, { email: 'reportowner@example.com', full_name: 'Report Owner' });
+    accessToken = res.accessToken;
   });
 
   afterAll(async () => {

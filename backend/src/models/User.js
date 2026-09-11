@@ -18,10 +18,6 @@ module.exports = (sequelize) => {
         isEmail: { msg: 'Введите корректный email' }
       }
     },
-    password_hash: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
     full_name: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -125,13 +121,6 @@ module.exports = (sequelize) => {
       }
     }
   });
-
-  // Instance methods
-  User.prototype.toJSON = function() {
-    const values = { ...this.get() };
-    delete values.password_hash;
-    return values;
-  };
 
   return User;
 };

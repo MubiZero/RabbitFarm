@@ -35,7 +35,6 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
 
     // Get user from database
     const user = await User.findByPk(decoded.id, {
-      attributes: { exclude: ['password_hash'] },
       include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'deleted_at'] }]
     });
 
@@ -181,7 +180,6 @@ const optionalAuth = async (req, res, next) => {
       const token = authHeader.substring(7);
       const decoded = JWTUtil.verifyAccessToken(token);
       const user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ['password_hash'] }
       });
 
       if (user && user.is_active) {

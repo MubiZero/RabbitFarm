@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 /**
  * Ферм в сервисе много, а привязку к ферме сервисы получают параметром —
@@ -18,12 +19,10 @@ describe('Изоляция ферм: поголовье, породы, клет�
 
   const authorized = (token) => ({ Authorization: `Bearer ${token}` });
 
-  const registerFarm = async (email, fullName) => {
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email, password: 'Password123!', full_name: fullName });
+  const tokenForNewFarm = async (email, fullName) => {
+    const { accessToken } = await registerFarm(app, { email, full_name: fullName });
 
-    return res.body.data.access_token;
+    return accessToken;
   };
 
   const createBreed = (token, name) =>
@@ -55,8 +54,8 @@ describe('Изоляция ферм: поголовье, породы, клет�
   beforeAll(async () => {
     await syncTestDb();
 
-    farmA.token = await registerFarm('isolation-farm-a@example.com', 'Владелец фермы А');
-    farmB.token = await registerFarm('isolation-farm-b@example.com', 'Владелец фермы Б');
+    farmA.token = await tokenForNewFarm('isolation-farm-a@example.com', 'Владелец фермы А');
+    farmB.token = await tokenForNewFarm('isolation-farm-b@example.com', 'Владелец фермы Б');
 
     farmA.breedId = (await createBreed(farmA.token, 'Порода фермы А')).body.data.id;
     farmB.breedId = (await createBreed(farmB.token, 'Порода фермы Б')).body.data.id;

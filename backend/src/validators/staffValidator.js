@@ -25,15 +25,10 @@ const createInvitationSchema = Joi.object({
   email: Joi.string().email(),
   phone: invitePhone,
   role: Joi.string().valid('manager', 'worker').default('worker'),
-  // Обязательно для приглашения по телефону: OTP-вход активирует его без
-  // отдельной формы, имя взять больше неоткуда, кроме как от владельца
-  // сейчас. У приглашения по email имя по-прежнему называет сам приглашённый
-  // на `/join`.
-  full_name: Joi.string().max(255).when('phone', {
-    is: Joi.exist(),
-    then: Joi.required(),
-    otherwise: Joi.optional()
-  })
+  // Имя всегда называет владелец: приглашение активируется кодом прямо на
+  // экране входа — что по телефону, что по почте, — и формы, где человек
+  // представился бы сам, больше нет.
+  full_name: Joi.string().max(255).required()
 })
   .xor('email', 'phone')
   .messages({
@@ -47,20 +42,6 @@ const updateMemberSchema = Joi.object({
   is_active: Joi.boolean()
 }).min(1);
 
-/**
- * Вступление по коду. Email обязателен только для приглашения по телефону:
- * вход в сервис пока по адресу, и у такого приглашения его взять неоткуда.
- * Для приглашения по email присланный адрес не используется — иначе кодом,
- * выписанным на один адрес, заводили бы учётку на любой другой.
- */
-const acceptInvitationSchema = Joi.object({
-  code: Joi.string().required(),
-  password: Joi.string().min(8).required(),
-  full_name: Joi.string().max(255).required(),
-  email: Joi.string().email().allow(null, ''),
-  phone: Joi.string().max(20).allow(null, '')
-});
-
 const listAuditQuerySchema = Joi.object({
   page: listQuery.page,
   limit: listQuery.limit
@@ -69,6 +50,5 @@ const listAuditQuerySchema = Joi.object({
 module.exports = {
   createInvitationSchema,
   updateMemberSchema,
-  acceptInvitationSchema,
   listAuditQuerySchema
 };

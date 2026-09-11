@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Tasks API', () => {
   let accessToken;
@@ -8,10 +9,8 @@ describe('Tasks API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'taskowner@example.com', password: 'Password123!', full_name: 'Task Owner', role: 'owner' });
-    accessToken = res.body.data.access_token;
+    const res = await registerFarm(app, { email: 'taskowner@example.com', full_name: 'Task Owner' });
+    accessToken = res.accessToken;
   });
 
   afterAll(async () => {

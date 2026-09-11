@@ -84,18 +84,16 @@ abstract class FarmInvitation with _$FarmInvitation {
       _$FarmInvitationFromJson(json);
 }
 
-/// Ответ на создание приглашения: код приходит ровно один раз.
+/// Ответ на создание приглашения. Кода в нём нет: приглашённый войдёт
+/// обычным кодом на свой контакт, и этот вход активирует приглашение.
 @freezed
 abstract class CreatedInvitation with _$CreatedInvitation {
   const factory CreatedInvitation({
     @IntConverter() required int id,
     String? email,
     String? phone,
+    @JsonKey(name: 'full_name') String? fullName,
     required FarmRole role,
-    required String code,
-    // Приглашение по телефону сервер пытается отправить SMS сам. Не дошла —
-    // код всё равно вернулся, и владелец передаёт его на словах.
-    @JsonKey(name: 'sms_sent') @Default(false) bool smsSent,
     @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
   }) = _CreatedInvitation;
 

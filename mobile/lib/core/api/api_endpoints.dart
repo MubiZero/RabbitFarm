@@ -27,21 +27,16 @@ class ApiEndpoints {
 
   // Auth endpoints
   static const String register = '/auth/register';
-  static const String login = '/auth/login';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
   static const String profile = '/auth/me';
   // Чтение и запись профиля живут на разных маршрутах: PUT /auth/me на
   // сервере нет, и запрос уходил в 404.
   static const String updateProfile = '/auth/profile';
-  static const String changePassword = '/auth/change-password';
-  static const String forgotPassword = '/auth/forgot-password';
-  static const String resetPassword = '/auth/reset-password';
-  // Вход по телефону — основной способ (см. docs/HANDOFF.md). Email+пароль
-  // остаётся запасным.
+  // Вход всегда по коду: телефон — основной путь, почта — запасной. Пароля
+  // в сервисе нет вовсе (см. docs/HANDOFF.md).
   static const String otpRequest = '/auth/otp/request';
   static const String otpVerify = '/auth/otp/verify';
-  static const String setPassword = '/auth/set-password';
 
   // Rabbits endpoints
   static const String rabbits = '/rabbits';

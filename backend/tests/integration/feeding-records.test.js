@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Feeding Records API', () => {
   let accessToken, feedId, cageId, recordId;
@@ -8,10 +9,8 @@ describe('Feeding Records API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'feedrecowner@example.com', password: 'Password123!', full_name: 'FeedRec Owner', role: 'owner' });
-    accessToken = res.body.data.access_token;
+    const res = await registerFarm(app, { email: 'feedrecowner@example.com', full_name: 'FeedRec Owner' });
+    accessToken = res.accessToken;
 
     // Create a feed for feeding records
     const feedRes = await request(app)

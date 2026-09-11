@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/utils/phone_utils.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
@@ -22,12 +23,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _farmNameController = TextEditingController();
   final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  final _contactController = TextEditingController();
+  /// Телефон основной, почта запасная — те же два способа, что и на входе.
+  bool _byPhone = true;
   bool _acceptedPrivacy = false;
   late final TapGestureRecognizer _privacyLinkRecognizer;
 
@@ -46,10 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _privacyLinkRecognizer.dispose();
     _farmNameController.dispose();
     _fullNameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _contactController.dispose();
     super.dispose();
   }
 
@@ -65,21 +60,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
     if (_formKey.currentState!.validate()) {
+      final contact = _byPhone
+          ? normalizeTjPhone(_contactController.text)
+          : _contactController.text.trim().toLowerCase();
       try {
         await ref.read(authProvider.notifier).register(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
               fullName: _fullNameController.text.trim(),
+              phone: _byPhone ? contact : null,
+              email: _byPhone ? null : contact,
               farmName: _farmNameController.text.trim().isNotEmpty
                   ? _farmNameController.text.trim()
                   : null,
-              phone: _phoneController.text.trim().isNotEmpty
-                  ? _phoneController.text.trim()
-                  : null,
             );
 
+        // Сессия ещё не открыта: регистрация только отправила код. Экран
+        // входа открывается сразу на шаге кода — второй раз слать SMS
+        // незачем.
         if (mounted) {
-          context.go('/');
+          context.go(Uri(
+            path: '/login',
+            queryParameters: {
+              if (_byPhone) 'phone': contact else 'email': contact,
+              'code_sent': '1',
+            },
+          ).toString());
         }
       } catch (e) {
         if (mounted) {
@@ -138,6 +142,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   size: 64,
                   color: Theme.of(context).colorScheme.primary,
                 ),
+                // Privacy policy consent
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _acceptedPrivacy,
+                      onChanged: (value) =>
+                          setState(() => _acceptedPrivacy = value ?? false),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTypography.bodyMd
+                                .copyWith(color: context.colors.onSurface),
+                            children: [
+                              TextSpan(text: context.l10n.registerConsentPrefix),
+                              TextSpan(
+                                text: context.l10n.registerConsentLink,
+                                recognizer: _privacyLinkRecognizer,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 24),
 
                 // Title
@@ -193,144 +230,64 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Email field
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.loginEmailLabel,
-                    hintText: context.l10n.loginEmailHint,
-                    prefixIcon: const Icon(Icons.email),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.l10n.registerEmailEmpty;
-                    }
-                    if (!value.contains('@')) {
-                      return context.l10n.registerEmailInvalid;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Phone field (optional)
-                TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.registerPhone,
-                    hintText: '+992 XX XXX XX XX',
-                    prefixIcon: const Icon(Icons.phone),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Password field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.loginPasswordLabel,
-                    hintText: context.l10n.registerPasswordHint,
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      tooltip: _obscurePassword
-                          ? context.l10n.commonPasswordShow
-                          : context.l10n.commonPasswordHide,
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                // Контакт: на него придёт код для входа — пароля в сервисе
+                // нет, и другого способа попасть в аккаунт тоже.
+                SegmentedButton<bool>(
+                  segments: [
+                    ButtonSegment(
+                      value: true,
+                      icon: const Icon(Icons.phone_outlined, size: 18),
+                      label: Text(context.l10n.loginByPhone),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.l10n.registerPasswordEmpty;
-                    }
-                    if (value.length < 8) {
-                      return context.l10n.registerPasswordShort;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Confirm password field
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: _obscureConfirmPassword,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.registerPasswordRepeat,
-                    hintText: context.l10n.registerPasswordRepeatEmpty,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      tooltip: _obscureConfirmPassword
-                          ? context.l10n.commonPasswordShow
-                          : context.l10n.commonPasswordHide,
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.l10n.registerPasswordRepeatEmpty;
-                    }
-                    if (value != _passwordController.text) {
-                      return context.l10n.registerPasswordMismatch;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                // Privacy policy consent
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: _acceptedPrivacy,
-                      onChanged: (value) =>
-                          setState(() => _acceptedPrivacy = value ?? false),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: RichText(
-                          text: TextSpan(
-                            style: AppTypography.bodyMd
-                                .copyWith(color: context.colors.onSurface),
-                            children: [
-                              TextSpan(text: context.l10n.registerConsentPrefix),
-                              TextSpan(
-                                text: context.l10n.registerConsentLink,
-                                recognizer: _privacyLinkRecognizer,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    ButtonSegment(
+                      value: false,
+                      icon: const Icon(Icons.alternate_email, size: 18),
+                      label: Text(context.l10n.loginByEmail),
                     ),
                   ],
+                  selected: {_byPhone},
+                  onSelectionChanged: (value) => setState(() {
+                    _byPhone = value.first;
+                    _contactController.clear();
+                  }),
                 ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _contactController,
+                  keyboardType:
+                      _byPhone ? TextInputType.phone : TextInputType.emailAddress,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    labelText: _byPhone
+                        ? context.l10n.loginPhoneLabel
+                        : context.l10n.loginEmailLabel,
+                    hintText: _byPhone
+                        ? context.l10n.loginPhoneHint
+                        : context.l10n.loginEmailHint,
+                    prefixIcon: Icon(
+                      _byPhone ? Icons.phone_outlined : Icons.alternate_email,
+                    ),
+                    helperText: context.l10n.registerContactHelper,
+                    helperMaxLines: 2,
+                  ),
+                  validator: (value) {
+                    final raw = value?.trim() ?? '';
+                    if (_byPhone) {
+                      if (raw.isEmpty) return context.l10n.loginPhoneEmpty;
+                      if (!isTjPhone(normalizeTjPhone(raw))) {
+                        return context.l10n.loginPhoneInvalid;
+                      }
+                    } else {
+                      if (raw.isEmpty) return context.l10n.registerEmailEmpty;
+                      if (!raw.contains('@') || !raw.contains('.')) {
+                        return context.l10n.registerEmailInvalid;
+                      }
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
                 const SizedBox(height: 24),
 
                 // Register button

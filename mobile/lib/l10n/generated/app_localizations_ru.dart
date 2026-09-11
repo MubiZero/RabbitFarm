@@ -149,7 +149,90 @@ class AppLocalizationsRu extends AppLocalizations {
   String get journalNoneInViewBody => 'Смените вид записи или срок.';
 
   @override
-  String get loginSubtitle => 'Вход в вашу ферму';
+  String get pinSetupTitle => 'Код быстрого входа';
+
+  @override
+  String get pinChangeTitle => 'Сменить код';
+
+  @override
+  String get pinSetupPrompt => 'Придумайте код из 4 цифр';
+
+  @override
+  String get pinRepeatPrompt => 'Повторите код';
+
+  @override
+  String get pinSetupExplanation =>
+      'Этим кодом вы будете открывать приложение на этом телефоне — SMS больше ждать не придётся.';
+
+  @override
+  String get pinSkip => 'Не сейчас';
+
+  @override
+  String get pinSaved => 'Код сохранён';
+
+  @override
+  String get pinMismatch => 'Коды не совпали — попробуйте ещё раз';
+
+  @override
+  String get pinLockPrompt => 'Введите код';
+
+  @override
+  String get pinWrong => 'Неверный код';
+
+  @override
+  String get pinDelete => 'Стереть цифру';
+
+  @override
+  String pinAttemptsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Осталось $count попыток',
+      few: 'Осталось $count попытки',
+      one: 'Осталась $count попытка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinForgot => 'Забыли код?';
+
+  @override
+  String get pinForgotTitle => 'Забыли код?';
+
+  @override
+  String get pinForgotBody =>
+      'Код хранится только на этом телефоне, восстановить его нечем. Выйдем из аккаунта — и вы войдёте заново по коду из SMS или письма.';
+
+  @override
+  String get pinForgotConfirm => 'Выйти и войти заново';
+
+  @override
+  String get settingsPinTitle => 'Код быстрого входа';
+
+  @override
+  String get settingsPinOn => 'Приложение открывается по коду';
+
+  @override
+  String get settingsPinOff => 'Приложение открывается без кода';
+
+  @override
+  String get settingsPinChange => 'Сменить код';
+
+  @override
+  String get loginByPhone => 'Телефон';
+
+  @override
+  String get loginByEmail => 'Почта';
+
+  @override
+  String get loginEmailIntro => 'Пришлём код на почту — пароль не нужен.';
+
+  @override
+  String get loginCodeChangeEmail => 'Изменить почту';
+
+  @override
+  String get registerContactHelper => 'На него придёт код для входа';
 
   @override
   String get loginPhoneLabel => 'Телефон';
@@ -168,12 +251,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginRequestCode => 'Получить код';
-
-  @override
-  String get loginWithPassword => 'Войти по почте и паролю';
-
-  @override
-  String get loginCodeTitle => 'Введите код';
 
   @override
   String loginCodeSentTo(String phone) {
@@ -207,13 +284,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginCodeChangePhone => 'Изменить номер';
 
   @override
-  String get passwordLoginTitle => 'Вход по почте и паролю';
-
-  @override
-  String get passwordLoginIntro =>
-      'Запасной способ — для тех, кто завёл ферму на почту.';
-
-  @override
   String get loginEmailLabel => 'Почта';
 
   @override
@@ -226,79 +296,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginEmailInvalid => 'Похоже, в адресе опечатка';
 
   @override
-  String get loginPasswordLabel => 'Пароль';
-
-  @override
-  String get loginPasswordEmpty => 'Введите пароль';
-
-  @override
-  String get commonPasswordShow => 'Показать пароль';
-
-  @override
-  String get commonPasswordHide => 'Скрыть пароль';
-
-  @override
   String get loginSubmit => 'Войти';
 
   @override
-  String get loginFailed => 'Не удалось войти';
-
-  @override
-  String get loginHasInvite => 'У меня есть код приглашения';
-
-  @override
   String get loginCreateFarm => 'Завести свою ферму';
-
-  @override
-  String get loginForgotPassword => 'Забыли пароль?';
-
-  @override
-  String get forgotPasswordTitle => 'Забыли пароль?';
-
-  @override
-  String get forgotPasswordIntro =>
-      'Укажите почту, с которой входите в ферму. Если аккаунт есть, пришлём код — по SMS или на почту.';
-
-  @override
-  String get forgotPasswordEmailHint => 'Введите почту';
-
-  @override
-  String get forgotPasswordSubmit => 'Отправить код';
-
-  @override
-  String get forgotPasswordSentMessage =>
-      'Если аккаунт существует, код отправлен';
-
-  @override
-  String get forgotPasswordBackToLogin => 'Вспомнили пароль? Войти';
-
-  @override
-  String get resetPasswordTitle => 'Введите код';
-
-  @override
-  String get resetPasswordCodeHint => '6-значный код из SMS или письма';
-
-  @override
-  String get resetPasswordCodeEmpty => 'Введите код';
-
-  @override
-  String get resetPasswordCodeInvalid => 'Код — это 6 цифр';
-
-  @override
-  String get resetPasswordNewPasswordHint => 'Новый пароль';
-
-  @override
-  String get resetPasswordConfirmHint => 'Повторите новый пароль';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Пароли не совпадают';
-
-  @override
-  String get resetPasswordSubmit => 'Сменить пароль';
-
-  @override
-  String get resetPasswordSuccessMessage =>
-      'Пароль изменён. Войдите с новым паролем.';
 
   @override
   String get todayGreetingMorning => 'Доброе утро';
@@ -2415,40 +2416,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту';
 
   @override
-  String get joinTitle => 'Присоединиться к ферме';
-
-  @override
-  String get joinIntro =>
-      'Код выдаёт владелец фермы. После входа вы увидите её хозяйство — поголовье, корма и задачи.';
-
-  @override
-  String get joinCode => 'Код приглашения';
-
-  @override
-  String get joinCodeHint => 'Введите код, который передал владелец';
-
-  @override
-  String get joinName => 'Ваше имя';
-
-  @override
-  String get joinNameHint => 'Как к вам обращаться?';
-
-  @override
-  String get joinPassword => 'Пароль';
-
-  @override
-  String get joinPasswordHint => 'Не короче 8 символов';
-
-  @override
-  String get joinPasswordShort => 'Пароль должен быть не короче 8 символов';
-
-  @override
-  String get joinSubmit => 'Присоединиться';
-
-  @override
-  String get joinHaveAccount => 'У меня уже есть аккаунт';
-
-  @override
   String get splashTagline => 'Управление фермой';
 
   @override
@@ -2485,27 +2452,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get registerEmailInvalid => 'Похоже, в адресе опечатка';
-
-  @override
-  String get registerPhone => 'Телефон, если нужен';
-
-  @override
-  String get registerPasswordHint => 'Не короче 8 символов';
-
-  @override
-  String get registerPasswordEmpty => 'Придумайте пароль';
-
-  @override
-  String get registerPasswordShort => 'Пароль должен быть не короче 8 символов';
-
-  @override
-  String get registerPasswordRepeat => 'Повторите пароль';
-
-  @override
-  String get registerPasswordRepeatEmpty => 'Введите пароль ещё раз';
-
-  @override
-  String get registerPasswordMismatch => 'Пароли не совпадают';
 
   @override
   String get registerSubmit => 'Завести ферму';
@@ -2932,24 +2878,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffSaved => 'Изменения сохранены';
 
   @override
-  String get staffResetPasswordTitle => 'Сбросить пароль?';
-
-  @override
-  String get staffResetPasswordBody =>
-      'Прежний пароль перестанет работать. Взамен приложение выдаст временный — его нужно передать человеку.';
-
-  @override
-  String get staffReset => 'Сбросить';
-
-  @override
-  String get staffTempPassword => 'Временный пароль';
-
-  @override
-  String staffTempPasswordBody(String name) {
-    return 'Передайте пароль $name. Второй раз он не покажется — при необходимости сбросьте ещё раз.';
-  }
-
-  @override
   String get staffRevokeTitle => 'Отозвать приглашение?';
 
   @override
@@ -2983,10 +2911,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffRole => 'Роль';
 
   @override
-  String get staffIssueCode => 'Выписать код';
+  String get staffIssueCode => 'Пригласить работника';
 
   @override
-  String get staffInviteCode => 'Код приглашения';
+  String get staffInvitedTitle => 'Работник приглашён';
+
+  @override
+  String staffInvitedPhoneBody(String phone) {
+    return 'Он вводит номер $phone на входе в приложение и код, который придёт ему в SMS. Ничего передавать не нужно.';
+  }
+
+  @override
+  String staffInvitedEmailBody(String email) {
+    return 'Он вводит почту $email на входе в приложение и код, который придёт ему письмом. Ничего передавать не нужно.';
+  }
 
   @override
   String get staffInviteChannelPhone => 'По телефону';
@@ -3010,16 +2948,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffInviteNameEmpty => 'Укажите имя работника';
 
   @override
-  String staffInviteCodeSmsBody(String phone) {
-    return 'Код ушёл по SMS на $phone. Работник вводит этот номер на входе и код из сообщения — больше ничего не нужно. Если SMS не дошла, передайте код сами: второй раз он не покажется.';
-  }
-
-  @override
-  String staffInviteCodeBody(String email) {
-    return 'Передайте этот код $email любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.';
-  }
-
-  @override
   String staffValidUntil(String date) {
     return 'Действует до $date';
   }
@@ -3029,9 +2957,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get staffMakeWorker => 'Сделать работником';
-
-  @override
-  String get staffResetPassword => 'Сбросить пароль';
 
   @override
   String get staffOpenAccess => 'Открыть доступ';

@@ -58,6 +58,16 @@ Widget _wrap(_FakeAuthRepository repository) => testAppScreen(
       ],
     );
 
+/// В настройках теперь два переключателя — замок приложения и дайджест.
+/// Берём тот, что стоит в строке дайджеста, а не «единственный на экране».
+Finder _digestSwitch() => find.descendant(
+      of: find.ancestor(
+        of: find.text('Дайджест по хозяйству'),
+        matching: find.byType(Row),
+      ),
+      matching: find.byType(Switch),
+    );
+
 void main() {
   group('SettingsScreen — дайджест', () {
     testWidgets('переключатель отражает текущее значение и отправляет новое',
@@ -66,7 +76,7 @@ void main() {
       await tester.pumpWidget(_wrap(repository));
       await tester.pumpAndSettle();
 
-      final switchFinder = find.byType(Switch);
+      final switchFinder = _digestSwitch();
       expect(tester.widget<Switch>(switchFinder).value, isTrue);
 
       await tester.tap(switchFinder);
@@ -84,7 +94,7 @@ void main() {
       await tester.pumpWidget(_wrap(repository));
       await tester.pumpAndSettle();
 
-      final switchFinder = find.byType(Switch);
+      final switchFinder = _digestSwitch();
       await tester.tap(switchFinder);
       await tester.pumpAndSettle();
 

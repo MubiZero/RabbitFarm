@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm, login: signIn } = require('./helpers/auth');
 const { client: minioClient, bucket: minioBucket } = require('../../src/config/minio');
 
 // Файлы галереи хранятся в MinIO, а не на локальном диске — существование
@@ -29,10 +30,8 @@ describe('Галерея фото кролика', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'gallery_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'gallery_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')
@@ -48,20 +47,16 @@ describe('Галерея фото кролика', () => {
     const { User } = require('../../src/models');
     await request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'gallery_worker@example.com', password: 'Password123!', full_name: 'Работник' });
+      .send({ email: 'gallery_worker@example.com', full_name: 'Работник' });
     await User.update(
-      { farm_id: owner.body.data.user.farm_id, role: 'worker' },
+      { farm_id: owner.user.farm_id, role: 'worker' },
       { where: { email: 'gallery_worker@example.com' } }
     );
-    const workerLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'gallery_worker@example.com', password: 'Password123!' });
-    workerToken = workerLogin.body.data.access_token;
+    const workerLogin = await signIn(app, { email: 'gallery_worker@example.com' })
+    workerToken = workerLogin.accessToken;
 
-    const stranger = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'gallery_stranger@example.com', password: 'Password123!', full_name: 'Сосед' });
-    strangerToken = stranger.body.data.access_token;
+    const stranger = await registerFarm(app, { email: 'gallery_stranger@example.com', full_name: 'Сосед' });
+    strangerToken = stranger.accessToken;
     const strangerBreed = await request(app)
       .post('/api/v1/breeds')
       .set('Authorization', `Bearer ${strangerToken}`)

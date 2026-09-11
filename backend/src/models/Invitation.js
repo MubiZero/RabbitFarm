@@ -45,11 +45,6 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    // Сам код не хранится: в базе лежит только его хеш.
-    token_hash: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
     expires_at: {
       type: DataTypes.DATE,
       allowNull: false

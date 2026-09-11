@@ -24,6 +24,7 @@ import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
 import 'core/widgets/offline_queue_gate.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
+import 'features/auth/presentation/widgets/pin_gate.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
 import 'l10n/generated/app_localizations.dart';
 
@@ -165,10 +166,16 @@ class MyApp extends ConsumerWidget {
       // другой экран за плашкой всё равно ломается непредсказуемо.
       builder: (context, child) => upgradeRequired
           ? const ForceUpdateScreen()
-          : ImpersonationBanner(
-              child: FarmStatusBanner(
-                child: OfflineQueueGate(
-                  child: OfflineBanner(child: child ?? const SizedBox.shrink()),
+          // Замок приложения — снаружи всех плашек: пока код не введён, не
+          // должно быть видно ни данных фермы, ни того, что за плашки на них
+          // наложены.
+          : PinGate(
+              child: ImpersonationBanner(
+                child: FarmStatusBanner(
+                  child: OfflineQueueGate(
+                    child:
+                        OfflineBanner(child: child ?? const SizedBox.shrink()),
+                  ),
                 ),
               ),
             ),

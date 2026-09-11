@@ -1,21 +1,21 @@
 'use strict';
-const bcrypt = require('bcrypt');
 const { QueryTypes } = require('sequelize');
 
 /**
- * Демонстрационный набор данных для разработки: три учётные записи с
- * заранее известными паролями, восемь пород, десять клеток и шесть кормов.
+ * Демонстрационный набор данных для разработки: три учётные записи,
+ * восемь пород, десять клеток и шесть кормов.
  *
  * Это НЕ справочники. В docker-compose и в DEPLOY.md флаг RUN_SEEDS был описан
  * как «залить справочники», из-за чего его легко включить на боевом стенде — и
- * получить владельца фермы с паролем, опубликованным в репозитории. Поэтому
+ * получить на нём чужого владельца фермы с общеизвестными контактами: пароля в
+ * сервисе нет, вход открывает код на телефон или почту demo-аккаунта. Поэтому
  * сидер жёстко отказывается работать в продакшене.
  */
 const assertNotProduction = () => {
   if (process.env.NODE_ENV === 'production') {
     throw new Error(
       'Демо-данные не заливаются в продакшен: сидер создаёт учётные записи ' +
-      'с общеизвестными паролями. Уберите RUN_SEEDS или смените NODE_ENV.'
+      'с общеизвестными контактами. Уберите RUN_SEEDS или смените NODE_ENV.'
     );
   }
 };
@@ -46,7 +46,7 @@ module.exports = {
      * а только доводится до нужной фермы: на стендах, залитых старой версией
      * сидера, менеджер и работник остались владельцами собственных пустых ферм.
      */
-    const ensureUser = async ({ email, password, fullName, role, phone, farmId }) => {
+    const ensureUser = async ({ email, fullName, role, phone, farmId }) => {
       const existingId = await findUserIdByEmail(email);
 
       if (existingId) {
@@ -56,7 +56,6 @@ module.exports = {
 
       await queryInterface.bulkInsert('users', [{
         email,
-        password_hash: await bcrypt.hash(password, 10),
         full_name: fullName,
         role,
         phone,
@@ -116,7 +115,6 @@ module.exports = {
 
     const ownerId = await ensureUser({
       email: OWNER_EMAIL,
-      password: 'admin123',
       fullName: 'Администратор',
       role: 'owner',
       phone: '+79991234567',
@@ -127,7 +125,6 @@ module.exports = {
 
     await ensureUser({
       email: 'manager@rabbitfarm.com',
-      password: 'manager123',
       fullName: 'Менеджер фермы',
       role: 'manager',
       phone: '+79991234568',
@@ -136,7 +133,6 @@ module.exports = {
 
     await ensureUser({
       email: 'worker@rabbitfarm.com',
-      password: 'worker123',
       fullName: 'Работник',
       role: 'worker',
       phone: '+79991234569',
@@ -358,10 +354,10 @@ module.exports = {
     ]);
 
     console.log('✅ Seed data inserted successfully!');
-    console.log('📧 Default users:');
-    console.log('   - admin@rabbitfarm.com / admin123 (Owner)');
-    console.log('   - manager@rabbitfarm.com / manager123 (Manager, сотрудник фермы владельца)');
-    console.log('   - worker@rabbitfarm.com / worker123 (Worker, сотрудник фермы владельца)');
+    console.log('📧 Default users (вход по коду на указанный контакт):');
+    console.log('   - admin@rabbitfarm.com (Owner)');
+    console.log('   - manager@rabbitfarm.com (Manager, сотрудник фермы владельца)');
+    console.log('   - worker@rabbitfarm.com (Worker, сотрудник фермы владельца)');
     console.log(`🐰 ${breedsInserted} breeds inserted`);
     console.log(`🏠 ${cagesInserted} cages inserted`);
     console.log(`🌾 ${feedsInserted} feed types inserted`);

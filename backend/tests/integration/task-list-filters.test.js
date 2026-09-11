@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 /**
  * Фильтры списка задач раньше «работали» молча: валидация пропускала запрос,
@@ -29,15 +30,11 @@ describe('Фильтры списка задач', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const registered = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const registered = await registerFarm(app, {
         email: 'taskfilters@example.com',
-        password: 'Password123!',
-        full_name: 'Task Filters Owner',
-        role: 'owner'
+        full_name: 'Task Filters Owner'
       });
-    accessToken = registered.body.data.access_token;
+    accessToken = registered.accessToken;
 
     await createTask('Просрочена', '2020-01-01T10:00:00.000Z');
     await createTask('В будущем', '2099-01-01T10:00:00.000Z');

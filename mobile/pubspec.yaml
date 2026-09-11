@@ -52,6 +52,9 @@ dependencies:
   app_links: ^6.3.2
 
   # Utils
+  # Хеш ПИН-кода быстрого входа: сам код на устройстве не хранится
+  # (см. features/auth/data/pin_repository.dart).
+  crypto: ^3.0.6
   freezed_annotation: ^3.1.0
   intl: ^0.20.2
   fl_chart: ^1.1.1

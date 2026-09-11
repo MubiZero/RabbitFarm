@@ -372,11 +372,155 @@ abstract class AppLocalizations {
   /// **'Смените вид записи или срок.'**
   String get journalNoneInViewBody;
 
-  /// No description provided for @loginSubtitle.
+  /// No description provided for @pinSetupTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Вход в вашу ферму'**
-  String get loginSubtitle;
+  /// **'Код быстрого входа'**
+  String get pinSetupTitle;
+
+  /// No description provided for @pinChangeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить код'**
+  String get pinChangeTitle;
+
+  /// No description provided for @pinSetupPrompt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Придумайте код из 4 цифр'**
+  String get pinSetupPrompt;
+
+  /// No description provided for @pinRepeatPrompt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите код'**
+  String get pinRepeatPrompt;
+
+  /// No description provided for @pinSetupExplanation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этим кодом вы будете открывать приложение на этом телефоне — SMS больше ждать не придётся.'**
+  String get pinSetupExplanation;
+
+  /// No description provided for @pinSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сейчас'**
+  String get pinSkip;
+
+  /// No description provided for @pinSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код сохранён'**
+  String get pinSaved;
+
+  /// No description provided for @pinMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Коды не совпали — попробуйте ещё раз'**
+  String get pinMismatch;
+
+  /// No description provided for @pinLockPrompt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код'**
+  String get pinLockPrompt;
+
+  /// No description provided for @pinWrong.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный код'**
+  String get pinWrong;
+
+  /// No description provided for @pinDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стереть цифру'**
+  String get pinDelete;
+
+  /// No description provided for @pinAttemptsLeft.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Осталась {count} попытка} few{Осталось {count} попытки} other{Осталось {count} попыток}}'**
+  String pinAttemptsLeft(int count);
+
+  /// No description provided for @pinForgot.
+  ///
+  /// In ru, this message translates to:
+  /// **'Забыли код?'**
+  String get pinForgot;
+
+  /// No description provided for @pinForgotTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Забыли код?'**
+  String get pinForgotTitle;
+
+  /// No description provided for @pinForgotBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код хранится только на этом телефоне, восстановить его нечем. Выйдем из аккаунта — и вы войдёте заново по коду из SMS или письма.'**
+  String get pinForgotBody;
+
+  /// No description provided for @pinForgotConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти и войти заново'**
+  String get pinForgotConfirm;
+
+  /// No description provided for @settingsPinTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код быстрого входа'**
+  String get settingsPinTitle;
+
+  /// No description provided for @settingsPinOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приложение открывается по коду'**
+  String get settingsPinOn;
+
+  /// No description provided for @settingsPinOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приложение открывается без кода'**
+  String get settingsPinOff;
+
+  /// No description provided for @settingsPinChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить код'**
+  String get settingsPinChange;
+
+  /// No description provided for @loginByPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон'**
+  String get loginByPhone;
+
+  /// No description provided for @loginByEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Почта'**
+  String get loginByEmail;
+
+  /// No description provided for @loginEmailIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пришлём код на почту — пароль не нужен.'**
+  String get loginEmailIntro;
+
+  /// No description provided for @loginCodeChangeEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить почту'**
+  String get loginCodeChangeEmail;
+
+  /// No description provided for @registerContactHelper.
+  ///
+  /// In ru, this message translates to:
+  /// **'На него придёт код для входа'**
+  String get registerContactHelper;
 
   /// No description provided for @loginPhoneLabel.
   ///
@@ -413,18 +557,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Получить код'**
   String get loginRequestCode;
-
-  /// No description provided for @loginWithPassword.
-  ///
-  /// In ru, this message translates to:
-  /// **'Войти по почте и паролю'**
-  String get loginWithPassword;
-
-  /// No description provided for @loginCodeTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите код'**
-  String get loginCodeTitle;
 
   /// No description provided for @loginCodeSentTo.
   ///
@@ -480,18 +612,6 @@ abstract class AppLocalizations {
   /// **'Изменить номер'**
   String get loginCodeChangePhone;
 
-  /// No description provided for @passwordLoginTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вход по почте и паролю'**
-  String get passwordLoginTitle;
-
-  /// No description provided for @passwordLoginIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Запасной способ — для тех, кто завёл ферму на почту.'**
-  String get passwordLoginIntro;
-
   /// No description provided for @loginEmailLabel.
   ///
   /// In ru, this message translates to:
@@ -516,149 +636,17 @@ abstract class AppLocalizations {
   /// **'Похоже, в адресе опечатка'**
   String get loginEmailInvalid;
 
-  /// No description provided for @loginPasswordLabel.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароль'**
-  String get loginPasswordLabel;
-
-  /// No description provided for @loginPasswordEmpty.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите пароль'**
-  String get loginPasswordEmpty;
-
-  /// No description provided for @commonPasswordShow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Показать пароль'**
-  String get commonPasswordShow;
-
-  /// No description provided for @commonPasswordHide.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скрыть пароль'**
-  String get commonPasswordHide;
-
   /// No description provided for @loginSubmit.
   ///
   /// In ru, this message translates to:
   /// **'Войти'**
   String get loginSubmit;
 
-  /// No description provided for @loginFailed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не удалось войти'**
-  String get loginFailed;
-
-  /// No description provided for @loginHasInvite.
-  ///
-  /// In ru, this message translates to:
-  /// **'У меня есть код приглашения'**
-  String get loginHasInvite;
-
   /// No description provided for @loginCreateFarm.
   ///
   /// In ru, this message translates to:
   /// **'Завести свою ферму'**
   String get loginCreateFarm;
-
-  /// No description provided for @loginForgotPassword.
-  ///
-  /// In ru, this message translates to:
-  /// **'Забыли пароль?'**
-  String get loginForgotPassword;
-
-  /// No description provided for @forgotPasswordTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Забыли пароль?'**
-  String get forgotPasswordTitle;
-
-  /// No description provided for @forgotPasswordIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Укажите почту, с которой входите в ферму. Если аккаунт есть, пришлём код — по SMS или на почту.'**
-  String get forgotPasswordIntro;
-
-  /// No description provided for @forgotPasswordEmailHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите почту'**
-  String get forgotPasswordEmailHint;
-
-  /// No description provided for @forgotPasswordSubmit.
-  ///
-  /// In ru, this message translates to:
-  /// **'Отправить код'**
-  String get forgotPasswordSubmit;
-
-  /// No description provided for @forgotPasswordSentMessage.
-  ///
-  /// In ru, this message translates to:
-  /// **'Если аккаунт существует, код отправлен'**
-  String get forgotPasswordSentMessage;
-
-  /// No description provided for @forgotPasswordBackToLogin.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вспомнили пароль? Войти'**
-  String get forgotPasswordBackToLogin;
-
-  /// No description provided for @resetPasswordTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите код'**
-  String get resetPasswordTitle;
-
-  /// No description provided for @resetPasswordCodeHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'6-значный код из SMS или письма'**
-  String get resetPasswordCodeHint;
-
-  /// No description provided for @resetPasswordCodeEmpty.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите код'**
-  String get resetPasswordCodeEmpty;
-
-  /// No description provided for @resetPasswordCodeInvalid.
-  ///
-  /// In ru, this message translates to:
-  /// **'Код — это 6 цифр'**
-  String get resetPasswordCodeInvalid;
-
-  /// No description provided for @resetPasswordNewPasswordHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Новый пароль'**
-  String get resetPasswordNewPasswordHint;
-
-  /// No description provided for @resetPasswordConfirmHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Повторите новый пароль'**
-  String get resetPasswordConfirmHint;
-
-  /// No description provided for @resetPasswordConfirmMismatch.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароли не совпадают'**
-  String get resetPasswordConfirmMismatch;
-
-  /// No description provided for @resetPasswordSubmit.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сменить пароль'**
-  String get resetPasswordSubmit;
-
-  /// No description provided for @resetPasswordSuccessMessage.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароль изменён. Войдите с новым паролем.'**
-  String get resetPasswordSuccessMessage;
 
   /// No description provided for @todayGreetingMorning.
   ///
@@ -4404,72 +4392,6 @@ abstract class AppLocalizations {
   /// **'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'**
   String get subscriptionPaymentPending;
 
-  /// No description provided for @joinTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Присоединиться к ферме'**
-  String get joinTitle;
-
-  /// No description provided for @joinIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Код выдаёт владелец фермы. После входа вы увидите её хозяйство — поголовье, корма и задачи.'**
-  String get joinIntro;
-
-  /// No description provided for @joinCode.
-  ///
-  /// In ru, this message translates to:
-  /// **'Код приглашения'**
-  String get joinCode;
-
-  /// No description provided for @joinCodeHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите код, который передал владелец'**
-  String get joinCodeHint;
-
-  /// No description provided for @joinName.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ваше имя'**
-  String get joinName;
-
-  /// No description provided for @joinNameHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как к вам обращаться?'**
-  String get joinNameHint;
-
-  /// No description provided for @joinPassword.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароль'**
-  String get joinPassword;
-
-  /// No description provided for @joinPasswordHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не короче 8 символов'**
-  String get joinPasswordHint;
-
-  /// No description provided for @joinPasswordShort.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароль должен быть не короче 8 символов'**
-  String get joinPasswordShort;
-
-  /// No description provided for @joinSubmit.
-  ///
-  /// In ru, this message translates to:
-  /// **'Присоединиться'**
-  String get joinSubmit;
-
-  /// No description provided for @joinHaveAccount.
-  ///
-  /// In ru, this message translates to:
-  /// **'У меня уже есть аккаунт'**
-  String get joinHaveAccount;
-
   /// No description provided for @splashTagline.
   ///
   /// In ru, this message translates to:
@@ -4541,48 +4463,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Похоже, в адресе опечатка'**
   String get registerEmailInvalid;
-
-  /// No description provided for @registerPhone.
-  ///
-  /// In ru, this message translates to:
-  /// **'Телефон, если нужен'**
-  String get registerPhone;
-
-  /// No description provided for @registerPasswordHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не короче 8 символов'**
-  String get registerPasswordHint;
-
-  /// No description provided for @registerPasswordEmpty.
-  ///
-  /// In ru, this message translates to:
-  /// **'Придумайте пароль'**
-  String get registerPasswordEmpty;
-
-  /// No description provided for @registerPasswordShort.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароль должен быть не короче 8 символов'**
-  String get registerPasswordShort;
-
-  /// No description provided for @registerPasswordRepeat.
-  ///
-  /// In ru, this message translates to:
-  /// **'Повторите пароль'**
-  String get registerPasswordRepeat;
-
-  /// No description provided for @registerPasswordRepeatEmpty.
-  ///
-  /// In ru, this message translates to:
-  /// **'Введите пароль ещё раз'**
-  String get registerPasswordRepeatEmpty;
-
-  /// No description provided for @registerPasswordMismatch.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пароли не совпадают'**
-  String get registerPasswordMismatch;
 
   /// No description provided for @registerSubmit.
   ///
@@ -5340,36 +5220,6 @@ abstract class AppLocalizations {
   /// **'Изменения сохранены'**
   String get staffSaved;
 
-  /// No description provided for @staffResetPasswordTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сбросить пароль?'**
-  String get staffResetPasswordTitle;
-
-  /// No description provided for @staffResetPasswordBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Прежний пароль перестанет работать. Взамен приложение выдаст временный — его нужно передать человеку.'**
-  String get staffResetPasswordBody;
-
-  /// No description provided for @staffReset.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сбросить'**
-  String get staffReset;
-
-  /// No description provided for @staffTempPassword.
-  ///
-  /// In ru, this message translates to:
-  /// **'Временный пароль'**
-  String get staffTempPassword;
-
-  /// No description provided for @staffTempPasswordBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Передайте пароль {name}. Второй раз он не покажется — при необходимости сбросьте ещё раз.'**
-  String staffTempPasswordBody(String name);
-
   /// No description provided for @staffRevokeTitle.
   ///
   /// In ru, this message translates to:
@@ -5433,14 +5283,26 @@ abstract class AppLocalizations {
   /// No description provided for @staffIssueCode.
   ///
   /// In ru, this message translates to:
-  /// **'Выписать код'**
+  /// **'Пригласить работника'**
   String get staffIssueCode;
 
-  /// No description provided for @staffInviteCode.
+  /// No description provided for @staffInvitedTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Код приглашения'**
-  String get staffInviteCode;
+  /// **'Работник приглашён'**
+  String get staffInvitedTitle;
+
+  /// No description provided for @staffInvitedPhoneBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Он вводит номер {phone} на входе в приложение и код, который придёт ему в SMS. Ничего передавать не нужно.'**
+  String staffInvitedPhoneBody(String phone);
+
+  /// No description provided for @staffInvitedEmailBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Он вводит почту {email} на входе в приложение и код, который придёт ему письмом. Ничего передавать не нужно.'**
+  String staffInvitedEmailBody(String email);
 
   /// No description provided for @staffInviteChannelPhone.
   ///
@@ -5484,18 +5346,6 @@ abstract class AppLocalizations {
   /// **'Укажите имя работника'**
   String get staffInviteNameEmpty;
 
-  /// No description provided for @staffInviteCodeSmsBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Код ушёл по SMS на {phone}. Работник вводит этот номер на входе и код из сообщения — больше ничего не нужно. Если SMS не дошла, передайте код сами: второй раз он не покажется.'**
-  String staffInviteCodeSmsBody(String phone);
-
-  /// No description provided for @staffInviteCodeBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Передайте этот код {email} любым удобным способом. Второй раз он не покажется: сервер хранит только его отпечаток.'**
-  String staffInviteCodeBody(String email);
-
   /// No description provided for @staffValidUntil.
   ///
   /// In ru, this message translates to:
@@ -5513,12 +5363,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сделать работником'**
   String get staffMakeWorker;
-
-  /// No description provided for @staffResetPassword.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сбросить пароль'**
-  String get staffResetPassword;
 
   /// No description provided for @staffOpenAccess.
   ///

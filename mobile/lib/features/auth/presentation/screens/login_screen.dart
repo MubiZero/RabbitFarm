@@ -12,6 +12,7 @@ import '../../../../core/router/deep_links.dart';
 import '../../../../core/utils/phone_utils.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
+import '../providers/pin_provider.dart';
 
 /// Вход по телефону — основной способ для всех: и для владельца, и для
 /// работника, приглашённого по номеру (его приглашение активирует тот же код
@@ -22,12 +23,25 @@ import '../providers/auth_provider.dart';
 /// возвращается к номеру, не теряя введённого. Вход по почте и паролю уехал
 /// на отдельный запасной экран (`/login/password`).
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key, this.initialPhone});
+  const LoginScreen({
+    super.key,
+    this.initialPhone,
+    this.initialEmail,
+    this.codeAlreadySent = false,
+  });
 
   /// Номер из ссылки-приглашения (`rabbitfarm://join?phone=…`), если она
   /// пришла маршрутом. Подставляется в поле, но код сам не запрашивается:
   /// SMS уходит по осознанному нажатию, а не потому что открыли ссылку.
   final String? initialPhone;
+
+  /// Почта, с которой пришли сюда после регистрации по почте.
+  final String? initialEmail;
+
+  /// Экран открывается сразу на шаге кода: код уже отправлен — так сюда
+  /// приходит только что зарегистрировавшийся владелец фермы, которому
+  /// второй раз слать SMS незачем.
+  final bool codeAlreadySent;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -36,14 +50,18 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   static const _resendCooldown = Duration(seconds: 60);
 
-  final _phoneFormKey = GlobalKey<FormState>();
+  final _contactFormKey = GlobalKey<FormState>();
   final _codeFormKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _contactController = TextEditingController();
   final _codeController = TextEditingController();
 
-  /// Номер, на который ушёл код, — уже нормализованный (`+992XXXXXXXXX`).
-  /// Пусто ровно тогда, когда мы на шаге ввода номера.
-  String? _phone;
+  /// Телефон — основной способ входа, почта — запасной. Ведут себя
+  /// одинаково: контакт, код, вход.
+  bool _byPhone = true;
+
+  /// Контакт, на который ушёл код, — уже приведённый к тому виду, в котором
+  /// его ждёт сервер. Пусто ровно тогда, когда мы на шаге ввода контакта.
+  String? _sentTo;
   bool _requesting = false;
   Timer? _resendTimer;
   int _resendSeconds = 0;
@@ -53,19 +71,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.initState();
     // Ссылка, открывшая приложение из закрытого состояния, приходит раньше
     // роутера — номер из неё ждёт здесь (см. `deep_links.dart`).
-    final initial = widget.initialPhone ?? takePendingInvitePhone();
-    if (initial != null && initial.isNotEmpty) {
-      _phoneController.text = formatTjPhone(normalizeTjPhone(initial));
+    final phone = widget.initialPhone ?? takePendingInvitePhone();
+    final email = widget.initialEmail;
+
+    if (email != null && email.isNotEmpty) {
+      _byPhone = false;
+      _contactController.text = email;
+    } else if (phone != null && phone.isNotEmpty) {
+      _contactController.text = formatTjPhone(normalizeTjPhone(phone));
+    }
+
+    if (widget.codeAlreadySent) {
+      _sentTo = _normalizedContact();
+      _startResendCountdown();
     }
   }
 
   @override
   void dispose() {
     _resendTimer?.cancel();
-    _phoneController.dispose();
+    _contactController.dispose();
     _codeController.dispose();
     super.dispose();
   }
+
+  /// Контакт в том виде, в котором его ждёт сервер: телефон — `+992…`,
+  /// почта — без регистра и пробелов по краям.
+  String _normalizedContact() => _byPhone
+      ? normalizeTjPhone(_contactController.text)
+      : _contactController.text.trim().toLowerCase();
+
+  /// Аргументы запроса: ровно одно из полей, в зависимости от способа входа.
+  ({String? phone, String? email}) _contactArgs(String contact) =>
+      _byPhone ? (phone: contact, email: null) : (phone: null, email: contact);
 
   void _startResendCountdown() {
     _resendTimer?.cancel();
@@ -88,14 +126,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _requestCode() async {
-    if (!(_phoneFormKey.currentState?.validate() ?? false)) return;
+    if (!(_contactFormKey.currentState?.validate() ?? false)) return;
 
-    final phone = normalizeTjPhone(_phoneController.text);
+    final contact = _normalizedContact();
+    final args = _contactArgs(contact);
     setState(() => _requesting = true);
     try {
-      await ref.read(authProvider.notifier).requestOtp(phone: phone);
+      await ref
+          .read(authProvider.notifier)
+          .requestOtp(phone: args.phone, email: args.email);
       if (!mounted) return;
-      setState(() => _phone = phone);
+      setState(() => _sentTo = contact);
       _startResendCountdown();
     } catch (e) {
       _showError(e);
@@ -105,12 +146,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _resendCode() async {
-    final phone = _phone;
-    if (phone == null || _resendSeconds > 0) return;
+    final contact = _sentTo;
+    if (contact == null || _resendSeconds > 0) return;
 
+    final args = _contactArgs(contact);
     setState(() => _requesting = true);
     try {
-      await ref.read(authProvider.notifier).requestOtp(phone: phone);
+      await ref
+          .read(authProvider.notifier)
+          .requestOtp(phone: args.phone, email: args.email);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.loginCodeResent)),
@@ -124,16 +168,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submitCode() async {
-    final phone = _phone;
-    if (phone == null) return;
+    final contact = _sentTo;
+    if (contact == null) return;
     if (!(_codeFormKey.currentState?.validate() ?? false)) return;
 
+    final args = _contactArgs(contact);
     try {
       await ref.read(authProvider.notifier).loginWithOtp(
-            phone: phone,
+            phone: args.phone,
+            email: args.email,
             code: _codeController.text.trim(),
           );
-      if (mounted) context.go('/');
+      // Вошли — предлагаем закрыть приложение коротким кодом, чтобы в
+      // следующий раз не ждать SMS. Один раз: отказ запоминается.
+      final offerPin = await ref.read(pinProvider.notifier).shouldOfferSetup();
+      if (mounted) context.go(offerPin ? '/pin/setup' : '/');
     } catch (e) {
       // Код неверный или просрочен — поле очищается, чтобы следующую попытку
       // не пришлось начинать со стирания шести цифр.
@@ -142,26 +191,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _changePhone() {
+  void _changeContact() {
     _resendTimer?.cancel();
     _codeController.clear();
     setState(() {
-      _phone = null;
+      _sentTo = null;
       _resendSeconds = 0;
+    });
+  }
+
+  /// Переключение «телефон ↔ почта» на шаге ввода контакта: поле очищается —
+  /// номер в поле почты и наоборот всё равно не подойдут.
+  void _switchContactKind(bool byPhone) {
+    if (byPhone == _byPhone) return;
+    setState(() {
+      _byPhone = byPhone;
+      _contactController.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final busy = ref.watch(authProvider).isLoading || _requesting;
-    final onCodeStep = _phone != null;
+    final onCodeStep = _sentTo != null;
 
     return PopScope(
       // На шаге кода системная кнопка «назад» возвращает к номеру, а не
       // выкидывает с экрана входа — выходить отсюда некуда.
       canPop: !onCodeStep,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop && onCodeStep) _changePhone();
+        if (!didPop && onCodeStep) _changeContact();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -201,14 +260,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     onCodeStep
-                        ? context.l10n.loginCodeSentTo(formatTjPhone(_phone!))
-                        : context.l10n.loginPhoneIntro,
+                        ? context.l10n.loginCodeSentTo(
+                            _byPhone ? formatTjPhone(_sentTo!) : _sentTo!)
+                        : (_byPhone
+                            ? context.l10n.loginPhoneIntro
+                            : context.l10n.loginEmailIntro),
                     style: AppTypography.bodyMd
                         .copyWith(color: context.colors.onSurfaceVariant),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  if (onCodeStep) _buildCodeStep(busy) else _buildPhoneStep(busy),
+                  if (onCodeStep)
+                    _buildCodeStep(busy)
+                  else
+                    _buildContactStep(busy),
                 ],
               ),
             ),
@@ -218,29 +283,66 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildPhoneStep(bool busy) {
+  Widget _buildContactStep(bool busy) {
     return Form(
-      key: _phoneFormKey,
+      key: _contactFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Телефон первым: код в SMS доходит и без интернета на телефоне,
+          // почта нужна тем, у кого номер не таджикский или SMS не приходят.
+          SegmentedButton<bool>(
+            segments: [
+              ButtonSegment(
+                value: true,
+                icon: const Icon(Icons.phone_outlined, size: 18),
+                label: Text(context.l10n.loginByPhone),
+              ),
+              ButtonSegment(
+                value: false,
+                icon: const Icon(Icons.alternate_email, size: 18),
+                label: Text(context.l10n.loginByEmail),
+              ),
+            ],
+            selected: {_byPhone},
+            onSelectionChanged:
+                busy ? null : (value) => _switchContactKind(value.first),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
+            controller: _contactController,
+            keyboardType:
+                _byPhone ? TextInputType.phone : TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.telephoneNumber],
+            autocorrect: false,
+            autofillHints: [
+              _byPhone ? AutofillHints.telephoneNumber : AutofillHints.email
+            ],
             enabled: !busy,
             decoration: InputDecoration(
-              labelText: context.l10n.loginPhoneLabel,
-              hintText: context.l10n.loginPhoneHint,
-              prefixIcon: const Icon(Icons.phone_outlined),
+              labelText: _byPhone
+                  ? context.l10n.loginPhoneLabel
+                  : context.l10n.loginEmailLabel,
+              hintText: _byPhone
+                  ? context.l10n.loginPhoneHint
+                  : context.l10n.loginEmailHint,
+              prefixIcon: Icon(
+                _byPhone ? Icons.phone_outlined : Icons.alternate_email,
+              ),
             ),
             onFieldSubmitted: (_) => _requestCode(),
             validator: (value) {
               final raw = value?.trim() ?? '';
-              if (raw.isEmpty) return context.l10n.loginPhoneEmpty;
-              if (!isTjPhone(normalizeTjPhone(raw))) {
-                return context.l10n.loginPhoneInvalid;
+              if (_byPhone) {
+                if (raw.isEmpty) return context.l10n.loginPhoneEmpty;
+                if (!isTjPhone(normalizeTjPhone(raw))) {
+                  return context.l10n.loginPhoneInvalid;
+                }
+              } else {
+                if (raw.isEmpty) return context.l10n.loginEmailEmpty;
+                if (!raw.contains('@') || !raw.contains('.')) {
+                  return context.l10n.loginEmailInvalid;
+                }
               }
               return null;
             },
@@ -256,15 +358,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           TextButton(
             onPressed: busy ? null : () => context.go('/register'),
             child: Text(context.l10n.loginCreateFarm),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          TextButton(
-            onPressed: busy ? null : () => context.push('/login/password'),
-            child: Text(
-              context.l10n.loginWithPassword,
-              style: AppTypography.labelSm
-                  .copyWith(color: context.colors.onSurfaceVariant),
-            ),
           ),
         ],
       ),
@@ -327,9 +420,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
           TextButton(
-            onPressed: busy ? null : _changePhone,
+            onPressed: busy ? null : _changeContact,
             child: Text(
-              context.l10n.loginCodeChangePhone,
+              _byPhone
+                  ? context.l10n.loginCodeChangePhone
+                  : context.l10n.loginCodeChangeEmail,
               style: AppTypography.labelSm
                   .copyWith(color: context.colors.onSurfaceVariant),
             ),

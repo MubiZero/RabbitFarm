@@ -76,15 +76,6 @@ router.get(
  */
 /**
  * @swagger
- * /staff/{id}/reset-password:
- *   post:
- *     summary: Задать работнику временный пароль (показывается один раз)
- *     tags: [Staff]
- */
-router.post('/:id/reset-password', authorize(['owner']), staffController.resetMemberPassword);
-
-/**
- * @swagger
  * /staff/{id}/transfer-ownership:
  *   post:
  *     summary: Передать хозяйство фермы активному работнику

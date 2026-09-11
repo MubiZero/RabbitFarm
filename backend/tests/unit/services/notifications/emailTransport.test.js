@@ -20,7 +20,7 @@ jest.mock('nodemailer', () => ({
 const nodemailer = require('nodemailer');
 const config = require('../../../../src/config/mailer');
 const {
-  sendPasswordResetEmail,
+  sendLoginCodeEmail,
   sendAnnouncementEmail
 } = require('../../../../src/services/notifications/emailTransport');
 
@@ -29,21 +29,23 @@ describe('emailTransport', () => {
     jest.clearAllMocks();
   });
 
-  describe('sendPasswordResetEmail', () => {
+  describe('sendLoginCodeEmail', () => {
+    const loginCode = { to: 'user@example.com', code: '123456' };
+
     it('бросает permanent-ошибку и не трогает nodemailer, если не настроено', async () => {
       config.isConfigured = false;
 
-      await expect(sendPasswordResetEmail({ to: 'user@example.com', code: '123456' }))
+      await expect(sendLoginCodeEmail(loginCode))
         .rejects.toMatchObject({ message: 'EMAIL_NOT_CONFIGURED', permanent: true });
       expect(nodemailer.createTransport).not.toHaveBeenCalled();
 
       config.isConfigured = true;
     });
 
-    it('отправляет письмо с кодом через SMTP-транспорт из конфига', async () => {
+    it('отправляет письмо с кодом входа через SMTP-транспорт из конфига', async () => {
       mockSendMail.mockResolvedValue({ messageId: 'abc' });
 
-      const result = await sendPasswordResetEmail({ to: 'user@example.com', code: '123456' });
+      const result = await sendLoginCodeEmail(loginCode);
 
       expect(nodemailer.createTransport).toHaveBeenCalledWith(
         expect.objectContaining({ host: 'mail.test', port: 587, requireTLS: true })
@@ -52,10 +54,22 @@ describe('emailTransport', () => {
         expect.objectContaining({
           from: '"RabbitFarm" <no-reply@test>',
           to: 'user@example.com',
+          subject: 'Код для входа в RabbitFarm',
           text: expect.stringContaining('123456')
         })
       );
       expect(result).toEqual({ messageId: 'abc' });
+    });
+
+    it('в тексте письма речь про вход и срок действия кода, а не про сброс пароля', async () => {
+      mockSendMail.mockResolvedValue({ messageId: 'abc' });
+
+      await sendLoginCodeEmail(loginCode);
+
+      const { subject, text } = mockSendMail.mock.calls[0][0];
+      expect(text).toContain('Ваш код для входа');
+      expect(text).toContain('10 минут');
+      expect(`${subject} ${text}`).not.toMatch(/парол/i);
     });
 
     it('помечает ошибку авторизации (EAUTH) как permanent', async () => {
@@ -63,7 +77,7 @@ describe('emailTransport', () => {
       err.code = 'EAUTH';
       mockSendMail.mockRejectedValue(err);
 
-      await expect(sendPasswordResetEmail({ to: 'user@example.com', code: '123456' }))
+      await expect(sendLoginCodeEmail(loginCode))
         .rejects.toMatchObject({ permanent: true });
     });
 
@@ -72,7 +86,7 @@ describe('emailTransport', () => {
       err.responseCode = 550;
       mockSendMail.mockRejectedValue(err);
 
-      await expect(sendPasswordResetEmail({ to: 'user@example.com', code: '123456' }))
+      await expect(sendLoginCodeEmail(loginCode))
         .rejects.toMatchObject({ permanent: true });
     });
 
@@ -81,7 +95,7 @@ describe('emailTransport', () => {
       err.code = 'ETIMEDOUT';
       mockSendMail.mockRejectedValue(err);
 
-      await expect(sendPasswordResetEmail({ to: 'user@example.com', code: '123456' }))
+      await expect(sendLoginCodeEmail(loginCode))
         .rejects.toMatchObject({ permanent: false });
     });
   });

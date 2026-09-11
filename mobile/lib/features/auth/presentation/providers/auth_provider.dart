@@ -9,6 +9,7 @@ import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
+import 'pin_provider.dart';
 
 // Auth Repository provider
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -227,44 +228,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  // Login
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final authResponse = await _authRepository.login(
-        email: email,
-        password: password,
-      );
-
-      state = state.copyWith(
-        user: authResponse.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
-      _ref.read(fcmServiceProvider).registerCurrentToken();
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
-      rethrow;
-    }
+  /// Запросить код входа. Контакт — телефон или почта, ровно один.
+  /// Состояние входа не трогаем: сессии ещё нет, а форма сама показывает
+  /// занятость на время запроса.
+  Future<void> requestOtp({String? phone, String? email}) async {
+    await _authRepository.requestOtp(phone: phone, email: email);
   }
 
-  /// Запросить код входа по телефону. Состояние входа не трогаем: сессии
-  /// ещё нет, а форма сама показывает занятость на время запроса.
-  Future<void> requestOtp({required String phone}) async {
-    await _authRepository.requestOtp(phone: phone);
-  }
-
-  /// Вход по коду из SMS — основной способ. Приглашённому сотруднику этот же
-  /// шаг заводит учётку (сервер активирует приглашение по номеру).
+  /// Вход по коду — единственный способ открыть сессию. Приглашённому
+  /// сотруднику этот же шаг заводит учётку (сервер активирует приглашение по
+  /// контакту, на который оно выписано).
   Future<void> loginWithOtp({
-    required String phone,
+    String? phone,
+    String? email,
     required String code,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -272,41 +248,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final authResponse = await _authRepository.verifyOtp(
         phone: phone,
-        code: code,
-      );
-
-      state = state.copyWith(
-        user: authResponse.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
-      _ref.read(fcmServiceProvider).registerCurrentToken();
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
-      rethrow;
-    }
-  }
-
-  // Register
-  Future<void> register({
-    required String email,
-    required String password,
-    required String fullName,
-    String? farmName,
-    String? phone,
-  }) async {
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final authResponse = await _authRepository.register(
         email: email,
-        password: password,
-        fullName: fullName,
-        farmName: farmName,
-        phone: phone,
+        code: code,
       );
 
       state = state.copyWith(
@@ -314,7 +257,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
-      Analytics.signUpCompleted();
       _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
       state = state.copyWith(
@@ -325,27 +267,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Присоединиться к ферме по коду приглашения.
-  Future<void> acceptInvitation({
-    required String code,
-    required String password,
+  /// Завести ферму. Сессия при этом не открывается — вход завершает код,
+  /// пришедший на указанный контакт (см. `AuthRepository.register`).
+  /// Возвращает канал доставки: 'phone' или 'email'.
+  Future<String> register({
     required String fullName,
+    String? phone,
+    String? email,
+    String? farmName,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final authResponse = await _authRepository.acceptInvitation(
-        code: code,
-        password: password,
+      final channel = await _authRepository.register(
         fullName: fullName,
+        phone: phone,
+        email: email,
+        farmName: farmName,
       );
 
-      state = state.copyWith(
-        user: authResponse.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
-      _ref.read(fcmServiceProvider).registerCurrentToken();
+      state = state.copyWith(isLoading: false);
+      Analytics.signUpCompleted();
+      return channel;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -369,6 +312,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } finally {
       // Always reset auth state
       state = AuthState();
+      // Код быстрого входа привязан к этой сессии: на общем планшете фермы
+      // следующий работник не должен упереться в чужой замок.
+      await _ref.read(pinRepositoryProvider).clear();
       // Данные предыдущего пользователя нужно забыть: на общем планшете фермы
       // следующий вошедший иначе увидит чужое поголовье прямо из памяти.
       resetSessionData(_ref);

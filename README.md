@@ -129,13 +129,15 @@ provisioned some other way; set it to `true` to let people register their own
 farms.
 
 Everyone else joins an *existing* farm by invitation rather than by
-registering. The owner issues a code on the Работники screen and passes it
-on; the person enters it at `/join` and lands inside that farm, seeing the
-same livestock, feed and tasks as everyone else there.
+registering. The owner invites them by phone (or email) on the Работники
+screen; the invited person signs in with the one-time code that arrives on
+that contact and lands inside the farm, seeing the same livestock, feed and
+tasks as everyone else there. There is no separate "enter invitation code"
+step — the login code is the invitation.
 
 | Role | Can |
 |---|---|
-| `owner` | everything: invite people, change roles, reset passwords, transfer ownership |
+| `owner` | everything: invite people, change roles, transfer ownership |
 | `manager` | create/edit livestock, cages, feed, breeding and finances; view financial reports |
 | `worker` | record daily work (feeding, vaccinations, medical records, notes, tasks); no finances, no create/edit on rabbits, cages, breeds, breeding or feed stock |
 
@@ -144,10 +146,11 @@ Deleting a record is owner-only almost everywhere; a few day-to-day types
 can hand the farm to another active member (`staff/:id/transfer-ownership`):
 the recipient becomes `owner`, the previous owner drops to `manager`.
 
-There is no mail server, so invitation codes travel however the owner already
-talks to people, and a forgotten password is reset by the owner rather than
-by email. Codes and temporary passwords are shown once — only their hashes
-are stored.
+There are no passwords at all. Signing in means asking for a six-digit code
+— by SMS to a Tajik number (the main path) or by email (the fallback) — and
+typing it in; only the hash of that code is stored, and it lives ten minutes.
+On the phone itself the app is locked by a four-digit PIN that never leaves
+the device: forgetting it means signing in again by code, not recovering it.
 
 `is_platform_admin` is a separate flag, unrelated to farm roles and set by
 hand in the database — it opens a "Платформа" section covering every farm on
@@ -206,8 +209,8 @@ The running API serves an interactive reference at `/api-docs`.
 
 Everything requires `Authorization: Bearer <access token>` except `/health`,
 the `/auth` endpoints you by definition don't have one for yet (`register`,
-`login`, `refresh`, `logout`, `accept-invitation`, `forgot-password`,
-`reset-password`), the bank's `/payments/webhook`, and `/files/*` (object
+`otp/request`, `otp/verify`, `refresh`, `logout`), the bank's
+`/payments/webhook`, and `/files/*` (object
 keys are unguessable timestamp+random names, not enumerable — the same
 protection static file serving would have had). Errors come back in one
 shape:

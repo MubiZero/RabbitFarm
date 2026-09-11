@@ -32,7 +32,6 @@ const Task = require('./Task')(sequelize);
 const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
 const TokenBlacklist = require('./TokenBlacklist')(sequelize);
-const PasswordResetToken = require('./PasswordResetToken')(sequelize);
 const LoginOtp = require('./LoginOtp')(sequelize);
 const DeviceToken = require('./DeviceToken')(sequelize);
 const Payment = require('./Payment')(sequelize);
@@ -95,8 +94,6 @@ Invitation.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 
 RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 
-User.hasMany(PasswordResetToken, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-PasswordResetToken.belongsTo(User, { foreignKey: 'user_id' });
 
 User.hasMany(Task, { as: 'assignedTo', foreignKey: 'assigned_to', onDelete: 'SET NULL' });
 User.hasMany(Task, { as: 'creator', foreignKey: 'created_by', onDelete: 'SET NULL' });
@@ -232,7 +229,6 @@ module.exports = {
   User,
   RefreshToken,
   TokenBlacklist,
-  PasswordResetToken,
   LoginOtp,
   Breed,
   Cage,

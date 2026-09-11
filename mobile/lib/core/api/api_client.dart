@@ -80,13 +80,6 @@ class ApiClient {
   }
 
   // Auth endpoints
-  Future<Response> login(String email, String password) {
-    return _dio.post(
-      ApiEndpoints.login,
-      data: {'email': email, 'password': password},
-    );
-  }
-
   Future<Response> register(Map<String, dynamic> data) {
     return _dio.post(ApiEndpoints.register, data: data);
   }

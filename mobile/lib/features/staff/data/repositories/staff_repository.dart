@@ -87,16 +87,6 @@ class StaffRepository {
     }
   }
 
-  /// Задать работнику временный пароль. Возвращается один раз.
-  Future<String> resetMemberPassword(int id) async {
-    try {
-      final response = await _apiClient.post('/staff/$id/reset-password');
-      return response.data['data']['temporary_password'] as String;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
-
   /// Передать хозяйство фермы работнику. Мгновенно, без подтверждения с
   /// его стороны — он уже участник этой же фермы.
   Future<FarmMember> transferOwnership(int id) async {
@@ -108,21 +98,4 @@ class StaffRepository {
     }
   }
 
-  /// Присоединиться к ферме по коду. Вызывается до авторизации.
-  Future<Map<String, dynamic>> acceptInvitation({
-    required String code,
-    required String password,
-    required String fullName,
-  }) async {
-    try {
-      final response = await _apiClient.post('/auth/accept-invitation', data: {
-        'code': code,
-        'password': password,
-        'full_name': fullName,
-      });
-      return response.data['data'] as Map<String, dynamic>;
-    } on DioException catch (e) {
-      throw ApiFailure.from(e);
-    }
-  }
 }

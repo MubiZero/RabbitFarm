@@ -34,7 +34,6 @@ describe('Регистрация', () => {
       .post('/api/v1/auth/register')
       .send({
         email,
-        password: 'Password123!',
         full_name: name,
         ...(farmName === undefined ? {} : { farm_name: farmName })
       });
@@ -43,18 +42,22 @@ describe('Регистрация', () => {
     const res = await register('first@example.com', 'Первый');
 
     expect(res.status).toBe(201);
-    expect(res.body.data.user.role).toBe('owner');
+    // Роль в ответе не приходит: сессию регистрация не открывает, поэтому
+    // смотрим на самого заведённого человека.
+    const user = await User.findByPk(res.body.data.user_id);
+    expect(user.role).toBe('owner');
   });
 
   it('второй тоже владелец — своей фермы, а не работник чужой', async () => {
     const res = await register('second@example.com', 'Второй');
 
     expect(res.status).toBe(201);
-    expect(res.body.data.user.role).toBe('owner');
+
+    const user = await User.findByPk(res.body.data.user_id);
+    expect(user.role).toBe('owner');
 
     // Регистрация заводит хозяйство, а не только человека: у новой фермы
     // владельцем должен стоять он сам.
-    const user = await User.findByPk(res.body.data.user.id);
     const farm = await Farm.findByPk(user.farm_id);
     expect(farm.owner_id).toBe(user.id);
   });
@@ -69,8 +72,7 @@ describe('Регистрация', () => {
   it('название хозяйства берётся из формы', async () => {
     const res = await register('named@example.com', 'Третий', 'Кроличий двор');
 
-    const user = await User.findByPk(res.body.data.user.id);
-    const farm = await Farm.findByPk(user.farm_id);
+    const farm = await Farm.findByPk(res.body.data.farm_id);
 
     expect(farm.name).toBe('Кроличий двор');
   });
@@ -80,8 +82,7 @@ describe('Регистрация', () => {
     // «человек просто не заполнил поле».
     const res = await register('unnamed@example.com', 'Четвёртый');
 
-    const user = await User.findByPk(res.body.data.user.id);
-    const farm = await Farm.findByPk(user.farm_id);
+    const farm = await Farm.findByPk(res.body.data.farm_id);
 
     expect(farm.name).toBe('Ферма Четвёртый');
   });

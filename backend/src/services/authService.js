@@ -1,15 +1,7 @@
-const { Farm, User, RefreshToken, TokenBlacklist, PasswordResetToken } = require('../models');
-const PasswordUtil = require('../utils/password');
+const { Farm, User, RefreshToken, TokenBlacklist, LoginOtp } = require('../models');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
-const { generateOtp, hashOtp } = require('../utils/otp');
-const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
-const payomSmsTransport = require('./notifications/payomSmsTransport');
-const emailTransport = require('./notifications/emailTransport');
 const planService = require('./planService');
-
-const RESET_CODE_TTL_MINUTES = 15;
-const RESET_CODE_MAX_ATTEMPTS = 5;
 
 /**
  * Authentication service
@@ -46,12 +38,8 @@ class AuthService {
     const transaction = await User.sequelize.transaction();
     try {
       // Регистрация заводит НОВУЮ ферму и её владельца — ферм в сервисе
-      // много. Раньше владельцем становился только самый первый
-      // зарегистрировавшийся, а всем следующим доставалась роль работника
-      // без фермы: пустой экран и ни одной доступной кнопки.
-      //
-      // Работника заводит не регистрация, а приглашение по коду
-      // (`staffService.acceptInvitation`): там человек получает `farm_id`
+      // много. Работника заводит не регистрация, а приглашение
+      // (`staffService.createInvitation`): там человек получает `farm_id`
       // фермы, которая его позвала.
       //
       // Флаг остаётся выключателем: `ALLOW_REGISTRATION=false` закрывает
@@ -60,19 +48,18 @@ class AuthService {
         throw new Error('REGISTRATION_CLOSED');
       }
 
-      // Check if user already exists
-      const existingUser = await User.findOne({
-        where: { email: userData.email },
-        transaction
-      });
-      if (existingUser) {
-        throw new Error('USER_EXISTS');
+      // Контакт уже приведён валидатором к тому же виду, в котором его ищет
+      // вход по коду: телефон — `+992XXXXXXXXX`, почта — в нижнем регистре.
+      if (userData.email) {
+        const existingUser = await User.findOne({
+          where: { email: userData.email },
+          transaction
+        });
+        if (existingUser) {
+          throw new Error('USER_EXISTS');
+        }
       }
 
-      // Телефон теперь тоже уникален на всю базу (основной способ входа) —
-      // та же проверка заранее, что и для email, вместо падения на
-      // unique-индексе при `User.create`. Телефон при регистрации не
-      // обязателен, поэтому проверяем только когда его прислали.
       if (userData.phone) {
         const existingPhone = await User.findOne({
           where: { phone: userData.phone },
@@ -82,9 +69,6 @@ class AuthService {
           throw new Error('PHONE_EXISTS');
         }
       }
-
-      // Hash password
-      const passwordHash = await PasswordUtil.hash(userData.password);
 
       // Ферма и её владелец ссылаются друг на друга, поэтому появляются по
       // очереди: сначала хозяйство без владельца, затем человек в нём, затем
@@ -104,8 +88,7 @@ class AuthService {
       }, { transaction });
 
       const user = await User.create({
-        email: userData.email,
-        password_hash: passwordHash,
+        email: userData.email || null,
         full_name: userData.full_name,
         phone: userData.phone || null,
         role: 'owner',
@@ -113,116 +96,43 @@ class AuthService {
       }, { transaction });
 
       await farm.update({ owner_id: user.id }, { transaction });
-
-      // Generate tokens
-      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
-      const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
-
-      // Save refresh token
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
-
-      await RefreshToken.create({
-        user_id: user.id,
-        token: refreshToken,
-        expires_at: expiresAt
-      }, { transaction });
-
       await transaction.commit();
-      logger.info('User registered successfully', { userId: user.id, email: user.email, farmId: farm.id });
 
-      // Remove password hash from response
-      const userResponse = user.toJSON();
-      // Свежая ферма создаётся без `include`, поэтому статус (см. `login`/
-      // `getProfile`, откуда мобильный клиент узнаёт про read_only/suspended)
-      // приходится проставить руками — здесь он всегда `active`.
-      userResponse.farm = { id: farm.id, status: farm.status };
+      logger.info('Farm registered, awaiting login code', { userId: user.id, farmId: farm.id });
+
+      // Сессию регистрация не открывает: пароля в сервисе нет, и войти можно
+      // только кодом на названный контакт. Так и подтверждается, что номер
+      // (он же логин, он же глобально уникальный) принадлежит тому, кто его
+      // вписал, — иначе чужой номер можно было бы занять навсегда.
+      //
+      // Отправка идёт после коммита: код ищет уже существующего
+      // пользователя, а внутри транзакции его ещё не видно.
+      // eslint-disable-next-line global-require
+      const otpAuthService = require('./otpAuthService');
+      try {
+        await otpAuthService.requestOtp(
+          userData.phone ? { phone: userData.phone } : { email: userData.email }
+        );
+      } catch (dispatchError) {
+        // Ферма уже создана и откату не подлежит — сорванная отправка кода
+        // не повод отвечать ошибкой на успешную регистрацию: человек
+        // запросит код заново кнопкой «Отправить ещё раз».
+        logger.warn('Registration code dispatch failed', {
+          userId: user.id,
+          error: dispatchError.message
+        });
+      }
 
       return {
-        user: userResponse,
-        access_token: accessToken,
-        refresh_token: refreshToken
-      };
-    } catch (error) {
-      if (transaction) await transaction.rollback();
-      logger.error('Registration error', { error: error.message });
-      throw error;
-    }
-  }
-
-  /**
-   * Login user
-   * @param {String} email - User email
-   * @param {String} password - User password
-   * @returns {Object} User and tokens
-   */
-  async login(email, password) {
-    try {
-      // `farm` — чтобы мобильный клиент сразу знал про read_only/suspended
-      // (см. `middleware/auth.js`), а не узнавал об этом только по отказу
-      // первой же попытки что-то записать.
-      const user = await User.findOne({
-        where: { email },
-        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
-      });
-
-      // Порядок проверок важен. Раньше отключённый аккаунт отвечал отдельным
-      // 403 ещё до сверки пароля, то есть любой желающий мог узнать, какие
-      // адреса заведены на ферме. Теперь про отключение узнаёт только тот,
-      // кто уже назвал верный пароль, а для неизвестного адреса тратится
-      // столько же времени, сколько на настоящую проверку.
-      if (!user) {
-        await PasswordUtil.fakeCompare(password);
-        throw new Error('INVALID_CREDENTIALS');
-      }
-
-      // Пароль теперь не обязателен (основной вход — по телефону): у
-      // аккаунта, заведённого через OTP и ни разу не задавшего пароль,
-      // `password_hash` пуст — `bcrypt.compare` на пустом хеше бросит
-      // исключение вместо честного «неверный пароль».
-      if (!user.password_hash) {
-        await PasswordUtil.fakeCompare(password);
-        throw new Error('INVALID_CREDENTIALS');
-      }
-
-      const isPasswordValid = await PasswordUtil.compare(password, user.password_hash);
-      if (!isPasswordValid) {
-        throw new Error('INVALID_CREDENTIALS');
-      }
-
-      if (!user.is_active) {
-        throw new Error('USER_INACTIVE');
-      }
-
-      // Generate tokens
-      const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
-      const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
-
-      // Save refresh token
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-
-      await RefreshToken.create({
         user_id: user.id,
-        token: refreshToken,
-        expires_at: expiresAt
-      });
-
-      // Update last login
-      await user.update({ last_login_at: new Date() });
-
-      logger.info('User logged in successfully', { userId: user.id, email: user.email });
-
-      // Remove password hash from response
-      const userResponse = user.toJSON();
-
-      return {
-        user: userResponse,
-        access_token: accessToken,
-        refresh_token: refreshToken
+        farm_id: farm.id,
+        // Клиент по нему решает, что писать на экране кода — «SMS» или
+        // «письмо», и не гадает по тому, какое поле он отправлял.
+        channel: userData.phone ? 'phone' : 'email'
       };
     } catch (error) {
-      logger.error('Login error', { error: error.message, email });
+      if (transaction && !transaction.finished) await transaction.rollback();
+      logger.error('Registration error', { error: error.message });
       throw error;
     }
   }
@@ -338,8 +248,7 @@ class AuthService {
       // read_only/suspended сразу при обновлении профиля (в частности, при
       // каждом холодном старте), а не по отказу очередной записи.
       const user = await User.findByPk(userId, {
-        attributes: { exclude: ['password_hash'] },
-        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
       });
 
       if (!user) {
@@ -371,7 +280,6 @@ class AuthService {
 
       logger.info('Profile updated', { userId });
 
-      // Remove password hash from response
       return user.toJSON();
     } catch (error) {
       logger.error('Update profile error', { error: error.message, userId });
@@ -380,237 +288,28 @@ class AuthService {
   }
 
   /**
-   * Change user password
-   * @param {Number} userId - User ID
-   * @param {String} currentPassword - Current password
-   * @param {String} newPassword - New password
-   */
-  async changePassword(userId, currentPassword, newPassword) {
-    const transaction = await User.sequelize.transaction();
-    try {
-      const user = await User.findByPk(userId, { transaction });
-
-      if (!user) {
-        await transaction.rollback();
-        throw new Error('USER_NOT_FOUND');
-      }
-
-      // Verify current password
-      const isPasswordValid = await PasswordUtil.compare(currentPassword, user.password_hash);
-      if (!isPasswordValid) {
-        await transaction.rollback();
-        throw new Error('INVALID_CURRENT_PASSWORD');
-      }
-
-      // Hash new password
-      const newPasswordHash = await PasswordUtil.hash(newPassword);
-
-      // Отметка времени отзывает и уже выданные access-токены: без неё они
-      // жили бы до конца своего срока, хотя пользователю сказано
-      // «войдите заново».
-      await user.update({
-        password_hash: newPasswordHash,
-        token_version: (user.token_version || 0) + 1
-      }, { transaction });
-
-      // Invalidate all refresh tokens (force re-login on all devices)
-      await RefreshToken.destroy({
-        where: { user_id: userId },
-        transaction
-      });
-
-      await transaction.commit();
-      logger.info('Password changed successfully', { userId });
-
-      return { success: true };
-    } catch (error) {
-      if (transaction) await transaction.rollback();
-      logger.error('Change password error', { error: error.message, userId });
-      throw error;
-    }
-  }
-
-  /**
-   * Запросить сброс пароля — код на телефон (если есть) или на email.
-   * Всегда отвечает успехом, даже если аккаунта нет: иначе по ответу можно
-   * было бы угадывать существующие email (энумерация).
-   * @param {String} email - User email
-   */
-  async forgotPassword(email) {
-    try {
-      const user = await User.findOne({ where: { email } });
-      if (!user || !user.is_active) {
-        return { success: true };
-      }
-
-      // Предыдущий код этого пользователя больше не должен работать —
-      // активным остаётся только последний запрошенный.
-      await PasswordResetToken.destroy({ where: { user_id: user.id } });
-
-      const code = generateOtp();
-      const tokenHash = hashOtp(code);
-
-      // Телефон при регистрации/в профиле принимается в общем международном
-      // формате (см. authValidator.js), а не строго таджикском — шлюз Payom
-      // же принимает только `+992XXXXXXXXX` (utils/phone.js). Без этой
-      // проверки канал 'sms' выбирался бы по одному факту наличия телефона,
-      // отправка молча падала бы у любого нетаджикского номера, и человек
-      // оставался бы без кода вовсе — форма всё равно отвечает `success`,
-      // чтобы не палить существование аккаунта.
-      const normalizedPhone = user.phone ? normalizeTjPhone(user.phone) : null;
-      const channel = normalizedPhone && isTjPhone(normalizedPhone) ? 'sms' : 'email';
-
-      const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + RESET_CODE_TTL_MINUTES);
-
-      await PasswordResetToken.create({
-        user_id: user.id,
-        token_hash: tokenHash,
-        channel,
-        expires_at: expiresAt
-      });
-
-      logger.info('Password reset code created', { userId: user.id, channel });
-
-      // Доставка — best-effort: не настроено или упало на стороне шлюза —
-      // логируем и продолжаем, не проваливая запрос (и не выдавая тем самым,
-      // что аккаунт существует, а канал недоступен).
-      try {
-        if (channel === 'sms') {
-          await payomSmsTransport.sendTemplateSms({
-            templateKey: 'user.verification_code',
-            telephone: normalizedPhone,
-            variables: { 'text-1': 'RabbitFarm', 'code-1': code }
-          });
-        } else {
-          await emailTransport.sendPasswordResetEmail({ to: user.email, code });
-        }
-      } catch (dispatchError) {
-        logger.warn('Password reset dispatch failed', {
-          channel,
-          userId: user.id,
-          error: dispatchError.message
-        });
-      }
-
-      return { success: true };
-    } catch (error) {
-      logger.error('Forgot password error', { error: error.message, email });
-      throw error;
-    }
-  }
-
-  /**
-   * Сбросить пароль по коду, присланному forgotPassword.
-   * @param {Object} params
-   * @param {String} params.email
-   * @param {String} params.code - 6-значный код
-   * @param {String} params.newPassword
-   */
-  async resetPassword({ email, code, newPassword }) {
-    const transaction = await User.sequelize.transaction();
-    try {
-      const user = await User.findOne({ where: { email }, transaction });
-      if (!user) {
-        throw new Error('INVALID_RESET_CODE');
-      }
-
-      // Код короткий (6 цифр) и не гарантирует глобальную уникальность хэша,
-      // в отличие от прежнего 32-байтного токена — ищем в пределах
-      // конкретного пользователя, а не по одному хэшу по всей таблице.
-      const resetRecord = await PasswordResetToken.findOne({
-        where: { user_id: user.id },
-        transaction
-      });
-
-      if (!resetRecord) {
-        throw new Error('INVALID_RESET_CODE');
-      }
-
-      // Эти три ветки завершаются ошибкой, а значит внешний catch откатит
-      // `transaction` — если снос/инкремент попадёт в неё же, откат вернёт
-      // всё как было. Поэтому здесь они выполняются вне транзакции: должны
-      // пережить неудачную попытку, а не отмениться вместе с ней.
-      if (resetRecord.attempts >= RESET_CODE_MAX_ATTEMPTS) {
-        await resetRecord.destroy();
-        throw new Error('RESET_CODE_LOCKED');
-      }
-
-      if (new Date() > resetRecord.expires_at) {
-        await resetRecord.destroy();
-        throw new Error('RESET_CODE_EXPIRED');
-      }
-
-      if (hashOtp(code) !== resetRecord.token_hash) {
-        await resetRecord.increment('attempts');
-        throw new Error('INVALID_RESET_CODE');
-      }
-
-      if (!user.is_active) {
-        throw new Error('USER_INACTIVE');
-      }
-
-      const newPasswordHash = await PasswordUtil.hash(newPassword);
-
-      await User.update(
-        { password_hash: newPasswordHash, token_version: (user.token_version || 0) + 1 },
-        { where: { id: user.id }, transaction }
-      );
-
-      // Delete used token
-      await resetRecord.destroy({ transaction });
-
-      // Invalidate all refresh tokens (force re-login)
-      await RefreshToken.destroy({ where: { user_id: user.id }, transaction });
-
-      await transaction.commit();
-      logger.info('Password reset successfully', { userId: user.id });
-
-      return { success: true };
-    } catch (error) {
-      await transaction.rollback();
-      logger.error('Reset password error', { error: error.message });
-      throw error;
-    }
-  }
-
-  /**
-   * Задать пароль тому, кто вошёл по OTP и никогда его не задавал —
-   * запасной способ входа иначе неоткуда взять. Не путать с
-   * `changePassword`: там нужен текущий пароль, здесь его по определению
-   * нет. Сменить уже существующий пароль этим методом нельзя.
-   * @param {Number} userId
-   * @param {String} newPassword
-   */
-  async setPassword(userId, newPassword) {
-    const user = await User.findByPk(userId);
-    if (!user) {
-      throw new Error('USER_NOT_FOUND');
-    }
-    if (user.password_hash) {
-      throw new Error('PASSWORD_ALREADY_SET');
-    }
-
-    const passwordHash = await PasswordUtil.hash(newPassword);
-    await user.update({ password_hash: passwordHash });
-
-    logger.info('Password set for OTP-only account', { userId });
-    return { success: true };
-  }
-
-  /**
    * Clean expired refresh tokens
    * Should be called periodically (e.g., cron job)
    */
   async cleanExpiredTokens() {
     try {
+      const { Op } = require('sequelize');
       const deleted = await RefreshToken.destroy({
         where: {
-          expires_at: { [require('sequelize').Op.lt]: new Date() }
+          expires_at: { [Op.lt]: new Date() }
         }
       });
 
-      logger.info(`Cleaned ${deleted} expired refresh tokens`);
+      // Коды входа живут десять минут, но записи о них остаются дольше: по
+      // ним считается «сколько кодов запросили за последние десять минут»
+      // (см. `otpAuthService.requestOtp`). Сутки — с запасом на это окно.
+      const staleOtpBefore = new Date();
+      staleOtpBefore.setDate(staleOtpBefore.getDate() - 1);
+      const deletedOtps = await LoginOtp.destroy({
+        where: { created_at: { [Op.lt]: staleOtpBefore } }
+      });
+
+      logger.info(`Cleaned ${deleted} expired refresh tokens, ${deletedOtps} old login codes`);
       return deleted;
     } catch (error) {
       logger.error('Clean expired tokens error', { error: error.message });

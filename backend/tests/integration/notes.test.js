@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm, login: signIn } = require('./helpers/auth');
 
 describe('Notes API', () => {
   let ownerToken;
@@ -11,10 +12,8 @@ describe('Notes API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'note_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'note_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')
@@ -29,21 +28,17 @@ describe('Notes API', () => {
 
     await request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'note_worker@example.com', password: 'Password123!', full_name: 'Работник' });
+      .send({ email: 'note_worker@example.com', full_name: 'Работник' });
     const { User } = require('../../src/models');
     await User.update(
-      { farm_id: owner.body.data.user.farm_id, role: 'worker' },
+      { farm_id: owner.user.farm_id, role: 'worker' },
       { where: { email: 'note_worker@example.com' } }
     );
-    const workerLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'note_worker@example.com', password: 'Password123!' });
-    workerToken = workerLogin.body.data.access_token;
+    const workerLogin = await signIn(app, { email: 'note_worker@example.com' })
+    workerToken = workerLogin.accessToken;
 
-    const stranger = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'note_stranger@example.com', password: 'Password123!', full_name: 'Сосед' });
-    strangerToken = stranger.body.data.access_token;
+    const stranger = await registerFarm(app, { email: 'note_stranger@example.com', full_name: 'Сосед' });
+    strangerToken = stranger.accessToken;
   });
 
   afterAll(async () => {

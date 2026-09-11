@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 const { User } = require('../../src/models');
 
 /**
@@ -33,29 +34,23 @@ describe('Платформенная админка (интеграция)', () 
     // БД, как и в проде (см. docs/plans/PLATFORM-ADMIN.md). is_platform_admin
     // читается заново на каждый запрос (middleware/auth.js из БД, не из
     // токена) — перелогин после смены флага не нужен.
-    const admin = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const admin = await registerFarm(app, {
         email: 'platform_admin_it@example.com',
-        password: 'Password123!',
         full_name: 'Суперадмин'
       });
-    adminToken = admin.body.data.access_token;
+    adminToken = admin.accessToken;
     await User.update(
       { is_platform_admin: true },
-      { where: { id: admin.body.data.user.id } }
+      { where: { id: admin.user.id } }
     );
 
     // Ферма A — с кроликами, ей назначим платный тариф ниже.
-    const ownerA = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const ownerA = await registerFarm(app, {
         email: 'summary_owner_a@example.com',
-        password: 'Password123!',
         full_name: 'Владелец А'
       });
-    ownerAToken = ownerA.body.data.access_token;
-    farmAId = ownerA.body.data.user.farm_id;
+    ownerAToken = ownerA.accessToken;
+    farmAId = ownerA.user.farm_id;
 
     const breed = await request(app)
       .post('/api/v1/breeds')
@@ -70,14 +65,11 @@ describe('Платформенная админка (интеграция)', () 
     }
 
     // Ферма B — пустая и без тарифа: считается в total, но не в rabbits_total.
-    const ownerB = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const ownerB = await registerFarm(app, {
         email: 'summary_owner_b@example.com',
-        password: 'Password123!',
         full_name: 'Владелец Б'
       });
-    farmBId = ownerB.body.data.user.farm_id;
+    farmBId = ownerB.user.farm_id;
   });
 
   afterAll(async () => {

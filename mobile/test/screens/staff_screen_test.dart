@@ -146,7 +146,7 @@ void main() {
     // Приглашение по телефону — способ по умолчанию: номер и имя работника.
     await tester.enterText(find.byType(TextField).at(0), '+992901234567');
     await tester.enterText(find.byType(TextField).at(1), 'Новый Работник');
-    await tester.tap(find.text('Выписать код'));
+    await tester.tap(find.text('Пригласить работника'));
     await tester.pumpAndSettle();
 
     // Форма приглашения закрыта — номер сам по себе тут ни при чём, а

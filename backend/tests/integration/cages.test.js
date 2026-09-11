@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Cages API', () => {
   let accessToken;
@@ -8,10 +9,8 @@ describe('Cages API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'cageowner@example.com', password: 'Password123!', full_name: 'Cage Owner', role: 'owner' });
-    accessToken = res.body.data.access_token;
+    const res = await registerFarm(app, { email: 'cageowner@example.com', full_name: 'Cage Owner' });
+    accessToken = res.accessToken;
   });
 
   afterAll(async () => {
@@ -103,10 +102,8 @@ describe('Cages API', () => {
     });
 
     it('не должен возвращать клетку другого пользователя (IDOR защита)', async () => {
-      const otherRes = await request(app)
-        .post('/api/v1/auth/register')
-        .send({ email: 'other_cage@example.com', password: 'Password123!', full_name: 'Other' });
-      const otherToken = otherRes.body.data.access_token;
+      const otherRes = await registerFarm(app, { email: 'other_cage@example.com', full_name: 'Other' });
+      const otherToken = otherRes.accessToken;
 
       const res = await request(app)
         .get(`/api/v1/cages/${cageId}`)

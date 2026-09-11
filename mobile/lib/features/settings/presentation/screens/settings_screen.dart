@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/pin_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -20,6 +21,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final themeState = ref.watch(themeProvider);
+    final pin = ref.watch(pinProvider);
     final user = authState.user;
 
     return Scaffold(
@@ -78,6 +80,39 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 onTap: () => showLanguagePicker(context, ref),
               ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Замок приложения. Код живёт только на этом телефоне — потому и
+          // настройка устройства, а не профиля (см. `PinRepository`).
+          _SectionLabel(context.l10n.settingsPinTitle),
+          _GroupCard(
+            context: context,
+            children: [
+              _SettingsTile(
+                icon: Icons.lock_outline,
+                label: pin.isSet
+                    ? context.l10n.settingsPinOn
+                    : context.l10n.settingsPinOff,
+                trailing: Switch(
+                  value: pin.isSet,
+                  onChanged: (value) async {
+                    if (value) {
+                      context.push('/pin/setup', extra: true);
+                    } else {
+                      await ref.read(pinProvider.notifier).disable();
+                    }
+                  },
+                ),
+              ),
+              if (pin.isSet)
+                _SettingsTile(
+                  icon: Icons.password_outlined,
+                  label: context.l10n.settingsPinChange,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/pin/setup', extra: true),
+                ),
             ],
           ),
           const SizedBox(height: 24),

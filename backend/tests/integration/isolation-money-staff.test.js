@@ -1,7 +1,8 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
-const { Invitation } = require('../../src/models');
+const { registerFarm, loginWithOtp } = require('./helpers/auth');
+const { Invitation, User } = require('../../src/models');
 
 /**
  * Изоляция ферм на деньгах, отчётах и персонале.
@@ -35,28 +36,28 @@ describe('Изоляция ферм: деньги, отчёты, персона�
   const auth = (token) => ({ Authorization: `Bearer ${token}` });
 
   const createFarm = async (email) => {
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email, password: 'Password123!', full_name: email });
+    const res = await registerFarm(app, { email, full_name: email });
     return {
-      token: res.body.data.access_token,
-      id: res.body.data.user.id,
-      farmId: res.body.data.user.farm_id
+      token: res.accessToken,
+      id: res.user.id,
+      farmId: res.user.farm_id
     };
   };
 
-  /** Пригласить человека в ферму и сразу активировать код. */
+  /**
+   * Пригласить человека в ферму и сразу завести его входом по коду:
+   * приглашение активируется тем же экраном входа, отдельной формы нет.
+   */
   const hire = async (ownerToken, email, role) => {
-    const invitation = await request(app)
+    await request(app)
       .post('/api/v1/staff/invitations')
       .set(auth(ownerToken))
-      .send({ email, role });
+      .send({ email, full_name: email, role });
 
-    const joined = await request(app)
-      .post('/api/v1/auth/accept-invitation')
-      .send({ code: invitation.body.data.code, password: 'Password123!', full_name: email });
+    await request(app).post('/api/v1/auth/otp/request').send({ email });
+    const joined = await loginWithOtp(app, { email });
 
-    return { token: joined.body.data.access_token, id: joined.body.data.user.id };
+    return { token: joined.access_token, id: joined.user.id };
   };
 
   const addMoney = async (token, payload) => {
@@ -129,7 +130,7 @@ describe('Изоляция ферм: деньги, отчёты, персона�
     const pending = await request(app)
       .post('/api/v1/staff/invitations')
       .set(auth(alphaToken))
-      .send({ email: 'alpha_future@example.com', role: 'worker' });
+      .send({ email: 'alpha_future@example.com', full_name: 'Будущий работник', role: 'worker' });
     alphaPendingInvitationId = pending.body.data.id;
   });
 
@@ -411,63 +412,77 @@ describe('Изоляция ферм: деньги, отчёты, персона�
       expect(stillThere.body.data.map((i) => i.id)).toContain(alphaPendingInvitationId);
     });
 
-    it('использованный код второй раз не срабатывает', async () => {
-      const invitation = await request(app)
+    it('приглашение срабатывает один раз — второй вход даёт того же работника', async () => {
+      await request(app)
         .post('/api/v1/staff/invitations')
         .set(auth(betaToken))
-        .send({ email: 'beta_worker@example.com', role: 'worker' });
+        .send({ email: 'beta_worker@example.com', full_name: 'Работник Беты', role: 'worker' });
 
-      const first = await request(app)
-        .post('/api/v1/auth/accept-invitation')
-        .send({ code: invitation.body.data.code, password: 'Password123!', full_name: 'Работник Беты' });
-      expect(first.status).toBe(201);
+      await request(app).post('/api/v1/auth/otp/request').send({ email: 'beta_worker@example.com' });
+      const first = await loginWithOtp(app, { email: 'beta_worker@example.com' });
+      expect(first.user.farm_id).toBe(betaFarmId);
 
-      const second = await request(app)
-        .post('/api/v1/auth/accept-invitation')
-        .send({ code: invitation.body.data.code, password: 'Password123!', full_name: 'Второй' });
+      await request(app).post('/api/v1/auth/otp/request').send({ email: 'beta_worker@example.com' });
+      const second = await loginWithOtp(app, { email: 'beta_worker@example.com' });
 
-      expect(second.status).toBe(400);
+      // Повторный вход — это вход того же человека, а не второй работник по
+      // тому же приглашению: иначе лимитом по тарифу можно было бы пренебречь.
+      expect(second.user.id).toBe(first.user.id);
+      expect(
+        await User.count({ where: { email: 'beta_worker@example.com' }, tenantScope: 'all' })
+      ).toBe(1);
     });
 
-    it('просроченный код не срабатывает', async () => {
+    it('просроченное приглашение в ферму не пускает', async () => {
       const invitation = await request(app)
         .post('/api/v1/staff/invitations')
         .set(auth(betaToken))
-        .send({ email: 'beta_late@example.com', role: 'worker' });
+        .send({ email: 'beta_late@example.com', full_name: 'Опоздавший', role: 'worker' });
 
       await Invitation.update(
         { expires_at: new Date('2020-01-01T00:00:00.000Z') },
         { where: { id: invitation.body.data.id }, tenantScope: 'all' }
       );
 
+      // Кода на просроченное приглашение сервис не выпускает вовсе, поэтому
+      // и войти нечем: любой код отвергается.
+      await request(app).post('/api/v1/auth/otp/request').send({ email: 'beta_late@example.com' });
       const res = await request(app)
-        .post('/api/v1/auth/accept-invitation')
-        .send({ code: invitation.body.data.code, password: 'Password123!', full_name: 'Опоздавший' });
+        .post('/api/v1/auth/otp/verify')
+        .send({ email: 'beta_late@example.com', code: '123456' });
 
       expect(res.status).toBe(400);
+      expect(
+        await User.count({ where: { email: 'beta_late@example.com' }, tenantScope: 'all' })
+      ).toBe(0);
     });
 
-    it('выдуманный код не срабатывает и не выдаёт, что именно не так', async () => {
+    it('непрошеный контакт не заводит работника и не выдаёт, что именно не так', async () => {
+      await request(app).post('/api/v1/auth/otp/request').send({ email: 'stranger@example.com' });
       const res = await request(app)
-        .post('/api/v1/auth/accept-invitation')
-        .send({ code: 'подобранный-код', password: 'Password123!', full_name: 'Посторонний' });
+        .post('/api/v1/auth/otp/verify')
+        .send({ email: 'stranger@example.com', code: '123456' });
 
       expect(res.status).toBe(400);
-      expect(res.body.error.code).toBe('INVITATION_INVALID');
+      // Тот же код ошибки, что и у просто неверного кода: по ответу нельзя
+      // понять, звали ли этот контакт хоть в какую-то ферму.
+      expect(res.body.error.code).toBe('OTP_INVALID');
+      expect(
+        await User.count({ where: { email: 'stranger@example.com' }, tenantScope: 'all' })
+      ).toBe(0);
     });
 
-    it('код приводит ровно в ту ферму, которая его выписала', async () => {
-      const invitation = await request(app)
+    it('приглашение приводит ровно в ту ферму, которая его выписала', async () => {
+      await request(app)
         .post('/api/v1/staff/invitations')
         .set(auth(alphaToken))
-        .send({ email: 'alpha_second@example.com', role: 'worker' });
+        .send({ email: 'alpha_second@example.com', full_name: 'Новичок Альфы', role: 'worker' });
 
-      const joined = await request(app)
-        .post('/api/v1/auth/accept-invitation')
-        .send({ code: invitation.body.data.code, password: 'Password123!', full_name: 'Новичок Альфы' });
+      await request(app).post('/api/v1/auth/otp/request').send({ email: 'alpha_second@example.com' });
+      const joined = await loginWithOtp(app, { email: 'alpha_second@example.com' });
 
-      expect(joined.body.data.user.farm_id).toBe(alphaFarmId);
-      expect(joined.body.data.user.farm_id).not.toBe(betaFarmId);
+      expect(joined.user.farm_id).toBe(alphaFarmId);
+      expect(joined.user.farm_id).not.toBe(betaFarmId);
     });
   });
 
@@ -507,21 +522,6 @@ describe('Изоляция ферм: деньги, отчёты, персона�
 
       expect(res.status).toBe(404);
 
-      const stillWorking = await request(app)
-        .get('/api/v1/transactions')
-        .set(auth(alphaManagerToken));
-      expect(stillWorking.status).toBe(200);
-    });
-
-    it('чужому работнику нельзя сбросить пароль', async () => {
-      const res = await request(app)
-        .post(`/api/v1/staff/${alphaManagerId}/reset-password`)
-        .set(auth(betaToken));
-
-      expect(res.status).toBe(404);
-
-      // Сброс пароля отзывает сессии: раз токен управляющего ещё живой,
-      // пароль ему никто не менял.
       const stillWorking = await request(app)
         .get('/api/v1/transactions')
         .set(auth(alphaManagerToken));

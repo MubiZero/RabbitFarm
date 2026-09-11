@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 const API = '/api/v1';
 
@@ -48,17 +49,13 @@ describe('Изоляция ферм: корма и здоровье', () => {
    * тест ходит теми же путями, что и приложение.
    */
   const setUpFarm = async (farm, { label, feedStock: stock, minStock, costPerUnit, treatmentCost }) => {
-    const registered = await request(app)
-      .post(`${API}/auth/register`)
-      .send({
-        email: farm.email,
-        password: 'Password123!',
-        full_name: `Владелец фермы ${label}`,
-        role: 'owner'
-      });
+    const registered = await registerFarm(app, {
+      email: farm.email,
+      full_name: `Владелец фермы ${label}`
+    });
 
-    farm.token = registered.body.data.access_token;
-    farm.userId = registered.body.data.user.id;
+    farm.token = registered.accessToken;
+    farm.userId = registered.user.id;
     farm.api = client(farm.token);
     farm.label = label;
 

@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm, login: signIn } = require('./helpers/auth');
 const { User } = require('../../src/models');
 
 /**
@@ -54,14 +55,13 @@ describe('Изоляция ферм: случки, окролы и задачи'
 
   /** Ферма целиком: порода, кролики, клетка, случка, окрол и задача. */
   const setupFarm = async (farm, { email, suffix }) => {
-    const registered = await post('/api/v1/auth/register', undefined, {
+    const registered = await registerFarm(app, {
       email,
-      password: 'Password123!',
       full_name: `Владелец ${suffix}`
     });
-    farm.token = registered.body.data.access_token;
-    farm.ownerId = registered.body.data.user.id;
-    farm.farmId = registered.body.data.user.farm_id;
+    farm.token = registered.accessToken;
+    farm.ownerId = registered.user.id;
+    farm.farmId = registered.user.farm_id;
 
     const breed = await post('/api/v1/breeds', farm.token, { name: `Порода ${suffix}` });
     farm.breedId = breed.body.data.id;
@@ -137,20 +137,16 @@ describe('Изоляция ферм: случки, окролы и задачи'
 
     // Работник заводится напрямую: приглашение здесь не предмет проверки,
     // нужен лишь второй человек в составе фермы А.
-    await post('/api/v1/auth/register', undefined, {
+    await request(app).post('/api/v1/auth/register').send({
       email: 'iso_worker_a@example.com',
-      password: 'Password123!',
       full_name: 'Работник А'
     });
     const worker = await User.findOne({ where: { email: 'iso_worker_a@example.com' } });
     workerAId = worker.id;
     await worker.update({ farm_id: farmA.farmId, role: 'worker' });
 
-    const workerLogin = await post('/api/v1/auth/login', undefined, {
-      email: 'iso_worker_a@example.com',
-      password: 'Password123!'
-    });
-    workerAToken = workerLogin.body.data.access_token;
+    // Вход уже после перевода в ферму А: роль и ферма зашиты в токен.
+    ({ accessToken: workerAToken } = await signIn(app, { email: 'iso_worker_a@example.com' }));
   });
 
   afterAll(async () => {

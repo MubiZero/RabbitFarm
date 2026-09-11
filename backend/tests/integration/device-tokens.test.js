@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Device Tokens API', () => {
   let ownerToken;
@@ -9,15 +10,11 @@ describe('Device Tokens API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'devicetoken_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'devicetoken_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
 
-    const stranger = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'devicetoken_stranger@example.com', password: 'Password123!', full_name: 'Сосед' });
-    strangerToken = stranger.body.data.access_token;
+    const stranger = await registerFarm(app, { email: 'devicetoken_stranger@example.com', full_name: 'Сосед' });
+    strangerToken = stranger.accessToken;
   });
 
   afterAll(async () => {

@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm, login: signIn } = require('./helpers/auth');
 const { User } = require('../../src/models');
 
 /**
@@ -18,42 +19,34 @@ describe('Ферма и работники', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'farm_owner@example.com', password: 'Password123!', full_name: 'Владелец' });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'farm_owner@example.com', full_name: 'Владелец' });
+    ownerToken = owner.accessToken;
 
     // Работника пока заводим напрямую: приглашений ещё нет.
     await request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'farm_worker@example.com', password: 'Password123!', full_name: 'Работник' });
+      .send({ email: 'farm_worker@example.com', full_name: 'Работник' });
     await User.update(
-      { farm_id: owner.body.data.user.farm_id, role: 'worker' },
+      { farm_id: owner.user.farm_id, role: 'worker' },
       { where: { email: 'farm_worker@example.com' } }
     );
-    const workerLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'farm_worker@example.com', password: 'Password123!' });
-    workerToken = workerLogin.body.data.access_token;
+    const workerLogin = await signIn(app, { email: 'farm_worker@example.com' })
+    workerToken = workerLogin.accessToken;
 
     // Менеджер той же фермы: ему разрешено вести поголовье.
     await request(app)
       .post('/api/v1/auth/register')
-      .send({ email: 'farm_manager@example.com', password: 'Password123!', full_name: 'Менеджер' });
+      .send({ email: 'farm_manager@example.com', full_name: 'Менеджер' });
     await User.update(
-      { farm_id: owner.body.data.user.farm_id, role: 'manager' },
+      { farm_id: owner.user.farm_id, role: 'manager' },
       { where: { email: 'farm_manager@example.com' } }
     );
-    const managerLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'farm_manager@example.com', password: 'Password123!' });
-    managerToken = managerLogin.body.data.access_token;
+    const managerLogin = await signIn(app, { email: 'farm_manager@example.com' })
+    managerToken = managerLogin.accessToken;
 
     // Посторонний владелец собственной фермы.
-    const stranger = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'other_farm@example.com', password: 'Password123!', full_name: 'Сосед' });
-    strangerToken = stranger.body.data.access_token;
+    const stranger = await registerFarm(app, { email: 'other_farm@example.com', full_name: 'Сосед' });
+    strangerToken = stranger.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')

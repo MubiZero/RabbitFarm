@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 /**
  * Окролы: до сих пор были покрыты только юнит-тестами с полностью
@@ -13,10 +14,8 @@ describe('Births API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'birthowner@example.com', password: 'Password123!', full_name: 'Birth Owner' });
-    accessToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, { email: 'birthowner@example.com', full_name: 'Birth Owner' });
+    accessToken = owner.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')

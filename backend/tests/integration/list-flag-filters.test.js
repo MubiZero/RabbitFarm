@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 /**
  * Флаговые фильтры списков ломались одинаково и тихо: Joi приводит `'true'`
@@ -21,15 +22,11 @@ describe('Флаговые фильтры списков', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const registered = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const registered = await registerFarm(app, {
         email: 'flagfilters@example.com',
-        password: 'Password123!',
-        full_name: 'Flag Filters Owner',
-        role: 'owner'
+        full_name: 'Flag Filters Owner'
       });
-    accessToken = registered.body.data.access_token;
+    accessToken = registered.accessToken;
   });
 
   afterAll(async () => {

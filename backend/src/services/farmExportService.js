@@ -34,7 +34,7 @@ class FarmExportService {
     ] = await Promise.all([
       // Хеш пароля и поколение токенов — не данные фермы, а её ключи от
       // дома: в выгрузке, которая уходит наружу, им места нет.
-      scoped(User, { attributes: { exclude: ['password_hash', 'token_version'] } }),
+      scoped(User, { attributes: { exclude: ['token_version'] } }),
       scoped(Rabbit),
       scoped(RabbitWeight),
       scoped(Breeding),

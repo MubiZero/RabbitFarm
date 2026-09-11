@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 const API = '/api/v1';
 
@@ -34,24 +35,16 @@ describe('Кормление пачкой', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post(`${API}/auth/register`)
-      .send({
-        email: 'bulkfeed@example.com',
-        password: 'Password123!',
-        full_name: 'Bulk Owner',
-        role: 'owner'
-      });
-    ownerToken = owner.body.data.access_token;
+    const owner = await registerFarm(app, {
+      email: 'bulkfeed@example.com',
+      full_name: 'Bulk Owner'
+    });
+    ownerToken = owner.accessToken;
 
-    const stranger = await request(app)
-      .post(`${API}/auth/register`)
-      .send({
-        email: 'bulkstranger@example.com',
-        password: 'Password123!',
-        full_name: 'Stranger Owner',
-        role: 'owner'
-      });
+    const stranger = await registerFarm(app, {
+      email: 'bulkstranger@example.com',
+      full_name: 'Stranger Owner'
+    });
 
     const feed = await request(app)
       .post(`${API}/feeds`)
@@ -74,7 +67,7 @@ describe('Кормление пачкой', () => {
     // тест проверяет ровно ту дорогу, по которой ходят живые клиенты.
     const strangerCage = await request(app)
       .post(`${API}/cages`)
-      .set('Authorization', `Bearer ${stranger.body.data.access_token}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
       .send({ number: 'X-01', type: 'single', capacity: 1, condition: 'good' });
     strangerCageId = strangerCage.body.data.id;
   });

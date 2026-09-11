@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -97,6 +98,41 @@ Widget testAppScreen(
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       home: home,
+    ),
+  );
+}
+
+/// Экран, которому нужен роутер: он сам куда-то уходит после успеха (как
+/// экран кода быстрого входа). Стартовая точка — `/screen`, под ней лежит
+/// `/`, поэтому работают и `go('/')`, и `pop()`.
+Widget testAppWithRouter(
+  Widget screen, {
+  List<Override> overrides = const [],
+  Brightness brightness = Brightness.light,
+  Locale locale = const Locale('ru'),
+}) {
+  final router = GoRouter(
+    initialLocation: '/screen',
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => const Scaffold(body: Text('дом'))),
+      GoRoute(path: '/screen', builder: (_, __) => screen),
+    ],
+  );
+
+  return ProviderScope(
+    retry: (retryCount, error) => null,
+    overrides: [_fixedRuLocaleOverride, ...overrides],
+    child: MaterialApp.router(
+      theme: _theme(brightness),
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
     ),
   );
 }

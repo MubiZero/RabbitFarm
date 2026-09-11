@@ -40,12 +40,12 @@ async function sendEmail({ to, subject, text }) {
   }
 }
 
-/** Отправить код сброса пароля по email. */
-async function sendPasswordResetEmail({ to, code }) {
+/** Код входа: почта — запасной способ войти, когда SMS не доходит. */
+async function sendLoginCodeEmail({ to, code }) {
   return sendEmail({
     to,
-    subject: 'Код для сброса пароля RabbitFarm',
-    text: `Ваш код для сброса пароля: ${code}. Действует 15 минут.`
+    subject: 'Код для входа в RabbitFarm',
+    text: `Ваш код для входа: ${code}. Действует 10 минут. Если вы не входили в RabbitFarm, просто не вводите его никуда.`
   });
 }
 
@@ -54,4 +54,4 @@ async function sendAnnouncementEmail({ to, subject, text }) {
   return sendEmail({ to, subject, text });
 }
 
-module.exports = { sendPasswordResetEmail, sendAnnouncementEmail };
+module.exports = { sendLoginCodeEmail, sendAnnouncementEmail };

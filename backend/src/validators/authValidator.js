@@ -15,14 +15,36 @@ const otpPhone = Joi.string()
     'any.required': 'Телефон обязателен'
   });
 
-// Запрос кода входа по телефону
-const requestOtpSchema = Joi.object({
-  phone: otpPhone.required()
-});
+// Почта как контакт для входа: приводится к нижнему регистру там же, где и
+// телефон к `+992…`, — иначе `Ivan@Farm.tj` и `ivan@farm.tj` были бы разными
+// логинами.
+const otpEmail = Joi.string()
+  .email()
+  .lowercase()
+  .trim()
+  .messages({
+    'string.email': 'Неверный формат почты'
+  });
 
-// Проверка кода входа по телефону
-const verifyOtpSchema = Joi.object({
-  phone: otpPhone.required(),
+// Контакт для кода: телефон (основной) или почта (запасная), ровно один.
+const contactKeys = {
+  phone: otpPhone,
+  email: otpEmail
+};
+
+const contactRules = (schema) => schema
+  .xor('phone', 'email')
+  .messages({
+    'object.missing': 'Укажите телефон или почту',
+    'object.xor': 'Укажите что-то одно — телефон или почту'
+  });
+
+// Запрос кода входа
+const requestOtpSchema = contactRules(Joi.object({ ...contactKeys }));
+
+// Проверка кода входа
+const verifyOtpSchema = contactRules(Joi.object({
+  ...contactKeys,
   code: Joi.string()
     .pattern(/^\d{6}$/)
     .required()
@@ -30,40 +52,14 @@ const verifyOtpSchema = Joi.object({
       'string.pattern.base': 'Код должен состоять из 6 цифр',
       'any.required': 'Код обязателен'
     })
-});
-
-// Первичная установка пароля тому, кто вошёл по OTP и ни разу его не задавал
-const setPasswordSchema = Joi.object({
-  new_password: Joi.string()
-    .min(8)
-    .max(100)
-    .required()
-    .messages({
-      'string.min': 'Пароль должен быть минимум 8 символов',
-      'string.max': 'Пароль должен быть максимум 100 символов',
-      'any.required': 'Пароль обязателен'
-    })
-});
+}));
 
 // Register validation
 const registerSchema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'string.email': 'Неверный формат email',
-      'any.required': 'Email обязателен'
-    }),
-
-  password: Joi.string()
-    .min(8)
-    .max(100)
-    .required()
-    .messages({
-      'string.min': 'Пароль должен быть минимум 8 символов',
-      'string.max': 'Пароль должен быть максимум 100 символов',
-      'any.required': 'Пароль обязателен'
-    }),
+  // Хотя бы один контакт: он же и логин, и единственный способ получить код
+  // для входа. Телефон — основной путь, почта — запасной.
+  phone: otpPhone.optional().allow(null, ''),
+  email: otpEmail.optional().allow(null, ''),
 
   full_name: Joi.string()
     .min(2)
@@ -74,12 +70,6 @@ const registerSchema = Joi.object({
       'string.max': 'Имя должно быть максимум 255 символов',
       'any.required': 'Имя обязательно'
     }),
-
-  // Не обязателен при регистрации — email+пароль сам по себе рабочий способ
-  // входа (запасной, но полноценный). Кто хочет войти по SMS-коду, добавит
-  // телефон позже через профиль (`updateProfileSchema` ниже) — заставлять
-  // указывать его прямо на форме регистрации незачем.
-  phone: otpPhone.optional().allow(null, ''),
 
   // Название хозяйства. Не обязательно: если его не прислали, ферма
   // называется по имени владельца — пустое название читалось бы в списках
@@ -92,30 +82,16 @@ const registerSchema = Joi.object({
     .messages({
       'string.min': 'Название хозяйства должно быть минимум 2 символа',
       'string.max': 'Название хозяйства должно быть максимум 255 символов'
-    }),
+    })
 
   // Роль здесь не принимается намеренно: её назначает сервис (регистрация
   // заводит новую ферму и делает регистрирующегося её владельцем, работники
-  // приходят по приглашению). Схема раньше её принимала и по умолчанию
-  // подставляла 'worker', создавая впечатление, что роль можно выбрать.
-});
-
-// Login validation
-const loginSchema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'string.email': 'Неверный формат email',
-      'any.required': 'Email обязателен'
-    }),
-
-  password: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'Пароль обязателен'
-    })
-});
+  // приходят по приглашению).
+})
+  .or('phone', 'email')
+  .messages({
+    'object.missing': 'Укажите телефон или почту — на него придёт код для входа'
+  });
 
 // Refresh token validation
 const refreshTokenSchema = Joi.object({
@@ -160,78 +136,10 @@ const updateProfileSchema = Joi.object({
   digest_enabled: Joi.boolean().optional()
 });
 
-// Change password validation
-const changePasswordSchema = Joi.object({
-  current_password: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'Текущий пароль обязателен'
-    }),
-
-  new_password: Joi.string()
-    .min(8)
-    .max(100)
-    .required()
-    .invalid(Joi.ref('current_password'))
-    .messages({
-      'string.min': 'Новый пароль должен быть минимум 8 символов',
-      'string.max': 'Новый пароль должен быть максимум 100 символов',
-      'any.required': 'Новый пароль обязателен',
-      'any.invalid': 'Новый пароль должен отличаться от текущего'
-    })
-});
-
-// Восстановление пароля по почте
-const forgotPasswordSchema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'string.email': 'Неверный формат email',
-      'any.required': 'Email обязателен'
-    })
-});
-
-// Установка нового пароля по коду из SMS/email.
-// Раньше маршрут шёл без валидации вовсе: пароль можно было задать любой
-// длины в обход правила восьми символов, а запрос без токена уходил в 500.
-const resetPasswordSchema = Joi.object({
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'string.email': 'Неверный формат email',
-      'any.required': 'Email обязателен'
-    }),
-
-  code: Joi.string()
-    .pattern(/^\d{6}$/)
-    .required()
-    .messages({
-      'string.pattern.base': 'Код должен состоять из 6 цифр',
-      'any.required': 'Код обязателен'
-    }),
-
-  new_password: Joi.string()
-    .min(8)
-    .max(100)
-    .required()
-    .messages({
-      'string.min': 'Новый пароль должен быть минимум 8 символов',
-      'string.max': 'Новый пароль должен быть максимум 100 символов',
-      'any.required': 'Новый пароль обязателен'
-    })
-});
-
 module.exports = {
   registerSchema,
-  loginSchema,
   refreshTokenSchema,
   updateProfileSchema,
-  changePasswordSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
   requestOtpSchema,
-  verifyOtpSchema,
-  setPasswordSchema
+  verifyOtpSchema
 };

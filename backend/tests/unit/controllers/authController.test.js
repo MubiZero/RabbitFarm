@@ -1,4 +1,5 @@
 jest.mock('../../../src/services/authService');
+jest.mock('../../../src/services/otpAuthService');
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(),
   error: jest.fn(),
@@ -7,6 +8,7 @@ jest.mock('../../../src/utils/logger', () => ({
 }));
 
 const authService = require('../../../src/services/authService');
+const otpAuthService = require('../../../src/services/otpAuthService');
 const authController = require('../../../src/controllers/authController');
 
 const mockReq = (overrides = {}) => ({
@@ -34,10 +36,10 @@ describe('AuthController', () => {
 
   // ─── register ───────────────────────────────────────────────
   describe('register', () => {
-    it('should register user and return 201', async () => {
-      const result = { user: { id: 1, email: 'a@b.com' }, token: 'tok' };
+    it('заводит ферму по телефону и возвращает 201 с обещанием кода в SMS', async () => {
+      const result = { user_id: 1, farm_id: 7, channel: 'phone' };
       authService.register.mockResolvedValue(result);
-      const req = mockReq({ body: { email: 'a@b.com', password: '123456' } });
+      const req = mockReq({ body: { phone: '+992901234567', full_name: 'Иван Петров' } });
       const res = mockRes();
 
       await authController.register(req, res, mockNext);
@@ -45,11 +47,48 @@ describe('AuthController', () => {
       expect(authService.register).toHaveBeenCalledWith(req.body);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
+      expect(res.json.mock.calls[0][0].message).toBe('Ферма создана. Код для входа отправлен по SMS.');
     });
 
-    it('should return 409 when USER_EXISTS error thrown', async () => {
+    it('заводит ферму по почте и обещает код письмом', async () => {
+      authService.register.mockResolvedValue({ user_id: 2, farm_id: 8, channel: 'email' });
+      const req = mockReq({ body: { email: 'a@b.com', full_name: 'Иван Петров' } });
+      const res = mockRes();
+
+      await authController.register(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json.mock.calls[0][0].message).toBe('Ферма создана. Код для входа отправлен на почту.');
+    });
+
+    it('не отдаёт токенов: сессию открывает только код', async () => {
+      authService.register.mockResolvedValue({ user_id: 1, farm_id: 7, channel: 'phone' });
+      const req = mockReq({ body: { phone: '+992901234567', full_name: 'Иван Петров' } });
+      const res = mockRes();
+
+      await authController.register(req, res, mockNext);
+
+      const { data } = res.json.mock.calls[0][0];
+      expect(Object.keys(data)).toEqual(['user_id', 'farm_id', 'channel']);
+      expect(data).not.toHaveProperty('token');
+      expect(data).not.toHaveProperty('access_token');
+      expect(data).not.toHaveProperty('refresh_token');
+    });
+
+    it('возвращает 403 при закрытой регистрации', async () => {
+      authService.register.mockRejectedValue(new Error('REGISTRATION_CLOSED'));
+      const req = mockReq({ body: { email: 'a@b.com', full_name: 'Иван' } });
+      const res = mockRes();
+
+      await authController.register(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 409 при USER_EXISTS', async () => {
       authService.register.mockRejectedValue(new Error('USER_EXISTS'));
-      const req = mockReq({ body: { email: 'a@b.com' } });
+      const req = mockReq({ body: { email: 'a@b.com', full_name: 'Иван' } });
       const res = mockRes();
 
       await authController.register(req, res, mockNext);
@@ -59,11 +98,23 @@ describe('AuthController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 409 when SequelizeUniqueConstraintError thrown', async () => {
+    it('возвращает 409 при занятом телефоне', async () => {
+      authService.register.mockRejectedValue(new Error('PHONE_EXISTS'));
+      const req = mockReq({ body: { phone: '+992901234567', full_name: 'Иван' } });
+      const res = mockRes();
+
+      await authController.register(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json.mock.calls[0][0].error.code).toBe('PHONE_EXISTS');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 409 при SequelizeUniqueConstraintError', async () => {
       const err = new Error('Unique');
       err.name = 'SequelizeUniqueConstraintError';
       authService.register.mockRejectedValue(err);
-      const req = mockReq({ body: { email: 'a@b.com' } });
+      const req = mockReq({ body: { email: 'a@b.com', full_name: 'Иван' } });
       const res = mockRes();
 
       await authController.register(req, res, mockNext);
@@ -73,7 +124,7 @@ describe('AuthController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should call next for unexpected errors', async () => {
+    it('передаёт неожиданные ошибки в next', async () => {
       authService.register.mockRejectedValue(new Error('DB down'));
       const req = mockReq({ body: {} });
       const res = mockRes();
@@ -84,52 +135,196 @@ describe('AuthController', () => {
     });
   });
 
-  // ─── login ──────────────────────────────────────────────────
-  describe('login', () => {
-    it('should login and return 200', async () => {
-      const result = { token: 'tok', user: { id: 1 } };
-      authService.login.mockResolvedValue(result);
-      const req = mockReq({ body: { email: 'a@b.com', password: 'pass' } });
+  // ─── requestOtp ─────────────────────────────────────────────
+  describe('requestOtp', () => {
+    it('передаёт телефон сервису контактом-объектом', async () => {
+      otpAuthService.requestOtp.mockResolvedValue(undefined);
+      const req = mockReq({ body: { phone: '+992901234567' } });
       const res = mockRes();
 
-      await authController.login(req, res, mockNext);
+      await authController.requestOtp(req, res, mockNext);
 
-      expect(authService.login).toHaveBeenCalledWith('a@b.com', 'pass');
+      expect(otpAuthService.requestOtp).toHaveBeenCalledWith({ phone: '+992901234567', email: undefined });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json.mock.calls[0][0].message).toBe('Если контакт известен, код отправлен');
+    });
+
+    it('передаёт почту сервису контактом-объектом', async () => {
+      otpAuthService.requestOtp.mockResolvedValue(undefined);
+      const req = mockReq({ body: { email: 'a@b.com' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(otpAuthService.requestOtp).toHaveBeenCalledWith({ phone: undefined, email: 'a@b.com' });
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('отвечает 200 и для неизвестного контакта — по ответу нельзя найти чужой аккаунт', async () => {
+      otpAuthService.requestOtp.mockResolvedValue(undefined);
+      const req = mockReq({ body: { phone: '+992900000000' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json.mock.calls[0][0].data).toBeNull();
+    });
+
+    it('возвращает 400 при INVALID_PHONE', async () => {
+      otpAuthService.requestOtp.mockRejectedValue(new Error('INVALID_PHONE'));
+      const req = mockReq({ body: { phone: '+79991234567' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('INVALID_PHONE');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 400 при INVALID_EMAIL', async () => {
+      otpAuthService.requestOtp.mockRejectedValue(new Error('INVALID_EMAIL'));
+      const req = mockReq({ body: { email: 'не-почта' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('INVALID_EMAIL');
+      expect(res.json.mock.calls[0][0].error.message).toBe('Неверный формат почты');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 400 при CONTACT_REQUIRED, если не названы ни телефон, ни почта', async () => {
+      otpAuthService.requestOtp.mockRejectedValue(new Error('CONTACT_REQUIRED'));
+      const req = mockReq({ body: {} });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('CONTACT_REQUIRED');
+      expect(res.json.mock.calls[0][0].error.message).toBe('Укажите телефон или почту');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('возвращает 429 при OTP_RATE_LIMITED', async () => {
+      otpAuthService.requestOtp.mockRejectedValue(new Error('OTP_RATE_LIMITED'));
+      const req = mockReq({ body: { phone: '+992901234567' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json.mock.calls[0][0].error.code).toBe('OTP_RATE_LIMITED');
+    });
+
+    it('передаёт неожиданные ошибки в next', async () => {
+      otpAuthService.requestOtp.mockRejectedValue(new Error('gateway down'));
+      const req = mockReq({ body: { phone: '+992901234567' } });
+      const res = mockRes();
+
+      await authController.requestOtp(req, res, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
+  // ─── verifyOtp ──────────────────────────────────────────────
+  describe('verifyOtp', () => {
+    it('проверяет код по контакту-объекту и возвращает токены', async () => {
+      const result = { access_token: 'a', refresh_token: 'r', user: { id: 1 } };
+      otpAuthService.verifyOtp.mockResolvedValue(result);
+      const req = mockReq({ body: { phone: '+992901234567', code: '123456' } });
+      const res = mockRes();
+
+      await authController.verifyOtp(req, res, mockNext);
+
+      expect(otpAuthService.verifyOtp).toHaveBeenCalledWith(
+        { phone: '+992901234567', email: undefined },
+        '123456'
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, data: result }));
     });
 
-    it('should return 401 for INVALID_CREDENTIALS', async () => {
-      authService.login.mockRejectedValue(new Error('INVALID_CREDENTIALS'));
-      const req = mockReq({ body: { email: 'a@b.com', password: 'wrong' } });
+    it('проверяет код, присланный на почту', async () => {
+      otpAuthService.verifyOtp.mockResolvedValue({ access_token: 'a' });
+      const req = mockReq({ body: { email: 'a@b.com', code: '123456' } });
       const res = mockRes();
 
-      await authController.login(req, res, mockNext);
+      await authController.verifyOtp(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(mockNext).not.toHaveBeenCalled();
+      expect(otpAuthService.verifyOtp).toHaveBeenCalledWith(
+        { phone: undefined, email: 'a@b.com' },
+        '123456'
+      );
+      expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    it('should return 403 for USER_INACTIVE', async () => {
-      authService.login.mockRejectedValue(new Error('USER_INACTIVE'));
-      const req = mockReq({ body: { email: 'a@b.com', password: 'pass' } });
+    it('возвращает 400 при неверном коде', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('OTP_INVALID'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '000000' } });
       const res = mockRes();
 
-      await authController.login(req, res, mockNext);
+      await authController.verifyOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('OTP_INVALID');
+    });
+
+    it('возвращает 400 при истёкшем коде', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('OTP_EXPIRED'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '000000' } });
+      const res = mockRes();
+
+      await authController.verifyOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('OTP_EXPIRED');
+    });
+
+    it('возвращает 429 после перебора попыток', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('OTP_LOCKED'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '000000' } });
+      const res = mockRes();
+
+      await authController.verifyOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json.mock.calls[0][0].error.code).toBe('OTP_LOCKED');
+    });
+
+    it('возвращает 403 при отключённом аккаунте', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('USER_INACTIVE'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '123456' } });
+      const res = mockRes();
+
+      await authController.verifyOtp(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
       // Формулировка одна на все места, где встречается это состояние.
       expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
-      expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should call next for unexpected errors', async () => {
-      authService.login.mockRejectedValue(new Error('Unknown'));
-      const req = mockReq({ body: { email: 'a@b.com', password: 'pass' } });
+    it('возвращает 400, если приглашение не влезает в лимит тарифа', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('STAFF_LIMIT_REACHED'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '123456' } });
       const res = mockRes();
 
-      await authController.login(req, res, mockNext);
+      await authController.verifyOtp(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json.mock.calls[0][0].error.code).toBe('STAFF_LIMIT_REACHED');
+    });
+
+    it('передаёт неожиданные ошибки в next', async () => {
+      otpAuthService.verifyOtp.mockRejectedValue(new Error('oops'));
+      const req = mockReq({ body: { phone: '+992901234567', code: '123456' } });
+      const res = mockRes();
+
+      await authController.verifyOtp(req, res, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
@@ -297,142 +492,6 @@ describe('AuthController', () => {
       const res = mockRes();
 
       await authController.updateProfile(req, res, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
-    });
-  });
-
-  // ─── forgotPassword ─────────────────────────────────────────
-  describe('forgotPassword', () => {
-    it('should always return 200 to prevent email enumeration', async () => {
-      authService.forgotPassword.mockResolvedValue();
-      const req = mockReq({ body: { email: 'a@b.com' } });
-      const res = mockRes();
-
-      await authController.forgotPassword(req, res, mockNext);
-
-      expect(authService.forgotPassword).toHaveBeenCalledWith('a@b.com');
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-
-    it('should call next for unexpected errors', async () => {
-      authService.forgotPassword.mockRejectedValue(new Error('mail fail'));
-      const req = mockReq({ body: { email: 'a@b.com' } });
-      const res = mockRes();
-
-      await authController.forgotPassword(req, res, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
-    });
-  });
-
-  // ─── resetPassword ──────────────────────────────────────────
-  describe('resetPassword', () => {
-    it('should reset password and return 200', async () => {
-      authService.resetPassword.mockResolvedValue();
-      const req = mockReq({ body: { email: 'a@b.com', code: '123456', new_password: 'newpass' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(authService.resetPassword).toHaveBeenCalledWith({
-        email: 'a@b.com', code: '123456', newPassword: 'newpass'
-      });
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-
-    it('should return 400 for INVALID_RESET_CODE', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('INVALID_RESET_CODE'));
-      const req = mockReq({ body: { email: 'a@b.com', code: 'bad000', new_password: 'x' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it('should return 400 for RESET_CODE_EXPIRED', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('RESET_CODE_EXPIRED'));
-      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it('should return 429 for RESET_CODE_LOCKED', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('RESET_CODE_LOCKED'));
-      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(429);
-      expect(res.json.mock.calls[0][0].error.code).toBe('RESET_CODE_LOCKED');
-    });
-
-    it('should return 403 for USER_INACTIVE', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('USER_INACTIVE'));
-      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json.mock.calls[0][0].error.message).toBe('Аккаунт отключён. Обратитесь к владельцу фермы.');
-    });
-
-    it('should call next for unexpected errors', async () => {
-      authService.resetPassword.mockRejectedValue(new Error('oops'));
-      const req = mockReq({ body: { email: 'a@b.com', code: '000000', new_password: 'x' } });
-      const res = mockRes();
-
-      await authController.resetPassword(req, res, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
-    });
-  });
-
-  // ─── changePassword ─────────────────────────────────────────
-  describe('changePassword', () => {
-    it('should change password and return 200', async () => {
-      authService.changePassword.mockResolvedValue();
-      const req = mockReq({ body: { current_password: 'old', new_password: 'new' } });
-      const res = mockRes();
-
-      await authController.changePassword(req, res, mockNext);
-
-      expect(authService.changePassword).toHaveBeenCalledWith(1, 'old', 'new');
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-
-    it('should return 404 for USER_NOT_FOUND', async () => {
-      authService.changePassword.mockRejectedValue(new Error('USER_NOT_FOUND'));
-      const req = mockReq({ body: { current_password: 'old', new_password: 'new' } });
-      const res = mockRes();
-
-      await authController.changePassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-    });
-
-    it('should return 400 for INVALID_CURRENT_PASSWORD', async () => {
-      authService.changePassword.mockRejectedValue(new Error('INVALID_CURRENT_PASSWORD'));
-      const req = mockReq({ body: { current_password: 'wrong', new_password: 'new' } });
-      const res = mockRes();
-
-      await authController.changePassword(req, res, mockNext);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it('should call next for unexpected errors', async () => {
-      authService.changePassword.mockRejectedValue(new Error('oops'));
-      const req = mockReq({ body: { current_password: 'o', new_password: 'n' } });
-      const res = mockRes();
-
-      await authController.changePassword(req, res, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });

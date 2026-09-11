@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 describe('Rabbits API', () => {
   let accessToken, breedId;
@@ -8,10 +9,10 @@ describe('Rabbits API', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({ email: 'farmer@example.com', password: 'Password123!', full_name: 'Farmer', role: 'owner' });
-    accessToken = res.body.data.access_token;
+    ({ accessToken } = await registerFarm(app, {
+      email: 'farmer@example.com',
+      full_name: 'Farmer'
+    }));
 
     const breedRes = await request(app)
       .post('/api/v1/breeds')
@@ -124,10 +125,10 @@ describe('Rabbits API', () => {
     });
 
     it('не должен возвращать кролика другого пользователя (IDOR защита)', async () => {
-      const res2 = await request(app)
-        .post('/api/v1/auth/register')
-        .send({ email: 'other@example.com', password: 'Password123!', full_name: 'Other' });
-      const otherToken = res2.body.data.access_token;
+      const { accessToken: otherToken } = await registerFarm(app, {
+        email: 'other@example.com',
+        full_name: 'Other'
+      });
 
       const rabbitRes = await request(app)
         .get(`/api/v1/rabbits/${rabbitId}`)

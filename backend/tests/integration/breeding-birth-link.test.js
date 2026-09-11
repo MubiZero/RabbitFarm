@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
+const { registerFarm } = require('./helpers/auth');
 
 /**
  * Список случек и связанный с ними окрол.
@@ -29,15 +30,11 @@ describe('Список случек: связанный окрол', () => {
   beforeAll(async () => {
     await syncTestDb();
 
-    const owner = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
+    const owner = await registerFarm(app, {
         email: 'cycleowner@example.com',
-        password: 'Password123!',
-        full_name: 'Cycle Owner',
-        role: 'owner'
+        full_name: 'Cycle Owner'
       });
-    accessToken = owner.body.data.access_token;
+    accessToken = owner.accessToken;
 
     const breed = await request(app)
       .post('/api/v1/breeds')

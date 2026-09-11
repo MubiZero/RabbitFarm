@@ -35,16 +35,17 @@ class _RecordingAuthRepository extends AuthRepository {
   Future<bool> isLoggedIn() async => false;
 
   @override
-  Future<void> requestOtp({required String phone}) async {
-    requestedPhones.add(phone);
+  Future<void> requestOtp({String? phone, String? email}) async {
+    requestedPhones.add(phone ?? email!);
   }
 
   @override
   Future<AuthResponse> verifyOtp({
-    required String phone,
+    String? phone,
+    String? email,
     required String code,
   }) async {
-    verified.add((phone, code));
+    verified.add((phone ?? email!, code));
     throw const ApiFailure(ApiFailureKind.invalid, serverText: 'Неверный код');
   }
 }

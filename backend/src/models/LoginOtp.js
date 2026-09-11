@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 
 /**
- * Код входа по телефону. Ключ — сам телефон, а не `user_id`: на момент
- * запроса кода за номером может стоять ещё не созданный пользователь,
- * только активное приглашение (см. `otpAuthService.verifyOtp`).
+ * Код входа. Ключ — сам контакт (телефон или почта), а не `user_id`: на
+ * момент запроса кода за контактом может стоять ещё не созданный
+ * пользователь, только активное приглашение (см. `otpAuthService.verifyOtp`).
  */
 module.exports = (sequelize) => {
   const LoginOtp = sequelize.define('LoginOtp', {
@@ -12,12 +12,17 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    phone: {
-      type: DataTypes.STRING(20),
+    identifier: {
+      type: DataTypes.STRING(255),
       allowNull: false
     },
+    channel: {
+      type: DataTypes.ENUM('phone', 'email'),
+      allowNull: false,
+      defaultValue: 'phone'
+    },
     // Без unique — 6-значный код не гарантирует уникальность хеша по всей
-    // таблице, ищем по `phone`, как и в `PasswordResetToken`.
+    // таблице, ищем по `identifier`.
     token_hash: {
       type: DataTypes.STRING(64),
       allowNull: false
@@ -38,7 +43,7 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: false,
     indexes: [
-      { fields: ['phone'], name: 'idx_login_otps_phone' },
+      { fields: ['identifier'], name: 'idx_login_otps_phone' },
       { fields: ['expires_at'], name: 'idx_login_otps_expires_at' }
     ]
   });
