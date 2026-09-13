@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User, Farm, Invitation, RefreshToken } = require('../models');
+const { User, Farm, Invitation } = require('../models');
 const planService = require('./planService');
 const farmAuditService = require('./farmAuditService');
 const logger = require('../utils/logger');

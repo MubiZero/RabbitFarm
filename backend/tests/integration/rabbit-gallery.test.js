@@ -82,7 +82,9 @@ describe('Галерея фото кролика', () => {
 
       expect(res.status).toBe(201);
       expect(res.body.data.caption).toBe('На выставке');
-      expect(res.body.data.url).toMatch(/^\/uploads\/rabbits\//);
+      // Префикс `farm-<id>/` обязателен: по нему считается место фермы и
+      // вычищаются её файлы (см. utils/fileStorage.js).
+      expect(res.body.data.url).toMatch(/^\/uploads\/farm-\d+\/rabbits\//);
       expect(res.body.data.author.full_name).toBe('Владелец');
 
       // Файл реально загружен в MinIO.

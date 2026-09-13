@@ -19,6 +19,22 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
+    // MySQL не отдаёт индекс, пока на колонке висит внешний ключ, а имя ключу
+    // сервер выдал сам (`farms_ibfk_N`) — поэтому имя спрашиваем у
+    // information_schema, а не угадываем.
+    const [foreignKeys] = await queryInterface.sequelize.query(`
+      SELECT CONSTRAINT_NAME AS name
+      FROM information_schema.KEY_COLUMN_USAGE
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'farms'
+        AND COLUMN_NAME = 'plan_id'
+        AND REFERENCED_TABLE_NAME IS NOT NULL
+    `);
+
+    for (const { name } of foreignKeys) {
+      await queryInterface.removeConstraint('farms', name);
+    }
+
     await queryInterface.removeIndex('farms', 'idx_farms_plan');
     await queryInterface.removeColumn('farms', 'plan_id');
   }

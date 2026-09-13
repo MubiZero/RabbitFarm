@@ -43,8 +43,20 @@ Stalwart, это перехват на уровне антивируса. Обх
 **MinIO не публикует порт 9000 наружу** (намеренно, см. `docker-compose.yml`)
 — поэтому интеграционные тесты `rabbit-gallery` и `farm-photo-feed`, которые
 бьют в него с хоста, всегда красные при прогоне *с хоста*. Это ограничение
-запуска, а не баг: чтобы прогнать и их, нужно временно опубликовать 9000 или
-запускать тесты внутри контейнера `api`.
+запуска, а не баг. В контейнере `api` их не прогнать — там только
+прод-зависимости, ни `jest`, ни самих тестов. Рабочий способ — временный
+проброс порта, без правки compose:
+
+```bash
+docker run -d --rm --name minio-fwd --network rabbitfarm_default \
+  -p 127.0.0.1:9000:9000 alpine/socat \
+  tcp-listen:9000,fork,reuseaddr tcp-connect:minio:9000
+# прогон тестов с MINIO_ENDPOINT=127.0.0.1 MINIO_PORT=9000
+docker rm -f minio-fwd
+```
+
+В CI MinIO поднимается по-настоящему (`.github/workflows/backend.yml`), так
+что эти наборы там выполняются, а не молчат.
 
 **Flutter не в PATH** на машине разработчика — команды в `mobile/` вызывать
 полным путём (`/Users/mubidev/development/flutter/bin/flutter`). Тесты
