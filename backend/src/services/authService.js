@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Farm, User, RefreshToken, TokenBlacklist, LoginOtp } = require('../models');
 const JWTUtil = require('../utils/jwt');
 const logger = require('../utils/logger');
@@ -276,7 +277,36 @@ class AuthService {
         throw new Error('USER_NOT_FOUND');
       }
 
-      await user.update(updateData);
+      const changes = { ...updateData };
+
+      // Стёртый номер — это `null`, а не пустая строка: телефон уникален на
+      // всю базу, и вторая пустая строка упёрлась бы в тот же индекс, тогда
+      // как двух NULL он не замечает.
+      if (changes.phone === '') {
+        changes.phone = null;
+      }
+
+      // Номер — логин: занятый чужим аккаунтом принимать нельзя. Без этой
+      // проверки запрос падал на unique-индексе, то есть пятисоткой вместо
+      // понятного ответа.
+      if (changes.phone && changes.phone !== user.phone) {
+        const taken = await User.findOne({
+          where: { phone: changes.phone, id: { [Op.ne]: userId } }
+        });
+        if (taken) {
+          throw new Error('PHONE_EXISTS');
+        }
+      }
+
+      try {
+        await user.update(changes);
+      } catch (error) {
+        // Тот же номер мог занять кто-то между проверкой и сохранением.
+        if (error.name === 'SequelizeUniqueConstraintError') {
+          throw new Error('PHONE_EXISTS');
+        }
+        throw error;
+      }
 
       logger.info('Profile updated', { userId });
 
@@ -293,7 +323,6 @@ class AuthService {
    */
   async cleanExpiredTokens() {
     try {
-      const { Op } = require('sequelize');
       const deleted = await RefreshToken.destroy({
         where: {
           expires_at: { [Op.lt]: new Date() }

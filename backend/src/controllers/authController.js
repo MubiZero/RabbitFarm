@@ -112,6 +112,13 @@ class AuthController {
       if (error.message === 'USER_NOT_FOUND') {
         return ApiResponse.notFound(res, 'Пользователь не найден');
       }
+      if (error.message === 'PHONE_EXISTS') {
+        return ApiResponse.conflict(
+          res,
+          'Этот номер уже занят другой учётной записью',
+          'PHONE_EXISTS'
+        );
+      }
       next(error);
     }
   }
