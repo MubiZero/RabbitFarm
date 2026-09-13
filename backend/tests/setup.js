@@ -6,6 +6,10 @@ process.env.JWT_SECRET = 'test_secret_key_minimum_32_chars_long';
 process.env.JWT_REFRESH_SECRET = 'test_refresh_secret_key_minimum_32_chars';
 process.env.JWT_EXPIRE = '15m';
 process.env.JWT_REFRESH_EXPIRE = '7d';
+// Браузерный источник для проверок CORS. Задаётся здесь, а не берётся из
+// `.env`: у разработчика он есть, в CI его нет вовсе — и тест, зелёный на
+// машине, краснел в сборке.
+process.env.CORS_ORIGIN = 'http://localhost:3000';
 
 // Заглушаем логгер чтобы не засорять вывод тестов
 jest.mock('../src/utils/logger', () => ({
