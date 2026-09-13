@@ -15,8 +15,20 @@
 ## Текущий стенд
 
 Проект `rabbitfarm` в Coolify на `cool.mubi.dev`, окружение `production`,
-сервер `localhost` (207.180.237.97), ресурс — Docker Compose из этого
-репозитория, файл `docker-compose.coolify.yml`, ветка `main`.
+сервер `localhost` (207.180.237.97). **Стенд собран из отдельных ресурсов, а
+не из `docker-compose.coolify.yml`** — сверено через API Coolify 2026-09-13:
+
+| Ресурс в Coolify | Тип | Что важно знать |
+|---|---|---|
+| `rabbitfarm-api` | Application (Dockerfile) | том `/app/logs`; боевая база называется `default`, не `rabbitfarm` |
+| `rabbitfarm-web` | Application (Dockerfile) | Flutter-сборка под web |
+| `rabbitfarm-db` | Database (managed MySQL 8) | имя базы `default`, пользователь `mysql` |
+| `rabbitfarm-minio` | Service (шаблон MinIO) | образ с `quay.io`, бакет `rabbitfarm-uploads`, тома `minio-data` и `minio-backups` |
+| `rabbitfarm-redis` | Database (managed Redis) | кэш сводки платформы |
+
+Отсюда следствие, на которое легко попасться: правка
+`docker-compose.coolify.yml` **прод не меняет**. Файл остаётся референсом и
+основой для прод-подобного стека локально; боевые настройки живут в панели.
 
 Домены сервисов:
 
@@ -181,6 +193,27 @@ mc mirror --overwrite /backups/uploads backup-local/rabbitfarm-uploads
 источником), 36 объектов ушли в зеркало и вернулись в отдельный бакет с
 совпадающей контрольной суммой файла. На боевом стенде восстановление не
 прогонялось — там живые данные фермы.
+
+### Что включено на боевом стенде (2026-09-13)
+
+**Фотографии — да.** На сервисе `rabbitfarm-minio` заведён том
+`minio-backups` на `/backups` и задача `backup-uploads` (ежедневно в 03:30,
+контейнер `minio`, таймаут 600 с) с телом из
+[`scripts/backup-uploads.sh`](../scripts/backup-uploads.sh). Проверено
+запуском вручную: задача отработала успешно, `/backups` — настоящий том на
+диске хоста, а не слой контейнера.
+
+Бакет на проде на момент настройки был **пуст**: ни одной фотографии за всё
+время. Это ожидаемо — отдача фото была сломана до 2026-09-13 (см. историю
+коммитов), и загружать их было бессмысленно.
+
+**База — нет.** Настраивается в панели, вкладка `Backups` у ресурса
+`rabbitfarm-db`: имя базы для дампа — **`default`** (не `rabbitfarm`),
+расписание `0 3 * * *`, хранить 14 копий. Через API это делать нельзя:
+эндпоинт `/databases/{uuid}/backups` отдаёт записи чужих ресурсов — на запрос
+бэкапов нашего MySQL он возвращает бэкап PostgreSQL другого проекта
+(`database_type=StandalonePostgresql`). Запись через него может уехать не туда,
+поэтому здесь — только руками через интерфейс.
 
 ### Чего ещё нет: выгрузки наружу
 
