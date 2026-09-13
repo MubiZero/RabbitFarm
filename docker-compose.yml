@@ -22,8 +22,12 @@ services:
 
   # Хранилище загруженных файлов (фото кроликов). Здоровье проверяем через
   # встроенный `mc ready local` — образ minio его несёт сам, curl внутри нет.
+  #
+  # Реестр — quay.io, и обратно на Docker Hub не возвращать: репозиторий
+  # `minio/minio` там больше не отдаётся вовсе (даже `latest` — 404), это
+  # официальный реестр MinIO. Образ тот же побайтово (2026-09-13).
   minio:
-    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    image: quay.io/minio/minio:RELEASE.2024-11-07T00-52-20Z
     container_name: rabbitfarm-minio
     restart: always
     environment:
