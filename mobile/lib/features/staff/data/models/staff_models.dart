@@ -37,7 +37,7 @@ abstract class FarmMember with _$FarmMember {
   const factory FarmMember({
     @IntConverter() required int id,
     // Почты может не быть вовсе: работника приглашают по телефону, и входит
-    // он кодом из SMS (см. docs/HANDOFF.md). Контакт для показа — `contact`.
+    // он кодом из SMS. Контакт для показа — `contact`.
     String? email,
     @JsonKey(name: 'full_name') required String fullName,
     String? phone,

@@ -34,7 +34,7 @@ class ApiEndpoints {
   // сервере нет, и запрос уходил в 404.
   static const String updateProfile = '/auth/profile';
   // Вход всегда по коду: телефон — основной путь, почта — запасной. Пароля
-  // в сервисе нет вовсе (см. docs/HANDOFF.md).
+  // в сервисе нет вовсе (см. README, «Accounts»).
   static const String otpRequest = '/auth/otp/request';
   static const String otpVerify = '/auth/otp/verify';
 

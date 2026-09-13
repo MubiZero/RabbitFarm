@@ -14,7 +14,7 @@ on:
         default: 'https://api.rabbitfarm.mubi.dev/api/v1'
 
 env:
-  # 3.47.0, не более раннюю: freezed ^4.0.1 (docs/HANDOFF.md, апгрейд
+  # 3.47.0, не более раннюю: freezed ^4.0.1 (апгрейд
   # кодогенерации) требует Dart >=3.13.0, которого более ранние тройки ещё
   # не несут, — на них `flutter pub get` отказывает.
   FLUTTER_VERSION: '3.47.0'

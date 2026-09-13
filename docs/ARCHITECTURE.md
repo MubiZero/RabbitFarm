@@ -1075,7 +1075,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 **Реализованные экраны (60, пересчитано 2026-09-10 по `presentation/screens/`):**
 1. Auth: Login, Register, ForgotPassword, ResetPassword
 2. Onboarding: Splash — анкета до регистрации (Welcome/FarmName/FarmType/Ready)
-   снесена 2026-09-10 вместе с `farmType`, см. HANDOFF.md
+   снесена 2026-09-10 вместе с `farmType`
 3. Home: Today, Farm, Journal, MainNavigation
 4. Rabbits: RabbitsList, RabbitDetail, RabbitForm, Herd, Pedigree, WeightHistory, PhotoGallery, BreedsList, BreedForm, BreedingPlanner, BirthsList, BirthForm
 5. Breeding: BreedingCycle, BreedingDetail, BreedingForm
@@ -1132,7 +1132,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - **API эндпоинты:** 141 (из них 18 — только `/platform-admin/*`)
 - **Модели БД (backend):** 25
 - **UI экраны:** 62
-- **Backend-тесты:** 1539 — 1532 зелёных, 7 падают на интеграционных, если MinIO не видна с хоста (не регресс, см. `docs/HANDOFF.md`)
+- **Backend-тесты:** 1539 — 1532 зелёных, 7 падают на интеграционных, если MinIO не видна с хоста (не регресс, см. `docs/ENVIRONMENT.md`)
 - **Mobile-тесты:** 326, `flutter analyze` чисто
 
 ### Готовность:

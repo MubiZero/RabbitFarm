@@ -178,7 +178,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 1539 tests, 7 fail unless MinIO is reachable from the host (see docs/HANDOFF.md)
+npm test                 # 7 fail unless MinIO is reachable from the host (see docs/ENVIRONMENT.md)
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change

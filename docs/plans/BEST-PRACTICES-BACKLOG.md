@@ -372,7 +372,7 @@ Analytics, ни Amplitude/PostHog/Mixpanel), реферальной механи
   ключам `breedPurposeFur`, `medOutcomeEuthanized`, `settingsDigestToggle`,
   `navHerd`/`herdTitle`, `cageFormLocationHint`, `txCategoryUtilities`).
   Таджикский формат телефона (`+992`) — отдельный вопрос валидации, не
-  языка интерфейса, уже в HANDOFF.
+  языка интерфейса.
 
 ## Сводка — все аспекты пройдены
 

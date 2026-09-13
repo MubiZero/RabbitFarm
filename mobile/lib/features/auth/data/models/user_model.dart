@@ -11,7 +11,7 @@ abstract class UserModel with _$UserModel {
   const factory UserModel({
     required int id,
     // Пусто у того, кто вошёл по телефону и почту не называл: с переходом на
-    // вход по номеру (см. docs/HANDOFF.md) `users.email` стал необязательным
+    // вход по номеру `users.email` стал необязательным
     // на сервере, и у приглашённого по SMS работника его действительно нет.
     String? email,
     @JsonKey(name: 'full_name') required String fullName,

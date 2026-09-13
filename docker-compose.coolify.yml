@@ -1,7 +1,7 @@
 # ВАЖНО (2026-09-08): реальный прод в Coolify больше НЕ использует этот
 # файл — RabbitFarm переведён с одного docker-compose-приложения на
 # отдельные ресурсы (Database для MySQL, Service для MinIO, обычные
-# Application для api/web), см. docs/HANDOFF.md. Файл оставлен как
+# Application для api/web), см. docs/DEPLOY.md. Файл оставлен как
 # референс/для локального прод-подобного стека, не как источник для
 # Coolify-редеплоя.
 #
