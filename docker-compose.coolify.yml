@@ -25,6 +25,9 @@ services:
       - MYSQL_ROOT_PASSWORD=${SERVICE_PASSWORD_DBROOT}
     volumes:
       - db-data:/var/lib/mysql
+      # Каталог резервных копий — отдельный том, не рабочий каталог базы
+      # (см. docs/DEPLOY.md и scripts/backup-db.sh).
+      - backups:/backups
     healthcheck:
       # Проверяем не порт, а готовность отвечать на запросы: MySQL слушает
       # раньше, чем заканчивает инициализацию.
@@ -46,6 +49,9 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
+      # Тот же том, что и у db: зеркало бакета ложится рядом с дампами,
+      # чтобы выгружать наружу одним источником.
+      - backups:/backups
     healthcheck:
       test: [ "CMD", "mc", "ready", "local" ]
       interval: 10s
@@ -150,3 +156,4 @@ services:
 volumes:
   db-data:
   minio-data:
+  backups:

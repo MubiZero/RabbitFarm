@@ -14,6 +14,9 @@ services:
       - "127.0.0.1:3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      # Каталог резервных копий — отдельный том, не рабочий каталог базы
+      # (см. docs/DEPLOY.md и scripts/backup-db.sh).
+      - backups:/backups
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
@@ -40,6 +43,9 @@ services:
       - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/data
+      # Тот же том, что и у db: зеркало бакета ложится рядом с дампами,
+      # чтобы выгружать наружу одним источником.
+      - backups:/backups
     healthcheck:
       test: [ "CMD", "mc", "ready", "local" ]
       interval: 5s
@@ -164,3 +170,4 @@ volumes:
   mysql_data:
   minio_data:
   redis_data:
+  backups:
