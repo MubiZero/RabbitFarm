@@ -1,11 +1,28 @@
 # syntax=docker/dockerfile:1
 
 # --- сборка веб-версии ---------------------------------------------------
-# 3.47.0, не более раннюю: freezed ^4.0.1 (см. коммит про апгрейд
-# кодогенерации) требует Dart >=3.13.0, которого 3.41.6 ещё не несёт —
-# `flutter pub get` на нём отказывает с тех пор, как этот образ ни разу не
-# пересобирался. Версия та же, что и в .github/workflows/mobile-release.yml.
-FROM ghcr.io/cirruslabs/flutter:3.47.0 AS build
+# SDK ставится из официального архива, а не берётся готовым образом
+# `ghcr.io/cirruslabs/flutter`: тег 3.47.0 из того реестра пропал, и деплой
+# встал на «not found» (2026-09-13). Оставаться на их последнем теге нельзя —
+# он несёт Dart 3.12, а freezed ^4.0.1 требует >=3.13.0.
+#
+# 3.47.0 — та же версия, что стоит локально и в
+# .github/workflows/mobile-release.yml; архивы на storage.googleapis.com
+# лежат для всех выпущенных версий и не исчезают.
+FROM debian:bookworm-slim AS build
+
+ARG FLUTTER_VERSION=3.47.0
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl git unzip xz-utils zip \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+      | tar -xJ -C /opt
+ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}"
+# Flutter отказывается работать в чужом git-чекауте без этой отметки —
+# распакованный архив принадлежит root, а сборка идёт от него же.
+RUN git config --global --add safe.directory /opt/flutter \
+    && flutter --version
+
 WORKDIR /app
 
 # Адрес API вшивается в бандл на этапе сборки: у Flutter web нет
