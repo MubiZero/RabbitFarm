@@ -44,7 +44,8 @@
       "Bash(git:*)",
       "Bash(sudo docker:*)",
       "Bash(sudo:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(ssh root@207.180.237.97 \"docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' zf136dgslnfbt4hyrlcxrhgf-044049472605 | cut -d= -f1 | grep -E 'SMS|SMTP|MAIL|ALLOW_REG|MIN_APP' | sort\")"
     ],
     "deny": [],
     "ask": []

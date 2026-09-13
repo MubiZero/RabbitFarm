@@ -158,4 +158,29 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('приглашение по телефону без имени не отправляется',
+      (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+
+    // Телефон — способ по умолчанию: поля номера и имени, почты нет.
+    expect(find.text('Имя работника'), findsOneWidget);
+    expect(find.text('Почта'), findsNothing);
+
+    await tester.enterText(find.byType(TextField).first, '901234567');
+    await tester.tap(find.text('Пригласить работника'));
+    await tester.pumpAndSettle();
+
+    // Диалог остался открыт и объясняет, чего не хватает: имя работник
+    // назвать больше нигде не может — он входит кодом, а не через форму.
+    expect(find.text('Пригласить на ферму'), findsOneWidget);
+    expect(find.text('Укажите имя работника'), findsOneWidget);
+  });
 }

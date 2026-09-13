@@ -10,18 +10,19 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/router/deep_links.dart';
 import '../../../../core/utils/phone_utils.dart';
+import '../../../../core/widgets/app_brand_mark.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pin_provider.dart';
 
-/// Вход по телефону — основной способ для всех: и для владельца, и для
-/// работника, приглашённого по номеру (его приглашение активирует тот же код
-/// из SMS, отдельного экрана «код приглашения» ему не нужно).
+/// Вход по коду — единственный способ попасть в аккаунт: телефон основной
+/// путь, почта запасной, оба ведут к одному и тому же шагу кода. Приглашение
+/// сотрудника активируется тем же кодом, отдельного экрана «код приглашения»
+/// нет.
 ///
-/// Номер и код — два шага одного экрана, а не два маршрута: «изменить номер»
-/// и обратный отсчёт живут рядом с полем кода, а промахнувшийся человек
-/// возвращается к номеру, не теряя введённого. Вход по почте и паролю уехал
-/// на отдельный запасной экран (`/login/password`).
+/// Контакт и код — два шага одного экрана, а не два маршрута: «изменить
+/// номер» и обратный отсчёт живут рядом с полем кода, а промахнувшийся
+/// человек возвращается к контакту, не теряя введённого.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({
     super.key,
@@ -239,17 +240,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: context.colors.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.pets, size: 36, color: context.accent),
-                    ),
-                  ),
+                  // Фирменный знак, а не `Icons.pets`: тот же значок стоит в
+                  // списках кроликов, и «логотип» приложения ничем не
+                  // отличался бы от значка одной записи.
+                  const Center(child: AppBrandMark(size: 72)),
                   const SizedBox(height: AppSpacing.xl),
                   Text(
                     context.l10n.appName,
