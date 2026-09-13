@@ -51,7 +51,18 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+  // `X-App-Version` шлёт каждый запрос клиента (см. mobile `api_interceptors`)
+  // — по нему сервер отличает сборки ниже минимально поддерживаемой. Без него
+  // в списке браузер резал preflight, и веб-версия вообще не могла достучаться
+  // до API: любой запрос падал как «нет связи». На мобильных CORS нет, поэтому
+  // всплыло только на боевом вебе (2026-09-13).
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'X-Requested-With',
+    'X-App-Version'
+  ],
   exposedHeaders: ['Content-Length', 'X-Total-Count']
 };
 app.use(cors(corsOptions));
