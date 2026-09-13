@@ -9,6 +9,7 @@ import '../../../../core/offline_queue/offline_queue.dart';
 import '../../../../core/providers/connectivity.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
+import '../../../../core/api/paginated.dart';
 import '../../data/models/task_model.dart';
 import '../../data/repositories/tasks_repository.dart';
 
@@ -151,19 +152,16 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
       );
 
       final tasks = result['tasks'] as List<Task>;
-      final pagination = result['pagination'] as Map<String, dynamic>;
-      final page = pagination['page'] as int;
-      final totalPages = pagination['pages'] as int;
-      final total = pagination['total'] as int? ?? 0;
+      final pagination = result['pagination'] as PageInfo;
 
       _hasFreshData = true;
       state = state.copyWith(
         tasks: tasks,
         isLoading: false,
-        currentPage: page,
-        totalPages: totalPages,
-        total: total,
-        hasMore: page < totalPages,
+        currentPage: pagination.page,
+        totalPages: pagination.totalPages,
+        total: pagination.total,
+        hasMore: pagination.hasMore,
       );
 
       // На диск кладётся только список без фильтров: иначе «просроченные»
@@ -196,18 +194,15 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
       );
 
       final tasks = result['tasks'] as List<Task>;
-      final pagination = result['pagination'] as Map<String, dynamic>;
-      final page = pagination['page'] as int;
-      final totalPages = pagination['pages'] as int;
-      final total = pagination['total'] as int? ?? 0;
+      final pagination = result['pagination'] as PageInfo;
 
       state = state.copyWith(
         tasks: [...state.tasks, ...tasks],
         isLoading: false,
-        currentPage: page,
-        totalPages: totalPages,
-        total: total,
-        hasMore: page < totalPages,
+        currentPage: pagination.page,
+        totalPages: pagination.totalPages,
+        total: pagination.total,
+        hasMore: pagination.hasMore,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e);

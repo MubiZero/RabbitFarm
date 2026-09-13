@@ -62,7 +62,11 @@ class TasksRepository {
 
       return {
         'tasks': tasks,
-        'pagination': data is Map ? data['pagination'] : null,
+        // Разбор пагинации — общий `PageInfo`, а не сырая мапа: раньше
+        // провайдер сам читал из неё ключ `pages`, которого в конверте нет
+        // (сервер отдаёт `totalPages`), и экран задач падал на `null as int`
+        // при любом ответе — в том числе на пустой ферме.
+        'pagination': PageInfo.of(data, fallbackCount: tasks.length),
       };
     }, 'Не удалось загрузить задачи');
   }
