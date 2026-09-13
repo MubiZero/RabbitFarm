@@ -91,6 +91,24 @@ describe('Галерея фото кролика', () => {
       expect(await objectExists(res.body.data.url)).toBe(true);
     });
 
+    // Мало положить файл в бакет — его ещё должно быть видно по тому самому
+    // URL, который сохранён в базе и уедет в приложение. Проверок на это не
+    // было, и маршрут отдачи остался с двумя сегментами пути, когда ключи
+    // получили префикс фермы.
+    it('загруженное фото отдаётся по сохранённому URL', async () => {
+      const upload = await request(app)
+        .post(`/api/v1/rabbits/${rabbitId}/photos`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .attach('photo', PNG_1PX, 'served.png');
+
+      expect(upload.status).toBe(201);
+
+      const file = await request(app).get(upload.body.data.url);
+
+      expect(file.status).toBe(200);
+      expect(file.headers['content-type']).toBe('image/png');
+    });
+
     it('работнику нельзя добавлять фото', async () => {
       const res = await request(app)
         .post(`/api/v1/rabbits/${rabbitId}/photos`)
