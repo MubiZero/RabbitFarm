@@ -16,7 +16,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Plan {
 
-@IntConverter() int get id; String get name;@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? get maxRabbits;@JsonKey(name: 'max_staff')@NullableIntConverter() int? get maxStaff;@DoubleConverter() double? get price;@JsonKey(name: 'is_active') bool get isActive;@JsonKey(name: 'is_default') bool get isDefault;
+@IntConverter() int get id; String get name;@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? get maxRabbits;@JsonKey(name: 'max_staff')@NullableIntConverter() int? get maxStaff;@DoubleConverter() double? get price;@JsonKey(name: 'is_active') bool get isActive;@JsonKey(name: 'is_default') bool get isDefault;/// Сколько живых ферм сейчас на этом тарифе.
+///
+/// Нужно там, где тариф трогают: удаление стирает его и обнуляет `plan_id`
+/// у ферм. Раньше сервер этого числа не отдавал, и диалог удаления молчал
+/// о том, задевает он одну ферму или половину сервиса.
+@JsonKey(name: 'farms_count')@IntConverter() int get farmsCount;
 /// Create a copy of Plan
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +35,20 @@ $PlanCopyWith<Plan> get copyWith => _$PlanCopyWithImpl<Plan>(this as Plan, _$ide
 @override
 bool operator ==(Object other) {
   final _this = this as Plan;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Plan&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.maxRabbits, _this.maxRabbits) || other.maxRabbits == _this.maxRabbits)&&(identical(other.maxStaff, _this.maxStaff) || other.maxStaff == _this.maxStaff)&&(identical(other.price, _this.price) || other.price == _this.price)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Plan&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.maxRabbits, _this.maxRabbits) || other.maxRabbits == _this.maxRabbits)&&(identical(other.maxStaff, _this.maxStaff) || other.maxStaff == _this.maxStaff)&&(identical(other.price, _this.price) || other.price == _this.price)&&(identical(other.isActive, _this.isActive) || other.isActive == _this.isActive)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault)&&(identical(other.farmsCount, _this.farmsCount) || other.farmsCount == _this.farmsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Plan;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.maxRabbits,_this.maxStaff,_this.price,_this.isActive,_this.isDefault);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.maxRabbits,_this.maxStaff,_this.price,_this.isActive,_this.isDefault,_this.farmsCount);
 }
 
 @override
 String toString() {
   final _this = this as Plan;
-  return 'Plan(id: ${_this.id}, name: ${_this.name}, maxRabbits: ${_this.maxRabbits}, maxStaff: ${_this.maxStaff}, price: ${_this.price}, isActive: ${_this.isActive}, isDefault: ${_this.isDefault})';
+  return 'Plan(id: ${_this.id}, name: ${_this.name}, maxRabbits: ${_this.maxRabbits}, maxStaff: ${_this.maxStaff}, price: ${_this.price}, isActive: ${_this.isActive}, isDefault: ${_this.isDefault}, farmsCount: ${_this.farmsCount})';
 }
 
 
@@ -54,7 +59,7 @@ abstract mixin class $PlanCopyWith<$Res>  {
   factory $PlanCopyWith(Plan value, $Res Function(Plan) _then) = _$PlanCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String name,@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? maxRabbits,@JsonKey(name: 'max_staff')@NullableIntConverter() int? maxStaff,@DoubleConverter() double? price,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_default') bool isDefault
+@IntConverter() int id, String name,@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? maxRabbits,@JsonKey(name: 'max_staff')@NullableIntConverter() int? maxStaff,@DoubleConverter() double? price,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_default') bool isDefault,@JsonKey(name: 'farms_count')@IntConverter() int farmsCount
 });
 
 
@@ -71,7 +76,7 @@ class _$PlanCopyWithImpl<$Res>
 
 /// Create a copy of Plan
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? maxRabbits = freezed,Object? maxStaff = freezed,Object? price = freezed,Object? isActive = null,Object? isDefault = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? maxRabbits = freezed,Object? maxStaff = freezed,Object? price = freezed,Object? isActive = null,Object? isDefault = null,Object? farmsCount = null,}) {
   return _then(Plan(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -80,7 +85,8 @@ as int?,maxStaff: freezed == maxStaff ? _self.maxStaff : maxStaff // ignore: cas
 as int?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,farmsCount: null == farmsCount ? _self.farmsCount : farmsCount // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -165,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault, @JsonKey(name: 'farms_count')@IntConverter()  int farmsCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Plan() when $default != null:
-return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault,_that.farmsCount);case _:
   return orElse();
 
 }
@@ -186,10 +192,10 @@ return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault, @JsonKey(name: 'farms_count')@IntConverter()  int farmsCount)  $default,) {final _that = this;
 switch (_that) {
 case _Plan():
-return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault,_that.farmsCount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +212,10 @@ return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name, @JsonKey(name: 'max_rabbits')@NullableIntConverter()  int? maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter()  int? maxStaff, @DoubleConverter()  double? price, @JsonKey(name: 'is_active')  bool isActive, @JsonKey(name: 'is_default')  bool isDefault, @JsonKey(name: 'farms_count')@IntConverter()  int farmsCount)?  $default,) {final _that = this;
 switch (_that) {
 case _Plan() when $default != null:
-return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,_that.isActive,_that.isDefault,_that.farmsCount);case _:
   return null;
 
 }
@@ -221,7 +227,7 @@ return $default(_that.id,_that.name,_that.maxRabbits,_that.maxStaff,_that.price,
 @JsonSerializable()
 
 class _Plan extends Plan {
-  const _Plan({@IntConverter() required this.id, required this.name, @JsonKey(name: 'max_rabbits')@NullableIntConverter() this.maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter() this.maxStaff, @DoubleConverter() this.price, @JsonKey(name: 'is_active') this.isActive = true, @JsonKey(name: 'is_default') this.isDefault = false}): super._();
+  const _Plan({@IntConverter() required this.id, required this.name, @JsonKey(name: 'max_rabbits')@NullableIntConverter() this.maxRabbits, @JsonKey(name: 'max_staff')@NullableIntConverter() this.maxStaff, @DoubleConverter() this.price, @JsonKey(name: 'is_active') this.isActive = true, @JsonKey(name: 'is_default') this.isDefault = false, @JsonKey(name: 'farms_count')@IntConverter() this.farmsCount = 0}): super._();
   factory _Plan.fromJson(Map<String, dynamic> json) => _$PlanFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -231,6 +237,12 @@ class _Plan extends Plan {
 @override@DoubleConverter() final  double? price;
 @override@JsonKey(name: 'is_active') final  bool isActive;
 @override@JsonKey(name: 'is_default') final  bool isDefault;
+/// Сколько живых ферм сейчас на этом тарифе.
+///
+/// Нужно там, где тариф трогают: удаление стирает его и обнуляет `plan_id`
+/// у ферм. Раньше сервер этого числа не отдавал, и диалог удаления молчал
+/// о том, задевает он одну ферму или половину сервиса.
+@override@JsonKey(name: 'farms_count')@IntConverter() final  int farmsCount;
 
 /// Create a copy of Plan
 /// with the given fields replaced by the non-null parameter values.
@@ -245,18 +257,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Plan&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.maxRabbits, maxRabbits) || other.maxRabbits == maxRabbits)&&(identical(other.maxStaff, maxStaff) || other.maxStaff == maxStaff)&&(identical(other.price, price) || other.price == price)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Plan&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.maxRabbits, maxRabbits) || other.maxRabbits == maxRabbits)&&(identical(other.maxStaff, maxStaff) || other.maxStaff == maxStaff)&&(identical(other.price, price) || other.price == price)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.farmsCount, farmsCount) || other.farmsCount == farmsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,maxRabbits,maxStaff,price,isActive,isDefault);
+    return Object.hash(runtimeType,id,name,maxRabbits,maxStaff,price,isActive,isDefault,farmsCount);
 }
 
 @override
 String toString() {
-    return 'Plan(id: $id, name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive, isDefault: $isDefault)';
+    return 'Plan(id: $id, name: $name, maxRabbits: $maxRabbits, maxStaff: $maxStaff, price: $price, isActive: $isActive, isDefault: $isDefault, farmsCount: $farmsCount)';
 }
 
 
@@ -267,7 +279,7 @@ abstract mixin class _$PlanCopyWith<$Res> implements $PlanCopyWith<$Res> {
   factory _$PlanCopyWith(_Plan value, $Res Function(_Plan) _then) = __$PlanCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String name,@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? maxRabbits,@JsonKey(name: 'max_staff')@NullableIntConverter() int? maxStaff,@DoubleConverter() double? price,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_default') bool isDefault
+@IntConverter() int id, String name,@JsonKey(name: 'max_rabbits')@NullableIntConverter() int? maxRabbits,@JsonKey(name: 'max_staff')@NullableIntConverter() int? maxStaff,@DoubleConverter() double? price,@JsonKey(name: 'is_active') bool isActive,@JsonKey(name: 'is_default') bool isDefault,@JsonKey(name: 'farms_count')@IntConverter() int farmsCount
 });
 
 
@@ -284,7 +296,7 @@ class __$PlanCopyWithImpl<$Res>
 
 /// Create a copy of Plan
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? maxRabbits = freezed,Object? maxStaff = freezed,Object? price = freezed,Object? isActive = null,Object? isDefault = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? maxRabbits = freezed,Object? maxStaff = freezed,Object? price = freezed,Object? isActive = null,Object? isDefault = null,Object? farmsCount = null,}) {
   return _then(_Plan(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -293,7 +305,8 @@ as int?,maxStaff: freezed == maxStaff ? _self.maxStaff : maxStaff // ignore: cas
 as int?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,farmsCount: null == farmsCount ? _self.farmsCount : farmsCount // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

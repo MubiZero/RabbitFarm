@@ -26,6 +26,12 @@ abstract class Plan with _$Plan {
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
     @JsonKey(name: 'is_default') @Default(false) bool isDefault,
+    /// Сколько живых ферм сейчас на этом тарифе.
+    ///
+    /// Нужно там, где тариф трогают: удаление стирает его и обнуляет `plan_id`
+    /// у ферм. Раньше сервер этого числа не отдавал, и диалог удаления молчал
+    /// о том, задевает он одну ферму или половину сервиса.
+    @JsonKey(name: 'farms_count') @Default(0) @IntConverter() int farmsCount,
   }) = _Plan;
 
   const Plan._();

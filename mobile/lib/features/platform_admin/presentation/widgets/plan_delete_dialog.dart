@@ -15,9 +15,9 @@ import '../../data/models/platform_admin_models.dart';
 /// только нынешние фермы, но и все будущие регистрации — они останутся вовсе
 /// без тарифа, пока таким не отмечен другой (`planService.getDefault`).
 ///
-/// Сколько ферм сейчас на этом тарифе, здесь не написано намеренно: сервер
-/// такого числа не отдаёт ни в списке тарифов, ни в сводке, а придумывать
-/// его — хуже, чем промолчать.
+/// Сколько ферм сейчас на этом тарифе — главное число в этом окне: одно дело
+/// стереть тариф, на котором никого, другое — тот, на котором половина
+/// сервиса. Сервер его раньше не отдавал вовсе, и окно об этом молчало.
 Future<bool> showPlanDeleteDialog(BuildContext context,
     {required Plan plan}) async {
   final confirmed = await showDialog<bool>(
@@ -32,6 +32,15 @@ Future<bool> showPlanDeleteDialog(BuildContext context,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.platformPlanDeleteBody(plan.name)),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              l10n.platformPlanDeleteFarms(plan.farmsCount),
+              style: AppTypography.bodyMd.copyWith(
+                color: plan.farmsCount > 0
+                    ? AppColors.warning
+                    : dialogContext.colors.onSurfaceVariant,
+              ),
+            ),
             if (plan.isDefault) ...[
               const SizedBox(height: AppSpacing.md),
               _Warning(l10n.platformPlanDeleteDefaultWarning),

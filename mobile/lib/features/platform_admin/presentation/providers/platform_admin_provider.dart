@@ -772,3 +772,14 @@ final platformAuditProvider = StateNotifierProvider.autoDispose<
     PlatformAuditNotifier, PlatformAuditState>((ref) {
   return PlatformAuditNotifier(ref.watch(platformAdminRepositoryProvider));
 });
+
+/// Журнал одной фермы. Сервер и репозиторий сужение по ферме умели с самого
+/// начала, а спросить его было неоткуда: вопрос «кто закрыл эту ферму и
+/// зачем» задают, стоя на её карточке, а не листая журнал всего сервиса.
+final platformFarmAuditProvider = StateNotifierProvider.autoDispose
+    .family<PlatformAuditNotifier, PlatformAuditState, int>((ref, farmId) {
+  return PlatformAuditNotifier(
+    ref.watch(platformAdminRepositoryProvider),
+    farmId: farmId,
+  );
+});

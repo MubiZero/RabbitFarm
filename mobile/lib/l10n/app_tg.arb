@@ -1083,6 +1083,10 @@
   "platformPlanNew": "Тарифи нав",
   "platformPlanEdit": "Тағйир додан",
   "platformPlanDeleteTitle": "Тарифро нест кунем?",
+  "platformPlanDeleteFarms": "{count, plural, =0{Ҳоло дар ин таъриф ягон ферма нест.} one{Ҳоло дар он {count} ферма ҳаст — он бе маҳдудият кор мекунад.} other{Ҳоло дар он {count} ферма ҳаст — онҳо бе маҳдудият кор мекунанд.}}",
+  "@platformPlanDeleteFarms": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "platformPlanDeleteBody": "«{name}» аз рӯйхат нест мешавад, фермаҳои дар он буда бе маҳдудият кор мекунанд. Сабтҳои онҳо дахл намекунанд.",
   "platformPlanDeleted": "Тариф нест карда шуд",
   "platformPlanUnlimited": "Бе маҳдудият",
@@ -1132,6 +1136,14 @@
   "platformFarmStatusConfirmBody": "Хоҷагӣ ба ҳолати «{status}» мегузарад. Одамони ферма инро дарҳол, бе воридшавии нав мебинанд.",
   "platformFarmStatusApply": "Татбиқ кардан",
   "platformFarmStatusUpdated": "Дастрасӣ нав карда шуд",
+  "platformFarmSectionAudit": "Бо он чӣ карданд",
+  "platformFarmAuditEmpty": "Админҳо ин фермаро даст назадаанд.",
+  "platformFarmAuditLoading": "Журналро мебинем…",
+  "platformFarmAuditAll": "Тамоми журнал",
+  "platformFarmStatusExpiredWarning": "Таъриф {date} ба охир расид. Санҷиши шабона фермаро боз ба «Танҳо хондан» бармегардонад — барои нигоҳ доштани дастрасӣ аввал таърифро дароз кунед.",
+  "@platformFarmStatusExpiredWarning": {
+    "placeholders": { "date": { "type": "String" } }
+  },
   "platformFarmPlanForever": "Бемуҳлат",
   "platformFarmPlanExpires": "То {date} амал мекунад",
   "platformFarmPlanExpired": "Мӯҳлаташ {date} гузашт",

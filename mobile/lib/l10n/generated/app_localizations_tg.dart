@@ -3592,6 +3592,18 @@ class AppLocalizationsTg extends AppLocalizations {
   String get platformPlanDeleteTitle => 'Тарифро нест кунем?';
 
   @override
+  String platformPlanDeleteFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ҳоло дар он $count ферма ҳаст — онҳо бе маҳдудият кор мекунанд.',
+      one: 'Ҳоло дар он $count ферма ҳаст — он бе маҳдудият кор мекунад.',
+      zero: 'Ҳоло дар ин таъриф ягон ферма нест.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String platformPlanDeleteBody(String name) {
     return '«$name» аз рӯйхат нест мешавад, фермаҳои дар он буда бе маҳдудият кор мекунанд. Сабтҳои онҳо дахл намекунанд.';
   }
@@ -3765,6 +3777,23 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get platformFarmStatusUpdated => 'Дастрасӣ нав карда шуд';
+
+  @override
+  String get platformFarmSectionAudit => 'Бо он чӣ карданд';
+
+  @override
+  String get platformFarmAuditEmpty => 'Админҳо ин фермаро даст назадаанд.';
+
+  @override
+  String get platformFarmAuditLoading => 'Журналро мебинем…';
+
+  @override
+  String get platformFarmAuditAll => 'Тамоми журнал';
+
+  @override
+  String platformFarmStatusExpiredWarning(String date) {
+    return 'Таъриф $date ба охир расид. Санҷиши шабона фермаро боз ба «Танҳо хондан» бармегардонад — барои нигоҳ доштани дастрасӣ аввал таърифро дароз кунед.';
+  }
 
   @override
   String get platformFarmPlanForever => 'Бемуҳлат';

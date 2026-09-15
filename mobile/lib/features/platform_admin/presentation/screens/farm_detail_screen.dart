@@ -13,6 +13,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
+import '../widgets/audit_entry_card.dart';
 import '../widgets/farm_delete_dialog.dart';
 import '../widgets/farm_extras_dialog.dart';
 import '../widgets/farm_impersonate_dialog.dart';
@@ -122,6 +123,12 @@ class FarmDetailScreen extends ConsumerWidget {
                 title: context.l10n.platformFarmSectionFacts,
                 child: _FactsCard(farm: farm),
               ),
+              // Журнал именно этой фермы: вопрос «кто закрыл её и зачем»
+              // задают здесь, а не листая журнал всего сервиса.
+              _Section(
+                title: context.l10n.platformFarmSectionAudit,
+                child: _FarmAudit(farmId: farm.id),
+              ),
               _Section(
                 title: context.l10n.platformFarmSectionExport,
                 child: _ExportCard(
@@ -170,13 +177,39 @@ class FarmDetailScreen extends ConsumerWidget {
     // Выбрали то же самое — запрос не нужен.
     if (choice == farm.status) return;
 
+    // Вернуть в «Работает как обычно» ферму с истёкшим тарифом можно, но
+    // ночная задача переведёт её обратно в `read_only` (planExpiryReminderJob)
+    // — и админ узнавал об этом наутро от самой фермы. Рычаг, который держит
+    // доступ, другой: продление тарифа.
+    final expiresAt = farm.planExpiresAt;
+    final revertsTonight = choice == 'active' &&
+        expiresAt != null &&
+        expiresAt.isBefore(DateTime.now());
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: Icon(farmStatusIcon(choice), color: farmStatusColor(context, choice)),
         title: Text(l10n.platformFarmStatusConfirmTitle),
-        content: Text(
-          l10n.platformFarmStatusConfirmBody(farmStatusLabel(context, choice)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.platformFarmStatusConfirmBody(
+                farmStatusLabel(context, choice),
+              ),
+            ),
+            if (revertsTonight) ...[
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.platformFarmStatusExpiredWarning(
+                  DateFormat('d MMMM y', 'ru').format(expiresAt),
+                ),
+                style: TextStyle(color: AppColors.warning),
+              ),
+            ],
+          ],
         ),
         actions: [
           TextButton(
@@ -1106,6 +1139,82 @@ class _Muted extends StatelessWidget {
       text,
       style: AppTypography.bodyMd
           .copyWith(color: context.colors.onSurfaceVariant),
+    );
+  }
+}
+
+/// Что админы делали с этой фермой.
+///
+/// Первые несколько строк прямо на карточке, дальше — общий журнал: полный
+/// список с постраничной подгрузкой здесь был бы вторым бесконечным списком
+/// внутри карточки, которую и так листают.
+class _FarmAudit extends ConsumerWidget {
+  const _FarmAudit({required this.farmId});
+
+  final int farmId;
+
+  static const _preview = 5;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(platformFarmAuditProvider(farmId));
+    // Тарифы — чтобы смена тарифа читалась названием, а не номером. Не
+    // приехали — строка показывается как есть, ждать их незачем.
+    final plans = ref.watch(platformPlansProvider).value ?? const <Plan>[];
+
+    // Журнал не приехал — так и говорим. Пустой список здесь означал бы
+    // «админы эту ферму не трогали», а это утверждение, которого мы не знаем:
+    // молчание сети выдавать за молчание журнала нельзя.
+    if (state.error != null && state.items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                errorText(context.l10n, state.error!),
+                style: AppTypography.bodyMd
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+            ),
+            TextButton(
+              onPressed: ref.read(platformFarmAuditProvider(farmId).notifier).load,
+              child: Text(context.l10n.commonRetry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Text(
+          // Крутящийся кружок внутри карточки, которую и так листают, — лишнее
+          // движение; строка отличает «ещё смотрим» от «не трогали».
+          state.isLoading
+              ? context.l10n.platformFarmAuditLoading
+              : context.l10n.platformFarmAuditEmpty,
+          style: AppTypography.bodyMd
+              .copyWith(color: context.colors.onSurfaceVariant),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final entry in state.items.take(_preview))
+          AuditEntryCard(entry: entry, plans: plans),
+        if (state.total > _preview)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => context.push('/platform-admin?tab=audit'),
+              child: Text(context.l10n.platformFarmAuditAll),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -3614,6 +3614,18 @@ class AppLocalizationsUz extends AppLocalizations {
   String get platformPlanDeleteTitle => 'Tarif oʻchirilsinmi?';
 
   @override
+  String platformPlanDeleteFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Hozir unda $count ferma bor — ular cheklovsiz ishlaydi.',
+      one: 'Hozir unda $count ferma bor — u cheklovsiz ishlaydi.',
+      zero: 'Hozir bu tarifda birorta ferma yoʻq.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String platformPlanDeleteBody(String name) {
     return '«$name» roʻyxatdan yoʻqoladi, undagi fermalar esa chegarasiz ishlay boshlaydi. Ularning yozuvlariga tegilmaydi.';
   }
@@ -3789,6 +3801,23 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get platformFarmStatusUpdated => 'Kirish yangilandi';
+
+  @override
+  String get platformFarmSectionAudit => 'U bilan nima qilingan';
+
+  @override
+  String get platformFarmAuditEmpty => 'Adminlar bu fermaga tegmagan.';
+
+  @override
+  String get platformFarmAuditLoading => 'Jurnalga qaraymiz…';
+
+  @override
+  String get platformFarmAuditAll => 'Butun jurnal';
+
+  @override
+  String platformFarmStatusExpiredWarning(String date) {
+    return 'Tarif $date da tugagan. Tungi tekshiruv fermani yana «Faqat oʻqish» holatiga qaytaradi — kirish saqlanishi uchun avval tarifni uzaytiring.';
+  }
 
   @override
   String get platformFarmPlanForever => 'Muddatsiz';

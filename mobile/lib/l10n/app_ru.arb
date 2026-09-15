@@ -1472,6 +1472,10 @@
   "platformPlanNew": "Новый тариф",
   "platformPlanEdit": "Изменить",
   "platformPlanDeleteTitle": "Удалить тариф?",
+  "platformPlanDeleteFarms": "{count, plural, =0{На этом тарифе сейчас нет ни одной фермы.} one{На нём сейчас {count} ферма — она станет работать без ограничений.} few{На нём сейчас {count} фермы — они станут работать без ограничений.} other{На нём сейчас {count} ферм — они станут работать без ограничений.}}",
+  "@platformPlanDeleteFarms": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "platformPlanDeleteBody": "«{name}» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.",
   "@platformPlanDeleteBody": {
     "placeholders": {
@@ -1554,6 +1558,14 @@
   },
   "platformFarmStatusApply": "Применить",
   "platformFarmStatusUpdated": "Доступ обновлён",
+  "platformFarmSectionAudit": "Что с ней делали",
+  "platformFarmAuditEmpty": "Админы эту ферму не трогали.",
+  "platformFarmAuditLoading": "Смотрим журнал…",
+  "platformFarmAuditAll": "Весь журнал",
+  "platformFarmStatusExpiredWarning": "Тариф истёк {date}. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.",
+  "@platformFarmStatusExpiredWarning": {
+    "placeholders": { "date": { "type": "String" } }
+  },
 
   "platformFarmPlanForever": "Бессрочно",
   "platformFarmPlanExpires": "Действует до {date}",

@@ -3607,6 +3607,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platformPlanDeleteTitle => 'Delete plan?';
 
   @override
+  String platformPlanDeleteFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count farms are on it — they will run without limits.',
+      one: '$count farm is on it — it will run without limits.',
+      zero: 'No farm is on this plan right now.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String platformPlanDeleteBody(String name) {
     return '\"$name\" will be removed from the list, and farms on it will run without limits. Their records won\'t be affected.';
   }
@@ -3782,6 +3794,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get platformFarmStatusUpdated => 'Access updated';
+
+  @override
+  String get platformFarmSectionAudit => 'What was done to it';
+
+  @override
+  String get platformFarmAuditEmpty => 'No admin has touched this farm.';
+
+  @override
+  String get platformFarmAuditLoading => 'Checking the log…';
+
+  @override
+  String get platformFarmAuditAll => 'Full log';
+
+  @override
+  String platformFarmStatusExpiredWarning(String date) {
+    return 'The plan expired on $date. The nightly check will put the farm back to read-only — extend the plan first if the access is to stay.';
+  }
 
   @override
   String get platformFarmPlanForever => 'Unlimited';

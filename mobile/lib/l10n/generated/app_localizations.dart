@@ -6564,6 +6564,12 @@ abstract class AppLocalizations {
   /// **'Удалить тариф?'**
   String get platformPlanDeleteTitle;
 
+  /// No description provided for @platformPlanDeleteFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{На этом тарифе сейчас нет ни одной фермы.} one{На нём сейчас {count} ферма — она станет работать без ограничений.} few{На нём сейчас {count} фермы — они станут работать без ограничений.} other{На нём сейчас {count} ферм — они станут работать без ограничений.}}'**
+  String platformPlanDeleteFarms(int count);
+
   /// No description provided for @platformPlanDeleteBody.
   ///
   /// In ru, this message translates to:
@@ -6857,6 +6863,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Доступ обновлён'**
   String get platformFarmStatusUpdated;
+
+  /// No description provided for @platformFarmSectionAudit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что с ней делали'**
+  String get platformFarmSectionAudit;
+
+  /// No description provided for @platformFarmAuditEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Админы эту ферму не трогали.'**
+  String get platformFarmAuditEmpty;
+
+  /// No description provided for @platformFarmAuditLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смотрим журнал…'**
+  String get platformFarmAuditLoading;
+
+  /// No description provided for @platformFarmAuditAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Весь журнал'**
+  String get platformFarmAuditAll;
+
+  /// No description provided for @platformFarmStatusExpiredWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф истёк {date}. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.'**
+  String platformFarmStatusExpiredWarning(String date);
 
   /// No description provided for @platformFarmPlanForever.
   ///

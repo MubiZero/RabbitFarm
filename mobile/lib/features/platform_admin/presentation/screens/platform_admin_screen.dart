@@ -25,7 +25,22 @@ import '../widgets/support_contact_dialog.dart';
 /// «Хозяйстве» и лишь при флаге суперадмина, а сервер и так откажет
 /// остальным.
 class PlatformAdminScreen extends StatefulWidget {
-  const PlatformAdminScreen({super.key});
+  const PlatformAdminScreen({super.key, this.initialTab});
+
+  /// С какой вкладки открыть. Имя, а не номер: ссылка «Весь журнал» с
+  /// карточки фермы не должна ломаться от того, что вкладок стало больше.
+  final String? initialTab;
+
+  /// Порядок вкладок на экране. Один список на разбор ссылки и на сборку
+  /// самих вкладок: разойдясь, они открывали бы не то, что обещает ссылка.
+  static const tabs = [
+    'summary',
+    'farms',
+    'plans',
+    'announcements',
+    'support',
+    'audit',
+  ];
 
   @override
   State<PlatformAdminScreen> createState() => _PlatformAdminScreenState();
@@ -36,7 +51,7 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
   static const _plansTab = 2;
   static const _announcementsTab = 3;
   static const _supportTab = 4;
-  static const _tabCount = 6;
+  static final _tabCount = PlatformAdminScreen.tabs.length;
 
   late final TabController _tabs;
 
@@ -45,8 +60,12 @@ class _PlatformAdminScreenState extends State<PlatformAdminScreen>
     super.initState();
     // Кнопка внизу справа своя у каждой вкладки, а на сводке, списке ферм и
     // обращениях её нет вовсе — поэтому экран следит за переключением.
-    _tabs = TabController(length: _tabCount, vsync: this)
-      ..addListener(() => setState(() {}));
+    final requested = PlatformAdminScreen.tabs.indexOf(widget.initialTab ?? '');
+    _tabs = TabController(
+      length: _tabCount,
+      vsync: this,
+      initialIndex: requested < 0 ? 0 : requested,
+    )..addListener(() => setState(() {}));
   }
 
   @override

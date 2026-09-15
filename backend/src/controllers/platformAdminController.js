@@ -20,7 +20,7 @@ class PlatformAdminController {
   /** GET /platform-admin/plans */
   async listPlans(req, res, next) {
     try {
-      const plans = await planService.list();
+      const plans = await planService.listWithFarmCount();
       return ApiResponse.success(res, plans, 'Список тарифов получен');
     } catch (error) {
       next(error);

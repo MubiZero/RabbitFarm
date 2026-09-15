@@ -3646,6 +3646,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformPlanDeleteTitle => 'Удалить тариф?';
 
   @override
+  String platformPlanDeleteFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'На нём сейчас $count ферм — они станут работать без ограничений.',
+      few: 'На нём сейчас $count фермы — они станут работать без ограничений.',
+      one: 'На нём сейчас $count ферма — она станет работать без ограничений.',
+      zero: 'На этом тарифе сейчас нет ни одной фермы.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String platformPlanDeleteBody(String name) {
     return '«$name» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.';
   }
@@ -3825,6 +3838,23 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFarmStatusUpdated => 'Доступ обновлён';
+
+  @override
+  String get platformFarmSectionAudit => 'Что с ней делали';
+
+  @override
+  String get platformFarmAuditEmpty => 'Админы эту ферму не трогали.';
+
+  @override
+  String get platformFarmAuditLoading => 'Смотрим журнал…';
+
+  @override
+  String get platformFarmAuditAll => 'Весь журнал';
+
+  @override
+  String platformFarmStatusExpiredWarning(String date) {
+    return 'Тариф истёк $date. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.';
+  }
 
   @override
   String get platformFarmPlanForever => 'Бессрочно';

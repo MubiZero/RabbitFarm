@@ -143,6 +143,32 @@ class _FakeRepository extends PlatformAdminRepository {
     return farm;
   }
 
+  /// Журнал, суженный до одной фермы. `farmId` записывается: сужение — весь
+  /// смысл секции, без него на карточке был бы журнал всего сервиса.
+  final auditFarmIds = <int?>[];
+
+  @override
+  Future<AuditPage> getAuditLog({
+    int page = 1,
+    int limit = 20,
+    int? farmId,
+  }) async {
+    auditFarmIds.add(farmId);
+    return (
+      items: [
+        AdminAuditEntry(
+          id: 1,
+          adminId: 7,
+          action: 'farm_status',
+          farmId: farmId,
+          admin: const UserRef(id: 7, fullName: 'Админ Админов'),
+          createdAt: DateTime(2026, 9, 10, 12),
+        ),
+      ],
+      page: PageInfo(page: 1, limit: limit, total: 1, totalPages: 1),
+    );
+  }
+
   @override
   Future<PlatformFarmDetail> updateFarmStatus(int farmId, String status) async {
     statusCalls.add(status);
@@ -372,6 +398,50 @@ void main() {
       expect(find.text('Доступ обновлён'), findsOneWidget);
       // Карточка обновилась из ответа, без второй загрузки.
       expect(find.text('Только чтение'), findsWidgets);
+    });
+
+    // Вернуть в «Работает как обычно» ферму с истёкшим тарифом можно, но
+    // ночная задача переведёт её обратно в `read_only`. Админ узнавал об этом
+    // наутро от самой фермы.
+    testWidgets('возврат просроченной фермы предупреждает о ночном откате', (
+      tester,
+    ) async {
+      final repository = _FakeRepository(
+        farm: _farm(
+          status: 'read_only',
+          planExpiresAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Изменить доступ'));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(ListTile, 'Работает как обычно'));
+      await _settle(tester);
+
+      expect(find.textContaining('Ночная проверка'), findsOneWidget);
+    });
+
+    testWidgets('у фермы с действующим тарифом предупреждения нет', (
+      tester,
+    ) async {
+      final repository = _FakeRepository(
+        farm: _farm(
+          status: 'read_only',
+          planExpiresAt: DateTime.now().add(const Duration(days: 20)),
+        ),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Изменить доступ'));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(ListTile, 'Работает как обычно'));
+      await _settle(tester);
+
+      expect(find.text('Изменить доступ?'), findsOneWidget);
+      expect(find.textContaining('Ночная проверка'), findsNothing);
     });
 
     testWidgets('отказ от подтверждения ничего не отправляет', (tester) async {
@@ -796,6 +866,26 @@ void main() {
       expect(error, isNull);
       // Список никто не смотрит — запрашивать его страницу незачем.
       expect(container.exists(platformFarmsProvider), isFalse);
+    });
+  });
+
+  // Вопрос «кто закрыл эту ферму и зачем» задают, стоя на её карточке.
+  // Сервер и репозиторий сужение по ферме умели с самого начала, а спросить
+  // его было неоткуда.
+  group('Журнал одной фермы', () {
+    testWidgets('карточка показывает, что админы делали именно с этой фермой', (
+      tester,
+    ) async {
+      final repository = _FakeRepository();
+      await tester.pumpWidget(_screen(repository));
+      // Секция журнала лежит ближе к концу карточки: окно повыше, чтобы
+      // ListView успел её построить.
+      await _settle(tester, height: 5000);
+
+      expect(repository.auditFarmIds, [1]);
+      // Подписи групп на этом экране пишутся прописными (`AppGroupLabel`).
+      expect(find.text('ЧТО С НЕЙ ДЕЛАЛИ'), findsOneWidget);
+      expect(find.textContaining('Админ Админов'), findsWidgets);
     });
   });
 }

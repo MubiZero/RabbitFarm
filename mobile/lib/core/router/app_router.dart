@@ -725,7 +725,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/platform-admin',
         name: 'platform-admin',
-        builder: (context, state) => const PlatformAdminScreen(),
+        builder: (context, state) => PlatformAdminScreen(
+          initialTab: state.uri.queryParameters['tab'],
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

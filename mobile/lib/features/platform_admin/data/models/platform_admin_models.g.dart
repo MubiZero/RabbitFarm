@@ -17,6 +17,9 @@ _Plan _$PlanFromJson(Map<String, dynamic> json) => _Plan(
   ),
   isActive: json['is_active'] as bool? ?? true,
   isDefault: json['is_default'] as bool? ?? false,
+  farmsCount: json['farms_count'] == null
+      ? 0
+      : const IntConverter().fromJson(json['farms_count'] as Object),
 );
 
 Map<String, dynamic> _$PlanToJson(_Plan instance) => <String, dynamic>{
@@ -30,6 +33,7 @@ Map<String, dynamic> _$PlanToJson(_Plan instance) => <String, dynamic>{
   ),
   'is_active': instance.isActive,
   'is_default': instance.isDefault,
+  'farms_count': const IntConverter().toJson(instance.farmsCount),
 };
 
 Value? _$JsonConverterFromJson<Json, Value>(

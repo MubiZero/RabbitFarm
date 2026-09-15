@@ -1083,6 +1083,10 @@
   "platformPlanNew": "New plan",
   "platformPlanEdit": "Edit",
   "platformPlanDeleteTitle": "Delete plan?",
+  "platformPlanDeleteFarms": "{count, plural, =0{No farm is on this plan right now.} one{{count} farm is on it — it will run without limits.} other{{count} farms are on it — they will run without limits.}}",
+  "@platformPlanDeleteFarms": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "platformPlanDeleteBody": "\"{name}\" will be removed from the list, and farms on it will run without limits. Their records won''t be affected.",
   "platformPlanDeleted": "Plan deleted",
   "platformPlanUnlimited": "Unlimited",
@@ -1132,6 +1136,14 @@
   "platformFarmStatusConfirmBody": "The farm will move to \"{status}\" status. People on the farm will see this immediately, without signing in again.",
   "platformFarmStatusApply": "Apply",
   "platformFarmStatusUpdated": "Access updated",
+  "platformFarmSectionAudit": "What was done to it",
+  "platformFarmAuditEmpty": "No admin has touched this farm.",
+  "platformFarmAuditLoading": "Checking the log…",
+  "platformFarmAuditAll": "Full log",
+  "platformFarmStatusExpiredWarning": "The plan expired on {date}. The nightly check will put the farm back to read-only — extend the plan first if the access is to stay.",
+  "@platformFarmStatusExpiredWarning": {
+    "placeholders": { "date": { "type": "String" } }
+  },
   "platformFarmPlanForever": "Unlimited",
   "platformFarmPlanExpires": "Valid until {date}",
   "platformFarmPlanExpired": "Expired on {date}",
