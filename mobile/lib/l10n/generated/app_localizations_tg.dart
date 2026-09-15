@@ -4372,6 +4372,37 @@ class AppLocalizationsTg extends AppLocalizations {
   String get deathFormSaved => 'Талафот қайд шуд';
 
   @override
+  String get saleFormTitle => 'Фурӯшро сабт кардан';
+
+  @override
+  String get saleFormRabbit => 'Харгӯш';
+
+  @override
+  String get saleFormAmount => 'Нарх';
+
+  @override
+  String get saleFormAmountHelp =>
+      'Маблағ ба дафтари даромад меафтад, харгӯш фурӯхташуда мешавад.';
+
+  @override
+  String get saleFormAmountEmpty => 'Нависед, ба чанд фурӯхтед';
+
+  @override
+  String get saleFormDate => 'Рӯзи фурӯш';
+
+  @override
+  String get saleFormBuyer => 'Харидор';
+
+  @override
+  String get saleFormBuyerHint => 'Ба кӣ фурӯхтед — агар хоҳед дар ёд монад';
+
+  @override
+  String get saleFormSubmit => 'Сабт кардан';
+
+  @override
+  String get saleFormSaved => 'Фурӯш сабт шуд';
+
+  @override
   String get quickRecordDeath => 'Талафот';
 
   @override

@@ -49,6 +49,16 @@ String rabbitPurposeLabel(BuildContext context, String? purpose) =>
 /// отказ, а карточка по нему прятала кнопку — и не прятала никогда.
 const rabbitStatusDead = 'dead';
 
+/// Статус проданного кролика. Ставится не правкой карточки, а записью
+/// продажи: вместе с ним заводится приход и день продажи.
+const rabbitStatusSold = 'sold';
+
+/// Кролик выбыл из поголовья — продан или пал. Обратной дороги из этих
+/// статусов форма не предлагает: у каждого свой экран, где спрашивают то,
+/// без чего запись остаётся полуправдой (цену и день продажи, дату и причину
+/// падежа).
+const rabbitStatusesTerminal = [rabbitStatusSold, rabbitStatusDead];
+
 const rabbitStatuses = [
   'healthy',
   'sick',

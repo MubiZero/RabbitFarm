@@ -7,6 +7,7 @@ import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/features/cages/data/models/cage_model.dart';
 import 'package:mobile/features/cages/presentation/providers/cages_provider.dart';
 import 'package:mobile/features/rabbits/data/models/breed_model.dart';
+import 'package:mobile/features/rabbits/data/models/rabbit_model.dart';
 import 'package:mobile/features/rabbits/data/repositories/breeds_repository.dart';
 import 'package:mobile/features/rabbits/presentation/screens/rabbit_form_screen.dart';
 
@@ -26,13 +27,42 @@ class _FakeBreedsRepository extends BreedsRepository {
   ];
 }
 
-Widget _screen() => testAppScreen(
-  const RabbitFormScreen(),
+Widget _screen({RabbitModel? rabbit}) => testAppScreen(
+  RabbitFormScreen(rabbit: rabbit),
   overrides: [
     breedsRepositoryProvider.overrideWithValue(_FakeBreedsRepository()),
     cageOptionsProvider.overrideWith((ref) async => const <CageModel>[]),
   ],
 );
+
+RabbitModel _rabbit({required String status}) => RabbitModel(
+  id: 42,
+  name: 'Мушка',
+  tagId: 'A-0231',
+  breedId: 1,
+  sex: 'female',
+  birthDate: DateTime(2026, 1, 1),
+  status: status,
+  purpose: 'meat',
+  createdAt: DateTime(2026, 1, 1),
+  updatedAt: DateTime(2026, 1, 1),
+);
+
+/// Открыть список статусов. При правке блок «Дополнительно» раскрыт сам:
+/// свёрнутый поверх заполненных полей читался бы как «данные потерялись».
+Future<void> _openStatuses(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(const Size(420, 2400));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+
+  final dropdown = find.ancestor(
+    of: find.text('Статус'),
+    matching: find.byType(DropdownButtonFormField<String>),
+  );
+  await tester.ensureVisible(dropdown);
+  await tester.pumpAndSettle();
+  await tester.tap(dropdown);
+  await tester.pumpAndSettle();
+}
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -77,5 +107,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Выберите, самец это или самка'), findsOneWidget);
+  });
+
+  // «Продан» и «Пал» ставились здесь без цены, без дня и без причины — так
+  // продажа теряла приход в книге, а падёж оставался статусом без объяснения.
+  // У каждого из двух теперь свой экран с карточки кролика.
+  testWidgets('выбытие в общем списке статусов не предлагают', (tester) async {
+    await tester.pumpWidget(_screen(rabbit: _rabbit(status: 'healthy')));
+    await tester.pumpAndSettle();
+    await _openStatuses(tester);
+
+    expect(find.text('Болен'), findsWidgets);
+    expect(find.text('Продан'), findsNothing);
+    expect(find.text('Погиб'), findsNothing);
+  });
+
+  // Ошибочную продажу надо уметь отменить, вернув кролика в живые, — да и
+  // список не нашёл бы своего значения, не будь в нём текущего статуса.
+  testWidgets('проданный кролик свой статус в списке видит', (tester) async {
+    await tester.pumpWidget(_screen(rabbit: _rabbit(status: 'sold')));
+    await tester.pumpAndSettle();
+    await _openStatuses(tester);
+
+    expect(find.text('Продан'), findsWidgets);
+    expect(find.text('Погиб'), findsNothing);
   });
 }

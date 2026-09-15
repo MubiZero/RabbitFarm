@@ -325,6 +325,22 @@ class RabbitService {
         else if (!updateData.cage_id && rabbit.cage_id) updateData.cage_id = null;
       }
 
+      // Кролик выбыл — проставляем дату выбытия, если её не прислали.
+      //
+      // Поголовье в недельной сводке считается по датам, а не по статусу
+      // (`reportController`): кролик без `sold_date`/`death_date` остаётся в
+      // графике живым навсегда. Дату присылает форма продажи и форма падежа;
+      // когда статус меняют иначе, днём выбытия считаем сегодняшний — это
+      // ближе к правде, чем «не выбыл вовсе».
+      const TERMINAL_DATE = { sold: 'sold_date', dead: 'death_date' };
+      const terminalDate = TERMINAL_DATE[updateData.status];
+      if (terminalDate &&
+          updateData.status !== rabbit.status &&
+          !updateData[terminalDate] &&
+          !rabbit[terminalDate]) {
+        updateData[terminalDate] = new Date();
+      }
+
       // Check if father exists and is male
       if (updateData.father_id) {
         if (updateData.father_id === rabbitId) throw new Error('CANNOT_BE_OWN_FATHER');

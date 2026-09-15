@@ -4397,6 +4397,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deathFormSaved => 'Death recorded';
 
   @override
+  String get saleFormTitle => 'Record a sale';
+
+  @override
+  String get saleFormRabbit => 'Rabbit';
+
+  @override
+  String get saleFormAmount => 'Price';
+
+  @override
+  String get saleFormAmountHelp =>
+      'The amount goes into the income book, the rabbit becomes sold.';
+
+  @override
+  String get saleFormAmountEmpty => 'Say what it sold for';
+
+  @override
+  String get saleFormDate => 'Day of sale';
+
+  @override
+  String get saleFormBuyer => 'Buyer';
+
+  @override
+  String get saleFormBuyerHint => 'Who bought it — if you want it remembered';
+
+  @override
+  String get saleFormSubmit => 'Record';
+
+  @override
+  String get saleFormSaved => 'Sale recorded';
+
+  @override
   String get quickRecordDeath => 'Death';
 
   @override

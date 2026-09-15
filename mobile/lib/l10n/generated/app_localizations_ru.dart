@@ -4456,6 +4456,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deathFormSaved => 'Падёж отмечен';
 
   @override
+  String get saleFormTitle => 'Записать продажу';
+
+  @override
+  String get saleFormRabbit => 'Кролик';
+
+  @override
+  String get saleFormAmount => 'Цена';
+
+  @override
+  String get saleFormAmountHelp =>
+      'Сумма попадёт в книгу доходов, кролик перейдёт в проданные.';
+
+  @override
+  String get saleFormAmountEmpty => 'Укажите, за сколько продали';
+
+  @override
+  String get saleFormDate => 'День продажи';
+
+  @override
+  String get saleFormBuyer => 'Покупатель';
+
+  @override
+  String get saleFormBuyerHint => 'Кому продали — если хотите запомнить';
+
+  @override
+  String get saleFormSubmit => 'Записать';
+
+  @override
+  String get saleFormSaved => 'Продажа записана';
+
+  @override
   String get quickRecordDeath => 'Падёж';
 
   @override

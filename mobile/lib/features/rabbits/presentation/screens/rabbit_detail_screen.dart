@@ -83,13 +83,15 @@ class RabbitDetailScreen extends ConsumerWidget {
           value: rabbitAsync,
           onRetry: () => ref.invalidate(rabbitDetailProvider(rabbitId)),
           skeleton: (_) => const SkeletonList(itemHeight: 120),
-          builder: (rabbit) => _buildContent(context, rabbit),
+          builder: (rabbit) => _buildContent(context, ref, rabbit),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, RabbitModel rabbit) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, RabbitModel rabbit) {
+    final canManageFinance =
+        ref.watch(canProvider(FarmCapability.manageFinance));
     final age = formatAge(rabbit.birthDate);
     final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
@@ -309,6 +311,27 @@ class RabbitDetailScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  // Продажа отсюда же и по той же причине, что падёж: в общей
+                  // форме статус «Продан» ставился без цены и без дня, и
+                  // главный доход фермы не попадал в книгу вовсе. Выбывшему
+                  // кролику пункт не нужен, а записывает продажу тот, кто
+                  // вправе вести деньги.
+                  if (!rabbitStatusesTerminal.contains(rabbit.status) &&
+                      canManageFinance) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            context.push('/rabbits/sale', extra: rabbit),
+                        icon: const Icon(Icons.sell_outlined),
+                        label: Text(context.l10n.saleFormTitle),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
                   // Отметить падёж отсюда же: иначе это делают правкой статуса
                   // в общей форме, где дата и причина смерти вообще не
                   // спрашиваются. Павшему кролику пункт уже не нужен.

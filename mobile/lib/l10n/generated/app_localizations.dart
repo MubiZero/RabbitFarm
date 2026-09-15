@@ -7848,6 +7848,66 @@ abstract class AppLocalizations {
   /// **'Падёж отмечен'**
   String get deathFormSaved;
 
+  /// No description provided for @saleFormTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать продажу'**
+  String get saleFormTitle;
+
+  /// No description provided for @saleFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик'**
+  String get saleFormRabbit;
+
+  /// No description provided for @saleFormAmount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена'**
+  String get saleFormAmount;
+
+  /// No description provided for @saleFormAmountHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сумма попадёт в книгу доходов, кролик перейдёт в проданные.'**
+  String get saleFormAmountHelp;
+
+  /// No description provided for @saleFormAmountEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите, за сколько продали'**
+  String get saleFormAmountEmpty;
+
+  /// No description provided for @saleFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'День продажи'**
+  String get saleFormDate;
+
+  /// No description provided for @saleFormBuyer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Покупатель'**
+  String get saleFormBuyer;
+
+  /// No description provided for @saleFormBuyerHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому продали — если хотите запомнить'**
+  String get saleFormBuyerHint;
+
+  /// No description provided for @saleFormSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать'**
+  String get saleFormSubmit;
+
+  /// No description provided for @saleFormSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа записана'**
+  String get saleFormSaved;
+
   /// No description provided for @quickRecordDeath.
   ///
   /// In ru, this message translates to:

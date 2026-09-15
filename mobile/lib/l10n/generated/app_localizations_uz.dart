@@ -4405,6 +4405,38 @@ class AppLocalizationsUz extends AppLocalizations {
   String get deathFormSaved => 'Nobud boʻlish qayd etildi';
 
   @override
+  String get saleFormTitle => 'Sotuvni yozish';
+
+  @override
+  String get saleFormRabbit => 'Quyon';
+
+  @override
+  String get saleFormAmount => 'Narxi';
+
+  @override
+  String get saleFormAmountHelp =>
+      'Summa daromad daftariga tushadi, quyon sotilganga oʻtadi.';
+
+  @override
+  String get saleFormAmountEmpty => 'Necha pulga sotganingizni yozing';
+
+  @override
+  String get saleFormDate => 'Sotilgan kun';
+
+  @override
+  String get saleFormBuyer => 'Xaridor';
+
+  @override
+  String get saleFormBuyerHint =>
+      'Kimga sotdingiz — esda qolishini xohlasangiz';
+
+  @override
+  String get saleFormSubmit => 'Yozish';
+
+  @override
+  String get saleFormSaved => 'Sotuv yozildi';
+
+  @override
   String get quickRecordDeath => 'Nobud boʻlish';
 
   @override

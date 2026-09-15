@@ -8,6 +8,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
 import '../../features/rabbits/presentation/screens/death_form_screen.dart';
+import '../../features/rabbits/presentation/screens/sale_form_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_detail_screen.dart';
 import '../../features/rabbits/presentation/screens/pedigree_screen.dart';
 import '../../features/rabbits/presentation/screens/breeds_list_screen.dart';
@@ -284,6 +285,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'rabbit-death',
         builder: (context, state) =>
             DeathFormScreen(rabbit: state.extra as RabbitModel?),
+      ),
+      // Продажа: тоже своим экраном. Цену и день спрашивают здесь, а не в
+      // общей форме, где их не спрашивали вовсе, — и продажа оставалась без
+      // прихода в книге.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/rabbits/sale',
+        name: 'rabbit-sale',
+        builder: (context, state) =>
+            SaleFormScreen(rabbit: state.extra as RabbitModel?),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

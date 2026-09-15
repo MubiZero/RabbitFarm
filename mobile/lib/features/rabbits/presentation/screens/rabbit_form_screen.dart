@@ -63,6 +63,11 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   /// половина ферм заводила самок самцами, просто не тронув поле.
   String? _selectedSex;
   String _selectedStatus = 'healthy';
+
+  /// Статус, с которым кролика открыли. Нужен списку статусов: выбывшего
+  /// кролика он должен показать самим собой, даже когда «продан» и «пал»
+  /// больше не предлагаются.
+  String? _loadedStatus;
   String _selectedPurpose = 'breeding';
   DateTime _birthDate = DateTime.now().subtract(const Duration(days: 60));
   bool _isLoading = false;
@@ -147,6 +152,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     _motherLabel = rabbit.mother?.name;
     _selectedSex = rabbit.sex;
     _selectedStatus = rabbit.status;
+    _loadedStatus = rabbit.status;
     _selectedPurpose = rabbit.purpose;
     _birthDate = rabbit.birthDate;
     _currentPhotoUrl = rabbit.photoUrl;
@@ -612,6 +618,15 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       _selectedMotherId = rabbit?.id;
                     }),
                   ),
+                  // Выбытие отсюда не отмечают. «Продан» и «Пал» здесь
+                  // ставились без цены, без покупателя, без дня и без причины
+                  // — и именно так продажа теряла приход в книге, а падёж
+                  // оставался статусом без объяснения. У каждого из двух
+                  // теперь свой экран с карточки кролика.
+                  //
+                  // Уже выбывший кролик свой статус в списке видит: иначе
+                  // список не нашёл бы своего значения, а ошибочную продажу
+                  // нельзя было бы отменить, вернув кролика в живые.
                   DropdownButtonFormField<String>(
                     initialValue: _selectedStatus,
                     decoration: InputDecoration(
@@ -620,10 +635,12 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                     ),
                     items: [
                       for (final status in rabbitStatuses)
-                        DropdownMenuItem(
-                          value: status,
-                          child: Text(rabbitStatusLabel(context, status)),
-                        ),
+                        if (!rabbitStatusesTerminal.contains(status) ||
+                            status == _loadedStatus)
+                          DropdownMenuItem(
+                            value: status,
+                            child: Text(rabbitStatusLabel(context, status)),
+                          ),
                     ],
                     onChanged: (value) =>
                         setState(() => _selectedStatus = value!),
