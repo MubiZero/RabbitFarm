@@ -2305,6 +2305,39 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsDigestToggle => 'Xoʻjalik boʻyicha kunlik xulosa';
 
   @override
+  String get settingsHerd => 'Poda';
+
+  @override
+  String get settingsPurposeAll => 'Hamma quyonlarga maqsad';
+
+  @override
+  String get settingsPurposeAllHint =>
+      'Koʻpchilik fermalar quyonlarni bitta narsa uchun boqadi. Bir marta qoʻying — har kartada javob bermang.';
+
+  @override
+  String get settingsPurposeAllTitle => 'Hammaga maqsad qoʻyilsinmi?';
+
+  @override
+  String settingsPurposeAllBody(String purpose) {
+    return 'Fermaning barcha tirik quyonlariga «$purpose» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Kimda boshqa maqsad boʻlgan — u almashadi va faqat bittalab qaytariladi.';
+  }
+
+  @override
+  String get settingsPurposeAllApply => 'Qoʻyish';
+
+  @override
+  String settingsPurposeAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count quyon oʻzgardi.',
+      one: '$count quyon oʻzgardi.',
+      zero: 'Oʻzgartiradigan narsa yoʻq — hammada allaqachon shunday.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsAbout => 'Ilova haqida';
 
   @override
@@ -3391,6 +3424,9 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get reportsByBreed => 'Zotlar boʻyicha jonivorlar';
+
+  @override
+  String get reportsByPurpose => 'Maqsadi boʻyicha';
 
   @override
   String reportsBreedUnknown(int id) {

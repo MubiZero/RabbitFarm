@@ -100,6 +100,29 @@ class RabbitController {
   }
 
   /**
+   * Назначение сразу всему поголовью
+   * PATCH /api/v1/rabbits/purpose
+   */
+  async setPurposeForAll(req, res, next) {
+    try {
+      const changed = await rabbitService.setPurposeForAll(
+        req.farmId,
+        req.body.purpose
+      );
+
+      // Сколько записей на самом деле изменилось — не формальность: экран
+      // спрашивает подтверждение числом, и оно должно совпасть с итогом.
+      return ApiResponse.success(
+        res,
+        { purpose: req.body.purpose, changed },
+        'Назначение выставлено всему поголовью'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Update rabbit
    * PUT /api/v1/rabbits/:id
    */

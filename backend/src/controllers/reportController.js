@@ -331,6 +331,21 @@ exports.getFarmReport = async (req, res, next) => {
       raw: true
     });
 
+    // Разбивка по назначению — тем же отбором живых, что и породы рядом:
+    // назначение отвечает на вопрос «сколько у меня племенных, а сколько на
+    // откорме», и проданные с павшими в этом счёте были бы враньём. До сих
+    // пор поле жило только фильтром списка — заполняли его на каждом кролике,
+    // а сводки по нему не было нигде.
+    const rabbitsByPurpose = await Rabbit.findAll({
+      where: { farm_id: farmId, status: ALIVE_STATUS },
+      attributes: [
+        'purpose',
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+      ],
+      group: ['purpose'],
+      raw: true
+    });
+
     // Financial summary
     const transactions = await Transaction.findAll({
       where: {
@@ -392,7 +407,8 @@ exports.getFarmReport = async (req, res, next) => {
       },
       population: {
         total_rabbits: await Rabbit.count({ where: { farm_id: farmId, status: ALIVE_STATUS } }),
-        by_breed: rabbitsByBreed
+        by_breed: rabbitsByBreed,
+        by_purpose: rabbitsByPurpose
       },
       financial: canSeeLedger(req)
         ? {

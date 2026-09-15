@@ -558,7 +558,7 @@ class _RabbitFilters extends StatelessWidget {
 
   /// Назначения в том порядке, в каком о стаде думают: сначала те, кто даёт
   /// приплод, потом те, кого держат на мясо, продажу и выставку.
-  static const _purposes = ['breeding', 'meat', 'sale', 'show'];
+  static const _purposes = rabbitPurposes;
 
   @override
   Widget build(BuildContext context) {

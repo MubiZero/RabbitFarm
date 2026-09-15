@@ -2299,6 +2299,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDigestToggle => 'Daily farm digest';
 
   @override
+  String get settingsHerd => 'Herd';
+
+  @override
+  String get settingsPurposeAll => 'Purpose for every rabbit';
+
+  @override
+  String get settingsPurposeAllHint =>
+      'Most farms keep rabbits for one thing. Set it once instead of answering on every card.';
+
+  @override
+  String get settingsPurposeAllTitle => 'Set the purpose for everyone?';
+
+  @override
+  String settingsPurposeAllBody(String purpose) {
+    return 'Every living rabbit on the farm will be set to «$purpose». Rabbits that have left stay as they are. Whoever had another purpose loses it, and it can only be restored one by one.';
+  }
+
+  @override
+  String get settingsPurposeAllApply => 'Set it';
+
+  @override
+  String settingsPurposeAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rabbits changed.',
+      one: '$count rabbit changed.',
+      zero: 'Nothing to change — everyone was already set.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsAbout => 'About';
 
   @override
@@ -3384,6 +3417,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportsByBreed => 'Livestock by breed';
+
+  @override
+  String get reportsByPurpose => 'By purpose';
 
   @override
   String reportsBreedUnknown(int id) {

@@ -4224,6 +4224,48 @@ abstract class AppLocalizations {
   /// **'Дайджест по хозяйству'**
   String get settingsDigestToggle;
 
+  /// No description provided for @settingsHerd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поголовье'**
+  String get settingsHerd;
+
+  /// No description provided for @settingsPurposeAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назначение всем кроликам'**
+  String get settingsPurposeAll;
+
+  /// No description provided for @settingsPurposeAllHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Большинство ферм держат кроликов для чего-то одного. Выставьте раз — и не отвечайте на этот вопрос в каждой карточке.'**
+  String get settingsPurposeAllHint;
+
+  /// No description provided for @settingsPurposeAllTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выставить назначение всем?'**
+  String get settingsPurposeAllTitle;
+
+  /// No description provided for @settingsPurposeAllBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному.'**
+  String settingsPurposeAllBody(String purpose);
+
+  /// No description provided for @settingsPurposeAllApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выставить'**
+  String get settingsPurposeAllApply;
+
+  /// No description provided for @settingsPurposeAllDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{Менять было нечего — у всех уже так.} one{Изменён {count} кролик.} few{Изменено {count} кролика.} other{Изменено {count} кроликов.}}'**
+  String settingsPurposeAllDone(int count);
+
   /// No description provided for @settingsAbout.
   ///
   /// In ru, this message translates to:
@@ -6203,6 +6245,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Поголовье по породам'**
   String get reportsByBreed;
+
+  /// No description provided for @reportsByPurpose.
+  ///
+  /// In ru, this message translates to:
+  /// **'По назначению'**
+  String get reportsByPurpose;
 
   /// No description provided for @reportsBreedUnknown.
   ///

@@ -693,6 +693,19 @@
   "settingsLanguage": "Забон",
   "settingsNotifications": "Огоҳиномаҳо",
   "settingsDigestToggle": "Хулосаи ҳаррӯзаи хоҷагӣ",
+  "settingsHerd": "Рама",
+  "settingsPurposeAll": "Таъинот ба ҳамаи харгӯшҳо",
+  "settingsPurposeAllHint": "Аксари фермаҳо харгӯшро барои як кор нигоҳ медоранд. Як бор гузоред — ва дар ҳар корт ҷавоб надиҳед.",
+  "settingsPurposeAllTitle": "Ба ҳама таъинот гузошта шавад?",
+  "settingsPurposeAllBody": "Ба ҳамаи харгӯшҳои зиндаи ферма «{purpose}» гузошта мешавад. Аз рама баромадаҳо тағйир намеёбанд. Дар кӣ таъиноти дигар буд — он иваз мешавад ва танҳо якто-якто бармегардад.",
+  "@settingsPurposeAllBody": {
+    "placeholders": { "purpose": { "type": "String" } }
+  },
+  "settingsPurposeAllApply": "Гузоштан",
+  "settingsPurposeAllDone": "{count, plural, =0{Тағйир додан чизе набуд — дар ҳама аллакай ҳамин аст.} one{{count} харгӯш тағйир ёфт.} other{{count} харгӯш тағйир ёфт.}}",
+  "@settingsPurposeAllDone": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "settingsAbout": "Дар бораи барнома",
   "settingsVersion": "Версия",
   "settingsSupport": "Дастгирӣ",
@@ -1023,6 +1036,7 @@
   "reportsFeedings": "Хӯрокдиҳиҳо",
   "reportsActivity": "Барои давра",
   "reportsByBreed": "Шумораи харгӯшҳо аз рӯи зот",
+  "reportsByPurpose": "Аз рӯи таъинот",
   "reportsBreedUnknown": "Зоти №{id}",
   "reportsMoney": "Пул барои давра",
   "reportsNoActivityTitle": "Дар ин давра сабт нест",

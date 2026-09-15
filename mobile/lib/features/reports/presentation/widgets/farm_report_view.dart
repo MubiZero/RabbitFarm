@@ -8,6 +8,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../feeding/presentation/utils/feed_labels.dart';
+import '../../../rabbits/presentation/utils/rabbit_labels.dart';
 import '../../data/models/report_model.dart';
 import '../providers/reports_provider.dart';
 import 'report_sections.dart';
@@ -163,6 +164,23 @@ class FarmReportView extends ConsumerWidget {
                       context.l10n.reportsBreedUnknown(breed.breedId),
                   value: '${breed.count}',
                   amount: breed.count.toDouble(),
+                ),
+            ],
+          ),
+        ],
+        // Назначение — главное деление стада: по нему решают, кого случать, а
+        // кого ставить на откорм. Числа по нему не показывал ни один экран.
+        if (report.population.byPurpose.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xl),
+          ReportBreakdown(
+            title: context.l10n.reportsByPurpose,
+            color: AppColors.domainLivestock,
+            items: [
+              for (final purpose in report.population.byPurpose)
+                ReportBreakdownItem(
+                  label: rabbitPurposeLabel(context, purpose.purpose),
+                  value: '${purpose.count}',
+                  amount: purpose.count.toDouble(),
                 ),
             ],
           ),

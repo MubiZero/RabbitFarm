@@ -941,6 +941,19 @@
   "settingsLanguage": "Язык",
   "settingsNotifications": "Уведомления",
   "settingsDigestToggle": "Дайджест по хозяйству",
+  "settingsHerd": "Поголовье",
+  "settingsPurposeAll": "Назначение всем кроликам",
+  "settingsPurposeAllHint": "Большинство ферм держат кроликов для чего-то одного. Выставьте раз — и не отвечайте на этот вопрос в каждой карточке.",
+  "settingsPurposeAllTitle": "Выставить назначение всем?",
+  "settingsPurposeAllBody": "Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному.",
+  "@settingsPurposeAllBody": {
+    "placeholders": { "purpose": { "type": "String" } }
+  },
+  "settingsPurposeAllApply": "Выставить",
+  "settingsPurposeAllDone": "{count, plural, =0{Менять было нечего — у всех уже так.} one{Изменён {count} кролик.} few{Изменено {count} кролика.} other{Изменено {count} кроликов.}}",
+  "@settingsPurposeAllDone": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "settingsAbout": "О приложении",
   "settingsVersion": "Версия",
   "settingsSupport": "Поддержка",
@@ -1367,6 +1380,7 @@
   "reportsFeedings": "Кормления",
   "reportsActivity": "За период",
   "reportsByBreed": "Поголовье по породам",
+  "reportsByPurpose": "По назначению",
   "reportsBreedUnknown": "Порода №{id}",
   "@reportsBreedUnknown": {
     "placeholders": { "id": { "type": "int" } }

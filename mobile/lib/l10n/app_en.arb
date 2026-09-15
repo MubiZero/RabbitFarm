@@ -693,6 +693,19 @@
   "settingsLanguage": "Language",
   "settingsNotifications": "Notifications",
   "settingsDigestToggle": "Daily farm digest",
+  "settingsHerd": "Herd",
+  "settingsPurposeAll": "Purpose for every rabbit",
+  "settingsPurposeAllHint": "Most farms keep rabbits for one thing. Set it once instead of answering on every card.",
+  "settingsPurposeAllTitle": "Set the purpose for everyone?",
+  "settingsPurposeAllBody": "Every living rabbit on the farm will be set to «{purpose}». Rabbits that have left stay as they are. Whoever had another purpose loses it, and it can only be restored one by one.",
+  "@settingsPurposeAllBody": {
+    "placeholders": { "purpose": { "type": "String" } }
+  },
+  "settingsPurposeAllApply": "Set it",
+  "settingsPurposeAllDone": "{count, plural, =0{Nothing to change — everyone was already set.} one{{count} rabbit changed.} other{{count} rabbits changed.}}",
+  "@settingsPurposeAllDone": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "settingsAbout": "About",
   "settingsVersion": "Version",
   "settingsSupport": "Support",
@@ -1023,6 +1036,7 @@
   "reportsFeedings": "Feedings",
   "reportsActivity": "For this period",
   "reportsByBreed": "Livestock by breed",
+  "reportsByPurpose": "By purpose",
   "reportsBreedUnknown": "Breed #{id}",
   "reportsMoney": "Money for this period",
   "reportsNoActivityTitle": "No records for this period",

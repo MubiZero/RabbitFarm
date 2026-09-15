@@ -2324,6 +2324,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDigestToggle => 'Дайджест по хозяйству';
 
   @override
+  String get settingsHerd => 'Поголовье';
+
+  @override
+  String get settingsPurposeAll => 'Назначение всем кроликам';
+
+  @override
+  String get settingsPurposeAllHint =>
+      'Большинство ферм держат кроликов для чего-то одного. Выставьте раз — и не отвечайте на этот вопрос в каждой карточке.';
+
+  @override
+  String get settingsPurposeAllTitle => 'Выставить назначение всем?';
+
+  @override
+  String settingsPurposeAllBody(String purpose) {
+    return 'Всем живым кроликам фермы будет проставлено «$purpose». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному.';
+  }
+
+  @override
+  String get settingsPurposeAllApply => 'Выставить';
+
+  @override
+  String settingsPurposeAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Изменено $count кроликов.',
+      few: 'Изменено $count кролика.',
+      one: 'Изменён $count кролик.',
+      zero: 'Менять было нечего — у всех уже так.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsAbout => 'О приложении';
 
   @override
@@ -3417,6 +3451,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get reportsByBreed => 'Поголовье по породам';
+
+  @override
+  String get reportsByPurpose => 'По назначению';
 
   @override
   String reportsBreedUnknown(int id) {

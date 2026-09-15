@@ -333,9 +333,27 @@ const addWeightSchema = Joi.object({
     .allow(null, '')
 });
 
+/**
+ * Назначение сразу всему поголовью.
+ *
+ * Отдельная схема, а не кусок `updateRabbitSchema`: тело здесь ровно из
+ * одного поля, и лишние ключи должны отвергаться, а не молча применяться ко
+ * всей ферме.
+ */
+const bulkPurposeSchema = Joi.object({
+  purpose: Joi.string()
+    .valid('breeding', 'meat', 'sale', 'show')
+    .required()
+    .messages({
+      'any.only': 'Назначение должно быть: breeding, meat, sale или show',
+      'any.required': 'Назначение обязательно'
+    })
+});
+
 module.exports = {
   createRabbitSchema,
   updateRabbitSchema,
   listRabbitsQuerySchema,
-  addWeightSchema
+  addWeightSchema,
+  bulkPurposeSchema
 };

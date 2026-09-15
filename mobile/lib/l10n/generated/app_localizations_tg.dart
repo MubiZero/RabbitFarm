@@ -2291,6 +2291,39 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsDigestToggle => 'Хулосаи ҳаррӯзаи хоҷагӣ';
 
   @override
+  String get settingsHerd => 'Рама';
+
+  @override
+  String get settingsPurposeAll => 'Таъинот ба ҳамаи харгӯшҳо';
+
+  @override
+  String get settingsPurposeAllHint =>
+      'Аксари фермаҳо харгӯшро барои як кор нигоҳ медоранд. Як бор гузоред — ва дар ҳар корт ҷавоб надиҳед.';
+
+  @override
+  String get settingsPurposeAllTitle => 'Ба ҳама таъинот гузошта шавад?';
+
+  @override
+  String settingsPurposeAllBody(String purpose) {
+    return 'Ба ҳамаи харгӯшҳои зиндаи ферма «$purpose» гузошта мешавад. Аз рама баромадаҳо тағйир намеёбанд. Дар кӣ таъиноти дигар буд — он иваз мешавад ва танҳо якто-якто бармегардад.';
+  }
+
+  @override
+  String get settingsPurposeAllApply => 'Гузоштан';
+
+  @override
+  String settingsPurposeAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count харгӯш тағйир ёфт.',
+      one: '$count харгӯш тағйир ёфт.',
+      zero: 'Тағйир додан чизе набуд — дар ҳама аллакай ҳамин аст.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsAbout => 'Дар бораи барнома';
 
   @override
@@ -3372,6 +3405,9 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get reportsByBreed => 'Шумораи харгӯшҳо аз рӯи зот';
+
+  @override
+  String get reportsByPurpose => 'Аз рӯи таъинот';
 
   @override
   String reportsBreedUnknown(int id) {

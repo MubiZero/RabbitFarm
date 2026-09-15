@@ -256,7 +256,10 @@ describe('reportController', () => {
         ...FeedingRecord.findAll.mock.calls
       ];
 
-      expect(calls).toHaveLength(9);
+      // Число — не самоцель: оно ловит запрос, добавленный в отчёт мимо
+      // фильтра по ферме. Прибавился раздел — проверьте его `where` и
+      // поправьте число здесь.
+      expect(calls).toHaveLength(10);
       for (const [options] of calls) {
         expect(options.where.farm_id).toBe(7);
       }

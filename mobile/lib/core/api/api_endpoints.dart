@@ -42,6 +42,9 @@ class ApiEndpoints {
   static const String rabbits = '/rabbits';
   static const String rabbitStatistics = '/rabbits/statistics';
 
+  /// Назначение сразу всему живому поголовью фермы.
+  static const String rabbitsPurpose = '/rabbits/purpose';
+
   // Breeds endpoints
   static const String breeds = '/breeds';
 

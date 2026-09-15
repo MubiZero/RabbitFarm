@@ -14,6 +14,9 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/providers/locale_provider.dart';
 import '../../../../core/widgets/language_picker.dart';
+import '../../../rabbits/presentation/providers/rabbits_provider.dart';
+import '../../../rabbits/presentation/utils/rabbit_labels.dart';
+import '../../../reports/presentation/providers/reports_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -150,6 +153,27 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
+
+          // Назначение всему поголовью — решение по хозяйству, а не правка
+          // карточки: большинство ферм держат кроликов для чего-то одного, и
+          // выставлять поле по одному на двухстах карточках никто не станет.
+          // Только владелец: помощник, переписавший назначение всем, вернуть
+          // их сможет лишь по одному.
+          if (user?.role == 'owner') ...[
+            _SectionLabel(context.l10n.settingsHerd),
+            _GroupCard(
+              context: context,
+              children: [
+                _SettingsTile(
+                  icon: Icons.label_outline,
+                  label: context.l10n.settingsPurposeAll,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _setPurposeForAll(context, ref),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
 
           // Тариф — своя оплата, только у владельца (см.
           // docs/plans/PLATFORM-ADMIN.md, 4.1): ферма сама себе план не
@@ -506,6 +530,84 @@ class _AccentPicker extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+/// Выставить назначение всему живому поголовью.
+///
+/// Два шага, а не один: сначала какое, потом подтверждение с последствием.
+/// Замена необратима оптом — вернуть прежние назначения можно только по
+/// одному кролику, и об этом окно говорит прямо.
+Future<void> _setPurposeForAll(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+
+  final purpose = await showModalBottomSheet<String>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              l10n.settingsPurposeAllHint,
+              style: AppTypography.bodyMd
+                  .copyWith(color: sheetContext.colors.onSurfaceVariant),
+            ),
+          ),
+          for (final value in rabbitPurposes)
+            ListTile(
+              leading: const Icon(Icons.label_outline),
+              title: Text(rabbitPurposeLabel(sheetContext, value)),
+              onTap: () => Navigator.pop(sheetContext, value),
+            ),
+        ],
+      ),
+    ),
+  );
+  if (purpose == null || !context.mounted) return;
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(l10n.settingsPurposeAllTitle),
+      content: Text(
+        l10n.settingsPurposeAllBody(rabbitPurposeLabel(dialogContext, purpose)),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: Text(l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: Text(l10n.settingsPurposeAllApply),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  final messenger = ScaffoldMessenger.of(context);
+  final repository = ref.read(rabbitsRepositoryProvider);
+
+  try {
+    final changed = await repository.setPurposeForAll(purpose);
+    // Список и отчёт держат прежние назначения — после оптовой замены они
+    // врут до следующей загрузки.
+    ref.invalidate(rabbitsListProvider);
+    ref.invalidate(farmReportProvider);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.settingsPurposeAllDone(changed))),
+    );
+  } catch (e) {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(errorText(l10n, e)),
+        backgroundColor: AppColors.error,
+      ),
     );
   }
 }

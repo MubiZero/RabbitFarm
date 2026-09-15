@@ -152,6 +152,23 @@ class RabbitsRepository {
     }
   }
 
+  /// Выставить назначение всему живому поголовью. Возвращает, скольких это
+  /// на самом деле задело: экран подтверждает решение числом, и итог обязан
+  /// с ним совпасть.
+  Future<int> setPurposeForAll(String purpose) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.rabbitsPurpose,
+        data: {'purpose': purpose},
+      );
+
+      final data = response.data['data'];
+      return data is Map ? (data['changed'] as num?)?.toInt() ?? 0 : 0;
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   // Delete rabbit
   Future<void> deleteRabbit(int id) async {
     try {

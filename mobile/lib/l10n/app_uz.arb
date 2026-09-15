@@ -694,6 +694,19 @@
   "settingsLanguage": "Til",
   "settingsNotifications": "Bildirishnomalar",
   "settingsDigestToggle": "Xoʻjalik boʻyicha kunlik xulosa",
+  "settingsHerd": "Poda",
+  "settingsPurposeAll": "Hamma quyonlarga maqsad",
+  "settingsPurposeAllHint": "Koʻpchilik fermalar quyonlarni bitta narsa uchun boqadi. Bir marta qoʻying — har kartada javob bermang.",
+  "settingsPurposeAllTitle": "Hammaga maqsad qoʻyilsinmi?",
+  "settingsPurposeAllBody": "Fermaning barcha tirik quyonlariga «{purpose}» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Kimda boshqa maqsad boʻlgan — u almashadi va faqat bittalab qaytariladi.",
+  "@settingsPurposeAllBody": {
+    "placeholders": { "purpose": { "type": "String" } }
+  },
+  "settingsPurposeAllApply": "Qoʻyish",
+  "settingsPurposeAllDone": "{count, plural, =0{Oʻzgartiradigan narsa yoʻq — hammada allaqachon shunday.} one{{count} quyon oʻzgardi.} other{{count} quyon oʻzgardi.}}",
+  "@settingsPurposeAllDone": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "settingsAbout": "Ilova haqida",
   "settingsVersion": "Versiya",
   "settingsSupport": "Qoʻllab-quvvatlash",
@@ -1024,6 +1037,7 @@
   "reportsFeedings": "Oziqlantirishlar",
   "reportsActivity": "Davr uchun",
   "reportsByBreed": "Zotlar boʻyicha jonivorlar",
+  "reportsByPurpose": "Maqsadi boʻyicha",
   "reportsBreedUnknown": "{id}-zot",
   "reportsMoney": "Davr uchun pul",
   "reportsNoActivityTitle": "Bu davrda yozuv yoʻq",

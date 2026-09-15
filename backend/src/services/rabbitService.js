@@ -254,6 +254,33 @@ class RabbitService {
    * @param {Object} updateData - Data to update
    * @returns {Object} Updated rabbit
    */
+  /**
+   * Назначение сразу всему живому поголовью фермы.
+   *
+   * Большинство хозяйств держат кроликов для чего-то одного, и назначение на
+   * такой ферме — свойство хозяйства, а не двухсот отдельных карточек.
+   * Выставлять его по одному никто не станет, и поле оставалось тем, чем
+   * было: фильтром, который ничего не отбирает.
+   *
+   * Выбывших не трогаем: назначение проданного кролика — это запись о том,
+   * кем он был, и переписывать её задним числом незачем.
+   */
+  async setPurposeForAll(farmId, purpose) {
+    const [changed] = await Rabbit.update(
+      { purpose },
+      {
+        where: {
+          farm_id: farmId,
+          status: { [Op.notIn]: ['dead', 'sold'] },
+          purpose: { [Op.ne]: purpose }
+        }
+      }
+    );
+
+    logger.info('Bulk rabbit purpose set', { farmId, purpose, changed });
+    return changed;
+  }
+
   async updateRabbit(rabbitId, farmId, updateData) {
     const transaction = await sequelize.transaction();
     try {

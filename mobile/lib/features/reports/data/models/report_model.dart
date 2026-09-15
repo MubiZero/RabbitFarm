@@ -193,6 +193,12 @@ abstract class PopulationData with _$PopulationData {
   const factory PopulationData({
     @JsonKey(name: 'total_rabbits') @IntConverter() required int totalRabbits,
     @JsonKey(name: 'by_breed') required List<BreedCount> byBreed,
+    /// Сколько кроликов на племя, сколько на мясо, сколько на продажу.
+    ///
+    /// Назначение до сих пор жило одним фильтром списка: поле обязательное,
+    /// заполняется на каждом кролике, а числа по нему не показывал ни один
+    /// экран. Пусто у старого сервера — поэтому со значением по умолчанию.
+    @JsonKey(name: 'by_purpose') @Default([]) List<PurposeCount> byPurpose,
   }) = _PopulationData;
 
   factory PopulationData.fromJson(Map<String, dynamic> json) =>
@@ -208,6 +214,17 @@ abstract class BreedCount with _$BreedCount {
 
   factory BreedCount.fromJson(Map<String, dynamic> json) =>
       _$BreedCountFromJson(json);
+}
+
+@freezed
+abstract class PurposeCount with _$PurposeCount {
+  const factory PurposeCount({
+    required String purpose,
+    @IntConverter() required int count,
+  }) = _PurposeCount;
+
+  factory PurposeCount.fromJson(Map<String, dynamic> json) =>
+      _$PurposeCountFromJson(json);
 }
 
 @freezed
