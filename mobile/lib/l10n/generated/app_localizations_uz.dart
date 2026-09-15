@@ -1917,6 +1917,24 @@ class AppLocalizationsUz extends AppLocalizations {
   String get txFormDescription => 'Tavsif';
 
   @override
+  String get txFormReceipt => 'Chek';
+
+  @override
+  String get txFormReceiptShoot => 'Chekni suratga oling';
+
+  @override
+  String get txFormReceiptFromGallery => 'Galereyadan';
+
+  @override
+  String get txFormReceiptReplace => 'Qayta suratga olish';
+
+  @override
+  String get txFormReceiptRemove => 'Chekni olib tashlash';
+
+  @override
+  String get txFormReceiptFailed => 'Suratni olib boʻlmadi';
+
+  @override
   String get txFormCreated => 'Amaliyot yozildi';
 
   @override

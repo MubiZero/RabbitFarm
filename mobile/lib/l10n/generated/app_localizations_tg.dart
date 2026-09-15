@@ -1904,6 +1904,24 @@ class AppLocalizationsTg extends AppLocalizations {
   String get txFormDescription => 'Тавсиф';
 
   @override
+  String get txFormReceipt => 'Расид';
+
+  @override
+  String get txFormReceiptShoot => 'Расидро сурат гиред';
+
+  @override
+  String get txFormReceiptFromGallery => 'Аз галерея';
+
+  @override
+  String get txFormReceiptReplace => 'Аз нав сурат гиред';
+
+  @override
+  String get txFormReceiptRemove => 'Расидро тоза кунед';
+
+  @override
+  String get txFormReceiptFailed => 'Суратро гирифтан нашуд';
+
+  @override
   String get txFormCreated => 'Амалиёт сабт шуд';
 
   @override

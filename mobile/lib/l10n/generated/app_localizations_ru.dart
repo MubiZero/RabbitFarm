@@ -1939,6 +1939,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get txFormDescription => 'Описание';
 
   @override
+  String get txFormReceipt => 'Чек';
+
+  @override
+  String get txFormReceiptShoot => 'Снять чек';
+
+  @override
+  String get txFormReceiptFromGallery => 'Из галереи';
+
+  @override
+  String get txFormReceiptReplace => 'Переснять';
+
+  @override
+  String get txFormReceiptRemove => 'Убрать чек';
+
+  @override
+  String get txFormReceiptFailed => 'Не удалось получить снимок';
+
+  @override
   String get txFormCreated => 'Операция записана';
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../../../core/providers/session.dart';
@@ -236,22 +238,41 @@ final rabbitTransactionsProvider = FutureProvider.autoDispose
   return repository.getRabbitTransactions(rabbitId);
 });
 
-/// Provider for creating a transaction
-final createTransactionProvider = FutureProvider.autoDispose
-    .family<Transaction, TransactionCreate>((ref, transactionCreate) async {
+/// Завести операцию. `receiptPath`/`receiptBytes` — снимок чека, если он
+/// есть: он уходит тем же запросом, а не отдельным шагом после сохранения.
+final createTransactionProvider = FutureProvider.autoDispose.family<
+    Transaction,
+    ({
+      TransactionCreate create,
+      String? receiptPath,
+      Uint8List? receiptBytes
+    })>((ref, params) async {
   final repository = ref.watch(transactionsRepositoryProvider);
-  final transaction = await repository.createTransaction(transactionCreate);
+  final transaction = await repository.createTransaction(
+    params.create,
+    receiptPath: params.receiptPath,
+    receiptBytes: params.receiptBytes,
+  );
 
   return transaction;
 });
 
-/// Provider for updating a transaction
-final updateTransactionProvider = FutureProvider.autoDispose
-    .family<Transaction, ({int id, TransactionUpdate update})>(
-        (ref, params) async {
+/// Поправить операцию — и, если приложили новый снимок, заменить чек.
+final updateTransactionProvider = FutureProvider.autoDispose.family<
+    Transaction,
+    ({
+      int id,
+      TransactionUpdate update,
+      String? receiptPath,
+      Uint8List? receiptBytes
+    })>((ref, params) async {
   final repository = ref.watch(transactionsRepositoryProvider);
-  final transaction =
-      await repository.updateTransaction(params.id, params.update);
+  final transaction = await repository.updateTransaction(
+    params.id,
+    params.update,
+    receiptPath: params.receiptPath,
+    receiptBytes: params.receiptBytes,
+  );
 
   return transaction;
 });

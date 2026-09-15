@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,7 +27,11 @@ class _FakeTransactionsRepository extends TransactionsRepository {
   final List<TransactionCreate> created = [];
 
   @override
-  Future<Transaction> createTransaction(TransactionCreate transaction) async {
+  Future<Transaction> createTransaction(
+    TransactionCreate transaction, {
+    String? receiptPath,
+    Uint8List? receiptBytes,
+  }) async {
     created.add(transaction);
     return Transaction(
       id: 1,

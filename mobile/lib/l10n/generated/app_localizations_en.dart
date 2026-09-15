@@ -1913,6 +1913,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get txFormDescription => 'Description';
 
   @override
+  String get txFormReceipt => 'Receipt';
+
+  @override
+  String get txFormReceiptShoot => 'Take a photo';
+
+  @override
+  String get txFormReceiptFromGallery => 'From gallery';
+
+  @override
+  String get txFormReceiptReplace => 'Retake';
+
+  @override
+  String get txFormReceiptRemove => 'Remove receipt';
+
+  @override
+  String get txFormReceiptFailed => 'Could not get the photo';
+
+  @override
   String get txFormCreated => 'Transaction logged';
 
   @override

@@ -4,6 +4,21 @@ const transactionController = require('../controllers/transactionController');
 const { createTransactionSchema, updateTransactionSchema, listTransactionsQuerySchema } = require('../validators/transactionValidator');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validation');
+const upload = require('../config/multer');
+const { uploadLimiter } = require('../middleware/rateLimiter');
+
+/**
+ * Отметка «к запросу приложен чек».
+ *
+ * multer кладёт файл мимо тела, а схема правки требует хотя бы одно поле —
+ * без этой отметки запрос «поменять только чек» читался бы как пустой и
+ * отвечал 422. Настоящий путь подставит контроллер после валидации: файл не
+ * должен уезжать в хранилище, пока остальные поля не проверены.
+ */
+const markReceipt = (req, res, next) => {
+  if (req.file) req.body.receipt_attached = true;
+  next();
+};
 
 /**
  * @swagger
@@ -115,10 +130,28 @@ router.get('/statistics', ledgerAccess, transactionController.getStatistics);
 router.get('/monthly-report', ledgerAccess, transactionController.getMonthlyReport);
 
 // CRUD routes
-router.post('/', authorize(['manager', 'owner']), validate(createTransactionSchema), transactionController.create);
+// Чек прикладывают снимком у кассы, поэтому маршрут принимает файл — тем же
+// путём, что и фотография кролика.
+router.post(
+  '/',
+  authorize(['manager', 'owner']),
+  uploadLimiter,
+  upload.single('receipt'),
+  markReceipt,
+  validate(createTransactionSchema),
+  transactionController.create
+);
 router.get('/', ledgerAccess, validate(listTransactionsQuerySchema, 'query'), transactionController.list);
 router.get('/:id', ledgerAccess, transactionController.getById);
-router.put('/:id', authorize(['manager', 'owner']), validate(updateTransactionSchema), transactionController.update);
+router.put(
+  '/:id',
+  authorize(['manager', 'owner']),
+  uploadLimiter,
+  upload.single('receipt'),
+  markReceipt,
+  validate(updateTransactionSchema),
+  transactionController.update
+);
 router.delete('/:id', authorize(['owner']), transactionController.delete);
 
 module.exports = router;

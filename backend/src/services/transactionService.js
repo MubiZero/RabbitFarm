@@ -1,5 +1,6 @@
 const { Transaction, Rabbit, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
+const fileStorage = require('../utils/fileStorage');
 const logger = require('../utils/logger');
 
 const TRANSACTION_INCLUDE = [
@@ -161,7 +162,11 @@ class TransactionService {
   async deleteTransaction(id, farmId) {
     const transaction = await Transaction.findOne({ where: { id, farm_id: farmId } });
     if (!transaction) throw new Error('TRANSACTION_NOT_FOUND');
+    // Чек уходит вместе с проводкой: снимок, на который больше никто не
+    // ссылается, иначе занимает место фермы по тарифу до конца времён.
+    const receiptUrl = transaction.receipt_url;
     await transaction.destroy();
+    if (receiptUrl) await fileStorage.deleteFile(receiptUrl);
     logger.info('Transaction deleted', { transactionId: id });
     return { success: true };
   }

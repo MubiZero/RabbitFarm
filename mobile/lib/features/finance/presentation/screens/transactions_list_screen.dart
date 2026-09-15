@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
@@ -441,6 +442,73 @@ class _TransactionCard extends ConsumerWidget {
   }
 }
 
+/// Снимок чека в карточке операции.
+///
+/// Чек — единственное подтверждение траты, и смотреть его приходят именно
+/// сюда: в списке видна сумма, а вопрос «а за что это» возникает уже у
+/// конкретной строки. По тапу снимок открывается целиком — с телефона в
+/// руке мелкий чек не прочитать.
+class _Receipt extends StatelessWidget {
+  final String url;
+
+  const _Receipt({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    final fullUrl = ImageUrlHelper.getFullImageUrl(url);
+    if (fullUrl == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.txFormReceipt,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          InkWell(
+            onTap: () => showDialog<void>(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                insetPadding: const EdgeInsets.all(AppSpacing.md),
+                child: InteractiveViewer(
+                  child: Image.network(fullUrl),
+                ),
+              ),
+            ),
+            borderRadius: AppRadius.mdAll,
+            child: ClipRRect(
+              borderRadius: AppRadius.mdAll,
+              child: SizedBox(
+                height: 160,
+                width: double.infinity,
+                child: Image.network(
+                  fullUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => ColoredBox(
+                    color: context.colors.surfaceContainerHighest,
+                    child: Center(
+                      child: Text(
+                        context.l10n.txFormReceiptFailed,
+                        style: AppTypography.labelSm.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DetailsSheet extends ConsumerWidget {
   final Transaction transaction;
 
@@ -579,6 +647,8 @@ class _DetailsSheet extends ConsumerWidget {
                 label: context.l10n.txFormRabbit,
                 value: transaction.rabbit!.label,
               ),
+            if (transaction.receiptUrl?.isNotEmpty == true)
+              _Receipt(url: transaction.receiptUrl!),
             if (transaction.description?.trim().isNotEmpty == true)
               _Row(
                 icon: Icons.notes,

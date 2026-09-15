@@ -3492,6 +3492,42 @@ abstract class AppLocalizations {
   /// **'Описание'**
   String get txFormDescription;
 
+  /// No description provided for @txFormReceipt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чек'**
+  String get txFormReceipt;
+
+  /// No description provided for @txFormReceiptShoot.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять чек'**
+  String get txFormReceiptShoot;
+
+  /// No description provided for @txFormReceiptFromGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Из галереи'**
+  String get txFormReceiptFromGallery;
+
+  /// No description provided for @txFormReceiptReplace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Переснять'**
+  String get txFormReceiptReplace;
+
+  /// No description provided for @txFormReceiptRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать чек'**
+  String get txFormReceiptRemove;
+
+  /// No description provided for @txFormReceiptFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось получить снимок'**
+  String get txFormReceiptFailed;
+
   /// No description provided for @txFormCreated.
   ///
   /// In ru, this message translates to:
