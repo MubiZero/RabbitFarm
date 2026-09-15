@@ -583,13 +583,14 @@ as DateTime,
 /// @nodoc
 mixin _$CreatedInvitation {
 
-@IntConverter() int get id; String? get email; String? get phone;@JsonKey(name: 'full_name') String? get fullName; FarmRole get role;@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime get expiresAt;/// Ссылка `rabbitfarm://join?phone=…`, открывающая приложение на экране
-/// входа с уже подставленным номером. Есть только у приглашения по
-/// телефону — почту экран входа так не подставляет.
-@JsonKey(name: 'invite_link') String? get inviteLink;/// Ушло ли сообщение самому работнику. На почту письмо уходит, на
-/// телефон — нет: SMS-шлюз принимает только заранее одобренные шаблоны,
-/// и приглашения среди них нет. От этого зависит, что мы скажем
-/// владельцу: «позвали» или «перешлите ссылку сами».
+@IntConverter() int get id; String? get email; String? get phone;@JsonKey(name: 'full_name') String? get fullName; FarmRole get role;@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime get expiresAt;/// Публичный адрес приглашения `https://…/i` — один на всех и без
+/// ничего личного внутри. С установленным приложением его перехватывает
+/// приложение, без него открывается страница с магазинами и
+/// веб-версией.
+@JsonKey(name: 'invite_link') String? get inviteLink;/// Ушло ли сообщение самому работнику: SMS на телефон, письмо на почту.
+/// Не уйти оно может по обе стороны — нет SMTP, не заведён шаблон у
+/// SMS-шлюза. От этого зависит, что мы скажем владельцу: «позвали» или
+/// «перешлите ссылку сами».
 @JsonKey(name: 'message_sent') bool get messageSent;
 /// Create a copy of CreatedInvitation
 /// with the given fields replaced by the non-null parameter values.
@@ -805,14 +806,15 @@ class _CreatedInvitation extends CreatedInvitation {
 @override@JsonKey(name: 'full_name') final  String? fullName;
 @override final  FarmRole role;
 @override@JsonKey(name: 'expires_at')@DateTimeConverter() final  DateTime expiresAt;
-/// Ссылка `rabbitfarm://join?phone=…`, открывающая приложение на экране
-/// входа с уже подставленным номером. Есть только у приглашения по
-/// телефону — почту экран входа так не подставляет.
+/// Публичный адрес приглашения `https://…/i` — один на всех и без
+/// ничего личного внутри. С установленным приложением его перехватывает
+/// приложение, без него открывается страница с магазинами и
+/// веб-версией.
 @override@JsonKey(name: 'invite_link') final  String? inviteLink;
-/// Ушло ли сообщение самому работнику. На почту письмо уходит, на
-/// телефон — нет: SMS-шлюз принимает только заранее одобренные шаблоны,
-/// и приглашения среди них нет. От этого зависит, что мы скажем
-/// владельцу: «позвали» или «перешлите ссылку сами».
+/// Ушло ли сообщение самому работнику: SMS на телефон, письмо на почту.
+/// Не уйти оно может по обе стороны — нет SMTP, не заведён шаблон у
+/// SMS-шлюза. От этого зависит, что мы скажем владельцу: «позвали» или
+/// «перешлите ссылку сами».
 @override@JsonKey(name: 'message_sent') final  bool messageSent;
 
 /// Create a copy of CreatedInvitation
