@@ -138,9 +138,16 @@ class OtpAuthService {
   async verifyOtp(contact, code) {
     const { identifier, channel } = this.resolveContact(contact);
 
+    // Второй ключ сортировки не для красоты: `created_at` — `datetime` без
+    // долей секунды, и два кода, запрошенных в одну секунду (человек нажал
+    // «выслать ещё раз», не дождавшись SMS), по нему неразличимы — база
+    // вправе вернуть любой из них. Тогда свежий код, который человек и
+    // получил, проверялся против старой записи и отвергался как неверный, а
+    // счётчик промахов рос не на той. `id` — автоинкремент, то есть
+    // настоящий порядок появления.
     const record = await LoginOtp.findOne({
       where: { identifier },
-      order: [['created_at', 'DESC']]
+      order: [['created_at', 'DESC'], ['id', 'DESC']]
     });
     if (!record) {
       throw new Error('OTP_INVALID');

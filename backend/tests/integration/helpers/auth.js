@@ -19,9 +19,11 @@ const loginWithOtp = async (app, contact) => {
     ? contact.phone.replace(/[^\d]/g, '').replace(/^(992)?/, '+992')
     : contact.email.trim().toLowerCase();
 
+  // Тот же порядок, что и у сервера (`otpAuthService`): иначе помощник
+  // подменит код в одной записи, а проверка пойдёт по другой.
   const record = await LoginOtp.findOne({
     where: { identifier },
-    order: [['created_at', 'DESC']]
+    order: [['created_at', 'DESC'], ['id', 'DESC']]
   });
   if (!record) {
     throw new Error(`Код для ${identifier} не создан — вход невозможен`);
