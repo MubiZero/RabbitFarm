@@ -94,9 +94,12 @@ const createRabbitSchema = Joi.object({
       'any.only': 'Статус должен быть: healthy, active, sick, quarantine, pregnant, sold или dead'
     }),
 
+  // Без `.default`: пустое поле означает «возьми умолчание хозяйства»
+  // (см. `rabbitService.createRabbit`), а не «племя». Со значением по
+  // умолчанию здесь ферма, которая держит кроликов на мясо, всё равно
+  // получала бы племенных.
   purpose: Joi.string()
     .valid('breeding', 'meat', 'sale', 'show')
-    .default('breeding')
     .messages({
       'any.only': 'Назначение должно быть: breeding, meat, sale или show'
     }),

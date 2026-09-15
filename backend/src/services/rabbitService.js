@@ -10,6 +10,7 @@ const {
   Transaction,
   Photo,
   User,
+  Farm,
   sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
@@ -31,6 +32,16 @@ class RabbitService {
    */
   async createRabbit(rabbitData) {
     await planService.assertRabbitLimit(rabbitData.farm_id);
+
+    // Назначение не прислали — берём то, что хозяйство назвало своим.
+    // Проставлять его в каждой карточке руками никто не станет: ферма
+    // обычно держит кроликов для чего-то одного.
+    if (!rabbitData.purpose) {
+      const farm = await Farm.findByPk(rabbitData.farm_id, {
+        attributes: ['default_purpose']
+      });
+      rabbitData.purpose = farm?.default_purpose || 'breeding';
+    }
 
     const transaction = await sequelize.transaction();
     try {
@@ -266,6 +277,12 @@ class RabbitService {
    * кем он был, и переписывать её задним числом незачем.
    */
   async setPurposeForAll(farmId, purpose) {
+    // Раз хозяйство выставило назначение всему поголовью, оно же и
+    // назначение хозяйства: следующий заведённый кролик получит его сам.
+    // Иначе фермер выставляет «мясо» двумстам кроликам и назавтра снова
+    // отвечает на тот же вопрос в форме двести первого.
+    await Farm.update({ default_purpose: purpose }, { where: { id: farmId } });
+
     const [changed] = await Rabbit.update(
       { purpose },
       {

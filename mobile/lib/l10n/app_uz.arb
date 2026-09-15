@@ -708,7 +708,7 @@
   "settingsPurposeAll": "Hamma quyonlarga maqsad",
   "settingsPurposeAllHint": "Koʻpchilik fermalar quyonlarni bitta narsa uchun boqadi. Bir marta qoʻying — har kartada javob bermang.",
   "settingsPurposeAllTitle": "Hammaga maqsad qoʻyilsinmi?",
-  "settingsPurposeAllBody": "Fermaning barcha tirik quyonlariga «{purpose}» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Kimda boshqa maqsad boʻlgan — u almashadi va faqat bittalab qaytariladi.",
+  "settingsPurposeAllBody": "Xoʻjalikdagi barcha tirik quyonlarga «{purpose}» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Boshqa tayinlov almashtiriladi va faqat bittalab qaytariladi. Yangi quyonlar ham shu tayinlov bilan qoʻshiladi.",
   "@settingsPurposeAllBody": {
     "placeholders": { "purpose": { "type": "String" } }
   },

@@ -5,7 +5,7 @@
  * «работает ли операция», но и «ограничена ли она своим владельцем».
  */
 jest.mock('../../../src/models', () => ({
-  Farm: {},
+  Farm: { findByPk: jest.fn(), update: jest.fn() },
   Breed: {
     findAll: jest.fn(),
     findOne: jest.fn(),

@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mobile/core/access/farm_access.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/features/cages/data/models/cage_model.dart';
 import 'package:mobile/features/cages/presentation/providers/cages_provider.dart';
@@ -27,11 +28,12 @@ class _FakeBreedsRepository extends BreedsRepository {
       ];
 }
 
-Widget _screen({RabbitModel? rabbit}) => testAppScreen(
+Widget _screen({RabbitModel? rabbit, String? farmPurpose}) => testAppScreen(
       RabbitFormScreen(rabbit: rabbit),
       overrides: [
         breedsRepositoryProvider.overrideWithValue(_FakeBreedsRepository()),
         cageOptionsProvider.overrideWith((ref) async => const <CageModel>[]),
+        farmDefaultPurposeProvider.overrideWithValue(farmPurpose),
       ],
     );
 
@@ -131,5 +133,47 @@ void main() {
 
     expect(find.text('Продан'), findsWidgets);
     expect(find.text('Погиб'), findsNothing);
+  });
+
+  testWidgets('новый кролик получает назначение хозяйства', (tester) async {
+    // «Не буду каждому кролику выставлять назначение» — сказано фермером про
+    // эту самую форму. Хозяйство говорит это один раз, в настройках.
+    await tester.binding.setSurfaceSize(const Size(420, 2400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(_screen(farmPurpose: 'meat'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Дополнительно'));
+    await tester.pumpAndSettle();
+
+    final purpose = find.ancestor(
+      of: find.text('Назначение'),
+      matching: find.byType(DropdownButtonFormField<String>),
+    );
+    expect(
+      tester.widget<DropdownButtonFormField<String>>(purpose).initialValue,
+      'meat',
+    );
+  });
+
+  testWidgets('пока хозяйство не сказало, назначение прежнее', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(420, 2400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(_screen());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Дополнительно'));
+    await tester.pumpAndSettle();
+
+    final purpose = find.ancestor(
+      of: find.text('Назначение'),
+      matching: find.byType(DropdownButtonFormField<String>),
+    );
+    expect(
+      tester.widget<DropdownButtonFormField<String>>(purpose).initialValue,
+      'breeding',
+    );
   });
 }

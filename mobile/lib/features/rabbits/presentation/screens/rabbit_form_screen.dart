@@ -10,6 +10,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/rabbit_picker.dart';
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/app_date_field.dart';
@@ -92,6 +93,11 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     } else {
       _tagIdController.text = _suggestedTag();
       _selectedCageId = widget.cageId;
+      // Назначение хозяйства: ферма обычно держит кроликов для чего-то
+      // одного, и спрашивать об этом на каждой карточке незачем. Хозяйство
+      // ещё не сказало — остаётся «племя», как и на сервере.
+      _selectedPurpose =
+          ref.read(farmDefaultPurposeProvider) ?? _selectedPurpose;
       Future.microtask(_restoreLastBreed);
     }
   }

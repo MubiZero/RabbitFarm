@@ -8,7 +8,7 @@
 jest.mock('../../../src/models', () => {
   const mockSequelize = { transaction: jest.fn() };
   return {
-    Farm: {},
+    Farm: { findByPk: jest.fn(), update: jest.fn() },
     Rabbit: {
       findOne: jest.fn(),
       findByPk: jest.fn(),

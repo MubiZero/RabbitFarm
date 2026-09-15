@@ -2349,7 +2349,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String settingsPurposeAllBody(String purpose) {
-    return 'Fermaning barcha tirik quyonlariga «$purpose» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Kimda boshqa maqsad boʻlgan — u almashadi va faqat bittalab qaytariladi.';
+    return 'Xoʻjalikdagi barcha tirik quyonlarga «$purpose» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Boshqa tayinlov almashtiriladi va faqat bittalab qaytariladi. Yangi quyonlar ham shu tayinlov bilan qoʻshiladi.';
   }
 
   @override

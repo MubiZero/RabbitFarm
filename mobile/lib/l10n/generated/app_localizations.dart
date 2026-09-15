@@ -4311,7 +4311,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPurposeAllBody.
   ///
   /// In ru, this message translates to:
-  /// **'Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному.'**
+  /// **'Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному. Новые кролики тоже будут заводиться с этим назначением.'**
   String settingsPurposeAllBody(String purpose);
 
   /// No description provided for @settingsPurposeAllApply.

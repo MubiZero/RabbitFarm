@@ -2343,7 +2343,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String settingsPurposeAllBody(String purpose) {
-    return 'Every living rabbit on the farm will be set to «$purpose». Rabbits that have left stay as they are. Whoever had another purpose loses it, and it can only be restored one by one.';
+    return 'Every live rabbit on the farm will be set to “$purpose”. Rabbits that have left the farm stay as they are. Different values are replaced and can only be restored one by one. New rabbits will get this purpose too.';
   }
 
   @override

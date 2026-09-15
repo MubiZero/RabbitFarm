@@ -707,7 +707,7 @@
   "settingsPurposeAll": "Purpose for every rabbit",
   "settingsPurposeAllHint": "Most farms keep rabbits for one thing. Set it once instead of answering on every card.",
   "settingsPurposeAllTitle": "Set the purpose for everyone?",
-  "settingsPurposeAllBody": "Every living rabbit on the farm will be set to «{purpose}». Rabbits that have left stay as they are. Whoever had another purpose loses it, and it can only be restored one by one.",
+  "settingsPurposeAllBody": "Every live rabbit on the farm will be set to “{purpose}”. Rabbits that have left the farm stay as they are. Different values are replaced and can only be restored one by one. New rabbits will get this purpose too.",
   "@settingsPurposeAllBody": {
     "placeholders": { "purpose": { "type": "String" } }
   },

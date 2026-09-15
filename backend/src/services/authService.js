@@ -248,7 +248,7 @@ class AuthService {
       // read_only/suspended сразу при обновлении профиля (в частности, при
       // каждом холодном старте), а не по отказу очередной записи.
       const user = await User.findByPk(userId, {
-          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose'] }]
       });
 
       if (!user) {

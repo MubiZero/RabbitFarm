@@ -6,7 +6,7 @@ jest.mock('../../../src/models', () => ({
   // Журнал отдаётся с именами админа и фермы — сервису нужны сами модели,
   // чтобы собрать include.
   User: {},
-  Farm: {}
+  Farm: { findByPk: jest.fn(), update: jest.fn() }
 }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()

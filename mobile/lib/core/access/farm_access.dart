@@ -91,6 +91,16 @@ final currentUserIdProvider = Provider<int?>((ref) {
   return ref.watch(authProvider).user?.id;
 });
 
+/// Кого держит это хозяйство: назначение, которое форма подставляет новому
+/// кролику.
+///
+/// Рядом с ролью и «кто смотрит», а не в фиче кроликов: это свойство
+/// хозяйства, а не карточки, и приходит оно вместе с профилем. Пусто —
+/// хозяйство ещё не сказало, и форма оставляет своё «племя».
+final farmDefaultPurposeProvider = Provider<String?>((ref) {
+  return ref.watch(authProvider).user?.farm?.defaultPurpose;
+});
+
 /// Платформенный суперадмин — доступ поверх ролей фермы.
 ///
 /// В [FarmRoleAccess] он намеренно не входит: это не «роль выше владельца», а

@@ -6,7 +6,7 @@ jest.mock('../../../src/models', () => {
     transaction: jest.fn()
   };
   return {
-    Farm: {},
+    Farm: { findByPk: jest.fn(), update: jest.fn() },
     Feed: {
       findAll: jest.fn(),
       findOne: jest.fn(),
