@@ -809,6 +809,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tasksFilterTodayOnly => 'Today only';
 
   @override
+  String get tasksFilterAssignee => 'Assignee';
+
+  @override
+  String get tasksFilterAssigneeAny => 'Anyone';
+
+  @override
+  String get tasksFilterAssigneeMine => 'Only mine';
+
+  @override
+  String get tasksAssigneeMineChip => 'My tasks';
+
+  @override
   String get tasksEmptyTitle => 'No tasks yet';
 
   @override

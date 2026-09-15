@@ -803,6 +803,18 @@ class AppLocalizationsTg extends AppLocalizations {
   String get tasksFilterTodayOnly => 'Танҳо имрӯза';
 
   @override
+  String get tasksFilterAssignee => 'Иҷрокунанда';
+
+  @override
+  String get tasksFilterAssigneeAny => 'Ҳар кас';
+
+  @override
+  String get tasksFilterAssigneeMine => 'Танҳо аз они ман';
+
+  @override
+  String get tasksAssigneeMineChip => 'Вазифаҳои ман';
+
+  @override
   String get tasksEmptyTitle => 'Вазифа ҳанӯз нест';
 
   @override

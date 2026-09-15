@@ -812,6 +812,18 @@ class AppLocalizationsUz extends AppLocalizations {
   String get tasksFilterTodayOnly => 'Faqat bugungilar';
 
   @override
+  String get tasksFilterAssignee => 'Ijrochi';
+
+  @override
+  String get tasksFilterAssigneeAny => 'Har kim';
+
+  @override
+  String get tasksFilterAssigneeMine => 'Faqat meniki';
+
+  @override
+  String get tasksAssigneeMineChip => 'Mening vazifalarim';
+
+  @override
   String get tasksEmptyTitle => 'Hali vazifa yoʻq';
 
   @override

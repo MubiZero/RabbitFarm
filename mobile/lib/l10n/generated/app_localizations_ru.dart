@@ -825,6 +825,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tasksFilterTodayOnly => 'Только на сегодня';
 
   @override
+  String get tasksFilterAssignee => 'Исполнитель';
+
+  @override
+  String get tasksFilterAssigneeAny => 'Любой';
+
+  @override
+  String get tasksFilterAssigneeMine => 'Только мои';
+
+  @override
+  String get tasksAssigneeMineChip => 'Мои задачи';
+
+  @override
   String get tasksEmptyTitle => 'Задач пока нет';
 
   @override

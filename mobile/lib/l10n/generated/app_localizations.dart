@@ -1476,6 +1476,30 @@ abstract class AppLocalizations {
   /// **'Только на сегодня'**
   String get tasksFilterTodayOnly;
 
+  /// No description provided for @tasksFilterAssignee.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель'**
+  String get tasksFilterAssignee;
+
+  /// No description provided for @tasksFilterAssigneeAny.
+  ///
+  /// In ru, this message translates to:
+  /// **'Любой'**
+  String get tasksFilterAssigneeAny;
+
+  /// No description provided for @tasksFilterAssigneeMine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только мои'**
+  String get tasksFilterAssigneeMine;
+
+  /// No description provided for @tasksAssigneeMineChip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои задачи'**
+  String get tasksAssigneeMineChip;
+
   /// No description provided for @tasksEmptyTitle.
   ///
   /// In ru, this message translates to:
