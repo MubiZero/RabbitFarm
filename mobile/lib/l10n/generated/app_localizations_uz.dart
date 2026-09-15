@@ -955,6 +955,21 @@ class AppLocalizationsUz extends AppLocalizations {
       'Vazifa bajarilgan deb belgilanganda, keyingisi oʻzi yaratiladi.';
 
   @override
+  String get taskFormAssignee => 'Ijrochi';
+
+  @override
+  String get taskFormAssigneeNobody => 'Hech kimga topshirilmagan';
+
+  @override
+  String get taskFormAssigneeHelp =>
+      'Ijrochiga vazifa haqida bildirishnoma boradi.';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Ijrochi: $name';
+  }
+
+  @override
   String get taskFormNotesLabel => 'Izohlar';
 
   @override
@@ -1821,6 +1836,14 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get financeDescription => 'Tavsif';
+
+  @override
+  String get financeAuthor => 'Kim yozdi';
+
+  @override
+  String financeAuthorLine(String name) {
+    return 'Yozdi: $name';
+  }
 
   @override
   String get financeTypeIncome => 'Daromad';

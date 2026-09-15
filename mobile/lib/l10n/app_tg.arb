@@ -271,6 +271,13 @@
   "taskFormRepeat": "Такрор кардан",
   "taskFormRepeatNever": "Такрор накардан",
   "taskFormRepeatHelp": "Вақте ки вазифа иҷрошуда қайд мешавад, навбатиаш худ ба худ пайдо мешавад.",
+  "taskFormAssignee": "Иҷрокунанда",
+  "taskFormAssigneeNobody": "Ба касе супорида нашудааст",
+  "taskFormAssigneeHelp": "Ба иҷрокунанда дар бораи вазифа огоҳинома меравад.",
+  "tasksAssignedTo": "Иҷрокунанда: {name}",
+  "@tasksAssignedTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "taskFormNotesLabel": "Қайдҳо",
   "taskFormCreate": "Сохтан",
   "taskFormCreated": "Вазифа сохта шуд",
@@ -536,6 +543,11 @@
   "financeType": "Навъ",
   "financeDate": "Сана",
   "financeDescription": "Тавсиф",
+  "financeAuthor": "Кӣ сабт кард",
+  "financeAuthorLine": "Сабт кард: {name}",
+  "@financeAuthorLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "financeTypeIncome": "Даромад",
   "financeTypeExpense": "Харҷ",
   "financeDeleteTitle": "Амалиётро нест кунем?",

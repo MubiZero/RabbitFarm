@@ -272,6 +272,13 @@
   "taskFormRepeat": "Takrorlash",
   "taskFormRepeatNever": "Takrorlanmasin",
   "taskFormRepeatHelp": "Vazifa bajarilgan deb belgilanganda, keyingisi oʻzi yaratiladi.",
+  "taskFormAssignee": "Ijrochi",
+  "taskFormAssigneeNobody": "Hech kimga topshirilmagan",
+  "taskFormAssigneeHelp": "Ijrochiga vazifa haqida bildirishnoma boradi.",
+  "tasksAssignedTo": "Ijrochi: {name}",
+  "@tasksAssignedTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "taskFormNotesLabel": "Izohlar",
   "taskFormCreate": "Yaratish",
   "taskFormCreated": "Vazifa yaratildi",
@@ -537,6 +544,11 @@
   "financeType": "Turi",
   "financeDate": "Sana",
   "financeDescription": "Tavsif",
+  "financeAuthor": "Kim yozdi",
+  "financeAuthorLine": "Yozdi: {name}",
+  "@financeAuthorLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "financeTypeIncome": "Daromad",
   "financeTypeExpense": "Xarajat",
   "financeDeleteTitle": "Amaliyot oʻchirilsinmi?",

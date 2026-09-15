@@ -945,6 +945,21 @@ class AppLocalizationsTg extends AppLocalizations {
       'Вақте ки вазифа иҷрошуда қайд мешавад, навбатиаш худ ба худ пайдо мешавад.';
 
   @override
+  String get taskFormAssignee => 'Иҷрокунанда';
+
+  @override
+  String get taskFormAssigneeNobody => 'Ба касе супорида нашудааст';
+
+  @override
+  String get taskFormAssigneeHelp =>
+      'Ба иҷрокунанда дар бораи вазифа огоҳинома меравад.';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Иҷрокунанда: $name';
+  }
+
+  @override
   String get taskFormNotesLabel => 'Қайдҳо';
 
   @override
@@ -1808,6 +1823,14 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get financeDescription => 'Тавсиф';
+
+  @override
+  String get financeAuthor => 'Кӣ сабт кард';
+
+  @override
+  String financeAuthorLine(String name) {
+    return 'Сабт кард: $name';
+  }
 
   @override
   String get financeTypeIncome => 'Даромад';

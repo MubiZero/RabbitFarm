@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -336,7 +337,7 @@ class _TasksSkeleton extends StatelessWidget {
 /// Отметить выполненной можно только галочкой, а не нажатием на всю строку:
 /// отменить выполнение приложение не умеет, и случайное касание списка стоило
 /// бы человеку задачи. Нажатие на строку открывает её целиком.
-class _TaskRow extends StatelessWidget {
+class _TaskRow extends ConsumerWidget {
   final Task task;
   final VoidCallback onComplete;
   final VoidCallback onOpen;
@@ -348,9 +349,16 @@ class _TaskRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final done = task.status == TaskStatus.completed;
     final overdue = !done && isOverdue(task.dueDate);
+    // Исполнителя называем только на чужих делах — по тому же правилу, что
+    // автора проводки в книге денег. На ферме из одного человека подпись под
+    // каждой строкой была бы шумом; на ферме с работниками она отвечает
+    // владельцу, кого ждать по этой задаче.
+    final assignee = task.assignee;
+    final someoneElse =
+        assignee != null && assignee.id != ref.watch(currentUserIdProvider);
 
     return AppCard(
       padding: const EdgeInsets.fromLTRB(
@@ -404,6 +412,14 @@ class _TaskRow extends StatelessWidget {
                     fontWeight: overdue ? FontWeight.w600 : null,
                   ),
                 ),
+                if (someoneElse)
+                  Text(
+                    context.l10n.tasksAssignedTo(assignee.fullName),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),

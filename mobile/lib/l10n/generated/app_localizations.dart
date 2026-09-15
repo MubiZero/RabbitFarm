@@ -1728,6 +1728,30 @@ abstract class AppLocalizations {
   /// **'Когда задачу отметят выполненной, следующая создастся сама.'**
   String get taskFormRepeatHelp;
 
+  /// No description provided for @taskFormAssignee.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель'**
+  String get taskFormAssignee;
+
+  /// No description provided for @taskFormAssigneeNobody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никому не поручена'**
+  String get taskFormAssigneeNobody;
+
+  /// No description provided for @taskFormAssigneeHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнителю придёт уведомление о задаче.'**
+  String get taskFormAssigneeHelp;
+
+  /// No description provided for @tasksAssignedTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель: {name}'**
+  String tasksAssignedTo(String name);
+
   /// No description provided for @taskFormNotesLabel.
   ///
   /// In ru, this message translates to:
@@ -3317,6 +3341,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Описание'**
   String get financeDescription;
+
+  /// No description provided for @financeAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто записал'**
+  String get financeAuthor;
+
+  /// No description provided for @financeAuthorLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записал {name}'**
+  String financeAuthorLine(String name);
 
   /// No description provided for @financeTypeIncome.
   ///

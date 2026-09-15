@@ -23,6 +23,9 @@ _Transaction _$TransactionFromJson(Map<String, dynamic> json) => _Transaction(
   rabbit: json['rabbit'] == null
       ? null
       : RabbitRef.fromJson(json['rabbit'] as Map<String, dynamic>),
+  author: json['creator'] == null
+      ? null
+      : UserRef.fromJson(json['creator'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TransactionToJson(
@@ -42,6 +45,7 @@ Map<String, dynamic> _$TransactionToJson(
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
   'rabbit': instance.rabbit,
+  'creator': instance.author,
 };
 
 const _$TransactionTypeEnumMap = {

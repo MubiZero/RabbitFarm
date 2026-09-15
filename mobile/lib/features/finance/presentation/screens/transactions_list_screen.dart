@@ -347,16 +347,23 @@ class _ActiveFilters extends ConsumerWidget {
   }
 }
 
-class _TransactionCard extends StatelessWidget {
+class _TransactionCard extends ConsumerWidget {
   final Transaction transaction;
   final VoidCallback onTap;
 
   const _TransactionCard({required this.transaction, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isIncome = transaction.type == TransactionType.income;
     final color = isIncome ? AppColors.success : AppColors.error;
+    // Автора называем только на чужих строках. На ферме из одного человека
+    // все проводки его собственные, и подпись «Записал Иван» под каждой была
+    // бы шумом; на ферме с наёмным управляющим она проступает ровно там, где
+    // отвечает на вопрос «кто это провёл».
+    final author = transaction.author;
+    final me = ref.watch(currentUserIdProvider);
+    final showAuthor = author != null && author.id != me;
 
     return AppCard(
       onTap: onTap,
@@ -408,6 +415,14 @@ class _TransactionCard extends StatelessWidget {
                 if (transaction.description?.trim().isNotEmpty == true)
                   Text(
                     transaction.description!.trim(),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                if (showAuthor)
+                  Text(
+                    context.l10n.financeAuthorLine(author.fullName),
                     style: AppTypography.labelSm
                         .copyWith(color: context.colors.onSurfaceVariant),
                     maxLines: 1,
@@ -553,6 +568,12 @@ class _DetailsSheet extends ConsumerWidget {
               value: DateFormat('d MMMM y', 'ru')
                   .format(transaction.transactionDate),
             ),
+            if (transaction.author != null)
+              _Row(
+                icon: Icons.person_outline,
+                label: context.l10n.financeAuthor,
+                value: transaction.author!.fullName,
+              ),
             if (transaction.rabbit != null)
               _Row(
                 icon: Icons.pets_outlined,

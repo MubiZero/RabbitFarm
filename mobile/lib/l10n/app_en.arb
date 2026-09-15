@@ -271,6 +271,13 @@
   "taskFormRepeat": "Repeat",
   "taskFormRepeatNever": "Don''t repeat",
   "taskFormRepeatHelp": "When the task is marked done, the next one will be created automatically.",
+  "taskFormAssignee": "Assignee",
+  "taskFormAssigneeNobody": "Not assigned",
+  "taskFormAssigneeHelp": "The assignee gets a notification about the task.",
+  "tasksAssignedTo": "Assignee: {name}",
+  "@tasksAssignedTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "taskFormNotesLabel": "Notes",
   "taskFormCreate": "Create",
   "taskFormCreated": "Task created",
@@ -536,6 +543,11 @@
   "financeType": "Type",
   "financeDate": "Date",
   "financeDescription": "Description",
+  "financeAuthor": "Recorded by",
+  "financeAuthorLine": "Recorded by {name}",
+  "@financeAuthorLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "financeTypeIncome": "Income",
   "financeTypeExpense": "Expense",
   "financeDeleteTitle": "Delete transaction?",

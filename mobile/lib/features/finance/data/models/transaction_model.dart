@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/models/user_ref.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../../core/json/double_converter.dart';
@@ -76,6 +77,14 @@ abstract class Transaction with _$Transaction {
     /// связь просто выбрасывали: продажа конкретного кролика приходила с его
     /// именем, а в книге стояла безликая строка «Продажа кролика».
     @JsonKey(name: 'rabbit') RabbitRef? rabbit,
+    /// Кто провёл операцию.
+    ///
+    /// Сервер прикладывает автора к каждому ответу (`TRANSACTION_INCLUDE`), а
+    /// книга денег его не показывала — числовой `created_by` ничего не
+    /// говорит. Для фермы с наёмным управляющим «кто это записал» — главный
+    /// вопрос к денежной странице, и ответ на него всё это время лежал в
+    /// ответе неразобранным.
+    @JsonKey(name: 'creator') UserRef? author,
   }) = _Transaction;
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>

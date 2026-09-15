@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/core/access/farm_access.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/api/api_failure.dart';
+import 'package:mobile/core/models/user_ref.dart';
 import 'package:mobile/core/providers/connectivity.dart';
 import 'package:mobile/features/home/presentation/screens/today_screen.dart';
 import 'package:mobile/features/reports/data/models/report_model.dart';
@@ -39,6 +40,7 @@ Task _task({
   required int id,
   required String title,
   required DateTime dueDate,
+  UserRef? assignee,
 }) => Task(
   id: id,
   title: title,
@@ -46,6 +48,8 @@ Task _task({
   status: TaskStatus.pending,
   priority: TaskPriority.high,
   dueDate: dueDate,
+  assignedTo: assignee?.id,
+  assignee: assignee,
 );
 
 DateTime _daysAgo(int days) {
@@ -155,6 +159,7 @@ Widget _wrap({
   DashboardReport dashboard = _calmDashboard,
   TasksRepository? repository,
   FarmRoleAccess role = FarmRoleAccess.owner,
+  int? viewerId,
   bool online = true,
 }) => testAppScreen(
   // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
@@ -174,6 +179,7 @@ Widget _wrap({
       repository ?? _FakeTasksRepository(const []),
     ),
     farmRoleProvider.overrideWithValue(role),
+    currentUserIdProvider.overrideWithValue(viewerId),
     isOnlineProvider.overrideWith((ref) => Stream.value(online)),
   ],
 );
@@ -457,5 +463,36 @@ void main() {
         expect(find.text('Кролики'), findsNothing);
       },
     );
+  });
+
+  // Владелец, открывший «Сегодня» на ферме с работниками, должен видеть, кого
+  // ждать по каждой строке. Своё имя под собственными делами он бы читал как
+  // шум — поэтому подпись только на чужих.
+  testWidgets('на «Сегодня» чужая задача подписана исполнителем, своя — нет', (
+    tester,
+  ) async {
+    const owner = UserRef(id: 1, fullName: 'Пётр Владелец');
+    const worker = UserRef(id: 2, fullName: 'Иван Работник');
+
+    final repository = _FakeTasksRepository([
+      _task(
+        id: 1,
+        title: 'Почистить клетки',
+        dueDate: _daysAgo(0),
+        assignee: worker,
+      ),
+      _task(
+        id: 2,
+        title: 'Раздать корм',
+        dueDate: _daysAgo(0),
+        assignee: owner,
+      ),
+    ]);
+
+    await tester.pumpWidget(_wrap(repository: repository, viewerId: owner.id));
+    await _settle(tester);
+
+    expect(find.text('Исполнитель: Иван Работник'), findsOneWidget);
+    expect(find.text('Исполнитель: Пётр Владелец'), findsNothing);
   });
 }

@@ -425,6 +425,13 @@
   "taskFormRepeat": "Повторять",
   "taskFormRepeatNever": "Не повторять",
   "taskFormRepeatHelp": "Когда задачу отметят выполненной, следующая создастся сама.",
+  "taskFormAssignee": "Исполнитель",
+  "taskFormAssigneeNobody": "Никому не поручена",
+  "taskFormAssigneeHelp": "Исполнителю придёт уведомление о задаче.",
+  "tasksAssignedTo": "Исполнитель: {name}",
+  "@tasksAssignedTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "taskFormNotesLabel": "Примечания",
   "taskFormCreate": "Создать",
   "taskFormCreated": "Задача создана",
@@ -751,6 +758,11 @@
   "financeType": "Тип",
   "financeDate": "Дата",
   "financeDescription": "Описание",
+  "financeAuthor": "Кто записал",
+  "financeAuthorLine": "Записал {name}",
+  "@financeAuthorLine": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "financeTypeIncome": "Доход",
   "financeTypeExpense": "Расход",
   "financeDeleteTitle": "Удалить операцию?",

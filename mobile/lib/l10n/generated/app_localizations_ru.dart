@@ -970,6 +970,20 @@ class AppLocalizationsRu extends AppLocalizations {
       'Когда задачу отметят выполненной, следующая создастся сама.';
 
   @override
+  String get taskFormAssignee => 'Исполнитель';
+
+  @override
+  String get taskFormAssigneeNobody => 'Никому не поручена';
+
+  @override
+  String get taskFormAssigneeHelp => 'Исполнителю придёт уведомление о задаче.';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Исполнитель: $name';
+  }
+
+  @override
   String get taskFormNotesLabel => 'Примечания';
 
   @override
@@ -1844,6 +1858,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get financeDescription => 'Описание';
+
+  @override
+  String get financeAuthor => 'Кто записал';
+
+  @override
+  String financeAuthorLine(String name) {
+    return 'Записал $name';
+  }
 
   @override
   String get financeTypeIncome => 'Доход';

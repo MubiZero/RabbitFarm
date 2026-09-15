@@ -951,6 +951,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'When the task is marked done, the next one will be created automatically.';
 
   @override
+  String get taskFormAssignee => 'Assignee';
+
+  @override
+  String get taskFormAssigneeNobody => 'Not assigned';
+
+  @override
+  String get taskFormAssigneeHelp =>
+      'The assignee gets a notification about the task.';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Assignee: $name';
+  }
+
+  @override
   String get taskFormNotesLabel => 'Notes';
 
   @override
@@ -1817,6 +1832,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get financeDescription => 'Description';
+
+  @override
+  String get financeAuthor => 'Recorded by';
+
+  @override
+  String financeAuthorLine(String name) {
+    return 'Recorded by $name';
+  }
 
   @override
   String get financeTypeIncome => 'Income';

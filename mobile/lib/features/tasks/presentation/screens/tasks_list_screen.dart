@@ -414,6 +414,32 @@ class _TaskCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                // Чьё это дело. Сервер кладёт исполнителя в каждый ответ и
+                // шлёт ему личный пуш, а список об этом молчал: на ферме с
+                // работниками нельзя было понять, кому поручено.
+                if (task.assignee != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        size: 14,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          task.assignee!.fullName,
+                          style: AppTypography.labelSm.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (task.description?.trim().isNotEmpty == true) ...[
                   const SizedBox(height: AppSpacing.sm),
                   Text(
