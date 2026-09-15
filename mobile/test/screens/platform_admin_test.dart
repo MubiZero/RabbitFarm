@@ -277,7 +277,8 @@ void main() {
       await _settle(tester);
 
       // В листе выбора есть и «без тарифа», и сам тариф со своими пределами.
-      expect(find.text('Без тарифа — работает без ограничений'), findsOneWidget);
+      expect(
+          find.text('Без тарифа — работает без ограничений'), findsOneWidget);
       await tester.tap(find.text('Базовый'));
       await _settle(tester);
 
@@ -299,7 +300,8 @@ void main() {
 
       await tester.tap(find.text('Назначить тариф'));
       await _settle(tester);
-      expect(find.text('Без тарифа — работает без ограничений'), findsOneWidget);
+      expect(
+          find.text('Без тарифа — работает без ограничений'), findsOneWidget);
 
       // Тап по затемнению вне листа — обычный способ его закрыть.
       await tester.tapAt(const Offset(210, 20));
@@ -329,7 +331,8 @@ void main() {
       expect(repository.queries.last.search, 'Иванов');
     });
 
-    testWidgets('фильтр «Без тарифа» уходит на сервер и снимается повторным тапом',
+    testWidgets(
+        'фильтр «Без тарифа» уходит на сервер и снимается повторным тапом',
         (tester) async {
       final repository = _FakeRepository(farms: [_farm(rabbits: 1)]);
       await tester.pumpWidget(_farmsTab(repository: repository));
@@ -355,12 +358,15 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
-      expect(find.widgetWithText(FilterChip, 'Упёрлась в предел тарифа'), findsOneWidget);
+      expect(find.widgetWithText(FilterChip, 'Упёрлась в предел тарифа'),
+          findsOneWidget);
       // Подпись та же, что у состояния фермы в её карточке — одно состояние
       // не должно называться в списке иначе.
       expect(find.widgetWithText(FilterChip, 'Доступ закрыт'), findsOneWidget);
-      expect(find.widgetWithText(FilterChip, 'Просрочен тариф'), findsOneWidget);
-      expect(find.widgetWithText(FilterChip, 'Не заходили 30 дней'), findsOneWidget);
+      expect(
+          find.widgetWithText(FilterChip, 'Просрочен тариф'), findsOneWidget);
+      expect(find.widgetWithText(FilterChip, 'Не заходили 30 дней'),
+          findsOneWidget);
     });
 
     testWidgets('срезы «доступ закрыт» и «просрочен тариф» уходят на сервер',
@@ -396,9 +402,11 @@ void main() {
   });
 
   group('Фермы — широкий экран', () {
-    final ownerB = const UserRef(id: 11, fullName: 'Мария Петрова', email: 'maria@example.com');
+    final ownerB = const UserRef(
+        id: 11, fullName: 'Мария Петрова', email: 'maria@example.com');
 
-    testWidgets('список ферм выглядит таблицей, а не карточками', (tester) async {
+    testWidgets('список ферм выглядит таблицей, а не карточками',
+        (tester) async {
       await tester.pumpWidget(_farmsTab(farms: [
         _farm(plan: _basic, rabbits: 5),
         PlatformFarm(
@@ -435,7 +443,9 @@ void main() {
       );
     });
 
-    testWidgets('на узком экране остаются карточки, на ровно граничной ширине — уже таблица', (tester) async {
+    testWidgets(
+        'на узком экране остаются карточки, на ровно граничной ширине — уже таблица',
+        (tester) async {
       await tester.pumpWidget(_farmsTab(farms: [_farm(plan: _basic)]));
 
       await _settleWide(tester, width: AppBreakpoints.wideScreen - 1);
@@ -482,7 +492,8 @@ void main() {
 
       // В листе выбора есть и «без тарифа», и сам тариф со своими пределами
       // — та же проверка, что и у карточки в узкой раскладке.
-      expect(find.text('Без тарифа — работает без ограничений'), findsOneWidget);
+      expect(
+          find.text('Без тарифа — работает без ограничений'), findsOneWidget);
       await tester.tap(find.text('Базовый'));
       await pump();
 
@@ -512,7 +523,8 @@ void main() {
     });
 
     testWidgets('тариф без пределов так и подписан', (tester) async {
-      await tester.pumpWidget(_plansTab([const Plan(id: 4, name: 'Без границ')]));
+      await tester
+          .pumpWidget(_plansTab([const Plan(id: 4, name: 'Без границ')]));
       await _settle(tester);
 
       expect(find.text('Без ограничений'), findsOneWidget);
@@ -556,7 +568,8 @@ void main() {
       expect(find.text('2'), findsOneWidget);
     });
 
-    testWidgets('показывает просроченные, приостановленные и упёршиеся в предел',
+    testWidgets(
+        'показывает просроченные, приостановленные и упёршиеся в предел',
         (tester) async {
       await tester.pumpWidget(_summaryTab(
         summary: const PlatformSummary(

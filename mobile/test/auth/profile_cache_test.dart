@@ -15,8 +15,8 @@ class _FakeAdapter implements HttpClientAdapter {
   final Map<String, dynamic> profile;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options, Stream<Uint8List>? _,
-      Future<void>? __) async {
+  Future<ResponseBody> fetch(
+      RequestOptions options, Stream<Uint8List>? _, Future<void>? __) async {
     final body = options.path.contains('me')
         ? {'success': true, 'message': 'ok', 'data': profile}
         : {'success': true, 'message': 'ok', 'data': <String, dynamic>{}};

@@ -58,7 +58,9 @@ class _FakeAdapter implements HttpClientAdapter {
     }
 
     if (otherCode == null) {
-      return _json({'success': true, 'message': 'ok', 'data': <String, dynamic>{}}, otherStatus);
+      return _json(
+          {'success': true, 'message': 'ok', 'data': <String, dynamic>{}},
+          otherStatus);
     }
     return _json({
       'error': {'code': otherCode, 'message': otherMessage ?? 'Ошибка'}
@@ -91,7 +93,9 @@ void main() {
     return container;
   }
 
-  test('узнаёт про read_only по ответу на обычный запрос, не дожидаясь следующего профиля', () async {
+  test(
+      'узнаёт про read_only по ответу на обычный запрос, не дожидаясь следующего профиля',
+      () async {
     final container = await buildContainer(_FakeAdapter(
       otherStatus: 403,
       otherCode: 'FARM_READ_ONLY',

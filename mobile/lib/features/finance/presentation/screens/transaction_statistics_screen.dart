@@ -93,9 +93,8 @@ class _TransactionStatisticsScreenState
           ),
           const SizedBox(height: 12),
           AppCard(
-            variant: isProfit
-                ? AppCardVariant.highlighted
-                : AppCardVariant.error,
+            variant:
+                isProfit ? AppCardVariant.highlighted : AppCardVariant.error,
             child: Row(
               children: [
                 Icon(

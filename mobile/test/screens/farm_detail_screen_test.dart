@@ -380,7 +380,8 @@ void main() {
       await _settle(tester);
 
       // Все три уровня видны сразу — вместе с тем, что каждый означает.
-      expect(find.widgetWithText(ListTile, 'Работает как обычно'), findsOneWidget);
+      expect(
+          find.widgetWithText(ListTile, 'Работает как обычно'), findsOneWidget);
       expect(find.widgetWithText(ListTile, 'Только чтение'), findsOneWidget);
       expect(find.widgetWithText(ListTile, 'Доступ закрыт'), findsOneWidget);
 
@@ -493,8 +494,7 @@ void main() {
       await tester.tap(find.text('Сохранить'));
       await _settle(tester);
 
-      expect(repository.extrasCalls,
-          [(rabbits: 50, staff: null, until: null)]);
+      expect(repository.extrasCalls, [(rabbits: 50, staff: null, until: null)]);
       expect(find.text('Поблажка обновлена'), findsOneWidget);
       // Предел на полосе — с добавкой, а сам тариф остался прежним.
       expect(find.text('26 из 80'), findsOneWidget);
@@ -535,8 +535,8 @@ void main() {
       await tester.tap(find.text('Снять поблажку'));
       await _settle(tester);
 
-      expect(repository.extrasCalls,
-          [(rabbits: null, staff: null, until: null)]);
+      expect(
+          repository.extrasCalls, [(rabbits: null, staff: null, until: null)]);
       expect(find.text('Поблажка снята'), findsOneWidget);
       expect(
         find.text('Поблажек нет — действуют пределы тарифа'),
@@ -690,7 +690,8 @@ void main() {
 
   group('Удаление и восстановление фермы', () {
     /// Высота под весь экран: раздел удаления идёт последним.
-    Future<void> openDangerZone(WidgetTester tester) => _settle(tester, height: 4600);
+    Future<void> openDangerZone(WidgetTester tester) =>
+        _settle(tester, height: 4600);
 
     /// Кнопка «Удалить» в диалоге — та, что оживает от набранного названия.
     TextButton confirmButton(WidgetTester tester) =>
@@ -798,13 +799,15 @@ void main() {
       // Пока ферма на пути к удалению, её доступ и поблажки не правят.
       expect(
         tester
-            .widget<TextButton>(find.widgetWithText(TextButton, 'Изменить доступ'))
+            .widget<TextButton>(
+                find.widgetWithText(TextButton, 'Изменить доступ'))
             .onPressed,
         isNull,
       );
       expect(
         tester
-            .widget<TextButton>(find.widgetWithText(TextButton, 'Выдать поблажку'))
+            .widget<TextButton>(
+                find.widgetWithText(TextButton, 'Выдать поблажку'))
             .onPressed,
         isNull,
       );
@@ -828,13 +831,16 @@ void main() {
 
       // Подписка держит список живым — как открытая вкладка «Фермы», с
       // которой в карточку и заходят.
-      container.listen(platformFarmsProvider, (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmsProvider, (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmsProvider).farms.isEmpty) {
         await Future<void>.delayed(Duration.zero);
       }
-      expect(container.read(platformFarmsProvider).farms.single.rabbitsCount, 1);
+      expect(
+          container.read(platformFarmsProvider).farms.single.rabbitsCount, 1);
 
-      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmDetailProvider(1), (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmDetailProvider(1)).isLoading) {
         await Future<void>.delayed(Duration.zero);
       }
@@ -844,7 +850,8 @@ void main() {
 
       expect(error, isNull);
       // Строка списка обновилась целиком из ответа, без перезагрузки страницы.
-      expect(container.read(platformFarmsProvider).farms.single.rabbitsCount, 26);
+      expect(
+          container.read(platformFarmsProvider).farms.single.rabbitsCount, 26);
       expect(container.read(platformFarmsProvider).farms.single.staffCount, 2);
     });
 
@@ -855,7 +862,8 @@ void main() {
       ]);
       addTearDown(container.dispose);
 
-      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmDetailProvider(1), (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmDetailProvider(1)).isLoading) {
         await Future<void>.delayed(Duration.zero);
       }

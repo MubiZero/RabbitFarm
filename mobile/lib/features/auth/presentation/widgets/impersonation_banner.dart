@@ -80,15 +80,16 @@ class _ImpersonationBannerState extends ConsumerState<ImpersonationBanner> {
                           ? l10n.impersonationExpired
                           : l10n.impersonationBanner(
                               auth.impersonatedFarmName ?? ''),
-                      style: AppTypography.labelLg
-                          .copyWith(color: Colors.white),
+                      style:
+                          AppTypography.labelLg.copyWith(color: Colors.white),
                     ),
                   ),
                   if (auth.isImpersonating)
                     TextButton(
                       onPressed: () =>
                           ref.read(authProvider.notifier).exitImpersonation(),
-                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      style:
+                          TextButton.styleFrom(foregroundColor: Colors.white),
                       child: Text(l10n.impersonationExit),
                     ),
                 ],

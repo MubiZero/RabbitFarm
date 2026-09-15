@@ -15,11 +15,11 @@ class NotificationPrimerSheet extends ConsumerStatefulWidget {
   const NotificationPrimerSheet({super.key});
 
   static Future<void> show(BuildContext context) => showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    showDragHandle: true,
-    builder: (_) => const NotificationPrimerSheet(),
-  );
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => const NotificationPrimerSheet(),
+      );
 
   @override
   ConsumerState<NotificationPrimerSheet> createState() =>
@@ -80,7 +80,8 @@ class _NotificationPrimerSheetState
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(l10n.notificationPrimerTitle, style: context.text.headlineSmall),
+            Text(l10n.notificationPrimerTitle,
+                style: context.text.headlineSmall),
             const SizedBox(height: AppSpacing.sm),
             Text(
               l10n.notificationPrimerBody,

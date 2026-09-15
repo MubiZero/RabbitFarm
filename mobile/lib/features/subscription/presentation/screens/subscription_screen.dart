@@ -122,7 +122,9 @@ class _Content extends ConsumerWidget {
           else if (flow.status == PaymentFlowStatus.declined)
             const _DeclinedCard()
           else if (flow.order != null)
-            _PayingCard(order: flow.order!, checking: flow.status == PaymentFlowStatus.checking)
+            _PayingCard(
+                order: flow.order!,
+                checking: flow.status == PaymentFlowStatus.checking)
           else if (plan!.price != null)
             _PayButton(loading: flow.status == PaymentFlowStatus.creating),
         ],
@@ -157,7 +159,8 @@ class _PlanInfoCard extends StatelessWidget {
               Text(
                 plan.price == null
                     ? l10n.subscriptionFree
-                    : l10n.subscriptionPricePerPeriod(plan.price!.toStringAsFixed(0)),
+                    : l10n.subscriptionPricePerPeriod(
+                        plan.price!.toStringAsFixed(0)),
                 style: AppTypography.labelLg
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),
@@ -180,7 +183,8 @@ class _PlanInfoCard extends StatelessWidget {
                       ? l10n.subscriptionForever
                       : plan.isExpired
                           ? l10n.subscriptionExpired(_dayFormat.format(expires))
-                          : l10n.subscriptionExpiresOn(_dayFormat.format(expires)),
+                          : l10n.subscriptionExpiresOn(
+                              _dayFormat.format(expires)),
                   style: AppTypography.bodyMd.copyWith(
                     color: plan.isExpired
                         ? AppColors.warning
@@ -206,7 +210,8 @@ class _PayButton extends ConsumerWidget {
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: loading ? null : () => ref.read(paymentFlowProvider.notifier).pay(),
+        onPressed:
+            loading ? null : () => ref.read(paymentFlowProvider.notifier).pay(),
         child: loading
             ? const SizedBox(
                 width: 20,
@@ -297,7 +302,8 @@ class _PayingCard extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () => _openPaymentPage(deepLink ?? url!, fallback: url),
+                onPressed: () =>
+                    _openPaymentPage(deepLink ?? url!, fallback: url),
                 child: Text(l10n.subscriptionOpenPaymentPage),
               ),
             ),
@@ -328,7 +334,8 @@ class _PayingCard extends ConsumerWidget {
     final uri = Uri.parse(primary);
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened && fallback != null && fallback != primary) {
-      await launchUrl(Uri.parse(fallback), mode: LaunchMode.externalApplication);
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 }

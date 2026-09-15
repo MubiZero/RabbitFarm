@@ -151,8 +151,7 @@ Future<void> showQuickEntrySheet(
       if (group.actions.any((a) => role.can(a.capability)))
         QuickEntryGroup(
           title: group.title,
-          actions:
-              group.actions.where((a) => role.can(a.capability)).toList(),
+          actions: group.actions.where((a) => role.can(a.capability)).toList(),
         ),
   ];
 

@@ -98,9 +98,12 @@ BreedingModel _breeding({
   );
 }
 
-Widget _wrap(KindlingSheetPrinter printer, _FakeBreedingRepository repository) =>
+Widget _wrap(
+        KindlingSheetPrinter printer, _FakeBreedingRepository repository) =>
     testApp(
-      Align(alignment: Alignment.topRight, child: KindlingPlanButton(printer: printer)),
+      Align(
+          alignment: Alignment.topRight,
+          child: KindlingPlanButton(printer: printer)),
       overrides: [breedingRepositoryProvider.overrideWithValue(repository)],
     );
 
@@ -118,14 +121,28 @@ void main() {
       final rows = kindlingPlanForMonth(
         [
           _breeding(id: 1, expectedBirth: DateTime(2026, 9, 20)),
-          _breeding(id: 2, expectedBirth: DateTime(2026, 9, 5), femaleName: 'Белка'),
+          _breeding(
+              id: 2, expectedBirth: DateTime(2026, 9, 5), femaleName: 'Белка'),
           // Соседний месяц — не на этом листе.
-          _breeding(id: 3, expectedBirth: DateTime(2026, 10, 2), femaleName: 'Чужая'),
+          _breeding(
+              id: 3, expectedBirth: DateTime(2026, 10, 2), femaleName: 'Чужая'),
           // Отменённая случка и пустая самка окрола не дадут.
-          _breeding(id: 4, expectedBirth: DateTime(2026, 9, 9), status: 'cancelled', femaleName: 'Отменённая'),
-          _breeding(id: 5, expectedBirth: DateTime(2026, 9, 11), isPregnant: false, femaleName: 'Пустая'),
+          _breeding(
+              id: 4,
+              expectedBirth: DateTime(2026, 9, 9),
+              status: 'cancelled',
+              femaleName: 'Отменённая'),
+          _breeding(
+              id: 5,
+              expectedBirth: DateTime(2026, 9, 11),
+              isPregnant: false,
+              femaleName: 'Пустая'),
           // Окрол уже записан — на листе «что сделать» ему делать нечего.
-          _breeding(id: 6, expectedBirth: DateTime(2026, 9, 12), status: 'completed', femaleName: 'Окотившаяся'),
+          _breeding(
+              id: 6,
+              expectedBirth: DateTime(2026, 9, 12),
+              status: 'completed',
+              femaleName: 'Окотившаяся'),
         ],
         month: DateTime(2026, 9),
       );
@@ -173,7 +190,11 @@ void main() {
     test('на листе есть месяц, ожидаемые окролы и дни маточника', () {
       final html = sheet([
         _breeding(expectedBirth: DateTime(2026, 9, 14)),
-        _breeding(id: 2, expectedBirth: DateTime(2026, 9, 20), femaleName: 'Белка', cage: 'К-3'),
+        _breeding(
+            id: 2,
+            expectedBirth: DateTime(2026, 9, 20),
+            femaleName: 'Белка',
+            cage: 'К-3'),
       ]);
 
       expect(html, contains('сентябрь 2026'));
@@ -194,7 +215,8 @@ void main() {
 
     test('кличка не ломает разметку листа', () {
       final html = sheet([
-        _breeding(expectedBirth: DateTime(2026, 9, 14), femaleName: 'Зорька <b>'),
+        _breeding(
+            expectedBirth: DateTime(2026, 9, 14), femaleName: 'Зорька <b>'),
       ]);
 
       expect(html, contains('Зорька &lt;b&gt;'));
@@ -236,7 +258,8 @@ void main() {
       var printed = 0;
 
       await tester.pumpWidget(_wrap(
-        ({required String html, required String documentName}) async => printed++,
+        ({required String html, required String documentName}) async =>
+            printed++,
         repository,
       ));
       await tester.pumpAndSettle();

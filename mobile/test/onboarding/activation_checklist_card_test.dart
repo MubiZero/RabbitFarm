@@ -21,7 +21,7 @@ import '../support/test_app.dart';
 /// а сама реализация метода не нужна — подменяется целиком.
 class _FakeFeedingRecordsRepository extends FeedingRecordsRepository {
   _FakeFeedingRecordsRepository(this._records)
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<FeedingRecord> _records;
 
@@ -39,26 +39,27 @@ Widget _wrap({
   List<FeedingRecord> feedingRecords = const [],
   FarmRoleAccess role = FarmRoleAccess.owner,
   Set<FirstStep>? doneSteps,
-}) => testAppScreen(
-  Scaffold(
-    body: ActivationChecklistCard(
-      cagesTotal: cagesTotal,
-      rabbitsTotal: rabbitsTotal,
-    ),
-  ),
-  overrides: <Override>[
-    farmRoleProvider.overrideWithValue(role),
-    feedingRecordsRepositoryProvider.overrideWithValue(
-      _FakeFeedingRecordsRepository(feedingRecords),
-    ),
-    // Шаги, которые карточка проверяет запросом: в тесте отвечаем за них
-    // напрямую, чтобы не поднимать четыре репозитория ради одной галочки.
-    if (doneSteps != null)
-      firstStepDoneProvider.overrideWith(
-        (ref, step) async => doneSteps.contains(step),
+}) =>
+    testAppScreen(
+      Scaffold(
+        body: ActivationChecklistCard(
+          cagesTotal: cagesTotal,
+          rabbitsTotal: rabbitsTotal,
+        ),
       ),
-  ],
-);
+      overrides: <Override>[
+        farmRoleProvider.overrideWithValue(role),
+        feedingRecordsRepositoryProvider.overrideWithValue(
+          _FakeFeedingRecordsRepository(feedingRecords),
+        ),
+        // Шаги, которые карточка проверяет запросом: в тесте отвечаем за них
+        // напрямую, чтобы не поднимать четыре репозитория ради одной галочки.
+        if (doneSteps != null)
+          firstStepDoneProvider.overrideWith(
+            (ref, step) async => doneSteps.contains(step),
+          ),
+      ],
+    );
 
 /// Ответы знакомства и признаки сделанных шагов читаются асинхронно —
 /// карточка складывается не в первом кадре.

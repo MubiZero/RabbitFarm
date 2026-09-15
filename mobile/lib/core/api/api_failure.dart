@@ -85,5 +85,6 @@ class ApiFailure implements Exception {
   /// Только для журналов и отладки: пользователю показывается текст,
   /// собранный экраном через `errorText`.
   @override
-  String toString() => 'ApiFailure(${kind.name}${code == null ? '' : ', $code'})';
+  String toString() =>
+      'ApiFailure(${kind.name}${code == null ? '' : ', $code'})';
 }

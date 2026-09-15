@@ -75,8 +75,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
                   title: context.l10n.galleryEmptyTitle,
                   subtitle: context.l10n.galleryEmptyBody,
                   actionLabel: canManage ? context.l10n.galleryAdd : null,
-                  onAction:
-                      canManage ? () => _addPhoto(context, ref) : null,
+                  onAction: canManage ? () => _addPhoto(context, ref) : null,
                 )
               : _grid(context, ref, photos, canManage),
         ),
@@ -369,7 +368,8 @@ class _PhotoTile extends StatelessWidget {
                 left: 6,
                 bottom: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.55),
                     borderRadius: AppRadius.smAll,

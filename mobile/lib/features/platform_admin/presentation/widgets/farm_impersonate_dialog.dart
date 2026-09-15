@@ -27,8 +27,7 @@ class _FarmImpersonateDialog extends StatefulWidget {
   final String farmName;
 
   @override
-  State<_FarmImpersonateDialog> createState() =>
-      _FarmImpersonateDialogState();
+  State<_FarmImpersonateDialog> createState() => _FarmImpersonateDialogState();
 }
 
 class _FarmImpersonateDialogState extends State<_FarmImpersonateDialog> {

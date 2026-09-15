@@ -26,6 +26,7 @@ abstract class Plan with _$Plan {
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
     @JsonKey(name: 'is_default') @Default(false) bool isDefault,
+
     /// Сколько живых ферм сейчас на этом тарифе.
     ///
     /// Нужно там, где тариф трогают: удаление стирает его и обнуляет `plan_id`

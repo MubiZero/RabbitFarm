@@ -109,7 +109,8 @@ const _feedingStats = FeedingStatistics(
     'kg': {'pellets': 240.5, 'hay': 180, 'vegetables': 46, 'grain': 20},
   },
   byFeed: {
-    'Гранулы «Премиум»': FeedingByFeed(quantity: 240.5, unit: 'kg', cost: 31265),
+    'Гранулы «Премиум»':
+        FeedingByFeed(quantity: 240.5, unit: 'kg', cost: 31265),
     'Люцерновое сено': FeedingByFeed(quantity: 180, unit: 'kg', cost: 9000),
   },
   totalCost: 40265,
@@ -205,8 +206,8 @@ void main() {
       await tester.pumpWidget(_wrap(
         const TransactionStatisticsScreen(),
         [
-          financialStatisticsProvider.overrideWith(
-              (ref, params) async => throw Exception('нет сети')),
+          financialStatisticsProvider
+              .overrideWith((ref, params) async => throw Exception('нет сети')),
         ],
       ));
       await _settle(tester);
@@ -217,8 +218,7 @@ void main() {
   });
 
   group('Экран аналитики склада', () {
-    testWidgets('показывает состав склада и позиции на исходе',
-        (tester) async {
+    testWidgets('показывает состав склада и позиции на исходе', (tester) async {
       await tester.pumpWidget(_wrap(
         const FeedStatisticsScreen(),
         [feedStatisticsProvider.overrideWith((ref) async => _feedStats)],
@@ -312,14 +312,14 @@ void main() {
       await tester.pumpWidget(_wrap(
         const FeedingStatisticsScreen(),
         [
-          feedingStatisticsProvider.overrideWith((ref, params) async =>
-              _feedingStats.copyWith(
-                totalFeedings: 0,
-                totalCost: 0,
-                quantityByUnit: const {},
-                byFeedType: const {},
-                byFeed: const {},
-              )),
+          feedingStatisticsProvider
+              .overrideWith((ref, params) async => _feedingStats.copyWith(
+                    totalFeedings: 0,
+                    totalCost: 0,
+                    quantityByUnit: const {},
+                    byFeedType: const {},
+                    byFeed: const {},
+                  )),
         ],
       ));
       await _settle(tester);

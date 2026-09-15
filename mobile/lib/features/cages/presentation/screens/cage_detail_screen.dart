@@ -54,8 +54,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-              failedTemplate(errorText(l10n, e))),
+          content: Text(failedTemplate(errorText(l10n, e))),
           backgroundColor: AppColors.error,
         ),
       );
@@ -478,8 +477,8 @@ class _ResidentTile extends StatelessWidget {
                     leading: const Icon(Icons.logout, color: AppColors.error),
                     title: Text(
                       context.l10n.cageRemoveConfirm,
-                      style: AppTypography.bodyLg
-                          .copyWith(color: AppColors.error),
+                      style:
+                          AppTypography.bodyLg.copyWith(color: AppColors.error),
                     ),
                   ),
                 ),
@@ -524,7 +523,8 @@ class _CagePickerSheet extends ConsumerWidget {
                 AppSpacing.xl,
               ),
               itemCount: available.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.sm),
               itemBuilder: (context, i) {
                 final cage = available[i];
                 final occupied =

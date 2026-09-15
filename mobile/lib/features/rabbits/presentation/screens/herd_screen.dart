@@ -235,8 +235,7 @@ class _Header extends StatelessWidget {
               ],
               selected: {view},
               showSelectedIcon: false,
-              onSelectionChanged: (selection) =>
-                  onViewChanged(selection.first),
+              onSelectionChanged: (selection) => onViewChanged(selection.first),
             ),
           ),
         ],

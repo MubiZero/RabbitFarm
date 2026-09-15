@@ -16,8 +16,8 @@ import '../utils/kindling_plan_sheet.dart';
 /// Куда уходит собранный лист. В приложении — в системный диалог печати и
 /// «поделиться», в тесте — в подмену: платформенный диалог не открыть без
 /// устройства, а проверять надо именно то, что на бумаге.
-typedef KindlingSheetPrinter =
-    Future<void> Function({required String html, required String documentName});
+typedef KindlingSheetPrinter = Future<void> Function(
+    {required String html, required String documentName});
 
 /// Кнопка «План окролов»: лист на месяц, который печатают и вешают в сарае.
 ///
@@ -122,9 +122,7 @@ class _KindlingPlanButtonState extends ConsumerState<KindlingPlanButton> {
       // Лента держит только первую страницу списка, а плану нужен весь месяц,
       // поэтому случки берутся отдельным запросом. Незакрытых случек на ферме
       // столько, сколько сукрольных самок, — десятки, а не тысячи.
-      final page = await ref
-          .read(breedingRepositoryProvider)
-          .getBreedings(
+      final page = await ref.read(breedingRepositoryProvider).getBreedings(
             page: 1,
             limit: 200,
             status: BreedingStatus.planned.value,

@@ -179,28 +179,38 @@ class InbreedingAnalyzer {
     final recommendations = <String>[];
 
     if (coefficient >= 0.25) {
-      recommendations.add('⛔ Критический уровень родства! Скрещивание настоятельно не рекомендуется.');
-      recommendations.add('Так близки родитель с потомком или полные брат с сестрой.');
-      recommendations.add('Высокий риск генетических дефектов и проблем со здоровьем потомства.');
+      recommendations.add(
+          '⛔ Критический уровень родства! Скрещивание настоятельно не рекомендуется.');
+      recommendations
+          .add('Так близки родитель с потомком или полные брат с сестрой.');
+      recommendations.add(
+          'Высокий риск генетических дефектов и проблем со здоровьем потомства.');
     } else if (coefficient >= 0.125) {
-      recommendations.add('⚠️ Высокий уровень родства. Скрещивание не рекомендуется.');
-      recommendations.add('Так близки полубрат с полусестрой или дядя с племянницей.');
+      recommendations
+          .add('⚠️ Высокий уровень родства. Скрещивание не рекомендуется.');
+      recommendations
+          .add('Так близки полубрат с полусестрой или дядя с племянницей.');
       recommendations.add('Возьмите неродственного самца.');
     } else if (coefficient >= 0.0625) {
-      recommendations.add('⚡ Средний уровень родства. Скрещивание допустимо с осторожностью.');
+      recommendations.add(
+          '⚡ Средний уровень родства. Скрещивание допустимо с осторожностью.');
       recommendations.add('Примерно так близки двоюродные.');
-      recommendations.add('Рекомендуется тщательный отбор и контроль здоровья потомства.');
+      recommendations
+          .add('Рекомендуется тщательный отбор и контроль здоровья потомства.');
     } else if (coefficient > 0.0) {
       recommendations.add('✓ Низкий уровень родства. Скрещивание допустимо.');
       recommendations.add('Общие предки находятся в дальних поколениях.');
     } else {
-      recommendations.add('✓ Родство не обнаружено. Оптимально для разведения.');
-      recommendations.add('Отсутствие общих предков снижает риск генетических проблем.');
+      recommendations
+          .add('✓ Родство не обнаружено. Оптимально для разведения.');
+      recommendations
+          .add('Отсутствие общих предков снижает риск генетических проблем.');
     }
 
     if (commonAncestors.isNotEmpty) {
       recommendations.add('');
-      recommendations.add('Общие предки: ${commonAncestors.map((a) => a.name).join(", ")}');
+      recommendations.add(
+          'Общие предки: ${commonAncestors.map((a) => a.name).join(", ")}');
     }
 
     return recommendations;
@@ -243,7 +253,8 @@ class CommonAncestor {
   });
 
   /// Ближайшее поколение
-  int get closestGeneration => maleGeneration < femaleGeneration ? maleGeneration : femaleGeneration;
+  int get closestGeneration =>
+      maleGeneration < femaleGeneration ? maleGeneration : femaleGeneration;
 }
 
 /// Информация о предке

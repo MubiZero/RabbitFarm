@@ -61,9 +61,8 @@ class WeightHistoryScreen extends ConsumerWidget {
                   title: context.l10n.weightEmptyTitle,
                   subtitle: context.l10n.weightEmptyBody,
                   actionLabel: canRecord ? context.l10n.weightAdd : null,
-                  onAction: canRecord
-                      ? () => _showAddDialog(context, ref)
-                      : null,
+                  onAction:
+                      canRecord ? () => _showAddDialog(context, ref) : null,
                 )
               : _content(context, weights),
         ),
@@ -82,7 +81,8 @@ class WeightHistoryScreen extends ConsumerWidget {
     final latest = weights.first;
     final oldest = weights.last;
     final totalChange = latest.weight - oldest.weight;
-    final trend = weights.length >= 2 ? latest.weight - weights[1].weight : null;
+    final trend =
+        weights.length >= 2 ? latest.weight - weights[1].weight : null;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -295,8 +295,8 @@ class _AddWeightDialogState extends ConsumerState<AddWeightDialog> {
     if (time == null) return;
 
     setState(() {
-      _measuredAt = DateTime(
-          date.year, date.month, date.day, time.hour, time.minute);
+      _measuredAt =
+          DateTime(date.year, date.month, date.day, time.hour, time.minute);
     });
   }
 

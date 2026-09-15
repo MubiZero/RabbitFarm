@@ -22,7 +22,8 @@ class _FakePermission extends NotificationPermission {
   }
 }
 
-Future<void> _pump(WidgetTester tester, _FakePermission permission, {required bool enabled}) async {
+Future<void> _pump(WidgetTester tester, _FakePermission permission,
+    {required bool enabled}) async {
   await tester.pumpWidget(
     testApp(
       NotificationPrimerGate(enabled: enabled),
@@ -43,7 +44,8 @@ void main() {
     expect(find.text('Напомним поставить маточник'), findsNothing);
   });
 
-  testWidgets('когда на ферме есть кролики — объясняем выгоду до системного вопроса', (
+  testWidgets(
+      'когда на ферме есть кролики — объясняем выгоду до системного вопроса', (
     tester,
   ) async {
     final permission = _FakePermission(shouldShow: true);
@@ -73,7 +75,9 @@ void main() {
     await tester.pumpWidget(
       testApp(
         const NotificationPrimerGate(enabled: true),
-        overrides: [notificationPermissionProvider.overrideWithValue(permission)],
+        overrides: [
+          notificationPermissionProvider.overrideWithValue(permission)
+        ],
       ),
     );
     await tester.pumpAndSettle();

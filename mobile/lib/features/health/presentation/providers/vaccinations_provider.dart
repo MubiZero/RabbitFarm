@@ -59,7 +59,8 @@ class VaccinationsState {
       vaccinations: vaccinations ?? this.vaccinations,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      rabbitIdFilter: clearRabbitId ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
+      rabbitIdFilter:
+          clearRabbitId ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
       typeFilter: clearType ? null : (typeFilter ?? this.typeFilter),
       fromDateFilter:
           clearFromDate ? null : (fromDateFilter ?? this.fromDateFilter),
@@ -90,7 +91,8 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
             vaccineType: state.typeFilter,
             upcoming: true,
           ),
-        VaccinationView.all || VaccinationView.last30Days =>
+        VaccinationView.all ||
+        VaccinationView.last30Days =>
           await _repository.getVaccinations(
             limit: 50,
             rabbitId: state.rabbitIdFilter,

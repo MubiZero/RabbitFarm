@@ -48,10 +48,11 @@ class VoiceInput {
   /// и запрос несуществующей локали заканчивается молчанием. Поэтому берётся
   /// ближайшая поддерживаемая: для них это русский — язык, на котором в
   /// регионе и так говорят с телефоном.
-  static String recognitionLocale(String languageCode) => switch (languageCode) {
-    'en' => 'en_US',
-    _ => 'ru_RU',
-  };
+  static String recognitionLocale(String languageCode) =>
+      switch (languageCode) {
+        'en' => 'en_US',
+        _ => 'ru_RU',
+      };
 
   Future<void> listen({
     required String localeId,
@@ -143,9 +144,7 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: _listening
-          ? context.l10n.voiceStop
-          : context.l10n.voiceDictate,
+      tooltip: _listening ? context.l10n.voiceStop : context.l10n.voiceDictate,
       onPressed: _toggle,
       iconSize: 24,
       constraints: const BoxConstraints(
@@ -154,7 +153,8 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton> {
       ),
       icon: Icon(
         _listening ? Icons.mic : Icons.mic_none_outlined,
-        color: _listening ? context.colors.error : context.colors.onSurfaceVariant,
+        color:
+            _listening ? context.colors.error : context.colors.onSurfaceVariant,
       ),
     );
   }

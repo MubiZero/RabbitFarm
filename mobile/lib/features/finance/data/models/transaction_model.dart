@@ -63,13 +63,20 @@ abstract class Transaction with _$Transaction {
     required TransactionType type,
     required TransactionCategory category,
     @DoubleConverter() required double amount,
-    @JsonKey(name: 'transaction_date') @DateOnlyConverter() required DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
+
     /// Кролик, к которому привязана операция.
     ///
     /// Сервер шлёт его урезанным — `id`, кличка и бирка (`TRANSACTION_INCLUDE`
@@ -77,6 +84,7 @@ abstract class Transaction with _$Transaction {
     /// связь просто выбрасывали: продажа конкретного кролика приходила с его
     /// именем, а в книге стояла безликая строка «Продажа кролика».
     @JsonKey(name: 'rabbit') RabbitRef? rabbit,
+
     /// Кто провёл операцию.
     ///
     /// Сервер прикладывает автора к каждому ответу (`TRANSACTION_INCLUDE`), а
@@ -98,7 +106,9 @@ abstract class TransactionCreate with _$TransactionCreate {
     required TransactionType type,
     required TransactionCategory category,
     required double amount,
-    @JsonKey(name: 'transaction_date') @DateOnlyConverter() required DateTime transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @DateOnlyConverter()
+    required DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -115,7 +125,9 @@ abstract class TransactionUpdate with _$TransactionUpdate {
     TransactionType? type,
     TransactionCategory? category,
     double? amount,
-    @JsonKey(name: 'transaction_date') @NullableDateOnlyConverter() DateTime? transactionDate,
+    @JsonKey(name: 'transaction_date')
+    @NullableDateOnlyConverter()
+    DateTime? transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
@@ -129,13 +141,22 @@ abstract class TransactionUpdate with _$TransactionUpdate {
 @freezed
 abstract class FinancialStatistics with _$FinancialStatistics {
   const factory FinancialStatistics({
-    @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
-    @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
+    @JsonKey(name: 'total_income')
+    @DoubleConverter()
+    required double totalIncome,
+    @JsonKey(name: 'total_expenses')
+    @DoubleConverter()
+    required double totalExpenses,
     @JsonKey(name: 'net_profit') @DoubleConverter() required double netProfit,
-    @JsonKey(name: 'total_transactions') @IntConverter() required int totalTransactions,
-    @JsonKey(name: 'income_by_category') required List<CategoryStatistics> incomeByCategory,
-    @JsonKey(name: 'expenses_by_category') required List<CategoryStatistics> expensesByCategory,
-    @JsonKey(name: 'recent_transactions') required List<Transaction> recentTransactions,
+    @JsonKey(name: 'total_transactions')
+    @IntConverter()
+    required int totalTransactions,
+    @JsonKey(name: 'income_by_category')
+    required List<CategoryStatistics> incomeByCategory,
+    @JsonKey(name: 'expenses_by_category')
+    required List<CategoryStatistics> expensesByCategory,
+    @JsonKey(name: 'recent_transactions')
+    required List<Transaction> recentTransactions,
   }) = _FinancialStatistics;
 
   factory FinancialStatistics.fromJson(Map<String, dynamic> json) =>
@@ -174,7 +195,9 @@ abstract class ReportPeriod with _$ReportPeriod {
   const factory ReportPeriod({
     @IntConverter() required int year,
     @IntConverter() required int month,
-    @JsonKey(name: 'start_date') @DateOnlyConverter() required DateTime startDate,
+    @JsonKey(name: 'start_date')
+    @DateOnlyConverter()
+    required DateTime startDate,
     @JsonKey(name: 'end_date') @DateOnlyConverter() required DateTime endDate,
   }) = _ReportPeriod;
 
@@ -186,10 +209,16 @@ abstract class ReportPeriod with _$ReportPeriod {
 @freezed
 abstract class ReportSummary with _$ReportSummary {
   const factory ReportSummary({
-    @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
-    @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
+    @JsonKey(name: 'total_income')
+    @DoubleConverter()
+    required double totalIncome,
+    @JsonKey(name: 'total_expenses')
+    @DoubleConverter()
+    required double totalExpenses,
     @JsonKey(name: 'net_profit') @DoubleConverter() required double netProfit,
-    @JsonKey(name: 'transaction_count') @IntConverter() required int transactionCount,
+    @JsonKey(name: 'transaction_count')
+    @IntConverter()
+    required int transactionCount,
   }) = _ReportSummary;
 
   factory ReportSummary.fromJson(Map<String, dynamic> json) =>
@@ -212,8 +241,12 @@ abstract class RabbitTransactionsSummary with _$RabbitTransactionsSummary {
 @freezed
 abstract class TransactionSummary with _$TransactionSummary {
   const factory TransactionSummary({
-    @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
-    @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
+    @JsonKey(name: 'total_income')
+    @DoubleConverter()
+    required double totalIncome,
+    @JsonKey(name: 'total_expenses')
+    @DoubleConverter()
+    required double totalExpenses,
     @JsonKey(name: 'net_profit') @DoubleConverter() required double netProfit,
   }) = _TransactionSummary;
 

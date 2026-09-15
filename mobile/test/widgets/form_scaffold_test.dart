@@ -81,7 +81,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Выйти без сохранения?'), findsOneWidget);
-    expect(find.text('Проба'), findsOneWidget, reason: 'форма осталась открытой');
+    expect(find.text('Проба'), findsOneWidget,
+        reason: 'форма осталась открытой');
   });
 
   testWidgets('пустая форма закрывается без лишних вопросов', (tester) async {
@@ -91,6 +92,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Выйти без сохранения?'), findsNothing);
-    expect(find.text('Открыть'), findsOneWidget, reason: 'вернулись на экран до формы');
+    expect(find.text('Открыть'), findsOneWidget,
+        reason: 'вернулись на экран до формы');
   });
 }

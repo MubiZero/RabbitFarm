@@ -35,15 +35,14 @@ class _MedicalRecordsListScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  Future<void> _load() => ref
-      .read(medicalRecordsProvider.notifier)
-      .loadMedicalRecords(
-        outcome: _outcome == null ? null : medicalOutcomeValue(_outcome!),
-        fromDate: _from,
-        toDate: _to,
-        sortBy: 'started_at',
-        sortOrder: 'DESC',
-      );
+  Future<void> _load() =>
+      ref.read(medicalRecordsProvider.notifier).loadMedicalRecords(
+            outcome: _outcome == null ? null : medicalOutcomeValue(_outcome!),
+            fromDate: _from,
+            toDate: _to,
+            sortBy: 'started_at',
+            sortOrder: 'DESC',
+          );
 
   void _setOutcome(MedicalOutcome? outcome) {
     setState(() => _outcome = outcome);
@@ -148,8 +147,7 @@ class _MedicalRecordsListScreenState
       title: context.l10n.medEmptyTitle,
       subtitle: context.l10n.medEmptyBody,
       actionLabel: canRecord ? context.l10n.medEmptyAction : null,
-      onAction:
-          canRecord ? () => context.push('/medical-records/form') : null,
+      onAction: canRecord ? () => context.push('/medical-records/form') : null,
     );
   }
 
@@ -638,8 +636,7 @@ class _StatisticsSheet extends ConsumerWidget {
                   color: AppColors.warning,
                 ),
                 _StatLine(
-                  label:
-                      medicalOutcomeLabel(context, MedicalOutcome.recovered),
+                  label: medicalOutcomeLabel(context, MedicalOutcome.recovered),
                   value: '${stats.byOutcome.recovered}',
                   color: AppColors.success,
                 ),
@@ -728,8 +725,8 @@ class _StatLine extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTypography.bodyMd
-                .copyWith(color: context.colors.onSurface),
+            style:
+                AppTypography.bodyMd.copyWith(color: context.colors.onSurface),
           ),
           Text(
             value,

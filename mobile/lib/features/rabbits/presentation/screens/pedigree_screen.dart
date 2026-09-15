@@ -14,6 +14,7 @@ import '../utils/rabbit_labels.dart';
 /// Показывает древо предков в вертикальном списке по поколениям
 class PedigreeScreen extends ConsumerWidget {
   final int rabbitId;
+
   /// Кличка для подзаголовка. Может отсутствовать: экран открывают и по
   /// прямой ссылке, где её негде взять.
   final String? rabbitName;
@@ -79,15 +80,15 @@ class PedigreeScreen extends ConsumerWidget {
           const SizedBox(height: 32),
           _buildGenerationHeader(context.l10n.rabbitParents, 1),
           const SizedBox(height: 12),
-
           if (pedigree.father != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildRabbitCard(context, pedigree.father!, label: context.l10n.rabbitFather),
+              child: _buildRabbitCard(context, pedigree.father!,
+                  label: context.l10n.rabbitFather),
             ),
-
           if (pedigree.mother != null)
-            _buildRabbitCard(context, pedigree.mother!, label: context.l10n.rabbitMother),
+            _buildRabbitCard(context, pedigree.mother!,
+                label: context.l10n.rabbitMother),
         ],
 
         // Бабушки и дедушки (Поколение 2)
@@ -98,7 +99,8 @@ class PedigreeScreen extends ConsumerWidget {
 
           // Родители отца
           if (pedigree.father != null) ...[
-            if (pedigree.father!.father != null || pedigree.father!.mother != null)
+            if (pedigree.father!.father != null ||
+                pedigree.father!.mother != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _buildParentsGroup(
@@ -112,7 +114,8 @@ class PedigreeScreen extends ConsumerWidget {
 
           // Родители матери
           if (pedigree.mother != null) ...[
-            if (pedigree.mother!.father != null || pedigree.mother!.mother != null)
+            if (pedigree.mother!.father != null ||
+                pedigree.mother!.mother != null)
               _buildParentsGroup(
                 context,
                 context.l10n.pedigreeMothersParents,
@@ -136,7 +139,8 @@ class PedigreeScreen extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     context.l10n.pedigreeHint,
-                    style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
+                    style: AppTypography.labelSm
+                        .copyWith(color: AppColors.accentOcean),
                   ),
                 ),
               ],
@@ -210,10 +214,12 @@ class PedigreeScreen extends ConsumerWidget {
         if (father != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: _buildRabbitCard(context, father, label: context.l10n.pedigreeGrandfather, isSmall: true),
+            child: _buildRabbitCard(context, father,
+                label: context.l10n.pedigreeGrandfather, isSmall: true),
           ),
         if (mother != null)
-          _buildRabbitCard(context, mother, label: context.l10n.pedigreeGrandmother, isSmall: true),
+          _buildRabbitCard(context, mother,
+              label: context.l10n.pedigreeGrandmother, isSmall: true),
       ],
     );
   }
@@ -309,8 +315,8 @@ class PedigreeScreen extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           rabbit.tagId!,
-                          style: AppTypography.bodyMd.copyWith(
-                              color: context.colors.onSurfaceVariant),
+                          style: AppTypography.bodyMd
+                              .copyWith(color: context.colors.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -324,7 +330,8 @@ class PedigreeScreen extends ConsumerWidget {
                           Icon(
                             Icons.pets,
                             size: isSmall ? 14 : 16,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
@@ -349,7 +356,8 @@ class PedigreeScreen extends ConsumerWidget {
                           Icon(
                             Icons.cake,
                             size: isSmall ? 14 : 16,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(

@@ -7,7 +7,8 @@ void main() {
   group('phoneFromInviteLink', () {
     test('берёт номер из ссылки приглашения', () {
       expect(
-        phoneFromInviteLink(Uri.parse('rabbitfarm://join?phone=%2B992901234567')),
+        phoneFromInviteLink(
+            Uri.parse('rabbitfarm://join?phone=%2B992901234567')),
         '+992901234567',
       );
     });
@@ -21,7 +22,8 @@ void main() {
 
     test('чужая схема и чужой адрес игнорируются', () {
       expect(
-        phoneFromInviteLink(Uri.parse('https://example.com/join?phone=901234567')),
+        phoneFromInviteLink(
+            Uri.parse('https://example.com/join?phone=901234567')),
         isNull,
       );
       expect(
@@ -32,9 +34,11 @@ void main() {
 
     test('мусорный или пустой номер не открывает вход', () {
       expect(phoneFromInviteLink(Uri.parse('rabbitfarm://join')), isNull);
-      expect(phoneFromInviteLink(Uri.parse('rabbitfarm://join?phone=')), isNull);
       expect(
-        phoneFromInviteLink(Uri.parse('rabbitfarm://join?phone=%2B79161234567')),
+          phoneFromInviteLink(Uri.parse('rabbitfarm://join?phone=')), isNull);
+      expect(
+        phoneFromInviteLink(
+            Uri.parse('rabbitfarm://join?phone=%2B79161234567')),
         isNull,
       );
     });

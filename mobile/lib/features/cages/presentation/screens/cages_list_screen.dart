@@ -74,7 +74,8 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
         hasMore: state.hasMore,
         onRefresh: notifier.loadCages,
         onLoadMore: notifier.loadMore,
-        header: _Header(state: state, controller: _search, onSearch: _onSearchChanged),
+        header: _Header(
+            state: state, controller: _search, onSearch: _onSearchChanged),
         empty: state.hasFilters
             ? AppEmptyState(
                 icon: Icons.search_off,

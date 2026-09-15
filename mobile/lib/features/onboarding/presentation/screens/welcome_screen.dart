@@ -64,9 +64,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               ),
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: context.reduceMotion
-                      ? Duration.zero
-                      : AppDuration.fast,
+                  duration:
+                      context.reduceMotion ? Duration.zero : AppDuration.fast,
                   switchInCurve: AppDuration.curve,
                   // Уход быстрее прихода: ушедший шаг догонять глазами уже не
                   // нужно, а задержка на нём читается как подтормаживание.
@@ -111,35 +110,35 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   }
 
   Widget _buildStep() => switch (_step) {
-    0 => _Greeting(
-      onStart: () => _goTo(1),
-      onHaveAccount: () => _leaveTo('/login'),
-    ),
-    1 => _HerdQuestion(
-      selected: _answers.herdSize,
-      onSelect: (size) {
-        setState(() => _answers = _answers.copyWith(herdSize: size));
-        _goTo(2);
-      },
-    ),
-    2 => _FocusQuestion(
-      selected: _answers.focus,
-      onToggle: (focus) => setState(() {
-        final next = Set<FarmFocus>.from(_answers.focus);
-        next.contains(focus) ? next.remove(focus) : next.add(focus);
-        _answers = _answers.copyWith(focus: next);
-      }),
-      onNext: () => _goTo(3),
-    ),
-    3 => _CrewQuestion(
-      selected: _answers.crew,
-      onSelect: (crew) {
-        setState(() => _answers = _answers.copyWith(crew: crew));
-        _goTo(4);
-      },
-    ),
-    _ => _Summary(answers: _answers, onCreate: () => _leaveTo('/register')),
-  };
+        0 => _Greeting(
+            onStart: () => _goTo(1),
+            onHaveAccount: () => _leaveTo('/login'),
+          ),
+        1 => _HerdQuestion(
+            selected: _answers.herdSize,
+            onSelect: (size) {
+              setState(() => _answers = _answers.copyWith(herdSize: size));
+              _goTo(2);
+            },
+          ),
+        2 => _FocusQuestion(
+            selected: _answers.focus,
+            onToggle: (focus) => setState(() {
+              final next = Set<FarmFocus>.from(_answers.focus);
+              next.contains(focus) ? next.remove(focus) : next.add(focus);
+              _answers = _answers.copyWith(focus: next);
+            }),
+            onNext: () => _goTo(3),
+          ),
+        3 => _CrewQuestion(
+            selected: _answers.crew,
+            onSelect: (crew) {
+              setState(() => _answers = _answers.copyWith(crew: crew));
+              _goTo(4);
+            },
+          ),
+        _ => _Summary(answers: _answers, onCreate: () => _leaveTo('/register')),
+      };
 }
 
 /// Шапка: возврат, полоска пути и выход из опроса.

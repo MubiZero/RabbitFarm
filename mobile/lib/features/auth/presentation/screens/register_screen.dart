@@ -24,6 +24,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _farmNameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _contactController = TextEditingController();
+
   /// Телефон основной, почта запасная — те же два способа, что и на входе.
   bool _byPhone = true;
   bool _acceptedPrivacy = false;
@@ -91,7 +92,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           bool userExists = false;
 
           if (e is DioException) {
-            message = serverMessage(e) ?? e.message ?? context.l10n.registerFailed;
+            message =
+                serverMessage(e) ?? e.message ?? context.l10n.registerFailed;
             userExists = serverErrorCode(e) == 'USER_EXISTS';
           }
 
@@ -159,7 +161,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             style: AppTypography.bodyMd
                                 .copyWith(color: context.colors.onSurface),
                             children: [
-                              TextSpan(text: context.l10n.registerConsentPrefix),
+                              TextSpan(
+                                  text: context.l10n.registerConsentPrefix),
                               TextSpan(
                                 text: context.l10n.registerConsentLink,
                                 recognizer: _privacyLinkRecognizer,
@@ -254,8 +257,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _contactController,
-                  keyboardType:
-                      _byPhone ? TextInputType.phone : TextInputType.emailAddress,
+                  keyboardType: _byPhone
+                      ? TextInputType.phone
+                      : TextInputType.emailAddress,
                   autocorrect: false,
                   decoration: InputDecoration(
                     labelText: _byPhone

@@ -48,7 +48,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       final paginatedData = apiResponse.data!;
@@ -57,8 +58,8 @@ class RabbitsRepository {
           .toList();
 
       // Read pagination nested object returned by backend
-      final pagination = (paginatedData['pagination'] ?? const <String, dynamic>{})
-          as Map<String, dynamic>;
+      final pagination = (paginatedData['pagination'] ??
+          const <String, dynamic>{}) as Map<String, dynamic>;
 
       int toInt(dynamic v) {
         if (v is int) return v;
@@ -103,7 +104,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -123,7 +125,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -143,7 +146,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -189,7 +193,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitStatistics.fromJson(apiResponse.data!);
@@ -209,7 +214,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -221,9 +227,11 @@ class RabbitsRepository {
   }
 
   // Add weight record
-  Future<RabbitWeight> addWeightRecord(int rabbitId, AddWeightRequest request) async {
+  Future<RabbitWeight> addWeightRecord(
+      int rabbitId, AddWeightRequest request) async {
     try {
-      final response = await _apiClient.addWeightRecord(rabbitId, request.toJson());
+      final response =
+          await _apiClient.addWeightRecord(rabbitId, request.toJson());
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,
@@ -231,7 +239,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitWeight.fromJson(apiResponse.data!);
@@ -241,9 +250,11 @@ class RabbitsRepository {
   }
 
   // Upload photo
-  Future<RabbitModel> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+  Future<RabbitModel> uploadPhoto(int rabbitId, String filePath,
+      {Uint8List? bytes}) async {
     try {
-      final response = await _apiClient.uploadPhoto(rabbitId, filePath, bytes: bytes);
+      final response =
+          await _apiClient.uploadPhoto(rabbitId, filePath, bytes: bytes);
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,
@@ -251,7 +262,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -271,7 +283,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -291,7 +304,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -323,7 +337,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitPhoto.fromJson(apiResponse.data!);

@@ -7,13 +7,13 @@ import 'package:mobile/features/cages/presentation/utils/cage_tag.dart';
 /// то, от чего зависит, откроется ли клетка: что кодируется, что принимается
 /// обратно и что на листе действительно есть номер клетки.
 CageModel _cage(int id, String number, {String? location}) => CageModel(
-  id: id,
-  number: number,
-  type: 'single',
-  capacity: 1,
-  condition: 'good',
-  location: location,
-);
+      id: id,
+      number: number,
+      type: 'single',
+      capacity: 1,
+      condition: 'good',
+      location: location,
+    );
 
 void main() {
   group('код метки', () {

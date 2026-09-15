@@ -73,8 +73,7 @@ class TasksListScreen extends ConsumerWidget {
       s.overdueOnly ||
       s.todayOnly;
 
-  Future<void> _complete(
-      BuildContext context, WidgetRef ref, Task task) async {
+  Future<void> _complete(BuildContext context, WidgetRef ref, Task task) async {
     final messenger = ScaffoldMessenger.of(context);
     final done = context.l10n.tasksCompleted;
     final failed = context.l10n.tasksCompleteFailed;
@@ -338,7 +337,8 @@ class _TaskCard extends StatelessWidget {
               color: priorityColor.withValues(alpha: 0.12),
               borderRadius: AppRadius.smAll,
             ),
-            child: Icon(taskTypeIcon(task.type), color: priorityColor, size: 20),
+            child:
+                Icon(taskTypeIcon(task.type), color: priorityColor, size: 20),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -396,7 +396,9 @@ class _TaskCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      overdue ? Icons.event_busy_outlined : Icons.event_outlined,
+                      overdue
+                          ? Icons.event_busy_outlined
+                          : Icons.event_outlined,
                       size: 14,
                       color: overdue
                           ? AppColors.error

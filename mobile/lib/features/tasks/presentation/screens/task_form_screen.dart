@@ -207,9 +207,8 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ? context.l10n.taskFormEditTitle
           : context.l10n.taskFormNewTitle,
       formKey: _formKey,
-      submitLabel: _isEditing
-          ? context.l10n.commonSave
-          : context.l10n.taskFormCreate,
+      submitLabel:
+          _isEditing ? context.l10n.commonSave : context.l10n.taskFormCreate,
       successMessage: _isEditing
           ? context.l10n.taskFormUpdated
           : context.l10n.taskFormCreated,
@@ -406,7 +405,10 @@ class _AssigneeField extends ConsumerWidget {
       error: (_, __) => const SizedBox.shrink(),
       data: (list) => _dropdown(
         context,
-        [for (final m in list) if (m.isActive) m],
+        [
+          for (final m in list)
+            if (m.isActive) m
+        ],
       ),
     );
   }

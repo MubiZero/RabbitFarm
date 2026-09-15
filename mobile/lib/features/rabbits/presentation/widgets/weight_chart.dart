@@ -33,8 +33,10 @@ class WeightChart extends StatelessWidget {
       return FlSpot(entry.key.toDouble(), entry.value.weight);
     }).toList();
 
-    final minWeight = sortedWeights.map((w) => w.weight).reduce((a, b) => a < b ? a : b);
-    final maxWeight = sortedWeights.map((w) => w.weight).reduce((a, b) => a > b ? a : b);
+    final minWeight =
+        sortedWeights.map((w) => w.weight).reduce((a, b) => a < b ? a : b);
+    final maxWeight =
+        sortedWeights.map((w) => w.weight).reduce((a, b) => a > b ? a : b);
     final weightRange = maxWeight - minWeight;
     final minY = (minWeight - weightRange * 0.2).clamp(0.0, double.infinity);
     final maxY = maxWeight + weightRange * 0.2;
@@ -74,8 +76,8 @@ class WeightChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             '${value.toStringAsFixed(1)} кг',
-                            style: AppTypography.labelSm
-                                .copyWith(color: context.colors.onSurfaceVariant),
+                            style: AppTypography.labelSm.copyWith(
+                                color: context.colors.onSurfaceVariant),
                           );
                         },
                       ),
@@ -94,8 +96,8 @@ class WeightChart extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               DateFormat('dd.MM').format(date),
-                              style: AppTypography.labelSm
-                                .copyWith(color: context.colors.onSurfaceVariant),
+                              style: AppTypography.labelSm.copyWith(
+                                  color: context.colors.onSurfaceVariant),
                             ),
                           );
                         },
@@ -138,7 +140,10 @@ class WeightChart extends StatelessWidget {
                       ),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.1),
                       ),
                     ),
                   ],

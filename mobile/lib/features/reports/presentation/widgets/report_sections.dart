@@ -65,7 +65,8 @@ class ReportPeriodCaption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       context.l10n.reportsPeriodRange(_format(from), _format(to)),
-      style: AppTypography.labelSm.copyWith(color: context.colors.onSurfaceVariant),
+      style: AppTypography.labelSm
+          .copyWith(color: context.colors.onSurfaceVariant),
     );
   }
 
@@ -116,7 +117,8 @@ class ReportFigureTable extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               child: Row(
                 children: [
-                  Icon(figure.icon, size: 18, color: context.colors.onSurfaceVariant),
+                  Icon(figure.icon,
+                      size: 18, color: context.colors.onSurfaceVariant),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(

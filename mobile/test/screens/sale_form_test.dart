@@ -129,7 +129,8 @@ void main() {
 
   test('выбытие названо одним списком — на него смотрят и форма, и карточка',
       () {
-    expect(rabbitStatusesTerminal, containsAll([rabbitStatusSold, rabbitStatusDead]));
+    expect(rabbitStatusesTerminal,
+        containsAll([rabbitStatusSold, rabbitStatusDead]));
     // Список статусов формы остаётся полным: он источник подписей, а прятать
     // выбытие — дело самого выпадающего списка.
     expect(rabbitStatuses, containsAll(rabbitStatusesTerminal));

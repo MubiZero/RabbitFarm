@@ -78,8 +78,7 @@ void main() {
     expect(find.text('Сотрудники'), findsOneWidget);
   });
 
-  testWidgets('платформенная админка не видна владельцу фермы',
-      (tester) async {
+  testWidgets('платформенная админка не видна владельцу фермы', (tester) async {
     await _pumpFor(tester, FarmRoleAccess.owner);
 
     expect(find.text('Платформа'), findsNothing);

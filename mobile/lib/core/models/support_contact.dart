@@ -14,9 +14,9 @@ class SupportContact {
   bool get isEmpty => email == null && phone == null;
 
   factory SupportContact.fromJson(Map<String, dynamic> json) => SupportContact(
-    email: _trimmed(json['email']),
-    phone: _trimmed(json['phone']),
-  );
+        email: _trimmed(json['email']),
+        phone: _trimmed(json['phone']),
+      );
 
   /// Пустая строка уходит на сервер именно как пустая, а не пропускается:
   /// «стереть телефон» — такое же изменение, как «вписать новый».

@@ -43,7 +43,8 @@ class AppEmptyState extends StatelessWidget {
                   Icon(
                     icon,
                     size: 72,
-                    color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
+                    color:
+                        context.colors.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
@@ -72,8 +73,8 @@ class AppEmptyState extends StatelessWidget {
                 // во всю ширину кнопка перетягивает внимание с подсказки.
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, 48),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xl),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 ),
                 child: Text(actionLabel!),
               ),

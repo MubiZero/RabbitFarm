@@ -29,8 +29,8 @@ enum JournalPeriod {
   /// Округление до дня здесь обязательно: значение уходит в ключ провайдера,
   /// и время с точностью до миллисекунды давало бы новый ключ на каждой
   /// перестройке — экран уходил бы в бесконечную загрузку.
-  DateTime from(DateTime now) => DateTime(now.year, now.month, now.day)
-      .subtract(Duration(days: days - 1));
+  DateTime from(DateTime now) =>
+      DateTime(now.year, now.month, now.day).subtract(Duration(days: days - 1));
 
   /// Конец периода — последняя миллисекунда сегодняшнего дня.
   DateTime to(DateTime now) =>

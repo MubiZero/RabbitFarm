@@ -34,7 +34,7 @@ import 'package:mobile/features/rabbits/presentation/providers/rabbits_provider.
 /// `tasksListProvider.notifier.refresh()` и сама отметка выполнения.
 class _FakeTasksRepository extends TasksRepository {
   _FakeTasksRepository({this.completeError, this.rejectIds = const {}})
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final Object? completeError;
 
@@ -60,10 +60,11 @@ class _FakeTasksRepository extends TasksRepository {
     String? toDate,
     bool? overdueOnly,
     bool? todayOnly,
-  }) async => {
-    'tasks': <Task>[],
-    'pagination': {'page': 1, 'pages': 1, 'total': 0},
-  };
+  }) async =>
+      {
+        'tasks': <Task>[],
+        'pagination': {'page': 1, 'pages': 1, 'total': 0},
+      };
 
   @override
   Future<Task> completeTask(int id) async {
@@ -90,7 +91,7 @@ class _FakeTasksRepository extends TasksRepository {
 /// сама пачковая запись.
 class _FakeFeedingRepository extends FeedingRecordsRepository {
   _FakeFeedingRepository()
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   var createCalls = 0;
 
@@ -105,7 +106,8 @@ class _FakeFeedingRepository extends FeedingRecordsRepository {
     int? cageId,
     DateTime? fromDate,
     DateTime? toDate,
-  }) async => const [];
+  }) async =>
+      const [];
 
   @override
   Future<int> createFeedingRecordsBulk({
@@ -124,7 +126,7 @@ class _FakeFeedingRepository extends FeedingRecordsRepository {
 /// Репозиторий заметок без сети.
 class _FakeNotesRepository extends NotesRepository {
   _FakeNotesRepository()
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<String> created = [];
 
@@ -139,7 +141,7 @@ class _FakeNotesRepository extends NotesRepository {
 /// телефон у клетки, где связи нет, поэтому очередь обязана его нести.
 class _FakeBirthsRepository extends BirthsRepository {
   _FakeBirthsRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   final List<Map<String, dynamic>> created = [];
 
@@ -162,7 +164,7 @@ class _FakeBirthsRepository extends BirthsRepository {
 /// Репозиторий случек без сети.
 class _FakeBreedingRepository extends BreedingRepository {
   _FakeBreedingRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   final List<Map<String, dynamic>> created = [];
 
@@ -175,13 +177,14 @@ class _FakeBreedingRepository extends BreedingRepository {
     int? femaleId,
     String? fromDate,
     String? toDate,
-  }) async => PaginatedResponse<BreedingModel>(
-    items: const [],
-    total: 0,
-    page: page,
-    limit: limit,
-    totalPages: 0,
-  );
+  }) async =>
+      PaginatedResponse<BreedingModel>(
+        items: const [],
+        total: 0,
+        page: page,
+        limit: limit,
+        totalPages: 0,
+      );
 
   @override
   Future<BreedingModel> createBreeding(Map<String, dynamic> data) async {
@@ -199,7 +202,7 @@ class _FakeBreedingRepository extends BreedingRepository {
 /// Кролики без сети: очередь трогает только отметку падежа.
 class _FakeRabbitsRepository extends RabbitsRepository {
   _FakeRabbitsRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   final List<(int, Map<String, dynamic>)> updates = [];
 
@@ -212,13 +215,14 @@ class _FakeRabbitsRepository extends RabbitsRepository {
     String? status,
     String? purpose,
     int? breedId,
-  }) async => PaginatedResponse<RabbitModel>(
-    items: const [],
-    total: 0,
-    page: page,
-    limit: limit,
-    totalPages: 0,
-  );
+  }) async =>
+      PaginatedResponse<RabbitModel>(
+        items: const [],
+        total: 0,
+        page: page,
+        limit: limit,
+        totalPages: 0,
+      );
 
   @override
   Future<RabbitModel> updateRabbit(int id, Map<String, dynamic> data) async {

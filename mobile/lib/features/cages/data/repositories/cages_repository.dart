@@ -46,7 +46,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       final data = apiResponse.data!;
@@ -78,7 +79,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
@@ -105,7 +107,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
@@ -132,7 +135,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);
@@ -156,7 +160,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
     } on DioException catch (e) {
       throw ApiFailure.from(e);
@@ -178,7 +183,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return CageStatistics.fromJson(apiResponse.data!);
@@ -191,7 +197,6 @@ class CagesRepository {
     }
   }
 
-
   /// Отметить клетку как убранную
   Future<CageModel> markCleaned(int id) async {
     try {
@@ -203,7 +208,8 @@ class CagesRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return CageModel.fromJson(apiResponse.data!);

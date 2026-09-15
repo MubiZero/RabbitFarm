@@ -13,6 +13,7 @@ abstract class DashboardReport with _$DashboardReport {
     required RabbitStats rabbits,
     required CageStats cages,
     required HealthStats health,
+
     /// Деньги фермы приходят не всем: работнику сервер их не отдаёт вовсе.
     /// Пусто здесь означает «не для этой роли», а не «на ферме ноль» — нули
     /// читались бы как пустая касса.
@@ -20,6 +21,7 @@ abstract class DashboardReport with _$DashboardReport {
     required TaskStats tasks,
     required InventoryStats inventory,
     required BreedingStats breeding,
+
     /// Потребление фермы против пределов тарифа. Пусто у ферм без тарифа —
     /// сервер в этом случае просто не присылает блок целиком.
     @JsonKey(name: 'plan_usage') PlanUsage? planUsage,
@@ -35,6 +37,7 @@ abstract class PlanUsage with _$PlanUsage {
   const factory PlanUsage({
     required ResourceUsage rabbits,
     required ResourceUsage staff,
+
     /// Сам тариф — название, цена продления, срок (см.
     /// docs/plans/PLATFORM-ADMIN.md, 4.1). `null`, если ферме не назначен
     /// тариф вовсе.
@@ -105,10 +108,8 @@ abstract class CageStats with _$CageStats {
 @freezed
 abstract class HealthStats with _$HealthStats {
   const factory HealthStats({
-    @IntConverter()
-    required int upcomingVaccinations,
-    @IntConverter()
-    required int overdueVaccinations,
+    @IntConverter() required int upcomingVaccinations,
+    @IntConverter() required int overdueVaccinations,
   }) = _HealthStats;
 
   factory HealthStats.fromJson(Map<String, dynamic> json) =>
@@ -166,6 +167,7 @@ abstract class FarmReport with _$FarmReport {
   const factory FarmReport({
     required ReportPeriod period,
     required PopulationData population,
+
     /// Как и в сводке «Сегодня»: работнику денежный блок не приходит.
     FinancialData? financial,
     required HealthData health,
@@ -193,6 +195,7 @@ abstract class PopulationData with _$PopulationData {
   const factory PopulationData({
     @JsonKey(name: 'total_rabbits') @IntConverter() required int totalRabbits,
     @JsonKey(name: 'by_breed') required List<BreedCount> byBreed,
+
     /// Сколько кроликов на племя, сколько на мясо, сколько на продажу.
     ///
     /// Назначение до сих пор жило одним фильтром списка: поле обязательное,
@@ -241,8 +244,12 @@ abstract class FinancialData with _$FinancialData {
 @freezed
 abstract class FinancialSummary with _$FinancialSummary {
   const factory FinancialSummary({
-    @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
-    @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
+    @JsonKey(name: 'total_income')
+    @DoubleConverter()
+    required double totalIncome,
+    @JsonKey(name: 'total_expenses')
+    @DoubleConverter()
+    required double totalExpenses,
   }) = _FinancialSummary;
 
   factory FinancialSummary.fromJson(Map<String, dynamic> json) =>
@@ -253,7 +260,9 @@ abstract class FinancialSummary with _$FinancialSummary {
 abstract class HealthData with _$HealthData {
   const factory HealthData({
     @IntConverter() required int vaccinations,
-    @JsonKey(name: 'medical_records') @IntConverter() required int medicalRecords,
+    @JsonKey(name: 'medical_records')
+    @IntConverter()
+    required int medicalRecords,
   }) = _HealthData;
 
   factory HealthData.fromJson(Map<String, dynamic> json) =>
@@ -309,7 +318,8 @@ abstract class FeedConsumption with _$FeedConsumption {
 abstract class HealthReport with _$HealthReport {
   const factory HealthReport({
     required VaccinationsData vaccinations,
-    @JsonKey(name: 'medical_records') required MedicalRecordsData medicalRecords,
+    @JsonKey(name: 'medical_records')
+    required MedicalRecordsData medicalRecords,
   }) = _HealthReport;
 
   factory HealthReport.fromJson(Map<String, dynamic> json) =>
@@ -381,8 +391,12 @@ abstract class FinancialReport with _$FinancialReport {
 @freezed
 abstract class FinancialReportSummary with _$FinancialReportSummary {
   const factory FinancialReportSummary({
-    @JsonKey(name: 'total_income') @DoubleConverter() required double totalIncome,
-    @JsonKey(name: 'total_expenses') @DoubleConverter() required double totalExpenses,
+    @JsonKey(name: 'total_income')
+    @DoubleConverter()
+    required double totalIncome,
+    @JsonKey(name: 'total_expenses')
+    @DoubleConverter()
+    required double totalExpenses,
     @JsonKey(name: 'net_profit') @DoubleConverter() required double netProfit,
   }) = _FinancialReportSummary;
 

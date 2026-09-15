@@ -19,13 +19,16 @@ class AppTheme {
   }) {
     final isDark = brightness == Brightness.dark;
 
-    final bg         = isDark ? AppColors.darkBackground     : AppColors.lightBackground;
-    final surface    = isDark ? AppColors.darkSurface        : AppColors.lightSurface;
-    final surfaceVar = isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant;
-    final border     = isDark ? AppColors.darkBorder         : AppColors.lightBorder;
-    final txtPri     = isDark ? AppColors.darkTextPrimary    : AppColors.lightTextPrimary;
-    final txtSec     = isDark ? AppColors.darkTextSecondary  : AppColors.lightTextSecondary;
-    final txtHint    = isDark ? AppColors.darkTextHint       : AppColors.lightTextHint;
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final surfaceVar =
+        isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final txtPri =
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final txtSec =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final txtHint = isDark ? AppColors.darkTextHint : AppColors.lightTextHint;
 
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -318,18 +321,17 @@ class AppTheme {
       ),
 
       textTheme: TextTheme(
-        displayLarge:   AppTypography.displayLg.copyWith(color: txtPri),
-        displayMedium:  AppTypography.displayMd.copyWith(color: txtPri),
-        displaySmall:   AppTypography.titleLg.copyWith(color: txtPri),
+        displayLarge: AppTypography.displayLg.copyWith(color: txtPri),
+        displayMedium: AppTypography.displayMd.copyWith(color: txtPri),
+        displaySmall: AppTypography.titleLg.copyWith(color: txtPri),
         headlineMedium: AppTypography.titleLg.copyWith(color: txtPri),
-        titleLarge:     AppTypography.titleMd.copyWith(color: txtPri),
-        titleMedium:    AppTypography.titleMd.copyWith(color: txtPri),
-        bodyLarge:      AppTypography.bodyLg.copyWith(color: txtPri),
-        bodyMedium:     AppTypography.bodyMd.copyWith(color: txtPri),
-        labelLarge:     AppTypography.labelLg.copyWith(color: txtPri),
-        labelSmall:     AppTypography.labelSm.copyWith(color: txtSec),
+        titleLarge: AppTypography.titleMd.copyWith(color: txtPri),
+        titleMedium: AppTypography.titleMd.copyWith(color: txtPri),
+        bodyLarge: AppTypography.bodyLg.copyWith(color: txtPri),
+        bodyMedium: AppTypography.bodyMd.copyWith(color: txtPri),
+        labelLarge: AppTypography.labelLg.copyWith(color: txtPri),
+        labelSmall: AppTypography.labelSm.copyWith(color: txtSec),
       ),
     );
   }
-
 }

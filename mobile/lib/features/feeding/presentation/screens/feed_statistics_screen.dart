@@ -184,9 +184,8 @@ class _LowStockRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     // Доля от минимального остатка: чем короче полоса, тем срочнее закупка.
-    final fraction = item.minStock <= 0
-        ? 1.0
-        : item.currentStock / item.minStock;
+    final fraction =
+        item.minStock <= 0 ? 1.0 : item.currentStock / item.minStock;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),

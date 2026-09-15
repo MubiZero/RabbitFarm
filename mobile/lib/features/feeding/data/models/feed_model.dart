@@ -75,12 +75,18 @@ abstract class Feed with _$Feed {
     required FeedType type,
     String? brand,
     @JsonKey(defaultValue: FeedUnit.kg) required FeedUnit unit,
-    @JsonKey(name: 'current_stock') @DoubleConverter() required double currentStock,
+    @JsonKey(name: 'current_stock')
+    @DoubleConverter()
+    required double currentStock,
     @JsonKey(name: 'min_stock') @DoubleConverter() required double minStock,
     @JsonKey(name: 'cost_per_unit') @DoubleConverter() double? costPerUnit,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   }) = _Feed;
 
   factory Feed.fromJson(Map<String, dynamic> json) => _$FeedFromJson(json);
@@ -176,7 +182,9 @@ abstract class LowStockItem with _$LowStockItem {
   const factory LowStockItem({
     @IntConverter() required int id,
     required String name,
-    @JsonKey(name: 'current_stock') @DoubleConverter() required double currentStock,
+    @JsonKey(name: 'current_stock')
+    @DoubleConverter()
+    required double currentStock,
     @JsonKey(name: 'min_stock') @DoubleConverter() required double minStock,
     required String unit,
   }) = _LowStockItem;
@@ -184,4 +192,3 @@ abstract class LowStockItem with _$LowStockItem {
   factory LowStockItem.fromJson(Map<String, dynamic> json) =>
       _$LowStockItemFromJson(json);
 }
-

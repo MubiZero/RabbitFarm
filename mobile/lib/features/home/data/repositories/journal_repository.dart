@@ -118,7 +118,8 @@ class JournalRepository {
       hasTime: false,
       // Диагноз точнее симптомов, но его ставят не всегда — тогда в строке
       // остаётся то, с чего лечение началось.
-      title: diagnosis == null || diagnosis.isEmpty ? record.symptoms : diagnosis,
+      title:
+          diagnosis == null || diagnosis.isEmpty ? record.symptoms : diagnosis,
       rabbitName: _text(item['rabbit'], 'name'),
       author: record.veterinarian,
       formArgs: record,

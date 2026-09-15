@@ -5,7 +5,8 @@ import '../../../../core/providers/session.dart';
 import '../../data/models/notification_model.dart';
 import '../../data/repositories/notifications_repository.dart';
 
-final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {
+final notificationsRepositoryProvider =
+    Provider<NotificationsRepository>((ref) {
   ref.watch(sessionRevisionProvider);
   return NotificationsRepository(ref.watch(apiClientProvider));
 });
@@ -25,7 +26,8 @@ final notificationsFeedProvider =
 /// Ошибку глушим намеренно: не сосчитали — значок просто не покажется.
 /// Красная плашка поверх «Сегодня» из-за того, что не удалось узнать число
 /// непрочитанных, была бы хуже самой проблемы.
-final unreadNotificationsProvider = FutureProvider.autoDispose<int>((ref) async {
+final unreadNotificationsProvider =
+    FutureProvider.autoDispose<int>((ref) async {
   try {
     return await ref.watch(notificationsRepositoryProvider).unreadCount();
   } catch (_) {

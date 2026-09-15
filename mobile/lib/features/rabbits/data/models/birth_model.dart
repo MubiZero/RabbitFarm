@@ -22,6 +22,7 @@ abstract class BirthModel with _$BirthModel {
     @JsonKey(name: 'birth_date') required String birthDate,
     @JsonKey(name: 'kits_born_alive') required int kitsBornAlive,
     @JsonKey(name: 'kits_born_dead') required int kitsBornDead,
+
     /// Пало до отсадки. Крольчонок в приложении — число внутри окрола,
     /// а не своя карточка, поэтому и падёж молодняка считается выводком.
     @JsonKey(name: 'kits_died') @Default(0) int kitsDied,
@@ -42,13 +43,17 @@ abstract class BirthModel with _$BirthModel {
     try {
       return BirthModel(
         id: intFromJson(json['id']),
-        breedingId: json['breeding_id'] != null ? intFromJson(json['breeding_id']) : null,
+        breedingId: json['breeding_id'] != null
+            ? intFromJson(json['breeding_id'])
+            : null,
         motherId: intFromJson(json['mother_id']),
         birthDate: json['birth_date']?.toString() ?? '',
         kitsBornAlive: intFromJson(json['kits_born_alive'] ?? 0),
         kitsBornDead: intFromJson(json['kits_born_dead'] ?? 0),
         kitsDied: intFromJson(json['kits_died'] ?? 0),
-        kitsWeaned: json['kits_weaned'] != null ? intFromJson(json['kits_weaned']) : null,
+        kitsWeaned: json['kits_weaned'] != null
+            ? intFromJson(json['kits_weaned'])
+            : null,
         weaningDate: json['weaning_date']?.toString(),
         complications: json['complications']?.toString(),
         notes: json['notes']?.toString(),
@@ -83,7 +88,8 @@ abstract class BirthModel with _$BirthModel {
   /// Отсаженные считаются по факту отсадки, до неё — по разнице: владелец
   /// смотрит в список, чтобы узнать, сколько осталось, а не чтобы вычитать
   /// в уме.
-  int get kitsAlive => kitsWeaned ?? (kitsBornAlive - kitsDied).clamp(0, kitsBornAlive);
+  int get kitsAlive =>
+      kitsWeaned ?? (kitsBornAlive - kitsDied).clamp(0, kitsBornAlive);
 
   static bool _hasFullRabbitPayload(Map<String, dynamic> m) {
     const requiredKeys = [

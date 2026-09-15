@@ -29,14 +29,15 @@ class AppNotification {
 
   bool get isRead => readAt != null;
 
-  factory AppNotification.fromJson(Map<String, dynamic> json) => AppNotification(
-    id: (json['id'] as num).toInt(),
-    title: json['title']?.toString() ?? '',
-    body: json['body']?.toString() ?? '',
-    createdAt:
-        DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
-    route: json['route']?.toString(),
-    type: json['type']?.toString(),
-    readAt: DateTime.tryParse(json['read_at']?.toString() ?? ''),
-  );
+  factory AppNotification.fromJson(Map<String, dynamic> json) =>
+      AppNotification(
+        id: (json['id'] as num).toInt(),
+        title: json['title']?.toString() ?? '',
+        body: json['body']?.toString() ?? '',
+        createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+            DateTime.now(),
+        route: json['route']?.toString(),
+        type: json['type']?.toString(),
+        readAt: DateTime.tryParse(json['read_at']?.toString() ?? ''),
+      );
 }

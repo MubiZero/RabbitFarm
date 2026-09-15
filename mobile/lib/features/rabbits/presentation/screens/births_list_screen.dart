@@ -179,8 +179,7 @@ class BirthsListScreen extends ConsumerWidget {
     // Мать берётся из самой записи об окроле. Раньше её искали в загруженной
     // странице списка кроликов, и для окрола постарше кнопка отвечала
     // «мать не найдена в списке» — хотя мать, разумеется, существовала.
-    final mother =
-        birth.mother ??
+    final mother = birth.mother ??
         ref
             .read(rabbitsListProvider)
             .rabbits
@@ -221,12 +220,10 @@ class _BirthCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final total = birth.kitsBornAlive + birth.kitsBornDead;
-    final survival = total > 0
-        ? (birth.kitsBornAlive / total * 100).round()
-        : 0;
+    final survival =
+        total > 0 ? (birth.kitsBornAlive / total * 100).round() : 0;
 
-    final mother =
-        birth.mother ??
+    final mother = birth.mother ??
         ref
             .read(rabbitsListProvider)
             .rabbits

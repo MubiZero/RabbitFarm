@@ -121,7 +121,8 @@ class BreedsNotifier extends StateNotifier<BreedsState> {
   Future<bool> deleteBreed(int id) async {
     try {
       await _repository.deleteBreed(id);
-      final updatedBreeds = state.breeds.where((breed) => breed.id != id).toList();
+      final updatedBreeds =
+          state.breeds.where((breed) => breed.id != id).toList();
 
       state = state.copyWith(breeds: updatedBreeds);
       return true;
@@ -138,7 +139,8 @@ class BreedsNotifier extends StateNotifier<BreedsState> {
 }
 
 /// Provider для StateNotifier пород
-final breedsProvider = StateNotifierProvider<BreedsNotifier, BreedsState>((ref) {
+final breedsProvider =
+    StateNotifierProvider<BreedsNotifier, BreedsState>((ref) {
   final repository = ref.watch(breedsRepositoryProvider);
   return BreedsNotifier(repository);
 });

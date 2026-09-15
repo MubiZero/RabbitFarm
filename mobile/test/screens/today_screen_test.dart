@@ -41,16 +41,17 @@ Task _task({
   required String title,
   required DateTime dueDate,
   UserRef? assignee,
-}) => Task(
-  id: id,
-  title: title,
-  type: TaskType.feeding,
-  status: TaskStatus.pending,
-  priority: TaskPriority.high,
-  dueDate: dueDate,
-  assignedTo: assignee?.id,
-  assignee: assignee,
-);
+}) =>
+    Task(
+      id: id,
+      title: title,
+      type: TaskType.feeding,
+      status: TaskStatus.pending,
+      priority: TaskPriority.high,
+      dueDate: dueDate,
+      assignedTo: assignee?.id,
+      assignee: assignee,
+    );
 
 DateTime _daysAgo(int days) {
   final now = DateTime.now();
@@ -66,7 +67,7 @@ DateTime _daysAgo(int days) {
 /// настоящая логика провайдера — и порядок строк, и откат отметки.
 class _FakeTasksRepository extends TasksRepository {
   _FakeTasksRepository(this.tasks, {this.completeError})
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<Task> tasks;
   final Object? completeError;
@@ -161,28 +162,29 @@ Widget _wrap({
   FarmRoleAccess role = FarmRoleAccess.owner,
   int? viewerId,
   bool online = true,
-}) => testAppScreen(
-  // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
-  // на каждом экране с самого первого кадра (см. `main.dart`) — здесь
-  // экран собирается без него, и без прогрева провайдер только начинал
-  // бы подписку на поток в момент самого нажатия, а `.value` в этот
-  // момент ещё `null` и код читал бы связь как «есть» по умолчанию.
-  Consumer(
-    builder: (context, ref, _) {
-      ref.watch(isOnlineProvider);
-      return const TodayScreen();
-    },
-  ),
-  overrides: <Override>[
-    dashboardReportProvider.overrideWith((ref) async => dashboard),
-    tasksRepositoryProvider.overrideWithValue(
-      repository ?? _FakeTasksRepository(const []),
-    ),
-    farmRoleProvider.overrideWithValue(role),
-    currentUserIdProvider.overrideWithValue(viewerId),
-    isOnlineProvider.overrideWith((ref) => Stream.value(online)),
-  ],
-);
+}) =>
+    testAppScreen(
+      // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
+      // на каждом экране с самого первого кадра (см. `main.dart`) — здесь
+      // экран собирается без него, и без прогрева провайдер только начинал
+      // бы подписку на поток в момент самого нажатия, а `.value` в этот
+      // момент ещё `null` и код читал бы связь как «есть» по умолчанию.
+      Consumer(
+        builder: (context, ref, _) {
+          ref.watch(isOnlineProvider);
+          return const TodayScreen();
+        },
+      ),
+      overrides: <Override>[
+        dashboardReportProvider.overrideWith((ref) async => dashboard),
+        tasksRepositoryProvider.overrideWithValue(
+          repository ?? _FakeTasksRepository(const []),
+        ),
+        farmRoleProvider.overrideWithValue(role),
+        currentUserIdProvider.overrideWithValue(viewerId),
+        isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+      ],
+    );
 
 void main() {
   setUpAll(() async {

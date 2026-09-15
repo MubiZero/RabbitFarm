@@ -5,7 +5,8 @@ import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/core/l10n/error_text.dart';
 import 'package:mobile/l10n/generated/app_localizations_ru.dart';
 
-DioException _response(int status, {Map<String, dynamic>? body}) => DioException(
+DioException _response(int status, {Map<String, dynamic>? body}) =>
+    DioException(
       requestOptions: RequestOptions(path: '/x'),
       type: DioExceptionType.badResponse,
       response: Response(

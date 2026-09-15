@@ -18,7 +18,8 @@ String planLimitsSummary(BuildContext context, Plan plan) {
   if (plan.isUnlimited) return l10n.platformPlanUnlimited;
 
   return [
-    if (plan.maxRabbits != null) l10n.platformPlanLimitRabbits(plan.maxRabbits!),
+    if (plan.maxRabbits != null)
+      l10n.platformPlanLimitRabbits(plan.maxRabbits!),
     if (plan.maxStaff != null) l10n.platformPlanLimitStaff(plan.maxStaff!),
   ].join(' · ');
 }

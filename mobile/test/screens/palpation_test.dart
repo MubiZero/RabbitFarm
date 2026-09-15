@@ -20,12 +20,12 @@ import '../support/test_app.dart';
 /// показывает лента после ответа.
 class _FakeBreedingRepository extends BreedingRepository {
   _FakeBreedingRepository(this._items)
-    : super(
-        apiClient: ApiClient(
-          storage: const FlutterSecureStorage(),
-          baseUrl: 'http://localhost',
-        ),
-      );
+      : super(
+          apiClient: ApiClient(
+            storage: const FlutterSecureStorage(),
+            baseUrl: 'http://localhost',
+          ),
+        );
 
   List<BreedingModel> _items;
   final List<Map<String, dynamic>> updates = [];
@@ -39,13 +39,14 @@ class _FakeBreedingRepository extends BreedingRepository {
     int? femaleId,
     String? fromDate,
     String? toDate,
-  }) async => PaginatedResponse<BreedingModel>(
-    items: _items,
-    total: _items.length,
-    page: 1,
-    limit: limit,
-    totalPages: 1,
-  );
+  }) async =>
+      PaginatedResponse<BreedingModel>(
+        items: _items,
+        total: _items.length,
+        page: 1,
+        limit: limit,
+        totalPages: 1,
+      );
 
   @override
   Future<BreedingModel> updateBreeding(
@@ -53,9 +54,7 @@ class _FakeBreedingRepository extends BreedingRepository {
     Map<String, dynamic> data,
   ) async {
     updates.add(data);
-    final updated = _items
-        .firstWhere((b) => b.id == id)
-        .copyWith(
+    final updated = _items.firstWhere((b) => b.id == id).copyWith(
           palpationDate: data['palpation_date'] as String?,
           isPregnant: data['is_pregnant'] as bool?,
         );
@@ -66,23 +65,22 @@ class _FakeBreedingRepository extends BreedingRepository {
   }
 }
 
-String _iso(DateTime date) =>
-    '${date.year.toString().padLeft(4, '0')}-'
+String _iso(DateTime date) => '${date.year.toString().padLeft(4, '0')}-'
     '${date.month.toString().padLeft(2, '0')}-'
     '${date.day.toString().padLeft(2, '0')}';
 
 RabbitModel _rabbit(int id, String name, String sex) => RabbitModel(
-  id: id,
-  tagId: 'A-$id',
-  name: name,
-  breedId: 1,
-  sex: sex,
-  birthDate: DateTime(2024, 1, 1),
-  status: 'active',
-  purpose: 'breeding',
-  createdAt: DateTime(2024, 1, 1),
-  updatedAt: DateTime(2024, 1, 1),
-);
+      id: id,
+      tagId: 'A-$id',
+      name: name,
+      breedId: 1,
+      sex: sex,
+      birthDate: DateTime(2024, 1, 1),
+      status: 'active',
+      purpose: 'breeding',
+      createdAt: DateTime(2024, 1, 1),
+      updatedAt: DateTime(2024, 1, 1),
+    );
 
 /// Случка на 14-й день — ровно тот день, на который сервер заводит задачу
 /// «Прощупать».

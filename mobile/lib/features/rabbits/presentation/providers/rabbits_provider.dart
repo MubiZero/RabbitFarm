@@ -50,16 +50,32 @@ class RabbitsFilter {
   /// Заменяют по одному полю. Обычный `copyWith` здесь не годится: снять
   /// фильтр — значит передать null, а `??` вернул бы прежнее значение.
   RabbitsFilter withSearch(String? value) => RabbitsFilter(
-      search: value, sex: sex, status: status, purpose: purpose, breedId: breedId);
+      search: value,
+      sex: sex,
+      status: status,
+      purpose: purpose,
+      breedId: breedId);
 
   RabbitsFilter withSex(String? value) => RabbitsFilter(
-      search: search, sex: value, status: status, purpose: purpose, breedId: breedId);
+      search: search,
+      sex: value,
+      status: status,
+      purpose: purpose,
+      breedId: breedId);
 
   RabbitsFilter withStatus(String? value) => RabbitsFilter(
-      search: search, sex: sex, status: value, purpose: purpose, breedId: breedId);
+      search: search,
+      sex: sex,
+      status: value,
+      purpose: purpose,
+      breedId: breedId);
 
   RabbitsFilter withPurpose(String? value) => RabbitsFilter(
-      search: search, sex: sex, status: status, purpose: value, breedId: breedId);
+      search: search,
+      sex: sex,
+      status: status,
+      purpose: value,
+      breedId: breedId);
 }
 
 // Rabbits List State

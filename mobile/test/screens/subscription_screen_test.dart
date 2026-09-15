@@ -18,7 +18,8 @@ import '../support/test_app.dart';
 DashboardReport _dashboard(PlanUsagePlan? plan) => DashboardReport(
       rabbits: const RabbitStats(total: 1, male: 1, female: 0),
       cages: const CageStats(total: 1, occupied: 0, available: 1),
-      health: const HealthStats(upcomingVaccinations: 0, overdueVaccinations: 0),
+      health:
+          const HealthStats(upcomingVaccinations: 0, overdueVaccinations: 0),
       tasks: const TaskStats(pending: 0, overdue: 0, urgent: 0),
       inventory: const InventoryStats(lowStockFeeds: 0),
       breeding: const BreedingStats(recentBirths: 0),
@@ -215,7 +216,8 @@ void main() {
       expiresAt: DateTime.now().add(const Duration(days: 5)),
     );
 
-    Future<void> payAndCheck(WidgetTester tester, PaymentRepository repo) async {
+    Future<void> payAndCheck(
+        WidgetTester tester, PaymentRepository repo) async {
       await tester.pumpWidget(_screen(plan: paidPlan, repository: repo));
       await tester.pumpAndSettle();
 
@@ -225,7 +227,8 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('отказ банка называется отказом и предлагает заплатить заново', (
+    testWidgets('отказ банка называется отказом и предлагает заплатить заново',
+        (
       tester,
     ) async {
       // Раньше сервер не записывал отказ ни в одной ветке, и человек
@@ -253,7 +256,8 @@ void main() {
       // Это сообщение говорило бы о состоянии платежа, которого никто не
       // проверял.
       expect(
-        find.text('Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'),
+        find.text(
+            'Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'),
         findsNothing,
       );
     });

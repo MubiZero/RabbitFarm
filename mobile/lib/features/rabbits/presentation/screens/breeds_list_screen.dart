@@ -56,7 +56,9 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          ref.read(breedsProvider.notifier).updateSearchQuery('');
+                          ref
+                              .read(breedsProvider.notifier)
+                              .updateSearchQuery('');
                         },
                       )
                     : null,
@@ -165,7 +167,10 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         if (breed.purpose != null)
                           Text(
                             breedPurposeLabel(context, breed.purpose),
-                            style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            style: AppTypography.bodyMd.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
                           ),
                       ],
                     ),
@@ -210,11 +215,13 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
               ),
 
               // Описание
-              if (breed.description != null && breed.description!.isNotEmpty) ...[
+              if (breed.description != null &&
+                  breed.description!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
                   breed.description!,
-                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: AppTypography.bodyMd.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

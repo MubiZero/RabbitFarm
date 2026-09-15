@@ -51,9 +51,8 @@ class _FeedingRecordsListScreenState
           ),
           IconButton(
             tooltip: context.l10n.commonPeriod,
-            icon: Icon(state.hasFilters
-                ? Icons.filter_list_alt
-                : Icons.filter_list),
+            icon: Icon(
+                state.hasFilters ? Icons.filter_list_alt : Icons.filter_list),
             onPressed: () => _showPeriodPicker(context),
           ),
         ],
@@ -181,9 +180,8 @@ class _PeriodChips extends ConsumerWidget {
             if (to != null) format.format(to),
           ].join(' — ')),
           deleteIcon: const Icon(Icons.close, size: 16),
-          onDeleted: () => ref
-              .read(feedingRecordsProvider.notifier)
-              .setPeriod(null, null),
+          onDeleted: () =>
+              ref.read(feedingRecordsProvider.notifier).setPeriod(null, null),
         ),
       ),
     );

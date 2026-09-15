@@ -12,11 +12,17 @@ abstract class BreedModel with _$BreedModel {
     required String name,
     String? description,
     @JsonKey(name: 'average_weight') double? averageWeight,
-    @JsonKey(name: 'average_litter_size') @IntConverter() int? averageLitterSize,
+    @JsonKey(name: 'average_litter_size')
+    @IntConverter()
+    int? averageLitterSize,
     String? purpose,
     @JsonKey(name: 'photo_url') String? photoUrl,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
   }) = _BreedModel;
 
   factory BreedModel.fromJson(Map<String, dynamic> json) =>

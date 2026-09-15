@@ -323,9 +323,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         rabbitId = widget.rabbitId ?? widget.rabbit!.id;
         await ref.read(rabbitsRepositoryProvider).updateRabbit(rabbitId, data);
       } else {
-        final createdRabbit = await ref
-            .read(rabbitsRepositoryProvider)
-            .createRabbit(data);
+        final createdRabbit =
+            await ref.read(rabbitsRepositoryProvider).createRabbit(data);
         rabbitId = createdRabbit.id;
         Analytics.rabbitAdded();
         await _rememberBreed();
@@ -333,9 +332,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
 
       if (_selectedImage != null) {
         try {
-          await ref
-              .read(rabbitsRepositoryProvider)
-              .uploadPhoto(
+          await ref.read(rabbitsRepositoryProvider).uploadPhoto(
                 rabbitId,
                 _selectedImage!.path,
                 bytes: _webImageBytes,
@@ -527,41 +524,41 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                                     borderRadius: BorderRadius.circular(10),
                                     child: kIsWeb
                                         ? (_webImageBytes != null
-                                              ? Image.memory(
-                                                  _webImageBytes!,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Icon(
-                                                  Icons.image,
-                                                  size: 60,
-                                                  color: cs.onSurfaceVariant,
-                                                ))
+                                            ? Image.memory(
+                                                _webImageBytes!,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Icon(
+                                                Icons.image,
+                                                size: 60,
+                                                color: cs.onSurfaceVariant,
+                                              ))
                                         : Image.file(
                                             File(_selectedImage!.path),
                                             fit: BoxFit.cover,
                                           ),
                                   )
                                 : displayPhotoUrl != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      displayPhotoUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          displayPhotoUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
                                             return Icon(
                                               Icons.pets,
                                               size: 60,
                                               color: cs.onSurfaceVariant,
                                             );
                                           },
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.add_a_photo,
-                                    size: 60,
-                                    color: cs.onSurfaceVariant,
-                                  ),
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.add_a_photo,
+                                        size: 60,
+                                        color: cs.onSurfaceVariant,
+                                      ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -722,7 +719,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       labelText: context.l10n.rabbitFormNotes,
                       hintText: context.l10n.rabbitFormNotesHint,
                       prefixIcon: Icon(Icons.notes),
-                      suffixIcon: VoiceInputButton(controller: _notesController),
+                      suffixIcon:
+                          VoiceInputButton(controller: _notesController),
                     ),
                     maxLines: 3,
                   ),

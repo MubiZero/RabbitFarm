@@ -19,7 +19,8 @@ class CageRow {
 
   int get occupied => cages.fold(
         0,
-        (sum, cage) => sum + (cage.currentOccupancy ?? cage.rabbits?.length ?? 0),
+        (sum, cage) =>
+            sum + (cage.currentOccupancy ?? cage.rabbits?.length ?? 0),
       );
 }
 

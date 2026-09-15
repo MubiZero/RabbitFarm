@@ -65,12 +65,10 @@ class VaccinationsListScreen extends ConsumerWidget {
                 icon: Icons.vaccines_outlined,
                 title: context.l10n.vaccinationsEmptyTitle,
                 subtitle: context.l10n.vaccinationsEmptyBody,
-                actionLabel: canRecord
-                    ? context.l10n.vaccinationsEmptyAction
-                    : null,
-                onAction: canRecord
-                    ? () => context.push('/vaccinations/form')
-                    : null,
+                actionLabel:
+                    canRecord ? context.l10n.vaccinationsEmptyAction : null,
+                onAction:
+                    canRecord ? () => context.push('/vaccinations/form') : null,
               ),
         itemBuilder: (context, vaccination, _) => _VaccinationCard(
           vaccination: vaccination,
@@ -167,8 +165,7 @@ class _ActiveFilters extends ConsumerWidget {
               label: Text(
                   '${context.l10n.vaccinationsFrom} ${format.format(state.fromDateFilter!)}'),
               deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () =>
-                  notifier.setDateFilter(null, state.toDateFilter),
+              onDeleted: () => notifier.setDateFilter(null, state.toDateFilter),
             ),
           if (state.toDateFilter != null)
             InputChip(
@@ -471,8 +468,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
-                      final notifier =
-                          ref.read(vaccinationsProvider.notifier);
+                      final notifier = ref.read(vaccinationsProvider.notifier);
                       notifier.setTypeFilter(_type);
                       notifier.setDateFilter(_from, _to);
                       Navigator.pop(context);

@@ -43,7 +43,7 @@ SupportRequest _request({
 /// объявлений (`platform_announcements_test.dart`).
 class _FakeRepository extends PlatformAdminRepository {
   _FakeRepository({this.requests = const [], this.resolveFailure})
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<SupportRequest> requests;
   final Object? resolveFailure;
@@ -96,9 +96,11 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 Widget _tab(_FakeRepository repository) => testApp(
-  const PlatformSupportRequestsTab(),
-  overrides: [platformAdminRepositoryProvider.overrideWithValue(repository)],
-);
+      const PlatformSupportRequestsTab(),
+      overrides: [
+        platformAdminRepositoryProvider.overrideWithValue(repository)
+      ],
+    );
 
 void main() {
   group('Обращения в поддержку (админ)', () {

@@ -392,9 +392,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'breeding-edit',
         builder: (context, state) {
           final breeding = state.extra as BreedingModel?;
-          assert(breeding != null, 'breeding-edit route requires BreedingModel as extra');
+          assert(breeding != null,
+              'breeding-edit route requires BreedingModel as extra');
           if (breeding == null) {
-            return BreedingDetailScreen(breedingId: int.parse(state.pathParameters['id']!));
+            return BreedingDetailScreen(
+                breedingId: int.parse(state.pathParameters['id']!));
           }
           return BreedingFormScreen(breeding: breeding);
         },
@@ -457,7 +459,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, ref, _) => AppAsyncView<Vaccination>(
               value: ref.watch(vaccinationByIdProvider(id)),
               onRetry: () => ref.invalidate(vaccinationByIdProvider(id)),
-              builder: (vaccination) => VaccinationFormScreen(vaccination: vaccination),
+              builder: (vaccination) =>
+                  VaccinationFormScreen(vaccination: vaccination),
             ),
           );
         },
@@ -765,7 +768,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'platform-announcement-form',
         builder: (context, state) => const AnnouncementFormScreen(),
       ),
-
     ],
   );
 });

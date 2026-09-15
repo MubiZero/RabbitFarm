@@ -38,9 +38,8 @@ void main() {
   });
 
   test('знаки не перепутаны местами', () {
-    final data =
-        jsonDecode(File('lib/l10n/app_uz.arb').readAsStringSync())
-            as Map<String, dynamic>;
+    final data = jsonDecode(File('lib/l10n/app_uz.arb').readAsStringSync())
+        as Map<String, dynamic>;
 
     final swapped = <String>[];
     data.forEach((key, value) {
@@ -50,7 +49,8 @@ void main() {
       if (RegExp('[oOgG]ʼ').hasMatch(value)) swapped.add('$key: $value');
     });
 
-    expect(swapped, isEmpty, reason: 'после o и g должен стоять ʻ, а не ʼ:\n'
-        '${swapped.join('\n')}');
+    expect(swapped, isEmpty,
+        reason: 'после o и g должен стоять ʻ, а не ʼ:\n'
+            '${swapped.join('\n')}');
   });
 }

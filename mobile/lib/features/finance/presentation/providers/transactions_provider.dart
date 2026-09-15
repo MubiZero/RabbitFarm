@@ -247,9 +247,11 @@ final createTransactionProvider = FutureProvider.autoDispose
 
 /// Provider for updating a transaction
 final updateTransactionProvider = FutureProvider.autoDispose
-    .family<Transaction, ({int id, TransactionUpdate update})>((ref, params) async {
+    .family<Transaction, ({int id, TransactionUpdate update})>(
+        (ref, params) async {
   final repository = ref.watch(transactionsRepositoryProvider);
-  final transaction = await repository.updateTransaction(params.id, params.update);
+  final transaction =
+      await repository.updateTransaction(params.id, params.update);
 
   return transaction;
 });
@@ -283,8 +285,8 @@ final monthlyReportProvider = FutureProvider.autoDispose
 });
 
 /// Provider for filtering transactions by type
-final transactionsByTypeProvider =
-    Provider.autoDispose.family<List<Transaction>, TransactionType?>((ref, type) {
+final transactionsByTypeProvider = Provider.autoDispose
+    .family<List<Transaction>, TransactionType?>((ref, type) {
   final transactionsState = ref.watch(transactionsProvider);
 
   if (type == null) {

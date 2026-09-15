@@ -117,7 +117,8 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
             const SizedBox(height: AppSpacing.lg),
             TextFormField(
               controller: _amount,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               onChanged: (_) => _touched = true,
               decoration: InputDecoration(
                 labelText: l10n.saleFormAmount,

@@ -178,9 +178,8 @@ class _ChecklistItem extends StatelessWidget {
             children: [
               Icon(
                 done ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: done
-                    ? AppColors.success
-                    : context.colors.onSurfaceVariant,
+                color:
+                    done ? AppColors.success : context.colors.onSurfaceVariant,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.md),

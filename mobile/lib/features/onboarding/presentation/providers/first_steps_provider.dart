@@ -15,41 +15,40 @@ import '../../data/first_steps.dart';
 ///
 /// Клетки и кролики сюда не попадают: их количество уже приехало в сводке
 /// «Сегодня», и второй запрос за тем же числом был бы лишним.
-final firstStepDoneProvider = FutureProvider.autoDispose
-    .family<bool, FirstStep>((ref, step) async {
-      switch (step) {
-        case FirstStep.cages:
-        case FirstStep.rabbits:
-          return false;
+final firstStepDoneProvider =
+    FutureProvider.autoDispose.family<bool, FirstStep>((ref, step) async {
+  switch (step) {
+    case FirstStep.cages:
+    case FirstStep.rabbits:
+      return false;
 
-        case FirstStep.breeding:
-          final page = await ref
-              .watch(breedingRepositoryProvider)
-              .getBreedings(limit: 1);
-          return page.items.isNotEmpty;
+    case FirstStep.breeding:
+      final page =
+          await ref.watch(breedingRepositoryProvider).getBreedings(limit: 1);
+      return page.items.isNotEmpty;
 
-        case FirstStep.feeding:
-          final records = await ref.watch(
-            recentFeedingRecordsProvider(1).future,
-          );
-          return records.isNotEmpty;
+    case FirstStep.feeding:
+      final records = await ref.watch(
+        recentFeedingRecordsProvider(1).future,
+      );
+      return records.isNotEmpty;
 
-        case FirstStep.health:
-          final shots = await ref
-              .watch(vaccinationsRepositoryProvider)
-              .getVaccinations(limit: 1);
-          return shots.isNotEmpty;
+    case FirstStep.health:
+      final shots = await ref
+          .watch(vaccinationsRepositoryProvider)
+          .getVaccinations(limit: 1);
+      return shots.isNotEmpty;
 
-        case FirstStep.money:
-          final entries = await ref
-              .watch(transactionsRepositoryProvider)
-              .getTransactions(limit: 1);
-          return entries.isNotEmpty;
+    case FirstStep.money:
+      final entries = await ref
+          .watch(transactionsRepositoryProvider)
+          .getTransactions(limit: 1);
+      return entries.isNotEmpty;
 
-        case FirstStep.helpers:
-          final members = await ref.watch(farmMembersProvider.future);
-          // Владелец в списке есть всегда — помощник появился, если людей
-          // стало больше одного.
-          return members.length > 1;
-      }
-    });
+    case FirstStep.helpers:
+      final members = await ref.watch(farmMembersProvider.future);
+      // Владелец в списке есть всегда — помощник появился, если людей
+      // стало больше одного.
+      return members.length > 1;
+  }
+});

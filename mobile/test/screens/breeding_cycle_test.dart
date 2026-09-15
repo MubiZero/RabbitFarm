@@ -64,8 +64,7 @@ RabbitModel rabbit(int id, String name, String sex) => RabbitModel(
       updatedAt: DateTime(2024, 1, 1),
     );
 
-String _iso(DateTime date) =>
-    '${date.year.toString().padLeft(4, '0')}-'
+String _iso(DateTime date) => '${date.year.toString().padLeft(4, '0')}-'
     '${date.month.toString().padLeft(2, '0')}-'
     '${date.day.toString().padLeft(2, '0')}';
 

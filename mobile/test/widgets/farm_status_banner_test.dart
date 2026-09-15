@@ -26,7 +26,9 @@ UserModel _user({String? farmStatus}) => UserModel(
 /// `authProvider`, а не на то, как оно туда попало.
 class _FakeAuthRepository extends AuthRepository {
   _FakeAuthRepository(this.user)
-      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()), storage: const FlutterSecureStorage());
+      : super(
+            apiClient: ApiClient(storage: const FlutterSecureStorage()),
+            storage: const FlutterSecureStorage());
 
   final UserModel user;
 
@@ -69,21 +71,24 @@ void main() {
 
       expect(find.text('контент'), findsOneWidget);
       expect(
-        find.text('Доступ только для чтения — продлите тариф, чтобы снова вносить записи'),
+        find.text(
+            'Доступ только для чтения — продлите тариф, чтобы снова вносить записи'),
         findsOneWidget,
       );
       expect(find.widgetWithText(TextButton, 'Тариф'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Поддержка'), findsNothing);
     });
 
-    testWidgets('suspended показывает баннер без кнопки «Тариф»', (tester) async {
+    testWidgets('suspended показывает баннер без кнопки «Тариф»',
+        (tester) async {
       await tester.pumpWidget(_wrap(
         _user(farmStatus: 'suspended'),
         child: const Text('контент'),
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Доступ закрыт — обратитесь в поддержку'), findsOneWidget);
+      expect(
+          find.text('Доступ закрыт — обратитесь в поддержку'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Тариф'), findsNothing);
       expect(find.widgetWithText(TextButton, 'Поддержка'), findsOneWidget);
     });

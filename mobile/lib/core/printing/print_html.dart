@@ -14,11 +14,12 @@ import 'package:printing/printing.dart';
 Future<void> printHtmlSheet({
   required String html,
   required String documentName,
-}) => Printing.layoutPdf(
-  name: documentName,
-  // Замены этому способу у пакета нет: всё, что он предлагает взамен, —
-  // собирать документ его же виджетами, то есть вернуться к проблеме
-  // шрифтов.
-  // ignore: deprecated_member_use
-  onLayout: (format) => Printing.convertHtml(format: format, html: html),
-);
+}) =>
+    Printing.layoutPdf(
+      name: documentName,
+      // Замены этому способу у пакета нет: всё, что он предлагает взамен, —
+      // собирать документ его же виджетами, то есть вернуться к проблеме
+      // шрифтов.
+      // ignore: deprecated_member_use
+      onLayout: (format) => Printing.convertHtml(format: format, html: html),
+    );

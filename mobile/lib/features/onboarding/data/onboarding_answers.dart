@@ -72,17 +72,18 @@ class OnboardingAnswers {
     HerdSize? herdSize,
     Set<FarmFocus>? focus,
     FarmCrew? crew,
-  }) => OnboardingAnswers(
-    herdSize: herdSize ?? this.herdSize,
-    focus: focus ?? this.focus,
-    crew: crew ?? this.crew,
-  );
+  }) =>
+      OnboardingAnswers(
+        herdSize: herdSize ?? this.herdSize,
+        focus: focus ?? this.focus,
+        crew: crew ?? this.crew,
+      );
 
   Map<String, dynamic> toJson() => {
-    if (herdSize != null) 'herd_size': herdSize!.name,
-    'focus': focus.map((f) => f.name).toList(),
-    if (crew != null) 'crew': crew!.name,
-  };
+        if (herdSize != null) 'herd_size': herdSize!.name,
+        'focus': focus.map((f) => f.name).toList(),
+        if (crew != null) 'crew': crew!.name,
+      };
 
   factory OnboardingAnswers.fromJson(Map<String, dynamic> json) =>
       OnboardingAnswers(

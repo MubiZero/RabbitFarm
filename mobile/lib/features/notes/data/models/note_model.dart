@@ -16,7 +16,9 @@ abstract class NoteModel with _$NoteModel {
     required String content,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
     RabbitRef? rabbit,
     CageInfo? cage,
     UserRef? author,

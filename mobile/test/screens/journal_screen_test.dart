@@ -53,7 +53,8 @@ Future<void> _pumpJournal(
 }
 
 Override _feed(List<JournalEntry> entries) =>
-    journalFeedProvider(JournalPeriod.today).overrideWith((ref) async => entries);
+    journalFeedProvider(JournalPeriod.today)
+        .overrideWith((ref) async => entries);
 
 void main() {
   setUpAll(() => initializeDateFormatting('ru', null));
@@ -156,8 +157,7 @@ void main() {
     expect(find.text('Повторить'), findsOneWidget);
   });
 
-  testWidgets('фильтр оставляет записи только выбранного вида',
-      (tester) async {
+  testWidgets('фильтр оставляет записи только выбранного вида', (tester) async {
     final at = DateTime(_today.year, _today.month, _today.day, 9);
 
     await _pumpJournal(

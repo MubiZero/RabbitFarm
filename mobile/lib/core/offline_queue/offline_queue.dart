@@ -66,11 +66,11 @@ class OfflineQueueItem {
       );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'type': type.name,
-    'payload': payload,
-    'queued_at': queuedAt.toIso8601String(),
-  };
+        'id': id,
+        'type': type.name,
+        'payload': payload,
+        'queued_at': queuedAt.toIso8601String(),
+      };
 }
 
 /// Хранилище очереди на диске.
@@ -92,13 +92,13 @@ Map<String, dynamic> _itemToJson(OfflineQueueItem item) => item.toJson();
 /// Очередь действий, накопленных без связи, и их отправка.
 final offlineQueueProvider =
     StateNotifierProvider<OfflineQueueController, List<OfflineQueueItem>>((
-      ref,
-    ) {
-      // Сменился пользователь — пересоздаём контроллер с новым scope, иначе он
-      // продолжил бы читать/писать очередь предыдущего аккаунта.
-      ref.watch(sessionRevisionProvider);
-      return OfflineQueueController(ref, ref.read(cacheScopeProvider));
-    });
+  ref,
+) {
+  // Сменился пользователь — пересоздаём контроллер с новым scope, иначе он
+  // продолжил бы читать/писать очередь предыдущего аккаунта.
+  ref.watch(sessionRevisionProvider);
+  return OfflineQueueController(ref, ref.read(cacheScopeProvider));
+});
 
 /// Итог одной попытки отправить элемент очереди.
 enum _SendResult {
@@ -225,9 +225,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
       (e.kind == ApiFailureKind.offline || e.kind == ApiFailureKind.timeout);
 
   Future<void> _sendFeedingRecord(Map<String, dynamic> payload) async {
-    await _ref
-        .read(feedingRecordsRepositoryProvider)
-        .createFeedingRecordsBulk(
+    await _ref.read(feedingRecordsRepositoryProvider).createFeedingRecordsBulk(
           feedId: payload['feed_id'] as int,
           quantityPerRecipient: (payload['quantity'] as num).toDouble(),
           fedAt: DateTime.parse(payload['fed_at'] as String),

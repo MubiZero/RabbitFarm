@@ -47,8 +47,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
       _femaleId = record.femaleId;
       _male = record.male;
       _female = record.female;
-      _breedingDate =
-          DateTime.tryParse(record.breedingDate) ?? DateTime.now();
+      _breedingDate = DateTime.tryParse(record.breedingDate) ?? DateTime.now();
       _status = record.status;
       _notes.text = record.notes ?? '';
     } else {

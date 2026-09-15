@@ -21,7 +21,7 @@ import '../support/test_app.dart';
 /// вёрстка, а две вещи: что уходит на сервер и что происходит, когда сети нет.
 class _FakeRabbitsRepository extends RabbitsRepository {
   _FakeRabbitsRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   final List<(int, Map<String, dynamic>)> updates = [];
 
@@ -34,13 +34,14 @@ class _FakeRabbitsRepository extends RabbitsRepository {
     String? status,
     String? purpose,
     int? breedId,
-  }) async => PaginatedResponse<RabbitModel>(
-    items: const [],
-    total: 0,
-    page: page,
-    limit: limit,
-    totalPages: 0,
-  );
+  }) async =>
+      PaginatedResponse<RabbitModel>(
+        items: const [],
+        total: 0,
+        page: page,
+        limit: limit,
+        totalPages: 0,
+      );
 
   @override
   Future<RabbitModel> updateRabbit(int id, Map<String, dynamic> data) async {
@@ -50,29 +51,30 @@ class _FakeRabbitsRepository extends RabbitsRepository {
 }
 
 RabbitModel _rabbit({String status = 'active'}) => RabbitModel(
-  id: 42,
-  name: 'Мушка',
-  tagId: 'A-0231',
-  breedId: 1,
-  sex: 'female',
-  birthDate: DateTime(2026, 1, 1),
-  status: status,
-  purpose: 'breeding',
-  createdAt: DateTime(2026, 1, 1),
-  updatedAt: DateTime(2026, 1, 1),
-);
+      id: 42,
+      name: 'Мушка',
+      tagId: 'A-0231',
+      breedId: 1,
+      sex: 'female',
+      birthDate: DateTime(2026, 1, 1),
+      status: status,
+      purpose: 'breeding',
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
 
 Widget _screen({
   required bool online,
   required _FakeRabbitsRepository repository,
-}) => testAppScreen(
-  DeathFormScreen(rabbit: _rabbit()),
-  overrides: [
-    rabbitsRepositoryProvider.overrideWithValue(repository),
-    isOnlineProvider.overrideWith((ref) => Stream.value(online)),
-    cacheScopeProvider.overrideWithValue(null),
-  ],
-);
+}) =>
+    testAppScreen(
+      DeathFormScreen(rabbit: _rabbit()),
+      overrides: [
+        rabbitsRepositoryProvider.overrideWithValue(repository),
+        isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+        cacheScopeProvider.overrideWithValue(null),
+      ],
+    );
 
 /// Падёж подтверждают сдвигом, а не нажатием: у клетки, в перчатке,
 /// случайное касание кнопки стоило бы необратимой записи.

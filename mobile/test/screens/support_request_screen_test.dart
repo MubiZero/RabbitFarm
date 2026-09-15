@@ -77,9 +77,9 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 Widget _screen(_FakeSupportRepository repository) => testAppScreen(
-  const SupportRequestScreen(),
-  overrides: [supportRepositoryProvider.overrideWithValue(repository)],
-);
+      const SupportRequestScreen(),
+      overrides: [supportRepositoryProvider.overrideWithValue(repository)],
+    );
 
 void main() {
   group('Поддержка: свои обращения', () {

@@ -58,9 +58,8 @@ class _AppFormDisclosureState extends State<AppFormDisclosure> {
                 ),
                 AnimatedRotation(
                   turns: _expanded ? 0.5 : 0,
-                  duration: context.reduceMotion
-                      ? Duration.zero
-                      : AppDuration.fast,
+                  duration:
+                      context.reduceMotion ? Duration.zero : AppDuration.fast,
                   curve: AppDuration.curve,
                   child: Icon(
                     Icons.expand_more,

@@ -55,7 +55,8 @@ class AppDateField extends StatelessWidget {
       initialTime: TimeOfDay.fromDateTime(value ?? DateTime.now()),
     );
     if (time == null || !context.mounted) return;
-    onChanged(DateTime(date.year, date.month, date.day, time.hour, time.minute));
+    onChanged(
+        DateTime(date.year, date.month, date.day, time.hour, time.minute));
   }
 
   String _formatted() {

@@ -6,7 +6,8 @@ import '../../data/models/feeding_record_model.dart';
 import '../../data/repositories/feeding_records_repository.dart';
 
 /// Provider for FeedingRecordsRepository
-final feedingRecordsRepositoryProvider = Provider<FeedingRecordsRepository>((ref) {
+final feedingRecordsRepositoryProvider =
+    Provider<FeedingRecordsRepository>((ref) {
   ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return FeedingRecordsRepository(apiClient);
@@ -161,7 +162,8 @@ class FeedingRecordsNotifier extends StateNotifier<FeedingRecordsState> {
 
   /// Remove feeding record from the list
   void removeRecord(int recordId) {
-    final updatedRecords = state.records.where((r) => r.id != recordId).toList();
+    final updatedRecords =
+        state.records.where((r) => r.id != recordId).toList();
     state = state.copyWith(records: updatedRecords);
   }
 
@@ -210,8 +212,8 @@ final feedingRecordByIdProvider =
 });
 
 /// Provider for feeding records by rabbit ID
-final rabbitFeedingRecordsProvider =
-    FutureProvider.autoDispose.family<List<FeedingRecord>, int>((ref, rabbitId) async {
+final rabbitFeedingRecordsProvider = FutureProvider.autoDispose
+    .family<List<FeedingRecord>, int>((ref, rabbitId) async {
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   return repository.getRabbitFeedingRecords(rabbitId);
 });
@@ -227,7 +229,8 @@ final createFeedingRecordProvider = FutureProvider.autoDispose
 
 /// Provider for updating a feeding record
 final updateFeedingRecordProvider = FutureProvider.autoDispose
-    .family<FeedingRecord, ({int id, FeedingRecordUpdate update})>((ref, params) async {
+    .family<FeedingRecord, ({int id, FeedingRecordUpdate update})>(
+        (ref, params) async {
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   final record = await repository.updateFeedingRecord(params.id, params.update);
 
@@ -243,7 +246,8 @@ final deleteFeedingRecordProvider =
 
 /// Provider for feeding statistics
 final feedingStatisticsProvider = FutureProvider.autoDispose
-    .family<FeedingStatistics, ({DateTime? fromDate, DateTime? toDate})>((ref, params) async {
+    .family<FeedingStatistics, ({DateTime? fromDate, DateTime? toDate})>(
+        (ref, params) async {
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   return repository.getStatistics(
     fromDate: params.fromDate,
@@ -252,8 +256,8 @@ final feedingStatisticsProvider = FutureProvider.autoDispose
 });
 
 /// Provider for recent feeding records
-final recentFeedingRecordsProvider =
-    FutureProvider.autoDispose.family<List<FeedingRecord>, int?>((ref, limit) async {
+final recentFeedingRecordsProvider = FutureProvider.autoDispose
+    .family<List<FeedingRecord>, int?>((ref, limit) async {
   final repository = ref.watch(feedingRecordsRepositoryProvider);
   return repository.getRecentFeedingRecords(limit: limit);
 });
@@ -267,7 +271,9 @@ final feedingRecordsByRabbitProvider =
     return recordsState.records;
   }
 
-  return recordsState.records.where((record) => record.rabbitId == rabbitId).toList();
+  return recordsState.records
+      .where((record) => record.rabbitId == rabbitId)
+      .toList();
 });
 
 /// Provider for filtering feeding records by feed ID
@@ -279,7 +285,9 @@ final feedingRecordsByFeedProvider =
     return recordsState.records;
   }
 
-  return recordsState.records.where((record) => record.feedId == feedId).toList();
+  return recordsState.records
+      .where((record) => record.feedId == feedId)
+      .toList();
 });
 
 /// Provider for filtering feeding records by cage ID
@@ -291,12 +299,15 @@ final feedingRecordsByCageProvider =
     return recordsState.records;
   }
 
-  return recordsState.records.where((record) => record.cageId == cageId).toList();
+  return recordsState.records
+      .where((record) => record.cageId == cageId)
+      .toList();
 });
 
 /// Provider for filtering feeding records by date range
 final feedingRecordsByDateRangeProvider = Provider.autoDispose
-    .family<List<FeedingRecord>, ({DateTime? fromDate, DateTime? toDate})>((ref, params) {
+    .family<List<FeedingRecord>, ({DateTime? fromDate, DateTime? toDate})>(
+        (ref, params) {
   final recordsState = ref.watch(feedingRecordsProvider);
 
   if (params.fromDate == null && params.toDate == null) {

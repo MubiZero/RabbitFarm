@@ -198,7 +198,8 @@ class ApiClient {
     return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/weights');
   }
 
-  Future<Response> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+  Future<Response> uploadPhoto(int rabbitId, String filePath,
+      {Uint8List? bytes}) async {
     final MultipartFile file;
 
     if (kIsWeb && bytes != null) {

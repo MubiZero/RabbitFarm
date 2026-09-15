@@ -218,8 +218,7 @@ void main() {
     );
   });
 
-  testWidgets('одна клетка — та же форма и тот же один запрос',
-      (tester) async {
+  testWidgets('одна клетка — та же форма и тот же один запрос', (tester) async {
     final repository = await _pumpForm(tester);
 
     await _openCagePicker(tester);

@@ -16,7 +16,7 @@ import '../support/test_app.dart';
 /// видны в списке.
 class _FakeBirthsRepository extends BirthsRepository {
   _FakeBirthsRepository(this._birth)
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   BirthModel _birth;
   final List<Map<String, dynamic>> updates = [];
@@ -33,13 +33,13 @@ class _FakeBirthsRepository extends BirthsRepository {
 }
 
 BirthModel _birth({int bornAlive = 8, int died = 0}) => BirthModel(
-  id: 1,
-  motherId: 5,
-  birthDate: '2026-09-01',
-  kitsBornAlive: bornAlive,
-  kitsBornDead: 0,
-  kitsDied: died,
-);
+      id: 1,
+      motherId: 5,
+      birthDate: '2026-09-01',
+      kitsBornAlive: bornAlive,
+      kitsBornDead: 0,
+      kitsDied: died,
+    );
 
 Future<_FakeBirthsRepository> _pump(
   WidgetTester tester, {

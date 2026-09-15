@@ -13,23 +13,23 @@ import 'package:mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:mobile/features/auth/presentation/providers/language_sync.dart';
 
 UserModel _user({String? language}) => UserModel(
-  id: 1,
-  fullName: 'Фермер',
-  role: 'owner',
-  isActive: true,
-  language: language,
-  createdAt: DateTime(2026, 1, 1),
-  updatedAt: DateTime(2026, 1, 1),
-);
+      id: 1,
+      fullName: 'Фермер',
+      role: 'owner',
+      isActive: true,
+      language: language,
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
 
 /// Репозиторий без сети: сессии нет, а обновление профиля только запоминает,
 /// какой язык до него доехал.
 class _FakeAuthRepository extends AuthRepository {
   _FakeAuthRepository()
-    : super(
-        apiClient: ApiClient(storage: const FlutterSecureStorage()),
-        storage: const FlutterSecureStorage(),
-      );
+      : super(
+          apiClient: ApiClient(storage: const FlutterSecureStorage()),
+          storage: const FlutterSecureStorage(),
+        );
 
   final List<String> languagesSent = [];
 
@@ -57,8 +57,7 @@ class _TestAuthNotifier extends AuthNotifier {
   ProviderContainer container,
   _FakeAuthRepository repository,
   _TestAuthNotifier auth,
-})
-_setUp({UserModel? signedInAs}) {
+}) _setUp({UserModel? signedInAs}) {
   final repository = _FakeAuthRepository();
   late _TestAuthNotifier auth;
 

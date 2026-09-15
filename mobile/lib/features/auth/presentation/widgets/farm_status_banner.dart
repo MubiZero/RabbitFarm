@@ -56,7 +56,8 @@ class FarmStatusBanner extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       message,
-                      style: AppTypography.labelLg.copyWith(color: Colors.white),
+                      style:
+                          AppTypography.labelLg.copyWith(color: Colors.white),
                     ),
                   ),
                   // Во время просмотра под клиентом всё и так только для
@@ -65,7 +66,8 @@ class FarmStatusBanner extends ConsumerWidget {
                   if (status == 'read_only' && !auth.isImpersonating)
                     TextButton(
                       onPressed: () => context.push('/subscription'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      style:
+                          TextButton.styleFrom(foregroundColor: Colors.white),
                       child: Text(l10n.farmStatusBannerAction),
                     ),
                   // Приостановленной ферме продлевать нечего — доступ закрыт
@@ -74,7 +76,8 @@ class FarmStatusBanner extends ConsumerWidget {
                   if (status == 'suspended' && !auth.isImpersonating)
                     TextButton(
                       onPressed: () => context.push('/support'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      style:
+                          TextButton.styleFrom(foregroundColor: Colors.white),
                       child: Text(l10n.farmStatusBannerContactSupport),
                     ),
                 ],

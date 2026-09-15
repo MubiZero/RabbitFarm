@@ -107,7 +107,8 @@ class BirthsNotifier extends Notifier<BirthsState> {
   Future<bool> deleteBirth(int id) async {
     try {
       await _repository.deleteBirth(id);
-      final updatedBirths = state.births.where((birth) => birth.id != id).toList();
+      final updatedBirths =
+          state.births.where((birth) => birth.id != id).toList();
 
       state = state.copyWith(births: updatedBirths);
       return true;
@@ -151,10 +152,12 @@ class BirthsNotifier extends Notifier<BirthsState> {
 }
 
 /// Provider для окролов
-final birthsProvider = NotifierProvider<BirthsNotifier, BirthsState>(BirthsNotifier.new);
+final birthsProvider =
+    NotifierProvider<BirthsNotifier, BirthsState>(BirthsNotifier.new);
 
 /// Provider для окролов конкретной самки
-final birthsByMotherProvider = FutureProvider.family<List<BirthModel>, int>((ref, motherId) async {
+final birthsByMotherProvider =
+    FutureProvider.family<List<BirthModel>, int>((ref, motherId) async {
   final repository = ref.watch(birthsRepositoryProvider);
   return repository.getBirthsByMother(motherId);
 });

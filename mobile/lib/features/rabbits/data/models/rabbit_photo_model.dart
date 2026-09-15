@@ -16,7 +16,9 @@ abstract class RabbitPhoto with _$RabbitPhoto {
     required String url,
     String? caption,
     @JsonKey(name: 'taken_at') @NullableDateTimeConverter() DateTime? takenAt,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
     UserRef? author,
     // Приходит только в общей по ферме ленте (/photos) — в галерее одного
     // кролика (/rabbits/:id/photos) он и так известен снаружи.

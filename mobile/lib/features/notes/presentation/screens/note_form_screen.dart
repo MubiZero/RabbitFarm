@@ -152,16 +152,15 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
           ? context.l10n.noteFormEditTitle
           : context.l10n.noteFormNewTitle,
       formKey: _formKey,
-      submitLabel: _isEditing
-          ? context.l10n.commonSave
-          : context.l10n.noteFormCreate,
+      submitLabel:
+          _isEditing ? context.l10n.commonSave : context.l10n.noteFormCreate,
       // Пока связи нет, заметка при сохранении уйдёт в очередь, а не на
       // сервер — сообщение об успехе должно говорить именно это.
       successMessage: _isEditing
           ? context.l10n.noteFormUpdated
           : (online
-                ? context.l10n.noteFormCreated
-                : context.l10n.offlineActionQueued),
+              ? context.l10n.noteFormCreated
+              : context.l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       actions: [

@@ -52,8 +52,7 @@ class SettingsScreen extends ConsumerWidget {
                 label: context.l10n.settingsTheme,
                 trailing: _ThemeModeToggle(
                   mode: themeState.mode,
-                  onChanged: (m) =>
-                      ref.read(themeProvider.notifier).setMode(m),
+                  onChanged: (m) => ref.read(themeProvider.notifier).setMode(m),
                 ),
               ),
               _SettingsTile(
@@ -137,8 +136,9 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (value) async {
                     final l10n = context.l10n;
                     final messenger = ScaffoldMessenger.of(context);
-                    final error =
-                        await ref.read(authProvider.notifier).setDigestEnabled(value);
+                    final error = await ref
+                        .read(authProvider.notifier)
+                        .setDigestEnabled(value);
                     if (error != null) {
                       messenger.showSnackBar(
                         SnackBar(
@@ -251,7 +251,6 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -363,7 +362,6 @@ class _ProfileCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _SettingsTile extends StatelessWidget {
@@ -433,9 +431,8 @@ class _NotificationPermissionTileState
   }
 
   Future<void> _check() async {
-    final canAsk = await ref
-        .read(notificationPermissionProvider)
-        .shouldShowPrimer();
+    final canAsk =
+        await ref.read(notificationPermissionProvider).shouldShowPrimer();
     if (mounted) setState(() => _canAsk = canAsk);
   }
 

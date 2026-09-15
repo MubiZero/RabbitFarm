@@ -64,8 +64,8 @@ void main() {
     });
 
     test('однозначная дата дополняется нулями', () {
-      expect(const DateOnlyConverter().toJson(DateTime(2026, 1, 5)),
-          '2026-01-05');
+      expect(
+          const DateOnlyConverter().toJson(DateTime(2026, 1, 5)), '2026-01-05');
     });
   });
 }

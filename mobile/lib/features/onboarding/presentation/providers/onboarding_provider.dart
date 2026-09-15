@@ -29,8 +29,8 @@ class OnboardingSeenNotifier extends AsyncNotifier<bool> {
 
 final onboardingSeenProvider =
     AsyncNotifierProvider<OnboardingSeenNotifier, bool>(
-      OnboardingSeenNotifier.new,
-    );
+  OnboardingSeenNotifier.new,
+);
 
 /// Ответы из знакомства.
 ///
@@ -63,5 +63,5 @@ class OnboardingAnswersNotifier extends AsyncNotifier<OnboardingAnswers> {
 
 final onboardingAnswersProvider =
     AsyncNotifierProvider<OnboardingAnswersNotifier, OnboardingAnswers>(
-      OnboardingAnswersNotifier.new,
-    );
+  OnboardingAnswersNotifier.new,
+);

@@ -83,12 +83,10 @@ class TasksListState {
       total: total ?? this.total,
       hasMore: hasMore ?? this.hasMore,
       typeFilter: clearTypeFilter ? null : (typeFilter ?? this.typeFilter),
-      statusFilter: clearStatusFilter
-          ? null
-          : (statusFilter ?? this.statusFilter),
-      priorityFilter: clearPriorityFilter
-          ? null
-          : (priorityFilter ?? this.priorityFilter),
+      statusFilter:
+          clearStatusFilter ? null : (statusFilter ?? this.statusFilter),
+      priorityFilter:
+          clearPriorityFilter ? null : (priorityFilter ?? this.priorityFilter),
       overdueOnly: overdueOnly ?? this.overdueOnly,
       todayOnly: todayOnly ?? this.todayOnly,
     );
@@ -113,7 +111,7 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
   bool _hasFreshData = false;
 
   TasksListNotifier(this._repository, this._cacheScope)
-    : super(TasksListState()) {
+      : super(TasksListState()) {
     _restoreFromCache();
     loadTasks();
   }
@@ -271,11 +269,11 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
 /// Tasks list provider with infinite scroll
 final tasksListProvider =
     StateNotifierProvider<TasksListNotifier, TasksListState>((ref) {
-      final repository = ref.watch(tasksRepositoryProvider);
-      // Владелец кэша читается один раз при создании списка: сменился
-      // пользователь — поднялся номер сессии, и список пересоздался целиком.
-      return TasksListNotifier(repository, ref.read(cacheScopeProvider));
-    });
+  final repository = ref.watch(tasksRepositoryProvider);
+  // Владелец кэша читается один раз при создании списка: сменился
+  // пользователь — поднялся номер сессии, и список пересоздался целиком.
+  return TasksListNotifier(repository, ref.read(cacheScopeProvider));
+});
 
 /// Single task provider
 final taskProvider = FutureProvider.autoDispose.family<Task, int>((
@@ -295,11 +293,11 @@ final taskStatisticsProvider = FutureProvider.autoDispose<TaskStatistics>((
 });
 
 /// Upcoming tasks provider
-final upcomingTasksProvider = FutureProvider.autoDispose
-    .family<List<Task>, int>((ref, days) async {
-      final repository = ref.watch(tasksRepositoryProvider);
-      return repository.getUpcoming(days: days);
-    });
+final upcomingTasksProvider =
+    FutureProvider.autoDispose.family<List<Task>, int>((ref, days) async {
+  final repository = ref.watch(tasksRepositoryProvider);
+  return repository.getUpcoming(days: days);
+});
 
 /// Task actions provider
 final taskActionsProvider = Provider<TaskActions>((ref) {
@@ -385,9 +383,7 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
     // а `overdue_only`/`today_only` он сейчас не применяет вовсе. Сортировка
     // по сроку по возрастанию и так ставит просроченные и сегодняшние первыми,
     // остаётся отсечь будущее.
-    final result = await ref
-        .watch(tasksRepositoryProvider)
-        .getTasks(
+    final result = await ref.watch(tasksRepositoryProvider).getTasks(
           page: 1,
           limit: _limit,
           sortBy: 'due_date',
@@ -461,8 +457,8 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
   }
 
   List<Task> _replace(List<Task> tasks, Task task) => [
-    for (final item in tasks) item.id == task.id ? task : item,
-  ];
+        for (final item in tasks) item.id == task.id ? task : item,
+      ];
 
   static DateTime _endOfToday() {
     final now = DateTime.now();
@@ -473,5 +469,5 @@ class TodayTasksNotifier extends AsyncNotifier<List<Task>> {
 /// Задачи для экрана «Сегодня».
 final todayTasksProvider =
     AsyncNotifierProvider.autoDispose<TodayTasksNotifier, List<Task>>(
-      TodayTasksNotifier.new,
-    );
+  TodayTasksNotifier.new,
+);

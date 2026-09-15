@@ -200,8 +200,7 @@ class _TypeBreakdown extends StatelessWidget {
                   label: feedTypeFromCode(entry.key)?.displayName ?? entry.key,
                   value: formatQuantity(entry.value, unitLabel(unit)),
                   fraction: max == 0 ? 0 : entry.value / max,
-                  color:
-                      feedTypeFromCode(entry.key)?.color ??
+                  color: feedTypeFromCode(entry.key)?.color ??
                       Theme.of(context).colorScheme.primary,
                 ),
             ],

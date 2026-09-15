@@ -109,7 +109,8 @@ class ListCache<T> {
 
     try {
       final box = await _box();
-      final head = items.length > _maxItems ? items.sublist(0, _maxItems) : items;
+      final head =
+          items.length > _maxItems ? items.sublist(0, _maxItems) : items;
       await box.put(scope, jsonEncode([for (final item in head) toJson(item)]));
     } catch (e) {
       // Кэш — удобство, а не обязательство: не сохранился, значит в следующий

@@ -133,8 +133,9 @@ class PaymentFlowNotifier extends StateNotifier<PaymentFlowState> {
 
     state = state.copyWith(status: PaymentFlowStatus.checking);
     try {
-      final status =
-          await _ref.read(paymentRepositoryProvider).checkStatus(order.invoiceId);
+      final status = await _ref
+          .read(paymentRepositoryProvider)
+          .checkStatus(order.invoiceId);
       if (!mounted) return;
 
       if (status == 'completed') {

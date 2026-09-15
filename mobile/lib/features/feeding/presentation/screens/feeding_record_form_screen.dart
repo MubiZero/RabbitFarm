@@ -130,9 +130,8 @@ class _FeedingRecordFormScreenState
         final rabbitIds = _mode == _FeedingMode.rabbit
             ? [for (final rabbit in _rabbits) rabbit.id]
             : const <int>[];
-        final cageIds = _mode == _FeedingMode.cage
-            ? _cageIds.toList()
-            : const <int>[];
+        final cageIds =
+            _mode == _FeedingMode.cage ? _cageIds.toList() : const <int>[];
 
         if (!(ref.read(isOnlineProvider).value ?? true)) {
           // Нет сети — запись не теряется, а уходит в офлайн-очередь и
@@ -142,13 +141,13 @@ class _FeedingRecordFormScreenState
           await ref
               .read(offlineQueueProvider.notifier)
               .enqueue(OfflineActionType.feedingRecord, {
-                'feed_id': _feedId,
-                'quantity': quantity,
-                'fed_at': _fedAt.toIso8601String(),
-                if (notes != null) 'notes': notes,
-                'rabbit_ids': rabbitIds,
-                'cage_ids': cageIds,
-              });
+            'feed_id': _feedId,
+            'quantity': quantity,
+            'fed_at': _fedAt.toIso8601String(),
+            if (notes != null) 'notes': notes,
+            'rabbit_ids': rabbitIds,
+            'cage_ids': cageIds,
+          });
           Analytics.feedingRecorded();
           return null;
         }
@@ -204,8 +203,8 @@ class _FeedingRecordFormScreenState
       successMessage: _isEditing
           ? l10n.feedingFormUpdated
           : (online
-                ? l10n.feedingBulkCreated(_recipientCount)
-                : l10n.offlineActionQueued),
+              ? l10n.feedingBulkCreated(_recipientCount)
+              : l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       children: [
@@ -564,14 +563,14 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
   }
 
   void _toggleRow(List<CageModel> row, bool select) => setState(() {
-    for (final cage in row) {
-      if (select) {
-        _selected.add(cage.id);
-      } else {
-        _selected.remove(cage.id);
-      }
-    }
-  });
+        for (final cage in row) {
+          if (select) {
+            _selected.add(cage.id);
+          } else {
+            _selected.remove(cage.id);
+          }
+        }
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -644,18 +643,18 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
                       subtitle: errorText(l10n, widget.error),
                     )
                   : widget.cages.isEmpty
-                  ? AppEmptyState(
-                      icon: Icons.grid_view_outlined,
-                      title: l10n.feedingBulkNoCagesTitle,
-                      subtitle: l10n.feedingBulkNoCagesBody,
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                      children: [
-                        for (final entry in rows.entries)
-                          ..._rowTiles(context, entry.key, entry.value),
-                      ],
-                    ),
+                      ? AppEmptyState(
+                          icon: Icons.grid_view_outlined,
+                          title: l10n.feedingBulkNoCagesTitle,
+                          subtitle: l10n.feedingBulkNoCagesBody,
+                        )
+                      : ListView(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          children: [
+                            for (final entry in rows.entries)
+                              ..._rowTiles(context, entry.key, entry.value),
+                          ],
+                        ),
             ),
             AppSubmitBar(
               label: l10n.feedingBulkDone,
@@ -681,8 +680,8 @@ class _CagePickerSheetState extends State<_CagePickerSheet> {
         value: chosen == cages.length
             ? true
             : chosen == 0
-            ? false
-            : null,
+                ? false
+                : null,
         tristate: true,
         controlAffinity: ListTileControlAffinity.leading,
         title: Text(

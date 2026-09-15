@@ -23,8 +23,7 @@ class VaccinationFormScreen extends ConsumerStatefulWidget {
       _VaccinationFormScreenState();
 }
 
-class _VaccinationFormScreenState
-    extends ConsumerState<VaccinationFormScreen> {
+class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _vaccineName;
@@ -67,7 +66,13 @@ class _VaccinationFormScreenState
     _rabbit = widget.rabbit;
     _rabbitId = _record?.rabbitId ?? widget.rabbit?.id;
 
-    for (final c in [_vaccineName, _batchNumber, _veterinarian, _cost, _notes]) {
+    for (final c in [
+      _vaccineName,
+      _batchNumber,
+      _veterinarian,
+      _cost,
+      _notes
+    ]) {
       c.addListener(() => _touched = true);
     }
   }
@@ -144,8 +149,7 @@ class _VaccinationFormScreenState
       title: _isEditing ? l10n.vaccFormEditTitle : l10n.vaccFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
-      successMessage:
-          _isEditing ? l10n.vaccFormUpdated : l10n.vaccFormCreated,
+      successMessage: _isEditing ? l10n.vaccFormUpdated : l10n.vaccFormCreated,
       onSubmit: _save,
       isDirty: () => _touched,
       children: [
@@ -328,7 +332,9 @@ class _VaccinationFormScreenState
               ),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return null;
-                return parseDecimal(v) == null ? l10n.commonNumberInvalid : null;
+                return parseDecimal(v) == null
+                    ? l10n.commonNumberInvalid
+                    : null;
               },
             ),
             TextFormField(

@@ -16,7 +16,7 @@ import '../support/test_app.dart';
 /// отсаживать второй раз.
 class _FakeBirthsRepository extends BirthsRepository {
   _FakeBirthsRepository(this._birth)
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   BirthModel _birth;
   final List<Map<String, dynamic>> updates = [];
@@ -35,8 +35,7 @@ class _FakeBirthsRepository extends BirthsRepository {
   }
 }
 
-String _iso(DateTime date) =>
-    '${date.year.toString().padLeft(4, '0')}-'
+String _iso(DateTime date) => '${date.year.toString().padLeft(4, '0')}-'
     '${date.month.toString().padLeft(2, '0')}-'
     '${date.day.toString().padLeft(2, '0')}';
 
@@ -45,16 +44,17 @@ BirthModel _birth({
   int died = 0,
   int? weaned,
   String? weaningDate,
-}) => BirthModel(
-  id: 1,
-  motherId: 5,
-  birthDate: '2026-08-01',
-  kitsBornAlive: bornAlive,
-  kitsBornDead: 0,
-  kitsDied: died,
-  kitsWeaned: weaned,
-  weaningDate: weaningDate,
-);
+}) =>
+    BirthModel(
+      id: 1,
+      motherId: 5,
+      birthDate: '2026-08-01',
+      kitsBornAlive: bornAlive,
+      kitsBornDead: 0,
+      kitsDied: died,
+      kitsWeaned: weaned,
+      weaningDate: weaningDate,
+    );
 
 Future<_FakeBirthsRepository> _pump(
   WidgetTester tester, {

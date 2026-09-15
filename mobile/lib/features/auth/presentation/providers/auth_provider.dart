@@ -94,8 +94,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _ref.read(apiClientProvider).onFarmAccessChanged = _handleFarmAccessChanged;
     // Проверяется бэкендом на каждый запрос, включая незалогиненные (вход,
     // регистрация) — поэтому висит здесь же, а не только для сессии.
-    _ref.read(apiClientProvider).onUpgradeRequired = () =>
-        _ref.read(upgradeRequiredProvider.notifier).state = true;
+    _ref.read(apiClientProvider).onUpgradeRequired =
+        () => _ref.read(upgradeRequiredProvider.notifier).state = true;
     _checkAuthStatus();
   }
 

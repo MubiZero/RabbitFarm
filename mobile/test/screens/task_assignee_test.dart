@@ -171,7 +171,9 @@ void main() {
       (tester) async {
     final repository = _FakeTasksRepository();
     await tester.pumpWidget(_form(
-      task: _task(assignedTo: _worker.id, assignee: const UserRef(id: 2, fullName: 'Иван Работник')),
+      task: _task(
+          assignedTo: _worker.id,
+          assignee: const UserRef(id: 2, fullName: 'Иван Работник')),
       repository: repository,
     ));
     await _settle(tester);

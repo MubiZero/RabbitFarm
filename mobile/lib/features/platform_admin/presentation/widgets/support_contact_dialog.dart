@@ -59,9 +59,7 @@ class _SupportContactDialogState extends ConsumerState<_SupportContactDialog> {
 
     final phone = _phone.text.trim();
     try {
-      await ref
-          .read(platformAdminRepositoryProvider)
-          .updateSupportContact(
+      await ref.read(platformAdminRepositoryProvider).updateSupportContact(
             SupportContact(
               email: email.isEmpty ? null : email,
               phone: phone.isEmpty ? null : phone,

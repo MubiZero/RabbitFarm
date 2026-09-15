@@ -158,8 +158,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
       title: _isEditing ? l10n.feedFormEditTitle : l10n.feedFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
-      successMessage:
-          _isEditing ? l10n.feedFormUpdated : l10n.feedFormCreated,
+      successMessage: _isEditing ? l10n.feedFormUpdated : l10n.feedFormCreated,
       onSubmit: _save,
       isDirty: () => _touched,
       actions: [

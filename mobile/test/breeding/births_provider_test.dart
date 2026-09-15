@@ -8,7 +8,7 @@ import 'package:mobile/features/rabbits/presentation/providers/births_provider.d
 
 class _FakeBirthsRepository extends BirthsRepository {
   _FakeBirthsRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   var calls = 0;
 

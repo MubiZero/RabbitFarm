@@ -18,35 +18,35 @@ import '../support/test_app.dart';
 /// проверяет не вёрстку, а сколько работы форма требует на входе.
 class _FakeBreedsRepository extends BreedsRepository {
   _FakeBreedsRepository()
-    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
 
   @override
   Future<List<BreedModel>> getBreeds() async => const [
-    BreedModel(id: 1, name: 'Калифорнийская'),
-    BreedModel(id: 2, name: 'Серый великан'),
-  ];
+        BreedModel(id: 1, name: 'Калифорнийская'),
+        BreedModel(id: 2, name: 'Серый великан'),
+      ];
 }
 
 Widget _screen({RabbitModel? rabbit}) => testAppScreen(
-  RabbitFormScreen(rabbit: rabbit),
-  overrides: [
-    breedsRepositoryProvider.overrideWithValue(_FakeBreedsRepository()),
-    cageOptionsProvider.overrideWith((ref) async => const <CageModel>[]),
-  ],
-);
+      RabbitFormScreen(rabbit: rabbit),
+      overrides: [
+        breedsRepositoryProvider.overrideWithValue(_FakeBreedsRepository()),
+        cageOptionsProvider.overrideWith((ref) async => const <CageModel>[]),
+      ],
+    );
 
 RabbitModel _rabbit({required String status}) => RabbitModel(
-  id: 42,
-  name: 'Мушка',
-  tagId: 'A-0231',
-  breedId: 1,
-  sex: 'female',
-  birthDate: DateTime(2026, 1, 1),
-  status: status,
-  purpose: 'meat',
-  createdAt: DateTime(2026, 1, 1),
-  updatedAt: DateTime(2026, 1, 1),
-);
+      id: 42,
+      name: 'Мушка',
+      tagId: 'A-0231',
+      breedId: 1,
+      sex: 'female',
+      birthDate: DateTime(2026, 1, 1),
+      status: status,
+      purpose: 'meat',
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
 
 /// Открыть список статусов. При правке блок «Дополнительно» раскрыт сам:
 /// свёрнутый поверх заполненных полей читался бы как «данные потерялись».

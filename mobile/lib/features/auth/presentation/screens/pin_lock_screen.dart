@@ -88,8 +88,8 @@ class _PinLockScreenState extends ConsumerState<PinLockScreen> {
                     color: context.colors.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.lock_outline,
-                      size: 32, color: context.accent),
+                  child:
+                      Icon(Icons.lock_outline, size: 32, color: context.accent),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(

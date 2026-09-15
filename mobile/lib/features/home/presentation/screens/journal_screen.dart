@@ -70,7 +70,10 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
   Widget _loaded(List<JournalEntry> entries) {
     final visible = _kind == null
         ? entries
-        : [for (final entry in entries) if (entry.kind == _kind) entry];
+        : [
+            for (final entry in entries)
+              if (entry.kind == _kind) entry
+          ];
 
     return RefreshIndicator(
       onRefresh: _refresh,

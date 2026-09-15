@@ -65,7 +65,7 @@ class MySupportRequestsState {
 
 class MySupportRequestsNotifier extends StateNotifier<MySupportRequestsState> {
   MySupportRequestsNotifier(this._repository)
-    : super(const MySupportRequestsState()) {
+      : super(const MySupportRequestsState()) {
     load();
   }
 
@@ -111,10 +111,7 @@ class MySupportRequestsNotifier extends StateNotifier<MySupportRequestsState> {
   }
 }
 
-final mySupportRequestsProvider =
-    StateNotifierProvider.autoDispose<
-      MySupportRequestsNotifier,
-      MySupportRequestsState
-    >((ref) {
-      return MySupportRequestsNotifier(ref.watch(supportRepositoryProvider));
-    });
+final mySupportRequestsProvider = StateNotifierProvider.autoDispose<
+    MySupportRequestsNotifier, MySupportRequestsState>((ref) {
+  return MySupportRequestsNotifier(ref.watch(supportRepositoryProvider));
+});

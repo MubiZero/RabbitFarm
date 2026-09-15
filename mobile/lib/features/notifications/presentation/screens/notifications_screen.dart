@@ -91,15 +91,15 @@ class _NotificationCard extends StatelessWidget {
 
   /// Значок по виду сообщения — тот же, которым это дело помечено в разделах.
   IconData get _icon => switch (notification.type) {
-    'vaccination_digest' => Icons.vaccines_outlined,
-    'feed_digest' => Icons.restaurant_outlined,
-    'task_digest' => Icons.check_circle_outline,
-    'kindling_soon' => Icons.favorite_outline,
-    'payment_receipt' => Icons.payments_outlined,
-    'support_answered' => Icons.support_agent_outlined,
-    'announcement' => Icons.campaign_outlined,
-    _ => Icons.notifications_none,
-  };
+        'vaccination_digest' => Icons.vaccines_outlined,
+        'feed_digest' => Icons.restaurant_outlined,
+        'task_digest' => Icons.check_circle_outline,
+        'kindling_soon' => Icons.favorite_outline,
+        'payment_receipt' => Icons.payments_outlined,
+        'support_answered' => Icons.support_agent_outlined,
+        'announcement' => Icons.campaign_outlined,
+        _ => Icons.notifications_none,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +107,8 @@ class _NotificationCard extends StatelessWidget {
     final colors = context.colors;
     // Непрочитанное выделяется цветом значка, а не фоном карточки: фон уже
     // занят разделением карточек между собой.
-    final accent = notification.isRead ? colors.onSurfaceVariant : colors.primary;
+    final accent =
+        notification.isRead ? colors.onSurfaceVariant : colors.primary;
 
     return AppCard(
       onTap: route == null ? null : () => context.push(route),

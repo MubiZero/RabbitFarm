@@ -46,22 +46,23 @@ AppNotification _notification({
   String body = 'Просрочено: 3',
   String? route = '/vaccinations',
   DateTime? readAt,
-}) => AppNotification(
-  id: id,
-  title: title,
-  body: body,
-  createdAt: DateTime(2026, 9, 14, 8),
-  route: route,
-  type: 'vaccination_digest',
-  readAt: readAt,
-);
+}) =>
+    AppNotification(
+      id: id,
+      title: title,
+      body: body,
+      createdAt: DateTime(2026, 9, 14, 8),
+      route: route,
+      type: 'vaccination_digest',
+      readAt: readAt,
+    );
 
 Widget _screen(_FakeNotificationsRepository repository) => testAppScreen(
-  const NotificationsScreen(),
-  overrides: [
-    notificationsRepositoryProvider.overrideWithValue(repository),
-  ],
-);
+      const NotificationsScreen(),
+      overrides: [
+        notificationsRepositoryProvider.overrideWithValue(repository),
+      ],
+    );
 
 void main() {
   testWidgets('показывает то, о чём сообщали, пока человек не смотрел', (
@@ -100,7 +101,8 @@ void main() {
     expect(repository.markCalls, 1);
   });
 
-  testWidgets('сбой отметки не показывает ошибку — сообщения просто останутся', (
+  testWidgets('сбой отметки не показывает ошибку — сообщения просто останутся',
+      (
     tester,
   ) async {
     // Красная плашка из-за того, что не удалось погасить счётчик, была бы

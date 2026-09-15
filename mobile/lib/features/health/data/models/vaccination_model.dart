@@ -55,10 +55,15 @@ abstract class Vaccination with _$Vaccination {
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') @DateOnlyConverter() required DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') @NullableDateOnlyConverter() DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    required DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') String? batchNumber,
     String? veterinarian,
+
     /// Сколько стоила прививка.
     ///
     /// Не просто число в карточке: на него сервер заводит расход фермы —
@@ -68,8 +73,12 @@ abstract class Vaccination with _$Vaccination {
     /// на ферме повторяется каждый сезон.
     @DoubleConverter() double? cost,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     // Related rabbit info (from API) - не сериализуем, создаем вручную
     /// Кролик, которого лечили или прививали.
     ///
@@ -168,7 +177,9 @@ abstract class UpcomingVaccinationItem with _$UpcomingVaccinationItem {
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'next_vaccination_date') @DateOnlyConverter() required DateTime nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
+    required DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') required int daysUntil,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   }) = _UpcomingVaccinationItem;

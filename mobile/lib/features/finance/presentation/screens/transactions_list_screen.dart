@@ -49,9 +49,8 @@ class _TransactionsListScreenState
           ),
           IconButton(
             tooltip: context.l10n.commonFilters,
-            icon: Icon(state.hasFilters
-                ? Icons.filter_list_alt
-                : Icons.filter_list),
+            icon: Icon(
+                state.hasFilters ? Icons.filter_list_alt : Icons.filter_list),
             onPressed: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,

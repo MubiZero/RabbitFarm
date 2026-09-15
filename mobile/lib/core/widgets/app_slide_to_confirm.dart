@@ -97,13 +97,14 @@ class _AppSlideToConfirmState extends State<AppSlideToConfirm> {
               Positioned(
                 left: _progress * travel,
                 child: GestureDetector(
-                  onHorizontalDragUpdate: (details) =>
-                      _update(travel, details.localPosition.dx + _progress * travel),
+                  onHorizontalDragUpdate: (details) => _update(
+                      travel, details.localPosition.dx + _progress * travel),
                   onHorizontalDragEnd: (_) => _release(),
                   child: Container(
                     width: knob,
                     height: knob,
-                    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                    decoration:
+                        BoxDecoration(color: color, shape: BoxShape.circle),
                     child: Icon(
                       _done ? Icons.check : Icons.arrow_forward,
                       color: colors.onError,
