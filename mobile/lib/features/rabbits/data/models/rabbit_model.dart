@@ -38,7 +38,6 @@ abstract class RabbitModel with _$RabbitModel {
     DateTime? deathDate,
     @JsonKey(name: 'death_reason') String? deathReason,
     @JsonKey(name: 'current_weight') double? currentWeight,
-    String? temperament,
     String? notes,
     @JsonKey(name: 'photo_url') String? photoUrl,
     @JsonKey(name: 'created_at')

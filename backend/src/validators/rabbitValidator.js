@@ -124,14 +124,6 @@ const createRabbitSchema = Joi.object({
       'number.max': 'Вес не может быть больше 20 кг'
     }),
 
-  temperament: Joi.string()
-    .max(100)
-    .optional()
-    .allow(null, '')
-    .messages({
-      'string.max': 'Характер должен быть максимум 100 символов'
-    }),
-
   notes: Joi.string()
     .optional()
     .allow(null, '')
@@ -218,11 +210,6 @@ const updateRabbitSchema = Joi.object({
     .max(20)
     .optional()
     .allow(null),
-
-  temperament: Joi.string()
-    .max(100)
-    .optional()
-    .allow(null, ''),
 
   notes: Joi.string()
     .optional()

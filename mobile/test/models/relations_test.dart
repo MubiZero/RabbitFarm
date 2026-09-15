@@ -148,7 +148,6 @@ Map<String, dynamic> _feedingListItem() => {
         'death_date': null,
         'death_reason': null,
         'current_weight': 3.4,
-        'temperament': null,
         'notes': null,
         'photo_url': null,
         'created_at': '2026-01-12T09:00:00.000Z',
