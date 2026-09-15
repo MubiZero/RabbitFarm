@@ -12,6 +12,11 @@ require('dotenv').config();
 const baseUrl = process.env.SMS_BASE_URL || 'https://gateway.payom.tj';
 const apiToken = process.env.SMS_API_TOKEN;
 const senderName = process.env.SMS_SENDER_NAME;
+// Подпись, которая подставляется в `{text-1}` шаблонов, — это не то же самое,
+// что имя отправителя: имя согласовано со шлюзом и стоит в заголовке SMS
+// (у нас AFK4.NET), а подпись живёт внутри текста и называет продукт. Держим
+// её в настройках, иначе смена названия требует выкладки кода.
+const senderLabel = process.env.SMS_SENDER_LABEL || 'RabbitFarm';
 const timeoutSeconds = Number(process.env.SMS_TIMEOUT_SECONDS) || 15;
 
 // Ломать require() из-за опечатки в JSON — тот же класс ошибки, что и
@@ -29,6 +34,7 @@ module.exports = {
   baseUrl,
   apiToken,
   senderName,
+  senderLabel,
   timeoutSeconds,
   templateIds,
   isConfigured: Boolean(apiToken && senderName)

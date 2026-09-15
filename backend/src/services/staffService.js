@@ -3,6 +3,9 @@ const { User, Farm, Invitation } = require('../models');
 const planService = require('./planService');
 const farmAuditService = require('./farmAuditService');
 const emailTransport = require('./notifications/emailTransport');
+const payomSmsTransport = require('./notifications/payomSmsTransport');
+const payomConfig = require('../config/payom');
+const appConfig = require('../config/app');
 const { notificationText, DEFAULT_LANGUAGE } = require('../i18n/notifications');
 const logger = require('../utils/logger');
 
@@ -142,21 +145,75 @@ class StaffService {
   /**
    * Отправить приглашение самому приглашённому.
    *
-   * На почту письмо уходит тем же транспортом, что и код входа. На телефон
-   * не уходит ничего: SMS-шлюз принимает только заранее одобренные шаблоны
-   * с фиксированным текстом (см. `payomSmsTransport`), а одобрен у нас один —
-   * «код подтверждения». Отправить им приглашение значило бы прислать
-   * человеку сообщение про код, которого ему никто не создавал. Поэтому
-   * приглашение по телефону владелец пересылает сам ссылкой, а приложение
-   * честно об этом говорит — вместо «ничего передавать не нужно», после
-   * которого работник ждал SMS, которой не было.
+   * На почту уходит письмо, на телефон — SMS по шаблону `staff.invitation`
+   * (с языковым суффиксом, если такой шаблон заведён: текст шаблона на
+   * стороне payom фиксирован, поэтому язык — это отдельный одобренный
+   * шаблон, а не плейсхолдер).
+   *
+   * Пока шаблон не заведён в `SMS_TEMPLATE_IDS`, транспорт откажет
+   * постоянной ошибкой, отправка вернёт `false` — и владелец увидит то же,
+   * что видел до появления шаблона: «перешлите приглашение сами». Поэтому
+   * включение SMS — это правка настроек, а не выкладка кода.
+   *
+   * Кода в этой SMS нет и быть не должно: у приглашения нет своего кода,
+   * человек входит обычным кодом на свой номер (`otpAuthService`), а
+   * приглашение активируется этим же входом.
    *
    * @returns {Boolean} ушло ли сообщение приглашённому.
    * @private
    */
   async deliverInvitation(invitation, author) {
-    if (!invitation.email) return false;
+    return invitation.email
+      ? this.deliverInvitationEmail(invitation, author)
+      : this.deliverInvitationSms(invitation, author);
+  }
 
+  /**
+   * SMS приглашённому: подпись продукта и адрес, по которому его ждут.
+   *
+   * Адрес `/i` — одна ссылка на все случаи: с установленным приложением её
+   * перехватывает приложение, без него открывается страница с магазинами и
+   * веб-версией (см. `config/app`).
+   *
+   * @private
+   */
+  async deliverInvitationSms(invitation, author) {
+    // Язык позвавшего — единственный, который мы знаем: язык приглашённого
+    // спросить не у кого, он ещё не в приложении.
+    const language = author.language || DEFAULT_LANGUAGE;
+    const templateKey = payomConfig.templateIds[`staff.invitation.${language}`]
+      ? `staff.invitation.${language}`
+      : 'staff.invitation';
+
+    // «Шаблон ещё не заведён» — это состояние настроек, а не сбой отправки:
+    // спрашивать о нём шлюз незачем, и предупреждение в логе на каждое
+    // приглашение только мешало бы видеть настоящие отказы.
+    if (!payomConfig.templateIds[templateKey]) return false;
+
+    try {
+      await payomSmsTransport.sendTemplateSms({
+        templateKey,
+        telephone: invitation.phone,
+        variables: {
+          'text-1': payomConfig.senderLabel,
+          'text-2': appConfig.inviteUrl
+        }
+      });
+      return true;
+    } catch (error) {
+      // Ненастроенный шаблон — это не сбой, а состояние «ещё не завели»:
+      // владельцу в таком случае показывают ссылку для пересылки руками.
+      logger.warn('Invitation SMS dispatch failed', {
+        invitationId: invitation.id,
+        permanent: Boolean(error.permanent),
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /** Письмо приглашённому. @private */
+  async deliverInvitationEmail(invitation, author) {
     try {
       const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['name'] });
       const { title, body } = notificationText(
@@ -165,7 +222,8 @@ class StaffService {
         {
           inviter: author.full_name,
           farm: farm ? farm.name : '',
-          contact: invitation.email
+          contact: invitation.email,
+          link: appConfig.inviteUrl
         }
       );
 

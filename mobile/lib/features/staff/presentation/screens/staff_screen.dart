@@ -557,19 +557,22 @@ class StaffScreen extends ConsumerWidget {
   /// Раньше здесь стояло «ничего передавать не нужно» — и это было неправдой
   /// для приглашения по телефону: SMS не уходила вовсе (шлюз принимает
   /// только заранее одобренные шаблоны), работник ничего не получал и ждал.
-  /// Теперь текст зависит от того, ушло ли сообщение, а ссылку владелец
-  /// пересылает сам — копированием, потому что переслать её нужно в тот
-  /// мессенджер, которым человек пользуется, а не обязательно SMS-кой.
+  /// Текст зависит от того, ушло ли сообщение работнику. Ушло — сказать об
+  /// этом и замолчать: ссылка под «мы уже позвали» только заставляет
+  /// гадать, нужно ли ещё что-то сделать. Не ушло — дать ссылку для
+  /// пересылки руками, в тот мессенджер, которым человек пользуется.
   Future<void> _showInvitedDialog(
     BuildContext context,
     CreatedInvitation invitation,
   ) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
-    final link = invitation.inviteLink;
+    final link = invitation.messageSent ? null : invitation.inviteLink;
 
     final body = invitation.phone != null
-        ? l10n.staffInvitedPhoneBody(formatTjPhone(invitation.phone!))
+        ? (invitation.messageSent
+            ? l10n.staffInvitedPhoneSentBody(formatTjPhone(invitation.phone!))
+            : l10n.staffInvitedPhoneBody(formatTjPhone(invitation.phone!)))
         : (invitation.messageSent
             ? l10n.staffInvitedEmailBody(invitation.contact)
             : l10n.staffInvitedEmailFailedBody(invitation.contact));

@@ -71,17 +71,17 @@ describe('StaffController', () => {
         full_name: 'Пётр',
         role: 'worker',
         expires_at: '2026-01-01',
-        invite_link: null,
+        invite_link: require('../../../src/config/app').inviteUrl,
         message_sent: true
       });
       // Диктовать работнику нечего: он войдёт кодом на свой же контакт.
       expect(payload.message).toContain('письмо работнику отправлено');
     });
 
-    // Приглашение по телефону SMS-кой не уходит: шлюз принимает только
-    // заранее одобренные шаблоны. Владельцу нужна ссылка и прямой текст, а
-    // не обещание, что «работнику придёт SMS».
-    it('на телефон отдаёт ссылку для пересылки и не обещает SMS', async () => {
+    // Пока у шлюза не заведён шаблон приглашения, SMS не уходит. Владельцу
+    // нужна ссылка и прямой текст, а не обещание, что «работнику придёт
+    // сообщение».
+    it('не ушедшее сообщение называет прямо и отдаёт ссылку', async () => {
       staffService.createInvitation.mockResolvedValue({
         invitation: {
           id: 2,
@@ -102,10 +102,12 @@ describe('StaffController', () => {
       );
 
       const payload = res.json.mock.calls[0][0];
-      expect(payload.data.invite_link)
-        .toBe('rabbitfarm://join?phone=%2B992901234567');
+      // Ссылка одна на всех и ничего личного не несёт: номер в ней больше
+      // не ездит, пересылать её можно любым способом.
+      expect(payload.data.invite_link).toBe(require('../../../src/config/app').inviteUrl);
+      expect(payload.data.invite_link).not.toContain('901234567');
       expect(payload.data.message_sent).toBe(false);
-      expect(payload.message).toContain('перешлите ему ссылку');
+      expect(payload.message).toContain('SMS работнику не ушла');
     });
 
     it('говорит прямо, когда письмо отправить не удалось', async () => {
@@ -141,7 +143,7 @@ describe('StaffController', () => {
 
       expect(staffService.resendInvitation).toHaveBeenCalledWith(1, req.user, '7');
       expect(res.json.mock.calls[0][0].data.invite_link)
-        .toBe('rabbitfarm://join?phone=%2B992901234567');
+        .toBe(require('../../../src/config/app').inviteUrl);
     });
 
     it('возвращает 404, если приглашения уже нет', async () => {

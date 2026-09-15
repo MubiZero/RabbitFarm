@@ -2965,7 +2965,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'Работнику на $phone SMS не уходит — перешлите ему приглашение сами. По ссылке он попадёт на вход с уже набранным номером, а код придёт ему в SMS.';
+    return 'SMS работнику на $phone не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.';
+  }
+
+  @override
+  String staffInvitedPhoneSentBody(String phone) {
+    return 'SMS с приглашением ушла на $phone. Работник войдёт по этому номеру — код придёт ему в SMS.';
   }
 
   @override
@@ -5072,7 +5077,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String staffInvitedEmailFailedBody(String email) {
-    return 'Письмо на $email отправить не удалось. Позовите работника по телефону — так приглашение точно дойдёт.';
+    return 'Письмо на $email отправить не удалось — перешлите работнику приглашение сами.';
   }
 
   @override
@@ -5087,7 +5092,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String staffInviteMessage(String link) {
-    return 'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку и войдите: $link';
+    return 'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: $link';
   }
 
   @override

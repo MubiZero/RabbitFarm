@@ -6,6 +6,7 @@ const logger = require('../utils/logger');
 const { generateOtp, hashOtp, otpMatches } = require('../utils/otp');
 const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 const payomSmsTransport = require('./notifications/payomSmsTransport');
+const payomConfig = require('../config/payom');
 const emailTransport = require('./notifications/emailTransport');
 
 const OTP_TTL_MINUTES = 10;
@@ -113,7 +114,7 @@ class OtpAuthService {
         await payomSmsTransport.sendTemplateSms({
           templateKey: 'user.verification_code',
           telephone: identifier,
-          variables: { 'text-1': 'RabbitFarm', 'code-1': code }
+          variables: { 'text-1': payomConfig.senderLabel, 'code-1': code }
         });
       } else {
         await emailTransport.sendLoginCodeEmail({ to: identifier, code });

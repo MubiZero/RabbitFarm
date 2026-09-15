@@ -2924,7 +2924,12 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'Ба рақами $phone SMS фиристода намешавад — даъватро худатон равон кунед. Пайванд саҳифаи даромадро бо рақами тайёр мекушояд, рамз бошад ба ӯ бо SMS меояд.';
+    return 'SMS ба $phone нарафт — даъватро худатон равон кунед. Бо пайванд ӯ барномаро насб мекунад ва бо рақами худ ворид мешавад, рамз бошад ба ӯ бо SMS меояд.';
+  }
+
+  @override
+  String staffInvitedPhoneSentBody(String phone) {
+    return 'SMS-и даъват ба $phone фиристода шуд. Корманд бо ҳамин рақам ворид мешавад — рамз ба ӯ бо SMS меояд.';
   }
 
   @override
@@ -4987,7 +4992,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String staffInvitedEmailFailedBody(String email) {
-    return 'Мактубро ба $email фиристодан муяссар нашуд. Кормандро бо телефон даъват кунед — ин тавр даъват ҳатман мерасад.';
+    return 'Мактубро ба $email фиристодан муяссар нашуд — даъватро худатон равон кунед.';
   }
 
   @override
@@ -5002,7 +5007,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String staffInviteMessage(String link) {
-    return 'Шуморо ба кор дар хоҷагии худ дар RabbitFarm даъват мекунам. Пайвандро кушоед ва ворид шавед: $link';
+    return 'Шуморо ба кор дар хоҷагии худ дар RabbitFarm даъват мекунам. Пайвандро кушоед, барномаро насб кунед ва бо рақами худ ворид шавед: $link';
   }
 
   @override

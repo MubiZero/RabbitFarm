@@ -5355,8 +5355,14 @@ abstract class AppLocalizations {
   /// No description provided for @staffInvitedPhoneBody.
   ///
   /// In ru, this message translates to:
-  /// **'Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он попадёт на вход с уже набранным номером, а код придёт ему в SMS.'**
+  /// **'SMS работнику на {phone} не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.'**
   String staffInvitedPhoneBody(String phone);
+
+  /// No description provided for @staffInvitedPhoneSentBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'SMS с приглашением ушла на {phone}. Работник войдёт по этому номеру — код придёт ему в SMS.'**
+  String staffInvitedPhoneSentBody(String phone);
 
   /// No description provided for @staffInvitedEmailBody.
   ///
@@ -8901,7 +8907,7 @@ abstract class AppLocalizations {
   /// No description provided for @staffInvitedEmailFailedBody.
   ///
   /// In ru, this message translates to:
-  /// **'Письмо на {email} отправить не удалось. Позовите работника по телефону — так приглашение точно дойдёт.'**
+  /// **'Письмо на {email} отправить не удалось — перешлите работнику приглашение сами.'**
   String staffInvitedEmailFailedBody(String email);
 
   /// No description provided for @staffInviteLinkLabel.
@@ -8925,7 +8931,7 @@ abstract class AppLocalizations {
   /// No description provided for @staffInviteMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку и войдите: {link}'**
+  /// **'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: {link}'**
   String staffInviteMessage(String link);
 
   /// No description provided for @staffExpiredInvites.

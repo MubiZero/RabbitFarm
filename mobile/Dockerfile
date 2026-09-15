@@ -45,6 +45,12 @@ FROM nginx:1.27-alpine AS runtime
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build/web /usr/share/nginx/html
+# Проверка ссылок доменом и адреса магазинов пишутся при старте из
+# окружения: Team ID и отпечаток ключа подписи меняются без пересборки, а
+# отпечаток Play App Signing вообще появляется только после первой загрузки
+# сборки в консоль. nginx выполняет всё из /docker-entrypoint.d/ сам.
+COPY nginx-app-links.sh /docker-entrypoint.d/40-links.sh
+RUN chmod +x /docker-entrypoint.d/40-links.sh
 
 EXPOSE 80
 

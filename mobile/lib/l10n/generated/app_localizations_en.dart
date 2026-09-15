@@ -2933,7 +2933,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'We cannot text $phone — forward the invitation yourself. The link opens the sign-in screen with the number already filled in, and the code arrives by SMS.';
+    return 'The text message to $phone did not go out — forward the invitation yourself. The link gets them the app, and they sign in with their own number; the code arrives by SMS.';
+  }
+
+  @override
+  String staffInvitedPhoneSentBody(String phone) {
+    return 'An invitation text was sent to $phone. They sign in with that number and the code arrives by SMS.';
   }
 
   @override
@@ -5011,7 +5016,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String staffInvitedEmailFailedBody(String email) {
-    return 'We could not send the email to $email. Invite your worker by phone instead — that way the invitation reaches them.';
+    return 'We could not send the email to $email — forward the invitation yourself.';
   }
 
   @override
@@ -5026,7 +5031,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String staffInviteMessage(String link) {
-    return 'I am inviting you to work at my farm in RabbitFarm. Open the link and sign in: $link';
+    return 'I am inviting you to work at my farm in RabbitFarm. Open the link, install the app and sign in with your own number: $link';
   }
 
   @override

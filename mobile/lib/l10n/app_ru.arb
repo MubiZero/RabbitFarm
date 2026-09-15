@@ -1190,8 +1190,12 @@
   "staffRole": "Роль",
   "staffIssueCode": "Пригласить работника",
   "staffInvitedTitle": "Работник приглашён",
-  "staffInvitedPhoneBody": "Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он попадёт на вход с уже набранным номером, а код придёт ему в SMS.",
+  "staffInvitedPhoneBody": "SMS работнику на {phone} не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.",
   "@staffInvitedPhoneBody": {
+    "placeholders": { "phone": { "type": "String" } }
+  },
+  "staffInvitedPhoneSentBody": "SMS с приглашением ушла на {phone}. Работник войдёт по этому номеру — код придёт ему в SMS.",
+  "@staffInvitedPhoneSentBody": {
     "placeholders": { "phone": { "type": "String" } }
   },
   "staffInvitedEmailBody": "Письмо с приглашением ушло на {email}. Работник войдёт по этому адресу — код придёт ему письмом.",
@@ -2079,12 +2083,12 @@
   "feedsPaidLabel": "Сколько заплатили",
   "feedsPaidHint": "Если это закупка — сумма попадёт в расходы. Пересчитали остаток — оставьте пустым.",
 
-  "staffInvitedEmailFailedBody": "Письмо на {email} отправить не удалось. Позовите работника по телефону — так приглашение точно дойдёт.",
+  "staffInvitedEmailFailedBody": "Письмо на {email} отправить не удалось — перешлите работнику приглашение сами.",
   "@staffInvitedEmailFailedBody": {"placeholders": {"email": {"type": "String"}}},
   "staffInviteLinkLabel": "Ссылка-приглашение",
   "staffInviteCopy": "Скопировать приглашение",
   "staffInviteCopied": "Приглашение скопировано — вставьте его в сообщение работнику",
-  "staffInviteMessage": "Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку и войдите: {link}",
+  "staffInviteMessage": "Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: {link}",
   "@staffInviteMessage": {"placeholders": {"link": {"type": "String"}}},
   "staffExpiredInvites": "Срок вышел",
   "staffInviteCardLive": "{role} · до {date}",

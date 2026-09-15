@@ -85,6 +85,10 @@ services:
       # Браузерное приложение ходит с другого домена — разрешаем именно его,
       # а не «*»: со звёздочкой куки и авторизация работают небезопасно.
       - CORS_ORIGIN=${SERVICE_URL_WEB}
+      # Адрес, который уходит людям наружу: ссылка в письме и SMS-приглашении
+      # (`<адрес>/i`). Он же вшит в одобренный шаблон payom, поэтому меняться
+      # не должен — см. docs/DEPLOY.md.
+      - APP_PUBLIC_URL=${SERVICE_URL_WEB}
       - MAX_FILE_SIZE=${MAX_FILE_SIZE:-5242880}
       - ALLOWED_FILE_TYPES=${ALLOWED_FILE_TYPES:-image/jpeg,image/png,image/jpg,image/webp}
       - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
@@ -149,6 +153,15 @@ services:
     restart: unless-stopped
     environment:
       - SERVICE_FQDN_WEB_80=/
+      # Проверка ссылок доменом и кнопки магазинов на странице /i. Пустые
+      # значения — рабочее состояние: ссылка тогда открывает страницу с
+      # кнопкой «открыть в браузере», а не обещает приложение, которого
+      # ещё нет. Отпечаток — от ключа Play App Signing, он появляется в
+      # консоли после первой загрузки сборки (см. docs/DEPLOY.md).
+      - APPLE_TEAM_ID=${APPLE_TEAM_ID:-}
+      - ANDROID_CERT_SHA256=${ANDROID_CERT_SHA256:-}
+      - APP_STORE_URL=${APP_STORE_URL:-}
+      - PLAY_STORE_URL=${PLAY_STORE_URL:-}
     # Зависимости от api намеренно нет: статика должна подниматься и когда
     # бэкенд лежит — приложение в этом случае показывает состояние ошибки
     # с кнопкой «Повторить», а не белый экран от недоступного контейнера.

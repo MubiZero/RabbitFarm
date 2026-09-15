@@ -34,10 +34,26 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Ссылка-приглашение из SMS: rabbitfarm://join?phone=+992…
-                 Открывает вход с подставленным номером (см.
-                 lib/core/router/deep_links.dart). Своя схема, а не App Links:
-                 для последних нужен домен с /.well-known. -->
+            <!-- Ссылка-приглашение: https://rabbitfarm.mubi.dev/i — тот же
+                 адрес уходит в SMS и в письме. autoVerify означает, что
+                 Android при установке сходит на домен за
+                 /.well-known/assetlinks.json и, найдя там отпечаток нашей
+                 подписи, будет открывать ссылку приложением без вопросов.
+                 Отпечаток — от ключа Play App Signing, то есть появляется
+                 после первой загрузки сборки в консоль; пока его нет,
+                 ссылка просто открывается браузером и человек попадает на
+                 страницу с магазинами. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="rabbitfarm.mubi.dev"
+                      android:path="/i"/>
+            </intent-filter>
+            <!-- Своя схема: QR-метки на клетках и приглашения, выданные до
+                 перехода на https (см. lib/core/router/deep_links.dart).
+                 Работает без домена и без проверки. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

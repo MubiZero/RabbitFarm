@@ -2941,7 +2941,12 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return '$phone raqamiga SMS yuborilmaydi — taklifni oʻzingiz yuboring. Havola kirish sahifasini raqam yozilgan holda ochadi, kod esa unga SMS orqali keladi.';
+    return '$phone raqamiga SMS yuborilmadi — taklifni oʻzingiz yuboring. Havola orqali u ilovani oʻrnatadi va oʻz raqami bilan kiradi, kod esa unga SMS orqali keladi.';
+  }
+
+  @override
+  String staffInvitedPhoneSentBody(String phone) {
+    return 'Taklif SMSi $phone raqamiga yuborildi. Ishchi shu raqam bilan kiradi — kod unga SMS orqali keladi.';
   }
 
   @override
@@ -5023,7 +5028,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String staffInvitedEmailFailedBody(String email) {
-    return '$email manziliga xat yuborib boʻlmadi. Ishchini telefon orqali taklif qiling — shunda taklif albatta yetib boradi.';
+    return '$email manziliga xat yuborib boʻlmadi — taklifni oʻzingiz yuboring.';
   }
 
   @override
@@ -5038,7 +5043,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String staffInviteMessage(String link) {
-    return 'Sizni RabbitFarmdagi xoʻjaligimda ishlashga taklif qilaman. Havolani oching va kiring: $link';
+    return 'Sizni RabbitFarmdagi xoʻjaligimda ishlashga taklif qilaman. Havolani oching, ilovani oʻrnating va oʻz raqamingiz bilan kiring: $link';
   }
 
   @override

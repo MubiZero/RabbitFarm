@@ -31,14 +31,16 @@ class _LimitedStaffRepository extends StaffRepository {
   }
 }
 
-const _inviteLink = 'rabbitfarm://join?phone=%2B992901234567';
+const _inviteLink = 'https://rabbitfarm.mubi.dev/i';
 
-/// Приглашение по телефону, которое сервер создал, но отправить не смог:
-/// SMS-шлюз принимает только заранее одобренные шаблоны.
+/// Приглашение по телефону. `messageSent` — ушла ли работнику SMS: она не
+/// уходит, пока у шлюза не заведён шаблон приглашения, и от этого зависит
+/// весь разговор с владельцем.
 class _InvitingStaffRepository extends StaffRepository {
-  _InvitingStaffRepository()
+  _InvitingStaffRepository({this.messageSent = false})
       : super(ApiClient(storage: const FlutterSecureStorage()));
 
+  final bool messageSent;
   int resentId = 0;
 
   CreatedInvitation _invitation() => CreatedInvitation(
@@ -48,6 +50,7 @@ class _InvitingStaffRepository extends StaffRepository {
         role: FarmRole.worker,
         expiresAt: DateTime.now().add(const Duration(days: 7)),
         inviteLink: _inviteLink,
+        messageSent: messageSent,
       );
 
   @override
@@ -339,9 +342,9 @@ void main() {
     expect(find.text('Укажите имя работника'), findsOneWidget);
   });
 
-  // Раньше диалог обещал, что работнику придёт SMS и передавать ничего не
-  // нужно. SMS не уходила вовсе: шлюз принимает только заранее одобренные
-  // шаблоны. Владелец должен увидеть ссылку и получить способ её переслать.
+  // Пока у шлюза не заведён шаблон приглашения, SMS не уходит — и владелец
+  // должен увидеть ссылку и получить способ её переслать, а не обещание
+  // «работнику придёт сообщение».
   testWidgets(
       'после приглашения по телефону владелец видит ссылку и может её переслать',
       (tester) async {
@@ -373,8 +376,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Никаких «ничего передавать не нужно»: текст прямо говорит, что SMS не
-    // уходит, и показывает ссылку целиком.
-    expect(find.textContaining('SMS не уходит'), findsOneWidget);
+    // ушла, и показывает ссылку целиком.
+    expect(find.textContaining('не ушла'), findsOneWidget);
     expect(find.text(_inviteLink), findsOneWidget);
 
     await tester.tap(find.text('Скопировать приглашение'));
@@ -387,5 +390,28 @@ void main() {
     // Диалог закрыт, подтверждение видно поверх экрана, а не под затемнением.
     expect(find.text('Работник приглашён'), findsNothing);
     expect(find.textContaining('Приглашение скопировано'), findsOneWidget);
+  });
+
+  // Обратный случай: шаблон у шлюза заведён, SMS ушла. Ссылка под «мы уже
+  // позвали» заставляла бы владельца гадать, нужно ли ещё что-то сделать.
+  testWidgets('когда SMS ушла, владельцу нечего пересылать', (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+      staffRepositoryProvider
+          .overrideWithValue(_InvitingStaffRepository(messageSent: true)),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).at(0), '+992901234567');
+    await tester.enterText(find.byType(TextField).at(1), 'Новый Работник');
+    await tester.tap(find.text('Пригласить работника'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('ушла на'), findsOneWidget);
+    expect(find.text(_inviteLink), findsNothing);
+    expect(find.text('Скопировать приглашение'), findsNothing);
   });
 }

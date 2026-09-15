@@ -7,3 +7,7 @@
 cages_resp.json
 .env
 .DS_Store
+
+# Адреса магазинов для страницы приглашения пишет docker-entrypoint.d/40-links.sh
+# при старте контейнера — в репозитории этого файла быть не должно.
+mobile/web/i/config.json

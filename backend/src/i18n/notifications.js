@@ -261,23 +261,23 @@ const MESSAGES = {
   staffInvitation: {
     ru: {
       title: 'Приглашение на ферму',
-      body: ({ inviter, farm, contact }) =>
-        `${inviter} зовёт вас работать в хозяйстве «${farm}» в приложении RabbitFarm. Откройте приложение, на экране входа введите ${contact} — код для входа придёт сюда же. Приглашение действует неделю.`
+      body: ({ inviter, farm, contact, link }) =>
+        `${inviter} зовёт вас работать в хозяйстве «${farm}» в приложении RabbitFarm. Приложение здесь: ${link} — на экране входа введите ${contact}, код для входа придёт сюда же. Приглашение действует неделю.`
     },
     en: {
       title: 'An invitation to a farm',
-      body: ({ inviter, farm, contact }) =>
-        `${inviter} invites you to work at the "${farm}" farm in RabbitFarm. Open the app, enter ${contact} on the sign-in screen, and the login code will arrive here. The invitation is valid for a week.`
+      body: ({ inviter, farm, contact, link }) =>
+        `${inviter} invites you to work at the "${farm}" farm in RabbitFarm. Get the app here: ${link} — enter ${contact} on the sign-in screen, and the login code will arrive here. The invitation is valid for a week.`
     },
     tg: {
       title: 'Даъват ба хоҷагӣ',
-      body: ({ inviter, farm, contact }) =>
-        `${inviter} шуморо ба кор дар хоҷагии «${farm}» дар барномаи RabbitFarm даъват мекунад. Барномаро кушоед, дар саҳифаи даромад ${contact}-ро ворид кунед — рамзи даромад ба ҳамин ҷо меояд. Даъват як ҳафта эътибор дорад.`
+      body: ({ inviter, farm, contact, link }) =>
+        `${inviter} шуморо ба кор дар хоҷагии «${farm}» дар барномаи RabbitFarm даъват мекунад. Барнома дар ин ҷо: ${link} — дар саҳифаи даромад ${contact}-ро ворид кунед, рамзи даромад ба ҳамин ҷо меояд. Даъват як ҳафта эътибор дорад.`
     },
     uz: {
       title: 'Xoʻjalikka taklif',
-      body: ({ inviter, farm, contact }) =>
-        `${inviter} sizni RabbitFarm ilovasidagi «${farm}» xoʻjaligida ishlashga taklif qilmoqda. Ilovani oching, kirish sahifasida ${contact} ni kiriting — kirish kodi shu yerga keladi. Taklif bir hafta amal qiladi.`
+      body: ({ inviter, farm, contact, link }) =>
+        `${inviter} sizni RabbitFarm ilovasidagi «${farm}» xoʻjaligida ishlashga taklif qilmoqda. Ilova shu yerda: ${link} — kirish sahifasida ${contact} ni kiriting, kirish kodi shu yerga keladi. Taklif bir hafta amal qiladi.`
     }
   },
 
