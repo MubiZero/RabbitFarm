@@ -28,6 +28,7 @@ class GalleryNotifier extends StateNotifier<AsyncValue<void>> {
     String filePath, {
     Uint8List? bytes,
     String? caption,
+    DateTime? takenAt,
   }) async {
     state = const AsyncLoading();
 
@@ -38,6 +39,7 @@ class GalleryNotifier extends StateNotifier<AsyncValue<void>> {
         filePath,
         bytes: bytes,
         caption: caption,
+        takenAt: takenAt,
       );
       _ref.invalidate(galleryProvider(rabbitId));
     });

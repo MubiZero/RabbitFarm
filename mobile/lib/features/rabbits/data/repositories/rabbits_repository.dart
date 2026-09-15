@@ -322,6 +322,7 @@ class RabbitsRepository {
     String filePath, {
     Uint8List? bytes,
     String? caption,
+    DateTime? takenAt,
   }) async {
     try {
       final response = await _apiClient.uploadGalleryPhoto(
@@ -329,6 +330,7 @@ class RabbitsRepository {
         filePath,
         bytes: bytes,
         caption: caption,
+        takenAt: takenAt,
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
