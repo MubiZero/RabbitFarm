@@ -158,17 +158,6 @@ class BreedingService {
 
             await transaction.commit();
 
-            // Прощупали — значит задача «прощупать» сделана, чем бы ни
-            // кончилось. Без этого она оставалась просроченной навсегда и
-            // каждое утро уходила пушем.
-            if (data.is_pregnant !== undefined || data.palpation_date) {
-              await closeAutoTasks({
-                farmId,
-                rabbitId: breeding.female_id,
-                keys: ['palpation']
-              });
-            }
-
             // Fetch with associations
             const createdBreeding = await this.getBreedingById(breeding.id, data.farm_id);
 
@@ -389,6 +378,22 @@ class BreedingService {
             }
 
             await transaction.commit();
+
+            // Прощупали — значит задача «прощупать» сделана, чем бы ни
+            // кончилось. Без этого она оставалась просроченной навсегда и
+            // каждое утро уходила пушем.
+            //
+            // Раньше это стояло в создании случки, где прощупывания не
+            // бывает: валидатор создания таких полей не принимает вовсе,
+            // и ветка не выполнялась ни разу. Отметить прощупывание можно
+            // только здесь.
+            if (data.is_pregnant !== undefined || data.palpation_date) {
+              await closeAutoTasks({
+                farmId,
+                rabbitId: breeding.female_id,
+                keys: ['palpation']
+              });
+            }
 
             const updated = await this.getBreedingById(id, farmId);
             logger.info('Breeding updated', { breedingId: id });

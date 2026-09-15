@@ -105,6 +105,61 @@ describe('Автозадачи закрываются самим делом', ()
     expect(await openTaskKeys(femaleId)).toHaveLength(0);
   });
 
+  it('отметка прощупывания закрывает задачу «прощупать»', async () => {
+    // Прощупывание записывают правкой случки — другого пути нет: валидатор
+    // создания таких полей не принимает. Закрытие задачи стояло как раз в
+    // создании и не выполнялось ни разу, так что «прощупать» висела
+    // просроченной до самого окрола и каждое утро уходила пушем.
+    const female = await request(app)
+      .post('/api/v1/rabbits')
+      .set(auth())
+      .send({ name: 'Ласка', breed_id: breedId, sex: 'female', birth_date: '2025-03-01' });
+    const palpatedId = female.body.data.id;
+
+    const breeding = await request(app)
+      .post('/api/v1/breeding')
+      .set(auth())
+      .send({ male_id: maleId, female_id: palpatedId, breeding_date: '2026-08-01' })
+      .expect(201);
+
+    expect(await openTaskKeys(palpatedId)).toContain('palpation');
+
+    await request(app)
+      .put(`/api/v1/breeding/${breeding.body.data.id}`)
+      .set(auth())
+      .send({ palpation_date: '2026-08-15', is_pregnant: true })
+      .expect(200);
+
+    const open = await openTaskKeys(palpatedId);
+    expect(open).not.toContain('palpation');
+    // Остальной цикл на месте: прощупали — значит дальше маточник и окрол.
+    expect(open).toEqual(expect.arrayContaining(['nestBox', 'expectedKindling']));
+  });
+
+  it('пустая прощупыванию правка задачу не трогает', async () => {
+    // Закрывает дело, а не сам факт правки: переписали заметку — задача
+    // «прощупать» осталась, её ещё не сделали.
+    const female = await request(app)
+      .post('/api/v1/rabbits')
+      .set(auth())
+      .send({ name: 'Юла', breed_id: breedId, sex: 'female', birth_date: '2025-04-01' });
+    const rabbitId = female.body.data.id;
+
+    const breeding = await request(app)
+      .post('/api/v1/breeding')
+      .set(auth())
+      .send({ male_id: maleId, female_id: rabbitId, breeding_date: '2026-08-02' })
+      .expect(201);
+
+    await request(app)
+      .put(`/api/v1/breeding/${breeding.body.data.id}`)
+      .set(auth())
+      .send({ notes: 'самка вела себя беспокойно' })
+      .expect(200);
+
+    expect(await openTaskKeys(rabbitId)).toContain('palpation');
+  });
+
   it('задачу, заведённую человеком, событие не снимает', async () => {
     const survivor = await request(app)
       .post('/api/v1/rabbits')
