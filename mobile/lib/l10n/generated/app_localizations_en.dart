@@ -2963,12 +2963,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'The text message to $phone did not go out — forward the invitation yourself. The link gets them the app, and they sign in with their own number; the code arrives by SMS.';
-  }
-
-  @override
-  String staffInvitedPhoneSentBody(String phone) {
-    return 'An invitation text was sent to $phone. They sign in with that number and the code arrives by SMS.';
+    return 'We do not text $phone — forward the invitation yourself. The link gets them the app, and they sign in with their own number; the code arrives by SMS.';
   }
 
   @override

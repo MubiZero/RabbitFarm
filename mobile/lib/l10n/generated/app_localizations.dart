@@ -5415,14 +5415,8 @@ abstract class AppLocalizations {
   /// No description provided for @staffInvitedPhoneBody.
   ///
   /// In ru, this message translates to:
-  /// **'SMS работнику на {phone} не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.'**
+  /// **'Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.'**
   String staffInvitedPhoneBody(String phone);
-
-  /// No description provided for @staffInvitedPhoneSentBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'SMS с приглашением ушла на {phone}. Работник войдёт по этому номеру — код придёт ему в SMS.'**
-  String staffInvitedPhoneSentBody(String phone);
 
   /// No description provided for @staffInvitedEmailBody.
   ///

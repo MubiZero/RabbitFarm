@@ -2971,12 +2971,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return '$phone raqamiga SMS yuborilmadi — taklifni oʻzingiz yuboring. Havola orqali u ilovani oʻrnatadi va oʻz raqami bilan kiradi, kod esa unga SMS orqali keladi.';
-  }
-
-  @override
-  String staffInvitedPhoneSentBody(String phone) {
-    return 'Taklif SMSi $phone raqamiga yuborildi. Ishchi shu raqam bilan kiradi — kod unga SMS orqali keladi.';
+    return '$phone raqamiga SMS yuborilmaydi — taklifni oʻzingiz yuboring. Havola orqali u ilovani oʻrnatadi va oʻz raqami bilan kiradi, kod esa unga SMS orqali keladi.';
   }
 
   @override

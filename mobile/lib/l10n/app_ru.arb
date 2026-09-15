@@ -1200,12 +1200,8 @@
   "staffRole": "Роль",
   "staffIssueCode": "Пригласить работника",
   "staffInvitedTitle": "Работник приглашён",
-  "staffInvitedPhoneBody": "SMS работнику на {phone} не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.",
+  "staffInvitedPhoneBody": "Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.",
   "@staffInvitedPhoneBody": {
-    "placeholders": { "phone": { "type": "String" } }
-  },
-  "staffInvitedPhoneSentBody": "SMS с приглашением ушла на {phone}. Работник войдёт по этому номеру — код придёт ему в SMS.",
-  "@staffInvitedPhoneSentBody": {
     "placeholders": { "phone": { "type": "String" } }
   },
   "staffInvitedEmailBody": "Письмо с приглашением ушло на {email}. Работник войдёт по этому адресу — код придёт ему письмом.",

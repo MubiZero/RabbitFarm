@@ -2995,12 +2995,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'SMS работнику на $phone не ушла — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.';
-  }
-
-  @override
-  String staffInvitedPhoneSentBody(String phone) {
-    return 'SMS с приглашением ушла на $phone. Работник войдёт по этому номеру — код придёт ему в SMS.';
+    return 'Работнику на $phone SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.';
   }
 
   @override

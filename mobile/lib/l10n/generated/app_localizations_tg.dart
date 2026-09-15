@@ -2954,12 +2954,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'SMS ба $phone нарафт — даъватро худатон равон кунед. Бо пайванд ӯ барномаро насб мекунад ва бо рақами худ ворид мешавад, рамз бошад ба ӯ бо SMS меояд.';
-  }
-
-  @override
-  String staffInvitedPhoneSentBody(String phone) {
-    return 'SMS-и даъват ба $phone фиристода шуд. Корманд бо ҳамин рақам ворид мешавад — рамз ба ӯ бо SMS меояд.';
+    return 'Ба рақами $phone SMS фиристода намешавад — даъватро худатон равон кунед. Бо пайванд ӯ барномаро насб мекунад ва бо рақами худ ворид мешавад, рамз бошад ба ӯ бо SMS меояд.';
   }
 
   @override

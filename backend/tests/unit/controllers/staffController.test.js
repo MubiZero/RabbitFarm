@@ -78,10 +78,10 @@ describe('StaffController', () => {
       expect(payload.message).toContain('письмо работнику отправлено');
     });
 
-    // Пока у шлюза не заведён шаблон приглашения, SMS не уходит. Владельцу
-    // нужна ссылка и прямой текст, а не обещание, что «работнику придёт
-    // сообщение».
-    it('не ушедшее сообщение называет прямо и отдаёт ссылку', async () => {
+    // Приглашение по телефону SMS-кой не уходит: шлюз принимает только
+    // заранее одобренные шаблоны. Владельцу нужна ссылка и прямой текст, а
+    // не обещание, что «работнику придёт SMS».
+    it('на телефон отдаёт ссылку для пересылки и не обещает SMS', async () => {
       staffService.createInvitation.mockResolvedValue({
         invitation: {
           id: 2,
@@ -107,7 +107,7 @@ describe('StaffController', () => {
       expect(payload.data.invite_link).toBe(require('../../../src/config/app').inviteUrl);
       expect(payload.data.invite_link).not.toContain('901234567');
       expect(payload.data.message_sent).toBe(false);
-      expect(payload.message).toContain('SMS работнику не ушла');
+      expect(payload.message).toContain('SMS работнику не уходит');
     });
 
     it('говорит прямо, когда письмо отправить не удалось', async () => {
