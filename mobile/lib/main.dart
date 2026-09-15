@@ -23,6 +23,7 @@ import 'core/router/deep_links.dart';
 import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
 import 'core/widgets/offline_queue_gate.dart';
+import 'features/auth/presentation/providers/language_sync.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/pin_gate.dart';
 import 'features/auth/presentation/widgets/impersonation_banner.dart';
@@ -138,6 +139,10 @@ class MyApp extends ConsumerWidget {
     final lightTheme = ref.watch(lightThemeProvider);
     final router = ref.watch(routerProvider);
     final upgradeRequired = ref.watch(upgradeRequiredProvider);
+    // Держит язык уведомлений на сервере в согласии с языком приложения.
+    // Провайдер нужен живым всё время работы приложения, а не пока на него
+    // смотрит какой-то экран, — поэтому его сторожит корень.
+    ref.watch(languageSyncProvider);
     // Пока `SharedPreferences` ещё не прочитан — русский, тот же выбор, что
     // и в самом провайдере до его первого разрешения.
     final locale = ref.watch(localeProvider).value ?? const Locale('ru');

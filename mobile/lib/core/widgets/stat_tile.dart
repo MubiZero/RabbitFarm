@@ -67,11 +67,17 @@ class StatTile extends StatelessWidget {
   }
 }
 
-/// Ряд из нескольких [StatTile], поровну делящих ширину.
+/// Ряд из нескольких [StatTile] — одинаковой ширины и одинаковой высоты.
 ///
 /// `Row([Expanded(StatTile), SizedBox(width: AppSpacing.md), ...])` был
 /// вручную повторён на доброй половине экранов со статистикой — вынесен
 /// сюда, чтобы новые экраны не писали его в восьмой раз.
+///
+/// Высота выравнивается намеренно. Подписи у плиток разной длины: «Поголовье»
+/// встаёт в строку, «Задачи в работе» переносится на вторую, — и карточки
+/// получались разного роста. В рукописных рядах было ещё хуже: `Row` по
+/// умолчанию центрирует детей, и плитки вдобавок разъезжались по вертикали,
+/// будто их расставили наугад.
 class StatTileRow extends StatelessWidget {
   final List<Widget> tiles;
 
@@ -79,14 +85,21 @@ class StatTileRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var i = 0; i < tiles.length; i++) ...[
-          if (i > 0) const SizedBox(width: AppSpacing.md),
-          Expanded(child: tiles[i]),
+    // IntrinsicHeight, а не просто `stretch`: внутри прокручиваемого списка
+    // высота ряду не задана сверху, и растягивать детей было бы не на что —
+    // Flutter упал бы на бесконечной высоте. Обёртка сначала измеряет самую
+    // высокую плитку и только потом равняет по ней остальные. Для двух-трёх
+    // плиток лишний проход разметки незаметен.
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < tiles.length; i++) ...[
+            if (i > 0) const SizedBox(width: AppSpacing.md),
+            Expanded(child: tiles[i]),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

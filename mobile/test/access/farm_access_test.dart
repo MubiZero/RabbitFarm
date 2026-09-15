@@ -14,20 +14,29 @@ void main() {
       expect(worker.can(FarmCapability.manageLivestock), isFalse);
       expect(worker.can(FarmCapability.manageStock), isFalse);
       expect(worker.can(FarmCapability.manageFinance), isFalse);
+      expect(worker.can(FarmCapability.viewStaff), isFalse);
       expect(worker.can(FarmCapability.manageStaff), isFalse);
       expect(worker.can(FarmCapability.deleteRecords), isFalse);
     });
 
-    test('управляющий ведёт хозяйство, но не трогает сотрудников и удаление',
-        () {
+    test('управляющий ведёт хозяйство, но не меняет состав и не удаляет', () {
       const manager = FarmRoleAccess.manager;
 
       expect(manager.can(FarmCapability.recordDailyWork), isTrue);
       expect(manager.can(FarmCapability.manageLivestock), isTrue);
       expect(manager.can(FarmCapability.manageStock), isTrue);
       expect(manager.can(FarmCapability.manageFinance), isTrue);
-      expect(manager.can(FarmCapability.manageStaff), isFalse);
       expect(manager.can(FarmCapability.deleteRecords), isFalse);
+    });
+
+    // Сервер отдаёт управляющему список работников и журнал кадровых действий,
+    // но менять состав разрешает только владельцу. Одно право на оба случая
+    // запирало управляющего от того, что ему по правилам видно.
+    test('управляющий видит состав фермы, но не меняет его', () {
+      const manager = FarmRoleAccess.manager;
+
+      expect(manager.can(FarmCapability.viewStaff), isTrue);
+      expect(manager.can(FarmCapability.manageStaff), isFalse);
     });
 
     test('владельцу доступно всё', () {

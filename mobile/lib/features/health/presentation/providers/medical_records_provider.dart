@@ -65,6 +65,17 @@ class MedicalRecordsNotifier extends StateNotifier<AsyncValue<List<MedicalRecord
     });
   }
 
+  /// Убрать запись из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `refresh()`.
+  void removeMedicalRecord(int id) {
+    state.whenData((records) {
+      state = AsyncValue.data(records.where((r) => r.id != id).toList());
+    });
+  }
+
   /// Delete medical record
   Future<void> deleteMedicalRecord(int id) async {
     await _repository.deleteMedicalRecord(id);

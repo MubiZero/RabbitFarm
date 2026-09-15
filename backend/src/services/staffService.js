@@ -2,9 +2,18 @@ const { Op } = require('sequelize');
 const { User, Farm, Invitation } = require('../models');
 const planService = require('./planService');
 const farmAuditService = require('./farmAuditService');
+const emailTransport = require('./notifications/emailTransport');
+const { notificationText, DEFAULT_LANGUAGE } = require('../i18n/notifications');
 const logger = require('../utils/logger');
 
 const INVITE_TTL_DAYS = 7;
+
+/** Срок приглашения считается от «сейчас», а не от прежнего срока. */
+function invitationExpiry() {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + INVITE_TTL_DAYS);
+  return expiresAt;
+}
 
 /**
  * Работники фермы и приглашения.
@@ -36,7 +45,7 @@ class StaffService {
   }
 
   /**
-   * Создать приглашение — на email или на телефон.
+   * Создать приглашение — на email или на телефон — и позвать человека.
    *
    * Валидатор пропускает ровно одно из двух и приводит номер к виду
    * `+992XXXXXXXXX`, который принимает шлюз (см. `utils/phone.js`).
@@ -46,9 +55,12 @@ class StaffService {
    * здесь выписывался отдельный длинный токен, который показывался владельцу
    * и уходил SMS-кой, — вводить его стало некуда, и он только путал.
    *
-   * @returns {Object} приглашение.
+   * @param {Object} author - позвавший: его имя стоит в письме, а язык
+   *   выбирает, на каком языке письмо написано.
+   * @returns {Object} `{ invitation, messageSent }` — ушло ли сообщение
+   *   самому приглашённому, решает, что покажет владельцу приложение.
    */
-  async createInvitation(farmId, authorId, { email, phone, role, full_name: fullName }) {
+  async createInvitation(farmId, author, { email, phone, role, full_name: fullName }) {
     await planService.assertStaffLimit(farmId);
 
     const normalizedEmail = email ? email.trim().toLowerCase() : null;
@@ -76,30 +88,114 @@ class StaffService {
         : { farm_id: farmId, phone: normalizedPhone, accepted_at: null }
     });
 
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + INVITE_TTL_DAYS);
-
     const invitation = await Invitation.create({
       farm_id: farmId,
       email: normalizedEmail,
       phone: normalizedPhone,
       role,
       full_name: fullName ? fullName.trim() : null,
-      expires_at: expiresAt,
-      created_by: authorId
+      expires_at: invitationExpiry(),
+      created_by: author.id
     });
+
+    const messageSent = await this.deliverInvitation(invitation, author);
 
     logger.info('Invitation created', {
       invitationId: invitation.id,
       farmId,
       role,
-      channel: normalizedPhone ? 'phone' : 'email'
+      channel: normalizedPhone ? 'phone' : 'email',
+      messageSent
     });
 
-    return { invitation };
+    return { invitation, messageSent };
   }
 
-  /** Действующие приглашения фермы. */
+  /**
+   * Позвать того же человека ещё раз: продлить срок и повторить отправку.
+   *
+   * Второй записи не заводим — контакт, роль и имя те же, а два приглашения
+   * на один контакт только путают список (`createInvitation` старое всё
+   * равно сносит). Просроченное приглашение продлевается этим же путём:
+   * срок считается от «сейчас», иначе продление уводило бы в прошлое.
+   */
+  async resendInvitation(farmId, author, invitationId) {
+    const invitation = await Invitation.findOne({
+      where: { id: invitationId, farm_id: farmId, accepted_at: null }
+    });
+    if (!invitation) {
+      throw new Error('INVITATION_NOT_FOUND');
+    }
+
+    // Пока приглашение лежало просроченным, места по тарифу могло не
+    // остаться: продлевать приглашение туда, куда уже некого принять, —
+    // обещание, которое сорвётся на активации.
+    await planService.assertStaffLimit(farmId);
+
+    await invitation.update({ expires_at: invitationExpiry() });
+    const messageSent = await this.deliverInvitation(invitation, author);
+
+    logger.info('Invitation resent', { invitationId: invitation.id, farmId, messageSent });
+    return { invitation, messageSent };
+  }
+
+  /**
+   * Отправить приглашение самому приглашённому.
+   *
+   * На почту письмо уходит тем же транспортом, что и код входа. На телефон
+   * не уходит ничего: SMS-шлюз принимает только заранее одобренные шаблоны
+   * с фиксированным текстом (см. `payomSmsTransport`), а одобрен у нас один —
+   * «код подтверждения». Отправить им приглашение значило бы прислать
+   * человеку сообщение про код, которого ему никто не создавал. Поэтому
+   * приглашение по телефону владелец пересылает сам ссылкой, а приложение
+   * честно об этом говорит — вместо «ничего передавать не нужно», после
+   * которого работник ждал SMS, которой не было.
+   *
+   * @returns {Boolean} ушло ли сообщение приглашённому.
+   * @private
+   */
+  async deliverInvitation(invitation, author) {
+    if (!invitation.email) return false;
+
+    try {
+      const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['name'] });
+      const { title, body } = notificationText(
+        'staffInvitation',
+        author.language || DEFAULT_LANGUAGE,
+        {
+          inviter: author.full_name,
+          farm: farm ? farm.name : '',
+          contact: invitation.email
+        }
+      );
+
+      await emailTransport.sendInvitationEmail({
+        to: invitation.email,
+        subject: title,
+        text: body
+      });
+      return true;
+    } catch (error) {
+      // Почта — опциональная интеграция, как и SMS: без SMTP в окружении
+      // она просто не настроена, и ронять из-за этого само приглашение
+      // нельзя. Владелец увидит, что письмо не ушло, и позовёт иначе.
+      logger.warn('Invitation email dispatch failed', {
+        invitationId: invitation.id,
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Приглашения фермы, которыми ещё не воспользовались, — вместе с
+   * просроченными.
+   *
+   * Просроченные не прячем: приглашение, о котором владелец забыл, — самая
+   * частая причина «я позвал, а он не пришёл», и увидеть его он должен
+   * именно здесь. Живое от мёртвого отличает `expires_at`, по нему
+   * приложение и делит список на две группы.
+   */
   async listInvitations(farmId) {
     return Invitation.findAll({
       where: { farm_id: farmId, accepted_at: null },

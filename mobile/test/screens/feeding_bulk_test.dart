@@ -122,6 +122,10 @@ Future<void> _tapInSheet(WidgetTester tester, String text) async {
     120,
     scrollable: find.byType(Scrollable).last,
   );
+  // Строки рассчитаны на нажатие в перчатке (56dp), и найденная строка
+  // может остаться за нижним краем листа — доводим её в видимую часть.
+  await tester.ensureVisible(target);
+  await tester.pumpAndSettle();
   await tester.tap(target);
   await tester.pumpAndSettle();
 }

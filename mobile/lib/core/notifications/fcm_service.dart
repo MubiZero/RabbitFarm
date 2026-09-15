@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../router/app_router.dart';
+import 'notification_permission.dart';
 import '../../features/device_tokens/data/repositories/device_tokens_repository.dart';
 import '../../features/device_tokens/presentation/providers/device_tokens_provider.dart';
 
@@ -53,11 +54,20 @@ class FcmService {
 
   FcmService(this._repository);
 
+  /// Привязать этот телефон к вошедшему пользователю.
+  ///
+  /// Системного вопроса о разрешении здесь больше нет: он задаётся один раз
+  /// за установку, и задавать его надо тогда, когда человеку есть что
+  /// напоминать, а не в момент входа. Этим занимается
+  /// `NotificationPrimerSheet`; сюда мы попадаем уже с ответом — и если
+  /// разрешения нет, регистрировать токен незачем, доставить по нему всё
+  /// равно ничего не получится.
   Future<void> registerCurrentToken() async {
     if (kIsWeb) return;
     try {
-      final settings = await FirebaseMessaging.instance.requestPermission();
-      if (settings.authorizationStatus == AuthorizationStatus.denied) return;
+      final settings =
+          await FirebaseMessaging.instance.getNotificationSettings();
+      if (!NotificationPermission.granted(settings.authorizationStatus)) return;
 
       final token = await FirebaseMessaging.instance.getToken();
       if (token == null) return;

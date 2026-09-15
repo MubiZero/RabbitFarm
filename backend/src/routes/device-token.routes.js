@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const deviceTokenController = require('../controllers/deviceTokenController');
 const { registerDeviceTokenSchema, unregisterDeviceTokenSchema } = require('../validators/deviceTokenValidator');
-const { authenticate } = require('../middleware/auth');
+const { authenticateEvenIfFarmBlocked } = require('../middleware/auth');
 const validate = require('../middleware/validation');
 
 /**
@@ -45,7 +45,11 @@ const validate = require('../middleware/validation');
  *         description: Устройство отвязано
  */
 
-router.use(authenticate);
+// Ферме в режиме чтения пуши нужны больше, чем кому-либо: именно ими ей
+// напоминают оплатить тариф. С обычной проверкой телефон не мог
+// зарегистрироваться, и напоминания переставали доходить ровно тогда,
+// когда они и нужны.
+router.use(authenticateEvenIfFarmBlocked);
 
 router.post('/', validate(registerDeviceTokenSchema), deviceTokenController.register);
 router.delete('/', validate(unregisterDeviceTokenSchema), deviceTokenController.unregister);

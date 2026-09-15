@@ -42,7 +42,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                 if (value == 'edit') {
                   context.push('/rabbits/${rabbit.id}/edit', extra: rabbit);
                 } else if (value == 'delete') {
-                  _showDeleteDialog(context, ref, rabbit);
+                  _delete(context, ref, rabbit);
                 }
               },
               itemBuilder: (context) => [
@@ -237,7 +237,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                 _buildInfoRow(
                   context,
                   context.l10n.rabbitWeight,
-                  formatQuantity(rabbit.currentWeight!, 'кг'),
+                  formatQuantity(rabbit.currentWeight!, context.l10n.unitKg),
                 ),
             ],
           ),
@@ -309,6 +309,24 @@ class RabbitDetailScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  // Отметить падёж отсюда же: иначе это делают правкой статуса
+                  // в общей форме, где дата и причина смерти вообще не
+                  // спрашиваются. Павшему кролику пункт уже не нужен.
+                  if (rabbit.status != rabbitStatusDead) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            context.push('/rabbits/death', extra: rabbit),
+                        icon: const Icon(Icons.heart_broken_outlined),
+                        label: Text(context.l10n.deathFormTitle),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
             ),
           ),
@@ -597,48 +615,48 @@ class RabbitDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, WidgetRef ref, RabbitModel rabbit) {
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
+  Future<void> _delete(
+      BuildContext context, WidgetRef ref, RabbitModel rabbit) async {
+    final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.rabbitDetailDeleteTitle),
-        content: Text(context.l10n.rabbitDetailDeleteBody(rabbit.label)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await ref.read(rabbitsRepositoryProvider).deleteRabbit(rabbit.id);
-                ref.read(rabbitsListProvider.notifier).refresh();
-                if (context.mounted) {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.l10n.rabbitDetailDeleted),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(errorText(l10n, e)),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              }
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
+    // Репозиторий и список забираем сразу: запрос уйдёт уже после того, как
+    // карточка закроется.
+    final repository = ref.read(rabbitsRepositoryProvider);
+    final list = ref.read(rabbitsListProvider.notifier);
+
+    list.removeRabbit(rabbit.id);
+
+    Object? error;
+    // Окно отмены открываем, пока карточка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму
+    // карточку закрываем, не дожидаясь окна, — подсказка живёт выше экрана и
+    // переживёт его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: l10n.rabbitDetailDeleted,
+      commit: () async {
+        try {
+          await repository.deleteRabbit(rabbit.id);
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: list.refresh,
     );
+    context.pop();
+    await pending;
+
+    if (error != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, error)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await list.refresh();
+    }
   }
 }

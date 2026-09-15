@@ -1,7 +1,10 @@
 const cron = require('node-cron');
+const { NEST_BOX_BEFORE_BIRTH } = require('../utils/breedingCycle');
+const { overdueRabbits } = require('../utils/vaccinationDue');
 const { Op, col } = require('sequelize');
-const { Farm, User, Vaccination, Task, Feed } = require('../models');
+const { Farm, User, Vaccination, Task, Feed, Breeding, Birth, Rabbit, Cage } = require('../models');
 const notificationService = require('../services/notificationService');
+const { taskTitle } = require('../i18n/tasks');
 const logger = require('../utils/logger');
 
 // 08:00 каждый день, время сервера (пояс задан через TZ, см. backend/Dockerfile:
@@ -35,14 +38,13 @@ async function runDigestForFarm(farmId) {
   const now = new Date();
   const recipients = await _digestRecipients(farmId);
 
-  // То же условие, что и в vaccinationController.getStatistics (overdue).
-  const overdueVaccinations = await Vaccination.count({
-    where: { farm_id: farmId, next_vaccination_date: { [Op.lt]: now, [Op.not]: null } }
-  });
+  // Кролики, а не строки истории: привитый пять раз давал пять «просрочек»,
+  // павшие и проданные считались наравне с живыми, и это число уходило
+  // пушем каждое утро, не уменьшаясь (см. utils/vaccinationDue).
+  const overdueVaccinations = await overdueRabbits(farmId);
   if (overdueVaccinations > 0 && recipients.length > 0) {
     await notificationService.sendToUsers(farmId, recipients, {
-      title: 'Просроченные вакцинации',
-      body: `Просрочено: ${overdueVaccinations}`,
+      i18n: { key: 'vaccinationDigest', params: { count: overdueVaccinations } },
       data: { type: 'vaccination_digest', route: '/vaccinations' }
     });
   }
@@ -53,8 +55,7 @@ async function runDigestForFarm(farmId) {
   });
   if (lowStockFeeds > 0 && recipients.length > 0) {
     await notificationService.sendToUsers(farmId, recipients, {
-      title: 'Низкий остаток корма',
-      body: `Кормов ниже минимума: ${lowStockFeeds}`,
+      i18n: { key: 'feedDigest', params: { count: lowStockFeeds } },
       data: { type: 'feed_digest', route: '/feeds' }
     });
   }
@@ -62,7 +63,7 @@ async function runDigestForFarm(farmId) {
   // То же условие, что и overdue_only в taskService.listTasks.
   const overdueTasks = await Task.findAll({
     where: { farm_id: farmId, due_date: { [Op.lt]: now }, status: { [Op.in]: ['pending', 'in_progress'] } },
-    attributes: ['id', 'title', 'assigned_to']
+    attributes: ['id', 'title', 'title_key', 'title_params', 'assigned_to']
   });
 
   const withAssignee = overdueTasks.filter(t => t.assigned_to);
@@ -70,17 +71,80 @@ async function runDigestForFarm(farmId) {
 
   for (const task of withAssignee) {
     await notificationService.sendToUsers(farmId, [task.assigned_to], {
-      title: 'Просроченная задача',
-      body: task.title,
+      i18n: {
+        key: 'taskOverdue',
+        params: (language) => ({ task: taskTitle(task, language) })
+      },
       data: { type: 'task_overdue', route: `/tasks/${task.id}` }
     });
   }
 
   if (withoutAssignee > 0 && recipients.length > 0) {
     await notificationService.sendToUsers(farmId, recipients, {
-      title: 'Просроченные задачи без исполнителя',
-      body: `Просрочено: ${withoutAssignee}`,
+      i18n: { key: 'taskDigest', params: { count: withoutAssignee } },
       data: { type: 'task_digest', route: '/tasks' }
+    });
+  }
+
+  await _notifyUpcomingKindlings(farmId, now, recipients);
+}
+
+/**
+ * За сколько дней предупреждать о будущем окроле.
+ *
+ * Ровно столько же, за сколько заводится задача «поставить маточник»: это
+ * одно и то же дело, и два разных дня для него сбивали человека с толку —
+ * задача звала в среду, пуш напоминал в четверг.
+ */
+const KINDLING_WARNING_DAYS = NEST_BOX_BEFORE_BIRTH;
+
+/**
+ * Скорый окрол: одно письмо на каждую самку, а не общий счётчик.
+ *
+ * Тут счётчик «ожидается окролов: 3» бесполезен — человеку надо знать, к
+ * какой клетке идти с маточником. Поэтому в тексте номер клетки: на ферме
+ * говорят «четырнадцатая окотилась», а не «самка А-0231».
+ */
+async function _notifyUpcomingKindlings(farmId, now, recipients) {
+  if (recipients.length === 0) return;
+
+  const target = new Date(now);
+  target.setDate(target.getDate() + KINDLING_WARNING_DAYS);
+  const targetDate = target.toISOString().split('T')[0];
+
+  const upcoming = await Breeding.findAll({
+    where: {
+      farm_id: farmId,
+      expected_birth_date: targetDate,
+      status: { [Op.in]: ['planned', 'completed'] }
+    },
+    attributes: ['id'],
+    include: [
+      {
+        model: Rabbit,
+        as: 'female',
+        attributes: ['id', 'name', 'tag_id'],
+        include: [{ model: Cage, attributes: ['number'] }]
+      },
+      // Уже окотившиеся отсеиваются здесь же: к записи о случке привязан
+      // окрол, значит предупреждать не о чем.
+      { model: Birth, attributes: ['id'], required: false }
+    ]
+  });
+
+  for (const breeding of upcoming) {
+    if (breeding.Births && breeding.Births.length > 0) continue;
+
+    const female = breeding.female;
+    const cageNumber = female && female.Cage ? female.Cage.number : null;
+    const femaleName = female ? (female.name || female.tag_id) : null;
+    // Ни клетки, ни клички — сказать человеку нечего, а «окрол послезавтра»
+    // без адреса только заставит его искать по всей ферме.
+    if (!cageNumber && !femaleName) continue;
+
+    await notificationService.sendToUsers(farmId, recipients, {
+      i18n: { key: 'kindlingSoon', params: { cageNumber, femaleName } },
+      data: { type: 'kindling_soon', route: `/breeding/${breeding.id}` }
     });
   }
 }

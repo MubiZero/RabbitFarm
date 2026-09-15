@@ -45,6 +45,8 @@ class BirthsListScreen extends ConsumerWidget {
           canDelete: canDelete,
           onDelete: () => _delete(context, ref, birth),
           onCreateKits: () => _createKits(context, ref, birth),
+          onKitDeath: () => _recordKitDeaths(context, ref, birth),
+          onWeaning: () => _recordWeaning(context, ref, birth),
         ),
       ),
       floatingActionButton: canManage
@@ -57,49 +59,128 @@ class BirthsListScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _delete(
-      BuildContext context, WidgetRef ref, BirthModel birth) async {
+  /// Отметить, что часть выводка пала.
+  ///
+  /// Спрашивается количество, а не «кто именно»: на ферме считают выводок
+  /// целиком — «из восьми осталось шесть», — и заводить карточку на каждого
+  /// крольчонка ради этого никто не станет.
+  Future<void> _recordKitDeaths(
+    BuildContext context,
+    WidgetRef ref,
+    BirthModel birth,
+  ) async {
+    final died = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => _KitDeathSheet(alive: birth.kitsAlive),
+    );
+    if (died == null || died <= 0 || !context.mounted) return;
+
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    final done = l10n.birthsDeleted;
+    final notifier = ref.read(birthsProvider.notifier);
+    final ok = await notifier.updateBirth(birth.id, {
+      'kits_died': birth.kitsDied + died,
+    });
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.birthsDeleteTitle),
-        content: Text(context.l10n.birthsDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-
-    final ok = await ref.read(birthsProvider.notifier).deleteBirth(birth.id);
     messenger.showSnackBar(
       ok
-          ? SnackBar(content: Text(done))
+          ? SnackBar(content: Text(l10n.birthsKitDeathSaved))
           : SnackBar(
-              content: Text(errorText(l10n, ref.read(birthsProvider).error)),
+              content: Text(
+                l10n.commonActionFailed(
+                  errorText(l10n, ref.read(birthsProvider).error),
+                ),
+              ),
               backgroundColor: AppColors.error,
             ),
     );
   }
 
+  /// Отметить, что молодняк отсадили от самки.
+  ///
+  /// Сервер принимает отсадку с первого дня, лента цикла по ней закрывает
+  /// цикл, а задача «Отсадка» приходит на 45-й день — но отправить её до сих
+  /// пор было неоткуда.
+  Future<void> _recordWeaning(
+    BuildContext context,
+    WidgetRef ref,
+    BirthModel birth,
+  ) async {
+    final weaned = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => _KitWeaningSheet(alive: birth.kitsAlive),
+    );
+    if (weaned == null || weaned <= 0 || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final notifier = ref.read(birthsProvider.notifier);
+    final ok = await notifier.updateBirth(birth.id, {
+      'kits_weaned': weaned,
+      'weaning_date': DateTime.now().toIso8601String().split('T').first,
+    });
+
+    messenger.showSnackBar(
+      ok
+          ? SnackBar(content: Text(l10n.birthsWeaningSaved))
+          : SnackBar(
+              content: Text(
+                l10n.commonActionFailed(
+                  errorText(l10n, ref.read(birthsProvider).error),
+                ),
+              ),
+              backgroundColor: AppColors.error,
+            ),
+    );
+  }
+
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    BirthModel birth,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final notifier = ref.read(birthsProvider.notifier);
+
+    notifier.removeBirth(birth.id);
+
+    var ok = true;
+    await deleteWithUndo(
+      context,
+      message: l10n.birthsDeleted,
+      commit: () async => ok = await notifier.deleteBirth(birth.id),
+      onUndo: notifier.loadBirths,
+    );
+
+    if (!ok) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, ref.read(birthsProvider).error)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await notifier.loadBirths();
+    }
+  }
+
   Future<void> _createKits(
-      BuildContext context, WidgetRef ref, BirthModel birth) async {
+    BuildContext context,
+    WidgetRef ref,
+    BirthModel birth,
+  ) async {
     // Мать берётся из самой записи об окроле. Раньше её искали в загруженной
     // странице списка кроликов, и для окрола постарше кнопка отвечала
     // «мать не найдена в списке» — хотя мать, разумеется, существовала.
-    final mother = birth.mother ??
+    final mother =
+        birth.mother ??
         ref
             .read(rabbitsListProvider)
             .rabbits
@@ -123,6 +204,8 @@ class _BirthCard extends ConsumerWidget {
   final bool canDelete;
   final VoidCallback onDelete;
   final VoidCallback onCreateKits;
+  final VoidCallback onKitDeath;
+  final VoidCallback onWeaning;
 
   const _BirthCard({
     required this.birth,
@@ -130,16 +213,20 @@ class _BirthCard extends ConsumerWidget {
     required this.canDelete,
     required this.onDelete,
     required this.onCreateKits,
+    required this.onKitDeath,
+    required this.onWeaning,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final total = birth.kitsBornAlive + birth.kitsBornDead;
-    final survival =
-        total > 0 ? (birth.kitsBornAlive / total * 100).round() : 0;
+    final survival = total > 0
+        ? (birth.kitsBornAlive / total * 100).round()
+        : 0;
 
-    final mother = birth.mother ??
+    final mother =
+        birth.mother ??
         ref
             .read(rabbitsListProvider)
             .rabbits
@@ -153,16 +240,20 @@ class _BirthCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.event_outlined,
-                  size: 16, color: context.colors.onSurfaceVariant),
+              Icon(
+                Icons.event_outlined,
+                size: 16,
+                color: context.colors.onSurfaceVariant,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   date == null
                       ? birth.birthDate
                       : DateFormat('d MMMM y', 'ru').format(date),
-                  style: AppTypography.titleMd
-                      .copyWith(color: context.colors.onSurface),
+                  style: AppTypography.titleMd.copyWith(
+                    color: context.colors.onSurface,
+                  ),
                 ),
               ),
               if (canDelete)
@@ -177,14 +268,20 @@ class _BirthCard extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
-              const Icon(Icons.female,
-                  size: 16, color: AppColors.domainBreeding),
+              const Icon(
+                Icons.female,
+                size: 16,
+                color: AppColors.domainBreeding,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  l10n.birthsMotherLine(mother?.name ?? l10n.birthsMotherUnknown),
-                  style: AppTypography.bodyLg
-                      .copyWith(color: context.colors.onSurface),
+                  l10n.birthsMotherLine(
+                    mother?.name ?? l10n.birthsMotherUnknown,
+                  ),
+                  style: AppTypography.bodyLg.copyWith(
+                    color: context.colors.onSurface,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -217,6 +314,12 @@ class _BirthCard extends ConsumerWidget {
                   value: '$survival%',
                   color: context.colors.onSurface,
                 ),
+                if (birth.kitsDied > 0)
+                  _Stat(
+                    label: l10n.birthsKitsDied,
+                    value: '${birth.kitsDied}',
+                    color: AppColors.error,
+                  ),
                 if (birth.kitsWeaned != null)
                   _Stat(
                     label: l10n.birthsWeaned,
@@ -233,19 +336,24 @@ class _BirthCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.warning.withValues(alpha: 0.08),
                 borderRadius: AppRadius.smAll,
-                border:
-                    Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.4),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber_outlined,
-                      size: 16, color: AppColors.warning),
+                  const Icon(
+                    Icons.warning_amber_outlined,
+                    size: 16,
+                    color: AppColors.warning,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       birth.complications!.trim(),
-                      style: AppTypography.labelSm
-                          .copyWith(color: AppColors.warning),
+                      style: AppTypography.labelSm.copyWith(
+                        color: AppColors.warning,
+                      ),
                     ),
                   ),
                 ],
@@ -256,17 +364,46 @@ class _BirthCard extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               birth.notes!.trim(),
-              style: AppTypography.bodyMd
-                  .copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.bodyMd.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
           ],
           if (canManage && birth.kitsBornAlive > 0) ...[
             const SizedBox(height: AppSpacing.md),
-            OutlinedButton.icon(
-              onPressed: onCreateKits,
-              icon: const Icon(Icons.auto_awesome_outlined, size: 18),
-              label: Text(l10n.birthsCreateKits),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: onCreateKits,
+                  icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                  label: Text(l10n.birthsCreateKits),
+                ),
+                // Крольчонок в приложении — число внутри окрола, а не своя
+                // карточка: экран падежа работает со взрослым кроликом, и
+                // отметить потерю в выводке до сих пор было негде.
+                if (birth.kitsAlive > 0)
+                  OutlinedButton.icon(
+                    onPressed: onKitDeath,
+                    icon: const Icon(Icons.remove_circle_outline, size: 18),
+                    label: Text(l10n.birthsKitDeathAction),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: const BorderSide(color: AppColors.error),
+                    ),
+                  ),
+                // Отсадка бывает один раз за окрол: записанную не переспрашивают,
+                // а отсаживать нечего, когда весь выводок пал.
+                if (birth.weaningDate == null &&
+                    birth.kitsWeaned == null &&
+                    birth.kitsAlive > 0)
+                  OutlinedButton.icon(
+                    onPressed: onWeaning,
+                    icon: const Icon(Icons.pets_outlined, size: 18),
+                    label: Text(l10n.birthsWeaningAction),
+                  ),
+              ],
             ),
           ],
         ],
@@ -280,11 +417,7 @@ class _Stat extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _Stat({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _Stat({required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -295,8 +428,9 @@ class _Stat extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             label,
-            style: AppTypography.labelSm
-                .copyWith(color: context.colors.onSurfaceVariant),
+            style: AppTypography.labelSm.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -307,3 +441,141 @@ class _Stat extends StatelessWidget {
 
 /// Оставлено для совместимости с формой окрола: она передаёт модель кролика.
 typedef BirthMother = RabbitModel;
+
+/// Сколько крольчат пало.
+///
+/// Цифры кнопками, а не поле ввода: отмечают это стоя у клетки, одной рукой
+/// и в перчатке, а потери в выводке считаются единицами.
+class _KitDeathSheet extends StatelessWidget {
+  const _KitDeathSheet({required this.alive});
+
+  final int alive;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.sm,
+          AppSpacing.xl,
+          AppSpacing.xl,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.birthsKitDeathTitle, style: context.text.headlineSmall),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.birthsKitDeathHint(alive),
+              style: context.text.bodyMedium?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (var n = 1; n <= alive; n++)
+                  SizedBox(
+                    width: AppSizes.touchTargetLarge,
+                    height: AppSizes.touchTargetLarge,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(n),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        shape: const CircleBorder(),
+                      ),
+                      child: Text('$n', style: context.text.titleMedium),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Сколько крольчат отсадили.
+///
+/// Обычный случай — «всех», и он стоит отдельной крупной кнопкой: набирать
+/// цифру, чтобы подтвердить очевидное, у клетки никто не будет. Меньшее
+/// количество рядом — на случай, когда часть выводка оставили под самкой.
+class _KitWeaningSheet extends StatelessWidget {
+  const _KitWeaningSheet({required this.alive});
+
+  final int alive;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.sm,
+          AppSpacing.xl,
+          AppSpacing.xl,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.birthsWeaningTitle, style: context.text.headlineSmall),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.birthsWeaningHint(alive),
+              style: context.text.bodyMedium?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(alive),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(AppSizes.touchTargetLarge),
+              ),
+              child: Text(l10n.birthsWeaningAll(alive)),
+            ),
+            if (alive > 1) ...[
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.birthsWeaningFewer,
+                style: AppTypography.labelSm.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  for (var n = 1; n < alive; n++)
+                    SizedBox(
+                      width: AppSizes.touchTargetLarge,
+                      height: AppSizes.touchTargetLarge,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(n),
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          shape: const CircleBorder(),
+                        ),
+                        child: Text('$n', style: context.text.titleMedium),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

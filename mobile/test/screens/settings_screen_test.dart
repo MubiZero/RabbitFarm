@@ -77,6 +77,10 @@ void main() {
       await tester.pumpAndSettle();
 
       final switchFinder = _digestSwitch();
+      // Строки настроек рассчитаны на нажатие в перчатке (56dp), и на
+      // экране высотой 600 переключатель лежит ниже сгиба.
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
       expect(tester.widget<Switch>(switchFinder).value, isTrue);
 
       await tester.tap(switchFinder);
@@ -95,6 +99,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final switchFinder = _digestSwitch();
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
       await tester.tap(switchFinder);
       await tester.pumpAndSettle();
 

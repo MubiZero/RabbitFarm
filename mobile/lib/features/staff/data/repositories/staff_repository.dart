@@ -22,7 +22,8 @@ class StaffRepository {
     }
   }
 
-  /// Действующие приглашения.
+  /// Приглашения, которыми ещё не воспользовались, — вместе с просроченными
+  /// (`FarmInvitation.isExpired` отличает одно от другого).
   Future<List<FarmInvitation>> getInvitations() async {
     try {
       final response = await _apiClient.get('/staff/invitations');
@@ -35,12 +36,16 @@ class StaffRepository {
     }
   }
 
-  /// Выписать приглашение — на почту или на телефон. Код в ответе приходит
-  /// один раз, сервер его не хранит.
+  /// Выписать приглашение — на почту или на телефон.
   ///
-  /// Приглашённый по телефону войдёт кодом из SMS прямо на экране входа —
-  /// имя ему взять неоткуда, поэтому его называет владелец здесь ([fullName]
-  /// обязателен именно для этого случая, так же требует и сервер).
+  /// Приглашённый входит обычным кодом на свой контакт, и этот вход
+  /// активирует приглашение. Имя ему взять неоткуда, поэтому его называет
+  /// владелец здесь ([fullName] обязателен именно для этого случая, так же
+  /// требует и сервер).
+  ///
+  /// В ответе — `messageSent` (позвал ли работника сервер) и `inviteLink`
+  /// для приглашения по телефону: SMS шлюз отправить не даёт, и ссылку
+  /// пересылает сам владелец.
   Future<CreatedInvitation> createInvitation({
     String? email,
     String? phone,
@@ -56,6 +61,17 @@ class StaffRepository {
         if (fullName != null) 'full_name': fullName,
         'role': role.name,
       });
+      return CreatedInvitation.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Позвать того же человека ещё раз: сервер продлевает срок приглашения
+  /// и повторяет отправку. Новой записи не заводит — контакт и роль те же.
+  Future<CreatedInvitation> resendInvitation(int id) async {
+    try {
+      final response = await _apiClient.post('/staff/invitations/$id/resend');
       return CreatedInvitation.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
@@ -97,5 +113,4 @@ class StaffRepository {
       throw ApiFailure.from(e);
     }
   }
-
 }

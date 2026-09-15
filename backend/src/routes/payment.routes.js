@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
-const { authenticate, authorize } = require('../middleware/auth');
+const { authenticateEvenIfFarmBlocked, authorize } = require('../middleware/auth');
 
 /**
  * @route   POST /api/v1/payments
@@ -10,9 +10,14 @@ const { authenticate, authorize } = require('../middleware/auth');
  *          4.1) — раньше клиент присылал произвольную сумму сам.
  * @access  Private (Owner only) — оплата фермы, не рабочий процесс
  */
+// `authenticateEvenIfFarmBlocked`, а не обычная проверка: ферму с истёкшим
+// тарифом сервер сам переводит в режим чтения, а режим чтения режет все
+// не-GET запросы. Получалось замкнуто: приложение показывало «Оплатить»,
+// нажатие возвращало 403 «обратитесь в поддержку», и заплатить было нельзя
+// именно тому, от кого мы ждём оплаты.
 router.post(
   '/',
-  authenticate,
+  authenticateEvenIfFarmBlocked,
   authorize(['owner']),
   paymentController.create
 );
@@ -22,7 +27,7 @@ router.post(
  * @desc    Ручной опрос статуса своего платежа — без ожидания вебхука
  * @access  Private (Owner only)
  */
-router.get('/:invoiceId', authenticate, authorize(['owner']), paymentController.status);
+router.get('/:invoiceId', authenticateEvenIfFarmBlocked, authorize(['owner']), paymentController.status);
 
 /**
  * @route   POST /api/v1/payments/webhook

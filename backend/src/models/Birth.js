@@ -39,6 +39,13 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: 0
     },
+    // Пало до отсадки. Считается выводком целиком: на ферме говорят «из
+    // восьми осталось шесть», а не перечисляют крольчат поимённо.
+    kits_died: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
     kits_weaned: {
       type: DataTypes.INTEGER,
       defaultValue: 0

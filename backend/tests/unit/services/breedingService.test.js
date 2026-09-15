@@ -71,6 +71,16 @@ describe('BreedingService', () => {
       // id владельца просто потому, что «ферма» и была этим id.
       expect(Task.create.mock.calls[0][0].created_by).toBeUndefined();
       expect(Task.create.mock.calls[0][0].assigned_to).toBeUndefined();
+      // У каждой задачи есть ключ шаблона и подстановки: по ним заголовок
+      // собирается на языке читателя, а готовая строка остаётся запасной
+      // для сборок, которые ключей ещё не понимают.
+      const keys = Task.create.mock.calls.map(([data]) => data.title_key);
+      expect(keys).toEqual(['palpation', 'nestBox', 'expectedKindling']);
+      for (const [taskData] of Task.create.mock.calls) {
+        expect(taskData.title_params).toEqual({ doe: female.name, buck: male.name });
+        expect(taskData.title).toContain(female.name);
+      }
+
       expect(mockTx.commit).toHaveBeenCalled();
       expect(result).toEqual(createdBreeding);
     });

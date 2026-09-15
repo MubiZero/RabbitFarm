@@ -41,6 +41,14 @@ String rabbitPurposeLabel(BuildContext context, String? purpose) =>
     };
 
 /// Статусы кролика, которые понимает сервер.
+/// Статус павшего кролика.
+///
+/// Слово ровно одно и совпадает с тем, что принимает сервер
+/// (`ENUM('healthy','active','sick','quarantine','pregnant','sold','dead')`).
+/// Рядом жило второе, `deceased`: форма падежа отправляла его и получала
+/// отказ, а карточка по нему прятала кнопку — и не прятала никогда.
+const rabbitStatusDead = 'dead';
+
 const rabbitStatuses = [
   'healthy',
   'sick',
@@ -57,7 +65,7 @@ String rabbitStatusLabel(BuildContext context, String? status) =>
       'quarantine' => context.l10n.statusQuarantine,
       'pregnant' => context.l10n.statusPregnant,
       'sold' => context.l10n.statusSold,
-      'dead' || 'deceased' => context.l10n.statusDead,
+      rabbitStatusDead => context.l10n.statusDead,
       _ => status ?? '',
     };
 

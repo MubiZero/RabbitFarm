@@ -71,7 +71,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get offlineBanner =>
-      'Алоқа нест — хӯрокдиҳӣ, вазифаҳо ва қайдҳо захира шуда, баъдтар фиристода мешаванд';
+      'Алоқа нест — қайдҳо захира шуда, пас аз пайдо шудани алоқа фиристода мешаванд';
 
   @override
   String get offlineActionQueued =>
@@ -163,7 +163,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get pinSetupExplanation =>
-      'Бо ин рамз шумо барномаро дар ҳамин телефон мекушоед — дигар интизори SMS шудан лозим нест.';
+      'Бо ин рамз шумо барномаро дар ҳамин телефон мекушоед — дигар интизори рамз аз SMS ё мактуб шудан лозим нест.';
 
   @override
   String get pinSkip => 'Ҳоло не';
@@ -357,15 +357,6 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get activationChecklistDismiss => 'Пинҳон кардан';
-
-  @override
-  String get activationChecklistAddCage => 'Қафас илова кунед';
-
-  @override
-  String get activationChecklistAddRabbit => 'Харгӯш илова кунед';
-
-  @override
-  String get activationChecklistFirstFeeding => 'Хӯрокдиҳии якумро сабт кунед';
 
   @override
   String get menuProfile => 'Профил';
@@ -2283,14 +2274,14 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsVersion => 'Версия';
 
   @override
-  String get settingsSupport => 'Ба дастгирӣ навиштан';
+  String get settingsSupport => 'Дастгирӣ';
 
   @override
   String get supportRequestTitle => 'Дастгирӣ';
 
   @override
   String get supportRequestHint =>
-      'Чӣ рӯй додаро тасвир кунед — аз ҳамон ҳисобе, ки мурожиат омад, ҷавоб медиҳем.';
+      'Чӣ рӯй доданашро тасвир кунед. Ҷавоб ба ҳамин экран ва ҳамчун огоҳинома ба телефон меояд.';
 
   @override
   String get supportRequestPlaceholder =>
@@ -2877,12 +2868,12 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'Ӯ ҳангоми вуруд рақами $phone ва рамзеро, ки бо SMS меояд, ворид мекунад. Чизе супоридан лозим нест.';
+    return 'Ба рақами $phone SMS фиристода намешавад — даъватро худатон равон кунед. Пайванд саҳифаи даромадро бо рақами тайёр мекушояд, рамз бошад ба ӯ бо SMS меояд.';
   }
 
   @override
   String staffInvitedEmailBody(String email) {
-    return 'Ӯ ҳангоми вуруд почтаи $email ва рамзеро, ки бо хат меояд, ворид мекунад. Чизе супоридан лозим нест.';
+    return 'Мактуби даъват ба $email фиристода шуд. Корманд бо ҳамин нишонӣ медарояд — рамз ба ӯ бо мактуб меояд.';
   }
 
   @override
@@ -4001,7 +3992,7 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get platformSupportRequestsEmptyBody =>
-      'Дар ин ҷо саволҳои фермаҳо пайдо мешаванд — фермер тавассути Танзимот → Ба дастгирӣ навиштан менависад.';
+      'Дар ин ҷо саволҳои фермаҳо пайдо мешаванд — фермер тавассути Танзимот → Дастгирӣ менависад.';
 
   @override
   String get platformSupportRequestNew => 'нав';
@@ -4207,4 +4198,722 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get emptyNoRecordsBody => 'Аввалинашро илова кунед.';
+
+  @override
+  String get onbWelcomeTitle => 'RabbitFarm';
+
+  @override
+  String get onbWelcomeBody =>
+      'Қафасҳо, ҷуфтшавӣ, зоиш, хӯрок ва пул — ҳама сабт мешавад ва ҳамеша дастрас аст. Барнома худаш хотиррасон мекунад, ки кай лона гузоред ва кай эм кунед.';
+
+  @override
+  String get onbWelcomeStart => 'Оғоз';
+
+  @override
+  String get onbWelcomeHaveAccount => 'Ман аллакай хоҷагӣ дорам';
+
+  @override
+  String get onbHerdTitle => 'Шумо чанд харгӯш доред?';
+
+  @override
+  String get onbHerdSubtitle => 'Тахминан, ҳамроҳи навраста.';
+
+  @override
+  String get onbHerdUpTo20 => 'То 20';
+
+  @override
+  String get onbHerdUpTo20Hint => 'Барои худам нигоҳ медорам';
+
+  @override
+  String get onbHerdUpTo100 => 'Аз 20 то 100';
+
+  @override
+  String get onbHerdUpTo100Hint => 'Хоҷагии хурд';
+
+  @override
+  String get onbHerdUpTo500 => 'Аз 100 то 500';
+
+  @override
+  String get onbHerdUpTo500Hint => 'Хоҷагӣ барои фурӯш';
+
+  @override
+  String get onbHerdOver500 => 'Зиёда аз 500';
+
+  @override
+  String get onbHerdOver500Hint => 'Хоҷагии калон';
+
+  @override
+  String get onbFocusTitle => 'Пеш аз ҳама чиро сабт кардан лозим аст?';
+
+  @override
+  String get onbFocusSubtitle =>
+      'Ҳар чизи мувофиқро қайд кунед. Боқимонда ҳам дастрас мемонад.';
+
+  @override
+  String get onbFocusBreeding => 'Ҷуфтшавӣ ва зоиш';
+
+  @override
+  String get onbFocusFeeding => 'Хӯрок ва сарфи он';
+
+  @override
+  String get onbFocusHealth => 'Эмгузаронӣ ва табобат';
+
+  @override
+  String get onbFocusMoney => 'Фурӯш ва хароҷот';
+
+  @override
+  String get onbFocusNext => 'Минбаъд';
+
+  @override
+  String get onbCrewTitle => 'Кӣ дар барнома кор мекунад?';
+
+  @override
+  String get onbCrewSubtitle => 'Инро ҳар вақт иваз кардан мумкин аст.';
+
+  @override
+  String get onbCrewAlone => 'Танҳо ман';
+
+  @override
+  String get onbCrewAloneHint => 'На даъват лозим аст, на танзими дастрасӣ';
+
+  @override
+  String get onbCrewHelpers => 'Ман ва ёрдамчиён';
+
+  @override
+  String get onbCrewHelpersHint =>
+      'Ҳар кас аз телефони худ сабт мекунад ва маълум мешавад, ки кӣ чиро навиштааст';
+
+  @override
+  String get onbDoneTitle => 'Аз чӣ оғоз мекунем';
+
+  @override
+  String get onbDoneSubtitle => 'Ин қадамҳо дар экрани асосӣ интизор мешаванд.';
+
+  @override
+  String get onbDoneCreate => 'Хоҷагӣ сохтан';
+
+  @override
+  String get onbBack => 'Бозгашт';
+
+  @override
+  String get onbSkip => 'Гузарондан';
+
+  @override
+  String get firstStepCages => 'Қафасҳоро эҷод кунед';
+
+  @override
+  String get firstStepRabbits => 'Модаҳо ва нарҳоро илова кунед';
+
+  @override
+  String get firstStepBreeding => 'Ҷуфтшавии якумро сабт кунед';
+
+  @override
+  String get firstStepFeeding => 'Хӯрокдиҳии якумро сабт кунед';
+
+  @override
+  String get firstStepHealth => 'Эмгузаронии якумро сабт кунед';
+
+  @override
+  String get firstStepMoney => 'Фурӯши якумро сабт кунед';
+
+  @override
+  String get firstStepHelpers => 'Ёрдамчиро даъват кунед';
+
+  @override
+  String get activationChecklistFarmCreated => 'Хоҷагӣ сохта шуд';
+
+  @override
+  String activationChecklistProgress(int done, int total) {
+    return '$done аз $total';
+  }
+
+  @override
+  String get deathFormTitle => 'Талафотро қайд кардан';
+
+  @override
+  String get deathFormRabbit => 'Харгӯш';
+
+  @override
+  String get deathFormDate => 'Сана';
+
+  @override
+  String get deathFormReason => 'Сабаб';
+
+  @override
+  String get deathFormReasonHint => 'Аз чӣ мурд — агар донед';
+
+  @override
+  String get deathFormSubmit => 'Қайд кардан';
+
+  @override
+  String get deathFormSaved => 'Талафот қайд шуд';
+
+  @override
+  String get quickRecordDeath => 'Талафот';
+
+  @override
+  String get notificationPrimerTitle =>
+      'Дар бораи лонаи зоиш хотиррасон мекунем';
+
+  @override
+  String get notificationPrimerBody =>
+      'Ду рӯз пеш аз зоиш хотиррасон меояд — қафасро тайёр кардан мерасед. Инчунин дар бораи эмкунӣ ва корҳои рӯз хотиррасон мекунем.';
+
+  @override
+  String get notificationPrimerAllow => 'Хотиррасонҳоро фаъол кардан';
+
+  @override
+  String get notificationPrimerDecline => 'Ҳоло не';
+
+  @override
+  String get settingsNotificationsOff => 'Огоҳиномаҳо хомӯшанд';
+
+  @override
+  String get settingsNotificationsTurnOn => 'Фаъол кардан';
+
+  @override
+  String get rabbitFormMore => 'Иловатан';
+
+  @override
+  String get rabbitFormSexRequired => 'Интихоб кунед: нар ё мода';
+
+  @override
+  String get rabbitFormCageNone => 'Бе қафас';
+
+  @override
+  String rabbitFormCageFull(String number) {
+    return '$number — пур аст';
+  }
+
+  @override
+  String get commonOptional => 'ихтиёрӣ';
+
+  @override
+  String get unitKg => 'кг';
+
+  @override
+  String get kindlingPlanAction => 'Нақшаи таваллуд';
+
+  @override
+  String get kindlingPlanPickMonth => 'Нақша барои кадом моҳ?';
+
+  @override
+  String get kindlingPlanThisMonth => 'Барои моҳи ҷорӣ';
+
+  @override
+  String get kindlingPlanNextMonth => 'Барои моҳи оянда';
+
+  @override
+  String kindlingPlanEmpty(String month) {
+    return 'Дар $month таваллуд интизор нест';
+  }
+
+  @override
+  String kindlingPlanSheetTitle(String month) {
+    return 'Нақшаи таваллуд — $month';
+  }
+
+  @override
+  String get kindlingPlanNestHint => 'Лонаро се рӯз пеш аз таваллуд мегузоранд';
+
+  @override
+  String get kindlingPlanColBirth => 'Таваллуд';
+
+  @override
+  String get kindlingPlanColFemale => 'Мода';
+
+  @override
+  String get kindlingPlanColCage => 'Қафас';
+
+  @override
+  String get kindlingPlanColBred => 'Ҷуфтгирӣ';
+
+  @override
+  String get kindlingPlanColNest => 'Лона';
+
+  @override
+  String get kindlingPlanColMark => 'Тамға';
+
+  @override
+  String kindlingPlanPrintedAt(String date) {
+    return 'Чоп шуд: $date';
+  }
+
+  @override
+  String get commonUndo => 'Баргардонидан';
+
+  @override
+  String get journalKindDeletion => 'Ҳазф';
+
+  @override
+  String get voiceDictate => 'Бо овоз гуфтан';
+
+  @override
+  String get voiceStop => 'Сабтро қатъ кардан';
+
+  @override
+  String get voiceUnavailable => 'Ин телефон нутқро намешиносад';
+
+  @override
+  String get cageAddNewRabbit => 'Нави сабт кардан';
+
+  @override
+  String get cageAddNewRabbitHint => 'Харгӯше, ки ҳанӯз дар барнома нест';
+
+  @override
+  String get cageSettleExisting => 'Аз рама кӯчонидан';
+
+  @override
+  String get cageSettleExistingHint =>
+      'Харгӯши аллакай сабтшударо ин ҷо гузаронед';
+
+  @override
+  String get cageFeedThis => 'Қафасро хӯрок додан';
+
+  @override
+  String get cageTagsTitle => 'Нишонаҳои қафасҳо';
+
+  @override
+  String get cageTagsPrint => 'Чоп кардан';
+
+  @override
+  String get cageTagsPrintHint =>
+      'Аз рӯи чорчӯба бурида, ба қафас овезед — камера онро дар барнома мекушояд.';
+
+  @override
+  String get cageTagsEmptyTitle => 'Ҳанӯз қафас нест';
+
+  @override
+  String get cageTagsEmptyBody =>
+      'Қафас сабт кунед — нишонаашро дарҳол чоп кардан мумкин мешавад.';
+
+  @override
+  String get cageScanTitle => 'Нишонаро хондан';
+
+  @override
+  String get cageScanHint => 'Камераро ба нишонаи қафас нигаронед';
+
+  @override
+  String get cageScanNoCamera =>
+      'Камера дастрас нест. Иҷозатро дар танзимоти телефон санҷед.';
+
+  @override
+  String get slideToDelete => 'Барои нест кардан лағжонед';
+
+  @override
+  String get birthsKitsDied => 'Талаф';
+
+  @override
+  String get birthsKitDeathAction => 'Талафотро қайд кардан';
+
+  @override
+  String get birthsKitDeathTitle => 'Чанд харгӯшбача мурд?';
+
+  @override
+  String birthsKitDeathHint(int alive) {
+    return 'Зинда мондаанд: $alive';
+  }
+
+  @override
+  String get birthsKitDeathSaved => 'Қайд шуд';
+
+  @override
+  String get birthsKitsAlive => 'Зинда';
+
+  @override
+  String get loginCodeLabelEmail => 'Рамз аз мактуб';
+
+  @override
+  String get cyclePalpationAction => 'Санҷидам';
+
+  @override
+  String get cyclePalpationTitle => 'Санҷиш чӣ нишон дод?';
+
+  @override
+  String get cyclePalpationPregnant => 'Ҳомиладор';
+
+  @override
+  String get cyclePalpationPregnantHint =>
+      'Мода ҳомиладор қайд мешавад, дар пеш зоиш';
+
+  @override
+  String get cyclePalpationEmpty => 'Холӣ';
+
+  @override
+  String get cyclePalpationEmptyHint =>
+      'Давра баста мешавад — модаро аз нав ҷуфт кардан мумкин';
+
+  @override
+  String get cyclePalpationSavedPregnant => 'Қайд шуд: ҳомиладор';
+
+  @override
+  String get cyclePalpationSavedEmpty => 'Қайд шуд: холӣ';
+
+  @override
+  String get birthsWeaningAction => 'Ҷудо кардем';
+
+  @override
+  String get birthsWeaningTitle => 'Чанд харгӯшбача ҷудо карда шуд?';
+
+  @override
+  String birthsWeaningHint(int alive) {
+    return 'Дар зоиш зинда: $alive';
+  }
+
+  @override
+  String birthsWeaningAll(int count) {
+    return 'Ҳамаро: $count';
+  }
+
+  @override
+  String get birthsWeaningFewer => 'Ё камтар';
+
+  @override
+  String get birthsWeaningSaved => 'Ҷудокунӣ қайд шуд';
+
+  @override
+  String get subscriptionCheckFailed =>
+      'Пардохтро санҷида нашуд — бо сервер алоқа нест';
+
+  @override
+  String get subscriptionPaymentDeclined => 'Бонк пардохтро рад кард';
+
+  @override
+  String get subscriptionPaymentDeclinedHint =>
+      'Пул гирифта нашуд. Кортро санҷед ва бори дигар кӯшиш кунед.';
+
+  @override
+  String get subscriptionPayAgain => 'Аз нав пардохт кардан';
+
+  @override
+  String get supportRequestNew => 'Навиштан';
+
+  @override
+  String get supportRequestNewTitle => 'Мурожиати нав';
+
+  @override
+  String get supportRequestsEmptyTitle => 'Ҳанӯз мурожиат нест';
+
+  @override
+  String get supportRequestsEmptyBody =>
+      'Агар чизе кор накунад ё нофаҳмо бошад, нависед. Ҷавоб ҳамин ҷо ва ҳамчун огоҳинома ба телефон меояд.';
+
+  @override
+  String get supportRequestsEmptyAction => 'Ба дастгирӣ навиштан';
+
+  @override
+  String get supportRequestStatusWaiting => 'Ҷавобро интизорем';
+
+  @override
+  String get supportRequestStatusAnswered => 'Дастгирӣ ҷавоб дод';
+
+  @override
+  String get supportRequestAnswerTitle => 'Ҷавоби дастгирӣ';
+
+  @override
+  String get supportRequestClosedWithoutAnswer =>
+      'Мурожиат бе ҷавоби хаттӣ баста шуд.';
+
+  @override
+  String get platformSupportAnswerTitle => 'Ҷавоб ба муаллиф';
+
+  @override
+  String get platformSupportResolveTitle => 'Бастани мурожиат';
+
+  @override
+  String get platformSupportResolveBody =>
+      'Ҷавоб нависед — он ба муаллиф ҳамчун огоҳинома ва мактуб меравад. Агар бе мукотиба ҳал шуда бошад, майдонро холӣ гузоред.';
+
+  @override
+  String get platformSupportResolveAnswerLabel => 'Ҷавоб ба муаллиф';
+
+  @override
+  String get platformSupportResolveAnswerHint =>
+      'Масалан: барномаро нав кунед — дар нусхаи нав ин ислоҳ шудааст';
+
+  @override
+  String get platformSupportResolveSendAnswer => 'Ирсоли ҷавоб';
+
+  @override
+  String get platformSupportResolveWithoutAnswer => 'Бе ҷавоб бастан';
+
+  @override
+  String get platformSupportContactTitle => 'Тамоси дастгирӣ';
+
+  @override
+  String get platformSupportContactBody =>
+      'Фермаҳо ин телефон ва почтаро дар экрани мурожиатҳои худ мебинанд. Агар тамоси бевосита набошад, холӣ гузоред.';
+
+  @override
+  String get platformSupportContactPhone => 'Телефон';
+
+  @override
+  String get platformSupportContactPhoneHint => '+992 00 000 00 00';
+
+  @override
+  String get platformSupportContactEmail => 'Почта';
+
+  @override
+  String get platformSupportContactEmailHint => 'support@example.com';
+
+  @override
+  String get platformSupportContactEmailInvalid =>
+      'Суроғаро санҷед — дар он аломати @ нест';
+
+  @override
+  String get platformSupportContactSaved => 'Тамоси дастгирӣ захира шуд';
+
+  @override
+  String get notificationsTitle => 'Огоҳиномаҳо';
+
+  @override
+  String get notificationsEmptyTitle => 'Ҳоло чизе нест';
+
+  @override
+  String get notificationsEmptyBody =>
+      'Дар ин ҷо он чизе пайдо мешавад, ки барнома хабар додааст: эмкунии мӯҳлаташ гузашта, хӯроки тамомшаванда, зоиши наздик.';
+
+  @override
+  String get platformFilterDeleted => 'Несткардашуда';
+
+  @override
+  String platformFarmDeletedShort(String date) {
+    return '$date нест карда шуд';
+  }
+
+  @override
+  String get platformFarmsDeletedEmptyTitle => 'Фермаи несткардашуда нест';
+
+  @override
+  String get platformFarmsDeletedEmptyBody =>
+      'Чизе интизори тозакунии ниҳоӣ нест. Фермаи несткардашуда 30 рӯз дар ин ҷо мемонад — ин муҳлат барои дигар кардани қарор кофист.';
+
+  @override
+  String get platformPlanDeleteDefaultWarning =>
+      'Ин тарифи пешфарз аст. Пас аз нест кардан фермаҳои нав тамоман бе тариф пайдо мешаванд, то даме ки тарифи дигар пешфарз таъин нашавад.';
+
+  @override
+  String get platformPlanDeleteIrreversible =>
+      'Бекор кардан мумкин нест: тарифро бояд аз нав созед ва ба фермаҳо дастӣ таъин кунед.';
+
+  @override
+  String get platformTabAudit => 'Журнал';
+
+  @override
+  String get platformAuditEmptyTitle => 'Журнал холӣ аст';
+
+  @override
+  String get platformAuditEmptyBody =>
+      'Ҳар амали админ ба ин ҷо меафтад: иваз кардани тариф, дастрасии ферма, вуруд аз номи муштарӣ, нест кардан.';
+
+  @override
+  String countAuditRecords(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сабт',
+      one: '$count сабт',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformAuditAdmin(String id) {
+    return 'Админ $id';
+  }
+
+  @override
+  String platformAuditFarm(String id) {
+    return 'Хоҷагӣ $id';
+  }
+
+  @override
+  String get platformAuditWholeService => 'Тамоми хизмат';
+
+  @override
+  String platformAuditIp(String ip) {
+    return 'IP $ip';
+  }
+
+  @override
+  String platformAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String platformAuditDetail(String field, String value) {
+    return '$field: $value';
+  }
+
+  @override
+  String get platformAuditValueNone => 'муайян нашудааст';
+
+  @override
+  String get platformAuditActionPlanCreate => 'Тариф сохта шуд';
+
+  @override
+  String get platformAuditActionPlanUpdate => 'Тариф тағйир ёфт';
+
+  @override
+  String get platformAuditActionPlanDelete => 'Тариф нест карда шуд';
+
+  @override
+  String get platformAuditActionPlanAssign => 'Тарифи ферма иваз шуд';
+
+  @override
+  String get platformAuditActionFarmStatus => 'Дастрасии ферма иваз шуд';
+
+  @override
+  String get platformAuditActionFarmExtras => 'Имтиёз болои тариф';
+
+  @override
+  String get platformAuditActionFarmExtendPlan => 'Тариф дастӣ дароз карда шуд';
+
+  @override
+  String get platformAuditActionFarmExport => 'Баровардани маълумоти ферма';
+
+  @override
+  String get platformAuditActionFarmImpersonate => 'Вуруд аз номи муштарӣ';
+
+  @override
+  String get platformAuditActionFarmDelete => 'Нест кардани ферма';
+
+  @override
+  String get platformAuditActionFarmRestore => 'Барқарор кардани ферма';
+
+  @override
+  String get platformAuditActionAnnouncementSend => 'Эълон фиристода шуд';
+
+  @override
+  String get platformAuditActionSupportResolve => 'Муроҷиат баста шуд';
+
+  @override
+  String get platformAuditActionSupportContact => 'Тамоси дастгирӣ тағйир ёфт';
+
+  @override
+  String platformAuditActionUnknown(String action) {
+    return 'Амали «$action»';
+  }
+
+  @override
+  String get platformAuditFieldName => 'Ном';
+
+  @override
+  String get platformAuditFieldLimits => 'Ҳудудҳо';
+
+  @override
+  String get platformAuditFieldPrice => 'Нарх';
+
+  @override
+  String get platformAuditFieldRabbitsLimit => 'Харгӯш аз рӯи тариф';
+
+  @override
+  String get platformAuditFieldStaffLimit => 'Одамон аз рӯи тариф';
+
+  @override
+  String get platformAuditFieldPlan => 'Тариф';
+
+  @override
+  String get platformAuditFieldStatus => 'Дастрасӣ';
+
+  @override
+  String get platformAuditFieldPlanExpiry => 'Муҳлати тариф';
+
+  @override
+  String get platformAuditFieldExtras => 'Имтиёз';
+
+  @override
+  String get platformAuditFieldReason => 'Барои чӣ';
+
+  @override
+  String get platformAuditPlanEnabled => 'Тариф боз ба фермаҳо дода мешавад';
+
+  @override
+  String get platformAuditPlanDisabled =>
+      'Тариф дигар ба фермаҳо дода намешавад';
+
+  @override
+  String get platformAuditPlanBecameDefault => 'Тарифи пешфарз шуд';
+
+  @override
+  String get platformAuditPlanNoLongerDefault => 'Дигар тарифи пешфарз нест';
+
+  @override
+  String platformAuditPlanRef(int id) {
+    return 'Тариф №$id';
+  }
+
+  @override
+  String platformAuditSupportAnswered(int id) {
+    return 'Муроҷиати №$id — бо ҷавоб ба муаллиф';
+  }
+
+  @override
+  String platformAuditSupportClosed(int id) {
+    return 'Муроҷиати №$id — бе ҷавоб';
+  }
+
+  @override
+  String get feedsPaidLabel => 'Чӣ қадар пардохт кардед';
+
+  @override
+  String get feedsPaidHint =>
+      'Агар ин харид бошад, маблағ ба хароҷот меравад. Танҳо бақияро аз нав ҳисоб кардед — холӣ монед.';
+
+  @override
+  String staffInvitedEmailFailedBody(String email) {
+    return 'Мактубро ба $email фиристодан муяссар нашуд. Кормандро бо телефон даъват кунед — ин тавр даъват ҳатман мерасад.';
+  }
+
+  @override
+  String get staffInviteLinkLabel => 'Пайванди даъват';
+
+  @override
+  String get staffInviteCopy => 'Даъватро нусха бардоштан';
+
+  @override
+  String get staffInviteCopied =>
+      'Даъват нусха шуд — онро ба паёми корманд гузоред';
+
+  @override
+  String staffInviteMessage(String link) {
+    return 'Шуморо ба кор дар хоҷагии худ дар RabbitFarm даъват мекунам. Пайвандро кушоед ва ворид шавед: $link';
+  }
+
+  @override
+  String get staffExpiredInvites => 'Мӯҳлат гузашт';
+
+  @override
+  String staffInviteCardLive(String role, String date) {
+    return '$role · то $date';
+  }
+
+  @override
+  String staffInviteCardExpired(String role, String date) {
+    return '$role · мӯҳлат $date гузашт';
+  }
+
+  @override
+  String get staffInviteAgain => 'Аз нав даъват кардан';
+
+  @override
+  String get loginNoCodePhone =>
+      'Рамз наомад? Аз соҳиби хоҷагӣ пурсед, ки шуморо ба кадом рақам даъват кардааст.';
+
+  @override
+  String get loginNoCodeEmail =>
+      'Рамз наомад? Аз соҳиби хоҷагӣ пурсед, ки шуморо ба кадом почта даъват кардааст.';
+
+  @override
+  String get platformPlanDefaultBadge => 'ба фермаҳои нав';
+
+  @override
+  String get staffAccessClosedBadge => 'дастрасӣ баста';
+
+  @override
+  String get roleManagerDescription => 'Рама, хӯрок ва маблағро идора мекунад';
+
+  @override
+  String get roleWorkerDescription =>
+      'Маълумотро мебинад ва корро қайд мекунад';
 }

@@ -299,33 +299,22 @@ class PhotoGalleryScreen extends ConsumerWidget {
     WidgetRef ref,
     RabbitPhoto photo,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.galleryDeleteTitle),
-        content: Text(context.l10n.galleryDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    final deleted = l10n.galleryDeleted;
+    final notifier = ref.read(galleryNotifierProvider.notifier);
+    // Итог удаления читаем через общий контейнер: экран к тому моменту может
+    // быть уже закрыт, а его `ref` — негодным.
+    final container = ProviderScope.containerOf(context, listen: false);
 
-    await ref.read(galleryNotifierProvider.notifier).delete(rabbitId, photo.id);
+    // Снимок пропадает из сетки не сразу, а когда окно отмены закрылось:
+    // сетку рисует ответ сервера, и до самого удаления перечитывать нечего.
+    await deleteWithUndo(
+      context,
+      message: l10n.galleryDeleted,
+      commit: () => notifier.delete(rabbitId, photo.id),
+    );
 
-    final state = ref.read(galleryNotifierProvider);
+    final state = container.read(galleryNotifierProvider);
     if (state.hasError) {
       messenger.showSnackBar(
         SnackBar(
@@ -333,10 +322,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
           backgroundColor: AppColors.error,
         ),
       );
-      return;
     }
-
-    messenger.showSnackBar(SnackBar(content: Text(deleted)));
   }
 }
 

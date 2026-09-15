@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/notifications/notification_primer.dart';
+import '../../../notifications/presentation/screens/notifications_screen.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/date_labels.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -91,6 +93,10 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           rabbitsTotal: d.rabbits.total,
         ),
 
+        // Разрешение на уведомления спрашиваем не при входе, а когда на
+        // ферме уже есть кого напоминать: пустой ферме напоминать нечего.
+        NotificationPrimerGate(enabled: d.rabbits.total > 0),
+
         // Всё, что горит сегодня, — один блок: дела, которые можно закрыть
         // отсюда же, и тревоги, за которыми надо идти в другой раздел.
         Column(
@@ -114,33 +120,25 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppSectionTitle(context.l10n.todayFarmNow),
-            Row(
-              children: [
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.pets_outlined,
-                    label: context.l10n.todayStatLivestock,
-                    value: '${d.rabbits.total}',
-                    accent: AppColors.domainLivestock,
-                  ),
+            StatTileRow(
+              tiles: [
+                StatTile(
+                  icon: Icons.pets_outlined,
+                  label: context.l10n.todayStatLivestock,
+                  value: '${d.rabbits.total}',
+                  accent: AppColors.domainLivestock,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.check_circle_outline,
-                    label: context.l10n.todayStatTasks,
-                    value: '${d.tasks.pending}',
-                    accent: AppColors.domainTasks,
-                  ),
+                StatTile(
+                  icon: Icons.check_circle_outline,
+                  label: context.l10n.todayStatTasks,
+                  value: '${d.tasks.pending}',
+                  accent: AppColors.domainTasks,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.grid_view_outlined,
-                    label: context.l10n.todayStatFreeCages,
-                    value: '${d.cages.available}',
-                    accent: AppColors.domainLivestock,
-                  ),
+                StatTile(
+                  icon: Icons.grid_view_outlined,
+                  label: context.l10n.todayStatFreeCages,
+                  value: '${d.cages.available}',
+                  accent: AppColors.domainLivestock,
                 ),
               ],
             ),
@@ -188,8 +186,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.health.overdueVaccinations > 0)
         AlertCard(
           title: context.l10n.todayAlertOverdueVaccination,
-          description:
-              context.l10n.countVaccinations(d.health.overdueVaccinations),
+          description: context.l10n.countVaccinations(
+            d.health.overdueVaccinations,
+          ),
           icon: Icons.vaccines_outlined,
           color: AppColors.error,
           onTap: () => context.push('/vaccinations'),
@@ -197,8 +196,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.inventory.lowStockFeeds > 0)
         AlertCard(
           title: context.l10n.todayAlertLowFeed,
-          description:
-              context.l10n.countFeedKinds(d.inventory.lowStockFeeds),
+          description: context.l10n.countFeedKinds(d.inventory.lowStockFeeds),
           icon: Icons.inventory_2_outlined,
           color: AppColors.warning,
           onTap: () => context.push('/feeds'),
@@ -206,8 +204,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.health.upcomingVaccinations > 0)
         AlertCard(
           title: context.l10n.todayAlertUpcomingVaccination,
-          description:
-              context.l10n.countVaccinations(d.health.upcomingVaccinations),
+          description: context.l10n.countVaccinations(
+            d.health.upcomingVaccinations,
+          ),
           icon: Icons.event_available_outlined,
           color: AppColors.info,
           onTap: () => context.push('/vaccinations'),
@@ -267,8 +266,9 @@ class _TodayTasks extends ConsumerWidget {
   Widget _empty(BuildContext context) => quietWhenEmpty
       ? Text(
           context.l10n.todayTasksNone,
-          style: AppTypography.bodyMd
-              .copyWith(color: context.colors.onSurfaceVariant),
+          style: AppTypography.bodyMd.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         )
       : const _AllClearCard();
 
@@ -279,8 +279,9 @@ class _TodayTasks extends ConsumerWidget {
           Expanded(
             child: Text(
               errorText(context.l10n, error),
-              style: AppTypography.bodyMd
-                  .copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.bodyMd.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
           ),
           TextButton(
@@ -292,8 +293,7 @@ class _TodayTasks extends ConsumerWidget {
     );
   }
 
-  Future<void> _complete(
-      BuildContext context, WidgetRef ref, Task task) async {
+  Future<void> _complete(BuildContext context, WidgetRef ref, Task task) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
     HapticFeedback.selectionClick();
@@ -424,17 +424,32 @@ class _Greeting extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _greeting(context, now.hour, name),
-          style:
-              AppTypography.displayMd.copyWith(color: context.colors.onSurface),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                _greeting(context, now.hour, name),
+                style: AppTypography.displayMd.copyWith(
+                  color: context.colors.onSurface,
+                ),
+              ),
+            ),
+            // То, что приложение сообщало, пока человек не смотрел: пуш
+            // пропадает со шторки, а до отказавшего в разрешении не доходит
+            // вовсе.
+            const NotificationsBell(),
+          ],
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          DateFormat('d MMMM, EEEE', dateSymbolsLocale(Localizations.localeOf(context)))
-              .format(now),
-          style: AppTypography.bodyMd
-              .copyWith(color: context.colors.onSurfaceVariant),
+          DateFormat(
+            'd MMMM, EEEE',
+            dateSymbolsLocale(Localizations.localeOf(context)),
+          ).format(now),
+          style: AppTypography.bodyMd.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -463,14 +478,18 @@ class _AllClearCard extends StatelessWidget {
     return AppCard(
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline,
-              color: AppColors.success, size: 28),
+          const Icon(
+            Icons.check_circle_outline,
+            color: AppColors.success,
+            size: 28,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
               context.l10n.todayAllClear,
-              style: AppTypography.bodyLg
-                  .copyWith(color: context.colors.onSurface),
+              style: AppTypography.bodyLg.copyWith(
+                color: context.colors.onSurface,
+              ),
             ),
           ),
         ],

@@ -16,6 +16,17 @@ abstract class BreedingCycleDays {
   /// Сукрольность: от случки до окрола.
   static const gestation = 31;
 
+  /// Маточник: раньше самка его затопчет и загадит, позже — окролится на
+  /// сетку. День тот же, что у задачи «поставить маточник», которую заводит
+  /// `breedingService` при записи случки.
+  static const nestBox = 28;
+
+  /// За сколько дней до окрола ставят маточник — то же самое, но от окрола, а
+  /// не от случки: бумажный план окролов читают по дням окрола. Считается из
+  /// двух сроков выше, чтобы уведомление и лист на гвозде не могли назвать
+  /// разные дни.
+  static const nestBoxBeforeBirth = gestation - nestBox;
+
   /// Прощупывание: раньше 10-го дня плоды не прощупываются, к 14-му уже пора.
   static const pregnancyCheck = 14;
 
@@ -91,6 +102,17 @@ class BreedingCycleStatus {
   }
 }
 
+/// Когда ждать окрол по этой случке.
+///
+/// Дату считает сервер, но поле бывает пустым — тогда считаем сами по той же
+/// формуле, чтобы запись не осталась без срока ни в ленте, ни на бумажном
+/// плане окролов.
+DateTime? expectedBirthDay(BreedingModel breeding) =>
+    dayOfDateString(breeding.expectedBirthDate) ??
+    dayOfDateString(
+      breeding.breedingDate,
+    )?.add(const Duration(days: BreedingCycleDays.gestation));
+
 /// Стадия цикла по записи о случке.
 ///
 /// Чистая функция: фермер думает «самка №12, 25-й день», а не «поле status
@@ -101,12 +123,9 @@ BreedingCycleStatus breedingCycleStatus(
   DateTime? now,
 }) {
   final today = _dayOf(now ?? DateTime.now());
-  final bred = _dayOfString(breeding.breedingDate);
+  final bred = dayOfDateString(breeding.breedingDate);
 
-  // Ожидаемый окрол приходит с сервера; если поле пустое, считаем сами по той
-  // же формуле, чтобы строка ленты не осталась без ближайшего дела.
-  final expected = _dayOfString(breeding.expectedBirthDate) ??
-      bred?.add(const Duration(days: BreedingCycleDays.gestation));
+  final expected = expectedBirthDay(breeding);
 
   final day = bred == null ? null : today.difference(bred).inDays + 1;
 
@@ -128,8 +147,8 @@ BreedingCycleStatus breedingCycleStatus(
       // отсчитывается от дня окрола, поэтому берём настоящую, когда она
       // приехала со списком. Ожидаемая — запасной вариант для старых серверов
       // и для окролов, которых в ответе нет: срок тогда честно приблизительный.
-      final born = _dayOfString(breeding.actualBirthDate);
-      final weaned = _dayOfString(breeding.weaningDate);
+      final born = dayOfDateString(breeding.actualBirthDate);
+      final weaned = dayOfDateString(breeding.weaningDate);
 
       if (weaned != null) {
         return BreedingCycleStatus(
@@ -139,8 +158,9 @@ BreedingCycleStatus breedingCycleStatus(
       }
 
       final countFrom = born ?? expected;
-      final weaning =
-          countFrom?.add(const Duration(days: BreedingCycleDays.weaning));
+      final weaning = countFrom?.add(
+        const Duration(days: BreedingCycleDays.weaning),
+      );
       if (weaning == null) {
         return BreedingCycleStatus(
           stage: BreedingCycleStage.closed,
@@ -152,10 +172,9 @@ BreedingCycleStatus breedingCycleStatus(
       // последнего разумного дня отсадки. Оценка такого права не даёт: гнать
       // «просрочено» по выдуманной дате хуже, чем промолчать, поэтому от
       // ожидаемого окрола цикл закрывается сразу за расчётным днём.
-      final lastCall = born?.add(
-            const Duration(days: BreedingCycleDays.weaningLatest),
-          ) ??
-          weaning;
+      final lastCall =
+          born?.add(const Duration(days: BreedingCycleDays.weaningLatest)) ??
+              weaning;
       if (lastCall.isBefore(today)) {
         return BreedingCycleStatus(
           stage: BreedingCycleStage.closed,
@@ -238,12 +257,25 @@ List<BreedingModel> sortedByNextAction(
   return [for (final row in rows) row.$1];
 }
 
-DateTime? _dayOfString(String? raw) {
+/// День из строки даты, как её отдаёт сервер («2026-09-14»). `null` — даты
+/// нет или она не разобралась.
+DateTime? dayOfDateString(String? raw) {
   final parsed = DateTime.tryParse(raw ?? '');
   return parsed == null
       ? null
       : DateTime(parsed.year, parsed.month, parsed.day);
 }
 
-DateTime _dayOf(DateTime value) =>
-    DateTime(value.year, value.month, value.day);
+DateTime _dayOf(DateTime value) => DateTime(value.year, value.month, value.day);
+
+/// Можно ли ещё записать результат прощупывания по этой случке.
+///
+/// Прощупывают, пока случка в работе: записанный окрол переводит её в
+/// «завершена», отменённая и неудачная ничего не ждут, а уже записанный
+/// результат второй раз не спрашивают. Срок сознательно не проверяется —
+/// фермер, который дошёл до клетки на 25-й день, должен иметь возможность
+/// записать то, что нащупал, а не читать «поздно».
+bool canRecordPalpation(BreedingModel breeding) =>
+    BreedingStatus.fromValue(breeding.status) == BreedingStatus.planned &&
+    breeding.palpationDate == null &&
+    breeding.isPregnant == null;

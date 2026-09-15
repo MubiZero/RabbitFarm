@@ -189,8 +189,10 @@ class _AnnouncementFormScreenState
                     .copyWith(color: sheetContext.colors.onSurface),
               ),
             ),
-            // Те же пять срезов, что и чипы в списке ферм, и теми же словами.
-            for (final option in PlatformFarmFilter.values)
+            // Те же срезы, что и чипы в списке ферм, и теми же словами —
+            // кроме «Удалённых»: рассылать объявление ферме, которой закрыли
+            // доступ и вот-вот сотрут, некому.
+            for (final option in announcementFarmFilters)
               ListTile(
                 leading: Icon(
                   option == _filter
@@ -346,8 +348,7 @@ class _AnnouncementFormScreenState
                 if (_target == 'farm')
                   _ChoiceRow(
                     icon: Icons.holiday_village_outlined,
-                    label: _farm?.name ??
-                        l10n.platformAnnouncementFormPickFarm,
+                    label: _farm?.name ?? l10n.platformAnnouncementFormPickFarm,
                     isEmpty: _farm == null,
                     onTap: _sending ? null : _pickFarm,
                   ),
@@ -402,8 +403,7 @@ class _ChoiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isEmpty ? AppColors.warning : context.colors.onSurface;
+    final color = isEmpty ? AppColors.warning : context.colors.onSurface;
 
     return AppCard(
       onTap: onTap,

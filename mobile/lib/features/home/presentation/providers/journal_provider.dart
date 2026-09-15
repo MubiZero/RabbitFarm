@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
 import '../../data/models/journal_entry.dart';
@@ -43,5 +44,8 @@ final journalFeedProvider = FutureProvider.autoDispose
   return ref.watch(journalRepositoryProvider).load(
         from: period.from(now),
         to: period.to(now),
+        // Кто что удалил — вопрос хозяйский, и сервер отдаёт эти записи
+        // только владельцу и управляющему.
+        includeDeletions: ref.watch(canProvider(FarmCapability.viewStaff)),
       );
 });

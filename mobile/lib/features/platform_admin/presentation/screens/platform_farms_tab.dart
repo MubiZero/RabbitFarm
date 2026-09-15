@@ -38,7 +38,8 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
     _debounce?.cancel();
     _debounce = Timer(
       AppDuration.normal,
-      () => ref.read(platformFarmsProvider.notifier).setSearchQuery(query.trim()),
+      () =>
+          ref.read(platformFarmsProvider.notifier).setSearchQuery(query.trim()),
     );
   }
 
@@ -54,23 +55,38 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
       hasMore: state.hasMore,
       onRefresh: notifier.load,
       onLoadMore: notifier.loadMore,
-      header: _Header(state: state, controller: _search, onSearch: _onSearchChanged),
-      empty: state.hasFilters
+      header: _Header(
+          state: state, controller: _search, onSearch: _onSearchChanged),
+      // Пустота в срезе удалённых — не «ничего не найдено», а хорошая новость:
+      // зачищать нечего. Общая подсказка «измените поиск» отвечала бы не на
+      // тот вопрос.
+      empty: state.filter == PlatformFarmFilter.deleted
           ? AppEmptyState(
-              icon: Icons.search_off,
-              title: context.l10n.platformFarmsNothingFound,
-              subtitle: context.l10n.platformFarmsNothingFoundBody,
+              icon: Icons.delete_outline,
+              title: context.l10n.platformFarmsDeletedEmptyTitle,
+              subtitle: context.l10n.platformFarmsDeletedEmptyBody,
               actionLabel: context.l10n.commonReset,
               onAction: () {
                 _search.clear();
                 notifier.resetFilters();
               },
             )
-          : AppEmptyState(
-              icon: Icons.holiday_village_outlined,
-              title: context.l10n.platformFarmsEmptyTitle,
-              subtitle: context.l10n.platformFarmsEmptyBody,
-            ),
+          : state.hasFilters
+              ? AppEmptyState(
+                  icon: Icons.search_off,
+                  title: context.l10n.platformFarmsNothingFound,
+                  subtitle: context.l10n.platformFarmsNothingFoundBody,
+                  actionLabel: context.l10n.commonReset,
+                  onAction: () {
+                    _search.clear();
+                    notifier.resetFilters();
+                  },
+                )
+              : AppEmptyState(
+                  icon: Icons.holiday_village_outlined,
+                  title: context.l10n.platformFarmsEmptyTitle,
+                  subtitle: context.l10n.platformFarmsEmptyBody,
+                ),
       itemBuilder: (context, farm, _) => PlatformFarmCard(
         farm: farm,
         onChangePlan: () => _changePlan(context, ref, farm),
@@ -83,7 +99,8 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
           ? (context, farms) => PlatformFarmsTable(
                 farms: farms,
                 onChangePlan: (farm) => _changePlan(context, ref, farm),
-                onOpen: (farm) => context.push('/platform-admin/farms/${farm.id}'),
+                onOpen: (farm) =>
+                    context.push('/platform-admin/farms/${farm.id}'),
               )
           : null,
     );
@@ -103,8 +120,9 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
     final l10n = context.l10n;
     final assigned = l10n.platformPlanAssigned;
 
-    final error =
-        await ref.read(platformFarmsProvider.notifier).assignPlan(farm.id, choice.planId);
+    final error = await ref
+        .read(platformFarmsProvider.notifier)
+        .assignPlan(farm.id, choice.planId);
 
     messenger.showSnackBar(
       error == null

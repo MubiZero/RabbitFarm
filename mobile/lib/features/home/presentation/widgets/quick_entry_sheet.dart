@@ -73,6 +73,13 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           capability: FarmCapability.recordDailyWork,
         ),
         QuickEntryAction(
+          icon: Icons.heart_broken_outlined,
+          label: l10n.quickRecordDeath,
+          route: '/rabbits/death',
+          domain: AppDomain.livestock,
+          capability: FarmCapability.recordDailyWork,
+        ),
+        QuickEntryAction(
           icon: Icons.sticky_note_2_outlined,
           label: l10n.quickRecordNote,
           route: '/notes/form',

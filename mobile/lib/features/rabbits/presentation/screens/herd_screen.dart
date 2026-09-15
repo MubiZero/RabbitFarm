@@ -169,10 +169,28 @@ class _Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.herdTitle,
-            style: AppTypography.displayMd
-                .copyWith(color: context.colors.onSurface),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.herdTitle,
+                  style: AppTypography.displayMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ),
+              // Камера вместо поиска по номеру: у клетки, к которой
+              // подошёл, номер написан на метке, а не в памяти.
+              IconButton(
+                tooltip: l10n.cageScanTitle,
+                icon: const Icon(Icons.qr_code_scanner),
+                iconSize: 26,
+                constraints: const BoxConstraints(
+                  minWidth: AppSizes.iconButton,
+                  minHeight: AppSizes.iconButton,
+                ),
+                onPressed: () => context.push('/cages/scan'),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           TextField(

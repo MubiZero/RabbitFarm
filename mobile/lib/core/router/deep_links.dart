@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/cages/presentation/utils/cage_tag.dart';
 import '../utils/phone_utils.dart';
 import 'app_router.dart';
 
@@ -74,6 +75,17 @@ String? takePendingInvitePhone() {
 }
 
 void _open(Uri uri) {
+  // Метка с клетки, прочитанная чужим сканером (камерой телефона, любым
+  // приложением для QR): наш экран сканирования сюда не приходит — он
+  // открывает клетку сам, не выходя из приложения.
+  final cageId = cageIdFromTag(uri.toString());
+  if (cageId != null) {
+    // Не вошедшего роутер завернёт на вход, и это верно: чужая ферма по
+    // ссылке открываться не должна.
+    rootNavigatorKey.currentContext?.push('/cages/$cageId');
+    return;
+  }
+
   // Сам URL в лог не пишем: в нём номер телефона живого человека.
   final phone = phoneFromInviteLink(uri);
   if (phone == null) return;

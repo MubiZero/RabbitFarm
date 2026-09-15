@@ -5,8 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/pin_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/notifications/notification_permission.dart';
+import '../../../../core/notifications/notification_primer.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../../core/l10n/error_text.dart';
@@ -124,6 +125,7 @@ class SettingsScreen extends ConsumerWidget {
           _GroupCard(
             context: context,
             children: [
+              const _NotificationPermissionTile(),
               _SettingsTile(
                 icon: Icons.notifications_outlined,
                 label: context.l10n.settingsDigestToggle,
@@ -355,7 +357,8 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = Padding(
+    final content = Container(
+      constraints: const BoxConstraints(minHeight: AppSizes.touchTarget),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
@@ -379,6 +382,55 @@ class _SettingsTile extends StatelessWidget {
     );
 
     return onTap == null ? content : InkWell(onTap: onTap, child: content);
+  }
+}
+
+/// Предложить включить уведомления, если системный вопрос ещё не задавали.
+///
+/// Появляется только тогда, когда на него можно ответить: если человек уже
+/// разрешил — показывать нечего, если отказал системному диалогу — включить
+/// обратно можно лишь в настройках телефона, и кнопка здесь врала бы.
+class _NotificationPermissionTile extends ConsumerStatefulWidget {
+  const _NotificationPermissionTile();
+
+  @override
+  ConsumerState<_NotificationPermissionTile> createState() =>
+      _NotificationPermissionTileState();
+}
+
+class _NotificationPermissionTileState
+    extends ConsumerState<_NotificationPermissionTile> {
+  bool _canAsk = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _check();
+  }
+
+  Future<void> _check() async {
+    final canAsk = await ref
+        .read(notificationPermissionProvider)
+        .shouldShowPrimer();
+    if (mounted) setState(() => _canAsk = canAsk);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_canAsk) return const SizedBox.shrink();
+
+    return _SettingsTile(
+      icon: Icons.notifications_off_outlined,
+      label: context.l10n.settingsNotificationsOff,
+      trailing: Text(
+        context.l10n.settingsNotificationsTurnOn,
+        style: AppTypography.bodyMd.copyWith(color: context.accent),
+      ),
+      onTap: () async {
+        await NotificationPrimerSheet.show(context);
+        await _check();
+      },
+    );
   }
 }
 

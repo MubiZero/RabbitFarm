@@ -149,40 +149,46 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     }
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.taskFormDeleteTitle),
-        content: Text(context.l10n.taskFormDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.taskFormDeleted;
     final failed = context.l10n.taskFormDeleteFailed;
+    // Действия и список забираем сразу: запрос уйдёт уже после того, как
+    // экран закроется.
+    final actions = ref.read(taskActionsProvider);
+    final list = ref.read(tasksListProvider.notifier);
+    final taskId = _task!.id;
 
-    try {
-      await ref.read(taskActionsProvider).deleteTask(_task!.id);
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-      if (navigator.canPop()) navigator.pop();
-    } catch (_) {
+    list.removeTask(taskId);
+
+    var failedToDelete = false;
+    // Окно отмены открываем, пока форма ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму форму
+    // закрываем, не дожидаясь окна, — подсказка живёт выше экрана и переживёт
+    // его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.taskFormDeleted,
+      commit: () async {
+        try {
+          await actions.deleteTask(taskId);
+        } catch (_) {
+          failedToDelete = true;
+        }
+      },
+      onUndo: list.refresh,
+    );
+    if (navigator.canPop()) navigator.pop();
+    await pending;
+
+    if (failedToDelete) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await list.refresh();
     }
   }
 

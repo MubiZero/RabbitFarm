@@ -47,10 +47,10 @@ function readOnlyDueAt(planExpiresAt) {
   return new Date(new Date(planExpiresAt).getTime() + graceHours() * MS_PER_HOUR);
 }
 
-async function _notifyFarm(farm, { title, body }) {
+async function _notifyFarm(farm, key) {
   await notifyFarmOwners(farm.id, {
-    title,
-    body,
+    key,
+    params: { plan: farm.plan.name },
     data: { type: 'plan_expiry', route: '/subscription' }
   });
 }
@@ -72,12 +72,7 @@ async function _processFarm(farm, now = new Date()) {
   const days = daysUntil(farm.plan_expires_at, now);
 
   if (days === 7 || days === 1) {
-    await _notifyFarm(farm, {
-      title: days === 7 ? 'Тариф скоро закончится' : 'Тариф заканчивается завтра',
-      body: days === 7
-        ? `Тариф «${farm.plan.name}» действует ещё 7 дней. Продлите его в приложении, раздел «Тариф».`
-        : `Тариф «${farm.plan.name}» истекает завтра. Продлите его в приложении, раздел «Тариф», чтобы не потерять доступ к записи.`
-    });
+    await _notifyFarm(farm, days === 7 ? 'planExpiringWeek' : 'planExpiringTomorrow');
     return;
   }
 
@@ -88,10 +83,7 @@ async function _processFarm(farm, now = new Date()) {
     if (readOnlyDueAt(farm.plan_expires_at) > now) return;
 
     await farm.update({ status: 'read_only' });
-    await _notifyFarm(farm, {
-      title: 'Тариф истёк',
-      body: `Тариф «${farm.plan.name}» истёк — доступ переведён в режим только для чтения. Продлите тариф в приложении, раздел «Тариф», чтобы снова вносить записи.`
-    });
+    await _notifyFarm(farm, 'planExpired');
     return;
   }
 
@@ -104,12 +96,7 @@ async function _processFarm(farm, now = new Date()) {
   // что текст говорит «записи не сохраняются»: приостановленной ферме
   // (`suspended`) это неправда, ей продление доступа не откроет.
   if (farm.status === 'read_only' && (days === -3 || days === -14)) {
-    await _notifyFarm(farm, {
-      title: days === -3 ? 'Ферма работает только на чтение' : 'Тариф не продлён две недели',
-      body: days === -3
-        ? `Тариф «${farm.plan.name}» истёк 3 дня назад — новые записи не сохраняются. Продлите тариф в приложении, раздел «Тариф».`
-        : `Тариф «${farm.plan.name}» истёк 14 дней назад, ферма всё это время работает только на чтение. Продлите тариф в приложении, раздел «Тариф», чтобы снова вносить записи.`
-    });
+    await _notifyFarm(farm, days === -3 ? 'planReadOnlyThreeDays' : 'planUnpaidTwoWeeks');
   }
 }
 

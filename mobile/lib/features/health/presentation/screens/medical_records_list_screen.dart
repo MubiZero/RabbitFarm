@@ -389,42 +389,40 @@ class _DetailsSheet extends ConsumerWidget {
 
   const _DetailsSheet({required this.record});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.medDeleteTitle),
-        content: Text(context.l10n.medDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.medDeleted;
     final failed = context.l10n.medDeleteFailed;
+    final notifier = ref.read(medicalRecordsProvider.notifier);
 
-    try {
-      await ref
-          .read(medicalRecordsProvider.notifier)
-          .deleteMedicalRecord(record.id);
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } catch (_) {
+    notifier.removeMedicalRecord(record.id);
+
+    var failedToDelete = false;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.medDeleted,
+      commit: () async {
+        try {
+          await notifier.deleteMedicalRecord(record.id);
+        } catch (_) {
+          failedToDelete = true;
+        }
+      },
+      onUndo: notifier.refresh,
+    );
+    navigator.pop();
+    await pending;
+
+    if (failedToDelete) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await notifier.refresh();
     }
   }
 

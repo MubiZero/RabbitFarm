@@ -80,21 +80,34 @@ _PlatformFarm _$PlatformFarmFromJson(
       : const IntConverter().fromJson(json['staff_count'] as Object),
   createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
   lastActiveAt: const NullableDateTimeConverter().fromJson(json['last_active']),
+  status: json['status'] as String? ?? 'active',
+  deletedAt: const NullableDateTimeConverter().fromJson(json['deleted_at']),
+  extraRabbits: const NullableIntConverter().fromJson(json['extra_rabbits']),
+  extraStaff: const NullableIntConverter().fromJson(json['extra_staff']),
+  extrasUntil: const NullableDateTimeConverter().fromJson(json['extras_until']),
 );
 
-Map<String, dynamic> _$PlatformFarmToJson(_PlatformFarm instance) =>
-    <String, dynamic>{
-      'id': const IntConverter().toJson(instance.id),
-      'name': instance.name,
-      'owner': instance.owner,
-      'plan': instance.plan,
-      'rabbits_count': const IntConverter().toJson(instance.rabbitsCount),
-      'staff_count': const IntConverter().toJson(instance.staffCount),
-      'created_at': const DateTimeConverter().toJson(instance.createdAt),
-      'last_active': const NullableDateTimeConverter().toJson(
-        instance.lastActiveAt,
-      ),
-    };
+Map<String, dynamic> _$PlatformFarmToJson(
+  _PlatformFarm instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'name': instance.name,
+  'owner': instance.owner,
+  'plan': instance.plan,
+  'rabbits_count': const IntConverter().toJson(instance.rabbitsCount),
+  'staff_count': const IntConverter().toJson(instance.staffCount),
+  'created_at': const DateTimeConverter().toJson(instance.createdAt),
+  'last_active': const NullableDateTimeConverter().toJson(
+    instance.lastActiveAt,
+  ),
+  'status': instance.status,
+  'deleted_at': const NullableDateTimeConverter().toJson(instance.deletedAt),
+  'extra_rabbits': const NullableIntConverter().toJson(instance.extraRabbits),
+  'extra_staff': const NullableIntConverter().toJson(instance.extraStaff),
+  'extras_until': const NullableDateTimeConverter().toJson(
+    instance.extrasUntil,
+  ),
+};
 
 _FarmStaffMember _$FarmStaffMemberFromJson(Map<String, dynamic> json) =>
     _FarmStaffMember(
@@ -383,28 +396,66 @@ Map<String, dynamic> _$SupportRequestFarmToJson(_SupportRequestFarm instance) =>
       'name': instance.name,
     };
 
-_SupportRequest _$SupportRequestFromJson(Map<String, dynamic> json) =>
-    _SupportRequest(
+_SupportRequest _$SupportRequestFromJson(
+  Map<String, dynamic> json,
+) => _SupportRequest(
+  id: const IntConverter().fromJson(json['id'] as Object),
+  text: json['text'] as String,
+  status: json['status'] as String? ?? 'new',
+  answer: json['answer'] as String?,
+  resolvedAt: const NullableDateTimeConverter().fromJson(json['resolved_at']),
+  farm: json['farm'] == null
+      ? null
+      : SupportRequestFarm.fromJson(json['farm'] as Map<String, dynamic>),
+  author: json['author'] == null
+      ? null
+      : UserRef.fromJson(json['author'] as Map<String, dynamic>),
+  createdAt: const DateTimeConverter().fromJson(json['created_at'] as Object),
+);
+
+Map<String, dynamic> _$SupportRequestToJson(
+  _SupportRequest instance,
+) => <String, dynamic>{
+  'id': const IntConverter().toJson(instance.id),
+  'text': instance.text,
+  'status': instance.status,
+  'answer': instance.answer,
+  'resolved_at': const NullableDateTimeConverter().toJson(instance.resolvedAt),
+  'farm': instance.farm,
+  'author': instance.author,
+  'created_at': const DateTimeConverter().toJson(instance.createdAt),
+};
+
+_AdminAuditEntry _$AdminAuditEntryFromJson(Map<String, dynamic> json) =>
+    _AdminAuditEntry(
       id: const IntConverter().fromJson(json['id'] as Object),
-      text: json['text'] as String,
-      status: json['status'] as String? ?? 'new',
+      adminId: const IntConverter().fromJson(json['admin_id'] as Object),
+      action: json['action'] as String,
+      farmId: const NullableIntConverter().fromJson(json['farm_id']),
+      admin: json['admin'] == null
+          ? null
+          : UserRef.fromJson(json['admin'] as Map<String, dynamic>),
       farm: json['farm'] == null
           ? null
           : SupportRequestFarm.fromJson(json['farm'] as Map<String, dynamic>),
-      author: json['author'] == null
-          ? null
-          : UserRef.fromJson(json['author'] as Map<String, dynamic>),
+      before: json['before'] as Map<String, dynamic>?,
+      after: json['after'] as Map<String, dynamic>?,
+      ip: json['ip'] as String?,
       createdAt: const DateTimeConverter().fromJson(
         json['created_at'] as Object,
       ),
     );
 
-Map<String, dynamic> _$SupportRequestToJson(_SupportRequest instance) =>
+Map<String, dynamic> _$AdminAuditEntryToJson(_AdminAuditEntry instance) =>
     <String, dynamic>{
       'id': const IntConverter().toJson(instance.id),
-      'text': instance.text,
-      'status': instance.status,
+      'admin_id': const IntConverter().toJson(instance.adminId),
+      'action': instance.action,
+      'farm_id': const NullableIntConverter().toJson(instance.farmId),
+      'admin': instance.admin,
       'farm': instance.farm,
-      'author': instance.author,
+      'before': instance.before,
+      'after': instance.after,
+      'ip': instance.ip,
       'created_at': const DateTimeConverter().toJson(instance.createdAt),
     };

@@ -75,24 +75,19 @@ class _TransactionStatisticsScreenState
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: StatTile(
-                  icon: Icons.arrow_upward,
-                  label: context.l10n.financeIncome,
-                  value: formatMoney(stats.totalIncome),
-                  accent: AppColors.success,
-                ),
+          StatTileRow(
+            tiles: [
+              StatTile(
+                icon: Icons.arrow_upward,
+                label: context.l10n.financeIncome,
+                value: formatMoney(stats.totalIncome),
+                accent: AppColors.success,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatTile(
-                  icon: Icons.arrow_downward,
-                  label: context.l10n.financeExpenses,
-                  value: formatMoney(stats.totalExpenses),
-                  accent: AppColors.error,
-                ),
+              StatTile(
+                icon: Icons.arrow_downward,
+                label: context.l10n.financeExpenses,
+                value: formatMoney(stats.totalExpenses),
+                accent: AppColors.error,
               ),
             ],
           ),
@@ -114,10 +109,11 @@ class _TransactionStatisticsScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isProfit ? context.l10n.financeProfit : context.l10n.financeLoss,
+                        isProfit
+                            ? context.l10n.financeProfit
+                            : context.l10n.financeLoss,
                         style: AppTypography.labelSm.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -174,7 +170,6 @@ class _TransactionStatisticsScreenState
     );
   }
 }
-
 
 class _CategoryBreakdown extends StatelessWidget {
   final String title;
@@ -244,10 +239,13 @@ class _RecentTransactionRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  DateFormat('dd MMM yyyy', 'ru_RU')
-                      .format(transaction.transactionDate),
-                  style:
-                      AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                  DateFormat(
+                    'dd MMM yyyy',
+                    'ru_RU',
+                  ).format(transaction.transactionDate),
+                  style: AppTypography.labelSm.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),

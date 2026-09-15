@@ -7,6 +7,7 @@ import '../../features/auth/presentation/screens/pin_setup_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
+import '../../features/rabbits/presentation/screens/death_form_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_detail_screen.dart';
 import '../../features/rabbits/presentation/screens/pedigree_screen.dart';
 import '../../features/rabbits/presentation/screens/breeds_list_screen.dart';
@@ -22,6 +23,9 @@ import '../../features/rabbits/data/models/breeding_model.dart';
 import '../../features/rabbits/data/models/birth_model.dart';
 import '../../features/cages/presentation/screens/cages_list_screen.dart';
 import '../../features/cages/presentation/screens/cage_form_screen.dart';
+import '../../features/cages/presentation/screens/cage_scanner_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../features/cages/presentation/screens/cage_tags_screen.dart';
 import '../../features/cages/presentation/screens/cage_detail_screen.dart';
 import '../../features/cages/data/models/cage_model.dart';
 import '../../features/health/presentation/screens/health_journal_screen.dart';
@@ -73,6 +77,7 @@ import '../../features/platform_admin/presentation/screens/plan_form_screen.dart
 import '../../features/platform_admin/presentation/screens/farm_detail_screen.dart';
 import '../../features/platform_admin/presentation/screens/farm_export_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
+import '../../features/onboarding/presentation/screens/welcome_screen.dart';
 
 /// Notifies GoRouter when auth state changes.
 /// Correct pattern: GoRouter is created once, redirect is re-evaluated on notification.
@@ -90,6 +95,7 @@ class RouterNotifier extends ChangeNotifier {
     '/login',
     '/register',
     '/splash',
+    '/welcome',
   };
 
   String? redirect(BuildContext context, GoRouterState state) {
@@ -141,6 +147,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+
+      // Знакомство при первом запуске — до регистрации и без аккаунта.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/welcome',
+        name: 'welcome',
+        builder: (context, state) => const WelcomeScreen(),
       ),
 
       // Auth routes
@@ -262,11 +276,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Rabbit detail and form routes (outside shell)
+      // Отметка падежа: своим экраном, а не выбором статуса в общей форме —
+      // её проходят у клетки и в спешке.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/rabbits/death',
+        name: 'rabbit-death',
+        builder: (context, state) =>
+            DeathFormScreen(rabbit: state.extra as RabbitModel?),
+      ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/rabbits/new',
         name: 'rabbit-new',
-        builder: (context, state) => const RabbitFormScreen(),
+        // `cage` в запросе — клетка, из которой открыли форму: кролика
+        // заводят, стоя у клетки, и спрашивать «в какой» там незачем.
+        builder: (context, state) => RabbitFormScreen(
+          cageId: int.tryParse(state.uri.queryParameters['cage'] ?? ''),
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -432,6 +459,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'cages',
         builder: (context, state) => const CagesListScreen(),
       ),
+      // Метки на клетках. Оба маршрута стоят выше `/cages/:id`, иначе
+      // `scan` и `tags` разобрались бы как идентификатор клетки.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/cages/scan',
+        name: 'cage-scan',
+        builder: (context, state) => const CageScannerScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/cages/tags',
+        name: 'cage-tags',
+        builder: (context, state) => CageTagsScreen(
+          cageId: int.tryParse(state.uri.queryParameters['cage'] ?? ''),
+        ),
+      ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/cages/form',
@@ -520,7 +569,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'feeding-record-form',
         builder: (context, state) {
           final record = state.extra as FeedingRecord?;
-          return FeedingRecordFormScreen(record: record);
+          return FeedingRecordFormScreen(
+            record: record,
+            cageId: int.tryParse(state.uri.queryParameters['cage'] ?? ''),
+          );
         },
       ),
       GoRoute(

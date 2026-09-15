@@ -456,12 +456,17 @@ class PlatformAdminController {
   /** PATCH /platform-admin/support-requests/:id/resolve */
   async resolveSupportRequest(req, res, next) {
     try {
-      const resolved = await supportRequestService.resolve(req.params.id);
+      // Ответ уходит автору пушем и письмом — см. supportRequestService.
+      const answer = (req.body.answer || '').trim() || null;
+      const resolved = await supportRequestService.resolve(req.params.id, {
+        answer,
+        actorId: req.user.id
+      });
       await auditService.record({
         adminId: req.user.id,
         action: 'support_request.resolve',
         farmId: resolved.farm_id,
-        after: { id: resolved.id, status: resolved.status },
+        after: { id: resolved.id, status: resolved.status, answered: Boolean(answer) },
         ip: req.ip
       });
       return ApiResponse.success(res, resolved, 'Обращение отмечено разобранным');

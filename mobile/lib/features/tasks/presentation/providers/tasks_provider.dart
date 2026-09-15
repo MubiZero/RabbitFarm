@@ -214,6 +214,18 @@ class TasksListNotifier extends StateNotifier<TasksListState> {
     await loadTasks();
   }
 
+  /// Убрать задачу из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `refresh()`.
+  void removeTask(int id) {
+    state = state.copyWith(
+      tasks: state.tasks.where((t) => t.id != id).toList(),
+      total: state.total - 1,
+    );
+  }
+
   /// Update filters and reload
   void setFilters({
     TaskType? type,

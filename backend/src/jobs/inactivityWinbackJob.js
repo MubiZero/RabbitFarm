@@ -42,16 +42,9 @@ function reminderStage(inactiveDays) {
 }
 
 function _message(farm, stage) {
-  if (stage === 14) {
-    return {
-      title: 'Давно вас не было',
-      body: `В хозяйство «${farm.name}» не заходили две недели. Загляните в приложение: отметьте кормления, взвешивания и окролы, чтобы записи не отстали от жизни фермы.`
-    };
-  }
-
   return {
-    title: 'Ферма ждёт вас',
-    body: `В хозяйстве «${farm.name}» не были уже месяц. Все ваши записи на месте — откройте приложение и продолжите с того, на чём остановились.`
+    key: stage === 14 ? 'winbackTwoWeeks' : 'winbackMonth',
+    params: { farm: farm.name }
   };
 }
 

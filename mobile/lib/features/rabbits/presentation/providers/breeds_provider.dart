@@ -106,6 +106,17 @@ class BreedsNotifier extends StateNotifier<BreedsState> {
     }
   }
 
+  /// Убрать породу из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `loadBreeds()`.
+  void removeBreed(int id) {
+    state = state.copyWith(
+      breeds: state.breeds.where((breed) => breed.id != id).toList(),
+    );
+  }
+
   /// Удалить породу
   Future<bool> deleteBreed(int id) async {
     try {

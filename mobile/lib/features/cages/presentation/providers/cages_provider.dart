@@ -268,6 +268,17 @@ class CagesNotifier extends StateNotifier<CagesState> {
     }
   }
 
+  /// Убрать клетку из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место — это
+  /// `loadCages()`.
+  void removeCage(int id) {
+    state = state.copyWith(
+      cages: state.cages.where((cage) => cage.id != id).toList(),
+    );
+  }
+
   /// Удалить клетку
   Future<bool> deleteCage(int id) async {
     try {

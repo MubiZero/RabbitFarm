@@ -24,5 +24,5 @@ class ActivationChecklistNotifier extends AsyncNotifier<bool> {
 
 final activationChecklistDismissedProvider =
     AsyncNotifierProvider<ActivationChecklistNotifier, bool>(
-  ActivationChecklistNotifier.new,
-);
+      ActivationChecklistNotifier.new,
+    );

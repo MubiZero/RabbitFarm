@@ -5,19 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/rabbit_picker.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/utils/image_url_helper.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_form_section.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/widgets/app_form_disclosure.dart';
 import '../../../../core/widgets/app_form_scaffold.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../core/voice/voice_input.dart';
+import '../../../cages/data/models/cage_model.dart';
+import '../../../cages/presentation/providers/cages_provider.dart';
+import '../../../cages/presentation/providers/herd_cages_provider.dart';
 import '../../../../core/widgets/plan_limit_dialog.dart';
 import '../../../../core/api/api_failure.dart';
 
@@ -25,7 +31,11 @@ class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
   final RabbitModel? rabbit;
 
-  const RabbitFormScreen({super.key, this.rabbitId, this.rabbit});
+  /// Клетка, из которой открыли форму. Кролика заводят, стоя у клетки, —
+  /// и если пришли с её экрана, спрашивать «в какой клетке» незачем.
+  final int? cageId;
+
+  const RabbitFormScreen({super.key, this.rabbitId, this.rabbit, this.cageId});
 
   @override
   ConsumerState<RabbitFormScreen> createState() => _RabbitFormScreenState();
@@ -41,13 +51,17 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   final _imagePicker = ImagePicker();
 
   int? _selectedBreedId;
+  int? _selectedCageId;
   int? _selectedFatherId;
   int? _selectedMotherId;
   RabbitModel? _father;
   RabbitModel? _mother;
   String? _fatherLabel;
   String? _motherLabel;
-  String _selectedSex = 'male';
+
+  /// Пола по умолчанию нет намеренно: «самец» стоял здесь заранее, и
+  /// половина ферм заводила самок самцами, просто не тронув поле.
+  String? _selectedSex;
   String _selectedStatus = 'healthy';
   String _selectedPurpose = 'breeding';
   DateTime _birthDate = DateTime.now().subtract(const Duration(days: 60));
@@ -66,7 +80,27 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       Future.microtask(() => _loadRabbitFromProvider());
     } else {
       _tagIdController.text = _suggestedTag();
+      _selectedCageId = widget.cageId;
+      Future.microtask(_restoreLastBreed);
     }
+  }
+
+  /// На ферме держат одну-две породы, и вторую сотню кроликов выбирают ту же
+  /// самую. Подставленная порода убирает одно из трёх решений на записи.
+  static const _lastBreedKey = 'rabbit_form_last_breed_id';
+
+  Future<void> _restoreLastBreed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt(_lastBreedKey);
+    if (id == null || !mounted || _selectedBreedId != null) return;
+    setState(() => _selectedBreedId = id);
+  }
+
+  Future<void> _rememberBreed() async {
+    final id = _selectedBreedId;
+    if (id == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_lastBreedKey, id);
   }
 
   /// Номер бирки человек пишет на ушной бирке от руки, поэтому он должен быть
@@ -106,6 +140,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     _weightController.text = rabbit.currentWeight?.toString() ?? '';
     _notesController.text = rabbit.notes ?? '';
     _selectedBreedId = rabbit.breedId;
+    _selectedCageId = rabbit.cageId;
     _selectedFatherId = rabbit.fatherId;
     _selectedMotherId = rabbit.motherId;
     _fatherLabel = rabbit.father?.name;
@@ -244,6 +279,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         'name': _nameController.text.trim(),
         'tag_id': _tagIdController.text.trim(),
         'breed_id': _selectedBreedId,
+        // Клетка отправляется всегда, включая null: кролика переселяют и
+        // высаживают, и «поле не пришло» сервер трактует как «оставить как
+        // было» — освободить клетку стало бы невозможно.
+        'cage_id': _selectedCageId,
         'sex': _selectedSex,
         'birth_date': _birthDate.toIso8601String(),
         'status': _selectedStatus,
@@ -272,6 +311,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             .createRabbit(data);
         rabbitId = createdRabbit.id;
         Analytics.rabbitAdded();
+        await _rememberBreed();
       }
 
       if (_selectedImage != null) {
@@ -302,6 +342,11 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
 
       ref.read(rabbitsListProvider.notifier).refresh();
+      ref.invalidate(cageRowsProvider);
+      ref.invalidate(cageOptionsProvider);
+      if (_selectedCageId != null) {
+        ref.invalidate(cageDetailProvider(_selectedCageId!));
+      }
 
       if (isEditMode && widget.rabbitId != null) {
         ref.invalidate(rabbitDetailProvider(widget.rabbitId!));
@@ -373,108 +418,34 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
           key: _formKey,
           onChanged: () => setState(() => _touched = true),
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.lg,
+              AppSpacing.screenH,
+              AppSpacing.fabSafeBottom,
+            ),
             children: [
-              // Photo section
-              Center(
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: _showImageSourceDialog,
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: cs.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: cs.outline, width: 2),
-                        ),
-                        child: _selectedImage != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: kIsWeb
-                                    ? (_webImageBytes != null
-                                          ? Image.memory(
-                                              _webImageBytes!,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Icon(
-                                              Icons.image,
-                                              size: 60,
-                                              color: cs.onSurfaceVariant,
-                                            ))
-                                    : Image.file(
-                                        File(_selectedImage!.path),
-                                        fit: BoxFit.cover,
-                                      ),
-                              )
-                            : displayPhotoUrl != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  displayPhotoUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.pets,
-                                      size: 60,
-                                      color: cs.onSurfaceVariant,
-                                    );
-                                  },
-                                ),
-                              )
-                            : Icon(
-                                Icons.add_a_photo,
-                                size: 60,
-                                color: cs.onSurfaceVariant,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      onPressed: _showImageSourceDialog,
-                      icon: const Icon(Icons.camera_alt),
-                      label: Text(
-                        _selectedImage != null || displayPhotoUrl != null
-                            ? context.l10n.rabbitFormPhotoChange
-                            : context.l10n.rabbitFormPhotoAdd,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-
+              // Главное — ровно три решения, без которых записи не будет:
+              // кто это, когда родился и какой породы. Остальное либо
+              // подставляется, либо не нужно в момент записи. Прежняя форма
+              // спрашивала одиннадцать полей подряд, и на словах фермера это
+              // звучало так: «всех своих кроликов по одному вбивать не буду».
               AppFormSection(
                 title: context.l10n.commonSectionMain,
                 children: [
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.rabbitFormName,
-                      hintText: context.l10n.rabbitFormNameHint,
-                      prefixIcon: Icon(Icons.pets),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return context.l10n.rabbitFormNameEmpty;
-                      }
-                      return null;
-                    },
+                  _SexField(
+                    value: _selectedSex,
+                    onChanged: (value) => setState(() {
+                      _selectedSex = value;
+                      _touched = true;
+                    }),
                   ),
-                  TextFormField(
-                    controller: _tagIdController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.rabbitFormTag,
-                      hintText: 'R-XXX',
-                      prefixIcon: Icon(Icons.tag),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return context.l10n.rabbitFormTagEmpty;
-                      }
-                      return null;
-                    },
+                  AppDateField(
+                    label: context.l10n.rabbitBirthDate,
+                    value: _birthDate,
+                    onChanged: (date) => setState(() => _birthDate = date),
+                    prefixIcon: Icons.cake,
+                    lastDate: DateTime.now(),
                   ),
                   if (breedsState.isLoading)
                     const Center(
@@ -510,37 +481,108 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                           ? context.l10n.rabbitFormBreedRequired
                           : null,
                     ),
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedSex,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.rabbitSex,
-                      prefixIcon: Icon(Icons.wc),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: 'male',
-                        child: Text(context.l10n.sexMale),
-                      ),
-                      DropdownMenuItem(
-                        value: 'female',
-                        child: Text(context.l10n.sexFemale),
-                      ),
-                    ],
-                    onChanged: (value) => setState(() => _selectedSex = value!),
-                  ),
-                  AppDateField(
-                    label: context.l10n.rabbitBirthDate,
-                    value: _birthDate,
-                    onChanged: (date) => setState(() => _birthDate = date),
-                    prefixIcon: Icons.cake,
-                    lastDate: DateTime.now(),
-                  ),
                 ],
               ),
 
-              AppFormSection(
-                title: context.l10n.rabbitPedigree,
+              const SizedBox(height: AppSpacing.xl),
+
+              AppFormDisclosure(
+                title: context.l10n.rabbitFormMore,
+                // При правке всё раскрыто сразу: свёрнутый блок поверх
+                // заполненных полей читается как «данные потерялись».
+                initiallyExpanded: isEditMode,
                 children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: _showImageSourceDialog,
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: cs.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: cs.outline, width: 2),
+                            ),
+                            child: _selectedImage != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: kIsWeb
+                                        ? (_webImageBytes != null
+                                              ? Image.memory(
+                                                  _webImageBytes!,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Icon(
+                                                  Icons.image,
+                                                  size: 60,
+                                                  color: cs.onSurfaceVariant,
+                                                ))
+                                        : Image.file(
+                                            File(_selectedImage!.path),
+                                            fit: BoxFit.cover,
+                                          ),
+                                  )
+                                : displayPhotoUrl != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      displayPhotoUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.pets,
+                                              size: 60,
+                                              color: cs.onSurfaceVariant,
+                                            );
+                                          },
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.add_a_photo,
+                                    size: 60,
+                                    color: cs.onSurfaceVariant,
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        TextButton.icon(
+                          onPressed: _showImageSourceDialog,
+                          icon: const Icon(Icons.camera_alt),
+                          label: Text(
+                            _selectedImage != null || displayPhotoUrl != null
+                                ? context.l10n.rabbitFormPhotoChange
+                                : context.l10n.rabbitFormPhotoAdd,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _tagIdController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormTag,
+                      hintText: 'R-XXX',
+                      prefixIcon: Icon(Icons.tag),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.rabbitFormName,
+                      hintText: context.l10n.rabbitFormNameHint,
+                      prefixIcon: Icon(Icons.pets),
+                    ),
+                  ),
+                  _CageField(
+                    value: _selectedCageId,
+                    onChanged: (value) => setState(() {
+                      _selectedCageId = value;
+                      _touched = true;
+                    }),
+                  ),
                   // Родитель выбирается поиском по серверу: прежний виджет
                   // предлагал только тех кроликов, что успели подгрузиться в
                   // постраничный список.
@@ -570,12 +612,6 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       _selectedMotherId = rabbit?.id;
                     }),
                   ),
-                ],
-              ),
-
-              AppFormSection(
-                title: context.l10n.commonSectionDetails,
-                children: [
                   DropdownButtonFormField<String>(
                     initialValue: _selectedStatus,
                     decoration: InputDecoration(
@@ -622,7 +658,6 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       labelText: context.l10n.rabbitFormWeight,
                       hintText: '0.0',
                       prefixIcon: Icon(Icons.monitor_weight_outlined),
-                      suffixText: 'кг',
                     ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
@@ -634,18 +669,13 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       return null;
                     },
                   ),
-                ],
-              ),
-
-              AppFormSection(
-                title: context.l10n.rabbitFormNotes,
-                children: [
                   TextFormField(
                     controller: _notesController,
                     decoration: InputDecoration(
                       labelText: context.l10n.rabbitFormNotes,
                       hintText: context.l10n.rabbitFormNotesHint,
                       prefixIcon: Icon(Icons.notes),
+                      suffixIcon: VoiceInputButton(controller: _notesController),
                     ),
                     maxLines: 3,
                   ),
@@ -659,7 +689,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SizedBox(
-              height: 52,
+              height: AppSizes.touchTargetLarge,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 child: _isLoading
@@ -678,6 +708,126 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Самец или самка — выбор из двух, а не список.
+///
+/// Раньше это был выпадающий список с заранее выбранным «самцом»: два
+/// нажатия там, где хватает одного, и тихая ошибка у всех, кто поле не
+/// тронул. Здесь оба варианта видны сразу, и ни один не выбран заранее —
+/// пол кролика приложение угадать не может.
+class _SexField extends StatelessWidget {
+  const _SexField({required this.value, required this.onChanged});
+
+  final String? value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return FormField<String>(
+      initialValue: value,
+      validator: (_) => value == null ? l10n.rabbitFormSexRequired : null,
+      builder: (field) {
+        final error = field.errorText;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.rabbitSex,
+              style: context.text.labelLarge?.copyWith(
+                color: error == null
+                    ? context.colors.onSurfaceVariant
+                    : context.colors.error,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            SizedBox(
+              width: double.infinity,
+              height: AppSizes.touchTargetLarge,
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(
+                    value: 'female',
+                    icon: const Icon(Icons.female),
+                    label: Text(l10n.sexFemale),
+                  ),
+                  ButtonSegment(
+                    value: 'male',
+                    icon: const Icon(Icons.male),
+                    label: Text(l10n.sexMale),
+                  ),
+                ],
+                emptySelectionAllowed: true,
+                showSelectedIcon: false,
+                selected: value == null ? const <String>{} : {value!},
+                onSelectionChanged: (selection) {
+                  if (selection.isEmpty) return;
+                  onChanged(selection.first);
+                  field.didChange(selection.first);
+                },
+              ),
+            ),
+            if (error != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                error,
+                style: context.text.bodySmall?.copyWith(
+                  color: context.colors.error,
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// В какой клетке живёт кролик.
+///
+/// Поле новое: `cage_id` у кролика был с самого начала и заполнялся только
+/// с экрана клетки, а в форме кролика клетки не было вовсе — карточка
+/// показывала «клетка не указана» и изменить это из неё было нельзя.
+///
+/// Полные клетки из списка не убираются, а помечаются: человек лучше знает,
+/// сколько кроликов влезет в его клетку, чем поле «вместимость».
+class _CageField extends ConsumerWidget {
+  const _CageField({required this.value, required this.onChanged});
+
+  final int? value;
+  final ValueChanged<int?> onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final cages = ref.watch(cageOptionsProvider);
+
+    return DropdownButtonFormField<int?>(
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: l10n.rabbitCage,
+        prefixIcon: const Icon(Icons.grid_view_outlined),
+      ),
+      items: [
+        DropdownMenuItem<int?>(
+          value: null,
+          child: Text(l10n.rabbitFormCageNone),
+        ),
+        for (final cage in cages.value ?? const <CageModel>[])
+          DropdownMenuItem<int?>(
+            value: cage.id,
+            child: Text(
+              cage.isFull == true
+                  ? l10n.rabbitFormCageFull(cage.number)
+                  : cage.number,
+            ),
+          ),
+      ],
+      onChanged: onChanged,
     );
   }
 }

@@ -11,7 +11,9 @@ extension RabbitStatusX on RabbitStatus {
     'sick'                => RabbitStatus.sick,
     'pregnant'            => RabbitStatus.pregnant,
     'sold'                => RabbitStatus.sold,
-    'deceased'            => RabbitStatus.deceased,
+    // Сервер присылает `dead`; `deceased` не присылает никогда, и
+    // павший кролик подписывался в списке «Неактивен».
+    'dead'                => RabbitStatus.deceased,
     'quarantine'          => RabbitStatus.quarantine,
     _                     => RabbitStatus.inactive,
   };

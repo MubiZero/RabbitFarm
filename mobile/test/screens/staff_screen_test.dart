@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'package:mobile/core/access/farm_access.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/features/staff/data/models/staff_models.dart';
@@ -28,6 +30,56 @@ class _LimitedStaffRepository extends StaffRepository {
     throw const ApiFailure(ApiFailureKind.invalid, code: 'STAFF_LIMIT_REACHED');
   }
 }
+
+const _inviteLink = 'rabbitfarm://join?phone=%2B992901234567';
+
+/// Приглашение по телефону, которое сервер создал, но отправить не смог:
+/// SMS-шлюз принимает только заранее одобренные шаблоны.
+class _InvitingStaffRepository extends StaffRepository {
+  _InvitingStaffRepository()
+      : super(ApiClient(storage: const FlutterSecureStorage()));
+
+  int resentId = 0;
+
+  CreatedInvitation _invitation() => CreatedInvitation(
+        id: 10,
+        phone: '+992901234567',
+        fullName: 'Новый Работник',
+        role: FarmRole.worker,
+        expiresAt: DateTime.now().add(const Duration(days: 7)),
+        inviteLink: _inviteLink,
+      );
+
+  @override
+  Future<CreatedInvitation> createInvitation({
+    String? email,
+    String? phone,
+    String? fullName,
+    required FarmRole role,
+  }) async =>
+      _invitation();
+
+  @override
+  Future<CreatedInvitation> resendInvitation(int id) async {
+    resentId = id;
+    return _invitation();
+  }
+}
+
+FarmInvitation _invitation({
+  required int id,
+  required String email,
+  required Duration expiresIn,
+}) =>
+    FarmInvitation(
+      id: id,
+      email: email,
+      role: FarmRole.worker,
+      // Срок задаётся от «сейчас», а не календарной датой: приглашение с
+      // датой из прошлого превращает тест в бомбу замедленного действия —
+      // он зеленеет до этого дня и краснеет после.
+      expiresAt: DateTime.now().add(expiresIn),
+    );
 
 const _owner = FarmMember(
   id: 1,
@@ -58,8 +110,14 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 400));
 }
 
-Widget _wrap(List<Override> overrides) =>
-    testAppScreen(const StaffScreen(), overrides: overrides);
+/// Роль задаётся явно: без неё вошедшего нет, и экран считал бы открывшего
+/// работником — а тогда пропали бы все кнопки изменения состава.
+Widget _wrap(
+  List<Override> overrides, {
+  FarmRoleAccess role = FarmRoleAccess.owner,
+}) =>
+    testAppScreen(const StaffScreen(),
+        overrides: [farmRoleProvider.overrideWithValue(role), ...overrides]);
 
 void main() {
   setUpAll(() => initializeDateFormatting('ru_RU', null));
@@ -92,7 +150,8 @@ void main() {
 
   testWidgets('закрытый доступ видно прямо в списке', (tester) async {
     await tester.pumpWidget(_wrap([
-      farmMembersProvider.overrideWith((ref) async => [_owner, _blockedManager]),
+      farmMembersProvider
+          .overrideWith((ref) async => [_owner, _blockedManager]),
       farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
     ]));
     await _settle(tester);
@@ -104,11 +163,10 @@ void main() {
     await tester.pumpWidget(_wrap([
       farmMembersProvider.overrideWith((ref) async => [_owner]),
       farmInvitationsProvider.overrideWith((ref) async => [
-            FarmInvitation(
+            _invitation(
               id: 10,
               email: 'invited@example.com',
-              role: FarmRole.worker,
-              expiresAt: DateTime(2026, 9, 1),
+              expiresIn: const Duration(days: 7),
             ),
           ]),
     ]));
@@ -119,9 +177,67 @@ void main() {
     expect(find.text('Отозвать'), findsOneWidget);
   });
 
+  // Просроченное приглашение выглядело как живое: та же группа «Ждут
+  // ответа», дата в прошлом мелким шрифтом и единственное действие
+  // «Отозвать». Владелец думал, что человека ждут, а войти тот уже не мог.
+  testWidgets(
+      'просроченное приглашение отделено от живого и зовёт позвать заново',
+      (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => [
+            _invitation(
+              id: 10,
+              email: 'live@example.com',
+              expiresIn: const Duration(days: 7),
+            ),
+            _invitation(
+              id: 11,
+              email: 'stale@example.com',
+              expiresIn: const Duration(days: -3),
+            ),
+          ]),
+    ]));
+    await _settle(tester);
+
+    expect(find.text('ЖДУТ ОТВЕТА'), findsOneWidget);
+    expect(find.text('СРОК ВЫШЕЛ'), findsOneWidget);
+    expect(find.textContaining('срок истёк'), findsOneWidget);
+    // Позвать заново можно оба: живое приглашение тоже приходится
+    // отправлять повторно, если ссылку никому не переслали.
+    expect(find.text('Пригласить заново'), findsNWidgets(2));
+  });
+
+  testWidgets('просроченное приглашение можно отправить заново',
+      (tester) async {
+    final repository = _InvitingStaffRepository();
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => [
+            _invitation(
+              id: 11,
+              email: 'stale@example.com',
+              expiresIn: const Duration(days: -3),
+            ),
+          ]),
+      staffRepositoryProvider.overrideWithValue(repository),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить заново'));
+    await tester.pumpAndSettle();
+
+    expect(repository.resentId, 11);
+    // Тот же разговор, что и после первого приглашения: вот ссылка, вот что
+    // с ней делать.
+    expect(find.text('Работник приглашён'), findsOneWidget);
+    expect(find.text(_inviteLink), findsOneWidget);
+  });
+
   testWidgets('на ошибке предлагает повторить', (tester) async {
     await tester.pumpWidget(_wrap([
-      farmMembersProvider.overrideWith((ref) async => throw Exception('нет сети')),
+      farmMembersProvider
+          .overrideWith((ref) async => throw Exception('нет сети')),
       farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
     ]));
     await _settle(tester);
@@ -159,6 +275,45 @@ void main() {
     );
   });
 
+  // Сервер отдаёт управляющему состав фермы, но менять его разрешает только
+  // владельцу: экран должен показывать людей и прятать всё, что их меняет.
+  testWidgets('управляющий видит состав фермы без кнопок изменения',
+      (tester) async {
+    await tester.pumpWidget(_wrap(
+      [
+        farmMembersProvider.overrideWith((ref) async => [_owner, _worker]),
+        farmInvitationsProvider.overrideWith((ref) async => [
+              _invitation(
+                id: 10,
+                email: 'invited@example.com',
+                expiresIn: const Duration(days: 7),
+              ),
+            ]),
+      ],
+      role: FarmRoleAccess.manager,
+    ));
+    await _settle(tester);
+
+    expect(find.text('Пётр Владелец'), findsOneWidget);
+    expect(find.text('Иван Работник'), findsOneWidget);
+    expect(find.text('invited@example.com'), findsOneWidget);
+
+    expect(find.text('Пригласить'), findsNothing);
+    expect(find.text('Отозвать'), findsNothing);
+    expect(find.byType(PopupMenuButton<String>), findsNothing);
+  });
+
+  testWidgets('владельцу кнопки изменения состава остаются', (tester) async {
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner, _worker]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+    ]));
+    await _settle(tester);
+
+    expect(find.text('Пригласить'), findsOneWidget);
+    expect(find.byType(PopupMenuButton<String>), findsOneWidget);
+  });
+
   testWidgets('приглашение по телефону без имени не отправляется',
       (tester) async {
     await tester.pumpWidget(_wrap([
@@ -182,5 +337,55 @@ void main() {
     // назвать больше нигде не может — он входит кодом, а не через форму.
     expect(find.text('Пригласить на ферму'), findsOneWidget);
     expect(find.text('Укажите имя работника'), findsOneWidget);
+  });
+
+  // Раньше диалог обещал, что работнику придёт SMS и передавать ничего не
+  // нужно. SMS не уходила вовсе: шлюз принимает только заранее одобренные
+  // шаблоны. Владелец должен увидеть ссылку и получить способ её переслать.
+  testWidgets(
+      'после приглашения по телефону владелец видит ссылку и может её переслать',
+      (tester) async {
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null));
+
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+      staffRepositoryProvider.overrideWithValue(_InvitingStaffRepository()),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).at(0), '+992901234567');
+    await tester.enterText(find.byType(TextField).at(1), 'Новый Работник');
+    await tester.tap(find.text('Пригласить работника'));
+    await tester.pumpAndSettle();
+
+    // Никаких «ничего передавать не нужно»: текст прямо говорит, что SMS не
+    // уходит, и показывает ссылку целиком.
+    expect(find.textContaining('SMS не уходит'), findsOneWidget);
+    expect(find.text(_inviteLink), findsOneWidget);
+
+    await tester.tap(find.text('Скопировать приглашение'));
+    await tester.pumpAndSettle();
+
+    // В буфер уходит готовое сообщение со ссылкой — его остаётся вставить в
+    // мессенджер, которым работник пользуется.
+    expect(copied, isNotNull);
+    expect(copied, contains(_inviteLink));
+    // Диалог закрыт, подтверждение видно поверх экрана, а не под затемнением.
+    expect(find.text('Работник приглашён'), findsNothing);
+    expect(find.textContaining('Приглашение скопировано'), findsOneWidget);
   });
 }

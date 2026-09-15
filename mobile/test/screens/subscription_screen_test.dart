@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/features/reports/data/models/report_model.dart';
@@ -31,10 +32,16 @@ DashboardReport _dashboard(PlanUsagePlan? plan) => DashboardReport(
 /// Репозиторий без сети. `statuses` — ответы `checkStatus` по порядку вызовов
 /// (последний повторяется, если проверок больше, чем элементов).
 class _FakePaymentRepository extends PaymentRepository {
-  _FakePaymentRepository({this.createError, this.statuses = const []})
-      : super(ApiClient(storage: const FlutterSecureStorage()));
+  _FakePaymentRepository({
+    this.createError,
+    this.checkError,
+    this.statuses = const [],
+  }) : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final Object? createError;
+
+  /// Сбой самой проверки — не ответ банка, а обрыв связи с нашим сервером.
+  final Object? checkError;
   final List<String> statuses;
   int _checkCalls = 0;
   int createCalls = 0;
@@ -54,6 +61,7 @@ class _FakePaymentRepository extends PaymentRepository {
 
   @override
   Future<String> checkStatus(String invoiceId) async {
+    if (checkError != null) throw checkError!;
     final status = _checkCalls < statuses.length
         ? statuses[_checkCalls]
         : (statuses.isEmpty ? 'new' : statuses.last);
@@ -73,6 +81,11 @@ Widget _screen({PlanUsagePlan? plan, PaymentRepository? repository}) =>
     );
 
 void main() {
+  // Заказ теперь переживает уход с экрана и лежит в настройках устройства —
+  // между тестами их надо очищать, иначе второй тест начнётся с «ждём
+  // оплату» от первого.
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   group('Экран «Тариф»', () {
     testWidgets('без тарифа объясняет, что делать', (tester) async {
       await tester.pumpWidget(_screen(plan: null));
@@ -191,6 +204,76 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Ферме не назначен тариф'), findsOneWidget);
+    });
+  });
+
+  group('Экран «Тариф» — исходы проверки оплаты', () {
+    final paidPlan = PlanUsagePlan(
+      id: 2,
+      name: 'Базовый',
+      price: 50,
+      expiresAt: DateTime.now().add(const Duration(days: 5)),
+    );
+
+    Future<void> payAndCheck(WidgetTester tester, PaymentRepository repo) async {
+      await tester.pumpWidget(_screen(plan: paidPlan, repository: repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Оплатить'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Проверить оплату'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('отказ банка называется отказом и предлагает заплатить заново', (
+      tester,
+    ) async {
+      // Раньше сервер не записывал отказ ни в одной ветке, и человек
+      // бесконечно жал «Проверить оплату», читая «банк ещё не подтвердил».
+      await payAndCheck(
+        tester,
+        _FakePaymentRepository(statuses: const ['failed']),
+      );
+
+      expect(find.text('Банк отклонил оплату'), findsOneWidget);
+      expect(find.text('Оплатить заново'), findsOneWidget);
+      expect(find.text('Проверить оплату'), findsNothing);
+    });
+
+    testWidgets('обрыв связи не выдаётся за ответ банка', (tester) async {
+      await payAndCheck(
+        tester,
+        _FakePaymentRepository(checkError: Exception('нет сети')),
+      );
+
+      expect(
+        find.text('Не удалось проверить оплату — нет связи с сервером'),
+        findsOneWidget,
+      );
+      // Это сообщение говорило бы о состоянии платежа, которого никто не
+      // проверял.
+      expect(
+        find.text('Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту'),
+        findsNothing,
+      );
+    });
+
+    testWidgets('незавершённый заказ переживает уход с экрана', (tester) async {
+      // Платить уходят в приложение банка, и наш экран система за это время
+      // вполне может выгрузить.
+      final repo = _FakePaymentRepository(statuses: const ['new']);
+      await tester.pumpWidget(_screen(plan: paidPlan, repository: repo));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Оплатить'));
+      await tester.pumpAndSettle();
+
+      // Новый запуск приложения: состояние в памяти потеряно.
+      await tester.pumpWidget(_screen(plan: paidPlan, repository: repo));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Проверить оплату'), findsOneWidget);
+      expect(find.text('Оплатить'), findsNothing);
+      expect(repo.createCalls, 1);
     });
   });
 }

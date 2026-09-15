@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
+import 'app_sizes.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
@@ -53,7 +54,10 @@ class AppTheme {
     // Форма и высота у всех крупных кнопок общие: на экране формы кнопки
     // стоят друг под другом, и разница даже в 4 пикселя читается как брак.
     final buttonShape = RoundedRectangleBorder(borderRadius: AppRadius.mdAll);
-    const buttonSize = Size(double.infinity, 52);
+    // Размер цели — не «как у всех», а под работу в перчатках: см.
+    // AppSizes. Прежние 52 брались из общих рекомендаций Material, которые
+    // написаны про голый палец в тёплой комнате.
+    const buttonSize = Size(double.infinity, AppSizes.touchTargetLarge);
 
     return ThemeData(
       useMaterial3: true,
@@ -158,15 +162,19 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: accent,
-          // Палец попадает по цели 44×44 даже в перчатке; у TextButton по
-          // умолчанию высота меньше.
-          minimumSize: const Size(0, 44),
+          // У TextButton по умолчанию высота меньше нижней границы, и в
+          // перчатке по нему промахиваются.
+          minimumSize: const Size(0, AppSizes.touchTarget),
           textStyle: AppTypography.labelLg,
         ),
       ),
 
       iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(foregroundColor: txtPri),
+        style: IconButton.styleFrom(
+          foregroundColor: txtPri,
+          // Сам значок остаётся прежним — растёт только область нажатия.
+          minimumSize: const Size.square(AppSizes.iconButton),
+        ),
       ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -268,6 +276,7 @@ class AppTheme {
         subtitleTextStyle: AppTypography.bodyMd.copyWith(color: txtSec),
         shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        minTileHeight: AppSizes.touchTarget,
       ),
 
       datePickerTheme: DatePickerThemeData(

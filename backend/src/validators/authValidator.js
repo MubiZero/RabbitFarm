@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
+const { LANGUAGES } = require('../i18n/notifications');
 
 /**
  * Authentication validation schemas
@@ -132,7 +133,17 @@ const updateProfileSchema = Joi.object({
   // notificationDigestJob.js) — включён/выключен ежедневный дайджест
   // (просроченные вакцинации, низкий остаток корма, задачи без исполнителя).
   // Персональный пуш по своей же задаче этим не выключается.
-  digest_enabled: Joi.boolean().optional()
+  digest_enabled: Joi.boolean().optional(),
+
+  // Язык уведомлений. Присылает приложение — при входе и при каждой смене
+  // языка в настройках, — потому что сервер шлёт пуши и письма тогда, когда
+  // приложение закрыто и спросить не у кого.
+  language: Joi.string()
+    .valid(...LANGUAGES)
+    .optional()
+    .messages({
+      'any.only': `Язык должен быть одним из: ${LANGUAGES.join(', ')}`
+    })
 });
 
 module.exports = {

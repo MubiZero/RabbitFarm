@@ -157,6 +157,16 @@ describe('birthController', () => {
       Task.create.mock.calls.forEach(([task]) => {
         expect(task).toMatchObject({ farm_id: 1, created_by: 1, assigned_to: 1 });
       });
+      // Ключ шаблона и подстановки: заголовок собирается на языке читателя,
+      // а готовая строка остаётся запасной.
+      expect(Task.create.mock.calls.map(([task]) => task.title_key)).toEqual([
+        'weighKits',
+        'eyesOpen',
+        'weaning'
+      ]);
+      Task.create.mock.calls.forEach(([task]) => {
+        expect(task.title_params).toEqual({ doe: 'Doe' });
+      });
     });
 
     it('should create birth with breeding_id', async () => {

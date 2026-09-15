@@ -35,8 +35,13 @@ class BirthsNotifier extends Notifier<BirthsState> {
   @override
   BirthsState build() {
     _repository = ref.watch(birthsRepositoryProvider);
-    loadBirths();
-    return BirthsState();
+    // Через microtask, а не прямым вызовом: `loadBirths` первой же строкой
+    // присваивает `state`, а во время build провайдер ещё не существует —
+    // riverpod бросает «provider depending on itself», загрузка обрывается
+    // на первой строке, и список окролов оставался пустым до тех пор, пока
+    // что-нибудь не дёрнет обновление ещё раз.
+    Future.microtask(loadBirths);
+    return BirthsState(isLoading: true);
   }
 
   /// Загрузить список окролов
@@ -85,6 +90,17 @@ class BirthsNotifier extends Notifier<BirthsState> {
       state = state.copyWith(error: e.toString());
       return false;
     }
+  }
+
+  /// Убрать окрол из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `loadBirths()`.
+  void removeBirth(int id) {
+    state = state.copyWith(
+      births: state.births.where((birth) => birth.id != id).toList(),
+    );
   }
 
   /// Удалить окрол

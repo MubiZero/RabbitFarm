@@ -35,7 +35,11 @@ enum _FeedingMode { rabbit, cage }
 class FeedingRecordFormScreen extends ConsumerStatefulWidget {
   final FeedingRecord? record;
 
-  const FeedingRecordFormScreen({super.key, this.record});
+  /// Клетка, с экрана которой пришли. Кормят стоя у клетки, и выбирать её
+  /// заново в списке из сорока номеров — лишняя работа на ровном месте.
+  final int? cageId;
+
+  const FeedingRecordFormScreen({super.key, this.record, this.cageId});
 
   @override
   ConsumerState<FeedingRecordFormScreen> createState() =>
@@ -83,6 +87,11 @@ class _FeedingRecordFormScreenState
       _mode = record.cageId != null ? _FeedingMode.cage : _FeedingMode.rabbit;
       _quantity.text = record.quantity.toString();
       _notes.text = record.notes ?? '';
+    }
+
+    if (record == null && widget.cageId != null) {
+      _mode = _FeedingMode.cage;
+      _cageIds.add(widget.cageId!);
     }
 
     for (final c in [_quantity, _notes]) {

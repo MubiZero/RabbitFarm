@@ -3,6 +3,41 @@ const farmAuditService = require('../services/farmAuditService');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
+ * Приглашение в том виде, в котором его получает приложение.
+ *
+ * `invite_link` открывает приложение на экране входа с подставленным
+ * номером — ничего секретного в ней нет, код придёт отдельно и только
+ * самому работнику.
+ *
+ * `message_sent` говорит, ушло ли сообщение приглашённому: на почту письмо
+ * уходит, на телефон — нет (SMS-шлюз принимает только заранее одобренные
+ * шаблоны, см. `staffService.deliverInvitation`). От этого зависит, что
+ * приложение скажет владельцу — «мы позвали» или «перешлите сами».
+ */
+const invitationPayload = (invitation, messageSent) => ({
+  id: invitation.id,
+  email: invitation.email,
+  phone: invitation.phone,
+  full_name: invitation.full_name,
+  role: invitation.role,
+  expires_at: invitation.expires_at,
+  invite_link: invitation.phone
+    ? `rabbitfarm://join?phone=${encodeURIComponent(invitation.phone)}`
+    : null,
+  message_sent: messageSent
+});
+
+/** Что на самом деле произошло — одной строкой для владельца. */
+const invitationMessage = (invitation, messageSent) => {
+  if (invitation.phone) {
+    return 'Приглашение создано. SMS работнику не уходит — перешлите ему ссылку.';
+  }
+  return messageSent
+    ? 'Приглашение создано, письмо работнику отправлено.'
+    : 'Приглашение создано, но письмо отправить не удалось — позовите работника по телефону.';
+};
+
+/**
  * Staff Controller
  * Работники фермы и приглашения.
  */
@@ -55,33 +90,19 @@ class StaffController {
   /** POST /staff/invitations — выписать приглашение (email или телефон) */
   async createInvitation(req, res, next) {
     try {
-      const { invitation } = await staffService.createInvitation(
+      const { invitation, messageSent } = await staffService.createInvitation(
         req.farmId,
-        req.user.id,
+        req.user,
         req.body
       );
 
       // Кода в ответе нет: приглашённый входит обычным кодом на свой
       // контакт, и этот вход сам активирует приглашение. Владельцу
-      // показывать и диктовать нечего.
+      // диктовать нечего — но ссылку, если SMS не ушла, переслать нужно.
       return ApiResponse.created(
         res,
-        {
-          id: invitation.id,
-          email: invitation.email,
-          phone: invitation.phone,
-          full_name: invitation.full_name,
-          role: invitation.role,
-          expires_at: invitation.expires_at,
-          // Ссылка открывает приложение на экране входа с подставленным
-          // номером — ничего секретного в ней нет.
-          invite_link: invitation.phone
-            ? `rabbitfarm://join?phone=${encodeURIComponent(invitation.phone)}`
-            : null
-        },
-        invitation.phone
-          ? 'Приглашение создано. Работник войдёт по своему номеру — код придёт ему в SMS.'
-          : 'Приглашение создано. Работник войдёт по своей почте — код придёт письмом.'
+        invitationPayload(invitation, messageSent),
+        invitationMessage(invitation, messageSent)
       );
     } catch (error) {
       if (error.message === 'STAFF_LIMIT_REACHED') {
@@ -105,7 +126,8 @@ class StaffController {
     try {
       const result = await farmAuditService.list(req.farmId, {
         page: req.query.page,
-        limit: req.query.limit
+        limit: req.query.limit,
+        scope: req.query.scope
       });
 
       return ApiResponse.paginated(
@@ -121,7 +143,32 @@ class StaffController {
     }
   }
 
-  /** GET /staff/invitations — действующие приглашения */
+  /** POST /staff/invitations/:id/resend — позвать ещё раз, продлив срок */
+  async resendInvitation(req, res, next) {
+    try {
+      const { invitation, messageSent } = await staffService.resendInvitation(
+        req.farmId,
+        req.user,
+        req.params.id
+      );
+
+      return ApiResponse.success(
+        res,
+        invitationPayload(invitation, messageSent),
+        invitationMessage(invitation, messageSent)
+      );
+    } catch (error) {
+      if (error.message === 'INVITATION_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Приглашение не найдено');
+      }
+      if (error.message === 'STAFF_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы', 'STAFF_LIMIT_REACHED');
+      }
+      next(error);
+    }
+  }
+
+  /** GET /staff/invitations — приглашения, которыми не воспользовались */
   async listInvitations(req, res, next) {
     try {
       const invitations = await staffService.listInvitations(req.farmId);

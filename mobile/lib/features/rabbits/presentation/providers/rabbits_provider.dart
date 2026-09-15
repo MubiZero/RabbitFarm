@@ -238,6 +238,18 @@ class RabbitsListNotifier extends StateNotifier<RabbitsListState> {
     await loadRabbits();
   }
 
+  /// Убрать кролика из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `refresh()`.
+  void removeRabbit(int id) {
+    state = state.copyWith(
+      rabbits: state.rabbits.where((r) => r.id != id).toList(),
+      total: state.total - 1,
+    );
+  }
+
   // Delete rabbit
   Future<void> deleteRabbit(int id) async {
     try {

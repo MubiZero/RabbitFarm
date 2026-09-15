@@ -124,46 +124,50 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     }
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.financeDeleteTitle),
-        content: Text(context.l10n.financeDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.financeDeleted;
     final failed = context.l10n.financeDeleteFailed;
     final l10n = context.l10n;
+    final notifier = ref.read(transactionsProvider.notifier);
+    // Репозиторий забираем сразу: запрос уйдёт уже после того, как экран
+    // закроется.
+    final repository = ref.read(transactionsRepositoryProvider);
+    final recordId = _record!.id;
 
-    try {
-      await ref.read(deleteTransactionProvider(_record!.id).future);
-      ref.read(transactionsProvider.notifier).removeTransaction(_record!.id);
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-      if (navigator.canPop()) navigator.pop();
-    } catch (e) {
+    notifier.removeTransaction(recordId);
+
+    Object? error;
+    // Окно отмены открываем, пока форма ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму форму
+    // закрываем, не дожидаясь окна, — подсказка живёт выше экрана и переживёт
+    // его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.financeDeleted,
+      commit: () async {
+        try {
+          await repository.deleteTransaction(recordId);
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: notifier.refresh,
+    );
+    if (navigator.canPop()) navigator.pop();
+    await pending;
+
+    if (error != null) {
       messenger.showSnackBar(
         SnackBar(
-          content:
-              Text('$failed: ${errorText(l10n, e)}'),
+          content: Text('$failed: ${errorText(l10n, error)}'),
           backgroundColor: AppColors.error,
         ),
       );
+      await notifier.refresh();
     }
   }
 

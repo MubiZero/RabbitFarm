@@ -128,6 +128,11 @@ abstract class StockAdjustment with _$StockAdjustment {
   const factory StockAdjustment({
     required double quantity,
     required String operation, // 'add' or 'subtract'
+
+    /// Сколько заплатили за корм. Пусто — значит это не покупка, а
+    /// пересчёт остатка: сервер по этому признаку и решает, заводить ли
+    /// расход в книге.
+    double? cost,
   }) = _StockAdjustment;
 
   factory StockAdjustment.fromJson(Map<String, dynamic> json) =>

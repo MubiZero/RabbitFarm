@@ -53,14 +53,15 @@ describe('StaffController', () => {
           full_name: 'Пётр',
           role: 'worker',
           expires_at: '2026-01-01'
-        }
+        },
+        messageSent: true
       });
       const res = mockRes();
       const req = mockReq({ body: inviteBody() });
 
       await staffController.createInvitation(req, res, mockNext);
 
-      expect(staffService.createInvitation).toHaveBeenCalledWith(1, 1, req.body);
+      expect(staffService.createInvitation).toHaveBeenCalledWith(1, req.user, req.body);
       expect(res.status).toHaveBeenCalledWith(201);
       const payload = res.json.mock.calls[0][0];
       expect(payload.data).toEqual({
@@ -70,10 +71,87 @@ describe('StaffController', () => {
         full_name: 'Пётр',
         role: 'worker',
         expires_at: '2026-01-01',
-        invite_link: null
+        invite_link: null,
+        message_sent: true
       });
       // Диктовать работнику нечего: он войдёт кодом на свой же контакт.
-      expect(payload.message).toContain('код придёт письмом');
+      expect(payload.message).toContain('письмо работнику отправлено');
+    });
+
+    // Приглашение по телефону SMS-кой не уходит: шлюз принимает только
+    // заранее одобренные шаблоны. Владельцу нужна ссылка и прямой текст, а
+    // не обещание, что «работнику придёт SMS».
+    it('на телефон отдаёт ссылку для пересылки и не обещает SMS', async () => {
+      staffService.createInvitation.mockResolvedValue({
+        invitation: {
+          id: 2,
+          email: null,
+          phone: '+992901234567',
+          full_name: 'Пётр',
+          role: 'worker',
+          expires_at: '2026-01-01'
+        },
+        messageSent: false
+      });
+      const res = mockRes();
+
+      await staffController.createInvitation(
+        mockReq({ body: inviteBody({ email: undefined, phone: '+992901234567' }) }),
+        res,
+        mockNext
+      );
+
+      const payload = res.json.mock.calls[0][0];
+      expect(payload.data.invite_link)
+        .toBe('rabbitfarm://join?phone=%2B992901234567');
+      expect(payload.data.message_sent).toBe(false);
+      expect(payload.message).toContain('перешлите ему ссылку');
+    });
+
+    it('говорит прямо, когда письмо отправить не удалось', async () => {
+      staffService.createInvitation.mockResolvedValue({
+        invitation: { id: 3, email: 'a@x.com', role: 'worker', expires_at: '2026-01-01' },
+        messageSent: false
+      });
+      const res = mockRes();
+
+      await staffController.createInvitation(mockReq({ body: inviteBody() }), res, mockNext);
+
+      expect(res.json.mock.calls[0][0].message).toContain('письмо отправить не удалось');
+    });
+  });
+
+  describe('resendInvitation', () => {
+    it('продлевает приглашение и отдаёт его тем же видом, что и создание', async () => {
+      staffService.resendInvitation.mockResolvedValue({
+        invitation: {
+          id: 7,
+          email: null,
+          phone: '+992901234567',
+          full_name: 'Пётр',
+          role: 'worker',
+          expires_at: '2026-02-01'
+        },
+        messageSent: false
+      });
+      const res = mockRes();
+      const req = mockReq({ params: { id: '7' } });
+
+      await staffController.resendInvitation(req, res, mockNext);
+
+      expect(staffService.resendInvitation).toHaveBeenCalledWith(1, req.user, '7');
+      expect(res.json.mock.calls[0][0].data.invite_link)
+        .toBe('rabbitfarm://join?phone=%2B992901234567');
+    });
+
+    it('возвращает 404, если приглашения уже нет', async () => {
+      staffService.resendInvitation.mockRejectedValue(new Error('INVITATION_NOT_FOUND'));
+      const res = mockRes();
+
+      await staffController.resendInvitation(mockReq({ params: { id: '7' } }), res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(mockNext).not.toHaveBeenCalled();
     });
   });
 });

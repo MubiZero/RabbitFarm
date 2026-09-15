@@ -86,7 +86,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Тариф скоро закончится' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planExpiringWeek' }) })
       );
       expect(sendAnnouncementEmail).toHaveBeenCalledWith(expect.objectContaining({
         to: 'owner@example.com',
@@ -104,7 +104,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Тариф заканчивается завтра' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planExpiringTomorrow' }) })
       );
       expect(farm.update).not.toHaveBeenCalled();
     });
@@ -130,7 +130,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Тариф истёк' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planExpired' }) })
       );
     });
 
@@ -228,7 +228,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Ферма работает только на чтение' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planReadOnlyThreeDays' }) })
       );
       expect(sendAnnouncementEmail).toHaveBeenCalledWith(expect.objectContaining({
         to: 'owner@example.com',
@@ -246,7 +246,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Тариф не продлён две недели' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planUnpaidTwoWeeks' }) })
       );
       expect(farm.update).not.toHaveBeenCalled();
     });
@@ -273,7 +273,7 @@ describe('planExpiryReminderJob', () => {
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(
         farm.id,
         [9],
-        expect.objectContaining({ title: 'Тариф истёк' })
+        expect.objectContaining({ i18n: expect.objectContaining({ key: 'planExpired' }) })
       );
     });
 

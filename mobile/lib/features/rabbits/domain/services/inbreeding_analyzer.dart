@@ -185,7 +185,7 @@ class InbreedingAnalyzer {
     } else if (coefficient >= 0.125) {
       recommendations.add('⚠️ Высокий уровень родства. Скрещивание не рекомендуется.');
       recommendations.add('Так близки полубрат с полусестрой или дядя с племянницей.');
-      recommendations.add('Рассмотрите использование неродственных производителей.');
+      recommendations.add('Возьмите неродственного самца.');
     } else if (coefficient >= 0.0625) {
       recommendations.add('⚡ Средний уровень родства. Скрещивание допустимо с осторожностью.');
       recommendations.add('Примерно так близки двоюродные.');

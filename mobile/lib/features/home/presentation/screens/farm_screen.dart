@@ -122,7 +122,10 @@ class FarmScreen extends ConsumerWidget {
               title: context.l10n.farmSectionPeople,
               domain: AppDomain.admin,
               items: [
-                if (role.can(FarmCapability.manageStaff))
+                // Состав фермы видит и управляющий: сервер отдаёт ему
+                // список и журнал, а менять состав разрешено только владельцу
+                // — это разное право, и внутри экрана они разведены.
+                if (role.can(FarmCapability.viewStaff))
                   _Item(Icons.groups_outlined, context.l10n.farmStaff, '/staff'),
               ],
             ),

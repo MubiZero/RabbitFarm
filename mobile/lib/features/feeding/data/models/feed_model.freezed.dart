@@ -898,7 +898,10 @@ as String?,
 /// @nodoc
 mixin _$StockAdjustment {
 
- double get quantity; String get operation;
+ double get quantity; String get operation;/// Сколько заплатили за корм. Пусто — значит это не покупка, а
+/// пересчёт остатка: сервер по этому признаку и решает, заводить ли
+/// расход в книге.
+ double? get cost;
 /// Create a copy of StockAdjustment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -912,20 +915,20 @@ $StockAdjustmentCopyWith<StockAdjustment> get copyWith => _$StockAdjustmentCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as StockAdjustment;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StockAdjustment&&(identical(other.quantity, _this.quantity) || other.quantity == _this.quantity)&&(identical(other.operation, _this.operation) || other.operation == _this.operation));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StockAdjustment&&(identical(other.quantity, _this.quantity) || other.quantity == _this.quantity)&&(identical(other.operation, _this.operation) || other.operation == _this.operation)&&(identical(other.cost, _this.cost) || other.cost == _this.cost));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as StockAdjustment;
-  return Object.hash(runtimeType,_this.quantity,_this.operation);
+  return Object.hash(runtimeType,_this.quantity,_this.operation,_this.cost);
 }
 
 @override
 String toString() {
   final _this = this as StockAdjustment;
-  return 'StockAdjustment(quantity: ${_this.quantity}, operation: ${_this.operation})';
+  return 'StockAdjustment(quantity: ${_this.quantity}, operation: ${_this.operation}, cost: ${_this.cost})';
 }
 
 
@@ -936,7 +939,7 @@ abstract mixin class $StockAdjustmentCopyWith<$Res>  {
   factory $StockAdjustmentCopyWith(StockAdjustment value, $Res Function(StockAdjustment) _then) = _$StockAdjustmentCopyWithImpl;
 @useResult
 $Res call({
- double quantity, String operation
+ double quantity, String operation, double? cost
 });
 
 
@@ -953,11 +956,12 @@ class _$StockAdjustmentCopyWithImpl<$Res>
 
 /// Create a copy of StockAdjustment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? quantity = null,Object? operation = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? quantity = null,Object? operation = null,Object? cost = freezed,}) {
   return _then(StockAdjustment(
 quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as double,operation: null == operation ? _self.operation : operation // ignore: cast_nullable_to_non_nullable
-as String,
+as String,cost: freezed == cost ? _self.cost : cost // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 
@@ -1042,10 +1046,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double quantity,  String operation)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double quantity,  String operation,  double? cost)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StockAdjustment() when $default != null:
-return $default(_that.quantity,_that.operation);case _:
+return $default(_that.quantity,_that.operation,_that.cost);case _:
   return orElse();
 
 }
@@ -1063,10 +1067,10 @@ return $default(_that.quantity,_that.operation);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double quantity,  String operation)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double quantity,  String operation,  double? cost)  $default,) {final _that = this;
 switch (_that) {
 case _StockAdjustment():
-return $default(_that.quantity,_that.operation);case _:
+return $default(_that.quantity,_that.operation,_that.cost);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1083,10 +1087,10 @@ return $default(_that.quantity,_that.operation);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double quantity,  String operation)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double quantity,  String operation,  double? cost)?  $default,) {final _that = this;
 switch (_that) {
 case _StockAdjustment() when $default != null:
-return $default(_that.quantity,_that.operation);case _:
+return $default(_that.quantity,_that.operation,_that.cost);case _:
   return null;
 
 }
@@ -1098,11 +1102,15 @@ return $default(_that.quantity,_that.operation);case _:
 @JsonSerializable()
 
 class _StockAdjustment implements StockAdjustment {
-  const _StockAdjustment({required this.quantity, required this.operation});
+  const _StockAdjustment({required this.quantity, required this.operation, this.cost});
   factory _StockAdjustment.fromJson(Map<String, dynamic> json) => _$StockAdjustmentFromJson(json);
 
 @override final  double quantity;
 @override final  String operation;
+/// Сколько заплатили за корм. Пусто — значит это не покупка, а
+/// пересчёт остатка: сервер по этому признаку и решает, заводить ли
+/// расход в книге.
+@override final  double? cost;
 
 /// Create a copy of StockAdjustment
 /// with the given fields replaced by the non-null parameter values.
@@ -1117,18 +1125,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StockAdjustment&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.operation, operation) || other.operation == operation));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StockAdjustment&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.operation, operation) || other.operation == operation)&&(identical(other.cost, cost) || other.cost == cost));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,quantity,operation);
+    return Object.hash(runtimeType,quantity,operation,cost);
 }
 
 @override
 String toString() {
-    return 'StockAdjustment(quantity: $quantity, operation: $operation)';
+    return 'StockAdjustment(quantity: $quantity, operation: $operation, cost: $cost)';
 }
 
 
@@ -1139,7 +1147,7 @@ abstract mixin class _$StockAdjustmentCopyWith<$Res> implements $StockAdjustment
   factory _$StockAdjustmentCopyWith(_StockAdjustment value, $Res Function(_StockAdjustment) _then) = __$StockAdjustmentCopyWithImpl;
 @override @useResult
 $Res call({
- double quantity, String operation
+ double quantity, String operation, double? cost
 });
 
 
@@ -1156,11 +1164,12 @@ class __$StockAdjustmentCopyWithImpl<$Res>
 
 /// Create a copy of StockAdjustment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? quantity = null,Object? operation = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? quantity = null,Object? operation = null,Object? cost = freezed,}) {
   return _then(_StockAdjustment(
 quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as double,operation: null == operation ? _self.operation : operation // ignore: cast_nullable_to_non_nullable
-as String,
+as String,cost: freezed == cost ? _self.cost : cost // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 

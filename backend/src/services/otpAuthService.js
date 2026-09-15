@@ -3,7 +3,7 @@ const { User, Farm, Invitation, LoginOtp } = require('../models');
 const authService = require('./authService');
 const planService = require('./planService');
 const logger = require('../utils/logger');
-const { generateOtp, hashOtp } = require('../utils/otp');
+const { generateOtp, hashOtp, otpMatches } = require('../utils/otp');
 const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 const payomSmsTransport = require('./notifications/payomSmsTransport');
 const emailTransport = require('./notifications/emailTransport');
@@ -158,7 +158,7 @@ class OtpAuthService {
       throw new Error('OTP_EXPIRED');
     }
 
-    if (hashOtp(code) !== record.token_hash) {
+    if (!otpMatches(code, record.token_hash)) {
       await record.increment('attempts');
       throw new Error('OTP_INVALID');
     }

@@ -71,7 +71,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get offlineBanner =>
-      'No connection — feeding, tasks and notes will be saved and sent later';
+      'No connection — your entries are saved and will be sent once you\'re back online';
 
   @override
   String get offlineActionQueued =>
@@ -162,7 +162,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pinSetupExplanation =>
-      'You\'ll open the app on this phone with this code — no more waiting for an SMS.';
+      'You\'ll open the app on this phone with this code — no more waiting for a code by SMS or email.';
 
   @override
   String get pinSkip => 'Not now';
@@ -356,15 +356,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activationChecklistDismiss => 'Dismiss';
-
-  @override
-  String get activationChecklistAddCage => 'Add a cage';
-
-  @override
-  String get activationChecklistAddRabbit => 'Add a rabbit';
-
-  @override
-  String get activationChecklistFirstFeeding => 'Log your first feeding';
 
   @override
   String get menuProfile => 'Profile';
@@ -2291,14 +2282,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVersion => 'Version';
 
   @override
-  String get settingsSupport => 'Contact support';
+  String get settingsSupport => 'Support';
 
   @override
   String get supportRequestTitle => 'Support';
 
   @override
   String get supportRequestHint =>
-      'Describe what happened — we\'ll reply to the same account this request came from.';
+      'Describe what happened. The reply lands on this very screen and as a notification on your phone.';
 
   @override
   String get supportRequestPlaceholder =>
@@ -2886,12 +2877,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'They enter the number $phone at sign-in, plus the code that arrives by SMS. Theres nothing for you to pass on.';
+    return 'We cannot text $phone — forward the invitation yourself. The link opens the sign-in screen with the number already filled in, and the code arrives by SMS.';
   }
 
   @override
   String staffInvitedEmailBody(String email) {
-    return 'They enter the email $email at sign-in, plus the code that arrives by mail. Theres nothing for you to pass on.';
+    return 'The invitation email has been sent to $email. Your worker signs in with that address, and the code arrives by email.';
   }
 
   @override
@@ -4018,7 +4009,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get platformSupportRequestsEmptyBody =>
-      'Questions from farms will show up here — a farmer writes in via Settings → Contact support.';
+      'Questions from farms will show up here — a farmer writes in via Settings → Support.';
 
   @override
   String get platformSupportRequestNew => 'new';
@@ -4231,4 +4222,721 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyNoRecordsBody => 'Add the first one.';
+
+  @override
+  String get onbWelcomeTitle => 'RabbitFarm';
+
+  @override
+  String get onbWelcomeBody =>
+      'Cages, matings, kindlings, feed and money, all recorded and always at hand. The app reminds you when to put the nest box in and when shots are due.';
+
+  @override
+  String get onbWelcomeStart => 'Get started';
+
+  @override
+  String get onbWelcomeHaveAccount => 'I already have a farm';
+
+  @override
+  String get onbHerdTitle => 'How many rabbits do you keep?';
+
+  @override
+  String get onbHerdSubtitle => 'Roughly, young stock included.';
+
+  @override
+  String get onbHerdUpTo20 => 'Up to 20';
+
+  @override
+  String get onbHerdUpTo20Hint => 'Just for my own table';
+
+  @override
+  String get onbHerdUpTo100 => '20 to 100';
+
+  @override
+  String get onbHerdUpTo100Hint => 'A small holding';
+
+  @override
+  String get onbHerdUpTo500 => '100 to 500';
+
+  @override
+  String get onbHerdUpTo500Hint => 'A farm that sells';
+
+  @override
+  String get onbHerdOver500 => 'More than 500';
+
+  @override
+  String get onbHerdOver500Hint => 'A large operation';
+
+  @override
+  String get onbFocusTitle => 'What matters most to record?';
+
+  @override
+  String get onbFocusSubtitle =>
+      'Pick everything that fits. The rest stays available anyway.';
+
+  @override
+  String get onbFocusBreeding => 'Matings and kindlings';
+
+  @override
+  String get onbFocusFeeding => 'Feed and consumption';
+
+  @override
+  String get onbFocusHealth => 'Vaccinations and treatment';
+
+  @override
+  String get onbFocusMoney => 'Sales and expenses';
+
+  @override
+  String get onbFocusNext => 'Next';
+
+  @override
+  String get onbCrewTitle => 'Who will use the app?';
+
+  @override
+  String get onbCrewSubtitle => 'You can change this at any time.';
+
+  @override
+  String get onbCrewAlone => 'Only me';
+
+  @override
+  String get onbCrewAloneHint => 'No invites, no access settings';
+
+  @override
+  String get onbCrewHelpers => 'Me and my helpers';
+
+  @override
+  String get onbCrewHelpersHint =>
+      'Everyone records from their own phone, and you can see who entered what';
+
+  @override
+  String get onbDoneTitle => 'Where we start';
+
+  @override
+  String get onbDoneSubtitle =>
+      'These steps will be waiting on the home screen.';
+
+  @override
+  String get onbDoneCreate => 'Create my farm';
+
+  @override
+  String get onbBack => 'Back';
+
+  @override
+  String get onbSkip => 'Skip';
+
+  @override
+  String get firstStepCages => 'Set up your cages';
+
+  @override
+  String get firstStepRabbits => 'Add your does and bucks';
+
+  @override
+  String get firstStepBreeding => 'Record your first mating';
+
+  @override
+  String get firstStepFeeding => 'Log your first feeding';
+
+  @override
+  String get firstStepHealth => 'Log your first vaccination';
+
+  @override
+  String get firstStepMoney => 'Record your first sale';
+
+  @override
+  String get firstStepHelpers => 'Invite a helper';
+
+  @override
+  String get activationChecklistFarmCreated => 'Farm created';
+
+  @override
+  String activationChecklistProgress(int done, int total) {
+    return '$done of $total';
+  }
+
+  @override
+  String get deathFormTitle => 'Record a death';
+
+  @override
+  String get deathFormRabbit => 'Rabbit';
+
+  @override
+  String get deathFormDate => 'Date';
+
+  @override
+  String get deathFormReason => 'Cause';
+
+  @override
+  String get deathFormReasonHint => 'What it died of, if you know';
+
+  @override
+  String get deathFormSubmit => 'Record';
+
+  @override
+  String get deathFormSaved => 'Death recorded';
+
+  @override
+  String get quickRecordDeath => 'Death';
+
+  @override
+  String get notificationPrimerTitle => 'We\'ll remind you about the nest box';
+
+  @override
+  String get notificationPrimerBody =>
+      'Two days before kindling you\'ll get a reminder, with time to prepare the cage. We\'ll also remind you about vaccinations and the day\'s work.';
+
+  @override
+  String get notificationPrimerAllow => 'Turn on reminders';
+
+  @override
+  String get notificationPrimerDecline => 'Not now';
+
+  @override
+  String get settingsNotificationsOff => 'Notifications are off';
+
+  @override
+  String get settingsNotificationsTurnOn => 'Turn on';
+
+  @override
+  String get rabbitFormMore => 'More details';
+
+  @override
+  String get rabbitFormSexRequired => 'Choose buck or doe';
+
+  @override
+  String get rabbitFormCageNone => 'No cage';
+
+  @override
+  String rabbitFormCageFull(String number) {
+    return '$number — full';
+  }
+
+  @override
+  String get commonOptional => 'optional';
+
+  @override
+  String get unitKg => 'kg';
+
+  @override
+  String get kindlingPlanAction => 'Kindling plan';
+
+  @override
+  String get kindlingPlanPickMonth => 'Which month is the plan for?';
+
+  @override
+  String get kindlingPlanThisMonth => 'This month';
+
+  @override
+  String get kindlingPlanNextMonth => 'Next month';
+
+  @override
+  String kindlingPlanEmpty(String month) {
+    return 'No kindlings expected in $month';
+  }
+
+  @override
+  String kindlingPlanSheetTitle(String month) {
+    return 'Kindling plan — $month';
+  }
+
+  @override
+  String get kindlingPlanNestHint =>
+      'Put the nest box in three days before kindling';
+
+  @override
+  String get kindlingPlanColBirth => 'Kindling';
+
+  @override
+  String get kindlingPlanColFemale => 'Doe';
+
+  @override
+  String get kindlingPlanColCage => 'Cage';
+
+  @override
+  String get kindlingPlanColBred => 'Mating';
+
+  @override
+  String get kindlingPlanColNest => 'Nest box';
+
+  @override
+  String get kindlingPlanColMark => 'Done';
+
+  @override
+  String kindlingPlanPrintedAt(String date) {
+    return 'Printed $date';
+  }
+
+  @override
+  String get commonUndo => 'Undo';
+
+  @override
+  String get journalKindDeletion => 'Deletion';
+
+  @override
+  String get voiceDictate => 'Dictate';
+
+  @override
+  String get voiceStop => 'Stop recording';
+
+  @override
+  String get voiceUnavailable => 'This phone cannot recognise speech';
+
+  @override
+  String get cageAddNewRabbit => 'Add a new rabbit';
+
+  @override
+  String get cageAddNewRabbitHint => 'A rabbit that is not in the app yet';
+
+  @override
+  String get cageSettleExisting => 'Move one in';
+
+  @override
+  String get cageSettleExistingHint => 'Bring a rabbit you already have';
+
+  @override
+  String get cageFeedThis => 'Feed this cage';
+
+  @override
+  String get cageTagsTitle => 'Cage tags';
+
+  @override
+  String get cageTagsPrint => 'Print';
+
+  @override
+  String get cageTagsPrintHint =>
+      'Cut along the frame and hang on the cage — the camera will open it in the app.';
+
+  @override
+  String get cageTagsEmptyTitle => 'No cages yet';
+
+  @override
+  String get cageTagsEmptyBody =>
+      'Add a cage and you can print its tag right away.';
+
+  @override
+  String get cageScanTitle => 'Scan a tag';
+
+  @override
+  String get cageScanHint => 'Point the camera at the cage tag';
+
+  @override
+  String get cageScanNoCamera =>
+      'Camera unavailable. Check the permission in your phone settings.';
+
+  @override
+  String get slideToDelete => 'Slide to delete';
+
+  @override
+  String get birthsKitsDied => 'Lost';
+
+  @override
+  String get birthsKitDeathAction => 'Record losses';
+
+  @override
+  String get birthsKitDeathTitle => 'How many kits died?';
+
+  @override
+  String birthsKitDeathHint(int alive) {
+    return 'Still alive: $alive';
+  }
+
+  @override
+  String get birthsKitDeathSaved => 'Recorded';
+
+  @override
+  String get birthsKitsAlive => 'Alive';
+
+  @override
+  String get loginCodeLabelEmail => 'Code from the email';
+
+  @override
+  String get cyclePalpationAction => 'Palpated';
+
+  @override
+  String get cyclePalpationTitle => 'What did the check show?';
+
+  @override
+  String get cyclePalpationPregnant => 'Pregnant';
+
+  @override
+  String get cyclePalpationPregnantHint =>
+      'The doe is marked pregnant, kindling comes next';
+
+  @override
+  String get cyclePalpationEmpty => 'Not pregnant';
+
+  @override
+  String get cyclePalpationEmptyHint =>
+      'The cycle closes — the doe can be bred again';
+
+  @override
+  String get cyclePalpationSavedPregnant => 'Recorded: pregnant';
+
+  @override
+  String get cyclePalpationSavedEmpty => 'Recorded: not pregnant';
+
+  @override
+  String get birthsWeaningAction => 'Weaned';
+
+  @override
+  String get birthsWeaningTitle => 'How many kits were weaned?';
+
+  @override
+  String birthsWeaningHint(int alive) {
+    return 'Alive in the litter: $alive';
+  }
+
+  @override
+  String birthsWeaningAll(int count) {
+    return 'All of them: $count';
+  }
+
+  @override
+  String get birthsWeaningFewer => 'Or fewer';
+
+  @override
+  String get birthsWeaningSaved => 'Weaning recorded';
+
+  @override
+  String get subscriptionCheckFailed =>
+      'Could not check the payment — no connection to the server';
+
+  @override
+  String get subscriptionPaymentDeclined => 'The bank declined the payment';
+
+  @override
+  String get subscriptionPaymentDeclinedHint =>
+      'No money was taken. Check the card and try again.';
+
+  @override
+  String get subscriptionPayAgain => 'Pay again';
+
+  @override
+  String get supportRequestNew => 'Write';
+
+  @override
+  String get supportRequestNewTitle => 'New request';
+
+  @override
+  String get supportRequestsEmptyTitle => 'No requests yet';
+
+  @override
+  String get supportRequestsEmptyBody =>
+      'Write to us if something is broken or unclear. The reply lands right here and as a notification on your phone.';
+
+  @override
+  String get supportRequestsEmptyAction => 'Contact support';
+
+  @override
+  String get supportRequestStatusWaiting => 'Waiting for a reply';
+
+  @override
+  String get supportRequestStatusAnswered => 'Support replied';
+
+  @override
+  String get supportRequestAnswerTitle => 'Support reply';
+
+  @override
+  String get supportRequestClosedWithoutAnswer =>
+      'The request was closed without a written reply.';
+
+  @override
+  String get platformSupportAnswerTitle => 'Reply to the author';
+
+  @override
+  String get platformSupportResolveTitle => 'Close the request';
+
+  @override
+  String get platformSupportResolveBody =>
+      'Write a reply — the author gets it as a notification and an email. Leave the field empty if it was sorted out without writing back.';
+
+  @override
+  String get platformSupportResolveAnswerLabel => 'Reply to the author';
+
+  @override
+  String get platformSupportResolveAnswerHint =>
+      'For example: update the app — the new version fixes this';
+
+  @override
+  String get platformSupportResolveSendAnswer => 'Send the reply';
+
+  @override
+  String get platformSupportResolveWithoutAnswer => 'Close without a reply';
+
+  @override
+  String get platformSupportContactTitle => 'Support contact';
+
+  @override
+  String get platformSupportContactBody =>
+      'Farms see this phone number and email on their requests screen. Leave them empty if there is no direct contact.';
+
+  @override
+  String get platformSupportContactPhone => 'Phone';
+
+  @override
+  String get platformSupportContactPhoneHint => '+992 00 000 00 00';
+
+  @override
+  String get platformSupportContactEmail => 'Email';
+
+  @override
+  String get platformSupportContactEmailHint => 'support@example.com';
+
+  @override
+  String get platformSupportContactEmailInvalid =>
+      'Check the address — it has no @ sign';
+
+  @override
+  String get platformSupportContactSaved => 'Support contact saved';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationsEmptyTitle => 'Nothing yet';
+
+  @override
+  String get notificationsEmptyBody =>
+      'Here you\'ll find what the app has told you: overdue vaccinations, feed running low, kindling coming up.';
+
+  @override
+  String get platformFilterDeleted => 'Deleted';
+
+  @override
+  String platformFarmDeletedShort(String date) {
+    return 'Deleted $date';
+  }
+
+  @override
+  String get platformFarmsDeletedEmptyTitle => 'No deleted farms';
+
+  @override
+  String get platformFarmsDeletedEmptyBody =>
+      'Nothing is waiting to be wiped. A deleted farm stays here for 30 days — long enough to change your mind.';
+
+  @override
+  String get platformPlanDeleteDefaultWarning =>
+      'This is the default plan. Once it is gone, new farms will appear with no plan at all until another one is marked as the default.';
+
+  @override
+  String get platformPlanDeleteIrreversible =>
+      'This cannot be undone: the plan would have to be created again and assigned to farms by hand.';
+
+  @override
+  String get platformTabAudit => 'Log';
+
+  @override
+  String get platformAuditEmptyTitle => 'The log is empty';
+
+  @override
+  String get platformAuditEmptyBody =>
+      'Every admin action lands here: plan changes, farm access, signing in as a client, deletions.';
+
+  @override
+  String countAuditRecords(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records',
+      one: '$count record',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformAuditAdmin(String id) {
+    return 'Admin $id';
+  }
+
+  @override
+  String platformAuditFarm(String id) {
+    return 'Farm $id';
+  }
+
+  @override
+  String get platformAuditWholeService => 'Whole service';
+
+  @override
+  String platformAuditIp(String ip) {
+    return 'IP $ip';
+  }
+
+  @override
+  String platformAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String platformAuditDetail(String field, String value) {
+    return '$field: $value';
+  }
+
+  @override
+  String get platformAuditValueNone => 'not set';
+
+  @override
+  String get platformAuditActionPlanCreate => 'Plan created';
+
+  @override
+  String get platformAuditActionPlanUpdate => 'Plan changed';
+
+  @override
+  String get platformAuditActionPlanDelete => 'Plan deleted';
+
+  @override
+  String get platformAuditActionPlanAssign => 'Farm plan changed';
+
+  @override
+  String get platformAuditActionFarmStatus => 'Farm access changed';
+
+  @override
+  String get platformAuditActionFarmExtras => 'Allowance above the plan';
+
+  @override
+  String get platformAuditActionFarmExtendPlan => 'Plan extended by hand';
+
+  @override
+  String get platformAuditActionFarmExport => 'Farm data exported';
+
+  @override
+  String get platformAuditActionFarmImpersonate => 'Signed in as the client';
+
+  @override
+  String get platformAuditActionFarmDelete => 'Farm deleted';
+
+  @override
+  String get platformAuditActionFarmRestore => 'Farm restored';
+
+  @override
+  String get platformAuditActionAnnouncementSend => 'Announcement sent';
+
+  @override
+  String get platformAuditActionSupportResolve => 'Support request closed';
+
+  @override
+  String get platformAuditActionSupportContact => 'Support contact changed';
+
+  @override
+  String platformAuditActionUnknown(String action) {
+    return 'Action “$action”';
+  }
+
+  @override
+  String get platformAuditFieldName => 'Name';
+
+  @override
+  String get platformAuditFieldLimits => 'Limits';
+
+  @override
+  String get platformAuditFieldPrice => 'Price';
+
+  @override
+  String get platformAuditFieldRabbitsLimit => 'Rabbits on the plan';
+
+  @override
+  String get platformAuditFieldStaffLimit => 'People on the plan';
+
+  @override
+  String get platformAuditFieldPlan => 'Plan';
+
+  @override
+  String get platformAuditFieldStatus => 'Access';
+
+  @override
+  String get platformAuditFieldPlanExpiry => 'Plan expiry';
+
+  @override
+  String get platformAuditFieldExtras => 'Allowance';
+
+  @override
+  String get platformAuditFieldReason => 'Why';
+
+  @override
+  String get platformAuditPlanEnabled => 'The plan is offered to farms again';
+
+  @override
+  String get platformAuditPlanDisabled =>
+      'The plan is no longer offered to farms';
+
+  @override
+  String get platformAuditPlanBecameDefault => 'Became the default plan';
+
+  @override
+  String get platformAuditPlanNoLongerDefault => 'No longer the default plan';
+
+  @override
+  String platformAuditPlanRef(int id) {
+    return 'Plan #$id';
+  }
+
+  @override
+  String platformAuditSupportAnswered(int id) {
+    return 'Request #$id — answered to the author';
+  }
+
+  @override
+  String platformAuditSupportClosed(int id) {
+    return 'Request #$id — closed without an answer';
+  }
+
+  @override
+  String get feedsPaidLabel => 'Amount paid';
+
+  @override
+  String get feedsPaidHint =>
+      'If this was a purchase, the amount goes into expenses. Leave empty when you are just correcting the count.';
+
+  @override
+  String staffInvitedEmailFailedBody(String email) {
+    return 'We could not send the email to $email. Invite your worker by phone instead — that way the invitation reaches them.';
+  }
+
+  @override
+  String get staffInviteLinkLabel => 'Invitation link';
+
+  @override
+  String get staffInviteCopy => 'Copy the invitation';
+
+  @override
+  String get staffInviteCopied =>
+      'Invitation copied — paste it into a message to your worker';
+
+  @override
+  String staffInviteMessage(String link) {
+    return 'I am inviting you to work at my farm in RabbitFarm. Open the link and sign in: $link';
+  }
+
+  @override
+  String get staffExpiredInvites => 'Expired';
+
+  @override
+  String staffInviteCardLive(String role, String date) {
+    return '$role · until $date';
+  }
+
+  @override
+  String staffInviteCardExpired(String role, String date) {
+    return '$role · expired on $date';
+  }
+
+  @override
+  String get staffInviteAgain => 'Invite again';
+
+  @override
+  String get loginNoCodePhone =>
+      'No code? Ask the farm owner which number they invited you with.';
+
+  @override
+  String get loginNoCodeEmail =>
+      'No code? Ask the farm owner which email address they invited you with.';
+
+  @override
+  String get platformPlanDefaultBadge => 'for new farms';
+
+  @override
+  String get staffAccessClosedBadge => 'access closed';
+
+  @override
+  String get roleManagerDescription => 'Runs the herd, the feed and the money';
+
+  @override
+  String get roleWorkerDescription => 'Reads the records and marks work done';
 }

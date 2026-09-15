@@ -20,6 +20,15 @@ import 'package:mobile/features/tasks/data/repositories/tasks_repository.dart';
 import 'package:mobile/features/tasks/presentation/providers/tasks_provider.dart';
 import 'package:mobile/features/feeding/presentation/providers/feeding_records_provider.dart';
 import 'package:mobile/features/notes/presentation/providers/notes_provider.dart';
+import 'package:mobile/shared/models/api_response.dart';
+import 'package:mobile/features/breeding/data/repositories/breeding_repository.dart';
+import 'package:mobile/features/breeding/presentation/providers/breeding_provider.dart';
+import 'package:mobile/features/rabbits/data/models/birth_model.dart';
+import 'package:mobile/features/rabbits/data/models/breeding_model.dart';
+import 'package:mobile/features/rabbits/data/models/rabbit_model.dart';
+import 'package:mobile/features/rabbits/data/repositories/births_repository.dart';
+import 'package:mobile/features/rabbits/data/repositories/rabbits_repository.dart';
+import 'package:mobile/features/rabbits/presentation/providers/rabbits_provider.dart';
 
 /// Репозиторий задач без сети: только то, что нужно очереди — список для
 /// `tasksListProvider.notifier.refresh()` и сама отметка выполнения.
@@ -126,6 +135,107 @@ class _FakeNotesRepository extends NotesRepository {
   }
 }
 
+/// Репозиторий окролов без сети. Окрол — то, ради чего человек достаёт
+/// телефон у клетки, где связи нет, поэтому очередь обязана его нести.
+class _FakeBirthsRepository extends BirthsRepository {
+  _FakeBirthsRepository()
+    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+
+  final List<Map<String, dynamic>> created = [];
+
+  @override
+  Future<List<BirthModel>> getBirths() async => const [];
+
+  @override
+  Future<BirthModel> createBirth(Map<String, dynamic> birthData) async {
+    created.add(birthData);
+    return BirthModel(
+      id: created.length,
+      motherId: birthData['mother_id'] as int,
+      birthDate: birthData['birth_date'] as String,
+      kitsBornAlive: birthData['kits_born_alive'] as int,
+      kitsBornDead: birthData['kits_born_dead'] as int,
+    );
+  }
+}
+
+/// Репозиторий случек без сети.
+class _FakeBreedingRepository extends BreedingRepository {
+  _FakeBreedingRepository()
+    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+
+  final List<Map<String, dynamic>> created = [];
+
+  @override
+  Future<PaginatedResponse<BreedingModel>> getBreedings({
+    int page = 1,
+    int limit = 20,
+    String? status,
+    int? maleId,
+    int? femaleId,
+    String? fromDate,
+    String? toDate,
+  }) async => PaginatedResponse<BreedingModel>(
+    items: const [],
+    total: 0,
+    page: page,
+    limit: limit,
+    totalPages: 0,
+  );
+
+  @override
+  Future<BreedingModel> createBreeding(Map<String, dynamic> data) async {
+    created.add(data);
+    return BreedingModel(
+      id: created.length,
+      maleId: data['male_id'] as int,
+      femaleId: data['female_id'] as int,
+      breedingDate: data['breeding_date'] as String,
+      status: data['status'] as String,
+    );
+  }
+}
+
+/// Кролики без сети: очередь трогает только отметку падежа.
+class _FakeRabbitsRepository extends RabbitsRepository {
+  _FakeRabbitsRepository()
+    : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+
+  final List<(int, Map<String, dynamic>)> updates = [];
+
+  @override
+  Future<PaginatedResponse<RabbitModel>> getRabbits({
+    int page = 1,
+    int limit = 10,
+    String? search,
+    String? sex,
+    String? status,
+    String? purpose,
+    int? breedId,
+  }) async => PaginatedResponse<RabbitModel>(
+    items: const [],
+    total: 0,
+    page: page,
+    limit: limit,
+    totalPages: 0,
+  );
+
+  @override
+  Future<RabbitModel> updateRabbit(int id, Map<String, dynamic> data) async {
+    updates.add((id, data));
+    return RabbitModel(
+      id: id,
+      breedId: 1,
+      sex: 'female',
+      birthDate: DateTime(2026, 1, 1),
+      status: data['status'] as String? ?? 'active',
+      purpose: 'breeding',
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
+  }
+}
+
 /// Пропускает несколько оборотов очереди микрозадач — колбэк `ref.listen`
 /// внутри контроллера и восстановление с диска не awaitable снаружи
 /// напрямую, а без паузы тест проверял бы состояние до того, как они
@@ -142,6 +252,9 @@ ProviderContainer _container({
   TasksRepository? tasks,
   FeedingRecordsRepository? feeding,
   NotesRepository? notes,
+  BirthsRepository? births,
+  BreedingRepository? breeding,
+  RabbitsRepository? rabbits,
 }) {
   final container = ProviderContainer(
     overrides: [
@@ -151,6 +264,10 @@ ProviderContainer _container({
       if (feeding != null)
         feedingRecordsRepositoryProvider.overrideWithValue(feeding),
       if (notes != null) notesRepositoryProvider.overrideWithValue(notes),
+      if (births != null) birthsRepositoryProvider.overrideWithValue(births),
+      if (breeding != null)
+        breedingRepositoryProvider.overrideWithValue(breeding),
+      if (rabbits != null) rabbitsRepositoryProvider.overrideWithValue(rabbits),
     ],
   );
   addTearDown(container.dispose);
@@ -266,6 +383,67 @@ void main() {
         expect(container.read(offlineQueueProvider), isEmpty);
         expect(feeding.createCalls, 1);
         expect(notes.created, ['Заметка с обхода']);
+      });
+
+      test('окрол и случка тоже уходят через очередь', () async {
+        final births = _FakeBirthsRepository();
+        final breeding = _FakeBreedingRepository();
+        final container = _container(
+          online: Stream.value(true),
+          births: births,
+          breeding: breeding,
+        );
+        await _settle();
+
+        final controller = container.read(offlineQueueProvider.notifier);
+        await controller.enqueue(OfflineActionType.birth, {
+          'mother_id': 7,
+          'birth_date': '2026-09-14',
+          'kits_born_alive': 8,
+          'kits_born_dead': 1,
+        });
+        await controller.enqueue(OfflineActionType.breeding, {
+          'male_id': 3,
+          'female_id': 7,
+          'breeding_date': '2026-09-14',
+          'status': 'completed',
+        });
+
+        await controller.flush();
+
+        expect(container.read(offlineQueueProvider), isEmpty);
+        expect(births.created.single['kits_born_alive'], 8);
+        expect(breeding.created.single['female_id'], 7);
+      });
+
+      test('падёж тоже уходит через очередь', () async {
+        final rabbits = _FakeRabbitsRepository();
+        final container = _container(
+          online: Stream.value(true),
+          rabbits: rabbits,
+        );
+        await _settle();
+
+        final controller = container.read(offlineQueueProvider.notifier);
+        await controller.enqueue(OfflineActionType.rabbitDeath, {
+          'rabbit_id': 42,
+          'status': 'deceased',
+          'death_date': '2026-09-14',
+          'death_reason': 'Не ела два дня',
+        });
+
+        await controller.flush();
+
+        expect(container.read(offlineQueueProvider), isEmpty);
+        // `rabbit_id` — адрес записи, а не её поле: в теле запроса его быть
+        // не должно.
+        final (id, data) = rabbits.updates.single;
+        expect(id, 42);
+        expect(data, {
+          'status': 'deceased',
+          'death_date': '2026-09-14',
+          'death_reason': 'Не ела два дня',
+        });
       });
 
       test(

@@ -432,47 +432,47 @@ class _DetailsSheet extends ConsumerWidget {
 
   const _DetailsSheet({required this.transaction});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.financeDeleteTitle),
-        content: Text(context.l10n.financeDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.financeDeleted;
     final failed = context.l10n.financeDeleteFailed;
     final l10n = context.l10n;
+    final notifier = ref.read(transactionsProvider.notifier);
+    // Репозиторий забираем сразу: запрос уйдёт уже после того, как шторка
+    // закроется, а вместе с ней перестанет быть годным её `ref`.
+    final repository = ref.read(transactionsRepositoryProvider);
 
-    try {
-      await ref.read(deleteTransactionProvider(transaction.id).future);
-      ref
-          .read(transactionsProvider.notifier)
-          .removeTransaction(transaction.id);
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } catch (e) {
+    notifier.removeTransaction(transaction.id);
+
+    Object? error;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.financeDeleted,
+      commit: () async {
+        try {
+          await repository.deleteTransaction(transaction.id);
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: notifier.refresh,
+    );
+    navigator.pop();
+    await pending;
+
+    if (error != null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('$failed: ${errorText(l10n, e)}'),
+          content: Text('$failed: ${errorText(l10n, error)}'),
           backgroundColor: AppColors.error,
         ),
       );
+      await notifier.refresh();
     }
   }
 

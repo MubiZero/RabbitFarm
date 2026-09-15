@@ -101,43 +101,40 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     }
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.feedsDeleteTitle),
-        content: Text(context.l10n.feedsDeleteBody(_feed!.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.feedsDeleted;
     final failed = context.l10n.feedsDeleteFailed;
+    final notifier = ref.read(feedsProvider.notifier);
+    final feedId = _feed!.id;
 
-    final error = await ref.read(feedsProvider.notifier).deleteFeed(_feed!.id);
-    if (error == null) {
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-      if (navigator.canPop()) navigator.pop();
-    } else {
+    notifier.removeFeed(feedId);
+
+    Object? error;
+    // Окно отмены открываем, пока форма ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму форму
+    // закрываем, не дожидаясь окна, — подсказка живёт выше экрана и переживёт
+    // его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.feedsDeleted,
+      commit: () async => error = await notifier.deleteFeed(feedId),
+      onUndo: notifier.refresh,
+    );
+    if (navigator.canPop()) navigator.pop();
+    await pending;
+
+    if (error != null) {
       messenger.showSnackBar(
         SnackBar(
           content: Text('$failed: $error'),
           backgroundColor: AppColors.error,
         ),
       );
+      await notifier.refresh();
     }
   }
 

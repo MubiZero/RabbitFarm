@@ -1,5 +1,9 @@
-const { Breeding, Rabbit, Task, Birth } = require('../models');
+const { Breeding, Rabbit, Task, Birth, Cage } = require('../models');
+const { GESTATION_DAYS, NEST_BOX_DAY } = require('../utils/breedingCycle');
+const { closeAutoTasks } = require('./autoTaskService');
 const { Op } = require('sequelize');
+const { taskText } = require('../i18n/tasks');
+const { DEFAULT_LANGUAGE } = require('../i18n/notifications');
 const logger = require('../utils/logger');
 
 /** Ассоциация Breeding.hasMany(Birth) объявлена без псевдонима. */
@@ -80,7 +84,7 @@ class BreedingService {
             // Calculate expected birth date (31 days after breeding)
             if (!data.expected_birth_date && data.breeding_date) {
                 const breedingDate = new Date(data.breeding_date);
-                breedingDate.setDate(breedingDate.getDate() + 31);
+                breedingDate.setDate(breedingDate.getDate() + GESTATION_DAYS);
                 data.expected_birth_date = breedingDate.toISOString().split('T')[0];
             }
 
@@ -100,10 +104,17 @@ class BreedingService {
                 // теперь ферма записана в farm_id, и подставлять хозяина
                 // автором чужой работы незачем: список фермы всё равно
                 // видит задачу.
+                const taskParams = { doe: female.name, buck: male.name };
+
                 await Task.create({
                     farm_id: data.farm_id,
-                    title: `Пальпация: ${female.name}`,
-                    description: `Проверить на беременность самку ${female.name} после случки с ${male.name}`,
+                    // Текст пишется дважды: ключ с подстановками — чтобы
+                    // собрать заголовок на языке читателя, и готовая строка —
+                    // как запасной вариант для сборок, которые ключей ещё не
+                    // понимают (см. `i18n/tasks`).
+                    title_key: 'palpation',
+                    title_params: taskParams,
+                    ...taskText('palpation', DEFAULT_LANGUAGE, taskParams),
                     type: 'checkup',
                     priority: 'medium',
                     due_date: palpationDate,
@@ -113,12 +124,13 @@ class BreedingService {
 
                 // 2. Nest Box Box Task (+28 days)
                 const nestBoxDate = new Date(breedingDate);
-                nestBoxDate.setDate(nestBoxDate.getDate() + 28);
+                nestBoxDate.setDate(nestBoxDate.getDate() + NEST_BOX_DAY);
 
                 await Task.create({
                     farm_id: data.farm_id,
-                    title: `Поставить маточник: ${female.name}`,
-                    description: `Подготовить клетку и поставить гнездовой ящик для ${female.name}`,
+                    title_key: 'nestBox',
+                    title_params: taskParams,
+                    ...taskText('nestBox', DEFAULT_LANGUAGE, taskParams),
                     type: 'breeding',
                     priority: 'high',
                     due_date: nestBoxDate,
@@ -129,12 +141,13 @@ class BreedingService {
 
                 // 3. Expected Birth Task (+31 days)
                 const birthDate = new Date(breedingDate);
-                birthDate.setDate(birthDate.getDate() + 31);
+                birthDate.setDate(birthDate.getDate() + GESTATION_DAYS);
 
                 await Task.create({
                     farm_id: data.farm_id,
-                    title: `Ожидаемый окрол: ${female.name}`,
-                    description: `Ожидается окрол у самки ${female.name} (случка с ${male.name})`,
+                    title_key: 'expectedKindling',
+                    title_params: taskParams,
+                    ...taskText('expectedKindling', DEFAULT_LANGUAGE, taskParams),
                     type: 'breeding',
                     priority: 'urgent',
                     due_date: birthDate,
@@ -144,6 +157,17 @@ class BreedingService {
             }
 
             await transaction.commit();
+
+            // Прощупали — значит задача «прощупать» сделана, чем бы ни
+            // кончилось. Без этого она оставалась просроченной навсегда и
+            // каждое утро уходила пушем.
+            if (data.is_pregnant !== undefined || data.palpation_date) {
+              await closeAutoTasks({
+                farmId,
+                rabbitId: breeding.female_id,
+                keys: ['palpation']
+              });
+            }
 
             // Fetch with associations
             const createdBreeding = await this.getBreedingById(breeding.id, data.farm_id);
@@ -254,7 +278,18 @@ class BreedingService {
                         model: Rabbit,
                         as: 'female',
                         where: { farm_id: farmId },
-                        required: false
+                        required: false,
+                        // Клетка самки — то, куда фермер идёт ставить
+                        // маточник. В бумажном плане окролов эта колонка без
+                        // номера клетки бесполезна, а больше взять его
+                        // неоткуда: список случек про клетки не спрашивал.
+                        include: [
+                            {
+                                model: Cage,
+                                required: false,
+                                attributes: ['id', 'number', 'type', 'location']
+                            }
+                        ]
                     },
                     {
                         // Списку нужен один вопрос к окролу — когда он был и

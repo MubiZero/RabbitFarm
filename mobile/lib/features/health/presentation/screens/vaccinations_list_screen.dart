@@ -591,45 +591,37 @@ class _DetailsSheet extends ConsumerWidget {
 
   const _DetailsSheet({required this.vaccination});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.vaccinationsDeleteTitle),
-        content: Text(context.l10n.vaccinationsDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.vaccinationsDeleted;
     final failed = context.l10n.vaccinationsDeleteFailed;
+    final notifier = ref.read(vaccinationsProvider.notifier);
 
-    final success = await ref
-        .read(vaccinationsProvider.notifier)
-        .deleteVaccination(vaccination.id);
+    notifier.removeVaccination(vaccination.id);
 
-    // Раньше при неудаче не происходило ничего: шторка оставалась открытой,
-    // и было непонятно, удалилось или нет.
-    if (success) {
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } else {
+    var success = true;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.vaccinationsDeleted,
+      commit: () async =>
+          success = await notifier.deleteVaccination(vaccination.id),
+      onUndo: notifier.load,
+    );
+    navigator.pop();
+    await pending;
+
+    // При неудаче строка возвращается на место, иначе останется впечатление,
+    // что прививку удалили.
+    if (!success) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await notifier.load();
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:mobile/core/access/farm_access.dart';
+import 'package:mobile/core/widgets/app_card.dart';
 import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/features/home/data/models/journal_entry.dart';
 import 'package:mobile/features/home/presentation/providers/journal_provider.dart';
@@ -198,5 +199,46 @@ void main() {
     );
 
     expect(find.byType(FilterChip), findsNothing);
+  });
+
+  testWidgets('удаление видно в ленте: что стёрли и кто', (tester) async {
+    // Второй названный владельцами страх — «помощник сотрёт». Раньше
+    // удаление не оставляло следа нигде: запись просто переставала
+    // существовать, и даже узнать, была ли она, было негде.
+    await _pumpJournal(
+      tester,
+      _feed([
+        _entry(
+          kind: JournalKind.deletion,
+          at: _today,
+          title: 'Мушка',
+          author: 'Мадина',
+        ),
+      ]),
+      role: FarmRoleAccess.owner,
+    );
+
+    expect(find.text('Мушка'), findsOneWidget);
+    expect(find.text('Удаление'), findsOneWidget);
+    expect(find.text('Мадина'), findsOneWidget);
+  });
+
+  testWidgets('по удалённой записи открывать нечего', (tester) async {
+    await _pumpJournal(
+      tester,
+      _feed([
+        _entry(kind: JournalKind.deletion, at: _today, title: 'Мушка'),
+      ]),
+      // Владелец записи заводить умеет, и у остальных видов строка открывает
+      // форму правки. У удаления формы нет — открывать уже нечего.
+      role: FarmRoleAccess.owner,
+    );
+
+    final card = tester.widget<InkWell>(
+      find
+          .descendant(of: find.byType(AppCard), matching: find.byType(InkWell))
+          .first,
+    );
+    expect(card.onTap, isNull);
   });
 }

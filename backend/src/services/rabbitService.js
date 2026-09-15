@@ -13,6 +13,7 @@ const {
   sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
+const { closeAutoTasks } = require('./autoTaskService');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
@@ -383,6 +384,13 @@ class RabbitService {
       }
 
       await transaction.commit();
+
+      // Кролик выбыл — все заведённые сервером задачи по нему потеряли
+      // смысл: взвесить павшего или поставить маточник проданной самке
+      // никто не пойдёт, а в дайджест они уходили каждое утро.
+      if (['dead', 'sold'].includes(updateData.status)) {
+        await closeAutoTasks({ farmId, rabbitId: rabbit.id });
+      }
 
       if (oldPhotoUrl) {
         await deleteFile(oldPhotoUrl);

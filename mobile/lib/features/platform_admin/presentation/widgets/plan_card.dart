@@ -40,7 +40,8 @@ class PlanCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         plan.name,
-                        style: AppTypography.titleMd.copyWith(color: titleColor),
+                        style:
+                            AppTypography.titleMd.copyWith(color: titleColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -51,6 +52,17 @@ class PlanCard extends StatelessWidget {
                         context.l10n.platformPlanInactive,
                         style: AppTypography.labelSm
                             .copyWith(color: AppColors.warning),
+                      ),
+                    ],
+                    // Тариф, который достаётся каждой новой ферме, ничем не
+                    // отличался от остальных — а удаление именно его оставляет
+                    // будущие регистрации вовсе без тарифа.
+                    if (plan.isDefault) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        context.l10n.platformPlanDefaultBadge,
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.accent),
                       ),
                     ],
                   ],

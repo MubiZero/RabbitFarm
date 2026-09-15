@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const { RefreshToken, TokenBlacklist } = require('../models');
+const notificationFeedService = require('../services/notificationFeedService');
 const logger = require('../utils/logger');
 
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // Every hour
@@ -15,6 +16,14 @@ async function cleanExpiredTokens() {
     const deletedBlacklist = await TokenBlacklist.destroy({
       where: { expires_at: { [Op.lt]: now } }
     });
+
+    // Лента уведомлений — не архив: её смысл в том, чтобы не пропустить дело
+    // на этой неделе, и вниз по ней никто не листает. Без ограничения
+    // таблица растёт вечно.
+    const deletedNotifications = await notificationFeedService.purgeOlderThan(90);
+    if (deletedNotifications > 0) {
+      logger.info('Old notifications purged', { count: deletedNotifications });
+    }
 
     if (deletedRefresh > 0 || deletedBlacklist > 0) {
       logger.info('Token cleanup completed', {

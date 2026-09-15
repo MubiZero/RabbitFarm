@@ -583,7 +583,14 @@ as DateTime,
 /// @nodoc
 mixin _$CreatedInvitation {
 
-@IntConverter() int get id; String? get email; String? get phone;@JsonKey(name: 'full_name') String? get fullName; FarmRole get role;@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime get expiresAt;
+@IntConverter() int get id; String? get email; String? get phone;@JsonKey(name: 'full_name') String? get fullName; FarmRole get role;@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime get expiresAt;/// Ссылка `rabbitfarm://join?phone=…`, открывающая приложение на экране
+/// входа с уже подставленным номером. Есть только у приглашения по
+/// телефону — почту экран входа так не подставляет.
+@JsonKey(name: 'invite_link') String? get inviteLink;/// Ушло ли сообщение самому работнику. На почту письмо уходит, на
+/// телефон — нет: SMS-шлюз принимает только заранее одобренные шаблоны,
+/// и приглашения среди них нет. От этого зависит, что мы скажем
+/// владельцу: «позвали» или «перешлите ссылку сами».
+@JsonKey(name: 'message_sent') bool get messageSent;
 /// Create a copy of CreatedInvitation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -597,20 +604,20 @@ $CreatedInvitationCopyWith<CreatedInvitation> get copyWith => _$CreatedInvitatio
 @override
 bool operator ==(Object other) {
   final _this = this as CreatedInvitation;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreatedInvitation&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.phone, _this.phone) || other.phone == _this.phone)&&(identical(other.fullName, _this.fullName) || other.fullName == _this.fullName)&&(identical(other.role, _this.role) || other.role == _this.role)&&(identical(other.expiresAt, _this.expiresAt) || other.expiresAt == _this.expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreatedInvitation&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.phone, _this.phone) || other.phone == _this.phone)&&(identical(other.fullName, _this.fullName) || other.fullName == _this.fullName)&&(identical(other.role, _this.role) || other.role == _this.role)&&(identical(other.expiresAt, _this.expiresAt) || other.expiresAt == _this.expiresAt)&&(identical(other.inviteLink, _this.inviteLink) || other.inviteLink == _this.inviteLink)&&(identical(other.messageSent, _this.messageSent) || other.messageSent == _this.messageSent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as CreatedInvitation;
-  return Object.hash(runtimeType,_this.id,_this.email,_this.phone,_this.fullName,_this.role,_this.expiresAt);
+  return Object.hash(runtimeType,_this.id,_this.email,_this.phone,_this.fullName,_this.role,_this.expiresAt,_this.inviteLink,_this.messageSent);
 }
 
 @override
 String toString() {
   final _this = this as CreatedInvitation;
-  return 'CreatedInvitation(id: ${_this.id}, email: ${_this.email}, phone: ${_this.phone}, fullName: ${_this.fullName}, role: ${_this.role}, expiresAt: ${_this.expiresAt})';
+  return 'CreatedInvitation(id: ${_this.id}, email: ${_this.email}, phone: ${_this.phone}, fullName: ${_this.fullName}, role: ${_this.role}, expiresAt: ${_this.expiresAt}, inviteLink: ${_this.inviteLink}, messageSent: ${_this.messageSent})';
 }
 
 
@@ -621,7 +628,7 @@ abstract mixin class $CreatedInvitationCopyWith<$Res>  {
   factory $CreatedInvitationCopyWith(CreatedInvitation value, $Res Function(CreatedInvitation) _then) = _$CreatedInvitationCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String? email, String? phone,@JsonKey(name: 'full_name') String? fullName, FarmRole role,@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime expiresAt
+@IntConverter() int id, String? email, String? phone,@JsonKey(name: 'full_name') String? fullName, FarmRole role,@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime expiresAt,@JsonKey(name: 'invite_link') String? inviteLink,@JsonKey(name: 'message_sent') bool messageSent
 });
 
 
@@ -638,7 +645,7 @@ class _$CreatedInvitationCopyWithImpl<$Res>
 
 /// Create a copy of CreatedInvitation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = freezed,Object? phone = freezed,Object? fullName = freezed,Object? role = null,Object? expiresAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = freezed,Object? phone = freezed,Object? fullName = freezed,Object? role = null,Object? expiresAt = null,Object? inviteLink = freezed,Object? messageSent = null,}) {
   return _then(CreatedInvitation(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -646,7 +653,9 @@ as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullabl
 as String?,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FarmRole,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,inviteLink: freezed == inviteLink ? _self.inviteLink : inviteLink // ignore: cast_nullable_to_non_nullable
+as String?,messageSent: null == messageSent ? _self.messageSent : messageSent // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -731,10 +740,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt, @JsonKey(name: 'invite_link')  String? inviteLink, @JsonKey(name: 'message_sent')  bool messageSent)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreatedInvitation() when $default != null:
-return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt);case _:
+return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt,_that.inviteLink,_that.messageSent);case _:
   return orElse();
 
 }
@@ -752,10 +761,10 @@ return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt, @JsonKey(name: 'invite_link')  String? inviteLink, @JsonKey(name: 'message_sent')  bool messageSent)  $default,) {final _that = this;
 switch (_that) {
 case _CreatedInvitation():
-return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt);case _:
+return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt,_that.inviteLink,_that.messageSent);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -772,10 +781,10 @@ return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String? email,  String? phone, @JsonKey(name: 'full_name')  String? fullName,  FarmRole role, @JsonKey(name: 'expires_at')@DateTimeConverter()  DateTime expiresAt, @JsonKey(name: 'invite_link')  String? inviteLink, @JsonKey(name: 'message_sent')  bool messageSent)?  $default,) {final _that = this;
 switch (_that) {
 case _CreatedInvitation() when $default != null:
-return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt);case _:
+return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that.expiresAt,_that.inviteLink,_that.messageSent);case _:
   return null;
 
 }
@@ -787,7 +796,7 @@ return $default(_that.id,_that.email,_that.phone,_that.fullName,_that.role,_that
 @JsonSerializable()
 
 class _CreatedInvitation extends CreatedInvitation {
-  const _CreatedInvitation({@IntConverter() required this.id, this.email, this.phone, @JsonKey(name: 'full_name') this.fullName, required this.role, @JsonKey(name: 'expires_at')@DateTimeConverter() required this.expiresAt}): super._();
+  const _CreatedInvitation({@IntConverter() required this.id, this.email, this.phone, @JsonKey(name: 'full_name') this.fullName, required this.role, @JsonKey(name: 'expires_at')@DateTimeConverter() required this.expiresAt, @JsonKey(name: 'invite_link') this.inviteLink, @JsonKey(name: 'message_sent') this.messageSent = false}): super._();
   factory _CreatedInvitation.fromJson(Map<String, dynamic> json) => _$CreatedInvitationFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -796,6 +805,15 @@ class _CreatedInvitation extends CreatedInvitation {
 @override@JsonKey(name: 'full_name') final  String? fullName;
 @override final  FarmRole role;
 @override@JsonKey(name: 'expires_at')@DateTimeConverter() final  DateTime expiresAt;
+/// Ссылка `rabbitfarm://join?phone=…`, открывающая приложение на экране
+/// входа с уже подставленным номером. Есть только у приглашения по
+/// телефону — почту экран входа так не подставляет.
+@override@JsonKey(name: 'invite_link') final  String? inviteLink;
+/// Ушло ли сообщение самому работнику. На почту письмо уходит, на
+/// телефон — нет: SMS-шлюз принимает только заранее одобренные шаблоны,
+/// и приглашения среди них нет. От этого зависит, что мы скажем
+/// владельцу: «позвали» или «перешлите ссылку сами».
+@override@JsonKey(name: 'message_sent') final  bool messageSent;
 
 /// Create a copy of CreatedInvitation
 /// with the given fields replaced by the non-null parameter values.
@@ -810,18 +828,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreatedInvitation&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.role, role) || other.role == role)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreatedInvitation&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.role, role) || other.role == role)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.inviteLink, inviteLink) || other.inviteLink == inviteLink)&&(identical(other.messageSent, messageSent) || other.messageSent == messageSent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,email,phone,fullName,role,expiresAt);
+    return Object.hash(runtimeType,id,email,phone,fullName,role,expiresAt,inviteLink,messageSent);
 }
 
 @override
 String toString() {
-    return 'CreatedInvitation(id: $id, email: $email, phone: $phone, fullName: $fullName, role: $role, expiresAt: $expiresAt)';
+    return 'CreatedInvitation(id: $id, email: $email, phone: $phone, fullName: $fullName, role: $role, expiresAt: $expiresAt, inviteLink: $inviteLink, messageSent: $messageSent)';
 }
 
 
@@ -832,7 +850,7 @@ abstract mixin class _$CreatedInvitationCopyWith<$Res> implements $CreatedInvita
   factory _$CreatedInvitationCopyWith(_CreatedInvitation value, $Res Function(_CreatedInvitation) _then) = __$CreatedInvitationCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String? email, String? phone,@JsonKey(name: 'full_name') String? fullName, FarmRole role,@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime expiresAt
+@IntConverter() int id, String? email, String? phone,@JsonKey(name: 'full_name') String? fullName, FarmRole role,@JsonKey(name: 'expires_at')@DateTimeConverter() DateTime expiresAt,@JsonKey(name: 'invite_link') String? inviteLink,@JsonKey(name: 'message_sent') bool messageSent
 });
 
 
@@ -849,7 +867,7 @@ class __$CreatedInvitationCopyWithImpl<$Res>
 
 /// Create a copy of CreatedInvitation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = freezed,Object? phone = freezed,Object? fullName = freezed,Object? role = null,Object? expiresAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = freezed,Object? phone = freezed,Object? fullName = freezed,Object? role = null,Object? expiresAt = null,Object? inviteLink = freezed,Object? messageSent = null,}) {
   return _then(_CreatedInvitation(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -857,7 +875,9 @@ as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullabl
 as String?,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FarmRole,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,inviteLink: freezed == inviteLink ? _self.inviteLink : inviteLink // ignore: cast_nullable_to_non_nullable
+as String?,messageSent: null == messageSent ? _self.messageSent : messageSent // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

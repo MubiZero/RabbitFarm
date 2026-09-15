@@ -1,6 +1,8 @@
 .gitignore
 .worktrees/
-.claude/
+.claude/*
+!.claude/skills/
+!.claude/agents/
 .idea/
 .vscode/
 .mcp.json

@@ -15,6 +15,7 @@ const {
   createAnnouncementSchema,
   updateSupportContactSchema
 } = require('../validators/planValidator');
+const { resolveSupportRequestSchema } = require('../validators/supportRequestValidator');
 
 /**
  * @swagger
@@ -190,7 +191,11 @@ router.get('/support-requests', platformAdminController.listSupportRequests);
  *     summary: Отметить обращение разобранным
  *     tags: [PlatformAdmin]
  */
-router.patch('/support-requests/:id/resolve', platformAdminController.resolveSupportRequest);
+router.patch(
+  '/support-requests/:id/resolve',
+  validate(resolveSupportRequestSchema),
+  platformAdminController.resolveSupportRequest
+);
 
 /**
  * @swagger

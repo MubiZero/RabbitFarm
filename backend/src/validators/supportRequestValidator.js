@@ -21,4 +21,22 @@ const createSupportRequestSchema = Joi.object({
     })
 });
 
-module.exports = { createSupportRequestSchema };
+/**
+ * Ответ поддержки при закрытии обращения.
+ *
+ * Необязателен: часть обращений закрывают после звонка, и заставлять админа
+ * дублировать разговор текстом значило бы получить в ответах «ок» вместо
+ * ответа. Но если текст есть — он уходит автору пушем и письмом.
+ */
+const resolveSupportRequestSchema = Joi.object({
+  answer: Joi.string()
+    .trim()
+    .max(2000)
+    .optional()
+    .allow(null, '')
+    .messages({
+      'string.max': 'Ответ не может превышать 2000 символов'
+    })
+});
+
+module.exports = { createSupportRequestSchema, resolveSupportRequestSchema };

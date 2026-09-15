@@ -160,6 +160,16 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
     }
   }
 
+  /// Убрать прививку из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место — `load()`.
+  void removeVaccination(int id) {
+    state = state.copyWith(
+      vaccinations: state.vaccinations.where((v) => v.id != id).toList(),
+    );
+  }
+
   Future<bool> deleteVaccination(int id) async {
     try {
       await _repository.deleteVaccination(id);

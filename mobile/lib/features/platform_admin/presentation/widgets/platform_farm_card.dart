@@ -4,6 +4,7 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
+import 'farm_state_chip.dart';
 import 'farm_usage_row.dart';
 
 /// Одна ферма в платформенной админке: чья она, на каком тарифе и сколько уже
@@ -33,8 +34,10 @@ class PlatformFarmCard extends StatelessWidget {
 
     return AppCard(
       onTap: onOpen,
+      // Тревожной рамкой помечается всё, из-за чего в ферму идут разбираться:
+      // упёрлась в предел, доступ закрыт, ждёт окончательной зачистки.
       variant:
-          farm.isAtLimit ? AppCardVariant.error : AppCardVariant.default_,
+          farm.needsAttention ? AppCardVariant.error : AppCardVariant.default_,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -66,34 +69,48 @@ class PlatformFarmCard extends StatelessWidget {
             style: AppTypography.labelSm
                 .copyWith(color: context.colors.onSurfaceVariant),
           ),
+          if (FarmStateChip.hasState(farm)) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FarmStateChip(farm: farm),
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
+          // Предел — эффективный, с выданной админом поблажкой: ферма с
+          // добавкой иначе горела бы «упёрлась» там, где сервер её пропускает.
           FarmUsageRow(
             icon: Icons.pets_outlined,
             label: context.l10n.platformRabbits,
             used: farm.rabbitsCount,
-            limit: farm.plan?.maxRabbits,
+            limit: farm.effectiveRabbitsLimit,
           ),
           FarmUsageRow(
             icon: Icons.groups_outlined,
             label: context.l10n.platformStaff,
             used: farm.staffCount,
-            limit: farm.plan?.maxStaff,
+            limit: farm.effectiveStaffLimit,
           ),
           if (farm.isAtLimit || farm.isNearLimit) ...[
             const SizedBox(height: AppSpacing.sm),
             _LimitNote(atLimit: farm.isAtLimit),
           ],
-          const SizedBox(height: AppSpacing.sm),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: onChangePlan,
-              icon: const Icon(Icons.sell_outlined, size: 18),
-              label: Text(farm.plan == null
-                  ? context.l10n.platformAssignPlan
-                  : context.l10n.platformChangePlan),
+          // У удалённой фермы тарифа не меняют — как и на её карточке, где
+          // все рычаги выключены до восстановления. Кнопка, которая ничего не
+          // решает, хуже её отсутствия.
+          if (!farm.isDeleted) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: onChangePlan,
+                icon: const Icon(Icons.sell_outlined, size: 18),
+                label: Text(farm.plan == null
+                    ? context.l10n.platformAssignPlan
+                    : context.l10n.platformChangePlan),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

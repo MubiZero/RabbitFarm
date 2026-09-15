@@ -31,6 +31,8 @@ const canSeeLedger = (req) =>
 
 // Живым считается всё, кроме проданных и павших. Перечислять живые
 // статусы поимённо опасно: список уже расходился с моделью.
+const { overdueRabbits, upcomingRabbits } = require('../utils/vaccinationDue');
+
 const ALIVE_STATUS = { [Op.notIn]: ['dead', 'sold'] };
 
 /**
@@ -100,26 +102,12 @@ exports.getDashboard = async (req, res, next) => {
         col: 'cage_id'
       }),
 
-      // Health statistics
-      // Count upcoming vaccinations (next_vaccination_date within next 30 days)
-      Vaccination.count({
-        where: {
-          farm_id: farmId,
-          next_vaccination_date: {
-            [Op.between]: [new Date(), new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)]
-          }
-        }
-      }),
-
-      // Count overdue vaccinations (next_vaccination_date in the past)
-      Vaccination.count({
-        where: {
-          farm_id: farmId,
-          next_vaccination_date: {
-            [Op.lt]: new Date()
-          }
-        }
-      }),
+      // Здоровье — в кроликах, а не в строках истории. Кролик, привитый
+      // пять раз, давал пять «просрочек», а павшие и проданные считались
+      // наравне с живыми: число не уменьшалось никогда и решения по нему
+      // принять было нельзя (см. utils/vaccinationDue).
+      upcomingRabbits(farmId),
+      overdueRabbits(farmId),
 
       // Financial summary (last 30 days)
       Transaction.sum('amount', {
@@ -330,8 +318,11 @@ exports.getFarmReport = async (req, res, next) => {
     };
 
     // Rabbit population dynamics
+    // Разбивка по породам стоит на экране прямо под общим поголовьем, а оно
+    // считает только живых. Без того же отбора числа расходились: проданные и
+    // павшие за годы кролики оставались в породах, но не в поголовье.
     const rabbitsByBreed = await Rabbit.findAll({
-      where: { farm_id: farmId },
+      where: { farm_id: farmId, status: ALIVE_STATUS },
       attributes: [
         'breed_id',
         [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
@@ -447,13 +438,20 @@ exports.getHealthReport = async (req, res, next) => {
     const farmId = req.farmId;
 
     const dateFilter = { farm_id: farmId };
+    // Прививки и лечения стоят на экране рядом под одним переключателем срока,
+    // поэтому и считаются за один срок. Раньше лечения отбирались только по
+    // ферме: «за месяц» рядом с прививками стояло число за всё время фермы.
+    const medicalFilter = { farm_id: farmId };
     if (from_date || to_date) {
       dateFilter.vaccination_date = {};
+      medicalFilter.started_at = {};
       if (from_date) {
         dateFilter.vaccination_date[Op.gte] = from_date;
+        medicalFilter.started_at[Op.gte] = from_date;
       }
       if (to_date) {
         dateFilter.vaccination_date[Op.lte] = to_date;
+        medicalFilter.started_at[Op.lte] = to_date;
       }
     }
 
@@ -470,7 +468,7 @@ exports.getHealthReport = async (req, res, next) => {
 
     // Medical records by outcome
     const medicalRecordsByOutcome = await MedicalRecord.findAll({
-      where: { farm_id: farmId },
+      where: medicalFilter,
       attributes: [
         'outcome',
         [Sequelize.fn('COUNT', Sequelize.col('MedicalRecord.id')), 'count']

@@ -17,6 +17,25 @@ const logger = require('../utils/logger');
  * Что именно покупает платёж (продление подписки, план) — решает вызывающий
  * код после того, как статус стал `completed`.
  */
+/**
+ * Отказ банка — состояние окончательное, и человеку о нём надо сказать.
+ *
+ * Раньше `failed` не проставлялся ни в одной ветке: платёж, по которому банк
+ * отказал, навсегда оставался «новым», и экран бесконечно отвечал «платёж
+ * ещё не подтверждён». Выйти из этого состояния было нельзя.
+ *
+ * Список слов, а не «всё, что не COMPLETED»: документации по словарю
+ * состояний у нас нет, и незнакомое значение безопаснее считать «ещё не
+ * решили», чем объявить отказом живой платёж.
+ */
+const DECLINED_MARKERS = ['DECLIN', 'CANCEL', 'REJECT', 'FAIL', 'EXPIR', 'REVERS'];
+
+function isDeclined(bankStatus) {
+  if (!bankStatus) return false;
+  const value = String(bankStatus).toUpperCase();
+  return DECLINED_MARKERS.some((marker) => value.includes(marker));
+}
+
 class PaymentService {
   /**
    * Создать заказ на оплату для фермы.
@@ -99,9 +118,22 @@ class PaymentService {
       return { found: true, payment, changed: true };
     }
 
+    if (isDeclined(bankStatus)) {
+      await payment.update({ status: 'failed', raw_response: body.data });
+      logger.info('Payment declined by bank', { invoiceId, orderId: payment.order_id, bankStatus });
+      return { found: true, payment, changed: true };
+    }
+
+    // Банк ещё не решил — или прислал слово, которого мы не знаем. Второе
+    // пишем в лог именно затем, чтобы словарь ниже пополнялся по факту, а
+    // не по догадкам: ошибиться здесь в сторону «отказ» хуже, чем подождать.
+    if (bankStatus) {
+      logger.warn('Unknown bank order status', { invoiceId, bankStatus });
+    }
     await payment.update({ raw_response: body.data });
     return { found: true, payment, changed: false };
   }
 }
 
 module.exports = new PaymentService();
+module.exports.isDeclined = isDeclined;

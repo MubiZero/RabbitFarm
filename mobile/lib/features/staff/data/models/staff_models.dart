@@ -16,21 +16,6 @@ enum FarmRole {
   worker,
 }
 
-extension FarmRoleLabels on FarmRole {
-  String get label => switch (this) {
-        FarmRole.owner => 'Владелец',
-        FarmRole.manager => 'Управляющий',
-        FarmRole.worker => 'Работник',
-      };
-
-  /// Что человеку доступно — короткой строкой под именем.
-  String get description => switch (this) {
-        FarmRole.owner => 'Полный доступ, включая работников',
-        FarmRole.manager => 'Ведёт поголовье, корма и финансы',
-        FarmRole.worker => 'Смотрит данные и отмечает работу',
-      };
-}
-
 /// Участник фермы: владелец или его сотрудник.
 @freezed
 abstract class FarmMember with _$FarmMember {
@@ -71,7 +56,9 @@ abstract class FarmInvitation with _$FarmInvitation {
     String? email,
     String? phone,
     required FarmRole role,
-    @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
+    @JsonKey(name: 'expires_at')
+    @DateTimeConverter()
+    required DateTime expiresAt,
   }) = _FarmInvitation;
 
   const FarmInvitation._();
@@ -79,6 +66,14 @@ abstract class FarmInvitation with _$FarmInvitation {
   /// Кому выписано — почта или телефон. Приглашение всегда ровно на одно из
   /// двух (сервер принимает только одно), поэтому одно поле для показа.
   String get contact => email ?? (phone == null ? '' : formatTjPhone(phone!));
+
+  /// Срок вышел — войти по такому приглашению уже нельзя (сервер проверяет
+  /// `expires_at` на входе), пока владелец не позовёт человека заново.
+  ///
+  /// Считается на устройстве по той же дате, которую карточка и показывает:
+  /// сервер отдаёт просроченные приглашения вместе с живыми, потому что
+  /// забытое приглашение — самая частая причина «я позвал, а он не пришёл».
+  bool get isExpired => expiresAt.isBefore(DateTime.now());
 
   factory FarmInvitation.fromJson(Map<String, dynamic> json) =>
       _$FarmInvitationFromJson(json);
@@ -94,7 +89,20 @@ abstract class CreatedInvitation with _$CreatedInvitation {
     String? phone,
     @JsonKey(name: 'full_name') String? fullName,
     required FarmRole role,
-    @JsonKey(name: 'expires_at') @DateTimeConverter() required DateTime expiresAt,
+    @JsonKey(name: 'expires_at')
+    @DateTimeConverter()
+    required DateTime expiresAt,
+
+    /// Ссылка `rabbitfarm://join?phone=…`, открывающая приложение на экране
+    /// входа с уже подставленным номером. Есть только у приглашения по
+    /// телефону — почту экран входа так не подставляет.
+    @JsonKey(name: 'invite_link') String? inviteLink,
+
+    /// Ушло ли сообщение самому работнику. На почту письмо уходит, на
+    /// телефон — нет: SMS-шлюз принимает только заранее одобренные шаблоны,
+    /// и приглашения среди них нет. От этого зависит, что мы скажем
+    /// владельцу: «позвали» или «перешлите ссылку сами».
+    @JsonKey(name: 'message_sent') @Default(false) bool messageSent,
   }) = _CreatedInvitation;
 
   const CreatedInvitation._();

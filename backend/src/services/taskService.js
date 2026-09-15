@@ -3,11 +3,16 @@ const { Op, fn, col } = require('sequelize');
 const logger = require('../utils/logger');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
 const notificationService = require('./notificationService');
+const { taskTitle } = require('../i18n/tasks');
 
 const notifyAssignee = (task, farmId) => {
   notificationService.sendToUsers(farmId, [task.assigned_to], {
-    title: 'Вам назначена задача',
-    body: task.title,
+    // Название задачи переводится вместе с самим уведомлением: у автозадач
+    // («Поставить маточник: Мушка») в базе лежит русский запасной вариант.
+    i18n: {
+      key: 'taskAssigned',
+      params: (language) => ({ task: taskTitle(task, language) })
+    },
     data: { type: 'task', route: `/tasks/${task.id}` }
   }).catch(error => {
     logger.error('Task assignment notification failed', { taskId: task.id, error: error.message });
@@ -302,6 +307,10 @@ class TaskService {
             await Task.create({
               farm_id: farmId,
               title: task.title,
+              // Ключ шаблона переезжает вместе с текстом: без него повтор
+              // автозадачи навсегда застыл бы на русском запасном варианте.
+              title_key: task.title_key,
+              title_params: task.title_params,
               description: task.description,
               type: task.type,
               status: 'pending',

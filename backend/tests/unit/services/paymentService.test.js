@@ -139,6 +139,51 @@ describe('PaymentService', () => {
       expect(result.changed).toBe(false);
     });
 
+    it('записывает отказ банка — иначе экран вечно отвечает «ещё не подтверждён»', async () => {
+      const payment = {
+        status: 'new',
+        invoice_id: 'inv1',
+        order_id: 'o1',
+        amount: 100,
+        currency: '972',
+        pos_id: 12,
+        update: jest.fn().mockResolvedValue(undefined)
+      };
+      Payment.findOne.mockResolvedValue(payment);
+      eskhataClient.checkStatus.mockResolvedValue({
+        httpStatus: 200,
+        body: { status: true, data: { orderStatus: 'DECLINED' } }
+      });
+
+      const result = await paymentService.reconcile('inv1');
+
+      expect(payment.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'failed' }));
+      expect(result.changed).toBe(true);
+    });
+
+    it('незнакомое слово банка отказом не считается', async () => {
+      const payment = {
+        status: 'new',
+        invoice_id: 'inv1',
+        order_id: 'o1',
+        amount: 100,
+        currency: '972',
+        pos_id: 12,
+        update: jest.fn().mockResolvedValue(undefined)
+      };
+      Payment.findOne.mockResolvedValue(payment);
+      eskhataClient.checkStatus.mockResolvedValue({
+        httpStatus: 200,
+        body: { status: true, data: { orderStatus: 'SOMETHING_NEW' } }
+      });
+
+      const result = await paymentService.reconcile('inv1');
+
+      // Объявить отказом живой платёж дороже, чем подождать ещё один опрос.
+      expect(payment.update).not.toHaveBeenCalledWith(expect.objectContaining({ status: 'failed' }));
+      expect(result.changed).toBe(false);
+    });
+
     it('does not complete the payment when the status check itself is declined (status:false)', async () => {
       const payment = {
         status: 'new',

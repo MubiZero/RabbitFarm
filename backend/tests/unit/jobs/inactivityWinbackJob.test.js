@@ -97,10 +97,10 @@ describe('inactivityWinbackJob', () => {
       await runWinbackReminders();
 
       expect(notifyFarmOwners).toHaveBeenCalledWith(farm.id, expect.objectContaining({
-        title: 'Давно вас не было',
+        key: 'winbackTwoWeeks',
         data: { type: 'farm_inactive', route: '/today' }
       }));
-      expect(notifyFarmOwners.mock.calls[0][1].body).toContain('«Заря»');
+      expect(notifyFarmOwners.mock.calls[0][1].params).toEqual({ farm: 'Заря' });
       expect(farm.update).toHaveBeenCalledWith({ inactivity_notified_days: 14 });
     });
 
@@ -112,7 +112,7 @@ describe('inactivityWinbackJob', () => {
       await runWinbackReminders();
 
       expect(notifyFarmOwners).toHaveBeenCalledWith(farm.id, expect.objectContaining({
-        title: 'Ферма ждёт вас'
+        key: 'winbackMonth'
       }));
       expect(farm.update).toHaveBeenCalledWith({ inactivity_notified_days: 30 });
     });

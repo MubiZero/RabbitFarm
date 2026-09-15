@@ -168,8 +168,7 @@ void main() {
       );
     });
 
-    testWidgets('номер из ссылки-приглашения уже стоит в поле',
-        (tester) async {
+    testWidgets('номер из ссылки-приглашения уже стоит в поле', (tester) async {
       final repository = _RecordingAuthRepository();
       await tester.pumpWidget(testAppScreen(
         const LoginScreen(initialPhone: '+992901234567'),
@@ -201,8 +200,25 @@ void main() {
       expect(pendingInvitePhone.value, isNull);
     });
 
-    testWidgets('«Изменить номер» возвращает к вводу телефона',
+    // Владелец ошибается в одной цифре номера — приглашённый запрашивает код
+    // на свой настоящий номер, сервер отвечает успехом, но кода не создаёт
+    // (защита от перебора), и человек остаётся перед пустым полем навсегда.
+    // Догадаться он не может, поэтому подсказка стоит прямо здесь.
+    testWidgets('на шаге кода объясняет, что делать, если код не пришёл',
         (tester) async {
+      await pumpLogin(tester);
+
+      expect(find.textContaining('Кода нет?'), findsNothing);
+
+      await enterPhone(tester, '901234567');
+
+      expect(
+        find.textContaining('на какой номер он вас пригласил'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('«Изменить номер» возвращает к вводу телефона', (tester) async {
       await pumpLogin(tester);
       await enterPhone(tester, '901234567');
 
@@ -236,8 +252,7 @@ void main() {
           .read(authProvider.notifier)
           .requestOtp(phone: '+992901234567');
 
-      expect(adapter.requests['/auth/otp/request'],
-          {'phone': '+992901234567'});
+      expect(adapter.requests['/auth/otp/request'], {'phone': '+992901234567'});
     });
 
     test('успешный код открывает сессию работнику без почты', () async {

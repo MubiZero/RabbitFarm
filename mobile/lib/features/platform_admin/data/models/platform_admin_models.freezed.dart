@@ -589,7 +589,7 @@ as bool,
 /// @nodoc
 mixin _$PlatformFarm {
 
-@IntConverter() int get id; String get name; UserRef? get owner; Plan? get plan;@JsonKey(name: 'rabbits_count')@IntConverter() int get rabbitsCount;@JsonKey(name: 'staff_count')@IntConverter() int get staffCount;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? get lastActiveAt;
+@IntConverter() int get id; String get name; UserRef? get owner; Plan? get plan;@JsonKey(name: 'rabbits_count')@IntConverter() int get rabbitsCount;@JsonKey(name: 'staff_count')@IntConverter() int get staffCount;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? get lastActiveAt; String get status;@JsonKey(name: 'deleted_at')@NullableDateTimeConverter() DateTime? get deletedAt;@JsonKey(name: 'extra_rabbits')@NullableIntConverter() int? get extraRabbits;@JsonKey(name: 'extra_staff')@NullableIntConverter() int? get extraStaff;@JsonKey(name: 'extras_until')@NullableDateTimeConverter() DateTime? get extrasUntil;
 /// Create a copy of PlatformFarm
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -603,20 +603,20 @@ $PlatformFarmCopyWith<PlatformFarm> get copyWith => _$PlatformFarmCopyWithImpl<P
 @override
 bool operator ==(Object other) {
   final _this = this as PlatformFarm;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlatformFarm&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.owner, _this.owner) || other.owner == _this.owner)&&(identical(other.plan, _this.plan) || other.plan == _this.plan)&&(identical(other.rabbitsCount, _this.rabbitsCount) || other.rabbitsCount == _this.rabbitsCount)&&(identical(other.staffCount, _this.staffCount) || other.staffCount == _this.staffCount)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.lastActiveAt, _this.lastActiveAt) || other.lastActiveAt == _this.lastActiveAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlatformFarm&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.owner, _this.owner) || other.owner == _this.owner)&&(identical(other.plan, _this.plan) || other.plan == _this.plan)&&(identical(other.rabbitsCount, _this.rabbitsCount) || other.rabbitsCount == _this.rabbitsCount)&&(identical(other.staffCount, _this.staffCount) || other.staffCount == _this.staffCount)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.lastActiveAt, _this.lastActiveAt) || other.lastActiveAt == _this.lastActiveAt)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.deletedAt, _this.deletedAt) || other.deletedAt == _this.deletedAt)&&(identical(other.extraRabbits, _this.extraRabbits) || other.extraRabbits == _this.extraRabbits)&&(identical(other.extraStaff, _this.extraStaff) || other.extraStaff == _this.extraStaff)&&(identical(other.extrasUntil, _this.extrasUntil) || other.extrasUntil == _this.extrasUntil));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PlatformFarm;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.owner,_this.plan,_this.rabbitsCount,_this.staffCount,_this.createdAt,_this.lastActiveAt);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.owner,_this.plan,_this.rabbitsCount,_this.staffCount,_this.createdAt,_this.lastActiveAt,_this.status,_this.deletedAt,_this.extraRabbits,_this.extraStaff,_this.extrasUntil);
 }
 
 @override
 String toString() {
   final _this = this as PlatformFarm;
-  return 'PlatformFarm(id: ${_this.id}, name: ${_this.name}, owner: ${_this.owner}, plan: ${_this.plan}, rabbitsCount: ${_this.rabbitsCount}, staffCount: ${_this.staffCount}, createdAt: ${_this.createdAt}, lastActiveAt: ${_this.lastActiveAt})';
+  return 'PlatformFarm(id: ${_this.id}, name: ${_this.name}, owner: ${_this.owner}, plan: ${_this.plan}, rabbitsCount: ${_this.rabbitsCount}, staffCount: ${_this.staffCount}, createdAt: ${_this.createdAt}, lastActiveAt: ${_this.lastActiveAt}, status: ${_this.status}, deletedAt: ${_this.deletedAt}, extraRabbits: ${_this.extraRabbits}, extraStaff: ${_this.extraStaff}, extrasUntil: ${_this.extrasUntil})';
 }
 
 
@@ -627,7 +627,7 @@ abstract mixin class $PlatformFarmCopyWith<$Res>  {
   factory $PlatformFarmCopyWith(PlatformFarm value, $Res Function(PlatformFarm) _then) = _$PlatformFarmCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String name, UserRef? owner, Plan? plan,@JsonKey(name: 'rabbits_count')@IntConverter() int rabbitsCount,@JsonKey(name: 'staff_count')@IntConverter() int staffCount,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? lastActiveAt
+@IntConverter() int id, String name, UserRef? owner, Plan? plan,@JsonKey(name: 'rabbits_count')@IntConverter() int rabbitsCount,@JsonKey(name: 'staff_count')@IntConverter() int staffCount,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? lastActiveAt, String status,@JsonKey(name: 'deleted_at')@NullableDateTimeConverter() DateTime? deletedAt,@JsonKey(name: 'extra_rabbits')@NullableIntConverter() int? extraRabbits,@JsonKey(name: 'extra_staff')@NullableIntConverter() int? extraStaff,@JsonKey(name: 'extras_until')@NullableDateTimeConverter() DateTime? extrasUntil
 });
 
 
@@ -644,7 +644,7 @@ class _$PlatformFarmCopyWithImpl<$Res>
 
 /// Create a copy of PlatformFarm
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? owner = freezed,Object? plan = freezed,Object? rabbitsCount = null,Object? staffCount = null,Object? createdAt = null,Object? lastActiveAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? owner = freezed,Object? plan = freezed,Object? rabbitsCount = null,Object? staffCount = null,Object? createdAt = null,Object? lastActiveAt = freezed,Object? status = null,Object? deletedAt = freezed,Object? extraRabbits = freezed,Object? extraStaff = freezed,Object? extrasUntil = freezed,}) {
   return _then(PlatformFarm(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -654,6 +654,11 @@ as Plan?,rabbitsCount: null == rabbitsCount ? _self.rabbitsCount : rabbitsCount 
 as int,staffCount: null == staffCount ? _self.staffCount : staffCount // ignore: cast_nullable_to_non_nullable
 as int,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,lastActiveAt: freezed == lastActiveAt ? _self.lastActiveAt : lastActiveAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,extraRabbits: freezed == extraRabbits ? _self.extraRabbits : extraRabbits // ignore: cast_nullable_to_non_nullable
+as int?,extraStaff: freezed == extraStaff ? _self.extraStaff : extraStaff // ignore: cast_nullable_to_non_nullable
+as int?,extrasUntil: freezed == extrasUntil ? _self.extrasUntil : extrasUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
@@ -763,10 +768,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt,  String status, @JsonKey(name: 'deleted_at')@NullableDateTimeConverter()  DateTime? deletedAt, @JsonKey(name: 'extra_rabbits')@NullableIntConverter()  int? extraRabbits, @JsonKey(name: 'extra_staff')@NullableIntConverter()  int? extraStaff, @JsonKey(name: 'extras_until')@NullableDateTimeConverter()  DateTime? extrasUntil)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PlatformFarm() when $default != null:
-return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt);case _:
+return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt,_that.status,_that.deletedAt,_that.extraRabbits,_that.extraStaff,_that.extrasUntil);case _:
   return orElse();
 
 }
@@ -784,10 +789,10 @@ return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt,  String status, @JsonKey(name: 'deleted_at')@NullableDateTimeConverter()  DateTime? deletedAt, @JsonKey(name: 'extra_rabbits')@NullableIntConverter()  int? extraRabbits, @JsonKey(name: 'extra_staff')@NullableIntConverter()  int? extraStaff, @JsonKey(name: 'extras_until')@NullableDateTimeConverter()  DateTime? extrasUntil)  $default,) {final _that = this;
 switch (_that) {
 case _PlatformFarm():
-return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt);case _:
+return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt,_that.status,_that.deletedAt,_that.extraRabbits,_that.extraStaff,_that.extrasUntil);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -804,10 +809,10 @@ return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String name,  UserRef? owner,  Plan? plan, @JsonKey(name: 'rabbits_count')@IntConverter()  int rabbitsCount, @JsonKey(name: 'staff_count')@IntConverter()  int staffCount, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter()  DateTime? lastActiveAt,  String status, @JsonKey(name: 'deleted_at')@NullableDateTimeConverter()  DateTime? deletedAt, @JsonKey(name: 'extra_rabbits')@NullableIntConverter()  int? extraRabbits, @JsonKey(name: 'extra_staff')@NullableIntConverter()  int? extraStaff, @JsonKey(name: 'extras_until')@NullableDateTimeConverter()  DateTime? extrasUntil)?  $default,) {final _that = this;
 switch (_that) {
 case _PlatformFarm() when $default != null:
-return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt);case _:
+return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_that.staffCount,_that.createdAt,_that.lastActiveAt,_that.status,_that.deletedAt,_that.extraRabbits,_that.extraStaff,_that.extrasUntil);case _:
   return null;
 
 }
@@ -819,7 +824,7 @@ return $default(_that.id,_that.name,_that.owner,_that.plan,_that.rabbitsCount,_t
 @JsonSerializable()
 
 class _PlatformFarm extends PlatformFarm {
-  const _PlatformFarm({@IntConverter() required this.id, required this.name, this.owner, this.plan, @JsonKey(name: 'rabbits_count')@IntConverter() this.rabbitsCount = 0, @JsonKey(name: 'staff_count')@IntConverter() this.staffCount = 0, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter() this.lastActiveAt}): super._();
+  const _PlatformFarm({@IntConverter() required this.id, required this.name, this.owner, this.plan, @JsonKey(name: 'rabbits_count')@IntConverter() this.rabbitsCount = 0, @JsonKey(name: 'staff_count')@IntConverter() this.staffCount = 0, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt, @JsonKey(name: 'last_active')@NullableDateTimeConverter() this.lastActiveAt, this.status = 'active', @JsonKey(name: 'deleted_at')@NullableDateTimeConverter() this.deletedAt, @JsonKey(name: 'extra_rabbits')@NullableIntConverter() this.extraRabbits, @JsonKey(name: 'extra_staff')@NullableIntConverter() this.extraStaff, @JsonKey(name: 'extras_until')@NullableDateTimeConverter() this.extrasUntil}): super._();
   factory _PlatformFarm.fromJson(Map<String, dynamic> json) => _$PlatformFarmFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -830,6 +835,11 @@ class _PlatformFarm extends PlatformFarm {
 @override@JsonKey(name: 'staff_count')@IntConverter() final  int staffCount;
 @override@JsonKey(name: 'created_at')@DateTimeConverter() final  DateTime createdAt;
 @override@JsonKey(name: 'last_active')@NullableDateTimeConverter() final  DateTime? lastActiveAt;
+@override@JsonKey() final  String status;
+@override@JsonKey(name: 'deleted_at')@NullableDateTimeConverter() final  DateTime? deletedAt;
+@override@JsonKey(name: 'extra_rabbits')@NullableIntConverter() final  int? extraRabbits;
+@override@JsonKey(name: 'extra_staff')@NullableIntConverter() final  int? extraStaff;
+@override@JsonKey(name: 'extras_until')@NullableDateTimeConverter() final  DateTime? extrasUntil;
 
 /// Create a copy of PlatformFarm
 /// with the given fields replaced by the non-null parameter values.
@@ -844,18 +854,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlatformFarm&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.owner, owner) || other.owner == owner)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.rabbitsCount, rabbitsCount) || other.rabbitsCount == rabbitsCount)&&(identical(other.staffCount, staffCount) || other.staffCount == staffCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastActiveAt, lastActiveAt) || other.lastActiveAt == lastActiveAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlatformFarm&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.owner, owner) || other.owner == owner)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.rabbitsCount, rabbitsCount) || other.rabbitsCount == rabbitsCount)&&(identical(other.staffCount, staffCount) || other.staffCount == staffCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastActiveAt, lastActiveAt) || other.lastActiveAt == lastActiveAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.extraRabbits, extraRabbits) || other.extraRabbits == extraRabbits)&&(identical(other.extraStaff, extraStaff) || other.extraStaff == extraStaff)&&(identical(other.extrasUntil, extrasUntil) || other.extrasUntil == extrasUntil));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,owner,plan,rabbitsCount,staffCount,createdAt,lastActiveAt);
+    return Object.hash(runtimeType,id,name,owner,plan,rabbitsCount,staffCount,createdAt,lastActiveAt,status,deletedAt,extraRabbits,extraStaff,extrasUntil);
 }
 
 @override
 String toString() {
-    return 'PlatformFarm(id: $id, name: $name, owner: $owner, plan: $plan, rabbitsCount: $rabbitsCount, staffCount: $staffCount, createdAt: $createdAt, lastActiveAt: $lastActiveAt)';
+    return 'PlatformFarm(id: $id, name: $name, owner: $owner, plan: $plan, rabbitsCount: $rabbitsCount, staffCount: $staffCount, createdAt: $createdAt, lastActiveAt: $lastActiveAt, status: $status, deletedAt: $deletedAt, extraRabbits: $extraRabbits, extraStaff: $extraStaff, extrasUntil: $extrasUntil)';
 }
 
 
@@ -866,7 +876,7 @@ abstract mixin class _$PlatformFarmCopyWith<$Res> implements $PlatformFarmCopyWi
   factory _$PlatformFarmCopyWith(_PlatformFarm value, $Res Function(_PlatformFarm) _then) = __$PlatformFarmCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String name, UserRef? owner, Plan? plan,@JsonKey(name: 'rabbits_count')@IntConverter() int rabbitsCount,@JsonKey(name: 'staff_count')@IntConverter() int staffCount,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? lastActiveAt
+@IntConverter() int id, String name, UserRef? owner, Plan? plan,@JsonKey(name: 'rabbits_count')@IntConverter() int rabbitsCount,@JsonKey(name: 'staff_count')@IntConverter() int staffCount,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt,@JsonKey(name: 'last_active')@NullableDateTimeConverter() DateTime? lastActiveAt, String status,@JsonKey(name: 'deleted_at')@NullableDateTimeConverter() DateTime? deletedAt,@JsonKey(name: 'extra_rabbits')@NullableIntConverter() int? extraRabbits,@JsonKey(name: 'extra_staff')@NullableIntConverter() int? extraStaff,@JsonKey(name: 'extras_until')@NullableDateTimeConverter() DateTime? extrasUntil
 });
 
 
@@ -883,7 +893,7 @@ class __$PlatformFarmCopyWithImpl<$Res>
 
 /// Create a copy of PlatformFarm
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? owner = freezed,Object? plan = freezed,Object? rabbitsCount = null,Object? staffCount = null,Object? createdAt = null,Object? lastActiveAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? owner = freezed,Object? plan = freezed,Object? rabbitsCount = null,Object? staffCount = null,Object? createdAt = null,Object? lastActiveAt = freezed,Object? status = null,Object? deletedAt = freezed,Object? extraRabbits = freezed,Object? extraStaff = freezed,Object? extrasUntil = freezed,}) {
   return _then(_PlatformFarm(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -893,6 +903,11 @@ as Plan?,rabbitsCount: null == rabbitsCount ? _self.rabbitsCount : rabbitsCount 
 as int,staffCount: null == staffCount ? _self.staffCount : staffCount // ignore: cast_nullable_to_non_nullable
 as int,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,lastActiveAt: freezed == lastActiveAt ? _self.lastActiveAt : lastActiveAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,extraRabbits: freezed == extraRabbits ? _self.extraRabbits : extraRabbits // ignore: cast_nullable_to_non_nullable
+as int?,extraStaff: freezed == extraStaff ? _self.extraStaff : extraStaff // ignore: cast_nullable_to_non_nullable
+as int?,extrasUntil: freezed == extrasUntil ? _self.extrasUntil : extrasUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
@@ -4252,7 +4267,8 @@ as String,
 /// @nodoc
 mixin _$SupportRequest {
 
-@IntConverter() int get id; String get text; String get status; SupportRequestFarm? get farm; UserRef? get author;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;
+@IntConverter() int get id; String get text; String get status;/// Что поддержка ответила, закрывая обращение. `null` — закрыли молча.
+ String? get answer;@JsonKey(name: 'resolved_at')@NullableDateTimeConverter() DateTime? get resolvedAt; SupportRequestFarm? get farm; UserRef? get author;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;
 /// Create a copy of SupportRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4266,20 +4282,20 @@ $SupportRequestCopyWith<SupportRequest> get copyWith => _$SupportRequestCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as SupportRequest;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupportRequest&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.farm, _this.farm) || other.farm == _this.farm)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupportRequest&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.answer, _this.answer) || other.answer == _this.answer)&&(identical(other.resolvedAt, _this.resolvedAt) || other.resolvedAt == _this.resolvedAt)&&(identical(other.farm, _this.farm) || other.farm == _this.farm)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as SupportRequest;
-  return Object.hash(runtimeType,_this.id,_this.text,_this.status,_this.farm,_this.author,_this.createdAt);
+  return Object.hash(runtimeType,_this.id,_this.text,_this.status,_this.answer,_this.resolvedAt,_this.farm,_this.author,_this.createdAt);
 }
 
 @override
 String toString() {
   final _this = this as SupportRequest;
-  return 'SupportRequest(id: ${_this.id}, text: ${_this.text}, status: ${_this.status}, farm: ${_this.farm}, author: ${_this.author}, createdAt: ${_this.createdAt})';
+  return 'SupportRequest(id: ${_this.id}, text: ${_this.text}, status: ${_this.status}, answer: ${_this.answer}, resolvedAt: ${_this.resolvedAt}, farm: ${_this.farm}, author: ${_this.author}, createdAt: ${_this.createdAt})';
 }
 
 
@@ -4290,7 +4306,7 @@ abstract mixin class $SupportRequestCopyWith<$Res>  {
   factory $SupportRequestCopyWith(SupportRequest value, $Res Function(SupportRequest) _then) = _$SupportRequestCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String text, String status, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+@IntConverter() int id, String text, String status, String? answer,@JsonKey(name: 'resolved_at')@NullableDateTimeConverter() DateTime? resolvedAt, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
 });
 
 
@@ -4307,12 +4323,14 @@ class _$SupportRequestCopyWithImpl<$Res>
 
 /// Create a copy of SupportRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? text = null,Object? status = null,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? text = null,Object? status = null,Object? answer = freezed,Object? resolvedAt = freezed,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
   return _then(SupportRequest(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as String,answer: freezed == answer ? _self.answer : answer // ignore: cast_nullable_to_non_nullable
+as String?,resolvedAt: freezed == resolvedAt ? _self.resolvedAt : resolvedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
 as SupportRequestFarm?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserRef?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -4424,10 +4442,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  String? answer, @JsonKey(name: 'resolved_at')@NullableDateTimeConverter()  DateTime? resolvedAt,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SupportRequest() when $default != null:
-return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+return $default(_that.id,_that.text,_that.status,_that.answer,_that.resolvedAt,_that.farm,_that.author,_that.createdAt);case _:
   return orElse();
 
 }
@@ -4445,10 +4463,10 @@ return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String text,  String status,  String? answer, @JsonKey(name: 'resolved_at')@NullableDateTimeConverter()  DateTime? resolvedAt,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _SupportRequest():
-return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+return $default(_that.id,_that.text,_that.status,_that.answer,_that.resolvedAt,_that.farm,_that.author,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -4465,10 +4483,10 @@ return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String text,  String status,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String text,  String status,  String? answer, @JsonKey(name: 'resolved_at')@NullableDateTimeConverter()  DateTime? resolvedAt,  SupportRequestFarm? farm,  UserRef? author, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _SupportRequest() when $default != null:
-return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.createdAt);case _:
+return $default(_that.id,_that.text,_that.status,_that.answer,_that.resolvedAt,_that.farm,_that.author,_that.createdAt);case _:
   return null;
 
 }
@@ -4480,12 +4498,15 @@ return $default(_that.id,_that.text,_that.status,_that.farm,_that.author,_that.c
 @JsonSerializable()
 
 class _SupportRequest extends SupportRequest {
-  const _SupportRequest({@IntConverter() required this.id, required this.text, this.status = 'new', this.farm, this.author, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt}): super._();
+  const _SupportRequest({@IntConverter() required this.id, required this.text, this.status = 'new', this.answer, @JsonKey(name: 'resolved_at')@NullableDateTimeConverter() this.resolvedAt, this.farm, this.author, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt}): super._();
   factory _SupportRequest.fromJson(Map<String, dynamic> json) => _$SupportRequestFromJson(json);
 
 @override@IntConverter() final  int id;
 @override final  String text;
 @override@JsonKey() final  String status;
+/// Что поддержка ответила, закрывая обращение. `null` — закрыли молча.
+@override final  String? answer;
+@override@JsonKey(name: 'resolved_at')@NullableDateTimeConverter() final  DateTime? resolvedAt;
 @override final  SupportRequestFarm? farm;
 @override final  UserRef? author;
 @override@JsonKey(name: 'created_at')@DateTimeConverter() final  DateTime createdAt;
@@ -4503,18 +4524,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupportRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text)&&(identical(other.status, status) || other.status == status)&&(identical(other.farm, farm) || other.farm == farm)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupportRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text)&&(identical(other.status, status) || other.status == status)&&(identical(other.answer, answer) || other.answer == answer)&&(identical(other.resolvedAt, resolvedAt) || other.resolvedAt == resolvedAt)&&(identical(other.farm, farm) || other.farm == farm)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,text,status,farm,author,createdAt);
+    return Object.hash(runtimeType,id,text,status,answer,resolvedAt,farm,author,createdAt);
 }
 
 @override
 String toString() {
-    return 'SupportRequest(id: $id, text: $text, status: $status, farm: $farm, author: $author, createdAt: $createdAt)';
+    return 'SupportRequest(id: $id, text: $text, status: $status, answer: $answer, resolvedAt: $resolvedAt, farm: $farm, author: $author, createdAt: $createdAt)';
 }
 
 
@@ -4525,7 +4546,7 @@ abstract mixin class _$SupportRequestCopyWith<$Res> implements $SupportRequestCo
   factory _$SupportRequestCopyWith(_SupportRequest value, $Res Function(_SupportRequest) _then) = __$SupportRequestCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String text, String status, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+@IntConverter() int id, String text, String status, String? answer,@JsonKey(name: 'resolved_at')@NullableDateTimeConverter() DateTime? resolvedAt, SupportRequestFarm? farm, UserRef? author,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
 });
 
 
@@ -4542,12 +4563,14 @@ class __$SupportRequestCopyWithImpl<$Res>
 
 /// Create a copy of SupportRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? text = null,Object? status = null,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? text = null,Object? status = null,Object? answer = freezed,Object? resolvedAt = freezed,Object? farm = freezed,Object? author = freezed,Object? createdAt = null,}) {
   return _then(_SupportRequest(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as String,answer: freezed == answer ? _self.answer : answer // ignore: cast_nullable_to_non_nullable
+as String?,resolvedAt: freezed == resolvedAt ? _self.resolvedAt : resolvedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
 as SupportRequestFarm?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserRef?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -4577,6 +4600,379 @@ $UserRefCopyWith<$Res>? get author {
 
   return $UserRefCopyWith<$Res>(_self.author!, (value) {
     return _then(_self.copyWith(author: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$AdminAuditEntry {
+
+@IntConverter() int get id;@JsonKey(name: 'admin_id')@IntConverter() int get adminId; String get action;@JsonKey(name: 'farm_id')@NullableIntConverter() int? get farmId;/// Кто это сделал и над какой фермой — именами.
+///
+/// Раньше строка журнала читалась как «Админ №3 · Ферма №7»: данные
+/// лежали полные, а до человека доезжали номера. Связи обнуляемые —
+/// ферму могли снести, и запись о том, кто это сделал, обязана её
+/// пережить.
+ UserRef? get admin; SupportRequestFarm? get farm; Map<String, dynamic>? get before; Map<String, dynamic>? get after; String? get ip;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get createdAt;
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AdminAuditEntryCopyWith<AdminAuditEntry> get copyWith => _$AdminAuditEntryCopyWithImpl<AdminAuditEntry>(this as AdminAuditEntry, _$identity);
+
+  /// Serializes this AdminAuditEntry to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as AdminAuditEntry;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AdminAuditEntry&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.adminId, _this.adminId) || other.adminId == _this.adminId)&&(identical(other.action, _this.action) || other.action == _this.action)&&(identical(other.farmId, _this.farmId) || other.farmId == _this.farmId)&&(identical(other.admin, _this.admin) || other.admin == _this.admin)&&(identical(other.farm, _this.farm) || other.farm == _this.farm)&&const DeepCollectionEquality().equals(other.before, _this.before)&&const DeepCollectionEquality().equals(other.after, _this.after)&&(identical(other.ip, _this.ip) || other.ip == _this.ip)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as AdminAuditEntry;
+  return Object.hash(runtimeType,_this.id,_this.adminId,_this.action,_this.farmId,_this.admin,_this.farm,const DeepCollectionEquality().hash(_this.before),const DeepCollectionEquality().hash(_this.after),_this.ip,_this.createdAt);
+}
+
+@override
+String toString() {
+  final _this = this as AdminAuditEntry;
+  return 'AdminAuditEntry(id: ${_this.id}, adminId: ${_this.adminId}, action: ${_this.action}, farmId: ${_this.farmId}, admin: ${_this.admin}, farm: ${_this.farm}, before: ${_this.before}, after: ${_this.after}, ip: ${_this.ip}, createdAt: ${_this.createdAt})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AdminAuditEntryCopyWith<$Res>  {
+  factory $AdminAuditEntryCopyWith(AdminAuditEntry value, $Res Function(AdminAuditEntry) _then) = _$AdminAuditEntryCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int id,@JsonKey(name: 'admin_id')@IntConverter() int adminId, String action,@JsonKey(name: 'farm_id')@NullableIntConverter() int? farmId, UserRef? admin, SupportRequestFarm? farm, Map<String, dynamic>? before, Map<String, dynamic>? after, String? ip,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+});
+
+
+$UserRefCopyWith<$Res>? get admin;$SupportRequestFarmCopyWith<$Res>? get farm;
+
+}
+/// @nodoc
+class _$AdminAuditEntryCopyWithImpl<$Res>
+    implements $AdminAuditEntryCopyWith<$Res> {
+  _$AdminAuditEntryCopyWithImpl(this._self, this._then);
+
+  final AdminAuditEntry _self;
+  final $Res Function(AdminAuditEntry) _then;
+
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? adminId = null,Object? action = null,Object? farmId = freezed,Object? admin = freezed,Object? farm = freezed,Object? before = freezed,Object? after = freezed,Object? ip = freezed,Object? createdAt = null,}) {
+  return _then(AdminAuditEntry(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,adminId: null == adminId ? _self.adminId : adminId // ignore: cast_nullable_to_non_nullable
+as int,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
+as String,farmId: freezed == farmId ? _self.farmId : farmId // ignore: cast_nullable_to_non_nullable
+as int?,admin: freezed == admin ? _self.admin : admin // ignore: cast_nullable_to_non_nullable
+as UserRef?,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as SupportRequestFarm?,before: freezed == before ? _self.before : before // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,after: freezed == after ? _self.after : after // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,ip: freezed == ip ? _self.ip : ip // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get admin {
+    if (_self.admin == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.admin!, (value) {
+    return _then(_self.copyWith(admin: value));
+  });
+}/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SupportRequestFarmCopyWith<$Res>? get farm {
+    if (_self.farm == null) {
+    return null;
+  }
+
+  return $SupportRequestFarmCopyWith<$Res>(_self.farm!, (value) {
+    return _then(_self.copyWith(farm: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [AdminAuditEntry].
+extension AdminAuditEntryPatterns on AdminAuditEntry {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AdminAuditEntry value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AdminAuditEntry() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AdminAuditEntry value)  $default,){
+final _that = this;
+switch (_that) {
+case _AdminAuditEntry():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AdminAuditEntry value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AdminAuditEntry() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'admin_id')@IntConverter()  int adminId,  String action, @JsonKey(name: 'farm_id')@NullableIntConverter()  int? farmId,  UserRef? admin,  SupportRequestFarm? farm,  Map<String, dynamic>? before,  Map<String, dynamic>? after,  String? ip, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AdminAuditEntry() when $default != null:
+return $default(_that.id,_that.adminId,_that.action,_that.farmId,_that.admin,_that.farm,_that.before,_that.after,_that.ip,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'admin_id')@IntConverter()  int adminId,  String action, @JsonKey(name: 'farm_id')@NullableIntConverter()  int? farmId,  UserRef? admin,  SupportRequestFarm? farm,  Map<String, dynamic>? before,  Map<String, dynamic>? after,  String? ip, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _AdminAuditEntry():
+return $default(_that.id,_that.adminId,_that.action,_that.farmId,_that.admin,_that.farm,_that.before,_that.after,_that.ip,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id, @JsonKey(name: 'admin_id')@IntConverter()  int adminId,  String action, @JsonKey(name: 'farm_id')@NullableIntConverter()  int? farmId,  UserRef? admin,  SupportRequestFarm? farm,  Map<String, dynamic>? before,  Map<String, dynamic>? after,  String? ip, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _AdminAuditEntry() when $default != null:
+return $default(_that.id,_that.adminId,_that.action,_that.farmId,_that.admin,_that.farm,_that.before,_that.after,_that.ip,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _AdminAuditEntry extends AdminAuditEntry {
+  const _AdminAuditEntry({@IntConverter() required this.id, @JsonKey(name: 'admin_id')@IntConverter() required this.adminId, required this.action, @JsonKey(name: 'farm_id')@NullableIntConverter() this.farmId, this.admin, this.farm,  Map<String, dynamic>? before,  Map<String, dynamic>? after, this.ip, @JsonKey(name: 'created_at')@DateTimeConverter() required this.createdAt}): _before = before,_after = after,super._();
+  factory _AdminAuditEntry.fromJson(Map<String, dynamic> json) => _$AdminAuditEntryFromJson(json);
+
+@override@IntConverter() final  int id;
+@override@JsonKey(name: 'admin_id')@IntConverter() final  int adminId;
+@override final  String action;
+@override@JsonKey(name: 'farm_id')@NullableIntConverter() final  int? farmId;
+/// Кто это сделал и над какой фермой — именами.
+///
+/// Раньше строка журнала читалась как «Админ №3 · Ферма №7»: данные
+/// лежали полные, а до человека доезжали номера. Связи обнуляемые —
+/// ферму могли снести, и запись о том, кто это сделал, обязана её
+/// пережить.
+@override final  UserRef? admin;
+@override final  SupportRequestFarm? farm;
+ final  Map<String, dynamic>? _before;
+@override Map<String, dynamic>? get before {
+  final value = _before;
+  if (value == null) return null;
+  if (_before is EqualUnmodifiableMapView) return _before;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+ final  Map<String, dynamic>? _after;
+@override Map<String, dynamic>? get after {
+  final value = _after;
+  if (value == null) return null;
+  if (_after is EqualUnmodifiableMapView) return _after;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+@override final  String? ip;
+@override@JsonKey(name: 'created_at')@DateTimeConverter() final  DateTime createdAt;
+
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AdminAuditEntryCopyWith<_AdminAuditEntry> get copyWith => __$AdminAuditEntryCopyWithImpl<_AdminAuditEntry>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$AdminAuditEntryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AdminAuditEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.adminId, adminId) || other.adminId == adminId)&&(identical(other.action, action) || other.action == action)&&(identical(other.farmId, farmId) || other.farmId == farmId)&&(identical(other.admin, admin) || other.admin == admin)&&(identical(other.farm, farm) || other.farm == farm)&&const DeepCollectionEquality().equals(other.before, _before)&&const DeepCollectionEquality().equals(other.after, _after)&&(identical(other.ip, ip) || other.ip == ip)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,adminId,action,farmId,admin,farm,const DeepCollectionEquality().hash(_before),const DeepCollectionEquality().hash(_after),ip,createdAt);
+}
+
+@override
+String toString() {
+    return 'AdminAuditEntry(id: $id, adminId: $adminId, action: $action, farmId: $farmId, admin: $admin, farm: $farm, before: $before, after: $after, ip: $ip, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AdminAuditEntryCopyWith<$Res> implements $AdminAuditEntryCopyWith<$Res> {
+  factory _$AdminAuditEntryCopyWith(_AdminAuditEntry value, $Res Function(_AdminAuditEntry) _then) = __$AdminAuditEntryCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int id,@JsonKey(name: 'admin_id')@IntConverter() int adminId, String action,@JsonKey(name: 'farm_id')@NullableIntConverter() int? farmId, UserRef? admin, SupportRequestFarm? farm, Map<String, dynamic>? before, Map<String, dynamic>? after, String? ip,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime createdAt
+});
+
+
+@override $UserRefCopyWith<$Res>? get admin;@override $SupportRequestFarmCopyWith<$Res>? get farm;
+
+}
+/// @nodoc
+class __$AdminAuditEntryCopyWithImpl<$Res>
+    implements _$AdminAuditEntryCopyWith<$Res> {
+  __$AdminAuditEntryCopyWithImpl(this._self, this._then);
+
+  final _AdminAuditEntry _self;
+  final $Res Function(_AdminAuditEntry) _then;
+
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? adminId = null,Object? action = null,Object? farmId = freezed,Object? admin = freezed,Object? farm = freezed,Object? before = freezed,Object? after = freezed,Object? ip = freezed,Object? createdAt = null,}) {
+  return _then(_AdminAuditEntry(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,adminId: null == adminId ? _self.adminId : adminId // ignore: cast_nullable_to_non_nullable
+as int,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
+as String,farmId: freezed == farmId ? _self.farmId : farmId // ignore: cast_nullable_to_non_nullable
+as int?,admin: freezed == admin ? _self.admin : admin // ignore: cast_nullable_to_non_nullable
+as UserRef?,farm: freezed == farm ? _self.farm : farm // ignore: cast_nullable_to_non_nullable
+as SupportRequestFarm?,before: freezed == before ? _self._before : before // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,after: freezed == after ? _self._after : after // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,ip: freezed == ip ? _self.ip : ip // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get admin {
+    if (_self.admin == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.admin!, (value) {
+    return _then(_self.copyWith(admin: value));
+  });
+}/// Create a copy of AdminAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SupportRequestFarmCopyWith<$Res>? get farm {
+    if (_self.farm == null) {
+    return null;
+  }
+
+  return $SupportRequestFarmCopyWith<$Res>(_self.farm!, (value) {
+    return _then(_self.copyWith(farm: value));
   });
 }
 }

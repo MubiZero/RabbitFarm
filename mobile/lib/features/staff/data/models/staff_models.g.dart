@@ -61,6 +61,8 @@ _CreatedInvitation _$CreatedInvitationFromJson(Map<String, dynamic> json) =>
       expiresAt: const DateTimeConverter().fromJson(
         json['expires_at'] as Object,
       ),
+      inviteLink: json['invite_link'] as String?,
+      messageSent: json['message_sent'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CreatedInvitationToJson(_CreatedInvitation instance) =>
@@ -71,4 +73,6 @@ Map<String, dynamic> _$CreatedInvitationToJson(_CreatedInvitation instance) =>
       'full_name': instance.fullName,
       'role': _$FarmRoleEnumMap[instance.role]!,
       'expires_at': const DateTimeConverter().toJson(instance.expiresAt),
+      'invite_link': instance.inviteLink,
+      'message_sent': instance.messageSent,
     };

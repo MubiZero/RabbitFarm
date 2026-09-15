@@ -91,10 +91,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
         hasMore: result.page < result.totalPages,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
     }
   }
 
@@ -130,16 +127,46 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
         hasMore: result.page < result.totalPages,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
     }
   }
 
   // Refresh
   Future<void> refresh() async {
     await loadBreedings();
+  }
+
+  /// Обновить случку и заменить строку в ленте ответом сервера.
+  ///
+  /// Ответ подставляется на место прежней записи, а не перезагружается весь
+  /// список: лента отсортирована по ближайшему делу, и полная перезагрузка
+  /// после «Прощупала» увела бы строку из-под пальца вместе со скроллом.
+  Future<bool> updateBreeding(int id, Map<String, dynamic> data) async {
+    try {
+      final updated = await _repository.updateBreeding(id, data);
+      state = state.copyWith(
+        breedings: [
+          for (final breeding in state.breedings)
+            breeding.id == id ? updated : breeding,
+        ],
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: e);
+      return false;
+    }
+  }
+
+  /// Убрать случку из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `refresh()`.
+  void removeBreeding(int id) {
+    state = state.copyWith(
+      breedings: state.breedings.where((b) => b.id != id).toList(),
+      total: state.total - 1,
+    );
   }
 
   // Delete breeding
@@ -151,9 +178,7 @@ class BreedingListNotifier extends StateNotifier<BreedingListState> {
         total: state.total - 1,
       );
     } catch (e) {
-      state = state.copyWith(
-        error: e,
-      );
+      state = state.copyWith(error: e);
       rethrow;
     }
   }
@@ -172,14 +197,18 @@ final breedingListProvider =
 });
 
 // Single Breeding Provider (for detail screen)
-final breedingDetailProvider =
-    FutureProvider.family<BreedingModel, int>((ref, id) async {
+final breedingDetailProvider = FutureProvider.family<BreedingModel, int>((
+  ref,
+  id,
+) async {
   final repository = ref.watch(breedingRepositoryProvider);
   return repository.getBreedingById(id);
 });
 
 // Breeding Statistics Provider
-final breedingStatisticsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+final breedingStatisticsProvider = FutureProvider<Map<String, dynamic>>((
+  ref,
+) async {
   final repository = ref.watch(breedingRepositoryProvider);
   return repository.getStatistics();
 });
