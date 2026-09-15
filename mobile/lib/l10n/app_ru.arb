@@ -1223,6 +1223,8 @@
   "rabbitSex": "Пол",
   "rabbitAge": "Возраст",
   "rabbitBirthDate": "Дата рождения",
+  "rabbitAcquiredDate": "Когда купили",
+  "rabbitAcquiredDateEmpty": "Родился на ферме",
   "rabbitColor": "Окрас",
   "rabbitWeight": "Вес",
   "rabbitQuickActions": "Что можно посмотреть",

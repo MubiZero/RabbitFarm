@@ -901,6 +901,8 @@
   "rabbitSex": "Ҷинс",
   "rabbitAge": "Синну сол",
   "rabbitBirthDate": "Санаи таваллуд",
+  "rabbitAcquiredDate": "Кай харида шуд",
+  "rabbitAcquiredDateEmpty": "Дар ферма таваллуд шуд",
   "rabbitColor": "Ранг",
   "rabbitWeight": "Вазн",
   "rabbitQuickActions": "Чиро дидан мумкин",

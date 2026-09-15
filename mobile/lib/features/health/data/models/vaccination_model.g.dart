@@ -19,6 +19,10 @@ _Vaccination _$VaccinationFromJson(Map<String, dynamic> json) => _Vaccination(
   ),
   batchNumber: json['batch_number'] as String?,
   veterinarian: json['veterinarian'] as String?,
+  cost: _$JsonConverterFromJson<Object, double>(
+    json['cost'],
+    const DoubleConverter().fromJson,
+  ),
   notes: json['notes'] as String?,
   createdAt: const NullableDateTimeConverter().fromJson(json['created_at']),
   updatedAt: const NullableDateTimeConverter().fromJson(json['updated_at']),
@@ -45,6 +49,10 @@ Map<String, dynamic> _$VaccinationToJson(
   ),
   'batch_number': instance.batchNumber,
   'veterinarian': instance.veterinarian,
+  'cost': _$JsonConverterToJson<Object, double>(
+    instance.cost,
+    const DoubleConverter().toJson,
+  ),
   'notes': instance.notes,
   'created_at': const NullableDateTimeConverter().toJson(instance.createdAt),
   'updated_at': const NullableDateTimeConverter().toJson(instance.updatedAt),
@@ -60,6 +68,16 @@ const _$VaccineTypeEnumMap = {
   VaccineType.pasteurellosis: 'pasteurellosis',
   VaccineType.other: 'other',
 };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);
 
 _VaccinationStatistics _$VaccinationStatisticsFromJson(
   Map<String, dynamic> json,

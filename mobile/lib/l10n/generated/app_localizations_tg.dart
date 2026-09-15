@@ -2983,6 +2983,12 @@ class AppLocalizationsTg extends AppLocalizations {
   String get rabbitBirthDate => 'Санаи таваллуд';
 
   @override
+  String get rabbitAcquiredDate => 'Кай харида шуд';
+
+  @override
+  String get rabbitAcquiredDateEmpty => 'Дар ферма таваллуд шуд';
+
+  @override
   String get rabbitColor => 'Ранг';
 
   @override

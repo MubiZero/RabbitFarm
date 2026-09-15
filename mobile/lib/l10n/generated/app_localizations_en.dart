@@ -2993,6 +2993,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rabbitBirthDate => 'Date of birth';
 
   @override
+  String get rabbitAcquiredDate => 'Acquired on';
+
+  @override
+  String get rabbitAcquiredDateEmpty => 'Born on the farm';
+
+  @override
   String get rabbitColor => 'Color';
 
   @override

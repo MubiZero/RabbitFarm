@@ -233,6 +233,14 @@ class RabbitDetailScreen extends ConsumerWidget {
                 context.l10n.rabbitBirthDate,
                 DateFormat('d MMMM y', 'ru').format(rabbit.birthDate),
               ),
+              // Только у покупного: у рождённого на ферме этой даты нет, и
+              // пустая строка «Когда купили» сбивала бы с толку.
+              if (rabbit.acquiredDate != null)
+                _buildInfoRow(
+                  context,
+                  context.l10n.rabbitAcquiredDate,
+                  DateFormat('d MMMM y', 'ru').format(rabbit.acquiredDate!),
+                ),
               if (rabbit.color != null)
                 _buildInfoRow(context, context.l10n.rabbitColor, rabbit.color!),
               if (rabbit.currentWeight != null)

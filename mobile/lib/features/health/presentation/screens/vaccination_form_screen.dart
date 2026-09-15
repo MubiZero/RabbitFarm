@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
@@ -29,6 +30,7 @@ class _VaccinationFormScreenState
   late final TextEditingController _vaccineName;
   late final TextEditingController _batchNumber;
   late final TextEditingController _veterinarian;
+  late final TextEditingController _cost;
   late final TextEditingController _notes;
 
   RabbitModel? _rabbit;
@@ -56,6 +58,7 @@ class _VaccinationFormScreenState
     _vaccineName = TextEditingController(text: _record?.vaccineName ?? '');
     _batchNumber = TextEditingController(text: _record?.batchNumber ?? '');
     _veterinarian = TextEditingController(text: _record?.veterinarian ?? '');
+    _cost = TextEditingController(text: _record?.cost?.toString() ?? '');
     _notes = TextEditingController(text: _record?.notes ?? '');
 
     _type = _record?.vaccineType ?? VaccineType.vhd;
@@ -64,7 +67,7 @@ class _VaccinationFormScreenState
     _rabbit = widget.rabbit;
     _rabbitId = _record?.rabbitId ?? widget.rabbit?.id;
 
-    for (final c in [_vaccineName, _batchNumber, _veterinarian, _notes]) {
+    for (final c in [_vaccineName, _batchNumber, _veterinarian, _cost, _notes]) {
       c.addListener(() => _touched = true);
     }
   }
@@ -74,6 +77,7 @@ class _VaccinationFormScreenState
     _vaccineName.dispose();
     _batchNumber.dispose();
     _veterinarian.dispose();
+    _cost.dispose();
     _notes.dispose();
     super.dispose();
   }
@@ -96,6 +100,10 @@ class _VaccinationFormScreenState
       nextVaccinationDate: _nextDate,
       batchNumber: _optional(_batchNumber),
       veterinarian: _optional(_veterinarian),
+      // Пустое поле при правке — это «стоимости больше нет», а не «не
+      // трогать»: ноль снимает заведённый на неё расход. У новой записи
+      // слать нечего.
+      cost: parseDecimal(_cost.text) ?? (_isEditing ? 0 : null),
       notes: _optional(_notes),
     );
 
@@ -161,13 +169,24 @@ class _VaccinationFormScreenState
             ),
             DropdownButtonFormField<VaccineType>(
               initialValue: _type,
+              // Полное название болезни в узкое поле не влезает: «Вирусная
+              // геморрагическая болезнь кроликов (ВГБК)» вылезала за край
+              // экрана жёлто-чёрной полосой.
+              isExpanded: true,
               decoration: InputDecoration(
                 labelText: l10n.vaccFormType,
                 prefixIcon: const Icon(Icons.category_outlined),
               ),
               items: [
                 for (final type in VaccineType.values)
-                  DropdownMenuItem(value: type, child: Text(type.fullName)),
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(
+                      type.fullName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -294,6 +313,23 @@ class _VaccinationFormScreenState
                 hintText: l10n.vaccFormVetHint,
                 prefixIcon: const Icon(Icons.person_outline),
               ),
+            ),
+            TextFormField(
+              controller: _cost,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: l10n.medFormCostLabel(kCurrencySymbol),
+                prefixIcon: const Icon(Icons.payments_outlined),
+                // Та же подпись, что у лечения: сумма не просто лежит в
+                // карточке — сервер заводит на неё расход фермы.
+                helperText: l10n.medFormCostHelp,
+                helperMaxLines: 2,
+              ),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                return parseDecimal(v) == null ? l10n.commonNumberInvalid : null;
+              },
             ),
             TextFormField(
               controller: _notes,

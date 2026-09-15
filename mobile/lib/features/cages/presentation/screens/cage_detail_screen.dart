@@ -351,6 +351,25 @@ class _CageSummary extends StatelessWidget {
               ),
             ],
           ),
+          // Размер клетки записывают в форме, а прочитать его было негде —
+          // хотя именно он отвечает, влезет ли сюда самка с гнездом.
+          if (cage.size?.trim().isNotEmpty == true) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Icon(Icons.straighten_outlined,
+                    size: 20, color: context.colors.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    cage.size!.trim(),
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurface),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

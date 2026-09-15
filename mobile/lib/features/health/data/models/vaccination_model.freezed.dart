@@ -16,7 +16,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Vaccination {
 
-@IntConverter() int get id;@JsonKey(name: 'rabbit_id')@IntConverter() int get rabbitId;@JsonKey(name: 'vaccine_name') String get vaccineName;@JsonKey(name: 'vaccine_type') VaccineType get vaccineType;@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime get vaccinationDate;@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? get nextVaccinationDate;@JsonKey(name: 'batch_number') String? get batchNumber; String? get veterinarian; String? get notes;@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? get createdAt;@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? get updatedAt;/// Кролик, которого лечили или прививали.
+@IntConverter() int get id;@JsonKey(name: 'rabbit_id')@IntConverter() int get rabbitId;@JsonKey(name: 'vaccine_name') String get vaccineName;@JsonKey(name: 'vaccine_type') VaccineType get vaccineType;@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime get vaccinationDate;@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? get nextVaccinationDate;@JsonKey(name: 'batch_number') String? get batchNumber; String? get veterinarian;/// Сколько стоила прививка.
+///
+/// Не просто число в карточке: на него сервер заводит расход фермы —
+/// ровно так же, как на стоимость лечения (`autoExpenseService`). Поля не
+/// было в модели вовсе, поэтому приложение его не отправляло ни разу, и
+/// готовая автоматика не срабатывала никогда. Прививки — статья, которая
+/// на ферме повторяется каждый сезон.
+@DoubleConverter() double? get cost; String? get notes;@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? get createdAt;@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? get updatedAt;/// Кролик, которого лечили или прививали.
 ///
 /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
 /// и разбор в полную модель упал бы, поэтому связь просто выбрасывали.
@@ -36,20 +43,20 @@ $VaccinationCopyWith<Vaccination> get copyWith => _$VaccinationCopyWithImpl<Vacc
 @override
 bool operator ==(Object other) {
   final _this = this as Vaccination;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Vaccination&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.vaccineName, _this.vaccineName) || other.vaccineName == _this.vaccineName)&&(identical(other.vaccineType, _this.vaccineType) || other.vaccineType == _this.vaccineType)&&(identical(other.vaccinationDate, _this.vaccinationDate) || other.vaccinationDate == _this.vaccinationDate)&&(identical(other.nextVaccinationDate, _this.nextVaccinationDate) || other.nextVaccinationDate == _this.nextVaccinationDate)&&(identical(other.batchNumber, _this.batchNumber) || other.batchNumber == _this.batchNumber)&&(identical(other.veterinarian, _this.veterinarian) || other.veterinarian == _this.veterinarian)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit)&&(identical(other.daysUntil, _this.daysUntil) || other.daysUntil == _this.daysUntil)&&(identical(other.daysOverdue, _this.daysOverdue) || other.daysOverdue == _this.daysOverdue)&&(identical(other.isOverdue, _this.isOverdue) || other.isOverdue == _this.isOverdue));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Vaccination&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.vaccineName, _this.vaccineName) || other.vaccineName == _this.vaccineName)&&(identical(other.vaccineType, _this.vaccineType) || other.vaccineType == _this.vaccineType)&&(identical(other.vaccinationDate, _this.vaccinationDate) || other.vaccinationDate == _this.vaccinationDate)&&(identical(other.nextVaccinationDate, _this.nextVaccinationDate) || other.nextVaccinationDate == _this.nextVaccinationDate)&&(identical(other.batchNumber, _this.batchNumber) || other.batchNumber == _this.batchNumber)&&(identical(other.veterinarian, _this.veterinarian) || other.veterinarian == _this.veterinarian)&&(identical(other.cost, _this.cost) || other.cost == _this.cost)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit)&&(identical(other.daysUntil, _this.daysUntil) || other.daysUntil == _this.daysUntil)&&(identical(other.daysOverdue, _this.daysOverdue) || other.daysOverdue == _this.daysOverdue)&&(identical(other.isOverdue, _this.isOverdue) || other.isOverdue == _this.isOverdue));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Vaccination;
-  return Object.hash(runtimeType,_this.id,_this.rabbitId,_this.vaccineName,_this.vaccineType,_this.vaccinationDate,_this.nextVaccinationDate,_this.batchNumber,_this.veterinarian,_this.notes,_this.createdAt,_this.updatedAt,_this.rabbit,_this.daysUntil,_this.daysOverdue,_this.isOverdue);
+  return Object.hash(runtimeType,_this.id,_this.rabbitId,_this.vaccineName,_this.vaccineType,_this.vaccinationDate,_this.nextVaccinationDate,_this.batchNumber,_this.veterinarian,_this.cost,_this.notes,_this.createdAt,_this.updatedAt,_this.rabbit,_this.daysUntil,_this.daysOverdue,_this.isOverdue);
 }
 
 @override
 String toString() {
   final _this = this as Vaccination;
-  return 'Vaccination(id: ${_this.id}, rabbitId: ${_this.rabbitId}, vaccineName: ${_this.vaccineName}, vaccineType: ${_this.vaccineType}, vaccinationDate: ${_this.vaccinationDate}, nextVaccinationDate: ${_this.nextVaccinationDate}, batchNumber: ${_this.batchNumber}, veterinarian: ${_this.veterinarian}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit}, daysUntil: ${_this.daysUntil}, daysOverdue: ${_this.daysOverdue}, isOverdue: ${_this.isOverdue})';
+  return 'Vaccination(id: ${_this.id}, rabbitId: ${_this.rabbitId}, vaccineName: ${_this.vaccineName}, vaccineType: ${_this.vaccineType}, vaccinationDate: ${_this.vaccinationDate}, nextVaccinationDate: ${_this.nextVaccinationDate}, batchNumber: ${_this.batchNumber}, veterinarian: ${_this.veterinarian}, cost: ${_this.cost}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit}, daysUntil: ${_this.daysUntil}, daysOverdue: ${_this.daysOverdue}, isOverdue: ${_this.isOverdue})';
 }
 
 
@@ -60,7 +67,7 @@ abstract mixin class $VaccinationCopyWith<$Res>  {
   factory $VaccinationCopyWith(Vaccination value, $Res Function(Vaccination) _then) = _$VaccinationCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id,@JsonKey(name: 'rabbit_id')@IntConverter() int rabbitId,@JsonKey(name: 'vaccine_name') String vaccineName,@JsonKey(name: 'vaccine_type') VaccineType vaccineType,@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime vaccinationDate,@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? nextVaccinationDate,@JsonKey(name: 'batch_number') String? batchNumber, String? veterinarian, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'days_until') int? daysUntil,@JsonKey(name: 'days_overdue') int? daysOverdue,@JsonKey(name: 'is_overdue') bool? isOverdue
+@IntConverter() int id,@JsonKey(name: 'rabbit_id')@IntConverter() int rabbitId,@JsonKey(name: 'vaccine_name') String vaccineName,@JsonKey(name: 'vaccine_type') VaccineType vaccineType,@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime vaccinationDate,@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? nextVaccinationDate,@JsonKey(name: 'batch_number') String? batchNumber, String? veterinarian,@DoubleConverter() double? cost, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'days_until') int? daysUntil,@JsonKey(name: 'days_overdue') int? daysOverdue,@JsonKey(name: 'is_overdue') bool? isOverdue
 });
 
 
@@ -77,7 +84,7 @@ class _$VaccinationCopyWithImpl<$Res>
 
 /// Create a copy of Vaccination
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? rabbitId = null,Object? vaccineName = null,Object? vaccineType = null,Object? vaccinationDate = null,Object? nextVaccinationDate = freezed,Object? batchNumber = freezed,Object? veterinarian = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? daysUntil = freezed,Object? daysOverdue = freezed,Object? isOverdue = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? rabbitId = null,Object? vaccineName = null,Object? vaccineType = null,Object? vaccinationDate = null,Object? nextVaccinationDate = freezed,Object? batchNumber = freezed,Object? veterinarian = freezed,Object? cost = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? daysUntil = freezed,Object? daysOverdue = freezed,Object? isOverdue = freezed,}) {
   return _then(Vaccination(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,rabbitId: null == rabbitId ? _self.rabbitId : rabbitId // ignore: cast_nullable_to_non_nullable
@@ -87,7 +94,8 @@ as VaccineType,vaccinationDate: null == vaccinationDate ? _self.vaccinationDate 
 as DateTime,nextVaccinationDate: freezed == nextVaccinationDate ? _self.nextVaccinationDate : nextVaccinationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,batchNumber: freezed == batchNumber ? _self.batchNumber : batchNumber // ignore: cast_nullable_to_non_nullable
 as String?,veterinarian: freezed == veterinarian ? _self.veterinarian : veterinarian // ignore: cast_nullable_to_non_nullable
-as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,cost: freezed == cost ? _self.cost : cost // ignore: cast_nullable_to_non_nullable
+as double?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable
@@ -191,10 +199,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian, @DoubleConverter()  double? cost,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Vaccination() when $default != null:
-return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
+return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.cost,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
   return orElse();
 
 }
@@ -212,10 +220,10 @@ return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian, @DoubleConverter()  double? cost,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)  $default,) {final _that = this;
 switch (_that) {
 case _Vaccination():
-return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
+return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.cost,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -232,10 +240,10 @@ return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id, @JsonKey(name: 'rabbit_id')@IntConverter()  int rabbitId, @JsonKey(name: 'vaccine_name')  String vaccineName, @JsonKey(name: 'vaccine_type')  VaccineType vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter()  DateTime vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter()  DateTime? nextVaccinationDate, @JsonKey(name: 'batch_number')  String? batchNumber,  String? veterinarian, @DoubleConverter()  double? cost,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'days_until')  int? daysUntil, @JsonKey(name: 'days_overdue')  int? daysOverdue, @JsonKey(name: 'is_overdue')  bool? isOverdue)?  $default,) {final _that = this;
 switch (_that) {
 case _Vaccination() when $default != null:
-return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
+return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_that.vaccinationDate,_that.nextVaccinationDate,_that.batchNumber,_that.veterinarian,_that.cost,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.daysUntil,_that.daysOverdue,_that.isOverdue);case _:
   return null;
 
 }
@@ -247,7 +255,7 @@ return $default(_that.id,_that.rabbitId,_that.vaccineName,_that.vaccineType,_tha
 @JsonSerializable()
 
 class _Vaccination implements Vaccination {
-  const _Vaccination({@IntConverter() required this.id, @JsonKey(name: 'rabbit_id')@IntConverter() required this.rabbitId, @JsonKey(name: 'vaccine_name') required this.vaccineName, @JsonKey(name: 'vaccine_type') required this.vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter() required this.vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() this.nextVaccinationDate, @JsonKey(name: 'batch_number') this.batchNumber, this.veterinarian, this.notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, @JsonKey(name: 'rabbit') this.rabbit, @JsonKey(name: 'days_until') this.daysUntil, @JsonKey(name: 'days_overdue') this.daysOverdue, @JsonKey(name: 'is_overdue') this.isOverdue});
+  const _Vaccination({@IntConverter() required this.id, @JsonKey(name: 'rabbit_id')@IntConverter() required this.rabbitId, @JsonKey(name: 'vaccine_name') required this.vaccineName, @JsonKey(name: 'vaccine_type') required this.vaccineType, @JsonKey(name: 'vaccination_date')@DateOnlyConverter() required this.vaccinationDate, @JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() this.nextVaccinationDate, @JsonKey(name: 'batch_number') this.batchNumber, this.veterinarian, @DoubleConverter() this.cost, this.notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, @JsonKey(name: 'rabbit') this.rabbit, @JsonKey(name: 'days_until') this.daysUntil, @JsonKey(name: 'days_overdue') this.daysOverdue, @JsonKey(name: 'is_overdue') this.isOverdue});
   factory _Vaccination.fromJson(Map<String, dynamic> json) => _$VaccinationFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -258,6 +266,14 @@ class _Vaccination implements Vaccination {
 @override@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() final  DateTime? nextVaccinationDate;
 @override@JsonKey(name: 'batch_number') final  String? batchNumber;
 @override final  String? veterinarian;
+/// Сколько стоила прививка.
+///
+/// Не просто число в карточке: на него сервер заводит расход фермы —
+/// ровно так же, как на стоимость лечения (`autoExpenseService`). Поля не
+/// было в модели вовсе, поэтому приложение его не отправляло ни разу, и
+/// готовая автоматика не срабатывала никогда. Прививки — статья, которая
+/// на ферме повторяется каждый сезон.
+@override@DoubleConverter() final  double? cost;
 @override final  String? notes;
 @override@JsonKey(name: 'created_at')@NullableDateTimeConverter() final  DateTime? createdAt;
 @override@JsonKey(name: 'updated_at')@NullableDateTimeConverter() final  DateTime? updatedAt;
@@ -285,18 +301,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Vaccination&&(identical(other.id, id) || other.id == id)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.vaccineName, vaccineName) || other.vaccineName == vaccineName)&&(identical(other.vaccineType, vaccineType) || other.vaccineType == vaccineType)&&(identical(other.vaccinationDate, vaccinationDate) || other.vaccinationDate == vaccinationDate)&&(identical(other.nextVaccinationDate, nextVaccinationDate) || other.nextVaccinationDate == nextVaccinationDate)&&(identical(other.batchNumber, batchNumber) || other.batchNumber == batchNumber)&&(identical(other.veterinarian, veterinarian) || other.veterinarian == veterinarian)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit)&&(identical(other.daysUntil, daysUntil) || other.daysUntil == daysUntil)&&(identical(other.daysOverdue, daysOverdue) || other.daysOverdue == daysOverdue)&&(identical(other.isOverdue, isOverdue) || other.isOverdue == isOverdue));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Vaccination&&(identical(other.id, id) || other.id == id)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.vaccineName, vaccineName) || other.vaccineName == vaccineName)&&(identical(other.vaccineType, vaccineType) || other.vaccineType == vaccineType)&&(identical(other.vaccinationDate, vaccinationDate) || other.vaccinationDate == vaccinationDate)&&(identical(other.nextVaccinationDate, nextVaccinationDate) || other.nextVaccinationDate == nextVaccinationDate)&&(identical(other.batchNumber, batchNumber) || other.batchNumber == batchNumber)&&(identical(other.veterinarian, veterinarian) || other.veterinarian == veterinarian)&&(identical(other.cost, cost) || other.cost == cost)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit)&&(identical(other.daysUntil, daysUntil) || other.daysUntil == daysUntil)&&(identical(other.daysOverdue, daysOverdue) || other.daysOverdue == daysOverdue)&&(identical(other.isOverdue, isOverdue) || other.isOverdue == isOverdue));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,rabbitId,vaccineName,vaccineType,vaccinationDate,nextVaccinationDate,batchNumber,veterinarian,notes,createdAt,updatedAt,rabbit,daysUntil,daysOverdue,isOverdue);
+    return Object.hash(runtimeType,id,rabbitId,vaccineName,vaccineType,vaccinationDate,nextVaccinationDate,batchNumber,veterinarian,cost,notes,createdAt,updatedAt,rabbit,daysUntil,daysOverdue,isOverdue);
 }
 
 @override
 String toString() {
-    return 'Vaccination(id: $id, rabbitId: $rabbitId, vaccineName: $vaccineName, vaccineType: $vaccineType, vaccinationDate: $vaccinationDate, nextVaccinationDate: $nextVaccinationDate, batchNumber: $batchNumber, veterinarian: $veterinarian, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, daysUntil: $daysUntil, daysOverdue: $daysOverdue, isOverdue: $isOverdue)';
+    return 'Vaccination(id: $id, rabbitId: $rabbitId, vaccineName: $vaccineName, vaccineType: $vaccineType, vaccinationDate: $vaccinationDate, nextVaccinationDate: $nextVaccinationDate, batchNumber: $batchNumber, veterinarian: $veterinarian, cost: $cost, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, daysUntil: $daysUntil, daysOverdue: $daysOverdue, isOverdue: $isOverdue)';
 }
 
 
@@ -307,7 +323,7 @@ abstract mixin class _$VaccinationCopyWith<$Res> implements $VaccinationCopyWith
   factory _$VaccinationCopyWith(_Vaccination value, $Res Function(_Vaccination) _then) = __$VaccinationCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id,@JsonKey(name: 'rabbit_id')@IntConverter() int rabbitId,@JsonKey(name: 'vaccine_name') String vaccineName,@JsonKey(name: 'vaccine_type') VaccineType vaccineType,@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime vaccinationDate,@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? nextVaccinationDate,@JsonKey(name: 'batch_number') String? batchNumber, String? veterinarian, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'days_until') int? daysUntil,@JsonKey(name: 'days_overdue') int? daysOverdue,@JsonKey(name: 'is_overdue') bool? isOverdue
+@IntConverter() int id,@JsonKey(name: 'rabbit_id')@IntConverter() int rabbitId,@JsonKey(name: 'vaccine_name') String vaccineName,@JsonKey(name: 'vaccine_type') VaccineType vaccineType,@JsonKey(name: 'vaccination_date')@DateOnlyConverter() DateTime vaccinationDate,@JsonKey(name: 'next_vaccination_date')@NullableDateOnlyConverter() DateTime? nextVaccinationDate,@JsonKey(name: 'batch_number') String? batchNumber, String? veterinarian,@DoubleConverter() double? cost, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'days_until') int? daysUntil,@JsonKey(name: 'days_overdue') int? daysOverdue,@JsonKey(name: 'is_overdue') bool? isOverdue
 });
 
 
@@ -324,7 +340,7 @@ class __$VaccinationCopyWithImpl<$Res>
 
 /// Create a copy of Vaccination
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? rabbitId = null,Object? vaccineName = null,Object? vaccineType = null,Object? vaccinationDate = null,Object? nextVaccinationDate = freezed,Object? batchNumber = freezed,Object? veterinarian = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? daysUntil = freezed,Object? daysOverdue = freezed,Object? isOverdue = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? rabbitId = null,Object? vaccineName = null,Object? vaccineType = null,Object? vaccinationDate = null,Object? nextVaccinationDate = freezed,Object? batchNumber = freezed,Object? veterinarian = freezed,Object? cost = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? daysUntil = freezed,Object? daysOverdue = freezed,Object? isOverdue = freezed,}) {
   return _then(_Vaccination(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,rabbitId: null == rabbitId ? _self.rabbitId : rabbitId // ignore: cast_nullable_to_non_nullable
@@ -334,7 +350,8 @@ as VaccineType,vaccinationDate: null == vaccinationDate ? _self.vaccinationDate 
 as DateTime,nextVaccinationDate: freezed == nextVaccinationDate ? _self.nextVaccinationDate : nextVaccinationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,batchNumber: freezed == batchNumber ? _self.batchNumber : batchNumber // ignore: cast_nullable_to_non_nullable
 as String?,veterinarian: freezed == veterinarian ? _self.veterinarian : veterinarian // ignore: cast_nullable_to_non_nullable
-as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,cost: freezed == cost ? _self.cost : cost // ignore: cast_nullable_to_non_nullable
+as double?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable

@@ -3000,6 +3000,12 @@ class AppLocalizationsUz extends AppLocalizations {
   String get rabbitBirthDate => 'Tugʻilgan sanasi';
 
   @override
+  String get rabbitAcquiredDate => 'Qachon sotib olingan';
+
+  @override
+  String get rabbitAcquiredDateEmpty => 'Fermada tugʻilgan';
+
+  @override
   String get rabbitColor => 'Rangi';
 
   @override

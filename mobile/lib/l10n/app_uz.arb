@@ -902,6 +902,8 @@
   "rabbitSex": "Jinsi",
   "rabbitAge": "Yoshi",
   "rabbitBirthDate": "Tugʻilgan sanasi",
+  "rabbitAcquiredDate": "Qachon sotib olingan",
+  "rabbitAcquiredDateEmpty": "Fermada tugʻilgan",
   "rabbitColor": "Rangi",
   "rabbitWeight": "Vazni",
   "rabbitQuickActions": "Nimalarni koʻrish mumkin",

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
@@ -252,6 +253,13 @@ class _VaccinationCard extends StatelessWidget {
             _Line(
               icon: Icons.person_outline,
               text: vaccination.veterinarian!.trim(),
+            ),
+          // Прививки — статья, которая повторяется каждый сезон, и до сих пор
+          // их стоимость не показывалась нигде: поля не было в модели вовсе.
+          if ((vaccination.cost ?? 0) > 0)
+            _Line(
+              icon: Icons.payments_outlined,
+              text: formatMoney(vaccination.cost!),
             ),
         ],
       ),
@@ -709,6 +717,12 @@ class _DetailsSheet extends ConsumerWidget {
                   icon: Icons.person_outline,
                   label: context.l10n.vaccinationsVet,
                   value: vaccination.veterinarian!.trim(),
+                ),
+              if ((vaccination.cost ?? 0) > 0)
+                _DetailRow(
+                  icon: Icons.payments_outlined,
+                  label: context.l10n.medCost,
+                  value: formatMoney(vaccination.cost!),
                 ),
               if (vaccination.notes?.trim().isNotEmpty == true)
                 _DetailRow(

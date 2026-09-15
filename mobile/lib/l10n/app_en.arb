@@ -901,6 +901,8 @@
   "rabbitSex": "Sex",
   "rabbitAge": "Age",
   "rabbitBirthDate": "Date of birth",
+  "rabbitAcquiredDate": "Acquired on",
+  "rabbitAcquiredDateEmpty": "Born on the farm",
   "rabbitColor": "Color",
   "rabbitWeight": "Weight",
   "rabbitQuickActions": "What you can view",

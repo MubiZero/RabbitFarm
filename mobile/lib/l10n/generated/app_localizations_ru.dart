@@ -3023,6 +3023,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitBirthDate => 'Дата рождения';
 
   @override
+  String get rabbitAcquiredDate => 'Когда купили';
+
+  @override
+  String get rabbitAcquiredDateEmpty => 'Родился на ферме';
+
+  @override
   String get rabbitColor => 'Окрас';
 
   @override

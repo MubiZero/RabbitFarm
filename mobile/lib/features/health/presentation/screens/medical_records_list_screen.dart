@@ -504,7 +504,15 @@ class _DetailsSheet extends ConsumerWidget {
                 _Row(
                   icon: Icons.medication_outlined,
                   label: context.l10n.medMedication,
-                  value: record.medication!.trim(),
+                  // Дозировку спрашивали и не показывали нигде, хотя порознь
+                  // обе половины — полуинструкция: название препарата без
+                  // дозы не говорит, сколько колоть, а доза без названия —
+                  // чего именно.
+                  value: [
+                    record.medication!.trim(),
+                    if (record.dosage?.trim().isNotEmpty == true)
+                      record.dosage!.trim(),
+                  ].join(', '),
                 ),
               _Row(
                 icon: Icons.event_available_outlined,

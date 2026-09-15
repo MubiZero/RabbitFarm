@@ -5472,6 +5472,18 @@ abstract class AppLocalizations {
   /// **'Дата рождения'**
   String get rabbitBirthDate;
 
+  /// No description provided for @rabbitAcquiredDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда купили'**
+  String get rabbitAcquiredDate;
+
+  /// No description provided for @rabbitAcquiredDateEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родился на ферме'**
+  String get rabbitAcquiredDateEmpty;
+
   /// No description provided for @rabbitColor.
   ///
   /// In ru, this message translates to:

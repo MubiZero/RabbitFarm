@@ -70,6 +70,12 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   String? _loadedStatus;
   String _selectedPurpose = 'breeding';
   DateTime _birthDate = DateTime.now().subtract(const Duration(days: 60));
+
+  /// Когда кролика купили. У покупного кролика дата рождения — со слов
+  /// продавца, а день, когда он появился на ферме, хозяин знает точно; по
+  /// нему и считают, сколько он здесь живёт и когда окупился. Поле было в
+  /// модели и на сервере, а заполнить его было негде.
+  DateTime? _acquiredDate;
   bool _isLoading = false;
   bool _touched = false;
   XFile? _selectedImage;
@@ -155,6 +161,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
     _loadedStatus = rabbit.status;
     _selectedPurpose = rabbit.purpose;
     _birthDate = rabbit.birthDate;
+    _acquiredDate = rabbit.acquiredDate;
     _currentPhotoUrl = rabbit.photoUrl;
     setState(() {});
   }
@@ -291,6 +298,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         'cage_id': _selectedCageId,
         'sex': _selectedSex,
         'birth_date': _birthDate.toIso8601String(),
+        // Отправляется всегда, включая null: дату покупки убирают, если
+        // кролик оказался своим, а «поле не пришло» сервер читает как
+        // «оставить как было».
+        'acquired_date': _acquiredDate?.toIso8601String().split('T').first,
         'status': _selectedStatus,
         'purpose': _selectedPurpose,
         // Ключи отправляются всегда, включая null: раньше убранный родитель
@@ -581,6 +592,25 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                       hintText: context.l10n.rabbitFormNameHint,
                       prefixIcon: Icon(Icons.pets),
                     ),
+                  ),
+                  // Пусто — значит родился здесь. Дату рождения покупного
+                  // кролика называет продавец, а день покупки хозяин знает
+                  // точно: по нему считают, сколько кролик живёт на ферме и
+                  // когда окупился.
+                  AppDateField(
+                    label: context.l10n.rabbitAcquiredDate,
+                    value: _acquiredDate,
+                    placeholder: context.l10n.rabbitAcquiredDateEmpty,
+                    prefixIcon: Icons.shopping_bag_outlined,
+                    lastDate: DateTime.now(),
+                    onChanged: (date) => setState(() {
+                      _acquiredDate = date;
+                      _touched = true;
+                    }),
+                    onCleared: () => setState(() {
+                      _acquiredDate = null;
+                      _touched = true;
+                    }),
                   ),
                   _CageField(
                     value: _selectedCageId,
