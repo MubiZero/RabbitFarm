@@ -1395,6 +1395,7 @@
 
   "birthsKitsDied": "Nobud",
   "birthsKitDeathAction": "Nobud boʻlganini qayd etish",
+  "birthsKitsCardedHint": "Bu nasl uchun alohida kartochkalar ochilgan — nobud boʻlish va ajratishni bolaning oʻz kartochkasida belgilang.",
   "birthsKitDeathTitle": "Nechta bolasi nobud boʻldi?",
   "birthsKitDeathHint": "Tirik qolgani: {alive}",
   "birthsKitDeathSaved": "Qayd etildi",

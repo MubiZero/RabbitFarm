@@ -4670,6 +4670,10 @@ class AppLocalizationsUz extends AppLocalizations {
   String get birthsKitDeathAction => 'Nobud boʻlganini qayd etish';
 
   @override
+  String get birthsKitsCardedHint =>
+      'Bu nasl uchun alohida kartochkalar ochilgan — nobud boʻlish va ajratishni bolaning oʻz kartochkasida belgilang.';
+
+  @override
   String get birthsKitDeathTitle => 'Nechta bolasi nobud boʻldi?';
 
   @override

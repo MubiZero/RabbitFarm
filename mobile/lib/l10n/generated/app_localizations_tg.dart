@@ -4637,6 +4637,10 @@ class AppLocalizationsTg extends AppLocalizations {
   String get birthsKitDeathAction => 'Талафотро қайд кардан';
 
   @override
+  String get birthsKitsCardedHint =>
+      'Барои ин бача-харгӯшҳо кортҳо кушода шудаанд — талафот ва ҷудокуниро дар корти худи бача қайд кунед.';
+
+  @override
   String get birthsKitDeathTitle => 'Чанд харгӯшбача мурд?';
 
   @override

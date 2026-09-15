@@ -8298,6 +8298,12 @@ abstract class AppLocalizations {
   /// **'Отметить падёж'**
   String get birthsKitDeathAction;
 
+  /// No description provided for @birthsKitsCardedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.'**
+  String get birthsKitsCardedHint;
+
   /// No description provided for @birthsKitDeathTitle.
   ///
   /// In ru, this message translates to:

@@ -17,7 +17,14 @@ mixin _$BirthModel implements DiagnosticableTreeMixin {
 
  int get id;@JsonKey(name: 'breeding_id') int? get breedingId;@JsonKey(name: 'mother_id') int get motherId;@JsonKey(name: 'birth_date') String get birthDate;@JsonKey(name: 'kits_born_alive') int get kitsBornAlive;@JsonKey(name: 'kits_born_dead') int get kitsBornDead;/// Пало до отсадки. Крольчонок в приложении — число внутри окрола,
 /// а не своя карточка, поэтому и падёж молодняка считается выводком.
-@JsonKey(name: 'kits_died') int get kitsDied;@JsonKey(name: 'kits_weaned') int? get kitsWeaned;@JsonKey(name: 'weaning_date') String? get weaningDate; String? get complications; String? get notes;@JsonKey(name: 'created_at') String? get createdAt;@JsonKey(name: 'updated_at') String? get updatedAt; RabbitModel? get mother; BreedingModel? get breeding; List<RabbitModel>? get kits;
+@JsonKey(name: 'kits_died') int get kitsDied;@JsonKey(name: 'kits_weaned') int? get kitsWeaned;@JsonKey(name: 'weaning_date') String? get weaningDate;/// Когда по этому выводку завели карточки крольчат.
+///
+/// Пока пусто — крольчата живут числами выше, и падёж с отсадкой
+/// отмечают прямо в выводке. Как только заведены, счёт идёт по
+/// карточкам: числа замораживаются, а отмечать надо на карточке
+/// крольчонка. Сервер такую правку выводка отклоняет — две правды об
+/// одних и тех же животных расходились молча.
+@JsonKey(name: 'kits_carded_at') String? get kitsCardedAt; String? get complications; String? get notes;@JsonKey(name: 'created_at') String? get createdAt;@JsonKey(name: 'updated_at') String? get updatedAt; RabbitModel? get mother; BreedingModel? get breeding; List<RabbitModel>? get kits;
 /// Create a copy of BirthModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,26 +37,26 @@ void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   final _this = this as BirthModel;
   properties
     ..add(DiagnosticsProperty('type', 'BirthModel'))
-    ..add(DiagnosticsProperty('id', _this.id))..add(DiagnosticsProperty('breedingId', _this.breedingId))..add(DiagnosticsProperty('motherId', _this.motherId))..add(DiagnosticsProperty('birthDate', _this.birthDate))..add(DiagnosticsProperty('kitsBornAlive', _this.kitsBornAlive))..add(DiagnosticsProperty('kitsBornDead', _this.kitsBornDead))..add(DiagnosticsProperty('kitsDied', _this.kitsDied))..add(DiagnosticsProperty('kitsWeaned', _this.kitsWeaned))..add(DiagnosticsProperty('weaningDate', _this.weaningDate))..add(DiagnosticsProperty('complications', _this.complications))..add(DiagnosticsProperty('notes', _this.notes))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('updatedAt', _this.updatedAt))..add(DiagnosticsProperty('mother', _this.mother))..add(DiagnosticsProperty('breeding', _this.breeding))..add(DiagnosticsProperty('kits', _this.kits));
+    ..add(DiagnosticsProperty('id', _this.id))..add(DiagnosticsProperty('breedingId', _this.breedingId))..add(DiagnosticsProperty('motherId', _this.motherId))..add(DiagnosticsProperty('birthDate', _this.birthDate))..add(DiagnosticsProperty('kitsBornAlive', _this.kitsBornAlive))..add(DiagnosticsProperty('kitsBornDead', _this.kitsBornDead))..add(DiagnosticsProperty('kitsDied', _this.kitsDied))..add(DiagnosticsProperty('kitsWeaned', _this.kitsWeaned))..add(DiagnosticsProperty('weaningDate', _this.weaningDate))..add(DiagnosticsProperty('kitsCardedAt', _this.kitsCardedAt))..add(DiagnosticsProperty('complications', _this.complications))..add(DiagnosticsProperty('notes', _this.notes))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('updatedAt', _this.updatedAt))..add(DiagnosticsProperty('mother', _this.mother))..add(DiagnosticsProperty('breeding', _this.breeding))..add(DiagnosticsProperty('kits', _this.kits));
 }
 
 @override
 bool operator ==(Object other) {
   final _this = this as BirthModel;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BirthModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.breedingId, _this.breedingId) || other.breedingId == _this.breedingId)&&(identical(other.motherId, _this.motherId) || other.motherId == _this.motherId)&&(identical(other.birthDate, _this.birthDate) || other.birthDate == _this.birthDate)&&(identical(other.kitsBornAlive, _this.kitsBornAlive) || other.kitsBornAlive == _this.kitsBornAlive)&&(identical(other.kitsBornDead, _this.kitsBornDead) || other.kitsBornDead == _this.kitsBornDead)&&(identical(other.kitsDied, _this.kitsDied) || other.kitsDied == _this.kitsDied)&&(identical(other.kitsWeaned, _this.kitsWeaned) || other.kitsWeaned == _this.kitsWeaned)&&(identical(other.weaningDate, _this.weaningDate) || other.weaningDate == _this.weaningDate)&&(identical(other.complications, _this.complications) || other.complications == _this.complications)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.mother, _this.mother) || other.mother == _this.mother)&&(identical(other.breeding, _this.breeding) || other.breeding == _this.breeding)&&const DeepCollectionEquality().equals(other.kits, _this.kits));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BirthModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.breedingId, _this.breedingId) || other.breedingId == _this.breedingId)&&(identical(other.motherId, _this.motherId) || other.motherId == _this.motherId)&&(identical(other.birthDate, _this.birthDate) || other.birthDate == _this.birthDate)&&(identical(other.kitsBornAlive, _this.kitsBornAlive) || other.kitsBornAlive == _this.kitsBornAlive)&&(identical(other.kitsBornDead, _this.kitsBornDead) || other.kitsBornDead == _this.kitsBornDead)&&(identical(other.kitsDied, _this.kitsDied) || other.kitsDied == _this.kitsDied)&&(identical(other.kitsWeaned, _this.kitsWeaned) || other.kitsWeaned == _this.kitsWeaned)&&(identical(other.weaningDate, _this.weaningDate) || other.weaningDate == _this.weaningDate)&&(identical(other.kitsCardedAt, _this.kitsCardedAt) || other.kitsCardedAt == _this.kitsCardedAt)&&(identical(other.complications, _this.complications) || other.complications == _this.complications)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.mother, _this.mother) || other.mother == _this.mother)&&(identical(other.breeding, _this.breeding) || other.breeding == _this.breeding)&&const DeepCollectionEquality().equals(other.kits, _this.kits));
 }
 
 
 @override
 int get hashCode {
   final _this = this as BirthModel;
-  return Object.hash(runtimeType,_this.id,_this.breedingId,_this.motherId,_this.birthDate,_this.kitsBornAlive,_this.kitsBornDead,_this.kitsDied,_this.kitsWeaned,_this.weaningDate,_this.complications,_this.notes,_this.createdAt,_this.updatedAt,_this.mother,_this.breeding,const DeepCollectionEquality().hash(_this.kits));
+  return Object.hash(runtimeType,_this.id,_this.breedingId,_this.motherId,_this.birthDate,_this.kitsBornAlive,_this.kitsBornDead,_this.kitsDied,_this.kitsWeaned,_this.weaningDate,_this.kitsCardedAt,_this.complications,_this.notes,_this.createdAt,_this.updatedAt,_this.mother,_this.breeding,const DeepCollectionEquality().hash(_this.kits));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   final _this = this as BirthModel;
-  return 'BirthModel(id: ${_this.id}, breedingId: ${_this.breedingId}, motherId: ${_this.motherId}, birthDate: ${_this.birthDate}, kitsBornAlive: ${_this.kitsBornAlive}, kitsBornDead: ${_this.kitsBornDead}, kitsDied: ${_this.kitsDied}, kitsWeaned: ${_this.kitsWeaned}, weaningDate: ${_this.weaningDate}, complications: ${_this.complications}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, mother: ${_this.mother}, breeding: ${_this.breeding}, kits: ${_this.kits})';
+  return 'BirthModel(id: ${_this.id}, breedingId: ${_this.breedingId}, motherId: ${_this.motherId}, birthDate: ${_this.birthDate}, kitsBornAlive: ${_this.kitsBornAlive}, kitsBornDead: ${_this.kitsBornDead}, kitsDied: ${_this.kitsDied}, kitsWeaned: ${_this.kitsWeaned}, weaningDate: ${_this.weaningDate}, kitsCardedAt: ${_this.kitsCardedAt}, complications: ${_this.complications}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, mother: ${_this.mother}, breeding: ${_this.breeding}, kits: ${_this.kits})';
 }
 
 
@@ -60,7 +67,7 @@ abstract mixin class $BirthModelCopyWith<$Res>  {
   factory $BirthModelCopyWith(BirthModel value, $Res Function(BirthModel) _then) = _$BirthModelCopyWithImpl;
 @useResult
 $Res call({
- int id,@JsonKey(name: 'breeding_id') int? breedingId,@JsonKey(name: 'mother_id') int motherId,@JsonKey(name: 'birth_date') String birthDate,@JsonKey(name: 'kits_born_alive') int kitsBornAlive,@JsonKey(name: 'kits_born_dead') int kitsBornDead,@JsonKey(name: 'kits_died') int kitsDied,@JsonKey(name: 'kits_weaned') int? kitsWeaned,@JsonKey(name: 'weaning_date') String? weaningDate, String? complications, String? notes,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt, RabbitModel? mother, BreedingModel? breeding, List<RabbitModel>? kits
+ int id,@JsonKey(name: 'breeding_id') int? breedingId,@JsonKey(name: 'mother_id') int motherId,@JsonKey(name: 'birth_date') String birthDate,@JsonKey(name: 'kits_born_alive') int kitsBornAlive,@JsonKey(name: 'kits_born_dead') int kitsBornDead,@JsonKey(name: 'kits_died') int kitsDied,@JsonKey(name: 'kits_weaned') int? kitsWeaned,@JsonKey(name: 'weaning_date') String? weaningDate,@JsonKey(name: 'kits_carded_at') String? kitsCardedAt, String? complications, String? notes,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt, RabbitModel? mother, BreedingModel? breeding, List<RabbitModel>? kits
 });
 
 
@@ -77,7 +84,7 @@ class _$BirthModelCopyWithImpl<$Res>
 
 /// Create a copy of BirthModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? breedingId = freezed,Object? motherId = null,Object? birthDate = null,Object? kitsBornAlive = null,Object? kitsBornDead = null,Object? kitsDied = null,Object? kitsWeaned = freezed,Object? weaningDate = freezed,Object? complications = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? mother = freezed,Object? breeding = freezed,Object? kits = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? breedingId = freezed,Object? motherId = null,Object? birthDate = null,Object? kitsBornAlive = null,Object? kitsBornDead = null,Object? kitsDied = null,Object? kitsWeaned = freezed,Object? weaningDate = freezed,Object? kitsCardedAt = freezed,Object? complications = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? mother = freezed,Object? breeding = freezed,Object? kits = freezed,}) {
   return _then(BirthModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,breedingId: freezed == breedingId ? _self.breedingId : breedingId // ignore: cast_nullable_to_non_nullable
@@ -88,6 +95,7 @@ as int,kitsBornDead: null == kitsBornDead ? _self.kitsBornDead : kitsBornDead //
 as int,kitsDied: null == kitsDied ? _self.kitsDied : kitsDied // ignore: cast_nullable_to_non_nullable
 as int,kitsWeaned: freezed == kitsWeaned ? _self.kitsWeaned : kitsWeaned // ignore: cast_nullable_to_non_nullable
 as int?,weaningDate: freezed == weaningDate ? _self.weaningDate : weaningDate // ignore: cast_nullable_to_non_nullable
+as String?,kitsCardedAt: freezed == kitsCardedAt ? _self.kitsCardedAt : kitsCardedAt // ignore: cast_nullable_to_non_nullable
 as String?,complications: freezed == complications ? _self.complications : complications // ignore: cast_nullable_to_non_nullable
 as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -204,10 +212,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate, @JsonKey(name: 'kits_carded_at')  String? kitsCardedAt,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BirthModel() when $default != null:
-return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
+return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.kitsCardedAt,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
   return orElse();
 
 }
@@ -225,10 +233,10 @@ return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.k
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate, @JsonKey(name: 'kits_carded_at')  String? kitsCardedAt,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)  $default,) {final _that = this;
 switch (_that) {
 case _BirthModel():
-return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
+return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.kitsCardedAt,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -245,10 +253,10 @@ return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.k
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id, @JsonKey(name: 'breeding_id')  int? breedingId, @JsonKey(name: 'mother_id')  int motherId, @JsonKey(name: 'birth_date')  String birthDate, @JsonKey(name: 'kits_born_alive')  int kitsBornAlive, @JsonKey(name: 'kits_born_dead')  int kitsBornDead, @JsonKey(name: 'kits_died')  int kitsDied, @JsonKey(name: 'kits_weaned')  int? kitsWeaned, @JsonKey(name: 'weaning_date')  String? weaningDate, @JsonKey(name: 'kits_carded_at')  String? kitsCardedAt,  String? complications,  String? notes, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt,  RabbitModel? mother,  BreedingModel? breeding,  List<RabbitModel>? kits)?  $default,) {final _that = this;
 switch (_that) {
 case _BirthModel() when $default != null:
-return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
+return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.kitsBornAlive,_that.kitsBornDead,_that.kitsDied,_that.kitsWeaned,_that.weaningDate,_that.kitsCardedAt,_that.complications,_that.notes,_that.createdAt,_that.updatedAt,_that.mother,_that.breeding,_that.kits);case _:
   return null;
 
 }
@@ -260,7 +268,7 @@ return $default(_that.id,_that.breedingId,_that.motherId,_that.birthDate,_that.k
 
 
 class _BirthModel extends BirthModel with DiagnosticableTreeMixin {
-  const _BirthModel({required this.id, @JsonKey(name: 'breeding_id') this.breedingId, @JsonKey(name: 'mother_id') required this.motherId, @JsonKey(name: 'birth_date') required this.birthDate, @JsonKey(name: 'kits_born_alive') required this.kitsBornAlive, @JsonKey(name: 'kits_born_dead') required this.kitsBornDead, @JsonKey(name: 'kits_died') this.kitsDied = 0, @JsonKey(name: 'kits_weaned') this.kitsWeaned, @JsonKey(name: 'weaning_date') this.weaningDate, this.complications, this.notes, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt, this.mother, this.breeding,  List<RabbitModel>? kits}): _kits = kits,super._();
+  const _BirthModel({required this.id, @JsonKey(name: 'breeding_id') this.breedingId, @JsonKey(name: 'mother_id') required this.motherId, @JsonKey(name: 'birth_date') required this.birthDate, @JsonKey(name: 'kits_born_alive') required this.kitsBornAlive, @JsonKey(name: 'kits_born_dead') required this.kitsBornDead, @JsonKey(name: 'kits_died') this.kitsDied = 0, @JsonKey(name: 'kits_weaned') this.kitsWeaned, @JsonKey(name: 'weaning_date') this.weaningDate, @JsonKey(name: 'kits_carded_at') this.kitsCardedAt, this.complications, this.notes, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt, this.mother, this.breeding,  List<RabbitModel>? kits}): _kits = kits,super._();
   
 
 @override final  int id;
@@ -274,6 +282,14 @@ class _BirthModel extends BirthModel with DiagnosticableTreeMixin {
 @override@JsonKey(name: 'kits_died') final  int kitsDied;
 @override@JsonKey(name: 'kits_weaned') final  int? kitsWeaned;
 @override@JsonKey(name: 'weaning_date') final  String? weaningDate;
+/// Когда по этому выводку завели карточки крольчат.
+///
+/// Пока пусто — крольчата живут числами выше, и падёж с отсадкой
+/// отмечают прямо в выводке. Как только заведены, счёт идёт по
+/// карточкам: числа замораживаются, а отмечать надо на карточке
+/// крольчонка. Сервер такую правку выводка отклоняет — две правды об
+/// одних и тех же животных расходились молча.
+@override@JsonKey(name: 'kits_carded_at') final  String? kitsCardedAt;
 @override final  String? complications;
 @override final  String? notes;
 @override@JsonKey(name: 'created_at') final  String? createdAt;
@@ -301,23 +317,23 @@ _$BirthModelCopyWith<_BirthModel> get copyWith => __$BirthModelCopyWithImpl<_Bir
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
     ..add(DiagnosticsProperty('type', 'BirthModel'))
-    ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('breedingId', breedingId))..add(DiagnosticsProperty('motherId', motherId))..add(DiagnosticsProperty('birthDate', birthDate))..add(DiagnosticsProperty('kitsBornAlive', kitsBornAlive))..add(DiagnosticsProperty('kitsBornDead', kitsBornDead))..add(DiagnosticsProperty('kitsDied', kitsDied))..add(DiagnosticsProperty('kitsWeaned', kitsWeaned))..add(DiagnosticsProperty('weaningDate', weaningDate))..add(DiagnosticsProperty('complications', complications))..add(DiagnosticsProperty('notes', notes))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt))..add(DiagnosticsProperty('mother', mother))..add(DiagnosticsProperty('breeding', breeding))..add(DiagnosticsProperty('kits', kits));
+    ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('breedingId', breedingId))..add(DiagnosticsProperty('motherId', motherId))..add(DiagnosticsProperty('birthDate', birthDate))..add(DiagnosticsProperty('kitsBornAlive', kitsBornAlive))..add(DiagnosticsProperty('kitsBornDead', kitsBornDead))..add(DiagnosticsProperty('kitsDied', kitsDied))..add(DiagnosticsProperty('kitsWeaned', kitsWeaned))..add(DiagnosticsProperty('weaningDate', weaningDate))..add(DiagnosticsProperty('kitsCardedAt', kitsCardedAt))..add(DiagnosticsProperty('complications', complications))..add(DiagnosticsProperty('notes', notes))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt))..add(DiagnosticsProperty('mother', mother))..add(DiagnosticsProperty('breeding', breeding))..add(DiagnosticsProperty('kits', kits));
 }
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BirthModel&&(identical(other.id, id) || other.id == id)&&(identical(other.breedingId, breedingId) || other.breedingId == breedingId)&&(identical(other.motherId, motherId) || other.motherId == motherId)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.kitsBornAlive, kitsBornAlive) || other.kitsBornAlive == kitsBornAlive)&&(identical(other.kitsBornDead, kitsBornDead) || other.kitsBornDead == kitsBornDead)&&(identical(other.kitsDied, kitsDied) || other.kitsDied == kitsDied)&&(identical(other.kitsWeaned, kitsWeaned) || other.kitsWeaned == kitsWeaned)&&(identical(other.weaningDate, weaningDate) || other.weaningDate == weaningDate)&&(identical(other.complications, complications) || other.complications == complications)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.mother, mother) || other.mother == mother)&&(identical(other.breeding, breeding) || other.breeding == breeding)&&const DeepCollectionEquality().equals(other.kits, _kits));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BirthModel&&(identical(other.id, id) || other.id == id)&&(identical(other.breedingId, breedingId) || other.breedingId == breedingId)&&(identical(other.motherId, motherId) || other.motherId == motherId)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.kitsBornAlive, kitsBornAlive) || other.kitsBornAlive == kitsBornAlive)&&(identical(other.kitsBornDead, kitsBornDead) || other.kitsBornDead == kitsBornDead)&&(identical(other.kitsDied, kitsDied) || other.kitsDied == kitsDied)&&(identical(other.kitsWeaned, kitsWeaned) || other.kitsWeaned == kitsWeaned)&&(identical(other.weaningDate, weaningDate) || other.weaningDate == weaningDate)&&(identical(other.kitsCardedAt, kitsCardedAt) || other.kitsCardedAt == kitsCardedAt)&&(identical(other.complications, complications) || other.complications == complications)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.mother, mother) || other.mother == mother)&&(identical(other.breeding, breeding) || other.breeding == breeding)&&const DeepCollectionEquality().equals(other.kits, _kits));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,breedingId,motherId,birthDate,kitsBornAlive,kitsBornDead,kitsDied,kitsWeaned,weaningDate,complications,notes,createdAt,updatedAt,mother,breeding,const DeepCollectionEquality().hash(_kits));
+    return Object.hash(runtimeType,id,breedingId,motherId,birthDate,kitsBornAlive,kitsBornDead,kitsDied,kitsWeaned,weaningDate,kitsCardedAt,complications,notes,createdAt,updatedAt,mother,breeding,const DeepCollectionEquality().hash(_kits));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-    return 'BirthModel(id: $id, breedingId: $breedingId, motherId: $motherId, birthDate: $birthDate, kitsBornAlive: $kitsBornAlive, kitsBornDead: $kitsBornDead, kitsDied: $kitsDied, kitsWeaned: $kitsWeaned, weaningDate: $weaningDate, complications: $complications, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, mother: $mother, breeding: $breeding, kits: $kits)';
+    return 'BirthModel(id: $id, breedingId: $breedingId, motherId: $motherId, birthDate: $birthDate, kitsBornAlive: $kitsBornAlive, kitsBornDead: $kitsBornDead, kitsDied: $kitsDied, kitsWeaned: $kitsWeaned, weaningDate: $weaningDate, kitsCardedAt: $kitsCardedAt, complications: $complications, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, mother: $mother, breeding: $breeding, kits: $kits)';
 }
 
 
@@ -328,7 +344,7 @@ abstract mixin class _$BirthModelCopyWith<$Res> implements $BirthModelCopyWith<$
   factory _$BirthModelCopyWith(_BirthModel value, $Res Function(_BirthModel) _then) = __$BirthModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id,@JsonKey(name: 'breeding_id') int? breedingId,@JsonKey(name: 'mother_id') int motherId,@JsonKey(name: 'birth_date') String birthDate,@JsonKey(name: 'kits_born_alive') int kitsBornAlive,@JsonKey(name: 'kits_born_dead') int kitsBornDead,@JsonKey(name: 'kits_died') int kitsDied,@JsonKey(name: 'kits_weaned') int? kitsWeaned,@JsonKey(name: 'weaning_date') String? weaningDate, String? complications, String? notes,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt, RabbitModel? mother, BreedingModel? breeding, List<RabbitModel>? kits
+ int id,@JsonKey(name: 'breeding_id') int? breedingId,@JsonKey(name: 'mother_id') int motherId,@JsonKey(name: 'birth_date') String birthDate,@JsonKey(name: 'kits_born_alive') int kitsBornAlive,@JsonKey(name: 'kits_born_dead') int kitsBornDead,@JsonKey(name: 'kits_died') int kitsDied,@JsonKey(name: 'kits_weaned') int? kitsWeaned,@JsonKey(name: 'weaning_date') String? weaningDate,@JsonKey(name: 'kits_carded_at') String? kitsCardedAt, String? complications, String? notes,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt, RabbitModel? mother, BreedingModel? breeding, List<RabbitModel>? kits
 });
 
 
@@ -345,7 +361,7 @@ class __$BirthModelCopyWithImpl<$Res>
 
 /// Create a copy of BirthModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? breedingId = freezed,Object? motherId = null,Object? birthDate = null,Object? kitsBornAlive = null,Object? kitsBornDead = null,Object? kitsDied = null,Object? kitsWeaned = freezed,Object? weaningDate = freezed,Object? complications = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? mother = freezed,Object? breeding = freezed,Object? kits = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? breedingId = freezed,Object? motherId = null,Object? birthDate = null,Object? kitsBornAlive = null,Object? kitsBornDead = null,Object? kitsDied = null,Object? kitsWeaned = freezed,Object? weaningDate = freezed,Object? kitsCardedAt = freezed,Object? complications = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? mother = freezed,Object? breeding = freezed,Object? kits = freezed,}) {
   return _then(_BirthModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,breedingId: freezed == breedingId ? _self.breedingId : breedingId // ignore: cast_nullable_to_non_nullable
@@ -356,6 +372,7 @@ as int,kitsBornDead: null == kitsBornDead ? _self.kitsBornDead : kitsBornDead //
 as int,kitsDied: null == kitsDied ? _self.kitsDied : kitsDied // ignore: cast_nullable_to_non_nullable
 as int,kitsWeaned: freezed == kitsWeaned ? _self.kitsWeaned : kitsWeaned // ignore: cast_nullable_to_non_nullable
 as int?,weaningDate: freezed == weaningDate ? _self.weaningDate : weaningDate // ignore: cast_nullable_to_non_nullable
+as String?,kitsCardedAt: freezed == kitsCardedAt ? _self.kitsCardedAt : kitsCardedAt // ignore: cast_nullable_to_non_nullable
 as String?,complications: freezed == complications ? _self.complications : complications // ignore: cast_nullable_to_non_nullable
 as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

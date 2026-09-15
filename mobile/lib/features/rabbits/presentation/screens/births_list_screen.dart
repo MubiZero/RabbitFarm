@@ -366,7 +366,33 @@ class _BirthCard extends ConsumerWidget {
               ),
             ),
           ],
-          if (canManage && birth.kitsBornAlive > 0) ...[
+          // Карточки заведены — крольчата считаются по ним, и здесь делать
+          // больше нечего: числа выводка заморожены, а падёж и отсадку
+          // отмечают на карточке крольчонка. Раньше обе половины жили
+          // независимо: отметка в выводке до карточек не доходила, отметка на
+          // карточке — до выводка, и какая из них права, не знал никто.
+          if (birth.kitsCarded) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.badge_outlined,
+                  size: 16,
+                  color: context.colors.onSurfaceVariant,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    l10n.birthsKitsCardedHint,
+                    style: AppTypography.labelSm.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ] else if (canManage && birth.kitsBornAlive > 0) ...[
             const SizedBox(height: AppSpacing.md),
             Wrap(
               spacing: AppSpacing.sm,

@@ -4721,6 +4721,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get birthsKitDeathAction => 'Отметить падёж';
 
   @override
+  String get birthsKitsCardedHint =>
+      'Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.';
+
+  @override
   String get birthsKitDeathTitle => 'Сколько крольчат пало?';
 
   @override

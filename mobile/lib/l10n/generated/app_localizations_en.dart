@@ -4661,6 +4661,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get birthsKitDeathAction => 'Record losses';
 
   @override
+  String get birthsKitsCardedHint =>
+      'This litter has individual cards — record deaths and weaning on the kit card in the herd.';
+
+  @override
   String get birthsKitDeathTitle => 'How many kits died?';
 
   @override

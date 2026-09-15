@@ -1957,6 +1957,7 @@
 
   "birthsKitsDied": "Пало",
   "birthsKitDeathAction": "Отметить падёж",
+  "birthsKitsCardedHint": "Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.",
   "birthsKitDeathTitle": "Сколько крольчат пало?",
   "birthsKitDeathHint": "Осталось живых: {alive}",
   "@birthsKitDeathHint": {

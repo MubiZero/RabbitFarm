@@ -1394,6 +1394,7 @@
 
   "birthsKitsDied": "Талаф",
   "birthsKitDeathAction": "Талафотро қайд кардан",
+  "birthsKitsCardedHint": "Барои ин бача-харгӯшҳо кортҳо кушода шудаанд — талафот ва ҷудокуниро дар корти худи бача қайд кунед.",
   "birthsKitDeathTitle": "Чанд харгӯшбача мурд?",
   "birthsKitDeathHint": "Зинда мондаанд: {alive}",
   "birthsKitDeathSaved": "Қайд шуд",

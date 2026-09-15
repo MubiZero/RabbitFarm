@@ -28,6 +28,15 @@ abstract class BirthModel with _$BirthModel {
     @JsonKey(name: 'kits_died') @Default(0) int kitsDied,
     @JsonKey(name: 'kits_weaned') int? kitsWeaned,
     @JsonKey(name: 'weaning_date') String? weaningDate,
+
+    /// Когда по этому выводку завели карточки крольчат.
+    ///
+    /// Пока пусто — крольчата живут числами выше, и падёж с отсадкой
+    /// отмечают прямо в выводке. Как только заведены, счёт идёт по
+    /// карточкам: числа замораживаются, а отмечать надо на карточке
+    /// крольчонка. Сервер такую правку выводка отклоняет — две правды об
+    /// одних и тех же животных расходились молча.
+    @JsonKey(name: 'kits_carded_at') String? kitsCardedAt,
     String? complications,
     String? notes,
     @JsonKey(name: 'created_at') String? createdAt,
@@ -55,6 +64,7 @@ abstract class BirthModel with _$BirthModel {
             ? intFromJson(json['kits_weaned'])
             : null,
         weaningDate: json['weaning_date']?.toString(),
+        kitsCardedAt: json['kits_carded_at']?.toString(),
         complications: json['complications']?.toString(),
         notes: json['notes']?.toString(),
         createdAt: json['created_at']?.toString(),
@@ -83,6 +93,9 @@ abstract class BirthModel with _$BirthModel {
 
   /// Проверяет, что вложенный объект кролика содержит полный набор
   /// обязательных полей для корректного парсинга `RabbitModel`.
+  /// Заведены ли по этому выводку карточки крольчат.
+  bool get kitsCarded => kitsCardedAt != null && kitsCardedAt!.isNotEmpty;
+
   /// Сколько крольчат живо сейчас.
   ///
   /// Отсаженные считаются по факту отсадки, до неё — по разнице: владелец

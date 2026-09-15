@@ -295,6 +295,20 @@ exports.updateBirth = async (req, res, next) => {
       return ApiResponse.notFound(res, 'Окрол не найден');
     }
 
+    // Когда карточки заведены, крольчата считаются по ним — и падёж с
+    // отсадкой отмечают на карточке. Правка чисел выводка в этот момент
+    // создаёт вторую правду: в выводке «пало двое», в поголовье те же двое
+    // живы, и какая из половин права, не знает никто.
+    const countsTouched = [kits_born_alive, kits_born_dead, kits_died, kits_weaned]
+      .some((value) => value !== undefined);
+    if (birth.kits_carded_at && countsTouched) {
+      return ApiResponse.error(
+        res,
+        'По этому окролу заведены карточки — отмечайте падёж и отсадку на карточке крольчонка',
+        409
+      );
+    }
+
     await birth.update({
       birth_date,
       kits_born_alive,
@@ -405,6 +419,20 @@ exports.createKitsFromBirth = async (req, res, next) => {
       return ApiResponse.notFound(res, 'Окрол не найден');
     }
 
+    // Второй раз карточки по тому же выводку не заводятся. Ничто не мешало
+    // нажать кнопку дважды: оба вызова отвечали 201, шесть крольчат
+    // становились двенадцатью карточками, а `kits_born_alive` так и
+    // оставался шестью. Ферма после этого платила за поголовье, которого у
+    // неё нет.
+    if (birth.kits_carded_at) {
+      await transaction.rollback();
+      return ApiResponse.error(
+        res,
+        'По этому окролу карточки уже заведены — крольчата есть в поголовье',
+        409
+      );
+    }
+
     // Идентификаторы приходят из тела запроса, поэтому каждый проверяется на
     // принадлежность ферме: иначе крольчата уезжали в чужую клетку, а ответ
     // об оставшихся местах раскрывал заполненность чужого хозяйства.
@@ -493,6 +521,8 @@ exports.createKitsFromBirth = async (req, res, next) => {
       }, { transaction });
       kits.push(kit);
     }
+
+    await birth.update({ kits_carded_at: new Date() }, { transaction });
 
     await transaction.commit();
     return ApiResponse.created(res, kits, 'Крольчата успешно созданы');

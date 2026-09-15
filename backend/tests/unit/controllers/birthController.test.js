@@ -413,8 +413,12 @@ describe('birthController', () => {
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
-      // birth.update should NOT be called — kits_weaned must remain unchanged at birth
-      expect(birth.update).not.toHaveBeenCalled();
+      // Запись об окроле трогается ровно одним полем — отметкой о том, что
+      // карточки заведены. Счётчики выводка (`kits_weaned` и остальные)
+      // заведение карточек не меняет: отсадка — отдельное событие.
+      const [patch] = birth.update.mock.calls[0];
+      expect(Object.keys(patch)).toEqual(['kits_carded_at']);
+      expect(patch.kits_carded_at).toBeInstanceOf(Date);
     });
 
     it('should use name_prefix when provided', async () => {

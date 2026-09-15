@@ -1394,6 +1394,7 @@
 
   "birthsKitsDied": "Lost",
   "birthsKitDeathAction": "Record losses",
+  "birthsKitsCardedHint": "This litter has individual cards — record deaths and weaning on the kit card in the herd.",
   "birthsKitDeathTitle": "How many kits died?",
   "birthsKitDeathHint": "Still alive: {alive}",
   "birthsKitDeathSaved": "Recorded",
