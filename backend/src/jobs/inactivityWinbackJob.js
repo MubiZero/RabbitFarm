@@ -3,11 +3,16 @@ const { Farm } = require('../models');
 const platformAdminService = require('../services/platformAdminService');
 const { notifyFarmOwners } = require('../services/notifications/farmOwnerNotifier');
 const logger = require('../utils/logger');
+const { hourInZone } = require('../utils/dateRange');
 
-// На час позже дайджеста и напоминаний о тарифе: и то и другое уходит в
-// 08:00, а «мы по вам скучали» вперемешку с «просрочены вакцинации» в одну
-// секунду — это не разговор, а очередь пушей.
-const CRON_SCHEDULE = '0 9 * * *';
+// Раз в час: зовём вернуться в девять утра **хозяйства**, а не сервера.
+// На час позже дайджеста и напоминаний о тарифе — «мы по вам скучали»
+// вперемешку с «просрочены вакцинации» в одну секунду это не разговор, а
+// очередь пушей.
+const CRON_SCHEDULE = '0 * * * *';
+
+/** Час хозяйства, в который зовём вернуться. */
+const WINBACK_HOUR = 9;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
@@ -90,9 +95,13 @@ async function _processFarm(farm, lastActive) {
  * звать в приложение, которое не пустит, — издевательство, а не забота.
  * Мягко удалённые — тем более (см. `notificationDigestJob`).
  */
-async function runWinbackReminders() {
+async function runWinbackReminders(now = new Date()) {
   const farms = await Farm.findAll({ where: { deleted_at: null } });
-  const living = farms.filter((farm) => farm.status !== 'suspended');
+  const living = farms.filter(
+    (farm) =>
+      farm.status !== 'suspended' &&
+      hourInZone(farm.timezone, now) === WINBACK_HOUR
+  );
   if (living.length === 0) return;
 
   const lastActiveByFarm = await platformAdminService.lastActiveByFarm(living.map((farm) => farm.id));

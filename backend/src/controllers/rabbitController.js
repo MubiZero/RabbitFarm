@@ -303,7 +303,7 @@ class RabbitController {
    */
   async listFarmPhotos(req, res, next) {
     try {
-      const result = await rabbitService.listFarmGalleryPhotos(req.farmId, req.query);
+      const result = await rabbitService.listFarmGalleryPhotos(req.farmId, req.query, req.farmTimezone);
       return ApiResponse.paginated(res, result.items, result.page, result.limit, result.total, 'Лента фото получена');
     } catch (error) {
       next(error);

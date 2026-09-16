@@ -36,6 +36,10 @@ const logger = require('../../../src/utils/logger');
 const notificationService = require('../../../src/services/notificationService');
 const { runDigest } = require('../../../src/jobs/notificationDigestJob');
 
+// 03:00 UTC = 08:00 в Душанбе. Сводка уходит хозяйству в его восемь утра,
+// поэтому теперь у прогона есть «сейчас»: без него фермы молча пропускаются.
+const MORNING_IN_DUSHANBE = new Date('2026-08-21T03:00:00.000Z');
+
 describe('notificationDigestJob.runDigest', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,18 +59,66 @@ describe('notificationDigestJob.runDigest', () => {
   it('не рассылает дайджест мягко удалённым фермам — входить туда всё равно нельзя', async () => {
     Farm.findAll.mockResolvedValue([]);
 
-    await runDigest();
+    await runDigest(MORNING_IN_DUSHANBE);
 
     expect(Farm.findAll).toHaveBeenCalledWith(expect.objectContaining({
       where: { deleted_at: null }
     }));
   });
 
+  describe('утро у каждого хозяйства своё', () => {
+    it('ферма в Москве не получает сводку, когда утро в Душанбе', async () => {
+      // 03:00 UTC — восемь утра в Душанбе и только шесть в Москве. Раньше
+      // задача била в восемь утра сервера и будила всех разом.
+      Farm.findAll.mockResolvedValue([{ id: 1, timezone: 'Europe/Moscow' }]);
+
+      await runDigest(MORNING_IN_DUSHANBE);
+
+      expect(notificationService.sendToUsers).not.toHaveBeenCalled();
+    });
+
+    it('та же ферма получает её в своё восемь утра', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1, timezone: 'Europe/Moscow' }]);
+      overdueRabbits.mockResolvedValue(3);
+
+      // 05:00 UTC — восемь утра в Москве.
+      await runDigest(new Date('2026-08-21T05:00:00.000Z'));
+
+      expect(notificationService.sendToUsers)
+        .toHaveBeenCalledWith(1, [10, 11], expect.anything());
+    });
+
+    it('в один час просыпаются только фермы этого пояса', async () => {
+      Farm.findAll.mockResolvedValue([
+        { id: 1, timezone: 'Asia/Dushanbe' },
+        { id: 2, timezone: 'Europe/Moscow' }
+      ]);
+      overdueRabbits.mockResolvedValue(1);
+
+      await runDigest(MORNING_IN_DUSHANBE);
+
+      expect(notificationService.sendToUsers)
+        .toHaveBeenCalledWith(1, [10, 11], expect.anything());
+      expect(notificationService.sendToUsers)
+        .not.toHaveBeenCalledWith(2, expect.anything(), expect.anything());
+    });
+
+    it('ферма без пояса считается таджикской, как было до выбора страны', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1 }]);
+      overdueRabbits.mockResolvedValue(2);
+
+      await runDigest(MORNING_IN_DUSHANBE);
+
+      expect(notificationService.sendToUsers)
+        .toHaveBeenCalledWith(1, [10, 11], expect.anything());
+    });
+  });
+
   it('обходит все живые фермы и шлёт только тем, кто не выключил дайджест', async () => {
     Farm.findAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);
     overdueRabbits.mockResolvedValue(3);
 
-    await runDigest();
+    await runDigest(MORNING_IN_DUSHANBE);
 
     expect(User.findAll).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({ farm_id: 1, is_active: true, digest_enabled: true })
@@ -83,7 +135,7 @@ describe('notificationDigestJob.runDigest', () => {
     overdueRabbits.mockResolvedValue(3);
     User.findAll.mockResolvedValue([]);
 
-    await runDigest();
+    await runDigest(MORNING_IN_DUSHANBE);
 
     expect(notificationService.sendToUsers).not.toHaveBeenCalled();
   });
@@ -95,7 +147,7 @@ describe('notificationDigestJob.runDigest', () => {
       { id: 5, title: 'Почистить клетку', assigned_to: 42 }
     ]);
 
-    await runDigest();
+    await runDigest(MORNING_IN_DUSHANBE);
 
     expect(notificationService.sendToUsers).toHaveBeenCalledWith(1, [42], expect.objectContaining({
       i18n: expect.objectContaining({ key: 'taskOverdue' })
@@ -120,7 +172,7 @@ describe('notificationDigestJob.runDigest', () => {
         { id: 99, female: femaleInCage('14'), Births: [] }
       ]);
 
-      await runDigest();
+      await runDigest(MORNING_IN_DUSHANBE);
 
       // Текст собирается уже на языке получателя — джоб передаёт составные
       // части, а не готовую русскую строку.
@@ -140,7 +192,7 @@ describe('notificationDigestJob.runDigest', () => {
       expected.setDate(expected.getDate() + NEST_BOX_BEFORE_BIRTH);
       const expectedDate = expected.toISOString().split('T')[0];
 
-      await runDigest();
+      await runDigest(MORNING_IN_DUSHANBE);
 
       expect(Breeding.findAll).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ expected_birth_date: expectedDate })
@@ -153,7 +205,7 @@ describe('notificationDigestJob.runDigest', () => {
         { id: 99, female: femaleInCage('14'), Births: [{ id: 3 }] }
       ]);
 
-      await runDigest();
+      await runDigest(MORNING_IN_DUSHANBE);
 
       expect(notificationService.sendToUsers).not.toHaveBeenCalled();
     });
@@ -164,7 +216,7 @@ describe('notificationDigestJob.runDigest', () => {
         { id: 99, female: femaleInCage(null), Births: [] }
       ]);
 
-      await runDigest();
+      await runDigest(MORNING_IN_DUSHANBE);
 
       expect(notificationService.sendToUsers).toHaveBeenCalledWith(1, [10, 11], expect.objectContaining({
         i18n: { key: 'kindlingSoon', params: { cageNumber: null, femaleName: 'Мушка' } }

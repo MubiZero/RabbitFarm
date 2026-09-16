@@ -3,11 +3,15 @@ const { Op } = require('sequelize');
 const { Farm, Plan } = require('../models');
 const { notifyFarmOwners } = require('../services/notifications/farmOwnerNotifier');
 const logger = require('../utils/logger');
+const { hourInZone } = require('../utils/dateRange');
 
-// Тем же часом, что и notificationDigestJob — время сервера (пояс задан через
-// TZ, см. backend/Dockerfile), не «раз в сутки от старта», чтобы не плыть
-// вместе с рестартами.
-const CRON_SCHEDULE = '0 8 * * *';
+// Раз в час, как и notificationDigestJob: напоминание уходит в восемь утра
+// **хозяйства**, а не сервера. «Тариф кончается завтра» посреди ночи — это
+// сообщение, которое прочитают уже после того, как ферму закроют на чтение.
+const CRON_SCHEDULE = '0 * * * *';
+
+/** Час хозяйства, в который уходит напоминание. */
+const REMINDER_HOUR = 8;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MS_PER_HOUR = 60 * 60 * 1000;
 
@@ -71,8 +75,19 @@ async function _notifyFarm(farm, key) {
 async function _processFarm(farm, now = new Date()) {
   const days = daysUntil(farm.plan_expires_at, now);
 
+  // Напоминания уходят в восемь утра хозяйства: задача ходит каждый час и
+  // будит только те фермы, у которых этот час наступил.
+  //
+  // Закрытие доступа ниже этой проверке НЕ подчиняется намеренно: перевод в
+  // режим чтения — не разговор с человеком, а следствие неоплаченного
+  // тарифа. Ждать утра значило бы оставить ферму работать на истёкшем
+  // тарифе лишние часы, а у фермы в другом поясе — почти сутки.
+  const isReminderHour = hourInZone(farm.timezone, now) === REMINDER_HOUR;
+
   if (days === 7 || days === 1) {
-    await _notifyFarm(farm, days === 7 ? 'planExpiringWeek' : 'planExpiringTomorrow');
+    if (isReminderHour) {
+      await _notifyFarm(farm, days === 7 ? 'planExpiringWeek' : 'planExpiringTomorrow');
+    }
     return;
   }
 
@@ -95,7 +110,7 @@ async function _processFarm(farm, now = new Date()) {
   // приходится на тот же день или следующий. `read_only` в условии — потому
   // что текст говорит «записи не сохраняются»: приостановленной ферме
   // (`suspended`) это неправда, ей продление доступа не откроет.
-  if (farm.status === 'read_only' && (days === -3 || days === -14)) {
+  if (farm.status === 'read_only' && (days === -3 || days === -14) && isReminderHour) {
     await _notifyFarm(farm, days === -3 ? 'planReadOnlyThreeDays' : 'planUnpaidTwoWeeks');
   }
 }
@@ -104,11 +119,10 @@ async function _processFarm(farm, now = new Date()) {
  * Обход всех платных ферм с известным сроком. Бесплатный тариф по умолчанию
  * бессрочен (`plan_expires_at = null`) — таким фермам напоминать нечего.
  */
-async function runReminders() {
+async function runReminders(now = new Date()) {
   // Один момент на весь проход: обход тысячи ферм может перевалить за
   // полночь, и тогда часть ферм считалась бы по вчерашним порогам, а часть
   // по сегодняшним.
-  const now = new Date();
   const farms = await Farm.findAll({
     where: { deleted_at: null, plan_expires_at: { [Op.not]: null } },
     include: [{ model: Plan, as: 'plan' }]
@@ -118,6 +132,7 @@ async function runReminders() {
     // Тариф сняли, а срок в базе остался — нечего напоминать и не за что
     // переводить в read_only.
     if (!farm.plan) continue;
+
 
     try {
       await _processFarm(farm, now);

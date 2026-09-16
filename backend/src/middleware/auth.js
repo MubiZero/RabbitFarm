@@ -2,6 +2,7 @@ const JWTUtil = require('../utils/jwt');
 const ApiResponse = require('../utils/apiResponse');
 const { User, TokenBlacklist, Farm } = require('../models');
 const { withRequestContext } = require('../utils/requestContext');
+const { DEFAULT_TIMEZONE } = require('../utils/dateRange');
 
 /**
  * Authentication middleware
@@ -36,7 +37,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
 
     // Get user from database
     const user = await User.findByPk(decoded.id, {
-      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'deleted_at'] }]
+      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'deleted_at', 'timezone'] }]
     });
 
     if (!user) {
@@ -70,6 +71,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
       }
       req.user = user;
       req.farmId = user.farm_id;
+      req.farmTimezone = user.farm?.timezone || DEFAULT_TIMEZONE;
       req.impersonatedBy = decoded.impersonated_by;
       return withRequestContext(req, res, next);
     }
@@ -104,6 +106,11 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     // формула жила в коде, и любая её копия мимо этого места давала другой
     // ответ. Теперь хозяйство записано у пользователя, и читать нечего.
     req.farmId = user.farm_id;
+    // Часовой пояс хозяйства — здесь же, потому что ферма уже загружена.
+    // В нём считаются границы суток: «сегодня», «за 30 дней» и период
+    // отчёта у фермы за пределами пояса сервера иначе разъезжались бы с её
+    // собственным календарём (см. utils/dateRange).
+    req.farmTimezone = user.farm?.timezone || DEFAULT_TIMEZONE;
     // Дальше запрос идёт внутри контекста вошедшего: хуки моделей, до
     // которых `req` не доезжает, узнают из него, кто удалил запись
     // (см. utils/requestContext).

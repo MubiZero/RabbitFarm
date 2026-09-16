@@ -17,7 +17,11 @@ const { Op, Sequelize } = require('sequelize');
 const { closeAutoTasks } = require('./autoTaskService');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  DEFAULT_TIMEZONE
+} = require('../utils/dateRange');
 const planService = require('./planService');
 
 /**
@@ -678,7 +682,7 @@ class RabbitService {
    * @param {Number} farmId - id хозяйства
    * @param {Object} filters - { page, limit, sort_by, sort_order, from_date, to_date }
    */
-  async listFarmGalleryPhotos(farmId, filters = {}) {
+  async listFarmGalleryPhotos(farmId, filters = {}, timeZone = DEFAULT_TIMEZONE) {
     const {
       page = 1,
       limit = 50,
@@ -693,8 +697,8 @@ class RabbitService {
 
     if (from_date || to_date) {
       where.created_at = {};
-      if (from_date) where.created_at[Op.gte] = startOfDayUtc(from_date);
-      if (to_date) where.created_at[Op.lt] = nextDayUtc(to_date);
+      if (from_date) where.created_at[Op.gte] = startOfDayInZone(from_date, timeZone);
+      if (to_date) where.created_at[Op.lt] = nextDayInZone(to_date, timeZone);
     }
 
     const { count, rows } = await Photo.findAndCountAll({

@@ -38,7 +38,7 @@ exports.getById = async (req, res, next) => {
 
 exports.list = async (req, res, next) => {
   try {
-    const result = await taskService.listTasks(req.farmId, req.query);
+    const result = await taskService.listTasks(req.farmId, req.query, req.farmTimezone);
     // Общий конверт пагинации. Раньше каждый сервис лепил свой: items/rows/
     // tasks/transactions и totalPages/pages — клиенту приходилось угадывать
     // форму в каждом репозитории, и в медкартах он угадал неверно.

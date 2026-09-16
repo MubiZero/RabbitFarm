@@ -182,12 +182,21 @@ describe('TaskController', () => {
     it('should return task list with 200', async () => {
       const result = { items: [{ id: 1 }], total: 1 };
       taskService.listTasks.mockResolvedValue(result);
-      const req = mockReq({ query: { status: 'pending' } });
+      const req = mockReq({
+        query: { status: 'pending' },
+        farmTimezone: 'Asia/Tashkent'
+      });
       const res = mockRes();
 
       await taskController.list(req, res, mockNext);
 
-      expect(taskService.listTasks).toHaveBeenCalledWith(FARM_ID, { status: 'pending' });
+      // Пояс хозяйства доезжает до сервиса: «сегодня» и границы периода
+      // считаются его сутками, а не сутками процесса.
+      expect(taskService.listTasks).toHaveBeenCalledWith(
+        FARM_ID,
+        { status: 'pending' },
+        'Asia/Tashkent'
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,

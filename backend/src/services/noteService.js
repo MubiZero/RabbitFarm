@@ -1,7 +1,11 @@
 const { Note, Rabbit, Cage, User } = require('../models');
 const { Op } = require('sequelize');
 const logger = require('../utils/logger');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  DEFAULT_TIMEZONE
+} = require('../utils/dateRange');
 const staffService = require('./staffService');
 const notificationService = require('./notificationService');
 
@@ -75,7 +79,7 @@ class NoteService {
     return note;
   }
 
-  async listNotes(farmId, filters = {}) {
+  async listNotes(farmId, filters = {}, timeZone = DEFAULT_TIMEZONE) {
     const {
       page = 1,
       limit = 50,
@@ -95,8 +99,8 @@ class NoteService {
 
     if (from_date || to_date) {
       where.created_at = {};
-      if (from_date) where.created_at[Op.gte] = startOfDayUtc(from_date);
-      if (to_date) where.created_at[Op.lt] = nextDayUtc(to_date);
+      if (from_date) where.created_at[Op.gte] = startOfDayInZone(from_date, timeZone);
+      if (to_date) where.created_at[Op.lt] = nextDayInZone(to_date, timeZone);
     }
 
     const { count, rows } = await Note.findAndCountAll({

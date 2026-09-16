@@ -21,6 +21,16 @@ const { notifyFarmOwners } = require('../../../src/services/notifications/farmOw
 const logger = require('../../../src/utils/logger');
 const { runWinbackReminders, daysSince, reminderStage } = require('../../../src/jobs/inactivityWinbackJob');
 
+// Сегодняшний день в 04:00 UTC — девять утра в Душанбе, час, в который
+// зовём вернуться. Дату не фиксируем: молчание фермы отсчитывается от
+// настоящего «сейчас».
+const NINE_IN_DUSHANBE = (() => {
+  const now = new Date();
+  return new Date(Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 4, 0, 0
+  ));
+})();
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const daysAgo = (n) => new Date(Date.now() - n * MS_PER_DAY);
 
@@ -83,7 +93,7 @@ describe('inactivityWinbackJob', () => {
     it('ищет только не удалённые фермы', async () => {
       Farm.findAll.mockResolvedValue([]);
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(Farm.findAll).toHaveBeenCalledWith({ where: { deleted_at: null } });
       expect(platformAdminService.lastActiveByFarm).not.toHaveBeenCalled();
@@ -94,7 +104,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(14) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).toHaveBeenCalledWith(farm.id, expect.objectContaining({
         key: 'winbackTwoWeeks',
@@ -109,7 +119,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(30) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).toHaveBeenCalledWith(farm.id, expect.objectContaining({
         key: 'winbackMonth'
@@ -122,7 +132,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(13) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).not.toHaveBeenCalled();
       expect(farm.update).not.toHaveBeenCalled();
@@ -133,7 +143,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(20) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).not.toHaveBeenCalled();
       expect(farm.update).not.toHaveBeenCalled();
@@ -144,7 +154,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(17) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(farm.update).toHaveBeenCalledWith({ inactivity_notified_days: 14 });
     });
@@ -154,7 +164,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(1) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).not.toHaveBeenCalled();
       expect(farm.update).toHaveBeenCalledWith({ inactivity_notified_days: null });
@@ -165,7 +175,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(2) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(farm.update).not.toHaveBeenCalled();
     });
@@ -175,7 +185,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({});
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(farm.update).toHaveBeenCalledWith({ inactivity_notified_days: 30 });
     });
@@ -185,7 +195,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({});
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).not.toHaveBeenCalled();
       expect(farm.update).not.toHaveBeenCalled();
@@ -196,7 +206,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(40) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).not.toHaveBeenCalled();
       expect(farm.update).not.toHaveBeenCalled();
@@ -207,7 +217,7 @@ describe('inactivityWinbackJob', () => {
       Farm.findAll.mockResolvedValue([farm]);
       lastActive({ 1: daysAgo(14) });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).toHaveBeenCalled();
     });
@@ -218,7 +228,7 @@ describe('inactivityWinbackJob', () => {
       lastActive({ 1: daysAgo(14) });
       notifyFarmOwners.mockRejectedValueOnce(new Error('fcm down'));
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(farm.update).not.toHaveBeenCalled();
       expect(logger.error).toHaveBeenCalled();
@@ -233,7 +243,7 @@ describe('inactivityWinbackJob', () => {
         .mockRejectedValueOnce(new Error('fcm down'))
         .mockResolvedValue({ owners: 1 });
 
-      await runWinbackReminders();
+      await runWinbackReminders(NINE_IN_DUSHANBE);
 
       expect(notifyFarmOwners).toHaveBeenCalledTimes(2);
       expect(healthy.update).toHaveBeenCalledWith({ inactivity_notified_days: 14 });

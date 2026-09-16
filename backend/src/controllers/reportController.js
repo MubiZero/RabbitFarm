@@ -12,7 +12,12 @@ const {
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  todayInZone,
+  daysAgoInZone
+} = require('../utils/dateRange');
 const planService = require('../services/planService');
 
 /**
@@ -54,13 +59,12 @@ exports.getDashboard = async (req, res, next) => {
     // отчёт те же операции показывал — два экрана называли разные суммы про
     // одни и те же деньги.
 
-    // Pre-compute date boundaries used by multiple queries
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
+    // Границы считаются в поясе хозяйства, а не процесса. Колонки здесь —
+    // DATEONLY (календарный день), поэтому и границы календарные: сравнивать
+    // день с моментом значит терять или прихватывать сутки на краю.
+    const timeZone = req.farmTimezone;
+    const thirtyDaysAgo = daysAgoInZone(30, timeZone);
+    const sevenDaysAgo = daysAgoInZone(6, timeZone);
 
     // Run all independent queries in parallel
     const [
@@ -212,20 +216,22 @@ exports.getDashboard = async (req, res, next) => {
     // --- History Calculations for Charts (in-memory, uses query results) ---
 
     // 1. Rabbits History (Last 7 days)
+    //
+    // Конец дня — начало следующего дня хозяйства: у фермы за пределами
+    // пояса сервера столбики графика съезжали на сутки.
     const rabbitsHistory = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const endOfDay = new Date(d.setHours(23, 59, 59, 999));
+      const day = daysAgoInZone(i, timeZone);
+      const endOfDay = nextDayInZone(day, timeZone);
 
       const count = allRabbits.filter(r => {
         const created = new Date(r.created_at);
         const dead = r.death_date ? new Date(r.death_date) : null;
         const sold = r.sold_date ? new Date(r.sold_date) : null;
 
-        if (created > endOfDay) return false;
-        if (dead && dead <= endOfDay) return false;
-        if (sold && sold <= endOfDay) return false;
+        if (created >= endOfDay) return false;
+        if (dead && dead < endOfDay) return false;
+        if (sold && sold < endOfDay) return false;
         return true;
       }).length;
       rabbitsHistory.push(count);
@@ -234,9 +240,9 @@ exports.getDashboard = async (req, res, next) => {
     // 2. Births History (Last 7 days)
     const birthsHistory = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateString = d.toISOString().split('T')[0];
+      // toISOString() давал день по Гринвичу: до рассвета столбик за сегодня
+      // оказывался вчерашним и всегда пустым.
+      const dateString = daysAgoInZone(i, timeZone);
 
       const birthsOnDay = recentBirthsList.filter(b => b.birth_date === dateString);
       const totalKits = birthsOnDay.reduce((sum, b) => sum + (b.kits_born_alive || 0), 0);
@@ -326,8 +332,12 @@ exports.getFarmReport = async (req, res, next) => {
     // последний день периода. Период по умолчанию заканчивается сегодняшним
     // днём — сегодняшние кормления не попадали в отчёт никогда.
     const feedingPeriod = {};
-    if (effectiveFromDate) feedingPeriod[Op.gte] = startOfDayUtc(effectiveFromDate);
-    if (effectiveToDate) feedingPeriod[Op.lt] = nextDayUtc(effectiveToDate);
+    if (effectiveFromDate) {
+      feedingPeriod[Op.gte] = startOfDayInZone(effectiveFromDate, req.farmTimezone);
+    }
+    if (effectiveToDate) {
+      feedingPeriod[Op.lt] = nextDayInZone(effectiveToDate, req.farmTimezone);
+    }
 
     const byFeedingPeriod = () => (hasPeriod ? { fed_at: feedingPeriod } : {});
 

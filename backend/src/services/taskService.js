@@ -1,7 +1,11 @@
 const { Task, Rabbit, Cage, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
 const logger = require('../utils/logger');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  DEFAULT_TIMEZONE
+} = require('../utils/dateRange');
 const notificationService = require('./notificationService');
 const { taskTitle } = require('../i18n/tasks');
 
@@ -122,7 +126,7 @@ class TaskService {
     return task;
   }
 
-  async listTasks(farmId, filters = {}) {
+  async listTasks(farmId, filters = {}, timeZone = DEFAULT_TIMEZONE) {
     const {
       page = 1,
       limit = 10,
@@ -153,11 +157,11 @@ class TaskService {
     // `tasks.due_date` хранит момент времени, а период задаётся календарной
     // датой: `due_date <= '2026-08-24'` означает «не позже полуночи», и задачи
     // с сегодняшним сроком выпадали из выборки. Верхняя граница — строгое
-    // «раньше следующего дня», в UTC, как лежат сами записи.
+    // «раньше следующего дня», в поясе хозяйства.
     if (from_date || to_date) {
       where.due_date = {};
-      if (from_date) where.due_date[Op.gte] = startOfDayUtc(from_date);
-      if (to_date) where.due_date[Op.lt] = nextDayUtc(to_date);
+      if (from_date) where.due_date[Op.gte] = startOfDayInZone(from_date, timeZone);
+      if (to_date) where.due_date[Op.lt] = nextDayInZone(to_date, timeZone);
     }
 
     // Флаг приходит из validate(listTasksQuerySchema, 'query'): Joi.boolean()
@@ -170,11 +174,14 @@ class TaskService {
     }
 
     if (today_only === true || today_only === 'true') {
-      // «Сегодня» считается в UTC по той же причине: в поясе процесса граница
-      // разъезжается с тем, как лежат записи, и вечерние задачи уезжают в
-      // соседние сутки.
+      // «Сегодня» — сутки хозяйства, а не процесса. Пока считали в UTC, у
+      // фермы в Душанбе день начинался в 5 утра по её же часам: утренние
+      // задачи до рассвета показывались вчерашними.
       const now = new Date();
-      where.due_date = { [Op.gte]: startOfDayUtc(now), [Op.lt]: nextDayUtc(now) };
+      where.due_date = {
+        [Op.gte]: startOfDayInZone(now, timeZone),
+        [Op.lt]: nextDayInZone(now, timeZone)
+      };
     }
 
     const { count, rows } = await Task.findAndCountAll({
