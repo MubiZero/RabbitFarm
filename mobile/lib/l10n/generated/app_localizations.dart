@@ -912,6 +912,30 @@ abstract class AppLocalizations {
   /// **'Записать кормление'**
   String get quickRecordFeeding;
 
+  /// No description provided for @quickNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужна связь'**
+  String get quickNeedsConnection;
+
+  /// No description provided for @offlineRejectedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}'**
+  String offlineRejectedTitle(int count);
+
+  /// No description provided for @offlineRejectedBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Их не принял сервер — запишите заново.'**
+  String get offlineRejectedBody;
+
+  /// No description provided for @offlineRejectedDismiss.
+  ///
+  /// In ru, this message translates to:
+  /// **'Понятно'**
+  String get offlineRejectedDismiss;
+
   /// No description provided for @quickRecordVaccination.
   ///
   /// In ru, this message translates to:

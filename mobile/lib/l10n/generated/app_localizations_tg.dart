@@ -440,6 +440,27 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickRecordFeeding => 'Хӯрокдиҳиро сабт кардан';
 
   @override
+  String get quickNeedsConnection => 'Алоқа лозим аст';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сабт нигоҳ дошта нашуданд',
+      one: '$count сабт нигоҳ дошта нашуд',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'Сервер онҳоро қабул накард — аз нав нависед.';
+
+  @override
+  String get offlineRejectedDismiss => 'Фаҳмидам';
+
+  @override
   String get quickRecordVaccination => 'Эмкуниро сабт кардан';
 
   @override

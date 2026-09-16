@@ -95,11 +95,17 @@ class MedicalRecordsRepository {
 
   /// Create new medical record
   Future<MedicalRecord> createMedicalRecord(
-      MedicalRecordCreate medicalRecord) async {
+          MedicalRecordCreate medicalRecord) =>
+      createMedicalRecordFromJson(medicalRecord.toJson());
+
+  /// То же, но из готового тела запроса — для отложенной очереди, которая
+  /// хранит запись на диске уже сериализованной.
+  Future<MedicalRecord> createMedicalRecordFromJson(
+      Map<String, dynamic> data) async {
     try {
       final response = await _apiClient.post(
         ApiEndpoints.medicalRecords,
-        data: medicalRecord.toJson(),
+        data: data,
       );
 
       if (response.data['success'] == true) {

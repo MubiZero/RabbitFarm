@@ -184,6 +184,15 @@
   "farmTitle": "Хозяйство",
   "navQuickTitle": "Что записать",
   "quickRecordFeeding": "Записать кормление",
+  "quickNeedsConnection": "Нужна связь",
+  "offlineRejectedTitle": "{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Их не принял сервер — запишите заново.",
+  "offlineRejectedDismiss": "Понятно",
   "quickRecordVaccination": "Записать вакцинацию",
   "quickCreateTask": "Создать задачу",
   "quickRecordNote": "Оставить заметку",

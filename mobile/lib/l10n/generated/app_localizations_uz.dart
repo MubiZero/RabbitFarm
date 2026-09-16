@@ -440,6 +440,27 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickRecordFeeding => 'Oziqlantirishni yozish';
 
   @override
+  String get quickNeedsConnection => 'Aloqa kerak';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count yozuv saqlanmadi',
+      one: '$count yozuv saqlanmadi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'Server ularni qabul qilmadi — qaytadan yozing.';
+
+  @override
+  String get offlineRejectedDismiss => 'Tushunarli';
+
+  @override
   String get quickRecordVaccination => 'Emlashni yozish';
 
   @override

@@ -439,6 +439,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickRecordFeeding => 'Log a feeding';
 
   @override
+  String get quickNeedsConnection => 'Needs connection';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records were not saved',
+      one: '$count record was not saved',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'The server rejected them — please enter them again.';
+
+  @override
+  String get offlineRejectedDismiss => 'Got it';
+
+  @override
   String get quickRecordVaccination => 'Log a vaccination';
 
   @override

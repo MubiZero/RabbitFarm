@@ -438,6 +438,28 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickRecordFeeding => 'Записать кормление';
 
   @override
+  String get quickNeedsConnection => 'Нужна связь';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записи не сохранились',
+      many: '$count записей не сохранились',
+      few: '$count записи не сохранились',
+      one: '$count запись не сохранилась',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody => 'Их не принял сервер — запишите заново.';
+
+  @override
+  String get offlineRejectedDismiss => 'Понятно';
+
+  @override
   String get quickRecordVaccination => 'Записать вакцинацию';
 
   @override

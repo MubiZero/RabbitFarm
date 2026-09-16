@@ -135,6 +135,15 @@
   "farmTitle": "Хоҷагӣ",
   "navQuickTitle": "Чиро сабт кунем",
   "quickRecordFeeding": "Хӯрокдиҳиро сабт кардан",
+  "quickNeedsConnection": "Алоқа лозим аст",
+  "offlineRejectedTitle": "{count, plural, one{{count} сабт нигоҳ дошта нашуд} other{{count} сабт нигоҳ дошта нашуданд}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Сервер онҳоро қабул накард — аз нав нависед.",
+  "offlineRejectedDismiss": "Фаҳмидам",
   "quickRecordVaccination": "Эмкуниро сабт кардан",
   "quickCreateTask": "Вазифа сохтан",
   "quickRecordNote": "Қайд гузоштан",

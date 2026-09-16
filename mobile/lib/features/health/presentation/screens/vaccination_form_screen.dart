@@ -11,6 +11,8 @@ import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 
 /// Форма записи о прививке.
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -112,6 +114,17 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
       cost: parseDecimal(_cost.text) ?? (_isEditing ? 0 : null),
       notes: _optional(_notes),
     );
+
+    // Прививку ставят, стоя рядом с кроликом в сарае, где связи обычно нет.
+    // Новая запись уходит в очередь и досылается сама; правку откладывать
+    // нельзя — она относится к записи, которая на сервере уже есть, и
+    // досылка вслепую затёрла бы то, что за это время изменил кто-то другой.
+    if (!_isEditing && !(ref.read(isOnlineProvider).value ?? true)) {
+      await ref
+          .read(offlineQueueProvider.notifier)
+          .enqueue(OfflineActionType.vaccination, request.toJson());
+      return null;
+    }
 
     final ok = _isEditing
         ? await notifier.updateVaccination(_record!.id, request)

@@ -136,6 +136,15 @@
   "farmTitle": "Xoʻjalik",
   "navQuickTitle": "Nimani yozamiz",
   "quickRecordFeeding": "Oziqlantirishni yozish",
+  "quickNeedsConnection": "Aloqa kerak",
+  "offlineRejectedTitle": "{count, plural, one{{count} yozuv saqlanmadi} other{{count} yozuv saqlanmadi}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Server ularni qabul qilmadi — qaytadan yozing.",
+  "offlineRejectedDismiss": "Tushunarli",
   "quickRecordVaccination": "Emlashni yozish",
   "quickCreateTask": "Vazifa yaratish",
   "quickRecordNote": "Eslatma qoldirish",

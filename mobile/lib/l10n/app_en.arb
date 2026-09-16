@@ -135,6 +135,15 @@
   "farmTitle": "Farm",
   "navQuickTitle": "What to record",
   "quickRecordFeeding": "Log a feeding",
+  "quickNeedsConnection": "Needs connection",
+  "offlineRejectedTitle": "{count, plural, one{{count} record was not saved} other{{count} records were not saved}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "The server rejected them — please enter them again.",
+  "offlineRejectedDismiss": "Got it",
   "quickRecordVaccination": "Log a vaccination",
   "quickCreateTask": "Create a task",
   "quickRecordNote": "Leave a note",

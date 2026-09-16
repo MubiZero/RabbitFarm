@@ -17,6 +17,9 @@ import '../../features/notes/data/models/note_model.dart';
 import '../../features/notes/presentation/providers/notes_provider.dart';
 import '../../features/rabbits/data/repositories/births_repository.dart';
 import '../../features/rabbits/presentation/providers/births_provider.dart';
+import '../../features/health/data/repositories/vaccinations_repository.dart';
+import '../../features/health/presentation/providers/medical_records_provider.dart';
+import '../../features/health/presentation/providers/vaccinations_provider.dart';
 import '../../features/rabbits/presentation/providers/rabbits_provider.dart';
 import '../../features/tasks/presentation/providers/tasks_provider.dart';
 
@@ -31,6 +34,11 @@ import '../../features/tasks/presentation/providers/tasks_provider.dart';
 /// именно за ними человек достаёт телефон, стоя между клетками, где связи
 /// обычно и нет. Записывать их приходится там, где стоишь, а не там, где
 /// ловит.
+///
+/// Лечение и прививка — последними и по той же причине, только сильнее:
+/// укол ставят, стоя рядом с кроликом в сарае, и именно эти две записи
+/// фермер назвал первыми, когда его спросили, чего не хватает. До сих пор
+/// они пропадали молча: форма говорила «сохранено», а записи не было.
 enum OfflineActionType {
   feedingRecord,
   taskComplete,
@@ -38,6 +46,8 @@ enum OfflineActionType {
   birth,
   breeding,
   rabbitDeath,
+  medicalRecord,
+  vaccination,
 }
 
 /// Одно отложенное действие на диске.
@@ -88,6 +98,52 @@ const _queueCache = ListCache<OfflineQueueItem>(
 );
 
 Map<String, dynamic> _itemToJson(OfflineQueueItem item) => item.toJson();
+
+/// Записи, которые сервер отверг окончательно.
+///
+/// Раньше такая запись просто исчезала: сигнал уходил в Sentry, а человек не
+/// узнавал ничего. Это ломает сам смысл очереди — ей доверили работу именно
+/// потому, что не хотели держать её в голове. Теперь она лежит здесь, пока
+/// человек её не увидит.
+const _rejectedCache = ListCache<OfflineQueueItem>(
+  boxName: 'offline_action_rejected',
+  fromJson: OfflineQueueItem.fromJson,
+  toJson: _itemToJson,
+);
+
+/// Отложенные записи, которые не удалось сохранить.
+final offlineRejectedProvider =
+    StateNotifierProvider<OfflineRejectedController, List<OfflineQueueItem>>((
+  ref,
+) {
+  ref.watch(sessionRevisionProvider);
+  return OfflineRejectedController(ref.read(cacheScopeProvider));
+});
+
+class OfflineRejectedController extends StateNotifier<List<OfflineQueueItem>> {
+  OfflineRejectedController(this._scope) : super(const []) {
+    _restore();
+  }
+
+  final String? _scope;
+
+  Future<void> _restore() async {
+    final items = await _rejectedCache.read(_scope);
+    if (!mounted || items.isEmpty) return;
+    state = items;
+  }
+
+  Future<void> add(OfflineQueueItem item) {
+    state = [...state, item];
+    return _rejectedCache.write(_scope, state);
+  }
+
+  /// Человек увидел список — больше напоминать не о чем.
+  Future<void> clear() {
+    state = const [];
+    return _rejectedCache.write(_scope, state);
+  }
+}
 
 /// Очередь действий, накопленных без связи, и их отправка.
 final offlineQueueProvider =
@@ -207,15 +263,21 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
           await _sendBreeding(item.payload);
         case OfflineActionType.rabbitDeath:
           await _sendRabbitDeath(item.payload);
+        case OfflineActionType.medicalRecord:
+          await _sendMedicalRecord(item.payload);
+        case OfflineActionType.vaccination:
+          await _sendVaccination(item.payload);
       }
       return _SendResult.done;
     } catch (e, stack) {
       if (_isConnectivityFailure(e)) return _SendResult.retryLater;
       // Настоящий отказ сервера — например клетку успели удалить, пока
-      // запись ждала связи. Повторами не лечится, а раздувать очередь
-      // нечем помочь: человек уже не смотрит на экран, где это вводил.
-      // Единственный оставшийся способ не потерять сигнал молча — Sentry.
+      // запись ждала связи. Повторами не лечится, но и молча выбрасывать
+      // нельзя: человек доверил этой очереди работу вместо того, чтобы
+      // держать её в голове. Запись перекладывается в «не удалось
+      // сохранить», и приложение об этом скажет.
       logUncaughtError(e, stack, source: 'offline_queue.${item.type.name}');
+      await _ref.read(offlineRejectedProvider.notifier).add(item);
       return _SendResult.dropped;
     }
   }
@@ -284,6 +346,24 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
   /// Падёж — единственное здесь изменение существующей записи, а не новая.
   /// Конфликта это не добавляет: смерть — состояние окончательное, и вторая
   /// такая же отметка поверх первой ничего не портит.
+  Future<void> _sendMedicalRecord(Map<String, dynamic> payload) async {
+    await _ref
+        .read(medicalRecordsRepositoryProvider)
+        .createMedicalRecordFromJson(payload);
+    if (!mounted) return;
+    _ref.invalidate(medicalRecordsProvider);
+    _ref.invalidate(journalFeedProvider);
+  }
+
+  Future<void> _sendVaccination(Map<String, dynamic> payload) async {
+    await _ref
+        .read(vaccinationsRepositoryProvider)
+        .createVaccinationFromJson(payload);
+    if (!mounted) return;
+    _ref.invalidate(vaccinationsProvider);
+    _ref.invalidate(journalFeedProvider);
+  }
+
   Future<void> _sendRabbitDeath(Map<String, dynamic> payload) async {
     final id = payload['rabbit_id'] as int;
     final data = Map<String, dynamic>.from(payload)..remove('rabbit_id');

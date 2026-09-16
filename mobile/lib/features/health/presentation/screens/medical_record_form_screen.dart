@@ -12,6 +12,8 @@ import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
 import '../utils/medical_labels.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 
 /// Карта лечения: что случилось, чем лечили, чем закончилось.
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
@@ -125,22 +127,33 @@ class _MedicalRecordFormScreenState
           ),
         );
       } else {
-        await notifier.addMedicalRecord(
-          MedicalRecordCreate(
-            rabbitId: _rabbitId!,
-            symptoms: _symptoms.text.trim(),
-            diagnosis: _optional(_diagnosis),
-            treatment: _optional(_treatment),
-            medication: _optional(_medication),
-            dosage: _optional(_dosage),
-            startedAt: _startedAt,
-            endedAt: _endedAt,
-            outcome: outcome,
-            cost: cost,
-            veterinarian: _optional(_veterinarian),
-            notes: _optional(_notes),
-          ),
+        final record = MedicalRecordCreate(
+          rabbitId: _rabbitId!,
+          symptoms: _symptoms.text.trim(),
+          diagnosis: _optional(_diagnosis),
+          treatment: _optional(_treatment),
+          medication: _optional(_medication),
+          dosage: _optional(_dosage),
+          startedAt: _startedAt,
+          endedAt: _endedAt,
+          outcome: outcome,
+          cost: cost,
+          veterinarian: _optional(_veterinarian),
+          notes: _optional(_notes),
         );
+
+        // Лечение записывают там же, где лечат, — в сарае без связи.
+        // Запись уходит в очередь и досылается сама. Правка так не
+        // откладывается: она относится к уже существующей записи, и
+        // досылка вслепую затёрла бы чужие изменения.
+        if (!(ref.read(isOnlineProvider).value ?? true)) {
+          await ref
+              .read(offlineQueueProvider.notifier)
+              .enqueue(OfflineActionType.medicalRecord, record.toJson());
+          return null;
+        }
+
+        await notifier.addMedicalRecord(record);
       }
       return null;
     } catch (e) {
