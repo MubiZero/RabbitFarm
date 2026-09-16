@@ -33,7 +33,10 @@ class AppTheme {
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: accent,
-      onPrimary: Colors.white,
+      // Белый на акценте не читается ни в одной теме: 2.15–4.23 при норме
+      // 4.5. Обе темы строятся этой же функцией, поэтому надпись на кнопке
+      // «Сохранить» была бледной и в тёмной, и в светлой.
+      onPrimary: AppColors.onAccent,
       primaryContainer: accent.withValues(alpha: 0.15),
       onPrimaryContainer: accent,
       secondary: accent,
