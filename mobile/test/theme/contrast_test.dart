@@ -1,8 +1,9 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/theme/app_colors.dart';
+import 'package:mobile/core/theme/app_theme.dart';
 
 /// Читаемость подписей — считаемая величина, а не дело вкуса.
 ///
@@ -111,6 +112,51 @@ void main() {
     test('незнакомый цвет возвращается как есть, а не подменяется чужим', () {
       const custom = Color(0xFF123456);
       expect(AppColors.readableOn(custom, Brightness.light), custom);
+    });
+  });
+
+  group('собранная тема, а не только палитра', () {
+    // Кнопки задают цвет надписи сами, мимо ColorScheme.onPrimary: правка
+    // одной схемы их не касается. Проверка палитры это пропускала — надпись
+    // оставалась белой, хотя константы были верные.
+    for (final brightness in Brightness.values) {
+      for (final accent in AppColors.accentOptions) {
+        test('кнопки читаются: ${brightness.name}, акцент $accent', () {
+          final theme =
+              AppTheme.build(brightness: brightness, accent: accent);
+
+          final filled = theme.filledButtonTheme.style!.foregroundColor!
+              .resolve(const <WidgetState>{})!;
+          final elevated = theme.elevatedButtonTheme.style!.foregroundColor!
+              .resolve(const <WidgetState>{})!;
+          final fab = theme.floatingActionButtonTheme.foregroundColor!;
+
+          for (final entry in {
+            'FilledButton': filled,
+            'ElevatedButton': elevated,
+            'FloatingActionButton': fab,
+          }.entries) {
+            final ratio = contrastRatio(entry.value, accent);
+            expect(
+              ratio,
+              greaterThanOrEqualTo(_minContrast),
+              reason: '${entry.key} в теме ${brightness.name} даёт '
+                  '${ratio.toStringAsFixed(2)} при норме $_minContrast',
+            );
+          }
+        });
+      }
+    }
+
+    test('надпись на красном тоже читается', () {
+      final theme = AppTheme.build(
+        brightness: Brightness.light,
+        accent: AppColors.accentEmerald,
+      );
+      expect(
+        contrastRatio(theme.colorScheme.onError, theme.colorScheme.error),
+        greaterThanOrEqualTo(_minContrast),
+      );
     });
   });
 
