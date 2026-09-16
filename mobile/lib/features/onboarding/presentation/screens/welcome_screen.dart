@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/countries/countries.dart';
+import '../../../../core/countries/country_labels.dart';
+import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -28,7 +31,10 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
-  static const _questionCount = 3;
+  // Вопросов стало четыре: страна добавилась первой. От неё зависят валюта,
+  // часовой пояс и то, предлагать ли вход по СМС, поэтому спросить её нужно
+  // раньше всего остального — и до регистрации, а не после.
+  static const _questionCount = 4;
 
   int _step = 0;
   OnboardingAnswers _answers = const OnboardingAnswers();
@@ -114,27 +120,33 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             onStart: () => _goTo(1),
             onHaveAccount: () => _leaveTo('/login'),
           ),
-        1 => _HerdQuestion(
+        1 => _CountryQuestion(
+            onSelect: (country) async {
+              await ref.read(selectedCountryProvider.notifier).select(country);
+              if (mounted) _goTo(2);
+            },
+          ),
+        2 => _HerdQuestion(
             selected: _answers.herdSize,
             onSelect: (size) {
               setState(() => _answers = _answers.copyWith(herdSize: size));
-              _goTo(2);
+              _goTo(3);
             },
           ),
-        2 => _FocusQuestion(
+        3 => _FocusQuestion(
             selected: _answers.focus,
             onToggle: (focus) => setState(() {
               final next = Set<FarmFocus>.from(_answers.focus);
               next.contains(focus) ? next.remove(focus) : next.add(focus);
               _answers = _answers.copyWith(focus: next);
             }),
-            onNext: () => _goTo(3),
+            onNext: () => _goTo(4),
           ),
-        3 => _CrewQuestion(
+        4 => _CrewQuestion(
             selected: _answers.crew,
             onSelect: (crew) {
               setState(() => _answers = _answers.copyWith(crew: crew));
-              _goTo(4);
+              _goTo(5);
             },
           ),
         _ => _Summary(answers: _answers, onCreate: () => _leaveTo('/register')),
@@ -245,6 +257,41 @@ class _Greeting extends StatelessWidget {
           child: Text(l10n.onbWelcomeHaveAccount),
         ),
         const SizedBox(height: AppSpacing.lg),
+      ],
+    );
+  }
+}
+
+/// Где хозяйство.
+///
+/// Первый вопрос знакомства и единственный, чей ответ уходит на сервер: из
+/// страны выводятся валюта хозяйства и часовой пояс, по которому у него
+/// кончаются сутки. Под каждой строкой сразу сказано, чем здесь считают
+/// деньги и как входят, — иначе последствия выбора человек увидел бы только
+/// после регистрации.
+class _CountryQuestion extends ConsumerWidget {
+  const _CountryQuestion({required this.onSelect});
+
+  final ValueChanged<Country> onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final selected = ref.watch(selectedCountryProvider).value;
+
+    return OnboardingStep(
+      title: l10n.onbCountryTitle,
+      subtitle: l10n.onbCountrySubtitle,
+      children: [
+        for (final country in kCountries) ...[
+          OnboardingChoiceCard(
+            label: countryName(context, country.code),
+            description: countryHint(context, country),
+            selected: selected?.code == country.code,
+            onTap: () => onSelect(country),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
       ],
     );
   }

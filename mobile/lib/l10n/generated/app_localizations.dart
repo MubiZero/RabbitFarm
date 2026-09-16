@@ -4506,6 +4506,24 @@ abstract class AppLocalizations {
   /// **'Оплатить'**
   String get subscriptionPay;
 
+  /// No description provided for @subscriptionPayAbroadTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплата картой пока только в Таджикистане'**
+  String get subscriptionPayAbroadTitle;
+
+  /// No description provided for @subscriptionPayAbroadBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мы продлим тариф вручную — напишите в поддержку, и вам ответят.'**
+  String get subscriptionPayAbroadBody;
+
+  /// No description provided for @subscriptionPayAbroadAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать в поддержку'**
+  String get subscriptionPayAbroadAction;
+
   /// No description provided for @subscriptionOpenPaymentPage.
   ///
   /// In ru, this message translates to:
@@ -7931,6 +7949,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пропустить'**
   String get onbSkip;
+
+  /// No description provided for @onbCountryTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Где ваше хозяйство?'**
+  String get onbCountryTitle;
+
+  /// No description provided for @onbCountrySubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'От этого зависят валюта, время и способ входа'**
+  String get onbCountrySubtitle;
+
+  /// No description provided for @countryTJ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таджикистан'**
+  String get countryTJ;
+
+  /// No description provided for @countryUZ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Узбекистан'**
+  String get countryUZ;
+
+  /// No description provided for @countryKG.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кыргызстан'**
+  String get countryKG;
+
+  /// No description provided for @countryKZ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Казахстан'**
+  String get countryKZ;
+
+  /// No description provided for @countryRU.
+  ///
+  /// In ru, this message translates to:
+  /// **'Россия'**
+  String get countryRU;
+
+  /// No description provided for @countryAF.
+  ///
+  /// In ru, this message translates to:
+  /// **'Афганистан'**
+  String get countryAF;
+
+  /// No description provided for @loginSmsUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'В вашей стране код по СМС не приходит — входите по почте'**
+  String get loginSmsUnavailable;
 
   /// No description provided for @firstStepCages.
   ///

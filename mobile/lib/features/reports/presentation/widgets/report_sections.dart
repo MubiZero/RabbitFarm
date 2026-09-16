@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Общие кирпичи трёх отчётов.
 ///
@@ -16,16 +16,13 @@ import '../../../../core/widgets/widgets.dart';
 
 /// Выбор периода отчёта.
 ///
-/// «Всё время» из [StatsPeriod] здесь намеренно нет: сервер, не получив
-/// `from_date`, считает отчёт по ферме за последние 30 дней. Подпись обещала бы
-/// историю фермы целиком, а цифры пришли бы за месяц — это хуже, чем не
-/// предлагать такой выбор вовсе.
+/// «Всё время» вернулось в список: раньше его убрали, потому что сервер, не
+/// получив `from_date`, считал отчёт по ферме за последние 30 дней — подпись
+/// обещала бы историю целиком, а числа пришли бы за месяц. Теперь пустой
+/// период на сервере и означает «за всё время», одинаково для всех трёх
+/// вкладок, и предлагать этот выбор снова честно.
 class ReportPeriodBar extends StatelessWidget {
-  static const periods = [
-    StatsPeriod.month,
-    StatsPeriod.quarter,
-    StatsPeriod.year,
-  ];
+  static const periods = StatsPeriod.values;
 
   final StatsPeriod selected;
   final ValueChanged<StatsPeriod> onChanged;
@@ -281,7 +278,7 @@ class ReportMoneySummary extends StatelessWidget {
               child: StatTile(
                 icon: Icons.arrow_upward,
                 label: context.l10n.financeIncome,
-                value: formatMoney(income),
+                value: context.money(income),
                 accent: AppColors.success,
               ),
             ),
@@ -290,7 +287,7 @@ class ReportMoneySummary extends StatelessWidget {
               child: StatTile(
                 icon: Icons.arrow_downward,
                 label: context.l10n.financeExpenses,
-                value: formatMoney(expenses),
+                value: context.money(expenses),
                 accent: AppColors.error,
               ),
             ),
@@ -320,7 +317,7 @@ class ReportMoneySummary extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      formatMoney(netProfit.abs()),
+                      context.money(netProfit.abs()),
                       style: AppTypography.displayMd.copyWith(
                         color: isProfit ? AppColors.success : AppColors.error,
                         fontFeatures: const [FontFeature.tabularFigures()],

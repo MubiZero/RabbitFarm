@@ -64,6 +64,27 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('breeding', 'meat', 'sale', 'show'),
       allowNull: true
     },
+    // Страна хозяйства, а из неё — валюта, часовой пояс и способ входа
+    // (см. config/countries.js). Держать валюту и пояс отдельными колонками,
+    // а не выводить из страны на лету, нужно ради двух случаев: валюта
+    // фиксируется в момент создания и не должна меняться под ногами у уже
+    // записанных сумм, а пояс хозяйство может поправить само, если сидит
+    // не в столичном.
+    country: {
+      type: DataTypes.CHAR(2),
+      allowNull: false,
+      defaultValue: 'TJ'
+    },
+    currency: {
+      type: DataTypes.CHAR(3),
+      allowNull: false,
+      defaultValue: 'TJS'
+    },
+    timezone: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      defaultValue: 'Asia/Dushanbe'
+    },
     // Разовая поблажка сверх лимита тарифа, а не смена тарифа: тариф
     // остаётся тем же, поблажка просто складывается с его пределом.
     extra_rabbits: {

@@ -2469,6 +2469,17 @@ class AppLocalizationsUz extends AppLocalizations {
   String get subscriptionPay => 'Toʻlash';
 
   @override
+  String get subscriptionPayAbroadTitle =>
+      'Karta bilan toʻlov hozircha faqat Tojikistonda';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Tarifni qoʻlda uzaytiramiz — qoʻllab-quvvatlashga yozing, javob berishadi.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Qoʻllab-quvvatlashga yozish';
+
+  @override
   String get subscriptionOpenPaymentPage => 'Toʻlov sahifasini ochish';
 
   @override
@@ -4467,6 +4478,35 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get onbSkip => 'Oʻtkazib yuborish';
+
+  @override
+  String get onbCountryTitle => 'Xoʻjaligingiz qayerda?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Valyuta, vaqt va kirish usuli shunga bogʻliq';
+
+  @override
+  String get countryTJ => 'Tojikiston';
+
+  @override
+  String get countryUZ => 'Oʻzbekiston';
+
+  @override
+  String get countryKG => 'Qirgʻiziston';
+
+  @override
+  String get countryKZ => 'Qozogʻiston';
+
+  @override
+  String get countryRU => 'Rossiya';
+
+  @override
+  String get countryAF => 'Afgʻoniston';
+
+  @override
+  String get loginSmsUnavailable =>
+      'Sizning mamlakatingizga SMS kod kelmaydi — pochta orqali kiring';
 
   @override
   String get firstStepCages => 'Kataklarni kiriting';

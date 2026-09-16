@@ -4,6 +4,7 @@ const JWTUtil = require('../utils/jwt');
 const jwtConfig = require('../config/jwt');
 const logger = require('../utils/logger');
 const planService = require('./planService');
+const { countryConfig } = require('../config/countries');
 
 /**
  * Authentication service
@@ -62,6 +63,14 @@ class AuthService {
       }
 
       if (userData.phone) {
+        // Телефон как логин имеет смысл только там, куда доходит код: шлюз у
+        // нас таджикский. Заводить хозяйство в другой стране на номер,
+        // которому мы не можем ничего прислать, — значит выдать человеку
+        // логин, которым он не войдёт.
+        if (!countryConfig(userData.country).sms) {
+          throw new Error('PHONE_LOGIN_UNAVAILABLE');
+        }
+
         const existingPhone = await User.findOne({
           where: { phone: userData.phone },
           transaction
@@ -82,10 +91,19 @@ class AuthService {
       // ферма остаётся без плана, как и раньше.
       const defaultPlan = await planService.getDefault();
 
+      // Страну спрашивают в знакомстве, до регистрации. Валюта и часовой
+      // пояс из неё выводятся здесь и дальше живут своими колонками: валюта
+      // не должна меняться под ногами у уже записанных сумм, а пояс
+      // хозяйство может поправить само, если сидит не в столичном.
+      const country = countryConfig(userData.country);
+
       const farm = await Farm.create({
         name: (userData.farm_name || '').trim() || `Ферма ${userData.full_name}`,
         owner_id: null,
-        plan_id: defaultPlan ? defaultPlan.id : null
+        plan_id: defaultPlan ? defaultPlan.id : null,
+        country: country.code,
+        currency: country.currency,
+        timezone: country.timezone
       }, { transaction });
 
       const user = await User.create({
@@ -248,7 +266,7 @@ class AuthService {
       // read_only/suspended сразу при обновлении профиля (в частности, при
       // каждом холодном старте), а не по отказу очередной записи.
       const user = await User.findByPk(userId, {
-          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose'] }]
+          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose', 'country', 'currency', 'timezone'] }]
       });
 
       if (!user) {

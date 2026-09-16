@@ -11,6 +11,7 @@ const router = express.Router();
  */
 const modules = [
   ['/auth', require('./auth.routes')],
+  ['/countries', require('./country.routes')],
   ['/staff', require('./staff.routes')],
   ['/rabbits', require('./rabbit.routes')],
   ['/breeds', require('./breed.routes')],

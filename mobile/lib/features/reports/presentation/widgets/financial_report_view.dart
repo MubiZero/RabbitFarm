@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../finance/data/models/transaction_model.dart';
 import '../../../finance/presentation/utils/transaction_labels.dart';
 import '../../data/models/report_model.dart';
 import '../providers/reports_provider.dart';
 import 'report_sections.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Финансовый отчёт: доход, расход, итог и структура по категориям.
 ///
@@ -99,7 +99,7 @@ class FinancialReportView extends ConsumerWidget {
       label: category == null
           ? data.category
           : transactionCategoryLabel(context, category),
-      value: formatMoney(data.total),
+      value: context.money(data.total),
       amount: data.total,
       icon: category?.icon,
     );

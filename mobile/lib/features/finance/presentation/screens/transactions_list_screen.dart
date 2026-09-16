@@ -7,12 +7,12 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/image_url_helper.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Ведомость доходов и расходов.
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -288,7 +288,7 @@ class _SummaryItem extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              formatMoney(amount),
+              context.money(amount),
               style: AppTypography.titleMd.copyWith(color: color),
             ),
           ),
@@ -433,7 +433,7 @@ class _TransactionCard extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(
-            '${isIncome ? '+' : '−'}${formatMoney(transaction.amount)}',
+            '${isIncome ? '+' : '−'}${context.money(transaction.amount)}',
             style: AppTypography.titleMd.copyWith(color: color),
           ),
         ],
@@ -594,7 +594,7 @@ class _DetailsSheet extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
-                    '${isIncome ? '+' : '−'}${formatMoney(transaction.amount)}',
+                    '${isIncome ? '+' : '−'}${context.money(transaction.amount)}',
                     style: AppTypography.displayMd.copyWith(color: color),
                   ),
                 ),

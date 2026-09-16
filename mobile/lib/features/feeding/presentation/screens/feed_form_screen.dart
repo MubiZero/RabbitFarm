@@ -8,6 +8,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Карточка корма на складе.
 class FeedFormScreen extends ConsumerStatefulWidget {
@@ -260,7 +261,8 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.feedFormCost,
                 prefixIcon: const Icon(Icons.payments_outlined),
-                suffixText: '$kCurrencySymbol/${_unit.displayName}',
+                suffixText:
+                    '${context.currencySymbol}/${_unit.displayName}',
               ),
               validator: (v) => _validateAmount(v, required: false),
             ),

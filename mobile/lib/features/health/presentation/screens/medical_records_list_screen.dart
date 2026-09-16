@@ -6,11 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
 import '../utils/medical_labels.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Карты лечения.
 class MedicalRecordsListScreen extends ConsumerStatefulWidget {
@@ -353,7 +353,7 @@ class _RecordCard extends StatelessWidget {
                       size: 16, color: context.colors.onSurfaceVariant),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    formatMoney(record.cost!),
+                    context.money(record.cost!),
                     style: AppTypography.labelSm
                         .copyWith(color: context.colors.onSurfaceVariant),
                   ),
@@ -527,7 +527,7 @@ class _DetailsSheet extends ConsumerWidget {
                 _Row(
                   icon: Icons.payments_outlined,
                   label: context.l10n.medCost,
-                  value: formatMoney(record.cost!),
+                  value: context.money(record.cost!),
                 ),
               if (record.veterinarian?.trim().isNotEmpty == true)
                 _Row(
@@ -653,7 +653,7 @@ class _StatisticsSheet extends ConsumerWidget {
                 const Divider(height: AppSpacing.xxl),
                 _StatLine(
                   label: context.l10n.medStatCost,
-                  value: formatMoney(stats.totalCost),
+                  value: context.money(stats.totalCost),
                 ),
                 _StatLine(
                   label: context.l10n.medStatThisYear,

@@ -18,6 +18,7 @@ import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -278,7 +279,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.txFormAmount,
                 prefixIcon: const Icon(Icons.payments_outlined),
-                suffixText: kCurrencySymbol,
+                suffixText: context.currencySymbol,
               ),
               validator: (v) {
                 final value = parseDecimal(v);

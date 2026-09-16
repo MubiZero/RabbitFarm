@@ -2462,6 +2462,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionPay => 'Pay';
 
   @override
+  String get subscriptionPayAbroadTitle =>
+      'Card payment is available in Tajikistan only for now';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'We will extend your plan manually — message support and they will reply.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Message support';
+
+  @override
   String get subscriptionOpenPaymentPage => 'Open payment page';
 
   @override
@@ -4459,6 +4470,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onbSkip => 'Skip';
+
+  @override
+  String get onbCountryTitle => 'Where is your farm?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Currency, time and sign-in method depend on this';
+
+  @override
+  String get countryTJ => 'Tajikistan';
+
+  @override
+  String get countryUZ => 'Uzbekistan';
+
+  @override
+  String get countryKG => 'Kyrgyzstan';
+
+  @override
+  String get countryKZ => 'Kazakhstan';
+
+  @override
+  String get countryRU => 'Russia';
+
+  @override
+  String get countryAF => 'Afghanistan';
+
+  @override
+  String get loginSmsUnavailable =>
+      'SMS codes do not reach your country — sign in by email';
 
   @override
   String get firstStepCages => 'Set up your cages';

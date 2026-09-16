@@ -10,6 +10,7 @@ import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/error_text.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -26,7 +27,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _contactController = TextEditingController();
 
   /// Телефон основной, почта запасная — те же два способа, что и на входе.
-  bool _byPhone = true;
+  /// Что выбрал человек. Доступен ли этот способ вообще — решает страна:
+  /// туда, куда СМС не доходит, телефон не предлагается вовсе.
+  bool _byPhoneChoice = true;
+
+  /// Способ, которым регистрация пойдёт на самом деле.
+  ///
+  /// Туда, куда код по СМС не доходит, телефон не предлагается вовсе —
+  /// иначе человек введёт номер и будет ждать сообщения, которого не будет.
+  bool get _byPhone => _byPhoneChoice && ref.read(smsAvailableProvider);
   bool _acceptedPrivacy = false;
   late final TapGestureRecognizer _privacyLinkRecognizer;
 
@@ -72,6 +81,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               farmName: _farmNameController.text.trim().isNotEmpty
                   ? _farmNameController.text.trim()
                   : null,
+              country: ref.read(selectedCountryProvider).value?.code,
             );
 
         // Сессия ещё не открыта: регистрация только отправила код. Экран
@@ -235,25 +245,54 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Контакт: на него придёт код для входа — пароля в сервисе
                 // нет, и другого способа попасть в аккаунт тоже.
-                SegmentedButton<bool>(
-                  segments: [
-                    ButtonSegment(
-                      value: true,
-                      icon: const Icon(Icons.phone_outlined, size: 18),
-                      label: Text(context.l10n.loginByPhone),
+                //
+                // Выбор способа показывается только там, куда СМС доходит.
+                // В остальных странах предлагать телефон нечестно: человек
+                // введёт номер и будет ждать код, которого не будет, —
+                // поэтому вместо переключателя стоит объяснение.
+                if (!ref.watch(smsAvailableProvider))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.alternate_email,
+                          size: 18,
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.l10n.loginSmsUnavailable,
+                            style: AppTypography.labelSm.copyWith(
+                              color: context.colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    ButtonSegment(
-                      value: false,
-                      icon: const Icon(Icons.alternate_email, size: 18),
-                      label: Text(context.l10n.loginByEmail),
-                    ),
-                  ],
-                  selected: {_byPhone},
-                  onSelectionChanged: (value) => setState(() {
-                    _byPhone = value.first;
-                    _contactController.clear();
-                  }),
-                ),
+                  )
+                else
+                  SegmentedButton<bool>(
+                    segments: [
+                      ButtonSegment(
+                        value: true,
+                        icon: const Icon(Icons.phone_outlined, size: 18),
+                        label: Text(context.l10n.loginByPhone),
+                      ),
+                      ButtonSegment(
+                        value: false,
+                        icon: const Icon(Icons.alternate_email, size: 18),
+                        label: Text(context.l10n.loginByEmail),
+                      ),
+                    ],
+                    selected: {_byPhone},
+                    onSelectionChanged: (value) => setState(() {
+                      _byPhoneChoice = value.first;
+                      _contactController.clear();
+                    }),
+                  ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _contactController,

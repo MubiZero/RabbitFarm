@@ -1,5 +1,6 @@
 const { Plan, Farm, Rabbit, User } = require('../models');
 const logger = require('../utils/logger');
+const { countryConfig } = require('../config/countries');
 
 /**
  * Тарифные планы и проверка лимитов фермы.
@@ -257,6 +258,15 @@ class PlanService {
     }
     if (this.isPlanFree(farm.plan)) {
       throw new Error('PLAN_FREE');
+    }
+
+    // Карту принимает банк «Эсхата», и карта другой страны через него не
+    // пройдёт. Отдавать такой ферме счёт значило бы вести её к оплате,
+    // которая заведомо сорвётся, — а это ровно тот тупик, что вычищал
+    // docs/plans/DEAD-ENDS.md. Продление идёт через поддержку, и экран
+    // подписки говорит об этом прямо.
+    if (!countryConfig(farm.country).payments) {
+      throw new Error('PAYMENTS_UNAVAILABLE_IN_COUNTRY');
     }
 
     // `plan` отдельным полем, а не разбором `description`: его сохраняет

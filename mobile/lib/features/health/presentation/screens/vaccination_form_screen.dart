@@ -10,6 +10,7 @@ import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Форма записи о прививке.
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -323,7 +324,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                labelText: l10n.medFormCostLabel(kCurrencySymbol),
+                labelText: l10n.medFormCostLabel(context.currencySymbol),
                 prefixIcon: const Icon(Icons.payments_outlined),
                 // Та же подпись, что у лечения: сумма не просто лежит в
                 // карточке — сервер заводит на неё расход фермы.

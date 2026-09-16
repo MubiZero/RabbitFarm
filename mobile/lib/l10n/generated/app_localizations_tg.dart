@@ -2455,6 +2455,17 @@ class AppLocalizationsTg extends AppLocalizations {
   String get subscriptionPay => 'Пардохт кардан';
 
   @override
+  String get subscriptionPayAbroadTitle =>
+      'Пардохт бо корт ҳоло танҳо дар Тоҷикистон';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Мо тарифро дастӣ дароз мекунем — ба дастгирӣ нависед, ҷавоб медиҳанд.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Ба дастгирӣ навиштан';
+
+  @override
   String get subscriptionOpenPaymentPage => 'Саҳифаи пардохтро кушодан';
 
   @override
@@ -4434,6 +4445,35 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get onbSkip => 'Гузарондан';
+
+  @override
+  String get onbCountryTitle => 'Хоҷагии шумо дар куҷост?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст';
+
+  @override
+  String get countryTJ => 'Тоҷикистон';
+
+  @override
+  String get countryUZ => 'Ӯзбекистон';
+
+  @override
+  String get countryKG => 'Қирғизистон';
+
+  @override
+  String get countryKZ => 'Қазоқистон';
+
+  @override
+  String get countryRU => 'Русия';
+
+  @override
+  String get countryAF => 'Афғонистон';
+
+  @override
+  String get loginSmsUnavailable =>
+      'Дар кишвари шумо рамз бо СМС намеояд — бо почта ворид шавед';
 
   @override
   String get firstStepCages => 'Қафасҳоро эҷод кунед';

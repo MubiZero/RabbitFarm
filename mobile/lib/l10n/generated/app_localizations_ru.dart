@@ -2489,6 +2489,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get subscriptionPay => 'Оплатить';
 
   @override
+  String get subscriptionPayAbroadTitle =>
+      'Оплата картой пока только в Таджикистане';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Мы продлим тариф вручную — напишите в поддержку, и вам ответят.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Написать в поддержку';
+
+  @override
   String get subscriptionOpenPaymentPage => 'Открыть страницу оплаты';
 
   @override
@@ -4520,6 +4531,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onbSkip => 'Пропустить';
+
+  @override
+  String get onbCountryTitle => 'Где ваше хозяйство?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'От этого зависят валюта, время и способ входа';
+
+  @override
+  String get countryTJ => 'Таджикистан';
+
+  @override
+  String get countryUZ => 'Узбекистан';
+
+  @override
+  String get countryKG => 'Кыргызстан';
+
+  @override
+  String get countryKZ => 'Казахстан';
+
+  @override
+  String get countryRU => 'Россия';
+
+  @override
+  String get countryAF => 'Афганистан';
+
+  @override
+  String get loginSmsUnavailable =>
+      'В вашей стране код по СМС не приходит — входите по почте';
 
   @override
   String get firstStepCages => 'Завести клетки';

@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Аналитика финансов: доходы, расходы, прибыль и структура по категориям.
 class TransactionStatisticsScreen extends ConsumerStatefulWidget {
@@ -80,13 +80,13 @@ class _TransactionStatisticsScreenState
               StatTile(
                 icon: Icons.arrow_upward,
                 label: context.l10n.financeIncome,
-                value: formatMoney(stats.totalIncome),
+                value: context.money(stats.totalIncome),
                 accent: AppColors.success,
               ),
               StatTile(
                 icon: Icons.arrow_downward,
                 label: context.l10n.financeExpenses,
-                value: formatMoney(stats.totalExpenses),
+                value: context.money(stats.totalExpenses),
                 accent: AppColors.error,
               ),
             ],
@@ -117,7 +117,7 @@ class _TransactionStatisticsScreenState
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        formatMoney(stats.netProfit.abs()),
+                        context.money(stats.netProfit.abs()),
                         style: AppTypography.displayMd.copyWith(
                           color: isProfit ? AppColors.success : AppColors.error,
                         ),
@@ -198,7 +198,7 @@ class _CategoryBreakdown extends StatelessWidget {
                 MetricBar(
                   icon: item.category.icon,
                   label: transactionCategoryLabel(context, item.category),
-                  value: formatMoney(item.total),
+                  value: context.money(item.total),
                   fraction: max == 0 ? 0 : item.total / max,
                   color: color,
                 ),
@@ -251,7 +251,7 @@ class _RecentTransactionRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '${isIncome ? '+' : '−'}${formatMoney(transaction.amount)}',
+            '${isIncome ? '+' : '−'}${context.money(transaction.amount)}',
             style: AppTypography.labelLg.copyWith(color: color),
           ),
         ],

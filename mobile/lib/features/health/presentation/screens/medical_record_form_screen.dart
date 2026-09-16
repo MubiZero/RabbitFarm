@@ -11,6 +11,7 @@ import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
 import '../utils/medical_labels.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Карта лечения: что случилось, чем лечили, чем закончилось.
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
@@ -316,7 +317,7 @@ class _MedicalRecordFormScreenState
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                labelText: l10n.medFormCostLabel(kCurrencySymbol),
+                labelText: l10n.medFormCostLabel(context.currencySymbol),
                 prefixIcon: const Icon(Icons.payments_outlined),
                 // Сумма не просто хранится в карте: сервер заводит на неё
                 // расход. Пользователь должен знать об этом до сохранения.

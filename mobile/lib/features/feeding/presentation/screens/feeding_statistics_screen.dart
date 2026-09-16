@@ -11,6 +11,7 @@ import '../providers/feeding_records_provider.dart';
 import '../utils/feed_labels.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Аналитика кормлений: сколько раз кормили, чем и на какую сумму.
 class FeedingStatisticsScreen extends ConsumerStatefulWidget {
@@ -95,7 +96,7 @@ class _FeedingStatisticsScreenState
               StatTile(
                 icon: Icons.payments_outlined,
                 label: context.l10n.feedingStatsCost,
-                value: formatMoney(stats.totalCost),
+                value: context.money(stats.totalCost),
                 accent: AppColors.accentSunset,
               ),
             ],
@@ -243,7 +244,7 @@ class _FeedUsageRow extends StatelessWidget {
               ),
               if (usage.cost > 0)
                 Text(
-                  formatMoney(usage.cost),
+                  context.money(usage.cost),
                   style: AppTypography.labelSm.copyWith(
                     color: cs.onSurfaceVariant,
                   ),

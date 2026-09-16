@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 const { LANGUAGES } = require('../i18n/notifications');
+const { COUNTRY_CODES } = require('../config/countries');
 
 /**
  * Authentication validation schemas
@@ -83,6 +84,17 @@ const registerSchema = Joi.object({
     .messages({
       'string.min': 'Название хозяйства должно быть минимум 2 символа',
       'string.max': 'Название хозяйства должно быть максимум 255 символов'
+    }),
+
+  // Страна хозяйства. Из неё берутся валюта и часовой пояс, поэтому она
+  // спрашивается в знакомстве, до регистрации. Не прислали — Таджикистан,
+  // как у всех ферм, заведённых до появления выбора.
+  country: Joi.string()
+    .uppercase()
+    .valid(...COUNTRY_CODES)
+    .optional()
+    .messages({
+      'any.only': 'Неизвестная страна'
     })
 
   // Роль здесь не принимается намеренно: её назначает сервис (регистрация

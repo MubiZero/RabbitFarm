@@ -14,6 +14,7 @@ import '../../../../core/widgets/app_brand_mark.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pin_provider.dart';
+import '../../../../core/countries/country_provider.dart';
 
 /// Вход по коду — единственный способ попасть в аккаунт: телефон основной
 /// путь, почта запасной, оба ведут к одному и тому же шагу кода. Приглашение
@@ -58,7 +59,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   /// Телефон — основной способ входа, почта — запасной. Ведут себя
   /// одинаково: контакт, код, вход.
-  bool _byPhone = true;
+  ///
+  /// В стране, куда СМС не доходит, остаётся только почта — что бы человек
+  /// ни выбирал: выбор и доступность держатся порознь.
+  bool _byPhoneChoice = true;
+
+  /// Способ, которым вход пойдёт на самом деле.
+  bool get _byPhone => _byPhoneChoice && ref.read(smsAvailableProvider);
 
   /// Контакт, на который ушёл код, — уже приведённый к тому виду, в котором
   /// его ждёт сервер. Пусто ровно тогда, когда мы на шаге ввода контакта.
@@ -76,7 +83,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final email = widget.initialEmail;
 
     if (email != null && email.isNotEmpty) {
-      _byPhone = false;
+      _byPhoneChoice = false;
       _contactController.text = email;
     } else if (phone != null && phone.isNotEmpty) {
       _contactController.text = formatTjPhone(normalizeTjPhone(phone));
@@ -206,7 +213,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _switchContactKind(bool byPhone) {
     if (byPhone == _byPhone) return;
     setState(() {
-      _byPhone = byPhone;
+      _byPhoneChoice = byPhone;
       _contactController.clear();
     });
   }
@@ -285,23 +292,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         children: [
           // Телефон первым: код в SMS доходит и без интернета на телефоне,
           // почта нужна тем, у кого номер не таджикский или SMS не приходят.
-          SegmentedButton<bool>(
-            segments: [
-              ButtonSegment(
-                value: true,
-                icon: const Icon(Icons.phone_outlined, size: 18),
-                label: Text(context.l10n.loginByPhone),
+          //
+          // В стране, куда СМС не доходит вовсе, выбора нет: телефон не
+          // предлагаем, вместо переключателя — объяснение, почему.
+          if (!ref.watch(smsAvailableProvider))
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.alternate_email,
+                    size: 18,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      context.l10n.loginSmsUnavailable,
+                      style: AppTypography.labelSm.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              ButtonSegment(
-                value: false,
-                icon: const Icon(Icons.alternate_email, size: 18),
-                label: Text(context.l10n.loginByEmail),
-              ),
-            ],
-            selected: {_byPhone},
-            onSelectionChanged:
-                busy ? null : (value) => _switchContactKind(value.first),
-          ),
+            )
+          else
+            SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(
+                  value: true,
+                  icon: const Icon(Icons.phone_outlined, size: 18),
+                  label: Text(context.l10n.loginByPhone),
+                ),
+                ButtonSegment(
+                  value: false,
+                  icon: const Icon(Icons.alternate_email, size: 18),
+                  label: Text(context.l10n.loginByEmail),
+                ),
+              ],
+              selected: {_byPhone},
+              onSelectionChanged:
+                  busy ? null : (value) => _switchContactKind(value.first),
+            ),
           const SizedBox(height: AppSpacing.lg),
           TextFormField(
             controller: _contactController,
