@@ -1,11 +1,12 @@
 const { randomUUID } = require('crypto');
 const { Op } = require('sequelize');
-const { Rabbit, Birth, Breeding, Task, Breed, Cage } = require('../models');
+const { Rabbit, Birth, Breeding, Task, Breed, Cage, Farm } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
 const { taskText } = require('../i18n/tasks');
 const { DEFAULT_LANGUAGE } = require('../i18n/notifications');
 const { closeAutoTasks } = require('../services/autoTaskService');
+const planService = require('../services/planService');
 
 /**
  * Получить список всех окролов для текущего пользователя
@@ -279,6 +280,8 @@ exports.updateBirth = async (req, res, next) => {
     const { id } = req.params;
     const farmId = req.farmId;
     const {
+      mother_id,
+      breeding_id,
       birth_date,
       kits_born_alive,
       kits_born_dead,
@@ -309,7 +312,44 @@ exports.updateBirth = async (req, res, next) => {
       );
     }
 
+    // Смена матери раньше пропадала молча: форма шлёт mother_id всегда, но
+    // контроллер его не читал, а приложение показывало «сохранено».
+    // Разрешаем менять, пока карточки не заведены, — иначе крольчата
+    // остались бы записаны на прежнюю мать, и родословная разъехалась бы.
+    const motherChanged = mother_id !== undefined && mother_id !== birth.mother_id;
+    if (motherChanged) {
+      if (birth.kits_carded_at) {
+        return ApiResponse.error(
+          res,
+          'По этому окролу заведены карточки — мать уже не поменять',
+          409
+        );
+      }
+
+      const mother = await Rabbit.findOne({
+        where: { id: mother_id, farm_id: farmId, sex: 'female' }
+      });
+      if (!mother) {
+        return ApiResponse.notFound(res, 'Мать не найдена');
+      }
+    }
+
+    // Дата отсадки не может быть раньше самого окрола. Проверить это в схеме
+    // нельзя: при частичной правке дата окрола может не прийти вовсе, и
+    // сравнивать надо с уже сохранённой.
+    const effectiveBirthDate = birth_date || birth.birth_date;
+    if (weaning_date && effectiveBirthDate &&
+        new Date(weaning_date) < new Date(effectiveBirthDate)) {
+      return ApiResponse.error(
+        res,
+        'Дата отсадки не может быть раньше окрола',
+        400
+      );
+    }
+
     await birth.update({
+      mother_id,
+      breeding_id,
       birth_date,
       kits_born_alive,
       kits_born_dead,
@@ -402,9 +442,13 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
   // Проверка количества стоит до открытия транзакции: раньше ранний return
   // оставлял её висеть и удерживал соединение из пула до таймаута.
+  //
+  // Потолок поднят с 20 до 30 под тот же предел, что у «родилось живыми»
+  // (kitsCount в birthValidator): окрол на 21–30 живых крольчат в карточки
+  // не заводился вовсе, хотя записать такой окрол приложение позволяло.
   const kitCount = parseInt(count);
-  if (isNaN(kitCount) || kitCount <= 0 || kitCount > 20) {
-    return ApiResponse.error(res, 'Некорректное количество крольчат (макс 20)', 400);
+  if (isNaN(kitCount) || kitCount <= 0 || kitCount > 30) {
+    return ApiResponse.error(res, 'Некорректное количество крольчат (макс 30)', 400);
   }
 
   const transaction = await Birth.sequelize.transaction();
@@ -431,6 +475,35 @@ exports.createKitsFromBirth = async (req, res, next) => {
         'По этому окролу карточки уже заведены — крольчата есть в поголовье',
         409
       );
+    }
+
+    // Карточек не может быть больше, чем родилось живыми: два числа про один
+    // выводок обязаны сходиться. Иначе «родилось 6» соседствует с восемью
+    // карточками, и ни одному из них уже нельзя верить.
+    if (birth.kits_born_alive && kitCount > birth.kits_born_alive) {
+      await transaction.rollback();
+      return ApiResponse.error(
+        res,
+        `В окроле родилось живыми ${birth.kits_born_alive} — карточек не может быть больше`,
+        400
+      );
+    }
+
+    // Лимит тарифа проверяется на всю пачку сразу. Одиночное добавление
+    // кролика лимит соблюдало, а заведение карточек из окрола его обходило:
+    // ферма уходила за предел тарифа целым выводком.
+    try {
+      await planService.assertRabbitLimit(farmId, kitCount);
+    } catch (limitError) {
+      if (limitError.message === 'RABBIT_LIMIT_REACHED') {
+        await transaction.rollback();
+        return ApiResponse.badRequest(
+          res,
+          'Достигнут лимит кроликов по тарифу фермы',
+          'RABBIT_LIMIT_REACHED'
+        );
+      }
+      throw limitError;
     }
 
     // Идентификаторы приходят из тела запроса, поэтому каждый проверяется на
@@ -502,14 +575,29 @@ exports.createKitsFromBirth = async (req, res, next) => {
       }
     }
 
+    // Назначение берётся то же, что у кролика, заведённого вручную
+    // (см. rabbitService.createRabbit): хозяйство называет его своим один
+    // раз. Вписанное в код 'meat' означало, что настройка фермы работает
+    // для меньшинства поголовья — рождённые крольчата её не наследовали.
+    const farm = await Farm.findByPk(farmId, {
+      attributes: ['default_purpose'],
+      transaction
+    });
+    const kitPurpose = farm?.default_purpose || 'breeding';
+
+    // Кличка даётся, только если фермер сам задал начало имени. Раньше сюда
+    // подставлялось русское слово «Крольчонок», и оно попадало в базу
+    // независимо от языка хозяйства: на узбекском экране триста голов
+    // назывались бы «Крольчонок-N», и переводом это уже не исправить —
+    // портятся сами данные. Без клички карточка показывает бирку, ровно как
+    // у кролика, заведённого без имени (RabbitModel.label).
     const kits = [];
-    const prefix = name_prefix || 'Крольчонок';
 
     for (let i = 1; i <= kitCount; i++) {
       const kit = await Rabbit.create({
         farm_id: farmId,
         tag_id: `kit-${randomUUID().slice(0, 8)}`,
-        name: `${prefix}-${i}`,
+        name: name_prefix ? `${name_prefix}-${i}` : null,
         breed_id: kitBreedId,
         sex: 'unknown',
         birth_date: birth_date || birth.birth_date,
@@ -517,7 +605,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
         father_id: father ? father.id : null,
         status: 'active',
         cage_id: cageId,
-        purpose: 'meat',
+        purpose: kitPurpose,
       }, { transaction });
       kits.push(kit);
     }

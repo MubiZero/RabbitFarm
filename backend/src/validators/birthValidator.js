@@ -50,6 +50,18 @@ const createBirthSchema = Joi.object({
 });
 
 const updateBirthSchema = Joi.object({
+  // Мать и случка обязаны быть в схеме правки: форма шлёт их всегда, а
+  // незнакомый ключ здесь не отвергается, а вырезается (stripUnknown в
+  // middleware/validation.js). Смена матери или привязки к случке молча
+  // пропадала — приложение отвечало «сохранено», а в окроле оставалась
+  // прежняя мать.
+  mother_id: Joi.number().integer().messages({
+    'number.base': 'ID матери должен быть числом'
+  }),
+  breeding_id: Joi.number().integer().allow(null).messages({
+    'number.base': 'ID случки должен быть числом'
+  }),
+
   birth_date: Joi.date().max('now').messages({
     'date.base': 'Неверная дата окрола',
     'date.max': 'Дата окрола не может быть в будущем'
@@ -58,8 +70,13 @@ const updateBirthSchema = Joi.object({
   kits_born_dead: kitsCount,
   kits_died: kitsCount,
   kits_weaned: kitsCount,
-  weaning_date: Joi.date().allow(null).messages({
-    'date.base': 'Неверная дата отсадки'
+
+  // Отсадка не может случиться раньше окрола или в будущем: крольчата
+  // отсаживаются в месяц-полтора, и дата вперёд календаря означает опечатку,
+  // которую потом никто не найдёт.
+  weaning_date: Joi.date().max('now').allow(null).messages({
+    'date.base': 'Неверная дата отсадки',
+    'date.max': 'Дата отсадки не может быть в будущем'
   }),
   complications: Joi.string().max(2000).allow(null, ''),
   notes: Joi.string().max(2000).allow(null, '')
@@ -67,15 +84,18 @@ const updateBirthSchema = Joi.object({
 
 /** Карточки крольчат из окрола. */
 const createKitsSchema = Joi.object({
+  // Потолок тот же, что у «родилось живыми» (kitsCount выше). Пока здесь
+  // стояло 20, окрол на 21–30 живых крольчат нельзя было завести в карточки
+  // вовсе, хотя записать такой окрол приложение позволяло.
   count: Joi.number()
     .integer()
     .min(1)
-    .max(20)
+    .max(30)
     .required()
     .messages({
       'number.base': 'Количество должно быть числом',
       'number.min': 'Нужно создать хотя бы одну карточку',
-      'number.max': 'За раз можно создать не больше 20 карточек',
+      'number.max': 'За раз можно создать не больше 30 карточек',
       'any.required': 'Количество обязательно'
     }),
 

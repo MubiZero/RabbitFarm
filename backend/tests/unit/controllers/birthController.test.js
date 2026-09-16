@@ -22,11 +22,21 @@ jest.mock('../../../src/models', () => {
     Breeding: { findOne: jest.fn() },
     Breed: { findOne: jest.fn() },
     Cage: { findOne: jest.fn() },
-    Task: { create: jest.fn() }
+    Task: { create: jest.fn() },
+    // Назначение крольчат берётся из настройки хозяйства, как у кролика,
+    // заведённого вручную.
+    Farm: { findByPk: jest.fn() }
   };
 });
 
-const { Rabbit, Birth, Breeding, Breed, Cage, Task } = require('../../../src/models');
+// Лимит тарифа проверяется на всю пачку карточек сразу: заведение выводка
+// раньше обходило предел, который одиночное добавление кролика соблюдало.
+jest.mock('../../../src/services/planService', () => ({
+  assertRabbitLimit: jest.fn()
+}));
+
+const { Rabbit, Birth, Breeding, Breed, Cage, Task, Farm } = require('../../../src/models');
+const planService = require('../../../src/services/planService');
 const ctrl = require('../../../src/controllers/birthController');
 
 const mockReq = (overrides = {}) => ({
@@ -46,6 +56,10 @@ describe('birthController', () => {
     jest.resetAllMocks();
     Rabbit.sequelize.transaction.mockResolvedValue(mockTx);
     Birth.sequelize.transaction.mockResolvedValue(mockTx);
+    // По умолчанию тариф не ограничивает, а у хозяйства нет своего
+    // назначения: каждый тест переопределяет это, если проверяет именно их.
+    planService.assertRabbitLimit.mockResolvedValue(undefined);
+    Farm.findByPk.mockResolvedValue(null);
   });
 
   describe('getBirths', () => {
@@ -357,13 +371,58 @@ describe('birthController', () => {
       expect(res.status).toHaveBeenCalledWith(400);
     });
 
-    it('should return 400 for count > 20', async () => {
-      const req = mockReq({ params: { id: '1' }, body: { count: 21, breed_id: 1 } });
+    it('should return 400 for count > 30', async () => {
+      // Потолок держится заодно с «родилось живыми» (kitsCount в
+      // birthValidator, тоже 30). Пока здесь стояло 20, окрол на 21–30 живых
+      // крольчат в карточки не заводился вовсе.
+      const req = mockReq({ params: { id: '1' }, body: { count: 31, breed_id: 1 } });
       const res = mockRes();
 
       await ctrl.createKitsFromBirth(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it('не заводит карточек больше, чем родилось живыми', async () => {
+      // Два числа про один выводок обязаны сходиться: «родилось 6» рядом с
+      // восемью карточками делает недостоверными оба.
+      Birth.findOne.mockResolvedValue({
+        id: 1,
+        farm_id: 1,
+        mother_id: 5,
+        kits_born_alive: 6,
+        kits_carded_at: null
+      });
+
+      const req = mockReq({ params: { id: '1' }, body: { count: 8, breed_id: 1 } });
+      const res = mockRes();
+
+      await ctrl.createKitsFromBirth(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(Rabbit.create).not.toHaveBeenCalled();
+    });
+
+    it('упирается в лимит тарифа всей пачкой, а не по одной карточке', async () => {
+      Birth.findOne.mockResolvedValue({
+        id: 1,
+        farm_id: 1,
+        mother_id: 5,
+        kits_born_alive: 10,
+        kits_carded_at: null
+      });
+      planService.assertRabbitLimit.mockRejectedValue(
+        new Error('RABBIT_LIMIT_REACHED')
+      );
+
+      const req = mockReq({ params: { id: '1' }, body: { count: 10, breed_id: 1 } });
+      const res = mockRes();
+
+      await ctrl.createKitsFromBirth(req, res, mockNext);
+
+      expect(planService.assertRabbitLimit).toHaveBeenCalledWith(1, 10);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(Rabbit.create).not.toHaveBeenCalled();
     });
 
     it('should return 404 if birth not found', async () => {

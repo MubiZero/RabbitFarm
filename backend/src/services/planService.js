@@ -179,14 +179,19 @@ class PlanService {
   /**
    * Бросает `RABBIT_LIMIT_REACHED`, если по тарифу фермы больше нельзя
    * заводить кроликов. Вызывается перед созданием кролика.
+   *
+   * `adding` — сколько карточек заводят разом. Карточки крольчат из окрола
+   * создаются пачкой до 30 штук, и проверка по одной пропускала ферму далеко
+   * за предел тарифа: одиночное добавление лимит соблюдало, а окрол его
+   * обходил.
    */
-  async assertRabbitLimit(farmId) {
+  async assertRabbitLimit(farmId, adding = 1) {
     const farm = await this._getFarmWithPlan(farmId);
     const maxRabbits = this.getEffectiveLimit(farm, 'rabbits');
     if (!maxRabbits) return;
 
     const count = await Rabbit.count({ where: { farm_id: farmId } });
-    if (count >= maxRabbits) {
+    if (count + adding > maxRabbits) {
       throw new Error('RABBIT_LIMIT_REACHED');
     }
   }
