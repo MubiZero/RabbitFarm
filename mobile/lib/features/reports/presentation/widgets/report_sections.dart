@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
@@ -56,15 +57,26 @@ class ReportPeriodBar extends StatelessWidget {
 /// подставить свои границы, и человек должен видеть, за что на самом деле
 /// посчитаны числа под этой подписью.
 class ReportPeriodCaption extends StatelessWidget {
-  final String from;
-  final String to;
+  final String? from;
+  final String? to;
 
   const ReportPeriodCaption({super.key, required this.from, required this.to});
 
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+
+    // Границ нет — значит показан весь срок жизни хозяйства. Подставлять сюда
+    // сегодняшнюю дату было бы враньём о периоде.
+    final caption = (from == null && to == null)
+        ? context.l10n.periodAll
+        : context.l10n.reportsPeriodRange(
+            _format(from, locale),
+            _format(to, locale),
+          );
+
     return Text(
-      context.l10n.reportsPeriodRange(_format(from), _format(to)),
+      caption,
       style: AppTypography.labelSm
           .copyWith(color: context.colors.onSurfaceVariant),
     );
@@ -73,10 +85,11 @@ class ReportPeriodCaption extends StatelessWidget {
   /// Даты приходят строкой «2026-08-21». Неразобранную строку показываем как
   /// есть: подставить сегодняшнее число вместо непонятного значения — значит
   /// соврать о периоде.
-  String _format(String raw) {
+  String _format(String? raw, Locale locale) {
+    if (raw == null) return '—';
     final date = DateTime.tryParse(raw);
     if (date == null) return raw;
-    return DateFormat('d MMMM yyyy', 'ru_RU').format(date);
+    return DateFormat('d MMMM yyyy', dateSymbolsLocale(locale)).format(date);
   }
 }
 

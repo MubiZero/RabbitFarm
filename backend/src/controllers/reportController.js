@@ -295,27 +295,41 @@ exports.getFarmReport = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
-    // Default date range: last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const defaultDateFrom = thirtyDaysAgo.toISOString().split('T')[0];
-    const defaultDateTo = new Date().toISOString().split('T')[0];
-
-    const effectiveFromDate = from_date || defaultDateFrom;
-    const effectiveToDate = to_date || defaultDateTo;
+    // Период берём ровно таким, каким его прислал клиент, без умолчаний.
+    // Раньше здесь подставлялись «последние 30 дней», и при выборе «всё
+    // время» — когда клиент не шлёт границ вовсе — эта вкладка показывала
+    // месяц, пока соседние «Деньги» и «Здоровье» считали за всё время. Три
+    // вкладки под одним переключателем срока называли разные числа, хотя
+    // экран обещает им общий период.
+    //
+    // Умолчание вдобавок считалось через toISOString(), то есть по Гринвичу,
+    // а сервер живёт в Душанбе (TZ=Asia/Dushanbe): с полуночи до 5 утра
+    // «сегодня» отставало на календарный день, и сегодняшние записи выпадали
+    // из отчёта.
+    const effectiveFromDate = from_date || null;
+    const effectiveToDate = to_date || null;
 
     const farmId = req.farmId;
-    const period = { [Op.gte]: effectiveFromDate, [Op.lte]: effectiveToDate };
+
+    const period = {};
+    if (effectiveFromDate) period[Op.gte] = effectiveFromDate;
+    if (effectiveToDate) period[Op.lte] = effectiveToDate;
+
+    // Пустой период означает «за всё время»: столбец в условие не добавляем
+    // вовсе, иначе Sequelize получит пустой объект вместо сравнения.
+    const hasPeriod = Boolean(effectiveFromDate || effectiveToDate);
+    const byPeriod = (column) => (hasPeriod ? { [column]: period } : {});
 
     // Отдельная граница для колонок со временем. Остальные даты в отчёте —
     // DATEONLY, там сравнение идёт день с днём. А fed_at хранит момент, и
     // `<= '2026-08-24'` означало «не позже полуночи», то есть отсекало весь
     // последний день периода. Период по умолчанию заканчивается сегодняшним
     // днём — сегодняшние кормления не попадали в отчёт никогда.
-    const feedingPeriod = {
-      [Op.gte]: startOfDayUtc(effectiveFromDate),
-      [Op.lt]: nextDayUtc(effectiveToDate)
-    };
+    const feedingPeriod = {};
+    if (effectiveFromDate) feedingPeriod[Op.gte] = startOfDayUtc(effectiveFromDate);
+    if (effectiveToDate) feedingPeriod[Op.lt] = nextDayUtc(effectiveToDate);
+
+    const byFeedingPeriod = () => (hasPeriod ? { fed_at: feedingPeriod } : {});
 
     // Rabbit population dynamics
     // Разбивка по породам стоит на экране прямо под общим поголовьем, а оно
@@ -350,7 +364,7 @@ exports.getFarmReport = async (req, res, next) => {
     const transactions = await Transaction.findAll({
       where: {
         farm_id: farmId,
-        transaction_date: period
+        ...byPeriod('transaction_date')
       },
       attributes: [
         'type',
@@ -364,33 +378,33 @@ exports.getFarmReport = async (req, res, next) => {
     // Отчёт заявляет период, поэтому и считать нужно за период: раньше рядом
     // с финансами за март стояло число прививок за всё время фермы.
     const vaccinationsCount = await Vaccination.count({
-      where: { farm_id: farmId, vaccination_date: period }
+      where: { farm_id: farmId, ...byPeriod('vaccination_date') }
     });
     const medicalRecordsCount = await MedicalRecord.count({
-      where: { farm_id: farmId, started_at: period }
+      where: { farm_id: farmId, ...byPeriod('started_at') }
     });
 
     // Breeding overview
     const breedingsCount = await Breeding.count({
       where: {
         farm_id: farmId,
-        breeding_date: period
+        ...byPeriod('breeding_date')
       }
     });
 
     const birthsCount = await Birth.count({
-      where: { farm_id: farmId, birth_date: period }
+      where: { farm_id: farmId, ...byPeriod('birth_date') }
     });
 
     const feedingRecordsCount = await FeedingRecord.count({
-      where: { farm_id: farmId, fed_at: feedingPeriod }
+      where: { farm_id: farmId, ...byFeedingPeriod() }
     });
 
     // Расход разбит по единицам измерения. Общая сумма складывала килограммы
     // комбикорма со штуками моркови — получалось число, которое невозможно
     // истолковать.
     const consumptionByUnit = await FeedingRecord.findAll({
-      where: { farm_id: farmId, fed_at: feedingPeriod },
+      where: { farm_id: farmId, ...byFeedingPeriod() },
       attributes: [
         [Sequelize.col('feed.unit'), 'unit'],
         [Sequelize.fn('SUM', Sequelize.col('FeedingRecord.quantity')), 'total']

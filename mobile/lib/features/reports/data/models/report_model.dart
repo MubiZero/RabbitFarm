@@ -181,9 +181,14 @@ abstract class FarmReport with _$FarmReport {
 
 @freezed
 abstract class ReportPeriod with _$ReportPeriod {
+  /// Границ может не быть вовсе — это период «за всё время».
+  ///
+  /// Раньше сервер подставлял сюда выдуманные «последние 30 дней», даже когда
+  /// человек выбрал «всё время», и вкладка «Ферма» показывала месяц рядом с
+  /// «Деньгами» за всю историю фермы.
   const factory ReportPeriod({
-    required String from,
-    required String to,
+    String? from,
+    String? to,
   }) = _ReportPeriod;
 
   factory ReportPeriod.fromJson(Map<String, dynamic> json) =>

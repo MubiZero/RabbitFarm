@@ -190,14 +190,13 @@ describe('reportController', () => {
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    it('should default date_from to 30 days ago when no dates provided', async () => {
+    it('без дат считает за всё время, как соседние вкладки отчёта', async () => {
       setAllMocksToEmpty();
 
-      // Fix Date to a known value
-      const fixedNow = new Date('2025-06-15T12:00:00Z');
-      jest.useFakeTimers();
-      jest.setSystemTime(fixedNow);
-
+      // Раньше эта вкладка подставляла «последние 30 дней», а «Деньги» и
+      // «Здоровье» при тех же пустых параметрах считали за всё время. Экран
+      // обещает трём вкладкам общий период, и при выборе «всё время» они
+      // называли разные числа.
       const req = mockReq({ query: {} });
       const res = mockRes();
 
@@ -205,18 +204,35 @@ describe('reportController', () => {
 
       expect(res.status).toHaveBeenCalledWith(200);
 
-      // Transaction.findAll should have been called with date range starting 30 days ago
+      // Столбец с датой в условие не попадает вовсе — отбор только по ферме.
+      const txCall = Transaction.findAll.mock.calls[0][0];
+      expect(txCall.where.transaction_date).toBeUndefined();
+      expect(txCall.where.farm_id).toBe(req.farmId);
+
+      // Ответ честно сообщает, что границ нет, вместо выдуманных дат.
+      const responseBody = res.json.mock.calls[0][0];
+      expect(responseBody.data.period.from).toBeNull();
+      expect(responseBody.data.period.to).toBeNull();
+    });
+
+    it('не подставляет верхнюю границу, когда прислана только нижняя', async () => {
+      setAllMocksToEmpty();
+
+      // Верхняя граница считалась через toISOString(), то есть по Гринвичу,
+      // а сервер живёт в Душанбе: с полуночи до 5 утра «сегодня» отставало на
+      // календарный день и сегодняшние записи выпадали из отчёта.
+      const req = mockReq({ query: { from_date: '2025-05-16' } });
+      const res = mockRes();
+
+      await ctrl.getFarmReport(req, res, mockNext);
+
       const txCall = Transaction.findAll.mock.calls[0][0];
       const { Op } = require('sequelize');
       expect(txCall.where.transaction_date[Op.gte]).toBe('2025-05-16');
-      expect(txCall.where.transaction_date[Op.lte]).toBe('2025-06-15');
+      expect(txCall.where.transaction_date[Op.lte]).toBeUndefined();
 
-      // period in response should reflect the defaults
       const responseBody = res.json.mock.calls[0][0];
-      expect(responseBody.data.period.from).toBe('2025-05-16');
-      expect(responseBody.data.period.to).toBe('2025-06-15');
-
-      jest.useRealTimers();
+      expect(responseBody.data.period.to).toBeNull();
     });
 
     it('should use explicit date_from when provided', async () => {
