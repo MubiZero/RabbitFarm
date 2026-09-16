@@ -918,6 +918,90 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @bulkHerdTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести несколько'**
+  String get bulkHerdTitle;
+
+  /// No description provided for @bulkHerdSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Так переносят стадо, которое уже есть'**
+  String get bulkHerdSubtitle;
+
+  /// No description provided for @bulkHerdCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько голов'**
+  String get bulkHerdCount;
+
+  /// No description provided for @bulkHerdTagPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начало клейма'**
+  String get bulkHerdTagPrefix;
+
+  /// No description provided for @bulkHerdTagPrefixHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, R- — получится R-001, R-002'**
+  String get bulkHerdTagPrefixHint;
+
+  /// No description provided for @bulkHerdTagPrefixEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставьте пустым, если бирок нет'**
+  String get bulkHerdTagPrefixEmpty;
+
+  /// No description provided for @bulkHerdCountInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'От 1 до 100'**
+  String get bulkHerdCountInvalid;
+
+  /// No description provided for @bulkHerdDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Заведён {count} кролик} few{Заведено {count} кролика} many{Заведено {count} кроликов} other{Заведено {count} кролика}}'**
+  String bulkHerdDone(int count);
+
+  /// No description provided for @rabbitMultiPickerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто в партии'**
+  String get rabbitMultiPickerTitle;
+
+  /// No description provided for @rabbitMultiPickerLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get rabbitMultiPickerLabel;
+
+  /// No description provided for @rabbitMultiPickerEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никто не выбран'**
+  String get rabbitMultiPickerEmpty;
+
+  /// No description provided for @rabbitMultiPickerDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get rabbitMultiPickerDone;
+
+  /// No description provided for @rabbitMultiPickerSelected.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Выбран {count}} few{Выбрано {count}} many{Выбрано {count}} other{Выбрано {count}}}'**
+  String rabbitMultiPickerSelected(int count);
+
+  /// No description provided for @transactionSaleBatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продать партией'**
+  String get transactionSaleBatch;
+
   /// No description provided for @ageYears.
   ///
   /// In ru, this message translates to:

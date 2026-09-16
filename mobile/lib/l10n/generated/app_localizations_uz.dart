@@ -443,6 +443,64 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickNeedsConnection => 'Aloqa kerak';
 
   @override
+  String get bulkHerdTitle => 'Bir nechta qoʻshish';
+
+  @override
+  String get bulkHerdSubtitle => 'Mavjud podani koʻchirish uchun';
+
+  @override
+  String get bulkHerdCount => 'Nechta bosh';
+
+  @override
+  String get bulkHerdTagPrefix => 'Tamgʻa boshi';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Masalan, R- — R-001, R-002 boʻladi';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Tamgʻa boʻlmasa, boʻsh qoldiring';
+
+  @override
+  String get bulkHerdCountInvalid => '1 dan 100 gacha';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta quyon qoʻshildi',
+      one: '$count ta quyon qoʻshildi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Partiyada kim bor';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Quyonlar';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Hech kim tanlanmadi';
+
+  @override
+  String get rabbitMultiPickerDone => 'Tayyor';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta tanlandi',
+      one: '$count ta tanlandi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Partiya bilan sotish';
+
+  @override
   String ageYears(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

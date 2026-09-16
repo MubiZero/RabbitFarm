@@ -136,6 +136,30 @@
   "navQuickTitle": "Чиро сабт кунем",
   "quickRecordFeeding": "Хӯрокдиҳиро сабт кардан",
   "quickNeedsConnection": "Алоқа лозим аст",
+  "bulkHerdTitle": "Якчандтоӣ илова кардан",
+  "bulkHerdSubtitle": "Барои кӯчонидани рамаи мавҷуда",
+  "bulkHerdCount": "Чанд сар",
+  "bulkHerdTagPrefix": "Оғози тамға",
+  "bulkHerdTagPrefixHint": "Масалан, R- — R-001, R-002 мешавад",
+  "bulkHerdTagPrefixEmpty": "Агар тамға набошад, холӣ монед",
+  "bulkHerdCountInvalid": "Аз 1 то 100",
+  "bulkHerdDone": "{count, plural, one{{count} харгӯш илова шуд} other{{count} харгӯш илова шуд}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Кӣ дар даста",
+  "rabbitMultiPickerLabel": "Харгӯшҳо",
+  "rabbitMultiPickerEmpty": "Касе интихоб нашуд",
+  "rabbitMultiPickerDone": "Тайёр",
+  "rabbitMultiPickerSelected": "{count, plural, one{Интихоб шуд {count}} other{Интихоб шуданд {count}}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Дастаҷамъӣ фурӯхтан",
   "ageYears": "{count, plural, one{{count} сол} other{{count} сол}}",
   "@ageYears": {
     "placeholders": {

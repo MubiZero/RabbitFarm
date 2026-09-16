@@ -441,6 +441,68 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String get bulkHerdTitle => 'Завести несколько';
+
+  @override
+  String get bulkHerdSubtitle => 'Так переносят стадо, которое уже есть';
+
+  @override
+  String get bulkHerdCount => 'Сколько голов';
+
+  @override
+  String get bulkHerdTagPrefix => 'Начало клейма';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Например, R- — получится R-001, R-002';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Оставьте пустым, если бирок нет';
+
+  @override
+  String get bulkHerdCountInvalid => 'От 1 до 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Заведено $count кролика',
+      many: 'Заведено $count кроликов',
+      few: 'Заведено $count кролика',
+      one: 'Заведён $count кролик',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Кто в партии';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Кролики';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Никто не выбран';
+
+  @override
+  String get rabbitMultiPickerDone => 'Готово';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Выбрано $count',
+      many: 'Выбрано $count',
+      few: 'Выбрано $count',
+      one: 'Выбран $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Продать партией';
+
+  @override
   String ageYears(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

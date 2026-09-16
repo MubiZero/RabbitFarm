@@ -442,6 +442,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickNeedsConnection => 'Needs connection';
 
   @override
+  String get bulkHerdTitle => 'Add several';
+
+  @override
+  String get bulkHerdSubtitle => 'For moving a herd you already have';
+
+  @override
+  String get bulkHerdCount => 'How many';
+
+  @override
+  String get bulkHerdTagPrefix => 'Tag prefix';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'For example, R- gives R-001, R-002';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Leave empty if there are no tags';
+
+  @override
+  String get bulkHerdCountInvalid => 'From 1 to 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rabbits added',
+      one: '$count rabbit added',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Who is in the batch';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Rabbits';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'No one selected';
+
+  @override
+  String get rabbitMultiPickerDone => 'Done';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '$count selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Sell as a batch';
+
+  @override
   String ageYears(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

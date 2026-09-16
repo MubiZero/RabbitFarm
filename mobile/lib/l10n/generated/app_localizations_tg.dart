@@ -443,6 +443,64 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickNeedsConnection => 'Алоқа лозим аст';
 
   @override
+  String get bulkHerdTitle => 'Якчандтоӣ илова кардан';
+
+  @override
+  String get bulkHerdSubtitle => 'Барои кӯчонидани рамаи мавҷуда';
+
+  @override
+  String get bulkHerdCount => 'Чанд сар';
+
+  @override
+  String get bulkHerdTagPrefix => 'Оғози тамға';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Масалан, R- — R-001, R-002 мешавад';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Агар тамға набошад, холӣ монед';
+
+  @override
+  String get bulkHerdCountInvalid => 'Аз 1 то 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count харгӯш илова шуд',
+      one: '$count харгӯш илова шуд',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Кӣ дар даста';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Харгӯшҳо';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Касе интихоб нашуд';
+
+  @override
+  String get rabbitMultiPickerDone => 'Тайёр';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Интихоб шуданд $count',
+      one: 'Интихоб шуд $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Дастаҷамъӣ фурӯхтан';
+
+  @override
   String ageYears(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

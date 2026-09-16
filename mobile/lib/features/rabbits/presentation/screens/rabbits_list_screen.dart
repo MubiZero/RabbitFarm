@@ -65,7 +65,19 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.rabbitsTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.rabbitsTitle),
+        actions: [
+          // Перенос стада, которое уже есть: заводить триста голов по одной
+          // форме никто не станет, и на этом перенос останавливался.
+          if (canManage)
+            IconButton(
+              tooltip: context.l10n.bulkHerdTitle,
+              icon: const Icon(Icons.library_add_outlined),
+              onPressed: () => context.push('/rabbits/bulk'),
+            ),
+        ],
+      ),
       body: PagedListView<RabbitModel>(
         items: state.rabbits,
         isLoading: state.isLoading,

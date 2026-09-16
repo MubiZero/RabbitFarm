@@ -137,6 +137,30 @@
   "navQuickTitle": "Nimani yozamiz",
   "quickRecordFeeding": "Oziqlantirishni yozish",
   "quickNeedsConnection": "Aloqa kerak",
+  "bulkHerdTitle": "Bir nechta qoʻshish",
+  "bulkHerdSubtitle": "Mavjud podani koʻchirish uchun",
+  "bulkHerdCount": "Nechta bosh",
+  "bulkHerdTagPrefix": "Tamgʻa boshi",
+  "bulkHerdTagPrefixHint": "Masalan, R- — R-001, R-002 boʻladi",
+  "bulkHerdTagPrefixEmpty": "Tamgʻa boʻlmasa, boʻsh qoldiring",
+  "bulkHerdCountInvalid": "1 dan 100 gacha",
+  "bulkHerdDone": "{count, plural, one{{count} ta quyon qoʻshildi} other{{count} ta quyon qoʻshildi}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Partiyada kim bor",
+  "rabbitMultiPickerLabel": "Quyonlar",
+  "rabbitMultiPickerEmpty": "Hech kim tanlanmadi",
+  "rabbitMultiPickerDone": "Tayyor",
+  "rabbitMultiPickerSelected": "{count, plural, one{{count} ta tanlandi} other{{count} ta tanlandi}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Partiya bilan sotish",
   "ageYears": "{count, plural, one{{count} yosh} other{{count} yosh}}",
   "@ageYears": {
     "placeholders": {

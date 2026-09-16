@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/pin_setup_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbits_list_screen.dart';
+import '../../features/rabbits/presentation/screens/bulk_rabbits_screen.dart';
 import '../../features/rabbits/presentation/screens/rabbit_form_screen.dart';
 import '../../features/rabbits/presentation/screens/death_form_screen.dart';
 import '../../features/rabbits/presentation/screens/sale_form_screen.dart';
@@ -295,6 +296,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'rabbit-sale',
         builder: (context, state) =>
             SaleFormScreen(rabbit: state.extra as RabbitModel?),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        // Рядом с «завести кролика»: перенос стада — тот же заход, только
+        // сразу нескольких. Выше '/rabbits/:id', иначе «bulk» разобралось бы
+        // как идентификатор.
+        path: '/rabbits/bulk',
+        name: 'rabbits-bulk',
+        builder: (context, state) => const BulkRabbitsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

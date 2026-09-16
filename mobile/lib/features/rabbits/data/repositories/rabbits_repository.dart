@@ -135,6 +135,30 @@ class RabbitsRepository {
     }
   }
 
+  /// Завести сразу несколько кроликов одним образцом.
+  ///
+  /// Так переносят на приложение существующее стадо: заводить триста голов
+  /// по одной форме никто не станет. Возвращает, сколько завелось.
+  Future<int> createRabbitsBulk(Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.post(ApiEndpoints.rabbitsBulk, data: data);
+
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data,
+        (json) => json as Map<String, dynamic>,
+      );
+
+      if (!apiResponse.success || apiResponse.data == null) {
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
+      }
+
+      return (apiResponse.data!['created'] as num).toInt();
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   // Update rabbit
   Future<RabbitModel> updateRabbit(int id, Map<String, dynamic> data) async {
     try {

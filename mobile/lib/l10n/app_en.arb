@@ -136,6 +136,30 @@
   "navQuickTitle": "What to record",
   "quickRecordFeeding": "Log a feeding",
   "quickNeedsConnection": "Needs connection",
+  "bulkHerdTitle": "Add several",
+  "bulkHerdSubtitle": "For moving a herd you already have",
+  "bulkHerdCount": "How many",
+  "bulkHerdTagPrefix": "Tag prefix",
+  "bulkHerdTagPrefixHint": "For example, R- gives R-001, R-002",
+  "bulkHerdTagPrefixEmpty": "Leave empty if there are no tags",
+  "bulkHerdCountInvalid": "From 1 to 100",
+  "bulkHerdDone": "{count, plural, one{{count} rabbit added} other{{count} rabbits added}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Who is in the batch",
+  "rabbitMultiPickerLabel": "Rabbits",
+  "rabbitMultiPickerEmpty": "No one selected",
+  "rabbitMultiPickerDone": "Done",
+  "rabbitMultiPickerSelected": "{count, plural, one{{count} selected} other{{count} selected}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Sell as a batch",
   "ageYears": "{count, plural, one{{count} year} other{{count} years}}",
   "@ageYears": {
     "placeholders": {
