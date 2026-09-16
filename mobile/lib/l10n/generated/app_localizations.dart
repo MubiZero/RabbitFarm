@@ -918,6 +918,48 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @taskReminderLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напомнить заранее'**
+  String get taskReminderLabel;
+
+  /// No description provided for @taskReminderNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не напоминать'**
+  String get taskReminderNone;
+
+  /// No description provided for @taskReminder15m.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 15 минут'**
+  String get taskReminder15m;
+
+  /// No description provided for @taskReminder1h.
+  ///
+  /// In ru, this message translates to:
+  /// **'За час'**
+  String get taskReminder1h;
+
+  /// No description provided for @taskReminder3h.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 3 часа'**
+  String get taskReminder3h;
+
+  /// No description provided for @taskReminder1d.
+  ///
+  /// In ru, this message translates to:
+  /// **'За день'**
+  String get taskReminder1d;
+
+  /// No description provided for @taskReminder2d.
+  ///
+  /// In ru, this message translates to:
+  /// **'За два дня'**
+  String get taskReminder2d;
+
   /// No description provided for @bulkHerdTitle.
   ///
   /// In ru, this message translates to:

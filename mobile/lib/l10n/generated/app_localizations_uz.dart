@@ -443,6 +443,27 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickNeedsConnection => 'Aloqa kerak';
 
   @override
+  String get taskReminderLabel => 'Oldindan eslatish';
+
+  @override
+  String get taskReminderNone => 'Eslatilmasin';
+
+  @override
+  String get taskReminder15m => '15 daqiqa oldin';
+
+  @override
+  String get taskReminder1h => 'Bir soat oldin';
+
+  @override
+  String get taskReminder3h => '3 soat oldin';
+
+  @override
+  String get taskReminder1d => 'Bir kun oldin';
+
+  @override
+  String get taskReminder2d => 'Ikki kun oldin';
+
+  @override
   String get bulkHerdTitle => 'Bir nechta qoʻshish';
 
   @override

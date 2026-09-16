@@ -441,6 +441,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String get taskReminderLabel => 'Напомнить заранее';
+
+  @override
+  String get taskReminderNone => 'Не напоминать';
+
+  @override
+  String get taskReminder15m => 'За 15 минут';
+
+  @override
+  String get taskReminder1h => 'За час';
+
+  @override
+  String get taskReminder3h => 'За 3 часа';
+
+  @override
+  String get taskReminder1d => 'За день';
+
+  @override
+  String get taskReminder2d => 'За два дня';
+
+  @override
   String get bulkHerdTitle => 'Завести несколько';
 
   @override

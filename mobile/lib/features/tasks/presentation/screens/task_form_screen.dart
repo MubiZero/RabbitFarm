@@ -49,6 +49,45 @@ enum TaskRepeat {
       };
 }
 
+/// За сколько предупредить о сроке.
+///
+/// Набор фиксированный, как в календарях: произвольное число минут человек
+/// вводить не станет, а серверу нужно ровно оно (`reminder_before`).
+///
+/// Поле в базе было с самого начала, но выбрать значение было негде, и никто
+/// его не читал: единственным сигналом оставалась утренняя сводка про уже
+/// просроченное — то есть приложение сообщало, что срок пропущен, вместо
+/// того чтобы помочь его не пропустить.
+enum TaskReminder {
+  quarterHour(15),
+  hour(60),
+  threeHours(180),
+  day(1440),
+  twoDays(2880);
+
+  final int minutes;
+  const TaskReminder(this.minutes);
+
+  static TaskReminder? fromMinutes(int? minutes) {
+    if (minutes == null) return null;
+    for (final option in TaskReminder.values) {
+      if (option.minutes == minutes) return option;
+    }
+    // Значение не из набора (например, заведённое раньше): напоминание
+    // остаётся рабочим, просто в списке его нет — подменять его ближайшим
+    // значило бы молча передвинуть срок.
+    return null;
+  }
+
+  String label(BuildContext context) => switch (this) {
+        TaskReminder.quarterHour => context.l10n.taskReminder15m,
+        TaskReminder.hour => context.l10n.taskReminder1h,
+        TaskReminder.threeHours => context.l10n.taskReminder3h,
+        TaskReminder.day => context.l10n.taskReminder1d,
+        TaskReminder.twoDays => context.l10n.taskReminder2d,
+      };
+}
+
 class TaskFormScreen extends ConsumerStatefulWidget {
   final Task? task;
 
@@ -69,6 +108,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   late TaskPriority _priority;
   late DateTime _dueDate;
   TaskRepeat? _repeat;
+  TaskReminder? _reminder;
   int? _assignedTo;
 
   bool _touched = false;
@@ -88,6 +128,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _priority = _task?.priority ?? TaskPriority.medium;
     _dueDate = _task?.dueDate ?? DateTime.now().add(const Duration(days: 1));
     _repeat = TaskRepeat.fromValue(_task?.recurrenceRule);
+    _reminder = TaskReminder.fromMinutes(_task?.reminderBefore);
     _assignedTo = _task?.assignedTo;
 
     for (final c in [_title, _description, _notes]) {
@@ -129,7 +170,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             assignedTo: _assignedTo,
             isRecurring: _repeat != null,
             recurrenceRule: _repeat?.value,
-            reminderBefore: _task!.reminderBefore,
+            reminderBefore: _reminder?.minutes,
             notes: _optional(_notes),
           ),
         );
@@ -145,6 +186,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             assignedTo: _assignedTo,
             isRecurring: _repeat != null,
             recurrenceRule: _repeat?.value,
+            reminderBefore: _reminder?.minutes,
             notes: _optional(_notes),
           ),
         );
@@ -352,6 +394,29 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               ],
               onChanged: (v) => setState(() {
                 _repeat = v;
+                _touched = true;
+              }),
+            ),
+            DropdownButtonFormField<TaskReminder?>(
+              isExpanded: true,
+              initialValue: _reminder,
+              decoration: InputDecoration(
+                labelText: context.l10n.taskReminderLabel,
+                prefixIcon: const Icon(Icons.notifications_active_outlined),
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: null,
+                  child: Text(context.l10n.taskReminderNone),
+                ),
+                for (final reminder in TaskReminder.values)
+                  DropdownMenuItem(
+                    value: reminder,
+                    child: Text(reminder.label(context)),
+                  ),
+              ],
+              onChanged: (v) => setState(() {
+                _reminder = v;
                 _touched = true;
               }),
             ),

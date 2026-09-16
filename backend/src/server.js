@@ -15,6 +15,7 @@ const { startTokenCleanupJob } = require('./jobs/tokenCleanup');
 const { startNotificationDigestJob } = require('./jobs/notificationDigestJob');
 const { startFarmPurgeJob } = require('./jobs/farmPurgeJob');
 const { startPlanExpiryReminderJob } = require('./jobs/planExpiryReminderJob');
+const { startTaskReminderJob } = require('./jobs/taskReminderJob');
 const { startInactivityWinbackJob } = require('./jobs/inactivityWinbackJob');
 
 const PORT = process.env.PORT || 3000;
@@ -62,6 +63,7 @@ async function startServer() {
       startFarmPurgeJob();
       startPlanExpiryReminderJob();
       startInactivityWinbackJob();
+      startTaskReminderJob();
     }
 
     // Start listening

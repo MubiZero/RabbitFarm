@@ -61,6 +61,27 @@ const MESSAGES = {
     uz: { title: 'Muddati oʻtgan vazifa', body: ({ task }) => task }
   },
 
+  // Напоминание заранее — в отличие от taskOverdue, оно приходит ДО срока и
+  // ради того, чтобы срок не пропустили.
+  taskReminder: {
+    ru: {
+      title: 'Скоро срок',
+      body: ({ task, minutes }) => `${task} — через ${minutes}`
+    },
+    en: {
+      title: 'Due soon',
+      body: ({ task, minutes }) => `${task} — in ${minutes}`
+    },
+    tg: {
+      title: 'Мӯҳлат наздик',
+      body: ({ task, minutes }) => `${task} — пас аз ${minutes}`
+    },
+    uz: {
+      title: 'Muddat yaqin',
+      body: ({ task, minutes }) => `${task} — ${minutes} dan keyin`
+    }
+  },
+
   taskDigest: {
     ru: {
       title: 'Просроченные задачи без исполнителя',

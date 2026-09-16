@@ -443,6 +443,27 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickNeedsConnection => 'Алоқа лозим аст';
 
   @override
+  String get taskReminderLabel => 'Пешакӣ хотиррасон кардан';
+
+  @override
+  String get taskReminderNone => 'Хотиррасон накардан';
+
+  @override
+  String get taskReminder15m => '15 дақиқа пеш';
+
+  @override
+  String get taskReminder1h => 'Як соат пеш';
+
+  @override
+  String get taskReminder3h => '3 соат пеш';
+
+  @override
+  String get taskReminder1d => 'Як рӯз пеш';
+
+  @override
+  String get taskReminder2d => 'Ду рӯз пеш';
+
+  @override
   String get bulkHerdTitle => 'Якчандтоӣ илова кардан';
 
   @override

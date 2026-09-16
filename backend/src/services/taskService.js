@@ -220,6 +220,19 @@ class TaskService {
     }
 
     const updateData = { ...data };
+
+    // Срок или само напоминание передвинули — значит предупредить нужно
+    // заново. Без сброса отметки перенос срока на неделю означал бы, что
+    // напоминание не придёт вовсе: по этой задаче оно «уже отправлено».
+    const dueChanged = data.due_date !== undefined &&
+      new Date(data.due_date).getTime() !== new Date(task.due_date).getTime();
+    const reminderChanged = data.reminder_before !== undefined &&
+      data.reminder_before !== task.reminder_before;
+
+    if (dueChanged || reminderChanged) {
+      updateData.reminder_sent_at = null;
+    }
+
     if (status === 'completed' && !completed_at) {
       updateData.completed_at = new Date();
     } else if (status !== 'completed') {

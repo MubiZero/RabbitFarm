@@ -442,6 +442,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickNeedsConnection => 'Needs connection';
 
   @override
+  String get taskReminderLabel => 'Remind in advance';
+
+  @override
+  String get taskReminderNone => 'No reminder';
+
+  @override
+  String get taskReminder15m => '15 minutes before';
+
+  @override
+  String get taskReminder1h => 'An hour before';
+
+  @override
+  String get taskReminder3h => '3 hours before';
+
+  @override
+  String get taskReminder1d => 'A day before';
+
+  @override
+  String get taskReminder2d => 'Two days before';
+
+  @override
   String get bulkHerdTitle => 'Add several';
 
   @override
