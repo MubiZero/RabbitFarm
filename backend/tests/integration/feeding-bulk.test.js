@@ -233,10 +233,24 @@ describe('Кормление пачкой', () => {
       expect(res.body.data.feeding.total_feeding_records).toBe(1);
     });
 
-    it('сегодняшнее кормление попадает в отчёт за период по умолчанию', async () => {
-      // Период по умолчанию заканчивается сегодняшним днём — именно на нём
-      // отчёт показывал «Кормления: 0» при живых записях в базе.
+    it('сегодняшнее кормление попадает в отчёт за сегодняшний день', async () => {
+      // Верхняя граница периода — момент, а fed_at хранит время: сравнение
+      // с полуночью отсекало всё, записанное сегодня, и отчёт показывал
+      // «Кормления: 0» при живых записях в базе.
+      //
+      // Период задаётся явно. Раньше здесь не было параметров вовсе, и
+      // проверка держалась на умолчании «последние 30 дней», которое сервер
+      // подставлял сам. Умолчание убрано: при выборе «всё время» оно давало
+      // вкладке «Ферма» месяц, пока «Деньги» и «Здоровье» считали за всю
+      // историю — три вкладки под одним переключателем срока называли
+      // разные числа.
       const justNow = new Date(Date.now() - 60 * 1000).toISOString();
+      const today = new Date();
+      const todayIso = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0')
+      ].join('-');
 
       await request(app)
         .post(`${API}/feeding-records`)
@@ -249,16 +263,29 @@ describe('Кормление пачкой', () => {
         });
 
       const res = await request(app)
-        .get(`${API}/reports/farm`)
+        .get(`${API}/reports/farm?from_date=${todayIso}&to_date=${todayIso}`)
         .set('Authorization', `Bearer ${ownerToken}`);
 
       expect(res.status).toBe(200);
-      // Остальные записи файла датированы 2024 годом и в последние 30 дней
-      // не попадают, поэтому счётчик равен ровно одной сегодняшней записи.
+      // Остальные записи файла датированы 2024 годом, поэтому в сегодняшний
+      // день попадает ровно одна — только что созданная.
       expect(res.body.data.feeding.total_feeding_records).toBe(1);
       expect(res.body.data.feeding.consumption_by_unit).toEqual([
         { unit: 'kg', total: '1.00' }
       ]);
+    });
+
+    it('без указания периода отчёт считает за всё время', async () => {
+      // Пустой период означает «за всё время» — одинаково для вкладок
+      // «Ферма», «Деньги» и «Здоровье». Записи 2024 года в счёт входят.
+      const res = await request(app)
+        .get(`${API}/reports/farm`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.period).toEqual({ from: null, to: null });
+      expect(res.body.data.feeding.total_feeding_records)
+        .toBeGreaterThan(1);
     });
   });
 });
