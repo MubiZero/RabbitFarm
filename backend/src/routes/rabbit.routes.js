@@ -7,6 +7,7 @@ const upload = require('../config/multer');
 const { uploadLimiter } = require('../middleware/rateLimiter');
 const {
   createRabbitSchema,
+  createRabbitsBulkSchema,
   updateRabbitSchema,
   listRabbitsQuerySchema,
   bulkPurposeSchema,
@@ -153,6 +154,21 @@ router.post(
   upload.single('photo'),
   validate(createRabbitSchema),
   rabbitController.create
+);
+
+/**
+ * @route   POST /api/v1/rabbits/bulk
+ * @desc    Завести сразу несколько кроликов одним образцом
+ * @access  Private (Manager, Owner)
+ *
+ * Выше `/:id` намеренно, как и `/purpose`: иначе «bulk» разобралось бы как
+ * идентификатор кролика.
+ */
+router.post(
+  '/bulk',
+  authorize(['manager', 'owner']),
+  validate(createRabbitsBulkSchema),
+  rabbitController.createBulk
 );
 
 /**

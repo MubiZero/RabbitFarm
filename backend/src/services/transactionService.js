@@ -1,4 +1,4 @@
-const { Transaction, Rabbit, User } = require('../models');
+const { Transaction, Rabbit, User, TransactionRabbit } = require('../models');
 const { Op, fn, col } = require('sequelize');
 const fileStorage = require('../utils/fileStorage');
 const logger = require('../utils/logger');
@@ -25,16 +25,41 @@ class TransactionService {
   async createTransaction(data) {
     const t = await Transaction.sequelize.transaction();
     try {
-      const { rabbit_id, type, category, farm_id: farmId, author_id: authorId } = data;
+      const {
+        rabbit_id,
+        rabbit_ids,
+        type,
+        category,
+        farm_id: farmId,
+        author_id: authorId
+      } = data;
 
-      let rabbit = null;
-      if (rabbit_id) {
-        rabbit = await Rabbit.findOne({ where: { id: rabbit_id, farm_id: farmId }, transaction: t });
-        if (!rabbit) {
+      // Партия: тридцать голов в ресторан — одна сделка, а не тридцать
+      // строк в книге. `rabbit_id` остаётся для одиночной операции (по нему
+      // стоят существующие записи и выборка «операции этого кролика»), а
+      // участники всегда пишутся связями — тогда «кто участвовал» читается
+      // одним способом.
+      const wantedIds = Array.isArray(rabbit_ids) && rabbit_ids.length > 0
+        ? [...new Set(rabbit_ids.map(Number))]
+        : (rabbit_id ? [Number(rabbit_id)] : []);
+
+      let rabbits = [];
+      if (wantedIds.length > 0) {
+        rabbits = await Rabbit.findAll({
+          where: { id: wantedIds, farm_id: farmId },
+          transaction: t
+        });
+
+        // Чужой или несуществующий кролик отбивается целиком: половина
+        // проданной партии — это расхождение денег с поголовьем, которое
+        // потом никто не найдёт.
+        if (rabbits.length !== wantedIds.length) {
           await t.rollback();
           throw new Error('RABBIT_NOT_FOUND');
         }
       }
+
+      const rabbit = rabbits.length === 1 ? rabbits[0] : null;
 
       const transaction = await Transaction.create({
         farm_id: farmId,
@@ -42,7 +67,9 @@ class TransactionService {
         category,
         amount: data.amount,
         transaction_date: data.transaction_date,
-        rabbit_id,
+        // Одиночная операция сохраняет прежнюю колонку; у партии её нет —
+        // иначе один из тридцати кроликов выглядел бы «главным».
+        rabbit_id: wantedIds.length === 1 ? wantedIds[0] : null,
         description: data.description,
         receipt_url: data.receipt_url,
         // Автор — тот, кто внёс запись, а не владелец фермы: иначе в графе
@@ -51,15 +78,28 @@ class TransactionService {
         created_by: authorId
       }, { transaction: t });
 
-      // If selling a rabbit, mark it as sold (skip if already in terminal state)
-      if (rabbit && type === 'income' &&
-        category?.startsWith('sale_')) {
-        if (rabbit.status !== 'sold' && rabbit.status !== 'dead') {
-          // Дата выбытия — день самой продажи, а не день, когда о ней вспомнили
-          // записать. По ней считается поголовье в сводке за неделю: без
-          // `sold_date` проданный кролик оставался в графике живым, потому что
-          // выбытие определяется только датой, а не статусом.
-          await rabbit.update({
+      // Участники сделки — связями, всегда.
+      if (rabbits.length > 0) {
+        await TransactionRabbit.bulkCreate(
+          rabbits.map((item) => ({
+            transaction_id: transaction.id,
+            rabbit_id: item.id,
+            farm_id: farmId
+          })),
+          { transaction: t }
+        );
+      }
+
+      // Продажа выводит кроликов из поголовья — всех, кто в сделке.
+      if (type === 'income' && category?.startsWith('sale_')) {
+        for (const item of rabbits) {
+          if (item.status === 'sold' || item.status === 'dead') continue;
+
+          // Дата выбытия — день самой продажи, а не день, когда о ней
+          // вспомнили записать. По ней считается поголовье в сводке за
+          // неделю: без `sold_date` проданный кролик оставался в графике
+          // живым, потому что выбытие определяется датой, а не статусом.
+          await item.update({
             status: 'sold',
             sold_date: data.transaction_date,
             cage_id: null

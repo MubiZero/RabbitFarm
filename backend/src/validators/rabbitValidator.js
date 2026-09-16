@@ -129,6 +129,33 @@ const createRabbitSchema = Joi.object({
     .allow(null, '')
 });
 
+/** Пачка кроликов по одному образцу — перенос существующего стада. */
+const createRabbitsBulkSchema = Joi.object({
+  count: Joi.number().integer().min(1).max(100).required().messages({
+    'number.min': 'Нужно завести хотя бы одного кролика',
+    'number.max': 'За раз можно завести не больше 100 кроликов',
+    'any.required': 'Укажите количество'
+  }),
+
+  // Начало клейма: «R-» даст R-001, R-002… Пусто — кролики заводятся без
+  // бирки, и это нормально: в мелком хозяйстве их не метят.
+  tag_prefix: Joi.string().max(20).allow(null, ''),
+
+  breed_id: Joi.number().integer().required().messages({
+    'any.required': 'Порода обязательна'
+  }),
+  sex: Joi.string().valid('male', 'female', 'unknown').default('unknown'),
+  birth_date: Joi.date().max('now').required().messages({
+    'date.max': 'Дата рождения не может быть в будущем',
+    'any.required': 'Дата рождения обязательна'
+  }),
+  cage_id: Joi.number().integer().allow(null),
+  purpose: Joi.string().valid('breeding', 'meat', 'sale', 'show'),
+  status: Joi.string().valid('healthy', 'sick', 'quarantine', 'active'),
+  color: Joi.string().max(50).allow(null, ''),
+  notes: Joi.string().max(2000).allow(null, '')
+});
+
 // Update rabbit validation (все поля опциональны)
 const updateRabbitSchema = Joi.object({
   tag_id: Joi.string()
@@ -341,6 +368,7 @@ const bulkPurposeSchema = Joi.object({
 });
 
 module.exports = {
+  createRabbitsBulkSchema,
   createRabbitSchema,
   updateRabbitSchema,
   listRabbitsQuerySchema,

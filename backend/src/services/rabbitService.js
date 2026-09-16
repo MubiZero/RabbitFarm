@@ -161,6 +161,91 @@ class RabbitService {
   }
 
   /**
+   * Завести сразу несколько кроликов по одному образцу.
+   *
+   * Так переносят на приложение уже существующее стадо: у фермы триста
+   * голов, порода одна-две, пол известен, возраст примерный. Заводить их по
+   * одному — триста заполненных форм, и именно на этом перенос
+   * останавливался, не начавшись.
+   *
+   * Клеймо каждому даётся своё: либо по образцу `R-001`, `R-002`, либо
+   * никакого — тогда в базе NULL, и кролики без бирки друг другу не мешают.
+   */
+  async createRabbitsBulk({ count, tag_prefix, farm_id: farmId, ...template }) {
+    const total = parseInt(count, 10);
+    if (Number.isNaN(total) || total < 1 || total > 100) {
+      throw new Error('BULK_COUNT_INVALID');
+    }
+
+    // Лимит тарифа проверяется на всю пачку сразу, до первой записи: иначе
+    // ферма ушла бы за предел и узнала об этом на середине переноса.
+    await planService.assertRabbitLimit(farmId, total);
+
+    const breed = await Breed.findOne({
+      where: { id: template.breed_id, farm_id: farmId }
+    });
+    if (!breed) throw new Error('BREED_NOT_FOUND');
+
+    if (template.cage_id) {
+      const cage = await Cage.findOne({
+        where: { id: template.cage_id, farm_id: farmId }
+      });
+      if (!cage) throw new Error('CAGE_NOT_FOUND');
+
+      const occupied = await Rabbit.count({
+        where: { cage_id: template.cage_id, farm_id: farmId }
+      });
+      if (occupied + total > cage.capacity) {
+        throw new Error('CAGE_FULL');
+      }
+    }
+
+    // Назначение — то же, что у одиночного кролика: хозяйство называет его
+    // один раз.
+    let purpose = template.purpose;
+    if (!purpose) {
+      const farm = await Farm.findByPk(farmId, {
+        attributes: ['default_purpose']
+      });
+      purpose = farm?.default_purpose || 'breeding';
+    }
+
+    const prefix = (tag_prefix || '').trim();
+    const rows = [];
+    for (let i = 1; i <= total; i++) {
+      rows.push({
+        ...template,
+        farm_id: farmId,
+        purpose,
+        tag_id: prefix ? `${prefix}${String(i).padStart(3, '0')}` : null
+      });
+    }
+
+    const transaction = await sequelize.transaction();
+    try {
+      // Клейма проверяются одним запросом: сто отдельных проверок внутри
+      // транзакции держали бы её открытой дольше самой вставки.
+      if (prefix) {
+        const taken = await Rabbit.findOne({
+          where: { farm_id: farmId, tag_id: rows.map((row) => row.tag_id) },
+          transaction
+        });
+        if (taken) throw new Error('TAG_ID_EXISTS');
+      }
+
+      const created = await Rabbit.bulkCreate(rows, { transaction });
+      await transaction.commit();
+
+      logger.info('Rabbits created in bulk', { farmId, count: created.length });
+      return created;
+    } catch (error) {
+      if (!transaction.finished) await transaction.rollback();
+      logger.error('Bulk rabbit create error', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
    * Get rabbit by ID
    * @param {Number} rabbitId - Rabbit ID
    * @param {Number} farmId - id хозяйства: чужая запись не найдётся
