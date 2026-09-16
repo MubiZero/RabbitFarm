@@ -8,9 +8,9 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../data/models/feed_model.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
+import '../utils/feed_labels.dart';
 
 /// История кормлений.
 class FeedingRecordsListScreen extends ConsumerStatefulWidget {
@@ -207,7 +207,7 @@ class _RecordCard extends StatelessWidget {
     // раньше её видели на каждой строке, потому что модель выбрасывала корм из
     // ответа сервера.
     final feedName = record.feed?.name ?? context.l10n.feedingUnknownFeed;
-    final unit = record.feed?.unit.displayName;
+    final unit = record.feed == null ? null : feedUnitLabel(context, record.feed!.unit);
 
     final target = record.rabbit != null
         ? context.l10n.feedingForRabbit(record.rabbit!.label)

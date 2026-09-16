@@ -441,6 +441,67 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count года',
+      many: '$count лет',
+      few: '$count года',
+      one: '$count год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '$years г $months мес';
+  }
+
+  @override
+  String get feedTypePellets => 'Гранулы';
+
+  @override
+  String get feedTypeHay => 'Сено';
+
+  @override
+  String get feedTypeVegetables => 'Овощи';
+
+  @override
+  String get feedTypeGrain => 'Зерно';
+
+  @override
+  String get feedTypeSupplements => 'Добавки';
+
+  @override
+  String get feedTypeOther => 'Другое';
+
+  @override
+  String get feedUnitKg => 'кг';
+
+  @override
+  String get feedUnitLiter => 'л';
+
+  @override
+  String get feedUnitPiece => 'шт';
+
+  @override
+  String get vaccineTypeVhd => 'ВГБК';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Миксоматоз';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Пастереллёз';
+
+  @override
+  String get vaccineTypeOther => 'Другое';
+
+  @override
+  String get vaccineFullVhd =>
+      'Вирусная геморрагическая болезнь кроликов (ВГБК)';
+
+  @override
   String offlineRejectedTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

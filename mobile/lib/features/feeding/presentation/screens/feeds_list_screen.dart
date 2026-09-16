@@ -102,6 +102,9 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
     final writtenOff = context.l10n.feedsWrittenOff;
     final failed = context.l10n.feedsAdjustFailed;
 
+    // Единицу берём до диалога: после ожидания контекст трогать нельзя.
+    final unit = feedUnitLabel(context, feed.unit);
+
     final answer = await showDialog<StockDialogResult>(
       context: context,
       builder: (_) => _StockDialog(feed: feed, isAddition: isAddition),
@@ -109,7 +112,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
     if (answer == null) return;
     final quantity = answer.quantity;
 
-    final amount = formatQuantity(quantity, feed.unit.displayName);
+    final amount = formatQuantity(quantity, unit);
     final done = isAddition ? refilled(amount) : writtenOff(amount);
 
     final error = await ref.read(feedsProvider.notifier).adjustStock(
@@ -163,7 +166,7 @@ class _Filters extends ConsumerWidget {
         // экране руками и могли разойтись с подписями в других местах.
         for (final type in FeedType.values)
           AppFilterChipData(
-            label: type.displayName,
+            label: feedTypeLabel(context, type),
             isSelected: state.type == type,
             onTap: () => notifier.setFilters(
               type: state.type == type ? null : type,
@@ -223,7 +226,7 @@ class _FeedCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      feed.type.displayName,
+                      feedTypeLabel(context, feed.type),
                       style: AppTypography.labelSm.copyWith(
                         color: context.colors.onSurfaceVariant,
                       ),
@@ -235,11 +238,11 @@ class _FeedCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    formatQuantity(feed.currentStock, feed.unit.displayName),
+                    formatQuantity(feed.currentStock, feedUnitLabel(context, feed.unit)),
                     style: AppTypography.titleLg.copyWith(color: stockColor),
                   ),
                   Text(
-                    '${context.l10n.feedsMinStock} ${formatQuantity(feed.minStock, feed.unit.displayName)}',
+                    '${context.l10n.feedsMinStock} ${formatQuantity(feed.minStock, feedUnitLabel(context, feed.unit))}',
                     style: AppTypography.labelSm.copyWith(
                       color: context.colors.onSurfaceVariant,
                     ),
@@ -364,7 +367,7 @@ class _StockDialogState extends State<_StockDialog> {
               l10n.feedsCurrentStock(
                 formatQuantity(
                   widget.feed.currentStock,
-                  widget.feed.unit.displayName,
+                  feedUnitLabel(context, widget.feed.unit),
                 ),
               ),
               style: AppTypography.bodyMd.copyWith(
@@ -381,7 +384,7 @@ class _StockDialogState extends State<_StockDialog> {
               ),
               decoration: InputDecoration(
                 labelText: l10n.feedsQuantity,
-                suffixText: widget.feed.unit.displayName,
+                suffixText: feedUnitLabel(context, widget.feed.unit),
               ),
               onFieldSubmitted: (_) => _submit(),
               validator: (v) {
@@ -516,7 +519,7 @@ class _FeedDetailsSheet extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        feed.type.displayName,
+                        feedTypeLabel(context, feed.type),
                         style: AppTypography.labelSm.copyWith(
                           color: context.colors.onSurfaceVariant,
                         ),
@@ -550,14 +553,14 @@ class _FeedDetailsSheet extends ConsumerWidget {
                   label: context.l10n.feedsInStock,
                   value: formatQuantity(
                     feed.currentStock,
-                    feed.unit.displayName,
+                    feedUnitLabel(context, feed.unit),
                   ),
                   accent: low ? AppColors.warning : AppColors.success,
                 ),
                 StatTile(
                   icon: Icons.low_priority,
                   label: context.l10n.feedsMinStock,
-                  value: formatQuantity(feed.minStock, feed.unit.displayName),
+                  value: formatQuantity(feed.minStock, feedUnitLabel(context, feed.unit)),
                 ),
               ],
             ),

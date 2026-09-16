@@ -126,7 +126,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                   for (final entry in presentTypes)
                     MetricBar(
                       icon: entry.key.icon,
-                      label: entry.key.displayName,
+                      label: feedTypeLabel(context, entry.key),
                       value: '${entry.value}',
                       fraction: maxCount == 0 ? 0 : entry.value / maxCount,
                       color: entry.key.color,

@@ -185,6 +185,33 @@
   "navQuickTitle": "Что записать",
   "quickRecordFeeding": "Записать кормление",
   "quickNeedsConnection": "Нужна связь",
+  "ageYears": "{count, plural, one{{count} год} few{{count} года} many{{count} лет} other{{count} года}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} г {months} мес",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Гранулы",
+  "feedTypeHay": "Сено",
+  "feedTypeVegetables": "Овощи",
+  "feedTypeGrain": "Зерно",
+  "feedTypeSupplements": "Добавки",
+  "feedTypeOther": "Другое",
+  "feedUnitKg": "кг",
+  "feedUnitLiter": "л",
+  "feedUnitPiece": "шт",
+  "vaccineTypeVhd": "ВГБК",
+  "vaccineTypeMyxomatosis": "Миксоматоз",
+  "vaccineTypePasteurellosis": "Пастереллёз",
+  "vaccineTypeOther": "Другое",
+  "vaccineFullVhd": "Вирусная геморрагическая болезнь кроликов (ВГБК)",
   "offlineRejectedTitle": "{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}",
   "@offlineRejectedTitle": {
     "placeholders": {

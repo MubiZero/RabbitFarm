@@ -137,6 +137,33 @@
   "navQuickTitle": "Nimani yozamiz",
   "quickRecordFeeding": "Oziqlantirishni yozish",
   "quickNeedsConnection": "Aloqa kerak",
+  "ageYears": "{count, plural, one{{count} yosh} other{{count} yosh}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} y {months} oy",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Granula",
+  "feedTypeHay": "Pichan",
+  "feedTypeVegetables": "Sabzavot",
+  "feedTypeGrain": "Don",
+  "feedTypeSupplements": "Qoʻshimchalar",
+  "feedTypeOther": "Boshqa",
+  "feedUnitKg": "kg",
+  "feedUnitLiter": "l",
+  "feedUnitPiece": "dona",
+  "vaccineTypeVhd": "QGVK",
+  "vaccineTypeMyxomatosis": "Miksomatoz",
+  "vaccineTypePasteurellosis": "Pasterellyoz",
+  "vaccineTypeOther": "Boshqa",
+  "vaccineFullVhd": "Quyonlarning virusli gemorragik kasalligi (QGVK)",
   "offlineRejectedTitle": "{count, plural, one{{count} yozuv saqlanmadi} other{{count} yozuv saqlanmadi}}",
   "@offlineRejectedTitle": {
     "placeholders": {

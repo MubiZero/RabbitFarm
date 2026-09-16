@@ -136,6 +136,33 @@
   "navQuickTitle": "What to record",
   "quickRecordFeeding": "Log a feeding",
   "quickNeedsConnection": "Needs connection",
+  "ageYears": "{count, plural, one{{count} year} other{{count} years}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years}y {months}m",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Pellets",
+  "feedTypeHay": "Hay",
+  "feedTypeVegetables": "Vegetables",
+  "feedTypeGrain": "Grain",
+  "feedTypeSupplements": "Supplements",
+  "feedTypeOther": "Other",
+  "feedUnitKg": "kg",
+  "feedUnitLiter": "l",
+  "feedUnitPiece": "pcs",
+  "vaccineTypeVhd": "RHD",
+  "vaccineTypeMyxomatosis": "Myxomatosis",
+  "vaccineTypePasteurellosis": "Pasteurellosis",
+  "vaccineTypeOther": "Other",
+  "vaccineFullVhd": "Rabbit haemorrhagic disease (RHD)",
   "offlineRejectedTitle": "{count, plural, one{{count} record was not saved} other{{count} records were not saved}}",
   "@offlineRejectedTitle": {
     "placeholders": {

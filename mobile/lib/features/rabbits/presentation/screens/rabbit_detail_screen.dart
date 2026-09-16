@@ -94,7 +94,7 @@ class RabbitDetailScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, RabbitModel rabbit) {
     final canManageFinance =
         ref.watch(canProvider(FarmCapability.manageFinance));
-    final age = formatAge(rabbit.birthDate);
+    final age = formatAge(context, rabbit.birthDate);
     final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
     return SingleChildScrollView(

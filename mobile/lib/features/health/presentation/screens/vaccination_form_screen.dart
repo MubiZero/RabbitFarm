@@ -13,6 +13,7 @@ import '../providers/vaccinations_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../../../../core/offline_queue/offline_queue.dart';
 import '../../../../core/providers/connectivity.dart';
+import '../utils/medical_labels.dart';
 
 /// Форма записи о прививке.
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -200,7 +201,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
                   DropdownMenuItem(
                     value: type,
                     child: Text(
-                      type.fullName,
+                      vaccineTypeFullLabel(context, type),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

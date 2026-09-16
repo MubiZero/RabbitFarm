@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_utils.dart';
-import '../../data/models/feed_model.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
 import '../utils/feed_labels.dart';
@@ -122,7 +121,7 @@ class _FeedingStatisticsScreenState
                         Text(
                           formatQuantity(
                             stats.quantityByUnit[unit] ?? 0,
-                            unitLabel(unit),
+                            unitLabel(context, unit),
                           ),
                           style: AppTypography.titleLg.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
@@ -184,7 +183,7 @@ class _TypeBreakdown extends StatelessWidget {
 
     final max = entries.first.value;
     final title = showUnitInTitle
-        ? context.l10n.feedingStatsChartTitle(unitLabel(unit))
+        ? context.l10n.feedingStatsChartTitle(unitLabel(context, unit))
         : context.l10n.feedingStatsChartTitlePlain;
 
     return Column(
@@ -198,8 +197,8 @@ class _TypeBreakdown extends StatelessWidget {
               for (final entry in entries)
                 MetricBar(
                   icon: feedTypeFromCode(entry.key)?.icon,
-                  label: feedTypeFromCode(entry.key)?.displayName ?? entry.key,
-                  value: formatQuantity(entry.value, unitLabel(unit)),
+                  label: _typeLabel(context, entry.key),
+                  value: formatQuantity(entry.value, unitLabel(context, unit)),
                   fraction: max == 0 ? 0 : entry.value / max,
                   color: feedTypeFromCode(entry.key)?.color ??
                       Theme.of(context).colorScheme.primary,
@@ -239,7 +238,7 @@ class _FeedUsageRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatQuantity(usage.quantity, unitLabel(usage.unit)),
+                formatQuantity(usage.quantity, unitLabel(context, usage.unit)),
                 style: AppTypography.labelLg.copyWith(color: cs.onSurface),
               ),
               if (usage.cost > 0)
@@ -283,4 +282,11 @@ class _FeedingStatisticsSkeleton extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Тип корма приходит ключом карты (`pellets`), а не разобранным значением.
+/// Незнакомый код показываем как есть — он понятнее пустоты.
+String _typeLabel(BuildContext context, String code) {
+  final type = feedTypeFromCode(code);
+  return type == null ? code : feedTypeLabel(context, type);
 }

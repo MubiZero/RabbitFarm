@@ -918,6 +918,102 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @ageYears.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} год} few{{count} года} many{{count} лет} other{{count} года}}'**
+  String ageYears(int count);
+
+  /// No description provided for @ageYearsMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'{years} г {months} мес'**
+  String ageYearsMonths(int years, int months);
+
+  /// No description provided for @feedTypePellets.
+  ///
+  /// In ru, this message translates to:
+  /// **'Гранулы'**
+  String get feedTypePellets;
+
+  /// No description provided for @feedTypeHay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сено'**
+  String get feedTypeHay;
+
+  /// No description provided for @feedTypeVegetables.
+  ///
+  /// In ru, this message translates to:
+  /// **'Овощи'**
+  String get feedTypeVegetables;
+
+  /// No description provided for @feedTypeGrain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зерно'**
+  String get feedTypeGrain;
+
+  /// No description provided for @feedTypeSupplements.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавки'**
+  String get feedTypeSupplements;
+
+  /// No description provided for @feedTypeOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get feedTypeOther;
+
+  /// No description provided for @feedUnitKg.
+  ///
+  /// In ru, this message translates to:
+  /// **'кг'**
+  String get feedUnitKg;
+
+  /// No description provided for @feedUnitLiter.
+  ///
+  /// In ru, this message translates to:
+  /// **'л'**
+  String get feedUnitLiter;
+
+  /// No description provided for @feedUnitPiece.
+  ///
+  /// In ru, this message translates to:
+  /// **'шт'**
+  String get feedUnitPiece;
+
+  /// No description provided for @vaccineTypeVhd.
+  ///
+  /// In ru, this message translates to:
+  /// **'ВГБК'**
+  String get vaccineTypeVhd;
+
+  /// No description provided for @vaccineTypeMyxomatosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Миксоматоз'**
+  String get vaccineTypeMyxomatosis;
+
+  /// No description provided for @vaccineTypePasteurellosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пастереллёз'**
+  String get vaccineTypePasteurellosis;
+
+  /// No description provided for @vaccineTypeOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get vaccineTypeOther;
+
+  /// No description provided for @vaccineFullVhd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вирусная геморрагическая болезнь кроликов (ВГБК)'**
+  String get vaccineFullVhd;
+
   /// No description provided for @offlineRejectedTitle.
   ///
   /// In ru, this message translates to:

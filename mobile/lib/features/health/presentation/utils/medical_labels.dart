@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../data/models/medical_record_model.dart';
+import '../../data/models/vaccination_model.dart';
 
 /// Подписи и цвета исходов лечения.
 ///
@@ -40,3 +41,23 @@ String medicalOutcomeValue(MedicalOutcome outcome) => switch (outcome) {
       MedicalOutcome.died => 'died',
       MedicalOutcome.euthanized => 'euthanized',
     };
+
+/// Название вакцины.
+///
+/// Жило в модели данных расширением `displayName`, написанным по-русски:
+/// «Миксоматоз» оставался русским и на таджикском экране. Сами болезни
+/// называются одинаково во всех языках лишь на слух — писать их надо
+/// местной графикой.
+String vaccineTypeLabel(BuildContext context, VaccineType type) =>
+    switch (type) {
+      VaccineType.vhd => context.l10n.vaccineTypeVhd,
+      VaccineType.myxomatosis => context.l10n.vaccineTypeMyxomatosis,
+      VaccineType.pasteurellosis => context.l10n.vaccineTypePasteurellosis,
+      VaccineType.other => context.l10n.vaccineTypeOther,
+    };
+
+/// Полное название — для подсказки в форме, где место есть.
+String vaccineTypeFullLabel(BuildContext context, VaccineType type) =>
+    type == VaccineType.vhd
+        ? context.l10n.vaccineFullVhd
+        : vaccineTypeLabel(context, type);

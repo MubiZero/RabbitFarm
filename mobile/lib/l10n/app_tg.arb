@@ -136,6 +136,33 @@
   "navQuickTitle": "Чиро сабт кунем",
   "quickRecordFeeding": "Хӯрокдиҳиро сабт кардан",
   "quickNeedsConnection": "Алоқа лозим аст",
+  "ageYears": "{count, plural, one{{count} сол} other{{count} сол}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} с {months} моҳ",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Гранула",
+  "feedTypeHay": "Хасбеда",
+  "feedTypeVegetables": "Сабзавот",
+  "feedTypeGrain": "Ғалла",
+  "feedTypeSupplements": "Иловагиҳо",
+  "feedTypeOther": "Дигар",
+  "feedUnitKg": "кг",
+  "feedUnitLiter": "л",
+  "feedUnitPiece": "дона",
+  "vaccineTypeVhd": "БГВХ",
+  "vaccineTypeMyxomatosis": "Миксоматоз",
+  "vaccineTypePasteurellosis": "Пастереллёз",
+  "vaccineTypeOther": "Дигар",
+  "vaccineFullVhd": "Бемории геморрагии вирусии харгӯшҳо (БГВХ)",
   "offlineRejectedTitle": "{count, plural, one{{count} сабт нигоҳ дошта нашуд} other{{count} сабт нигоҳ дошта нашуданд}}",
   "@offlineRejectedTitle": {
     "placeholders": {

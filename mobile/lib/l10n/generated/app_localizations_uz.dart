@@ -443,6 +443,65 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickNeedsConnection => 'Aloqa kerak';
 
   @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count yosh',
+      one: '$count yosh',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '$years y $months oy';
+  }
+
+  @override
+  String get feedTypePellets => 'Granula';
+
+  @override
+  String get feedTypeHay => 'Pichan';
+
+  @override
+  String get feedTypeVegetables => 'Sabzavot';
+
+  @override
+  String get feedTypeGrain => 'Don';
+
+  @override
+  String get feedTypeSupplements => 'Qoʻshimchalar';
+
+  @override
+  String get feedTypeOther => 'Boshqa';
+
+  @override
+  String get feedUnitKg => 'kg';
+
+  @override
+  String get feedUnitLiter => 'l';
+
+  @override
+  String get feedUnitPiece => 'dona';
+
+  @override
+  String get vaccineTypeVhd => 'QGVK';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Miksomatoz';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Pasterellyoz';
+
+  @override
+  String get vaccineTypeOther => 'Boshqa';
+
+  @override
+  String get vaccineFullVhd =>
+      'Quyonlarning virusli gemorragik kasalligi (QGVK)';
+
+  @override
   String offlineRejectedTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

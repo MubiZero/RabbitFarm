@@ -9,6 +9,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../utils/feed_labels.dart';
 
 /// Карточка корма на складе.
 class FeedFormScreen extends ConsumerStatefulWidget {
@@ -197,7 +198,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                 for (final type in FeedType.values)
                   DropdownMenuItem(
                     value: type,
-                    child: Text(type.displayName),
+                    child: Text(feedTypeLabel(context, type)),
                   ),
               ],
               onChanged: (v) => setState(() {
@@ -216,7 +217,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                 for (final unit in FeedUnit.values)
                   DropdownMenuItem(
                     value: unit,
-                    child: Text(unit.displayName),
+                    child: Text(feedUnitLabel(context, unit)),
                   ),
               ],
               onChanged: (v) => setState(() {
@@ -237,7 +238,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.feedFormCurrentStock,
                 prefixIcon: const Icon(Icons.inventory_2_outlined),
-                suffixText: _unit.displayName,
+                suffixText: feedUnitLabel(context, _unit),
               ),
               validator: (v) => _validateAmount(v, required: true),
             ),
@@ -248,7 +249,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.feedFormMinStock,
                 prefixIcon: const Icon(Icons.warning_amber_outlined),
-                suffixText: _unit.displayName,
+                suffixText: feedUnitLabel(context, _unit),
                 helperText: l10n.feedFormMinStockHelp,
                 helperMaxLines: 2,
               ),
@@ -262,7 +263,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                 labelText: l10n.feedFormCost,
                 prefixIcon: const Icon(Icons.payments_outlined),
                 suffixText:
-                    '${context.currencySymbol}/${_unit.displayName}',
+                    '${context.currencySymbol}/${feedUnitLabel(context, _unit)}',
               ),
               validator: (v) => _validateAmount(v, required: false),
             ),

@@ -442,6 +442,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickNeedsConnection => 'Needs connection';
 
   @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count years',
+      one: '$count year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '${years}y ${months}m';
+  }
+
+  @override
+  String get feedTypePellets => 'Pellets';
+
+  @override
+  String get feedTypeHay => 'Hay';
+
+  @override
+  String get feedTypeVegetables => 'Vegetables';
+
+  @override
+  String get feedTypeGrain => 'Grain';
+
+  @override
+  String get feedTypeSupplements => 'Supplements';
+
+  @override
+  String get feedTypeOther => 'Other';
+
+  @override
+  String get feedUnitKg => 'kg';
+
+  @override
+  String get feedUnitLiter => 'l';
+
+  @override
+  String get feedUnitPiece => 'pcs';
+
+  @override
+  String get vaccineTypeVhd => 'RHD';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Myxomatosis';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Pasteurellosis';
+
+  @override
+  String get vaccineTypeOther => 'Other';
+
+  @override
+  String get vaccineFullVhd => 'Rabbit haemorrhagic disease (RHD)';
+
+  @override
   String offlineRejectedTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

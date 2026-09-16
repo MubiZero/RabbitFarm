@@ -18,6 +18,7 @@ import '../../data/models/feed_model.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
 import '../providers/feeds_provider.dart';
+import '../utils/feed_labels.dart';
 
 enum _FeedingMode { rabbit, cage }
 
@@ -265,7 +266,7 @@ class _FeedingRecordFormScreenState
                     ? l10n.feedingBulkQuantityEach
                     : l10n.feedingFormQuantity,
                 prefixIcon: const Icon(Icons.scale_outlined),
-                suffixText: feed?.unit.displayName,
+                suffixText: feed == null ? null : feedUnitLabel(context, feed.unit),
                 helperText: _quantityHelper(context, feed, isBulk),
                 helperMaxLines: 2,
               ),
@@ -377,7 +378,8 @@ class _FeedingRecordFormScreenState
     }
 
     return l10n.feedingBulkQuantityEachNote(
-      formatQuantity(perRecipient * _recipientCount, feed?.unit.displayName),
+      formatQuantity(perRecipient * _recipientCount,
+          feed == null ? null : feedUnitLabel(context, feed.unit)),
     );
   }
 }
@@ -815,7 +817,7 @@ class _FeedField extends StatelessWidget {
                 // корма, которого на складе уже нет.
                 Text(
                   context.l10n.feedingFormStockLeft(
-                    formatQuantity(feed.currentStock, feed.unit.displayName),
+                    formatQuantity(feed.currentStock, feedUnitLabel(context, feed.unit)),
                   ),
                   style: AppTypography.labelSm.copyWith(
                     color: feed.currentStock <= feed.minStock

@@ -280,16 +280,13 @@ class _FakeMedicalRepository extends MedicalRecordsRepository {
 }
 
 class _FakeVaccinationsRepository extends VaccinationsRepository {
-  _FakeVaccinationsRepository({this.error})
+  _FakeVaccinationsRepository()
       : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
-
-  final Object? error;
   final sent = <Map<String, dynamic>>[];
 
   @override
   Future<Vaccination> createVaccinationFromJson(
       Map<String, dynamic> data) async {
-    if (error != null) throw error!;
     sent.add(data);
     return Vaccination(
       id: 1,
