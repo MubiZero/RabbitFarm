@@ -186,6 +186,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
                   : null,
             ),
             DropdownButtonFormField<FeedType>(
+              isExpanded: true,
               initialValue: _type,
               decoration: InputDecoration(
                 labelText: l10n.feedFormType,
@@ -204,6 +205,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
               }),
             ),
             DropdownButtonFormField<FeedUnit>(
+              isExpanded: true,
               initialValue: _unit,
               decoration: InputDecoration(
                 labelText: l10n.feedFormUnit,

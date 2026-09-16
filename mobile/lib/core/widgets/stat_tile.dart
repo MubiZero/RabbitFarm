@@ -59,6 +59,10 @@ class StatTile extends StatelessWidget {
               label,
               style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
               maxLines: 2,
+              // Без этого подпись длиннее двух строк обрубается по букве.
+              // Таджикские и узбекские слова длиннее русских, и плитки чисел
+              // стоят на самом видном месте — на «Сегодня».
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

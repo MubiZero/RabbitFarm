@@ -263,6 +263,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           title: context.l10n.taskFormSectionParams,
           children: [
             DropdownButtonFormField<TaskType>(
+              isExpanded: true,
               initialValue: _type,
               decoration: InputDecoration(
                 labelText: context.l10n.tasksFilterType,
@@ -281,6 +282,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               }),
             ),
             DropdownButtonFormField<TaskPriority>(
+              isExpanded: true,
               initialValue: _priority,
               decoration: InputDecoration(
                 labelText: context.l10n.tasksFilterPriority,
@@ -300,6 +302,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             ),
             if (_isEditing)
               DropdownButtonFormField<TaskStatus>(
+                isExpanded: true,
                 initialValue: _status,
                 decoration: InputDecoration(
                   labelText: context.l10n.tasksFilterStatus,
@@ -328,6 +331,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               }),
             ),
             DropdownButtonFormField<TaskRepeat?>(
+              isExpanded: true,
               initialValue: _repeat,
               decoration: InputDecoration(
                 labelText: context.l10n.taskFormRepeat,

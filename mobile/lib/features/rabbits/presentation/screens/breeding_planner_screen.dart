@@ -179,6 +179,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
+              isExpanded: true,
               initialValue: selectedId,
               decoration: InputDecoration(
                 hintText: context.l10n.rabbitPickerTitle,

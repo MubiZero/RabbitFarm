@@ -293,6 +293,7 @@ class _MedicalRecordFormScreenState
               ),
             ),
             DropdownButtonFormField<MedicalOutcome>(
+              isExpanded: true,
               initialValue: _outcome,
               decoration: InputDecoration(
                 labelText: l10n.medFormOutcome,

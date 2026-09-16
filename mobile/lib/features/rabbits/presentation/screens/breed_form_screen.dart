@@ -107,6 +107,7 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
                   : null,
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _purpose,
               decoration: InputDecoration(
                 labelText: l10n.breedFormPurpose,

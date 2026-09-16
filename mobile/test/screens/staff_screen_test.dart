@@ -66,6 +66,38 @@ class _InvitingStaffRepository extends StaffRepository {
   }
 }
 
+/// Запоминает, с чем ушло приглашение: поле «имя» показывали только в ветке
+/// «по телефону», а сервер требует его всегда — приглашение по почте
+/// отвечало отказом про поле, которого человек не видел.
+class _RecordingStaffRepository extends StaffRepository {
+  _RecordingStaffRepository()
+      : super(ApiClient(storage: const FlutterSecureStorage()));
+
+  String? sentEmail;
+  String? sentPhone;
+  String? sentFullName;
+
+  @override
+  Future<CreatedInvitation> createInvitation({
+    String? email,
+    String? phone,
+    String? fullName,
+    required FarmRole role,
+  }) async {
+    sentEmail = email;
+    sentPhone = phone;
+    sentFullName = fullName;
+    return CreatedInvitation(
+      id: 11,
+      email: email,
+      fullName: fullName,
+      role: role,
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
+      inviteLink: _inviteLink,
+    );
+  }
+}
+
 FarmInvitation _invitation({
   required int id,
   required String email,
@@ -387,5 +419,36 @@ void main() {
     // Диалог закрыт, подтверждение видно поверх экрана, а не под затемнением.
     expect(find.text('Работник приглашён'), findsNothing);
     expect(find.textContaining('Приглашение скопировано'), findsOneWidget);
+  });
+
+  testWidgets('приглашение по почте спрашивает имя и отправляет его',
+      (tester) async {
+    final repo = _RecordingStaffRepository();
+
+    await tester.pumpWidget(_wrap([
+      farmMembersProvider.overrideWith((ref) async => [_owner]),
+      farmInvitationsProvider.overrideWith((ref) async => <FarmInvitation>[]),
+      staffRepositoryProvider.overrideWithValue(repo),
+    ]));
+    await _settle(tester);
+
+    await tester.tap(find.text('Пригласить'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('По почте'));
+    await tester.pumpAndSettle();
+
+    // Поле имени должно быть видно и здесь, а не только у телефона.
+    expect(find.text('Имя работника'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).at(0), 'aziz@example.com');
+    await tester.enterText(find.byType(TextField).at(1), 'Азиз');
+    await tester.tap(find.text('Пригласить работника'));
+    await tester.pumpAndSettle();
+
+    expect(repo.sentEmail, 'aziz@example.com');
+    expect(repo.sentPhone, isNull);
+    // Раньше сюда уходил null, и сервер отвечал отказом про обязательное имя.
+    expect(repo.sentFullName, 'Азиз');
   });
 }

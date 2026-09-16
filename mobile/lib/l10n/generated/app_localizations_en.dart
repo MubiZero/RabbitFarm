@@ -2087,6 +2087,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rabbitsFilterSold => 'Sold';
 
   @override
+  String get rabbitsFilterDead => 'Dead';
+
+  @override
   String get sexMale => 'Male';
 
   @override
@@ -2399,6 +2402,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLogout => 'Sign out';
+
+  @override
+  String get logoutDialogTitle => 'Sign out?';
+
+  @override
+  String get logoutDialogBody =>
+      'Your records stay on the server — you will see them again after signing in.';
+
+  @override
+  String get logoutDialogConfirm => 'Sign out';
 
   @override
   String get settingsThemeLight => 'Light';

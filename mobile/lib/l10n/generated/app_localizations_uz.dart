@@ -2093,6 +2093,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get rabbitsFilterSold => 'Sotilgan';
 
   @override
+  String get rabbitsFilterDead => 'Nobud boʻlgan';
+
+  @override
   String get sexMale => 'Erkak';
 
   @override
@@ -2407,7 +2410,17 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsLogout => 'Akkauntdan chiqish';
 
   @override
-  String get settingsThemeLight => 'Yorug\'';
+  String get logoutDialogTitle => 'Akkauntdan chiqilsinmi?';
+
+  @override
+  String get logoutDialogBody =>
+      'Yozuvlar serverda qoladi — kirganingizdan keyin ularni yana koʻrasiz.';
+
+  @override
+  String get logoutDialogConfirm => 'Chiqish';
+
+  @override
+  String get settingsThemeLight => 'Yorugʻ';
 
   @override
   String get settingsThemeSystem => 'Tizimdagidek';

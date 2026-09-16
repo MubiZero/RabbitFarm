@@ -3822,6 +3822,12 @@ abstract class AppLocalizations {
   /// **'Проданы'**
   String get rabbitsFilterSold;
 
+  /// No description provided for @rabbitsFilterDead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Павшие'**
+  String get rabbitsFilterDead;
+
   /// No description provided for @sexMale.
   ///
   /// In ru, this message translates to:
@@ -4397,6 +4403,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выйти из аккаунта'**
   String get settingsLogout;
+
+  /// No description provided for @logoutDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта?'**
+  String get logoutDialogTitle;
+
+  /// No description provided for @logoutDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записи останутся на сервере — вы снова увидите их после входа.'**
+  String get logoutDialogBody;
+
+  /// No description provided for @logoutDialogConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get logoutDialogConfirm;
 
   /// No description provided for @settingsThemeLight.
   ///

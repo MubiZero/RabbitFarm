@@ -2079,6 +2079,9 @@ class AppLocalizationsTg extends AppLocalizations {
   String get rabbitsFilterSold => 'Фурӯхташуда';
 
   @override
+  String get rabbitsFilterDead => 'Талафшуда';
+
+  @override
   String get sexMale => 'Нар';
 
   @override
@@ -2391,6 +2394,16 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get settingsLogout => 'Аз ҳисоб баромадан';
+
+  @override
+  String get logoutDialogTitle => 'Аз ҳисоб баромадан?';
+
+  @override
+  String get logoutDialogBody =>
+      'Сабтҳо дар сервер мемонанд — пас аз воридшавӣ онҳоро дубора мебинед.';
+
+  @override
+  String get logoutDialogConfirm => 'Баромадан';
 
   @override
   String get settingsThemeLight => 'Равшан';

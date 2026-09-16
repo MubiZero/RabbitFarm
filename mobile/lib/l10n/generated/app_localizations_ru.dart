@@ -2112,6 +2112,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitsFilterSold => 'Проданы';
 
   @override
+  String get rabbitsFilterDead => 'Павшие';
+
+  @override
   String get sexMale => 'Самец';
 
   @override
@@ -2425,6 +2428,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsLogout => 'Выйти из аккаунта';
+
+  @override
+  String get logoutDialogTitle => 'Выйти из аккаунта?';
+
+  @override
+  String get logoutDialogBody =>
+      'Записи останутся на сервере — вы снова увидите их после входа.';
+
+  @override
+  String get logoutDialogConfirm => 'Выйти';
 
   @override
   String get settingsThemeLight => 'Светлая';

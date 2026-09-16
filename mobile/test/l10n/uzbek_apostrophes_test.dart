@@ -20,7 +20,11 @@ void main() {
     final data = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     // В ARB включено use-escaping, поэтому одиночная кавычка внутри текста
     // выглядит как две подряд.
-    final wrong = RegExp(r"[a-zA-Z]''[a-zA-Z]");
+    //
+    // Буква после кавычки не требуется: пока шаблон был `[a-zA-Z]''[a-zA-Z]`,
+    // он пропускал кавычку в конце строки — `"settingsThemeLight": "Yorug''"`
+    // прожил так до полевого испытания, хотя сторож стоял рядом.
+    final wrong = RegExp(r"[a-zA-Z]''");
 
     final offenders = <String>[];
     data.forEach((key, value) {

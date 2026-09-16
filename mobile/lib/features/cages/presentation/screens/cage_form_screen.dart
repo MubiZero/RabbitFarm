@@ -128,6 +128,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
                   : null,
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _type,
               decoration: InputDecoration(
                 labelText: l10n.cageFormType,
@@ -165,6 +166,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
               },
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _condition,
               decoration: InputDecoration(
                 labelText: l10n.cagesFilterCondition,

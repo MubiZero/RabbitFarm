@@ -733,6 +733,7 @@ class _CageField extends StatelessWidget {
     final cages = cagesAsync.value ?? const <CageModel>[];
 
     return DropdownButtonFormField<int>(
+      isExpanded: true,
       initialValue: selected,
       decoration: InputDecoration(
         labelText: context.l10n.feedingFormCage,
