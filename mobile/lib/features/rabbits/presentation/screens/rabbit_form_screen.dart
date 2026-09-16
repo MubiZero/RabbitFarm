@@ -123,8 +123,16 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   /// Номер бирки человек пишет на ушной бирке от руки, поэтому он должен быть
   /// коротким. Раньше подставлялась метка времени вида «R-1787510574403»:
   /// переписать её на бирку невозможно, и её оставляли как есть.
+  ///
+  /// Счёт берётся только из нефильтрованного списка. При включённом отборе
+  /// `total` — это число найденных, а не всё поголовье: с фильтром «самки»
+  /// на сотне кроликов форма предлагала номер из третьего десятка, который
+  /// давно занят, и сохранение упиралось в отказ про дубликат клейма.
   String _suggestedTag() {
-    final next = ref.read(rabbitsListProvider).total + 1;
+    final state = ref.read(rabbitsListProvider);
+    if (!state.filter.isEmpty) return '';
+
+    final next = state.total + 1;
     return 'R-${next.toString().padLeft(3, '0')}';
   }
 
@@ -484,6 +492,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                     )
                   else
                     DropdownButtonFormField<int>(
+                      isExpanded: true,
                       initialValue: _selectedBreedId,
                       decoration: InputDecoration(
                         labelText: context.l10n.rabbitBreed,
@@ -661,6 +670,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                   // список не нашёл бы своего значения, а ошибочную продажу
                   // нельзя было бы отменить, вернув кролика в живые.
                   DropdownButtonFormField<String>(
+                    isExpanded: true,
                     initialValue: _selectedStatus,
                     decoration: InputDecoration(
                       labelText: context.l10n.rabbitStatus,
@@ -679,6 +689,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                         setState(() => _selectedStatus = value!),
                   ),
                   DropdownButtonFormField<String>(
+                    isExpanded: true,
                     initialValue: _selectedPurpose,
                     decoration: InputDecoration(
                       labelText: context.l10n.rabbitPurpose,
@@ -858,6 +869,7 @@ class _CageField extends ConsumerWidget {
     final cages = ref.watch(cageOptionsProvider);
 
     return DropdownButtonFormField<int?>(
+      isExpanded: true,
       initialValue: value,
       decoration: InputDecoration(
         labelText: l10n.rabbitCage,

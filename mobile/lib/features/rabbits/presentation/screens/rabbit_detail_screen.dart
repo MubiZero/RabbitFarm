@@ -215,16 +215,25 @@ class RabbitDetailScreen extends ConsumerWidget {
                           rabbit.label,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          context.l10n.rabbitTagLine(rabbit.tagId!),
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                        ),
+                        // Клеймо есть не у всех — то же правило, что строкой
+                        // ниже у родителей (:595) и в списке кроликов.
+                        // Здесь охраны не было: в мелком хозяйстве биркой не
+                        // метят никого, и правило должно быть одно на экран.
+                        if (rabbit.tagId != null &&
+                            rabbit.tagId!.trim().isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            context.l10n.rabbitTagLine(rabbit.tagId!),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

@@ -108,6 +108,17 @@ class RabbitService {
         }
       }
 
+      // Пустое клеймо — это его отсутствие, а не значение. Форма при пустом
+      // поле шлёт пустую строку, и она доезжала до базы как обычное
+      // значение: уникальный индекс (unique_user_rabbit_tag) рассчитан на
+      // NULL — «кролики без бирки друг другу не мешают», — а две пустые
+      // строки он считает дубликатом. Проверка ниже такую строку пропускала
+      // (условие ложно), и наружу вылезал сырой конфликт «Такая запись уже
+      // существует» на втором же кролике без бирки.
+      if (!rabbitData.tag_id || !String(rabbitData.tag_id).trim()) {
+        rabbitData.tag_id = null;
+      }
+
       // Клеймо уникально в пределах фермы: у соседа может быть такое же
       if (rabbitData.tag_id) {
         const existing = await Rabbit.findOne({
@@ -403,6 +414,13 @@ class RabbitService {
           transaction
         });
         if (!mother) throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');
+      }
+
+      // То же, что при создании: очистка поля бирки означает её отсутствие.
+      // Пустая строка ломается об уникальный индекс, рассчитанный на NULL.
+      if (updateData.tag_id !== undefined &&
+          (!updateData.tag_id || !String(updateData.tag_id).trim())) {
+        updateData.tag_id = null;
       }
 
       // Клеймо уникально в пределах фермы (если его меняют)

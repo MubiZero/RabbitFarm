@@ -179,6 +179,16 @@ class _Header extends StatelessWidget {
                   filter.withStatus(filter.status == 'sold' ? null : 'sold')),
               color: AppColors.warning,
             ),
+            // Павших отбирать было нечем, хотя статус такой есть: чтобы
+            // посмотреть падёж за сезон, приходилось листать всё стадо
+            // глазами.
+            AppFilterChipData(
+              label: l10n.rabbitsFilterDead,
+              isSelected: filter.status == 'dead',
+              onTap: () => onFilter(
+                  filter.withStatus(filter.status == 'dead' ? null : 'dead')),
+              color: AppColors.error,
+            ),
           ],
         ),
       ],
