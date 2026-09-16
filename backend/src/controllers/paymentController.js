@@ -13,9 +13,15 @@ async function sendReceipt(payment, expiresAt) {
   if (!expiresAt) return;
   try {
     await notifyFarmOwners(payment.farm_id, {
-      title: 'Оплата получена',
-      body: `Сумма: ${payment.amount} сомони. Заказ №${payment.order_id}. `
-        + `Тариф продлён до ${expiresAt.toLocaleDateString('ru-RU')}.`,
+      key: 'paymentReceipt',
+      params: {
+        amount: payment.amount,
+        orderId: payment.order_id,
+        // Дата собирается по числам, а не словом месяца: текст уходит на
+        // четырёх языках, и русское «14 сентября» в узбекском письме
+        // читалось бы как ошибка.
+        until: expiresAt.toISOString().split('T')[0]
+      },
       data: { type: 'payment_receipt', payment_id: String(payment.id) }
     });
   } catch (error) {

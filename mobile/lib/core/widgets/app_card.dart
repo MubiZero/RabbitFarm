@@ -25,8 +25,8 @@ class AppCard extends StatelessWidget {
     final effectiveBorder = borderColor ??
         switch (variant) {
           AppCardVariant.highlighted => scheme.primary,
-          AppCardVariant.error       => scheme.error,
-          AppCardVariant.default_    => scheme.outline,
+          AppCardVariant.error => scheme.error,
+          AppCardVariant.default_ => scheme.outline,
         };
 
     return Material(

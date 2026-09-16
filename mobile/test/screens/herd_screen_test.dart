@@ -255,7 +255,8 @@ void main() {
     await tester.pumpWidget(testAppScreen(
       const HerdScreen(),
       overrides: [
-        cagesRepositoryProvider.overrideWithValue(_FakeCagesRepository(const [])),
+        cagesRepositoryProvider
+            .overrideWithValue(_FakeCagesRepository(const [])),
         rabbitsRepositoryProvider.overrideWithValue(repository),
         farmRoleProvider.overrideWithValue(FarmRoleAccess.owner),
         // Список кроликов общий с экраном «Кролики»: заходим на вкладку так,

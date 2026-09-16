@@ -63,7 +63,8 @@ class FarmExportScreen extends ConsumerWidget {
             // забрать и кусками, не копируя весь снимок.
             SelectableText(
               _pretty(export),
-              style: AppTypography.mono.copyWith(color: context.colors.onSurface),
+              style:
+                  AppTypography.mono.copyWith(color: context.colors.onSurface),
             ),
           ],
         ),
@@ -99,10 +100,10 @@ class _GeneratedAt extends StatelessWidget {
     return Text(
       moment == null
           ? context.l10n.platformFarmExportHint
-          : context.l10n
-              .platformFarmExportGeneratedAt(_momentFormat.format(moment.toLocal())),
-      style:
-          AppTypography.labelSm.copyWith(color: context.colors.onSurfaceVariant),
+          : context.l10n.platformFarmExportGeneratedAt(
+              _momentFormat.format(moment.toLocal())),
+      style: AppTypography.labelSm
+          .copyWith(color: context.colors.onSurfaceVariant),
     );
   }
 }

@@ -22,7 +22,8 @@ class PaymentRepository {
   /// платежа банка: `new` / `completed` / `failed`.
   Future<String> checkStatus(String invoiceId) async {
     return guardRequest(() async {
-      final response = await _apiClient.get(ApiEndpoints.paymentStatus(invoiceId));
+      final response =
+          await _apiClient.get(ApiEndpoints.paymentStatus(invoiceId));
       return response.data['data']['status'] as String;
     }, 'Не удалось проверить статус оплаты');
   }

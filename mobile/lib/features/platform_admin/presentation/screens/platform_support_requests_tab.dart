@@ -49,8 +49,8 @@ class PlatformSupportRequestsTab extends ConsumerWidget {
       ),
       itemBuilder: (context, request, _) => SupportRequestCard(
         request: request,
-        onResolve: () async {
-          final error = await notifier.resolve(request.id);
+        onResolve: (answer) async {
+          final error = await notifier.resolve(request.id, answer: answer);
           if (error != null && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

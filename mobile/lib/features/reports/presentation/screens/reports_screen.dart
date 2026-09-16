@@ -37,8 +37,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
   /// Дата уходит в запрос строкой «2026-08-21» — так её ждут остальные
   /// разделы API.
-  String? get _fromDate =>
-      _period.fromDate?.toIso8601String().split('T').first;
+  String? get _fromDate => _period.fromDate?.toIso8601String().split('T').first;
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +46,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     final canFinance = ref.watch(canProvider(FarmCapability.manageFinance));
     // Роль может смениться, пока экран открыт: тогда открытый финансовый
     // отчёт нужно закрыть, а не оставлять его без кнопки возврата.
-    final kind = _kind == _ReportKind.finance && !canFinance
-        ? _ReportKind.farm
-        : _kind;
+    final kind =
+        _kind == _ReportKind.finance && !canFinance ? _ReportKind.farm : _kind;
 
     final params = ReportDateParams(fromDate: _fromDate);
 

@@ -22,7 +22,9 @@ abstract class FeedingRecord with _$FeedingRecord {
     @JsonKey(name: 'fed_at') @DateTimeConverter() required DateTime fedAt,
     @JsonKey(name: 'fed_by') @NullableIntConverter() int? fedBy,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
     // Связи, которые сервер кладёт в ответ. Раньше все три отбрасывались
     // (`includeFromJson: false`), и список кормлений на каждой строке писал
     // «Корм не указан», хотя название корма приходило в том же ответе.
@@ -81,8 +83,12 @@ abstract class FeedingRecordUpdate with _$FeedingRecordUpdate {
 abstract class FeedingStatistics with _$FeedingStatistics {
   const factory FeedingStatistics({
     @JsonKey(name: 'total_feedings') required int totalFeedings,
-    @JsonKey(name: 'quantity_by_unit') @Default({}) Map<String, double> quantityByUnit,
-    @JsonKey(name: 'by_feed_type') @Default({}) Map<String, Map<String, double>> byFeedType,
+    @JsonKey(name: 'quantity_by_unit')
+    @Default({})
+    Map<String, double> quantityByUnit,
+    @JsonKey(name: 'by_feed_type')
+    @Default({})
+    Map<String, Map<String, double>> byFeedType,
     @JsonKey(name: 'by_feed') @Default({}) Map<String, FeedingByFeed> byFeed,
     @JsonKey(name: 'total_cost') required double totalCost,
   }) = _FeedingStatistics;
@@ -103,4 +109,3 @@ abstract class FeedingByFeed with _$FeedingByFeed {
   factory FeedingByFeed.fromJson(Map<String, dynamic> json) =>
       _$FeedingByFeedFromJson(json);
 }
-

@@ -5,9 +5,9 @@ class ApiEndpoints {
   // Production VPS: http://108.181.167.236:4567/api/v1
   // Local Docker: http://localhost:4567/api/v1 (iOS/Web/Desktop)
   // Android Emulator: http://10.0.2.2:4567/api/v1
-  
+
   static const String _defaultBaseUrl = 'http://localhost:4567/api/v1';
-  
+
   // Get base URL from environment or use default
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
@@ -42,9 +42,12 @@ class ApiEndpoints {
   static const String rabbits = '/rabbits';
   static const String rabbitStatistics = '/rabbits/statistics';
 
+  /// Назначение сразу всему живому поголовью фермы.
+  static const String rabbitsPurpose = '/rabbits/purpose';
+
   // Breeds endpoints
   static const String breeds = '/breeds';
-  
+
   // Breeding endpoints
   static const String breeding = '/breeding';
   static const String breedingStatistics = '/breeding/statistics';
@@ -97,20 +100,39 @@ class ApiEndpoints {
   static const String platformFarms = '/platform-admin/farms';
   static String platformFarm(int id) => '/platform-admin/farms/$id';
   static String platformFarmPlan(int id) => '/platform-admin/farms/$id/plan';
-  static String platformFarmStatus(int id) => '/platform-admin/farms/$id/status';
-  static String platformFarmExtras(int id) => '/platform-admin/farms/$id/extras';
+  static String platformFarmStatus(int id) =>
+      '/platform-admin/farms/$id/status';
+  static String platformFarmExtras(int id) =>
+      '/platform-admin/farms/$id/extras';
   static String platformFarmPlanExpiry(int id) =>
       '/platform-admin/farms/$id/plan-expiry';
-  static String platformFarmExport(int id) => '/platform-admin/farms/$id/export';
+  static String platformFarmExport(int id) =>
+      '/platform-admin/farms/$id/export';
   static String platformFarmImpersonate(int id) =>
       '/platform-admin/farms/$id/impersonate';
   static String platformFarmRestore(int id) =>
       '/platform-admin/farms/$id/restore';
+
+  /// Журнал действий платформенного админа, постранично. Опциональный
+  /// `farm_id` сужает его до одной фермы — адрес тот же, отдельного эндпоинта
+  /// «журнал фермы» на сервере нет.
+  static const String platformAudit = '/platform-admin/audit';
   static const String platformAnnouncements = '/platform-admin/announcements';
   static const String platformSupportRequests =
       '/platform-admin/support-requests';
   static String platformSupportRequestResolve(int id) =>
       '/platform-admin/support-requests/$id/resolve';
+
+  /// Официальный контакт поддержки — один на весь сервис, поэтому без id:
+  /// читается и правится по одному и тому же адресу.
+  static const String platformSupportContact =
+      '/platform-admin/support-contact';
+
+  // Лента уведомлений: те же сообщения, что уходят пушем, но они не
+  // пропадают вместе со шторкой и доходят до тех, кто пуши отключил.
+  static const String notifications = '/notifications';
+  static const String notificationsUnreadCount = '/notifications/unread-count';
+  static const String notificationsRead = '/notifications/read';
 
   // Обращение фермы в поддержку — доступно любой роли, работает даже при
   // закрытом доступе (см. backend/src/middleware/auth.js,

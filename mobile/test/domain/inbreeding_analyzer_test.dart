@@ -36,8 +36,8 @@ void main() {
     // «отец и дочь» получала вердикт «Оптимально для разведения».
     test('отец и дочь — 25%, даже когда родители отца неизвестны', () {
       final father = rabbit(1, 'Отец', born: '2020-03-01', sex: 'male');
-      final daughter = rabbit(2, 'Дочь',
-          born: '2023-05-01', sex: 'female', father: father);
+      final daughter =
+          rabbit(2, 'Дочь', born: '2023-05-01', sex: 'female', father: father);
 
       final analysis = InbreedingAnalyzer.analyze(father, daughter);
 
@@ -48,8 +48,8 @@ void main() {
 
     test('мать и сын — тоже 25%', () {
       final mother = rabbit(1, 'Мать', born: '2020-03-01', sex: 'female');
-      final son = rabbit(2, 'Сын',
-          born: '2023-05-01', sex: 'male', mother: mother);
+      final son =
+          rabbit(2, 'Сын', born: '2023-05-01', sex: 'male', mother: mother);
 
       final analysis = InbreedingAnalyzer.analyze(son, mother);
 
@@ -76,7 +76,8 @@ void main() {
     // различал две вязки, которые заводчику важнее всего различать.
     test('полубрат и полусестра — 12.5%, вдвое меньше полных сибсов', () {
       final sire = rabbit(10, 'Общий отец', born: '2019-01-01', sex: 'male');
-      final dam1 = rabbit(11, 'Мать первого', born: '2019-01-01', sex: 'female');
+      final dam1 =
+          rabbit(11, 'Мать первого', born: '2019-01-01', sex: 'female');
       final dam2 = rabbit(12, 'Мать второй', born: '2019-01-01', sex: 'female');
 
       final brother = rabbit(1, 'Полубрат',

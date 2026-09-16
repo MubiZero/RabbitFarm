@@ -117,12 +117,14 @@ _StockAdjustment _$StockAdjustmentFromJson(Map<String, dynamic> json) =>
     _StockAdjustment(
       quantity: (json['quantity'] as num).toDouble(),
       operation: json['operation'] as String,
+      cost: (json['cost'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$StockAdjustmentToJson(_StockAdjustment instance) =>
     <String, dynamic>{
       'quantity': instance.quantity,
       'operation': instance.operation,
+      'cost': instance.cost,
     };
 
 _FeedStatistics _$FeedStatisticsFromJson(Map<String, dynamic> json) =>

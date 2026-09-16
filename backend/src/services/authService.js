@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { Farm, User, RefreshToken, TokenBlacklist, LoginOtp } = require('../models');
 const JWTUtil = require('../utils/jwt');
+const jwtConfig = require('../config/jwt');
 const logger = require('../utils/logger');
 const planService = require('./planService');
 
@@ -23,8 +24,7 @@ class AuthService {
     const accessToken = JWTUtil.generateAccessToken({ id: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
     const refreshToken = JWTUtil.generateRefreshToken({ id: user.id });
 
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    const expiresAt = new Date(Date.now() + jwtConfig.refreshExpiresMs);
 
     await RefreshToken.create({
       user_id: user.id,
@@ -181,8 +181,7 @@ class AuthService {
       const newRefreshToken = JWTUtil.generateRefreshToken({ id: tokenRecord.User.id });
 
       // Update refresh token in database
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
+      const expiresAt = new Date(Date.now() + jwtConfig.refreshExpiresMs);
 
       await tokenRecord.update({
         token: newRefreshToken,
@@ -249,7 +248,7 @@ class AuthService {
       // read_only/suspended сразу при обновлении профиля (в частности, при
       // каждом холодном старте), а не по отказу очередной записи.
       const user = await User.findByPk(userId, {
-          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+          include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose'] }]
       });
 
       if (!user) {

@@ -6,14 +6,16 @@ import '../../data/models/medical_record_model.dart';
 import '../../data/repositories/medical_records_repository.dart';
 
 /// Provider for medical records repository
-final medicalRecordsRepositoryProvider = Provider<MedicalRecordsRepository>((ref) {
+final medicalRecordsRepositoryProvider =
+    Provider<MedicalRecordsRepository>((ref) {
   ref.watch(sessionRevisionProvider);
   final apiClient = ref.watch(apiClientProvider);
   return MedicalRecordsRepository(apiClient);
 });
 
 /// State notifier for managing medical records list
-class MedicalRecordsNotifier extends StateNotifier<AsyncValue<List<MedicalRecord>>> {
+class MedicalRecordsNotifier
+    extends StateNotifier<AsyncValue<List<MedicalRecord>>> {
   final MedicalRecordsRepository _repository;
 
   MedicalRecordsNotifier(this._repository) : super(const AsyncValue.loading());
@@ -53,7 +55,8 @@ class MedicalRecordsNotifier extends StateNotifier<AsyncValue<List<MedicalRecord
   }
 
   /// Update existing medical record
-  Future<void> updateMedicalRecord(int id, MedicalRecordUpdate medicalRecord) async {
+  Future<void> updateMedicalRecord(
+      int id, MedicalRecordUpdate medicalRecord) async {
     final result = await _repository.updateMedicalRecord(id, medicalRecord);
     state.whenData((records) {
       final index = records.indexWhere((r) => r.id == id);
@@ -62,6 +65,17 @@ class MedicalRecordsNotifier extends StateNotifier<AsyncValue<List<MedicalRecord
         updated[index] = result;
         state = AsyncValue.data(updated);
       }
+    });
+  }
+
+  /// Убрать запись из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `refresh()`.
+  void removeMedicalRecord(int id) {
+    state.whenData((records) {
+      state = AsyncValue.data(records.where((r) => r.id != id).toList());
     });
   }
 
@@ -100,8 +114,8 @@ class MedicalRecordsNotifier extends StateNotifier<AsyncValue<List<MedicalRecord
 }
 
 /// Provider for medical records state
-final medicalRecordsProvider =
-    StateNotifierProvider<MedicalRecordsNotifier, AsyncValue<List<MedicalRecord>>>(
+final medicalRecordsProvider = StateNotifierProvider<MedicalRecordsNotifier,
+    AsyncValue<List<MedicalRecord>>>(
   (ref) {
     final repository = ref.watch(medicalRecordsRepositoryProvider);
     return MedicalRecordsNotifier(repository);
@@ -123,7 +137,8 @@ final rabbitMedicalRecordsProvider =
 });
 
 /// Provider for medical records statistics
-final medicalStatisticsProvider = FutureProvider<MedicalStatistics>((ref) async {
+final medicalStatisticsProvider =
+    FutureProvider<MedicalStatistics>((ref) async {
   final repository = ref.watch(medicalRecordsRepositoryProvider);
   return repository.getStatistics();
 });

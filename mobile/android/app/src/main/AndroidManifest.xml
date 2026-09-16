@@ -1,4 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Диктовка вместо набора: в сарае руки заняты и в перчатках
+         (см. lib/core/voice). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Метки на клетках читаются камерой (см. lib/features/cages). -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Камера нужна, но не обязательна: на телефоне без неё
+         приложение должно ставиться и работать без сканера. -->
+    <uses-feature android:name="android.hardware.camera"
+        android:required="false"/>
     <application
         android:label="Кроличья ферма"
         android:name="${applicationName}"
@@ -25,15 +34,35 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Ссылка-приглашение из SMS: rabbitfarm://join?phone=+992…
-                 Открывает вход с подставленным номером (см.
-                 lib/core/router/deep_links.dart). Своя схема, а не App Links:
-                 для последних нужен домен с /.well-known. -->
+            <!-- Ссылка-приглашение: https://rabbitfarm.mubi.dev/i — тот же
+                 адрес уходит в SMS и в письме. autoVerify означает, что
+                 Android при установке сходит на домен за
+                 /.well-known/assetlinks.json и, найдя там отпечаток нашей
+                 подписи, будет открывать ссылку приложением без вопросов.
+                 Отпечаток — от ключа Play App Signing, то есть появляется
+                 после первой загрузки сборки в консоль; пока его нет,
+                 ссылка просто открывается браузером и человек попадает на
+                 страницу с магазинами. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="rabbitfarm.mubi.dev"
+                      android:path="/i"/>
+            </intent-filter>
+            <!-- Своя схема: QR-метки на клетках и приглашения, выданные до
+                 перехода на https (см. lib/core/router/deep_links.dart).
+                 Работает без домена и без проверки. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="rabbitfarm" android:host="join"/>
+                <!-- Метка на клетке: rabbitfarm://cage/12. Чужой сканер
+                     откроет приложение на этой клетке (см.
+                     lib/features/cages/presentation/utils/cage_tag.dart). -->
+                <data android:scheme="rabbitfarm" android:host="cage"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -51,6 +80,12 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Начиная с Android 11 приложение не видит распознаватель речи,
+             если не объявит намерение: без этого блока диктовка молча
+             сообщает, что распознавание недоступно, на исправном телефоне. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
         </intent>
     </queries>
 </manifest>

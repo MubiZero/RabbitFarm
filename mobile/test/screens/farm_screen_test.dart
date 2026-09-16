@@ -64,7 +64,9 @@ void main() {
     expect(find.text('Работник'), findsOneWidget);
   });
 
-  testWidgets('управляющий распоряжается хозяйством, но не сотрудниками',
+  // Сервер отдаёт управляющему состав фермы и журнал кадровых действий —
+  // вход в раздел должен быть, менять состав ему внутри не дадут.
+  testWidgets('управляющий распоряжается хозяйством и видит состав фермы',
       (tester) async {
     await _pumpFor(tester, FarmRoleAccess.manager);
 
@@ -72,11 +74,11 @@ void main() {
     expect(find.text('Отчёты'), findsOneWidget);
     expect(find.text('Корма'), findsOneWidget);
     expect(find.text('Здоровье'), findsOneWidget);
-    expect(find.text('Люди'), findsNothing);
+    expect(find.text('Люди'), findsOneWidget);
+    expect(find.text('Сотрудники'), findsOneWidget);
   });
 
-  testWidgets('платформенная админка не видна владельцу фермы',
-      (tester) async {
+  testWidgets('платформенная админка не видна владельцу фермы', (tester) async {
     await _pumpFor(tester, FarmRoleAccess.owner);
 
     expect(find.text('Платформа'), findsNothing);

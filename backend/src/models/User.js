@@ -88,6 +88,18 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
+    },
+
+    /// Язык уведомлений: на нём приходят пуши и письма с сервера.
+    ///
+    /// Приложение присылает его при входе и при каждой смене языка в
+    /// настройках — гадать по заголовкам запроса не нужно и не стоит:
+    /// человек мог поставить в приложении не тот язык, что в системе
+    /// телефона, и верен именно выбранный им.
+    language: {
+      type: DataTypes.ENUM('ru', 'en', 'tg', 'uz'),
+      allowNull: false,
+      defaultValue: 'ru'
     }
   }, {
     tableName: 'users',

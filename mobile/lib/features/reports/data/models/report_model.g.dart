@@ -248,12 +248,18 @@ _PopulationData _$PopulationDataFromJson(Map<String, dynamic> json) =>
       byBreed: (json['by_breed'] as List<dynamic>)
           .map((e) => BreedCount.fromJson(e as Map<String, dynamic>))
           .toList(),
+      byPurpose:
+          (json['by_purpose'] as List<dynamic>?)
+              ?.map((e) => PurposeCount.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$PopulationDataToJson(_PopulationData instance) =>
     <String, dynamic>{
       'total_rabbits': const IntConverter().toJson(instance.totalRabbits),
       'by_breed': instance.byBreed,
+      'by_purpose': instance.byPurpose,
     };
 
 _BreedCount _$BreedCountFromJson(Map<String, dynamic> json) => _BreedCount(
@@ -264,6 +270,18 @@ _BreedCount _$BreedCountFromJson(Map<String, dynamic> json) => _BreedCount(
 Map<String, dynamic> _$BreedCountToJson(_BreedCount instance) =>
     <String, dynamic>{
       'breed_id': const IntConverter().toJson(instance.breedId),
+      'count': const IntConverter().toJson(instance.count),
+    };
+
+_PurposeCount _$PurposeCountFromJson(Map<String, dynamic> json) =>
+    _PurposeCount(
+      purpose: json['purpose'] as String,
+      count: const IntConverter().fromJson(json['count'] as Object),
+    );
+
+Map<String, dynamic> _$PurposeCountToJson(_PurposeCount instance) =>
+    <String, dynamic>{
+      'purpose': instance.purpose,
       'count': const IntConverter().toJson(instance.count),
     };
 

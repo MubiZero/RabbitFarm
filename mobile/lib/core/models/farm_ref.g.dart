@@ -9,9 +9,11 @@ part of 'farm_ref.dart';
 _FarmRef _$FarmRefFromJson(Map<String, dynamic> json) => _FarmRef(
   id: const IntConverter().fromJson(json['id'] as Object),
   status: json['status'] as String,
+  defaultPurpose: json['default_purpose'] as String?,
 );
 
 Map<String, dynamic> _$FarmRefToJson(_FarmRef instance) => <String, dynamic>{
   'id': const IntConverter().toJson(instance.id),
   'status': instance.status,
+  'default_purpose': instance.defaultPurpose,
 };

@@ -270,7 +270,12 @@ describe('FeedController', () => {
 
       await feedController.adjustStock(req, res, mockNext);
 
-      expect(feedService.adjustStock).toHaveBeenCalledWith('1', 1, 10, 'add');
+      // Пятым аргументом уходит стоимость закупки и автор записи: корм
+      // — главная статья затрат, и до сих пор его в книге расходов не
+      // было вовсе.
+      expect(feedService.adjustStock).toHaveBeenCalledWith(
+        '1', 1, 10, 'add', expect.objectContaining({ userId: 1 })
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
@@ -287,7 +292,12 @@ describe('FeedController', () => {
 
       await feedController.adjustStock(req, res, mockNext);
 
-      expect(feedService.adjustStock).toHaveBeenCalledWith('1', 1, 10, 'subtract');
+      // Пятым аргументом уходит стоимость закупки и автор записи: корм
+      // — главная статья затрат, и до сих пор его в книге расходов не
+      // было вовсе.
+      expect(feedService.adjustStock).toHaveBeenCalledWith(
+        '1', 1, 10, 'subtract', expect.objectContaining({ userId: 1 })
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,

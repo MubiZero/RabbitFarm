@@ -31,7 +31,14 @@ router.get('/', authorize(['manager', 'owner']), staffController.listMembers);
  *     summary: Действующие приглашения
  *     tags: [Staff]
  *   post:
- *     summary: Выписать приглашение (код показывается один раз)
+ *     summary: Выписать приглашение и позвать работника
+ *     tags: [Staff]
+ */
+/**
+ * @swagger
+ * /staff/invitations/{id}/resend:
+ *   post:
+ *     summary: Позвать того же работника ещё раз — продлевает срок приглашения
  *     tags: [Staff]
  */
 router.get('/invitations', authorize(['manager', 'owner']), staffController.listInvitations);
@@ -41,6 +48,7 @@ router.post(
   validate(createInvitationSchema),
   staffController.createInvitation
 );
+router.post('/invitations/:id/resend', authorize(['owner']), staffController.resendInvitation);
 router.delete('/invitations/:id', authorize(['owner']), staffController.revokeInvitation);
 
 /**

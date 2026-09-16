@@ -46,6 +46,9 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     final notifier = ref.read(cagesProvider.notifier);
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
+    // Клетки убирает работник — это его ежедневная работа, а не распоряжение
+    // поголовьем. Сервер отметку об уборке принимает от любой роли.
+    final canClean = ref.watch(canProvider(FarmCapability.recordDailyWork));
 
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +74,8 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
         hasMore: state.hasMore,
         onRefresh: notifier.loadCages,
         onLoadMore: notifier.loadMore,
-        header: _Header(state: state, controller: _search, onSearch: _onSearchChanged),
+        header: _Header(
+            state: state, controller: _search, onSearch: _onSearchChanged),
         empty: state.hasFilters
             ? AppEmptyState(
                 icon: Icons.search_off,
@@ -94,6 +98,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
           cage: cage,
           canManage: canManage,
           canDelete: canDelete,
+          canClean: canClean,
           onTap: () => context.push('/cages/${cage.id}'),
           onEdit: () => context.push('/cages/form', extra: cage),
           onClean: () => _markCleaned(cage),
@@ -123,37 +128,30 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     );
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(CageModel cage) async {
     final messenger = ScaffoldMessenger.of(context);
-    final done = context.l10n.cagesDeleted;
     final failed = context.l10n.cagesDeleteFailed;
+    final notifier = ref.read(cagesProvider.notifier);
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.cagesDeleteTitle),
-        content: Text(context.l10n.cagesDeleteBody(cage.number)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
+    notifier.removeCage(cage.id);
 
-    final ok = await ref.read(cagesProvider.notifier).deleteCage(cage.id);
-    messenger.showSnackBar(
-      ok
-          ? SnackBar(content: Text(done))
-          : SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+    var ok = true;
+    await deleteWithUndo(
+      context,
+      message: context.l10n.cagesDeleted,
+      commit: () async => ok = await notifier.deleteCage(cage.id),
+      onUndo: notifier.loadCages,
     );
+
+    if (!ok) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
+      );
+      await notifier.loadCages();
+    }
   }
 }
 
@@ -245,6 +243,7 @@ class _CageCard extends StatelessWidget {
   final CageModel cage;
   final bool canManage;
   final bool canDelete;
+  final bool canClean;
   final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onClean;
@@ -254,6 +253,7 @@ class _CageCard extends StatelessWidget {
     required this.cage,
     required this.canManage,
     required this.canDelete,
+    required this.canClean,
     required this.onTap,
     required this.onEdit,
     required this.onClean,
@@ -311,7 +311,7 @@ class _CageCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (canManage)
+              if (canManage || canClean)
                 PopupMenuButton<_CageAction>(
                   tooltip: context.l10n.commonActions,
                   onSelected: (action) => switch (action) {
@@ -320,22 +320,24 @@ class _CageCard extends StatelessWidget {
                     _CageAction.delete => onDelete(),
                   },
                   itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: _CageAction.edit,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.edit_outlined),
-                        title: Text(context.l10n.cageEdit),
+                    if (canManage)
+                      PopupMenuItem(
+                        value: _CageAction.edit,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.edit_outlined),
+                          title: Text(context.l10n.cageEdit),
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: _CageAction.clean,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.cleaning_services_outlined),
-                        title: Text(context.l10n.cagesMarkCleaned),
+                    if (canClean)
+                      PopupMenuItem(
+                        value: _CageAction.clean,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.cleaning_services_outlined),
+                          title: Text(context.l10n.cagesMarkCleaned),
+                        ),
                       ),
-                    ),
                     if (canDelete)
                       PopupMenuItem(
                         value: _CageAction.delete,

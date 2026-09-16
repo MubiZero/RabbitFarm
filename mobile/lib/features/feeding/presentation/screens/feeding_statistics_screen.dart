@@ -70,8 +70,11 @@ class _FeedingStatisticsScreenState
     // Каждая единица измерения — своя шкала: килограммы и штуки нельзя
     // складывать и нельзя сравнивать одной полосой.
     final units = stats.byFeedType.keys.toList()
-      ..sort((a, b) => (stats.quantityByUnit[b] ?? 0)
-          .compareTo(stats.quantityByUnit[a] ?? 0));
+      ..sort(
+        (a, b) => (stats.quantityByUnit[b] ?? 0).compareTo(
+          stats.quantityByUnit[a] ?? 0,
+        ),
+      );
 
     final byFeed = stats.byFeed.entries.toList()
       ..sort((a, b) => b.value.quantity.compareTo(a.value.quantity));
@@ -81,24 +84,19 @@ class _FeedingStatisticsScreenState
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: StatTile(
-                  icon: Icons.restaurant,
-                  label: context.l10n.feedingStatsCount,
-                  value: '${stats.totalFeedings}',
-                  accent: AppColors.accentOcean,
-                ),
+          StatTileRow(
+            tiles: [
+              StatTile(
+                icon: Icons.restaurant,
+                label: context.l10n.feedingStatsCount,
+                value: '${stats.totalFeedings}',
+                accent: AppColors.accentOcean,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatTile(
-                  icon: Icons.payments_outlined,
-                  label: context.l10n.feedingStatsCost,
-                  value: formatMoney(stats.totalCost),
-                  accent: AppColors.accentSunset,
-                ),
+              StatTile(
+                icon: Icons.payments_outlined,
+                label: context.l10n.feedingStatsCost,
+                value: formatMoney(stats.totalCost),
+                accent: AppColors.accentSunset,
               ),
             ],
           ),
@@ -164,7 +162,6 @@ class _FeedingStatisticsScreenState
     );
   }
 }
-
 
 /// Разбивка расхода по типам корма внутри одной единицы измерения.
 class _TypeBreakdown extends StatelessWidget {
@@ -247,8 +244,9 @@ class _FeedUsageRow extends StatelessWidget {
               if (usage.cost > 0)
                 Text(
                   formatMoney(usage.cost),
-                  style:
-                      AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                  style: AppTypography.labelSm.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
                 ),
             ],
           ),

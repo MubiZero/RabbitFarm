@@ -85,10 +85,6 @@ module.exports = (sequelize) => {
         return value !== null ? parseFloat(value) : null;
       }
     },
-    temperament: {
-      type: DataTypes.STRING(100),
-      allowNull: true
-    },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true

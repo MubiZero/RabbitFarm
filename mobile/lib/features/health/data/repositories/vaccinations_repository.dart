@@ -52,7 +52,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       final data = apiResponse.data!;
@@ -84,7 +85,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
@@ -109,7 +111,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -138,7 +141,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
@@ -166,7 +170,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return Vaccination.fromJson(apiResponse.data!);
@@ -190,7 +195,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
     } on DioException catch (e) {
       throw ApiFailure.from(e);
@@ -212,7 +218,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return VaccinationStatistics.fromJson(apiResponse.data!);
@@ -239,7 +246,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -265,7 +273,8 @@ class VaccinationsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!

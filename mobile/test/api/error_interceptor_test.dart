@@ -42,7 +42,8 @@ Dio _buildDio(int status, String code, String message) {
 void main() {
   group('ErrorInterceptor', () {
     test('сообщает о переходе в read_only по коду FARM_READ_ONLY', () async {
-      final dio = _buildDio(403, 'FARM_READ_ONLY', 'Хозяйство доступно только для чтения');
+      final dio = _buildDio(
+          403, 'FARM_READ_ONLY', 'Хозяйство доступно только для чтения');
       final interceptor = dio.interceptors.whereType<ErrorInterceptor>().first;
       String? seenStatus;
       interceptor.onFarmAccessChanged = (status) => seenStatus = status;
@@ -64,7 +65,8 @@ void main() {
     });
 
     test('сообщает об устаревшей версии по коду UPGRADE_REQUIRED', () async {
-      final dio = _buildDio(426, 'UPGRADE_REQUIRED', 'Обновитесь до 1.2.0 или новее');
+      final dio =
+          _buildDio(426, 'UPGRADE_REQUIRED', 'Обновитесь до 1.2.0 или новее');
       final interceptor = dio.interceptors.whereType<ErrorInterceptor>().first;
       var called = false;
       interceptor.onUpgradeRequired = () => called = true;
@@ -75,7 +77,8 @@ void main() {
     });
 
     test('не срабатывает на посторонние коды ошибок', () async {
-      final dio = _buildDio(400, 'RABBIT_LIMIT_REACHED', 'Предел кроликов исчерпан');
+      final dio =
+          _buildDio(400, 'RABBIT_LIMIT_REACHED', 'Предел кроликов исчерпан');
       final interceptor = dio.interceptors.whereType<ErrorInterceptor>().first;
       var called = false;
       interceptor.onFarmAccessChanged = (_) => called = true;

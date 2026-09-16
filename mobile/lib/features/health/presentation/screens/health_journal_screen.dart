@@ -156,7 +156,10 @@ class _HealthJournalScreenState extends ConsumerState<HealthJournalScreen> {
   Widget _loaded(List<HealthEntry> entries) {
     final visible = _kind == null
         ? entries
-        : [for (final entry in entries) if (entry.kind == _kind) entry];
+        : [
+            for (final entry in entries)
+              if (entry.kind == _kind) entry
+          ];
 
     return RefreshIndicator(
       onRefresh: _refresh,
@@ -385,9 +388,8 @@ class _EntryCard extends ConsumerWidget {
 
     return _StatusLine(
       icon: overdue ? Icons.event_busy_outlined : Icons.event_repeat_outlined,
-      text: overdue
-          ? '$label · ${context.l10n.vaccinationsOverdueBadge}'
-          : label,
+      text:
+          overdue ? '$label · ${context.l10n.vaccinationsOverdueBadge}' : label,
       color: overdue ? AppColors.error : AppColors.success,
     );
   }
@@ -424,8 +426,7 @@ class _StatusLine extends StatelessWidget {
 }
 
 /// Вид записи в строке ленты — единственное число: речь об одной записи.
-String _kindLabel(BuildContext context, HealthEntryKind kind) =>
-    switch (kind) {
+String _kindLabel(BuildContext context, HealthEntryKind kind) => switch (kind) {
       HealthEntryKind.vaccination => context.l10n.healthEntryVaccination,
       HealthEntryKind.treatment => context.l10n.healthEntryTreatment,
     };

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { FarmAuditLog, User } = require('../models');
 const logger = require('../utils/logger');
 
@@ -41,17 +42,23 @@ class FarmAuditService {
   }
 
   /** Записи журнала одной фермы постранично, свежие сверху. */
-  async list(farmId, { page = 1, limit = 20 } = {}) {
+  async list(farmId, { page = 1, limit = 20, scope = 'all' } = {}) {
     const safePage = parseInt(page) || 1;
     const safeLimit = parseInt(limit) || 20;
     const offset = (safePage - 1) * safeLimit;
+
+    // Кадровое действие и удаление записи различаются наличием предмета:
+    // у первого его нет, у второго это кролик, клетка или кормление.
+    const where = { farm_id: farmId };
+    if (scope === 'staff') where.entity_type = null;
+    if (scope === 'data') where.entity_type = { [Op.ne]: null };
 
     // Второй ключ сортировки не для красоты: одно обращение к PATCH /staff/:id
     // пишет и смену роли, и отключение доступа — created_at у них совпадает
     // с точностью до секунды, и без id страницы разъезжались бы между
     // запросами, показывая одну запись дважды, а другую ни разу.
     const { count, rows } = await FarmAuditLog.findAndCountAll({
-      where: { farm_id: farmId },
+      where,
       include: PEOPLE_INCLUDE,
       order: [['created_at', 'DESC'], ['id', 'DESC']],
       limit: safeLimit,

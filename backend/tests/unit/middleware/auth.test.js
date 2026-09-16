@@ -10,7 +10,7 @@ jest.mock('../../../src/models', () => ({
   TokenBlacklist: { findOne: jest.fn() },
   // Farm нужен только как модель для include — запросов к нему middleware
   // не делает, ферма приезжает вместе с пользователем.
-  Farm: {}
+  Farm: { findByPk: jest.fn(), update: jest.fn() }
 }));
 
 const JWTUtil = require('../../../src/utils/jwt');

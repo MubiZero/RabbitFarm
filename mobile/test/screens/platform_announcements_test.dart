@@ -63,7 +63,8 @@ class _FakeRepository extends PlatformAdminRepository {
   int listCalls = 0;
 
   @override
-  Future<AnnouncementsPage> getAnnouncements({int page = 1, int limit = 20}) async {
+  Future<AnnouncementsPage> getAnnouncements(
+      {int page = 1, int limit = 20}) async {
     listCalls += 1;
     return (
       items: announcements,
@@ -246,7 +247,8 @@ void main() {
       expect(_submitButton(tester).onPressed, isNull);
     });
 
-    testWidgets('отправка спрашивает подтверждение и уходит на сервер с '
+    testWidgets(
+        'отправка спрашивает подтверждение и уходит на сервер с '
         'обоими каналами', (tester) async {
       final repository = _FakeRepository();
       await tester.pumpWidget(_form(repository));
@@ -318,7 +320,8 @@ void main() {
       expect(_submitButton(tester).onPressed, isNotNull);
     });
 
-    testWidgets('выбранная ферма уходит адресатом, а лишних полей в запросе нет',
+    testWidgets(
+        'выбранная ферма уходит адресатом, а лишних полей в запросе нет',
         (tester) async {
       final repository = _FakeRepository(farms: [
         PlatformFarm(

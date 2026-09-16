@@ -115,6 +115,24 @@ describe('Платформенная админка (интеграция)', () 
     expect(res.body.data.some((plan) => plan.id === planId)).toBe(true);
   });
 
+  // Удаление тарифа стирает его и обнуляет `plan_id` у ферм. Числа ферм на
+  // тарифе сервер не отдавал вовсе, и окно подтверждения молчало о том,
+  // задевает админ одну ферму или половину сервиса.
+  it('список тарифов называет число ферм на каждом', async () => {
+    const res = await request(app)
+      .get('/api/v1/platform-admin/plans')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const assigned = res.body.data.find((plan) => plan.id === planId);
+    // Тариф назначен ровно одной ферме — предыдущей проверкой.
+    expect(assigned.farms_count).toBe(1);
+
+    const untouched = res.body.data.filter((plan) => plan.id !== planId);
+    for (const plan of untouched) {
+      expect(typeof plan.farms_count).toBe('number');
+    }
+  });
+
   it('список ферм видит все фермы с фактическим потреблением', async () => {
     const res = await request(app)
       .get('/api/v1/platform-admin/farms')

@@ -5,7 +5,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 
 // Keys for SharedPreferences
-const _kThemeMode = 'theme_mode';    // 'dark' | 'light' | 'system'
+const _kThemeMode = 'theme_mode'; // 'dark' | 'light' | 'system'
 const _kAccentIndex = 'accent_index'; // 0-4
 
 class ThemeState {

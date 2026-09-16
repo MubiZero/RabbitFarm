@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/notifications/notification_primer.dart';
+import '../../../notifications/presentation/screens/notifications_screen.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/date_labels.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -91,6 +94,10 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           rabbitsTotal: d.rabbits.total,
         ),
 
+        // Разрешение на уведомления спрашиваем не при входе, а когда на
+        // ферме уже есть кого напоминать: пустой ферме напоминать нечего.
+        NotificationPrimerGate(enabled: d.rabbits.total > 0),
+
         // Всё, что горит сегодня, — один блок: дела, которые можно закрыть
         // отсюда же, и тревоги, за которыми надо идти в другой раздел.
         Column(
@@ -114,33 +121,25 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppSectionTitle(context.l10n.todayFarmNow),
-            Row(
-              children: [
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.pets_outlined,
-                    label: context.l10n.todayStatLivestock,
-                    value: '${d.rabbits.total}',
-                    accent: AppColors.domainLivestock,
-                  ),
+            StatTileRow(
+              tiles: [
+                StatTile(
+                  icon: Icons.pets_outlined,
+                  label: context.l10n.todayStatLivestock,
+                  value: '${d.rabbits.total}',
+                  accent: AppColors.domainLivestock,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.check_circle_outline,
-                    label: context.l10n.todayStatTasks,
-                    value: '${d.tasks.pending}',
-                    accent: AppColors.domainTasks,
-                  ),
+                StatTile(
+                  icon: Icons.check_circle_outline,
+                  label: context.l10n.todayStatTasks,
+                  value: '${d.tasks.pending}',
+                  accent: AppColors.domainTasks,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.grid_view_outlined,
-                    label: context.l10n.todayStatFreeCages,
-                    value: '${d.cages.available}',
-                    accent: AppColors.domainLivestock,
-                  ),
+                StatTile(
+                  icon: Icons.grid_view_outlined,
+                  label: context.l10n.todayStatFreeCages,
+                  value: '${d.cages.available}',
+                  accent: AppColors.domainLivestock,
                 ),
               ],
             ),
@@ -188,8 +187,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.health.overdueVaccinations > 0)
         AlertCard(
           title: context.l10n.todayAlertOverdueVaccination,
-          description:
-              context.l10n.countVaccinations(d.health.overdueVaccinations),
+          description: context.l10n.countVaccinations(
+            d.health.overdueVaccinations,
+          ),
           icon: Icons.vaccines_outlined,
           color: AppColors.error,
           onTap: () => context.push('/vaccinations'),
@@ -197,8 +197,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.inventory.lowStockFeeds > 0)
         AlertCard(
           title: context.l10n.todayAlertLowFeed,
-          description:
-              context.l10n.countFeedKinds(d.inventory.lowStockFeeds),
+          description: context.l10n.countFeedKinds(d.inventory.lowStockFeeds),
           icon: Icons.inventory_2_outlined,
           color: AppColors.warning,
           onTap: () => context.push('/feeds'),
@@ -206,8 +205,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       if (d.health.upcomingVaccinations > 0)
         AlertCard(
           title: context.l10n.todayAlertUpcomingVaccination,
-          description:
-              context.l10n.countVaccinations(d.health.upcomingVaccinations),
+          description: context.l10n.countVaccinations(
+            d.health.upcomingVaccinations,
+          ),
           icon: Icons.event_available_outlined,
           color: AppColors.info,
           onTap: () => context.push('/vaccinations'),
@@ -267,8 +267,9 @@ class _TodayTasks extends ConsumerWidget {
   Widget _empty(BuildContext context) => quietWhenEmpty
       ? Text(
           context.l10n.todayTasksNone,
-          style: AppTypography.bodyMd
-              .copyWith(color: context.colors.onSurfaceVariant),
+          style: AppTypography.bodyMd.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         )
       : const _AllClearCard();
 
@@ -279,8 +280,9 @@ class _TodayTasks extends ConsumerWidget {
           Expanded(
             child: Text(
               errorText(context.l10n, error),
-              style: AppTypography.bodyMd
-                  .copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.bodyMd.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
           ),
           TextButton(
@@ -292,8 +294,7 @@ class _TodayTasks extends ConsumerWidget {
     );
   }
 
-  Future<void> _complete(
-      BuildContext context, WidgetRef ref, Task task) async {
+  Future<void> _complete(BuildContext context, WidgetRef ref, Task task) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
     HapticFeedback.selectionClick();
@@ -336,7 +337,7 @@ class _TasksSkeleton extends StatelessWidget {
 /// Отметить выполненной можно только галочкой, а не нажатием на всю строку:
 /// отменить выполнение приложение не умеет, и случайное касание списка стоило
 /// бы человеку задачи. Нажатие на строку открывает её целиком.
-class _TaskRow extends StatelessWidget {
+class _TaskRow extends ConsumerWidget {
   final Task task;
   final VoidCallback onComplete;
   final VoidCallback onOpen;
@@ -348,9 +349,16 @@ class _TaskRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final done = task.status == TaskStatus.completed;
     final overdue = !done && isOverdue(task.dueDate);
+    // Исполнителя называем только на чужих делах — по тому же правилу, что
+    // автора проводки в книге денег. На ферме из одного человека подпись под
+    // каждой строкой была бы шумом; на ферме с работниками она отвечает
+    // владельцу, кого ждать по этой задаче.
+    final assignee = task.assignee;
+    final someoneElse =
+        assignee != null && assignee.id != ref.watch(currentUserIdProvider);
 
     return AppCard(
       padding: const EdgeInsets.fromLTRB(
@@ -404,6 +412,14 @@ class _TaskRow extends StatelessWidget {
                     fontWeight: overdue ? FontWeight.w600 : null,
                   ),
                 ),
+                if (someoneElse)
+                  Text(
+                    context.l10n.tasksAssignedTo(assignee.fullName),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),
@@ -424,17 +440,32 @@ class _Greeting extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _greeting(context, now.hour, name),
-          style:
-              AppTypography.displayMd.copyWith(color: context.colors.onSurface),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                _greeting(context, now.hour, name),
+                style: AppTypography.displayMd.copyWith(
+                  color: context.colors.onSurface,
+                ),
+              ),
+            ),
+            // То, что приложение сообщало, пока человек не смотрел: пуш
+            // пропадает со шторки, а до отказавшего в разрешении не доходит
+            // вовсе.
+            const NotificationsBell(),
+          ],
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          DateFormat('d MMMM, EEEE', dateSymbolsLocale(Localizations.localeOf(context)))
-              .format(now),
-          style: AppTypography.bodyMd
-              .copyWith(color: context.colors.onSurfaceVariant),
+          DateFormat(
+            'd MMMM, EEEE',
+            dateSymbolsLocale(Localizations.localeOf(context)),
+          ).format(now),
+          style: AppTypography.bodyMd.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -463,14 +494,18 @@ class _AllClearCard extends StatelessWidget {
     return AppCard(
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline,
-              color: AppColors.success, size: 28),
+          const Icon(
+            Icons.check_circle_outline,
+            color: AppColors.success,
+            size: 28,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
               context.l10n.todayAllClear,
-              style: AppTypography.bodyLg
-                  .copyWith(color: context.colors.onSurface),
+              style: AppTypography.bodyLg.copyWith(
+                color: context.colors.onSurface,
+              ),
             ),
           ),
         ],

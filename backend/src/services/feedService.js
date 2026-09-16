@@ -1,4 +1,4 @@
-const { Feed, FeedingRecord } = require('../models');
+const { Feed, FeedingRecord, Transaction } = require('../models');
 const { Op, col, literal } = require('sequelize');
 const logger = require('../utils/logger');
 
@@ -132,7 +132,16 @@ class FeedService {
     }));
   }
 
-  async adjustStock(id, farmId, quantity, operation) {
+  /**
+   * Изменить остаток корма и, если это была покупка, записать расход.
+   *
+   * Корм — обычно главная статья затрат фермы, и в «прибыли за 30 дней» его
+   * не было вовсе: остаток пополнялся, а денег это не касалось. Расход при
+   * этом создаётся не всегда: «добавил» значит и «закупил мешок», и
+   * «пересчитал, оказалось больше». Отличить одно от другого по числу
+   * нельзя, поэтому спрашиваем: указана стоимость — была покупка.
+   */
+  async adjustStock(id, farmId, quantity, operation, { cost = null, userId = null } = {}) {
     const transaction = await Feed.sequelize.transaction();
     try {
       const feed = await Feed.findOne({
@@ -164,9 +173,23 @@ class FeedService {
       }
 
       await feed.update({ current_stock: newStock }, { transaction });
+
+      const spent = cost === null || cost === undefined || cost === '' ? 0 : parseFloat(cost);
+      if (operation === 'add' && spent > 0) {
+        await Transaction.create({
+          farm_id: farmId,
+          type: 'expense',
+          category: 'feed',
+          amount: spent,
+          transaction_date: new Date(),
+          description: `Закупка корма: ${feed.name}, ${quantity} ${feed.unit || ''}`.trim(),
+          created_by: userId
+        }, { transaction });
+      }
+
       await transaction.commit();
 
-      logger.info('Feed stock adjusted', { feedId: id, operation, quantity, newStock });
+      logger.info('Feed stock adjusted', { feedId: id, operation, quantity, newStock, spent });
       return feed;
     } catch (error) {
       if (transaction && !transaction.finished) {

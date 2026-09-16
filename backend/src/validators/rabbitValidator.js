@@ -94,9 +94,12 @@ const createRabbitSchema = Joi.object({
       'any.only': 'Статус должен быть: healthy, active, sick, quarantine, pregnant, sold или dead'
     }),
 
+  // Без `.default`: пустое поле означает «возьми умолчание хозяйства»
+  // (см. `rabbitService.createRabbit`), а не «племя». Со значением по
+  // умолчанию здесь ферма, которая держит кроликов на мясо, всё равно
+  // получала бы племенных.
   purpose: Joi.string()
     .valid('breeding', 'meat', 'sale', 'show')
-    .default('breeding')
     .messages({
       'any.only': 'Назначение должно быть: breeding, meat, sale или show'
     }),
@@ -119,14 +122,6 @@ const createRabbitSchema = Joi.object({
       'number.base': 'Вес должен быть числом',
       'number.positive': 'Вес должен быть положительным',
       'number.max': 'Вес не может быть больше 20 кг'
-    }),
-
-  temperament: Joi.string()
-    .max(100)
-    .optional()
-    .allow(null, '')
-    .messages({
-      'string.max': 'Характер должен быть максимум 100 символов'
     }),
 
   notes: Joi.string()
@@ -215,11 +210,6 @@ const updateRabbitSchema = Joi.object({
     .max(20)
     .optional()
     .allow(null),
-
-  temperament: Joi.string()
-    .max(100)
-    .optional()
-    .allow(null, ''),
 
   notes: Joi.string()
     .optional()
@@ -333,9 +323,27 @@ const addWeightSchema = Joi.object({
     .allow(null, '')
 });
 
+/**
+ * Назначение сразу всему поголовью.
+ *
+ * Отдельная схема, а не кусок `updateRabbitSchema`: тело здесь ровно из
+ * одного поля, и лишние ключи должны отвергаться, а не молча применяться ко
+ * всей ферме.
+ */
+const bulkPurposeSchema = Joi.object({
+  purpose: Joi.string()
+    .valid('breeding', 'meat', 'sale', 'show')
+    .required()
+    .messages({
+      'any.only': 'Назначение должно быть: breeding, meat, sale или show',
+      'any.required': 'Назначение обязательно'
+    })
+});
+
 module.exports = {
   createRabbitSchema,
   updateRabbitSchema,
   listRabbitsQuerySchema,
-  addWeightSchema
+  addWeightSchema,
+  bulkPurposeSchema
 };

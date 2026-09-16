@@ -51,9 +51,8 @@ class _FeedingRecordsListScreenState
           ),
           IconButton(
             tooltip: context.l10n.commonPeriod,
-            icon: Icon(state.hasFilters
-                ? Icons.filter_list_alt
-                : Icons.filter_list),
+            icon: Icon(
+                state.hasFilters ? Icons.filter_list_alt : Icons.filter_list),
             onPressed: () => _showPeriodPicker(context),
           ),
         ],
@@ -102,41 +101,36 @@ class _FeedingRecordsListScreenState
     );
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену.
+  ///
+  /// В перчатках диалог подтверждения не защищает: рука жмёт «Удалить»
+  /// рефлекторно, и случайное нажатие проходит так же легко. Поэтому строка
+  /// уходит из списка сразу, а запрос на сервер — только когда окно отмены
+  /// закрылось.
   Future<void> _delete(FeedingRecord record) async {
     final messenger = ScaffoldMessenger.of(context);
-    final done = context.l10n.feedingDeleted;
     final failed = context.l10n.feedingDeleteFailed;
+    final notifier = ref.read(feedingRecordsProvider.notifier);
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.feedingDeleteTitle),
-        content: Text(context.l10n.feedingDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
+    notifier.removeRecord(record.id);
 
-    final error =
-        await ref.read(feedingRecordsProvider.notifier).deleteRecord(record.id);
-    messenger.showSnackBar(
-      error == null
-          ? SnackBar(content: Text(done))
-          : SnackBar(
-              content: Text('$failed: $error'),
-              backgroundColor: AppColors.error,
-            ),
+    Object? error;
+    await deleteWithUndo(
+      context,
+      message: context.l10n.feedingDeleted,
+      commit: () async => error = await notifier.deleteRecord(record.id),
+      onUndo: notifier.refresh,
     );
+
+    if (error != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$failed: $error'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await notifier.refresh();
+    }
   }
 
   Future<void> _showPeriodPicker(BuildContext context) async {
@@ -186,9 +180,8 @@ class _PeriodChips extends ConsumerWidget {
             if (to != null) format.format(to),
           ].join(' — ')),
           deleteIcon: const Icon(Icons.close, size: 16),
-          onDeleted: () => ref
-              .read(feedingRecordsProvider.notifier)
-              .setPeriod(null, null),
+          onDeleted: () =>
+              ref.read(feedingRecordsProvider.notifier).setPeriod(null, null),
         ),
       ),
     );

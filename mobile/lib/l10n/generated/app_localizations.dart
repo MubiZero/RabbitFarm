@@ -225,7 +225,7 @@ abstract class AppLocalizations {
   /// Плашка поверх всего приложения, когда у устройства нет сети
   ///
   /// In ru, this message translates to:
-  /// **'Нет связи — кормление, задачи и заметки сохранятся и отправятся позже'**
+  /// **'Нет связи — записи сохранятся и отправятся, когда связь появится'**
   String get offlineBanner;
 
   /// Сообщение об успехе вместо обычного, когда действие (кормление, заметка) сохранено офлайн и ждёт отправки
@@ -399,7 +399,7 @@ abstract class AppLocalizations {
   /// No description provided for @pinSetupExplanation.
   ///
   /// In ru, this message translates to:
-  /// **'Этим кодом вы будете открывать приложение на этом телефоне — SMS больше ждать не придётся.'**
+  /// **'Этим кодом вы будете открывать приложение на этом телефоне — кода из SMS или письма больше ждать не придётся.'**
   String get pinSetupExplanation;
 
   /// No description provided for @pinSkip.
@@ -749,24 +749,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Скрыть'**
   String get activationChecklistDismiss;
-
-  /// No description provided for @activationChecklistAddCage.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добавьте клетку'**
-  String get activationChecklistAddCage;
-
-  /// No description provided for @activationChecklistAddRabbit.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добавьте кролика'**
-  String get activationChecklistAddRabbit;
-
-  /// No description provided for @activationChecklistFirstFeeding.
-  ///
-  /// In ru, this message translates to:
-  /// **'Внесите первое кормление'**
-  String get activationChecklistFirstFeeding;
 
   /// No description provided for @menuProfile.
   ///
@@ -1494,6 +1476,30 @@ abstract class AppLocalizations {
   /// **'Только на сегодня'**
   String get tasksFilterTodayOnly;
 
+  /// No description provided for @tasksFilterAssignee.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель'**
+  String get tasksFilterAssignee;
+
+  /// No description provided for @tasksFilterAssigneeAny.
+  ///
+  /// In ru, this message translates to:
+  /// **'Любой'**
+  String get tasksFilterAssigneeAny;
+
+  /// No description provided for @tasksFilterAssigneeMine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только мои'**
+  String get tasksFilterAssigneeMine;
+
+  /// No description provided for @tasksAssigneeMineChip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои задачи'**
+  String get tasksAssigneeMineChip;
+
   /// No description provided for @tasksEmptyTitle.
   ///
   /// In ru, this message translates to:
@@ -1745,6 +1751,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Когда задачу отметят выполненной, следующая создастся сама.'**
   String get taskFormRepeatHelp;
+
+  /// No description provided for @taskFormAssignee.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель'**
+  String get taskFormAssignee;
+
+  /// No description provided for @taskFormAssigneeNobody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никому не поручена'**
+  String get taskFormAssigneeNobody;
+
+  /// No description provided for @taskFormAssigneeHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнителю придёт уведомление о задаче.'**
+  String get taskFormAssigneeHelp;
+
+  /// No description provided for @tasksAssignedTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель: {name}'**
+  String tasksAssignedTo(String name);
 
   /// No description provided for @taskFormNotesLabel.
   ///
@@ -3336,6 +3366,18 @@ abstract class AppLocalizations {
   /// **'Описание'**
   String get financeDescription;
 
+  /// No description provided for @financeAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто записал'**
+  String get financeAuthor;
+
+  /// No description provided for @financeAuthorLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записал {name}'**
+  String financeAuthorLine(String name);
+
   /// No description provided for @financeTypeIncome.
   ///
   /// In ru, this message translates to:
@@ -3449,6 +3491,42 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Описание'**
   String get txFormDescription;
+
+  /// No description provided for @txFormReceipt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чек'**
+  String get txFormReceipt;
+
+  /// No description provided for @txFormReceiptShoot.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять чек'**
+  String get txFormReceiptShoot;
+
+  /// No description provided for @txFormReceiptFromGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Из галереи'**
+  String get txFormReceiptFromGallery;
+
+  /// No description provided for @txFormReceiptReplace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Переснять'**
+  String get txFormReceiptReplace;
+
+  /// No description provided for @txFormReceiptRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать чек'**
+  String get txFormReceiptRemove;
+
+  /// No description provided for @txFormReceiptFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось получить снимок'**
+  String get txFormReceiptFailed;
 
   /// No description provided for @txFormCreated.
   ///
@@ -4206,6 +4284,48 @@ abstract class AppLocalizations {
   /// **'Дайджест по хозяйству'**
   String get settingsDigestToggle;
 
+  /// No description provided for @settingsHerd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поголовье'**
+  String get settingsHerd;
+
+  /// No description provided for @settingsPurposeAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назначение всем кроликам'**
+  String get settingsPurposeAll;
+
+  /// No description provided for @settingsPurposeAllHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Большинство ферм держат кроликов для чего-то одного. Выставьте раз — и не отвечайте на этот вопрос в каждой карточке.'**
+  String get settingsPurposeAllHint;
+
+  /// No description provided for @settingsPurposeAllTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выставить назначение всем?'**
+  String get settingsPurposeAllTitle;
+
+  /// No description provided for @settingsPurposeAllBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному. Новые кролики тоже будут заводиться с этим назначением.'**
+  String settingsPurposeAllBody(String purpose);
+
+  /// No description provided for @settingsPurposeAllApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выставить'**
+  String get settingsPurposeAllApply;
+
+  /// No description provided for @settingsPurposeAllDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{Менять было нечего — у всех уже так.} one{Изменён {count} кролик.} few{Изменено {count} кролика.} other{Изменено {count} кроликов.}}'**
+  String settingsPurposeAllDone(int count);
+
   /// No description provided for @settingsAbout.
   ///
   /// In ru, this message translates to:
@@ -4221,7 +4341,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSupport.
   ///
   /// In ru, this message translates to:
-  /// **'Написать в поддержку'**
+  /// **'Поддержка'**
   String get settingsSupport;
 
   /// No description provided for @supportRequestTitle.
@@ -4233,7 +4353,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportRequestHint.
   ///
   /// In ru, this message translates to:
-  /// **'Опишите, что случилось, — ответим по тому же аккаунту, с которого пришло обращение.'**
+  /// **'Опишите, что случилось. Ответ придёт на этот же экран и уведомлением на телефон.'**
   String get supportRequestHint;
 
   /// No description provided for @supportRequestPlaceholder.
@@ -5295,13 +5415,13 @@ abstract class AppLocalizations {
   /// No description provided for @staffInvitedPhoneBody.
   ///
   /// In ru, this message translates to:
-  /// **'Он вводит номер {phone} на входе в приложение и код, который придёт ему в SMS. Ничего передавать не нужно.'**
+  /// **'Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.'**
   String staffInvitedPhoneBody(String phone);
 
   /// No description provided for @staffInvitedEmailBody.
   ///
   /// In ru, this message translates to:
-  /// **'Он вводит почту {email} на входе в приложение и код, который придёт ему письмом. Ничего передавать не нужно.'**
+  /// **'Письмо с приглашением ушло на {email}. Работник войдёт по этому адресу — код придёт ему письмом.'**
   String staffInvitedEmailBody(String email);
 
   /// No description provided for @staffInviteChannelPhone.
@@ -5453,6 +5573,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Дата рождения'**
   String get rabbitBirthDate;
+
+  /// No description provided for @rabbitAcquiredDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда купили'**
+  String get rabbitAcquiredDate;
+
+  /// No description provided for @rabbitAcquiredDateEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Родился на ферме'**
+  String get rabbitAcquiredDateEmpty;
 
   /// No description provided for @rabbitColor.
   ///
@@ -6174,6 +6306,12 @@ abstract class AppLocalizations {
   /// **'Поголовье по породам'**
   String get reportsByBreed;
 
+  /// No description provided for @reportsByPurpose.
+  ///
+  /// In ru, this message translates to:
+  /// **'По назначению'**
+  String get reportsByPurpose;
+
   /// No description provided for @reportsBreedUnknown.
   ///
   /// In ru, this message translates to:
@@ -6534,6 +6672,12 @@ abstract class AppLocalizations {
   /// **'Удалить тариф?'**
   String get platformPlanDeleteTitle;
 
+  /// No description provided for @platformPlanDeleteFarms.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{На этом тарифе сейчас нет ни одной фермы.} one{На нём сейчас {count} ферма — она станет работать без ограничений.} few{На нём сейчас {count} фермы — они станут работать без ограничений.} other{На нём сейчас {count} ферм — они станут работать без ограничений.}}'**
+  String platformPlanDeleteFarms(int count);
+
   /// No description provided for @platformPlanDeleteBody.
   ///
   /// In ru, this message translates to:
@@ -6827,6 +6971,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Доступ обновлён'**
   String get platformFarmStatusUpdated;
+
+  /// No description provided for @platformFarmSectionAudit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что с ней делали'**
+  String get platformFarmSectionAudit;
+
+  /// No description provided for @platformFarmAuditEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Админы эту ферму не трогали.'**
+  String get platformFarmAuditEmpty;
+
+  /// No description provided for @platformFarmAuditLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смотрим журнал…'**
+  String get platformFarmAuditLoading;
+
+  /// No description provided for @platformFarmAuditAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Весь журнал'**
+  String get platformFarmAuditAll;
+
+  /// No description provided for @platformFarmStatusExpiredWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф истёк {date}. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.'**
+  String platformFarmStatusExpiredWarning(String date);
 
   /// No description provided for @platformFarmPlanForever.
   ///
@@ -7239,7 +7413,7 @@ abstract class AppLocalizations {
   /// No description provided for @platformSupportRequestsEmptyBody.
   ///
   /// In ru, this message translates to:
-  /// **'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Написать в поддержку.'**
+  /// **'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Поддержка.'**
   String get platformSupportRequestsEmptyBody;
 
   /// No description provided for @platformSupportRequestNew.
@@ -7541,6 +7715,1344 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Добавьте первую.'**
   String get emptyNoRecordsBody;
+
+  /// No description provided for @onbWelcomeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'RabbitFarm'**
+  String get onbWelcomeTitle;
+
+  /// No description provided for @onbWelcomeBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетки, случки, окролы, корма и деньги — всё записано и всегда под рукой. Приложение само напомнит, когда ставить маточник и делать прививки.'**
+  String get onbWelcomeBody;
+
+  /// No description provided for @onbWelcomeStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начать'**
+  String get onbWelcomeStart;
+
+  /// No description provided for @onbWelcomeHaveAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'У меня уже есть ферма'**
+  String get onbWelcomeHaveAccount;
+
+  /// No description provided for @onbHerdTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько у вас кроликов?'**
+  String get onbHerdTitle;
+
+  /// No description provided for @onbHerdSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Примерно, вместе с молодняком.'**
+  String get onbHerdSubtitle;
+
+  /// No description provided for @onbHerdUpTo20.
+  ///
+  /// In ru, this message translates to:
+  /// **'До 20'**
+  String get onbHerdUpTo20;
+
+  /// No description provided for @onbHerdUpTo20Hint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Держу для себя'**
+  String get onbHerdUpTo20Hint;
+
+  /// No description provided for @onbHerdUpTo100.
+  ///
+  /// In ru, this message translates to:
+  /// **'От 20 до 100'**
+  String get onbHerdUpTo100;
+
+  /// No description provided for @onbHerdUpTo100Hint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Небольшое хозяйство'**
+  String get onbHerdUpTo100Hint;
+
+  /// No description provided for @onbHerdUpTo500.
+  ///
+  /// In ru, this message translates to:
+  /// **'От 100 до 500'**
+  String get onbHerdUpTo500;
+
+  /// No description provided for @onbHerdUpTo500Hint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма на продажу'**
+  String get onbHerdUpTo500Hint;
+
+  /// No description provided for @onbHerdOver500.
+  ///
+  /// In ru, this message translates to:
+  /// **'Больше 500'**
+  String get onbHerdOver500;
+
+  /// No description provided for @onbHerdOver500Hint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Крупное хозяйство'**
+  String get onbHerdOver500Hint;
+
+  /// No description provided for @onbFocusTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что записывать в первую очередь?'**
+  String get onbFocusTitle;
+
+  /// No description provided for @onbFocusSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметьте всё, что подходит. Остальное никуда не денется.'**
+  String get onbFocusSubtitle;
+
+  /// No description provided for @onbFocusBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случки и окролы'**
+  String get onbFocusBreeding;
+
+  /// No description provided for @onbFocusFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корма и расход'**
+  String get onbFocusFeeding;
+
+  /// No description provided for @onbFocusHealth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививки и лечение'**
+  String get onbFocusHealth;
+
+  /// No description provided for @onbFocusMoney.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажи и расходы'**
+  String get onbFocusMoney;
+
+  /// No description provided for @onbFocusNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дальше'**
+  String get onbFocusNext;
+
+  /// No description provided for @onbCrewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто будет работать в приложении?'**
+  String get onbCrewTitle;
+
+  /// No description provided for @onbCrewSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это можно изменить в любой момент.'**
+  String get onbCrewSubtitle;
+
+  /// No description provided for @onbCrewAlone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только я'**
+  String get onbCrewAlone;
+
+  /// No description provided for @onbCrewAloneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ни приглашений, ни настроек доступа'**
+  String get onbCrewAloneHint;
+
+  /// No description provided for @onbCrewHelpers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я и помощники'**
+  String get onbCrewHelpers;
+
+  /// No description provided for @onbCrewHelpersHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый записывает со своего телефона, и видно, кто что внёс'**
+  String get onbCrewHelpersHint;
+
+  /// No description provided for @onbDoneTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'С чего начнём'**
+  String get onbDoneTitle;
+
+  /// No description provided for @onbDoneSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эти шаги будут ждать на главном экране.'**
+  String get onbDoneSubtitle;
+
+  /// No description provided for @onbDoneCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать ферму'**
+  String get onbDoneCreate;
+
+  /// No description provided for @onbBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назад'**
+  String get onbBack;
+
+  /// No description provided for @onbSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропустить'**
+  String get onbSkip;
+
+  /// No description provided for @firstStepCages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести клетки'**
+  String get firstStepCages;
+
+  /// No description provided for @firstStepRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить самок и самцов'**
+  String get firstStepRabbits;
+
+  /// No description provided for @firstStepBreeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать первую случку'**
+  String get firstStepBreeding;
+
+  /// No description provided for @firstStepFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить первое кормление'**
+  String get firstStepFeeding;
+
+  /// No description provided for @firstStepHealth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить первую прививку'**
+  String get firstStepHealth;
+
+  /// No description provided for @firstStepMoney.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать первую продажу'**
+  String get firstStepMoney;
+
+  /// No description provided for @firstStepHelpers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пригласить помощника'**
+  String get firstStepHelpers;
+
+  /// No description provided for @activationChecklistFarmCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма создана'**
+  String get activationChecklistFarmCreated;
+
+  /// Сколько шагов начала работы уже сделано
+  ///
+  /// In ru, this message translates to:
+  /// **'{done} из {total}'**
+  String activationChecklistProgress(int done, int total);
+
+  /// No description provided for @deathFormTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить падёж'**
+  String get deathFormTitle;
+
+  /// No description provided for @deathFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик'**
+  String get deathFormRabbit;
+
+  /// No description provided for @deathFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата'**
+  String get deathFormDate;
+
+  /// No description provided for @deathFormReason.
+  ///
+  /// In ru, this message translates to:
+  /// **'Причина'**
+  String get deathFormReason;
+
+  /// No description provided for @deathFormReasonHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отчего пал — если знаете'**
+  String get deathFormReasonHint;
+
+  /// No description provided for @deathFormSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить'**
+  String get deathFormSubmit;
+
+  /// No description provided for @deathFormSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Падёж отмечен'**
+  String get deathFormSaved;
+
+  /// No description provided for @saleFormTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать продажу'**
+  String get saleFormTitle;
+
+  /// No description provided for @saleFormRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик'**
+  String get saleFormRabbit;
+
+  /// No description provided for @saleFormAmount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена'**
+  String get saleFormAmount;
+
+  /// No description provided for @saleFormAmountHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сумма попадёт в книгу доходов, кролик перейдёт в проданные.'**
+  String get saleFormAmountHelp;
+
+  /// No description provided for @saleFormAmountEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите, за сколько продали'**
+  String get saleFormAmountEmpty;
+
+  /// No description provided for @saleFormDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'День продажи'**
+  String get saleFormDate;
+
+  /// No description provided for @saleFormBuyer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Покупатель'**
+  String get saleFormBuyer;
+
+  /// No description provided for @saleFormBuyerHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому продали — если хотите запомнить'**
+  String get saleFormBuyerHint;
+
+  /// No description provided for @saleFormSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать'**
+  String get saleFormSubmit;
+
+  /// No description provided for @saleFormSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продажа записана'**
+  String get saleFormSaved;
+
+  /// No description provided for @quickRecordDeath.
+  ///
+  /// In ru, this message translates to:
+  /// **'Падёж'**
+  String get quickRecordDeath;
+
+  /// No description provided for @notificationPrimerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напомним поставить маточник'**
+  String get notificationPrimerTitle;
+
+  /// No description provided for @notificationPrimerBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'За два дня до окрола придёт напоминание — успеете подготовить клетку. Ещё напомним про прививки и дела на день.'**
+  String get notificationPrimerBody;
+
+  /// No description provided for @notificationPrimerAllow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить напоминания'**
+  String get notificationPrimerAllow;
+
+  /// No description provided for @notificationPrimerDecline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сейчас'**
+  String get notificationPrimerDecline;
+
+  /// No description provided for @settingsNotificationsOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления выключены'**
+  String get settingsNotificationsOff;
+
+  /// No description provided for @settingsNotificationsTurnOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить'**
+  String get settingsNotificationsTurnOn;
+
+  /// No description provided for @rabbitFormMore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дополнительно'**
+  String get rabbitFormMore;
+
+  /// No description provided for @rabbitFormSexRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите, самец это или самка'**
+  String get rabbitFormSexRequired;
+
+  /// No description provided for @rabbitFormCageNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без клетки'**
+  String get rabbitFormCageNone;
+
+  /// Клетка в списке выбора, куда уже некого селить
+  ///
+  /// In ru, this message translates to:
+  /// **'{number} — занята полностью'**
+  String rabbitFormCageFull(String number);
+
+  /// No description provided for @commonOptional.
+  ///
+  /// In ru, this message translates to:
+  /// **'необязательно'**
+  String get commonOptional;
+
+  /// No description provided for @unitKg.
+  ///
+  /// In ru, this message translates to:
+  /// **'кг'**
+  String get unitKg;
+
+  /// No description provided for @kindlingPlanAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'План окролов'**
+  String get kindlingPlanAction;
+
+  /// No description provided for @kindlingPlanPickMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'План окролов на какой месяц?'**
+  String get kindlingPlanPickMonth;
+
+  /// No description provided for @kindlingPlanThisMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'На этот месяц'**
+  String get kindlingPlanThisMonth;
+
+  /// No description provided for @kindlingPlanNextMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'На следующий месяц'**
+  String get kindlingPlanNextMonth;
+
+  /// No description provided for @kindlingPlanEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'На {month} окролов не ожидается'**
+  String kindlingPlanEmpty(String month);
+
+  /// No description provided for @kindlingPlanSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'План окролов — {month}'**
+  String kindlingPlanSheetTitle(String month);
+
+  /// No description provided for @kindlingPlanNestHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маточник ставят за три дня до окрола'**
+  String get kindlingPlanNestHint;
+
+  /// No description provided for @kindlingPlanColBirth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрол'**
+  String get kindlingPlanColBirth;
+
+  /// No description provided for @kindlingPlanColFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка'**
+  String get kindlingPlanColFemale;
+
+  /// No description provided for @kindlingPlanColCage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка'**
+  String get kindlingPlanColCage;
+
+  /// No description provided for @kindlingPlanColBred.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка'**
+  String get kindlingPlanColBred;
+
+  /// No description provided for @kindlingPlanColNest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маточник'**
+  String get kindlingPlanColNest;
+
+  /// No description provided for @kindlingPlanColMark.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметка'**
+  String get kindlingPlanColMark;
+
+  /// No description provided for @kindlingPlanPrintedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напечатано {date}'**
+  String kindlingPlanPrintedAt(String date);
+
+  /// No description provided for @commonUndo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть'**
+  String get commonUndo;
+
+  /// No description provided for @journalKindDeletion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление'**
+  String get journalKindDeletion;
+
+  /// No description provided for @voiceDictate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Надиктовать'**
+  String get voiceDictate;
+
+  /// No description provided for @voiceStop.
+  ///
+  /// In ru, this message translates to:
+  /// **'Остановить запись'**
+  String get voiceStop;
+
+  /// No description provided for @voiceUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот телефон не умеет распознавать речь'**
+  String get voiceUnavailable;
+
+  /// No description provided for @cageAddNewRabbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести нового'**
+  String get cageAddNewRabbit;
+
+  /// No description provided for @cageAddNewRabbitHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик, которого ещё нет в приложении'**
+  String get cageAddNewRabbitHint;
+
+  /// No description provided for @cageSettleExisting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поселить из стада'**
+  String get cageSettleExisting;
+
+  /// No description provided for @cageSettleExistingHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перевести сюда уже заведённого'**
+  String get cageSettleExistingHint;
+
+  /// No description provided for @cageFeedThis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Покормить клетку'**
+  String get cageFeedThis;
+
+  /// No description provided for @cageTagsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Метки на клетки'**
+  String get cageTagsTitle;
+
+  /// No description provided for @cageTagsPrint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Распечатать'**
+  String get cageTagsPrint;
+
+  /// No description provided for @cageTagsPrintHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вырежьте по рамке и повесьте на клетку — камера откроет её в приложении.'**
+  String get cageTagsPrintHint;
+
+  /// No description provided for @cageTagsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клеток пока нет'**
+  String get cageTagsEmptyTitle;
+
+  /// No description provided for @cageTagsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заведите клетку — метку можно будет напечатать сразу.'**
+  String get cageTagsEmptyBody;
+
+  /// No description provided for @cageScanTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прочитать метку'**
+  String get cageScanTitle;
+
+  /// No description provided for @cageScanHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наведите камеру на метку клетки'**
+  String get cageScanHint;
+
+  /// No description provided for @cageScanNoCamera.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера недоступна. Проверьте разрешение в настройках телефона.'**
+  String get cageScanNoCamera;
+
+  /// No description provided for @slideToDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сдвиньте, чтобы удалить'**
+  String get slideToDelete;
+
+  /// No description provided for @birthsKitsDied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пало'**
+  String get birthsKitsDied;
+
+  /// No description provided for @birthsKitDeathAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить падёж'**
+  String get birthsKitDeathAction;
+
+  /// No description provided for @birthsKitsCardedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.'**
+  String get birthsKitsCardedHint;
+
+  /// No description provided for @birthsKitDeathTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько крольчат пало?'**
+  String get birthsKitDeathTitle;
+
+  /// Сколько крольчат этого окрола живы на момент записи падежа
+  ///
+  /// In ru, this message translates to:
+  /// **'Осталось живых: {alive}'**
+  String birthsKitDeathHint(int alive);
+
+  /// No description provided for @birthsKitDeathSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записано'**
+  String get birthsKitDeathSaved;
+
+  /// No description provided for @birthsKitsAlive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Живых'**
+  String get birthsKitsAlive;
+
+  /// No description provided for @loginCodeLabelEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код из письма'**
+  String get loginCodeLabelEmail;
+
+  /// No description provided for @cyclePalpationAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прощупала'**
+  String get cyclePalpationAction;
+
+  /// No description provided for @cyclePalpationTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что показало прощупывание?'**
+  String get cyclePalpationTitle;
+
+  /// No description provided for @cyclePalpationPregnant.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сукрольная'**
+  String get cyclePalpationPregnant;
+
+  /// No description provided for @cyclePalpationPregnantHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка станет беременной, впереди окрол'**
+  String get cyclePalpationPregnantHint;
+
+  /// No description provided for @cyclePalpationEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пустая'**
+  String get cyclePalpationEmpty;
+
+  /// No description provided for @cyclePalpationEmptyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цикл закрывается — самку можно крыть заново'**
+  String get cyclePalpationEmptyHint;
+
+  /// No description provided for @cyclePalpationSavedPregnant.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записано: сукрольная'**
+  String get cyclePalpationSavedPregnant;
+
+  /// No description provided for @cyclePalpationSavedEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записано: пустая'**
+  String get cyclePalpationSavedEmpty;
+
+  /// No description provided for @birthsWeaningAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отсадили'**
+  String get birthsWeaningAction;
+
+  /// No description provided for @birthsWeaningTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько крольчат отсадили?'**
+  String get birthsWeaningTitle;
+
+  /// Сколько крольчат этого окрола живы на момент отсадки
+  ///
+  /// In ru, this message translates to:
+  /// **'Живых в выводке: {alive}'**
+  String birthsWeaningHint(int alive);
+
+  /// Кнопка «отсадили весь выводок» с количеством
+  ///
+  /// In ru, this message translates to:
+  /// **'Всех: {count}'**
+  String birthsWeaningAll(int count);
+
+  /// No description provided for @birthsWeaningFewer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Или сколько-то меньше'**
+  String get birthsWeaningFewer;
+
+  /// No description provided for @birthsWeaningSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отсадка записана'**
+  String get birthsWeaningSaved;
+
+  /// No description provided for @subscriptionCheckFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось проверить оплату — нет связи с сервером'**
+  String get subscriptionCheckFailed;
+
+  /// No description provided for @subscriptionPaymentDeclined.
+  ///
+  /// In ru, this message translates to:
+  /// **'Банк отклонил оплату'**
+  String get subscriptionPaymentDeclined;
+
+  /// No description provided for @subscriptionPaymentDeclinedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Деньги не списаны. Проверьте карту и попробуйте ещё раз.'**
+  String get subscriptionPaymentDeclinedHint;
+
+  /// No description provided for @subscriptionPayAgain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплатить заново'**
+  String get subscriptionPayAgain;
+
+  /// No description provided for @supportRequestNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать'**
+  String get supportRequestNew;
+
+  /// No description provided for @supportRequestNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое обращение'**
+  String get supportRequestNewTitle;
+
+  /// No description provided for @supportRequestsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращений пока нет'**
+  String get supportRequestsEmptyTitle;
+
+  /// No description provided for @supportRequestsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напишите, если что-то не работает или непонятно. Ответ придёт сюда же и уведомлением на телефон.'**
+  String get supportRequestsEmptyBody;
+
+  /// No description provided for @supportRequestsEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать в поддержку'**
+  String get supportRequestsEmptyAction;
+
+  /// No description provided for @supportRequestStatusWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ждём ответа'**
+  String get supportRequestStatusWaiting;
+
+  /// No description provided for @supportRequestStatusAnswered.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддержка ответила'**
+  String get supportRequestStatusAnswered;
+
+  /// No description provided for @supportRequestAnswerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ поддержки'**
+  String get supportRequestAnswerTitle;
+
+  /// No description provided for @supportRequestClosedWithoutAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение закрыто без письменного ответа.'**
+  String get supportRequestClosedWithoutAnswer;
+
+  /// No description provided for @platformSupportAnswerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ автору'**
+  String get platformSupportAnswerTitle;
+
+  /// No description provided for @platformSupportResolveTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть обращение'**
+  String get platformSupportResolveTitle;
+
+  /// No description provided for @platformSupportResolveBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напишите ответ — он придёт автору уведомлением и письмом. Оставьте поле пустым, если разобрались без переписки.'**
+  String get platformSupportResolveBody;
+
+  /// No description provided for @platformSupportResolveAnswerLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ автору'**
+  String get platformSupportResolveAnswerLabel;
+
+  /// No description provided for @platformSupportResolveAnswerHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: обновите приложение — в новой версии это исправлено'**
+  String get platformSupportResolveAnswerHint;
+
+  /// No description provided for @platformSupportResolveSendAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить ответ'**
+  String get platformSupportResolveSendAnswer;
+
+  /// No description provided for @platformSupportResolveWithoutAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть без ответа'**
+  String get platformSupportResolveWithoutAnswer;
+
+  /// No description provided for @platformSupportContactTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Контакт поддержки'**
+  String get platformSupportContactTitle;
+
+  /// No description provided for @platformSupportContactBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот телефон и почту фермы видят на своём экране обращений. Оставьте пустыми, если прямого контакта нет.'**
+  String get platformSupportContactBody;
+
+  /// No description provided for @platformSupportContactPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон'**
+  String get platformSupportContactPhone;
+
+  /// No description provided for @platformSupportContactPhoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'+992 00 000 00 00'**
+  String get platformSupportContactPhoneHint;
+
+  /// No description provided for @platformSupportContactEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Почта'**
+  String get platformSupportContactEmail;
+
+  /// No description provided for @platformSupportContactEmailHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'support@example.com'**
+  String get platformSupportContactEmailHint;
+
+  /// No description provided for @platformSupportContactEmailInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте адрес — в нём нет знака @'**
+  String get platformSupportContactEmailInvalid;
+
+  /// No description provided for @platformSupportContactSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Контакт поддержки сохранён'**
+  String get platformSupportContactSaved;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока тихо'**
+  String get notificationsEmptyTitle;
+
+  /// No description provided for @notificationsEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь появится то, о чём приложение сообщало: просроченные прививки, кончающийся корм, скорый окрол.'**
+  String get notificationsEmptyBody;
+
+  /// No description provided for @platformFilterDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалённые'**
+  String get platformFilterDeleted;
+
+  /// No description provided for @platformFarmDeletedShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалена {date}'**
+  String platformFarmDeletedShort(String date);
+
+  /// No description provided for @platformFarmsDeletedEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалённых ферм нет'**
+  String get platformFarmsDeletedEmptyTitle;
+
+  /// No description provided for @platformFarmsDeletedEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не ждёт окончательной очистки. Удалённая ферма остаётся здесь 30 дней — этого срока хватает, чтобы передумать.'**
+  String get platformFarmsDeletedEmptyBody;
+
+  /// No description provided for @platformPlanDeleteDefaultWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это тариф по умолчанию. После удаления новые фермы будут появляться вовсе без тарифа, пока таким не отмечен другой.'**
+  String get platformPlanDeleteDefaultWarning;
+
+  /// No description provided for @platformPlanDeleteIrreversible.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить нельзя: тариф придётся заводить заново и назначать фермам вручную.'**
+  String get platformPlanDeleteIrreversible;
+
+  /// No description provided for @platformTabAudit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал'**
+  String get platformTabAudit;
+
+  /// No description provided for @platformAuditEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал пуст'**
+  String get platformAuditEmptyTitle;
+
+  /// No description provided for @platformAuditEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сюда попадает каждое действие админа: смена тарифа, доступ фермы, вход под клиентом, удаление.'**
+  String get platformAuditEmptyBody;
+
+  /// No description provided for @countAuditRecords.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} запись} few{{count} записи} many{{count} записей} other{{count} записи}}'**
+  String countAuditRecords(int count);
+
+  /// No description provided for @platformAuditAdmin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Админ {id}'**
+  String platformAuditAdmin(String id);
+
+  /// No description provided for @platformAuditFarm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ферма {id}'**
+  String platformAuditFarm(String id);
+
+  /// No description provided for @platformAuditWholeService.
+  ///
+  /// In ru, this message translates to:
+  /// **'Весь сервис'**
+  String get platformAuditWholeService;
+
+  /// No description provided for @platformAuditIp.
+  ///
+  /// In ru, this message translates to:
+  /// **'IP {ip}'**
+  String platformAuditIp(String ip);
+
+  /// No description provided for @platformAuditChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'{field}: {before} → {after}'**
+  String platformAuditChange(String field, String before, String after);
+
+  /// No description provided for @platformAuditDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'{field}: {value}'**
+  String platformAuditDetail(String field, String value);
+
+  /// No description provided for @platformAuditValueNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'не задано'**
+  String get platformAuditValueNone;
+
+  /// No description provided for @platformAuditActionPlanCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создан тариф'**
+  String get platformAuditActionPlanCreate;
+
+  /// No description provided for @platformAuditActionPlanUpdate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменён тариф'**
+  String get platformAuditActionPlanUpdate;
+
+  /// No description provided for @platformAuditActionPlanDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалён тариф'**
+  String get platformAuditActionPlanDelete;
+
+  /// No description provided for @platformAuditActionPlanAssign.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена тарифа фермы'**
+  String get platformAuditActionPlanAssign;
+
+  /// No description provided for @platformAuditActionFarmStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена доступа фермы'**
+  String get platformAuditActionFarmStatus;
+
+  /// No description provided for @platformAuditActionFarmExtras.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка сверх тарифа'**
+  String get platformAuditActionFarmExtras;
+
+  /// No description provided for @platformAuditActionFarmExtendPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф продлён вручную'**
+  String get platformAuditActionFarmExtendPlan;
+
+  /// No description provided for @platformAuditActionFarmExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выгрузка данных фермы'**
+  String get platformAuditActionFarmExport;
+
+  /// No description provided for @platformAuditActionFarmImpersonate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход под клиентом'**
+  String get platformAuditActionFarmImpersonate;
+
+  /// No description provided for @platformAuditActionFarmDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление фермы'**
+  String get platformAuditActionFarmDelete;
+
+  /// No description provided for @platformAuditActionFarmRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление фермы'**
+  String get platformAuditActionFarmRestore;
+
+  /// No description provided for @platformAuditActionAnnouncementSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправлено объявление'**
+  String get platformAuditActionAnnouncementSend;
+
+  /// No description provided for @platformAuditActionSupportResolve.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение закрыто'**
+  String get platformAuditActionSupportResolve;
+
+  /// No description provided for @platformAuditActionSupportContact.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменён контакт поддержки'**
+  String get platformAuditActionSupportContact;
+
+  /// No description provided for @platformAuditActionUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действие «{action}»'**
+  String platformAuditActionUnknown(String action);
+
+  /// No description provided for @platformAuditFieldName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get platformAuditFieldName;
+
+  /// No description provided for @platformAuditFieldLimits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пределы'**
+  String get platformAuditFieldLimits;
+
+  /// No description provided for @platformAuditFieldPrice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена'**
+  String get platformAuditFieldPrice;
+
+  /// No description provided for @platformAuditFieldRabbitsLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кроликов по тарифу'**
+  String get platformAuditFieldRabbitsLimit;
+
+  /// No description provided for @platformAuditFieldStaffLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Людей по тарифу'**
+  String get platformAuditFieldStaffLimit;
+
+  /// No description provided for @platformAuditFieldPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф'**
+  String get platformAuditFieldPlan;
+
+  /// No description provided for @platformAuditFieldStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ'**
+  String get platformAuditFieldStatus;
+
+  /// No description provided for @platformAuditFieldPlanExpiry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок тарифа'**
+  String get platformAuditFieldPlanExpiry;
+
+  /// No description provided for @platformAuditFieldExtras.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поблажка'**
+  String get platformAuditFieldExtras;
+
+  /// No description provided for @platformAuditFieldReason.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зачем'**
+  String get platformAuditFieldReason;
+
+  /// No description provided for @platformAuditPlanEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф снова выдаётся фермам'**
+  String get platformAuditPlanEnabled;
+
+  /// No description provided for @platformAuditPlanDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф больше не выдаётся фермам'**
+  String get platformAuditPlanDisabled;
+
+  /// No description provided for @platformAuditPlanBecameDefault.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стал тарифом по умолчанию'**
+  String get platformAuditPlanBecameDefault;
+
+  /// No description provided for @platformAuditPlanNoLongerDefault.
+  ///
+  /// In ru, this message translates to:
+  /// **'Больше не тариф по умолчанию'**
+  String get platformAuditPlanNoLongerDefault;
+
+  /// No description provided for @platformAuditPlanRef.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф №{id}'**
+  String platformAuditPlanRef(int id);
+
+  /// No description provided for @platformAuditSupportAnswered.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение №{id} — с ответом автору'**
+  String platformAuditSupportAnswered(int id);
+
+  /// No description provided for @platformAuditSupportClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение №{id} — без ответа'**
+  String platformAuditSupportClosed(int id);
+
+  /// No description provided for @feedsPaidLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько заплатили'**
+  String get feedsPaidLabel;
+
+  /// No description provided for @feedsPaidHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если это закупка — сумма попадёт в расходы. Пересчитали остаток — оставьте пустым.'**
+  String get feedsPaidHint;
+
+  /// No description provided for @staffInvitedEmailFailedBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Письмо на {email} отправить не удалось — перешлите работнику приглашение сами.'**
+  String staffInvitedEmailFailedBody(String email);
+
+  /// No description provided for @staffInviteLinkLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ссылка-приглашение'**
+  String get staffInviteLinkLabel;
+
+  /// No description provided for @staffInviteCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать приглашение'**
+  String get staffInviteCopy;
+
+  /// No description provided for @staffInviteCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение скопировано — вставьте его в сообщение работнику'**
+  String get staffInviteCopied;
+
+  /// No description provided for @staffInviteMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: {link}'**
+  String staffInviteMessage(String link);
+
+  /// No description provided for @staffExpiredInvites.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок вышел'**
+  String get staffExpiredInvites;
+
+  /// No description provided for @staffInviteCardLive.
+  ///
+  /// In ru, this message translates to:
+  /// **'{role} · до {date}'**
+  String staffInviteCardLive(String role, String date);
+
+  /// No description provided for @staffInviteCardExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'{role} · срок истёк {date}'**
+  String staffInviteCardExpired(String role, String date);
+
+  /// No description provided for @staffInviteAgain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пригласить заново'**
+  String get staffInviteAgain;
+
+  /// No description provided for @loginNoCodePhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кода нет? Спросите у владельца фермы, на какой номер он вас пригласил.'**
+  String get loginNoCodePhone;
+
+  /// No description provided for @loginNoCodeEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кода нет? Спросите у владельца фермы, на какую почту он вас пригласил.'**
+  String get loginNoCodeEmail;
+
+  /// No description provided for @platformPlanDefaultBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'новым фермам'**
+  String get platformPlanDefaultBadge;
+
+  /// No description provided for @staffAccessClosedBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'доступ закрыт'**
+  String get staffAccessClosedBadge;
+
+  /// No description provided for @roleManagerDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ведёт поголовье, корма и финансы'**
+  String get roleManagerDescription;
+
+  /// No description provided for @roleWorkerDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смотрит данные и отмечает работу'**
+  String get roleWorkerDescription;
 }
 
 class _AppLocalizationsDelegate

@@ -19,8 +19,7 @@ class PinGate extends ConsumerStatefulWidget {
   ConsumerState<PinGate> createState() => _PinGateState();
 }
 
-class _PinGateState extends ConsumerState<PinGate>
-    with WidgetsBindingObserver {
+class _PinGateState extends ConsumerState<PinGate> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

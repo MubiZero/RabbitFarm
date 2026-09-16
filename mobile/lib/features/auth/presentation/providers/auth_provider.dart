@@ -106,8 +106,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     state = state.copyWith(
       user: user.copyWith(
-        farm: (user.farm ?? FarmRef(id: user.id, status: status))
-            .copyWith(status: status),
+        farm: (user.farm ?? FarmRef(id: user.id, status: status)).copyWith(
+          status: status,
+        ),
       ),
     );
   }
@@ -259,10 +260,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       _ref.read(fcmServiceProvider).registerCurrentToken();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
       rethrow;
     }
   }
@@ -290,10 +288,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       Analytics.signUpCompleted();
       return channel;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e,
-      );
+      state = state.copyWith(isLoading: false, error: e);
       rethrow;
     }
   }
@@ -387,14 +382,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(user: user.copyWith(digestEnabled: enabled));
 
     try {
-      final updated =
-          await _authRepository.updateProfile({'digest_enabled': enabled});
+      final updated = await _authRepository.updateProfile({
+        'digest_enabled': enabled,
+      });
       if (!mounted) return null;
       state = state.copyWith(user: updated);
       return null;
     } catch (e) {
       if (!mounted) return null;
       state = state.copyWith(user: user.copyWith(digestEnabled: previous));
+      return e;
+    }
+  }
+
+  /// Сообщить серверу язык, на котором человеку присылать уведомления.
+  ///
+  /// Возвращает ошибку, а не показывает её: смена языка интерфейса удалась в
+  /// любом случае, и упрекать человека сбоем сети из-за настройки, о которой
+  /// он не просил, незачем — синхронизация повторится при следующем входе.
+  Future<Object?> setLanguage(String language) async {
+    if (!state.isAuthenticated) return null;
+
+    try {
+      final updated = await _authRepository.updateProfile({
+        'language': language,
+      });
+      if (!mounted) return null;
+      state = state.copyWith(user: updated);
+      return null;
+    } catch (e) {
       return e;
     }
   }

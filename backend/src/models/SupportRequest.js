@@ -32,6 +32,20 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('new', 'resolved'),
       allowNull: false,
       defaultValue: 'new'
+    },
+    // Ответ поддержки. Без него «разобрано» было отметкой для одного только
+    // админа: автор обращения не узнавал ни что его прочитали, ни что решили.
+    answer: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    resolved_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    resolved_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     tableName: 'support_requests',

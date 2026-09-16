@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
@@ -97,12 +99,20 @@ class TransactionsRepository {
     }
   }
 
-  /// Create new transaction
-  Future<Transaction> createTransaction(TransactionCreate transaction) async {
+  /// Завести операцию, при необходимости — со снимком чека.
+  ///
+  /// Чек снимают телефоном у кассы, поэтому он уходит файлом в том же
+  /// запросе: отдельный шаг «сначала сохраните, потом приложите» человек у
+  /// кассы не пройдёт.
+  Future<Transaction> createTransaction(
+    TransactionCreate transaction, {
+    String? receiptPath,
+    Uint8List? receiptBytes,
+  }) async {
     try {
       final response = await _apiClient.post(
         '/transactions',
-        data: transaction.toJson(),
+        data: await _body(transaction.toJson(), receiptPath, receiptBytes),
       );
 
       if (response.data['success'] == true) {
@@ -115,13 +125,17 @@ class TransactionsRepository {
     }
   }
 
-  /// Update transaction
+  /// Поправить операцию, при необходимости заменив снимок чека.
   Future<Transaction> updateTransaction(
-      int id, TransactionUpdate transaction) async {
+    int id,
+    TransactionUpdate transaction, {
+    String? receiptPath,
+    Uint8List? receiptBytes,
+  }) async {
     try {
       final response = await _apiClient.put(
         '/transactions/$id',
-        data: transaction.toJson(),
+        data: await _body(transaction.toJson(), receiptPath, receiptBytes),
       );
 
       if (response.data['success'] == true) {
@@ -132,6 +146,29 @@ class TransactionsRepository {
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
+  }
+
+  /// Тело запроса: с чеком — multipart, без чека — прежний JSON.
+  ///
+  /// Multipart всегда слать нельзя: числа и даты уехали бы строками, а
+  /// разбирать их обратно на сервере пришлось бы ради случая, который
+  /// случается не в каждой операции.
+  Future<dynamic> _body(
+    Map<String, dynamic> json,
+    String? receiptPath,
+    Uint8List? receiptBytes,
+  ) async {
+    if (receiptPath == null && receiptBytes == null) return json;
+
+    final file = receiptBytes != null
+        ? MultipartFile.fromBytes(receiptBytes, filename: 'receipt.jpg')
+        : await MultipartFile.fromFile(receiptPath!);
+
+    return FormData.fromMap({
+      for (final entry in json.entries)
+        if (entry.value != null) entry.key: '${entry.value}',
+      'receipt': file,
+    });
   }
 
   /// Delete transaction

@@ -11,9 +11,15 @@ abstract class RabbitStatistics with _$RabbitStatistics {
     @JsonKey(name: 'alive_count') @IntConverter() @Default(0) int aliveCount,
     @JsonKey(name: 'male_count') @IntConverter() @Default(0) int maleCount,
     @JsonKey(name: 'female_count') @IntConverter() @Default(0) int femaleCount,
-    @JsonKey(name: 'pregnant_count') @IntConverter() @Default(0) int pregnantCount,
+    @JsonKey(name: 'pregnant_count')
+    @IntConverter()
+    @Default(0)
+    int pregnantCount,
     @JsonKey(name: 'sick_count') @IntConverter() @Default(0) int sickCount,
-    @JsonKey(name: 'for_sale_count') @IntConverter() @Default(0) int forSaleCount,
+    @JsonKey(name: 'for_sale_count')
+    @IntConverter()
+    @Default(0)
+    int forSaleCount,
     @JsonKey(name: 'by_breed') @Default([]) List<BreedStats> byBreed,
     @JsonKey(name: 'dead_count') @IntConverter() @Default(0) int deadCount,
   }) = _RabbitStatistics;

@@ -35,7 +35,8 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       final paginatedData = apiResponse.data!;
@@ -43,8 +44,8 @@ class BreedingRepository {
           .map((item) => BreedingModel.fromJson(item as Map<String, dynamic>))
           .toList();
 
-      final pagination = (paginatedData['pagination'] ?? const <String, dynamic>{})
-          as Map<String, dynamic>;
+      final pagination = (paginatedData['pagination'] ??
+          const <String, dynamic>{}) as Map<String, dynamic>;
 
       int toInt(dynamic v) {
         if (v is int) return v;
@@ -88,7 +89,8 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
@@ -107,7 +109,8 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
@@ -116,7 +119,8 @@ class BreedingRepository {
     }
   }
 
-  Future<BreedingModel> updateBreeding(int id, Map<String, dynamic> data) async {
+  Future<BreedingModel> updateBreeding(
+      int id, Map<String, dynamic> data) async {
     try {
       final response = await _apiClient.updateBreeding(id, data);
 
@@ -126,7 +130,8 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BreedingModel.fromJson(apiResponse.data!);
@@ -153,7 +158,8 @@ class BreedingRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!;

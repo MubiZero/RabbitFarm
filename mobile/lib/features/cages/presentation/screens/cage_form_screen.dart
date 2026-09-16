@@ -109,8 +109,7 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
       title: _isEditing ? l10n.cageFormEditTitle : l10n.cageFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
-      successMessage:
-          _isEditing ? l10n.cageFormUpdated : l10n.cageFormCreated,
+      successMessage: _isEditing ? l10n.cageFormUpdated : l10n.cageFormCreated,
       onSubmit: _save,
       isDirty: () => _touched,
       children: [

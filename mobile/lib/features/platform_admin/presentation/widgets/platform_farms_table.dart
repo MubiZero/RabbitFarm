@@ -5,6 +5,7 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
+import 'farm_state_chip.dart';
 import 'platform_farm_card.dart';
 
 final _dayFormat = DateFormat('dd.MM.yyyy');
@@ -97,12 +98,13 @@ class _TableHeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final style = AppTypography.labelSm
-        .copyWith(color: context.colors.onSurfaceVariant);
+    final style =
+        AppTypography.labelSm.copyWith(color: context.colors.onSurfaceVariant);
 
     Widget cell(int flex, String text) => Expanded(
           flex: flex,
-          child: Text(text, style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
+          child: Text(text,
+              style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
         );
 
     return Padding(
@@ -143,8 +145,8 @@ class _TableRow extends StatelessWidget {
     final owner = farm.owner;
     final bodyStyle =
         AppTypography.bodyMd.copyWith(color: context.colors.onSurface);
-    final mutedStyle = AppTypography.bodyMd
-        .copyWith(color: context.colors.onSurfaceVariant);
+    final mutedStyle =
+        AppTypography.bodyMd.copyWith(color: context.colors.onSurfaceVariant);
 
     Widget text(int flex, String value, {TextStyle? style}) => Expanded(
           flex: flex,
@@ -163,13 +165,14 @@ class _TableRow extends StatelessWidget {
         // состоянии (AppCardVariant.error) — упёршуюся в предел ферму
         // видно с первого взгляда вдоль всей таблицы, не только заглянув в
         // числа.
-        decoration: farm.isAtLimit
+        decoration: farm.needsAttention
             ? const BoxDecoration(
-                border: Border(left: BorderSide(color: AppColors.error, width: 4)),
+                border:
+                    Border(left: BorderSide(color: AppColors.error, width: 4)),
               )
             : null,
         padding: EdgeInsets.only(
-          left: farm.isAtLimit ? AppSpacing.lg - 4 : AppSpacing.lg,
+          left: farm.needsAttention ? AppSpacing.lg - 4 : AppSpacing.lg,
           right: AppSpacing.lg,
           top: AppSpacing.md,
           bottom: AppSpacing.md,
@@ -177,11 +180,34 @@ class _TableRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            text(_Columns.name, farm.name, style: bodyStyle.copyWith(fontWeight: FontWeight.w600)),
+            Expanded(
+              flex: _Columns.name,
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      farm.name,
+                      style: bodyStyle.copyWith(fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (FarmStateChip.hasState(farm)) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    // Ярлык короткий: в колонке имени дате удаления места нет,
+                    // а точный день виден на карточке фермы.
+                    FarmStateChip(farm: farm, compact: true),
+                  ],
+                ],
+              ),
+            ),
             Expanded(
               flex: _Columns.owner,
               child: owner == null
-                  ? Text(l10n.platformOwnerMissing, style: mutedStyle, maxLines: 1, overflow: TextOverflow.ellipsis)
+                  ? Text(l10n.platformOwnerMissing,
+                      style: mutedStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis)
                   : Tooltip(
                       // Контакт целиком доступен по наведению/долгому тапу —
                       // колонка слишком узкая для «имя · почта · телефон»
@@ -191,31 +217,46 @@ class _TableRow extends StatelessWidget {
                           .whereType<String>()
                           .where((part) => part.trim().isNotEmpty)
                           .join(' · '),
-                      child: Text(owner.fullName, style: bodyStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      child: Text(owner.fullName,
+                          style: bodyStyle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
                     ),
             ),
             Expanded(flex: _Columns.plan, child: PlanChip(plan: farm.plan)),
             Expanded(
               flex: _Columns.rabbits,
-              child: _UsageCell(used: farm.rabbitsCount, limit: farm.plan?.maxRabbits),
+              // Предел эффективный — с поблажкой, как и на карточке.
+              child: _UsageCell(
+                  used: farm.rabbitsCount, limit: farm.effectiveRabbitsLimit),
             ),
             Expanded(
               flex: _Columns.staff,
-              child: _UsageCell(used: farm.staffCount, limit: farm.plan?.maxStaff),
+              child: _UsageCell(
+                  used: farm.staffCount, limit: farm.effectiveStaffLimit),
             ),
             text(
               _Columns.lastActive,
-              farm.lastActiveAt == null ? l10n.platformFarmNeverActive : _dayFormat.format(farm.lastActiveAt!),
+              farm.lastActiveAt == null
+                  ? l10n.platformFarmNeverActive
+                  : _dayFormat.format(farm.lastActiveAt!),
               style: mutedStyle,
             ),
-            text(_Columns.createdAt, _dayFormat.format(farm.createdAt), style: mutedStyle),
+            text(_Columns.createdAt, _dayFormat.format(farm.createdAt),
+                style: mutedStyle),
             SizedBox(
               width: _Columns.actionWidth,
-              child: IconButton(
-                icon: const Icon(Icons.sell_outlined, size: 20),
-                tooltip: farm.plan == null ? l10n.platformAssignPlan : l10n.platformChangePlan,
-                onPressed: onChangePlan,
-              ),
+              // У удалённой фермы тарифа не меняют — до восстановления это
+              // действие ничего не решает.
+              child: farm.isDeleted
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.sell_outlined, size: 20),
+                      tooltip: farm.plan == null
+                          ? l10n.platformAssignPlan
+                          : l10n.platformChangePlan,
+                      onPressed: onChangePlan,
+                    ),
             ),
           ],
         ),
@@ -240,7 +281,8 @@ class _UsageCell extends StatelessWidget {
     if (limit == null || limit! <= 0) {
       return Text(
         l10n.platformUsageUnlimited(used),
-        style: AppTypography.bodyMd.copyWith(color: context.colors.onSurfaceVariant),
+        style: AppTypography.bodyMd
+            .copyWith(color: context.colors.onSurfaceVariant),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );
@@ -255,7 +297,8 @@ class _UsageCell extends StatelessWidget {
 
     return Text(
       l10n.platformUsageOfLimit(used, limit!),
-      style: AppTypography.bodyMd.copyWith(color: color, fontWeight: fraction >= 0.8 ? FontWeight.w600 : null),
+      style: AppTypography.bodyMd.copyWith(
+          color: color, fontWeight: fraction >= 0.8 ? FontWeight.w600 : null),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );

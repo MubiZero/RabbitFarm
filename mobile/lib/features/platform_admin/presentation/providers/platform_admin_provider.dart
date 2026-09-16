@@ -1,34 +1,51 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../../core/models/support_contact.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../core/providers/session.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../../data/repositories/platform_admin_repository.dart';
 
-final platformAdminRepositoryProvider = Provider<PlatformAdminRepository>((ref) {
+final platformAdminRepositoryProvider = Provider<PlatformAdminRepository>((
+  ref,
+) {
   ref.watch(sessionRevisionProvider);
   return PlatformAdminRepository(ref.watch(apiClientProvider));
 });
 
 /// Тарифы сервиса. Нужны и на вкладке тарифов, и на вкладке ферм — там из
 /// них собирается список выбора.
-final platformPlansProvider =
-    FutureProvider.autoDispose<List<Plan>>((ref) async {
+final platformPlansProvider = FutureProvider.autoDispose<List<Plan>>((
+  ref,
+) async {
   return ref.watch(platformAdminRepositoryProvider).getPlans();
 });
 
 /// Сводка платформы целиком — вкладка «Сводка» (см.
 /// docs/plans/PLATFORM-ADMIN.md, этап 5).
-final platformSummaryProvider =
-    FutureProvider.autoDispose<PlatformSummary>((ref) async {
+final platformSummaryProvider = FutureProvider.autoDispose<PlatformSummary>((
+  ref,
+) async {
   return ref.watch(platformAdminRepositoryProvider).getSummary();
 });
 
 /// Фильтр списка ферм — одно значение сразу, а не набор галочек: сервер
 /// принимает единственный `filter`, и совмещать «без тарифа» с «упёрлась в
 /// предел» всё равно было бы нечего — это взаимоисключающие срезы.
-enum PlatformFarmFilter { noPlan, atLimit, suspended, expired, inactiveDays }
+///
+/// `deleted` — не такой же срез, как остальные, а единственный режим, в
+/// котором мягко удалённые фермы вообще видны: из обычного списка сервер их
+/// убирает, и без этого чипа до кнопки «Восстановить» было не добраться, пока
+/// зачистка через 30 дней не сделает вопрос неактуальным.
+enum PlatformFarmFilter {
+  noPlan,
+  atLimit,
+  suspended,
+  expired,
+  inactiveDays,
+  deleted,
+}
 
 /// Названо, а не безымянное расширение: тот же срез выбирают и в объявлениях
 /// (`target_filter`), а безымянное расширение видно только в своей библиотеке.
@@ -39,8 +56,21 @@ extension PlatformFarmFilterApi on PlatformFarmFilter {
         PlatformFarmFilter.suspended => 'suspended',
         PlatformFarmFilter.expired => 'expired',
         PlatformFarmFilter.inactiveDays => 'inactive_days',
+        PlatformFarmFilter.deleted => 'deleted',
       };
+
+  /// По этому срезу можно адресовать объявление. Удалённым фермам — нельзя:
+  /// их доступ уже закрыт, читать рассылку некому, и сервер такой адресат
+  /// отвергает (`planValidator.createAnnouncementSchema`).
+  bool get canTargetAnnouncement => this != PlatformFarmFilter.deleted;
 }
+
+/// Срезы, которыми адресуют объявление, — в том же порядке, что и чипы
+/// списка ферм.
+List<PlatformFarmFilter> get announcementFarmFilters =>
+    PlatformFarmFilter.values
+        .where((filter) => filter.canTargetAnnouncement)
+        .toList();
 
 /// Разобрать срез, пришедший от сервера. `null` — значение незнакомое или
 /// отсутствует: сорвать из-за него показ всей строки нельзя.
@@ -218,6 +248,14 @@ class PlatformFarmsNotifier extends StateNotifier<PlatformFarmsState> {
               rabbitsCount: detail.rabbitsCount,
               staffCount: detail.staffCount,
               lastActiveAt: detail.lastActiveAt,
+              // Доступ, удаление и поблажка меняются именно с карточки — без
+              // них список после возврата показывал бы ферму работающей,
+              // хотя админ только что её закрыл.
+              status: detail.status,
+              deletedAt: detail.deletedAt,
+              extraRabbits: detail.extraRabbits,
+              extraStaff: detail.extraStaff,
+              extrasUntil: detail.extrasUntil,
             )
           else
             farm,
@@ -255,8 +293,9 @@ class PlatformFarmDetailNotifier
   Future<void> _load() async {
     state = const AsyncValue.loading();
     try {
-      final detail =
-          await _ref.read(platformAdminRepositoryProvider).getFarmDetail(farmId);
+      final detail = await _ref
+          .read(platformAdminRepositoryProvider)
+          .getFarmDetail(farmId);
       state = AsyncValue.data(detail);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -267,7 +306,9 @@ class PlatformFarmDetailNotifier
   /// если всё получилось, — как `assignPlan` в списке ферм.
   Future<Object?> updateStatus(String status) {
     return _apply(
-      () => _ref.read(platformAdminRepositoryProvider).updateFarmStatus(farmId, status),
+      () => _ref
+          .read(platformAdminRepositoryProvider)
+          .updateFarmStatus(farmId, status),
     );
   }
 
@@ -319,9 +360,7 @@ class PlatformFarmDetailNotifier
     );
   }
 
-  Future<Object?> _apply(
-    Future<PlatformFarmDetail> Function() action,
-  ) async {
+  Future<Object?> _apply(Future<PlatformFarmDetail> Function() action) async {
     try {
       final updated = await action();
       state = AsyncValue.data(updated);
@@ -338,8 +377,10 @@ class PlatformFarmDetailNotifier
 }
 
 final platformFarmDetailProvider = StateNotifierProvider.autoDispose
-    .family<PlatformFarmDetailNotifier, AsyncValue<PlatformFarmDetail>, int>(
-        (ref, farmId) {
+    .family<PlatformFarmDetailNotifier, AsyncValue<PlatformFarmDetail>, int>((
+  ref,
+  farmId,
+) {
   // `watch`, не `read`: как раньше в `build()` — смена репозитория (в тестах
   // через override) должна пересоздать нотифаер с нуля, а не молча
   // остаться на прежних данных.
@@ -405,7 +446,10 @@ class PlatformAnnouncementsNotifier
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final result = await _repository.getAnnouncements(page: 1, limit: _pageSize);
+      final result = await _repository.getAnnouncements(
+        page: 1,
+        limit: _pageSize,
+      );
       state = state.copyWith(
         items: result.items,
         isLoading: false,
@@ -461,7 +505,9 @@ class PlatformAnnouncementsNotifier
 
 final platformAnnouncementsProvider = StateNotifierProvider.autoDispose<
     PlatformAnnouncementsNotifier, PlatformAnnouncementsState>((ref) {
-  return PlatformAnnouncementsNotifier(ref.watch(platformAdminRepositoryProvider));
+  return PlatformAnnouncementsNotifier(
+    ref.watch(platformAdminRepositoryProvider),
+  );
 });
 
 /// Обращения ферм в поддержку с постраничной подгрузкой — тот же приём, что
@@ -518,7 +564,10 @@ class PlatformSupportRequestsNotifier
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final result = await _repository.getSupportRequests(page: 1, limit: _pageSize);
+      final result = await _repository.getSupportRequests(
+        page: 1,
+        limit: _pageSize,
+      );
       state = state.copyWith(
         items: result.items,
         isLoading: false,
@@ -552,12 +601,15 @@ class PlatformSupportRequestsNotifier
     }
   }
 
-  /// Отметить обращение разобранным. Обновляет запись на месте — как и
-  /// история объявлений, список не перезагружается целиком ради одной
-  /// строки.
-  Future<Object?> resolve(int id) async {
+  /// Отметить обращение разобранным, по желанию — с ответом автору. Обновляет
+  /// запись на месте — как и история объявлений, список не перезагружается
+  /// целиком ради одной строки.
+  Future<Object?> resolve(int id, {String? answer}) async {
     try {
-      final resolved = await _repository.resolveSupportRequest(id);
+      final resolved = await _repository.resolveSupportRequest(
+        id,
+        answer: answer,
+      );
       state = state.copyWith(
         items: [
           for (final item in state.items)
@@ -573,7 +625,19 @@ class PlatformSupportRequestsNotifier
 
 final platformSupportRequestsProvider = StateNotifierProvider.autoDispose<
     PlatformSupportRequestsNotifier, PlatformSupportRequestsState>((ref) {
-  return PlatformSupportRequestsNotifier(ref.watch(platformAdminRepositoryProvider));
+  return PlatformSupportRequestsNotifier(
+    ref.watch(platformAdminRepositoryProvider),
+  );
+});
+
+/// Официальный контакт поддержки — один на весь сервис.
+///
+/// `autoDispose`: форму открывают редко и ненадолго, а держать в памяти после
+/// закрытия диалога прошлые значения значило бы показать их второй раз, если
+/// правку внёс другой админ.
+final platformSupportContactProvider =
+    FutureProvider.autoDispose<SupportContact>((ref) async {
+  return ref.watch(platformAdminRepositoryProvider).getSupportContact();
 });
 
 /// Фермы для выбора адресата объявления, по поисковой строке.
@@ -599,7 +663,123 @@ final announcementFarmChoicesProvider = FutureProvider.autoDispose
 /// `autoDispose`: снимок фермы с историей весит немало, и держать его в памяти
 /// после закрытия экрана незачем. Разбирать по полям нечего — наружу уходит та
 /// же карта, что прислал сервер.
-final platformFarmExportProvider = FutureProvider.autoDispose
-    .family<Map<String, dynamic>, int>((ref, farmId) {
+final platformFarmExportProvider =
+    FutureProvider.autoDispose.family<Map<String, dynamic>, int>((ref, farmId) {
   return ref.watch(platformAdminRepositoryProvider).exportFarm(farmId);
+});
+
+/// Журнал действий платформенного админа с постраничной подгрузкой.
+///
+/// Как история объявлений: список сверху вниз, без поиска. Записи журнала
+/// неизменяемы — менять здесь нечего, только читать.
+class PlatformAuditState {
+  const PlatformAuditState({
+    this.items = const [],
+    this.isLoading = false,
+    this.error,
+    this.page = 1,
+    this.totalPages = 1,
+    this.total = 0,
+  });
+
+  final List<AdminAuditEntry> items;
+  final bool isLoading;
+  final Object? error;
+  final int page;
+  final int totalPages;
+  final int total;
+
+  bool get hasMore => page < totalPages;
+
+  PlatformAuditState copyWith({
+    List<AdminAuditEntry>? items,
+    bool? isLoading,
+    Object? error,
+    int? page,
+    int? totalPages,
+    int? total,
+  }) {
+    return PlatformAuditState(
+      items: items ?? this.items,
+      isLoading: isLoading ?? this.isLoading,
+      // Как и в остальных списках: ошибка присваивается напрямую, иначе
+      // сообщение залипало бы и после успешной загрузки.
+      error: error,
+      page: page ?? this.page,
+      totalPages: totalPages ?? this.totalPages,
+      total: total ?? this.total,
+    );
+  }
+}
+
+class PlatformAuditNotifier extends StateNotifier<PlatformAuditState> {
+  PlatformAuditNotifier(this._repository, {this.farmId})
+      : super(const PlatformAuditState()) {
+    load();
+  }
+
+  final PlatformAdminRepository _repository;
+
+  /// Журнал одной фермы, а не всего сервиса. `null` — весь сервис.
+  final int? farmId;
+
+  static const _pageSize = 20;
+
+  Future<void> load() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getAuditLog(
+        page: 1,
+        limit: _pageSize,
+        farmId: farmId,
+      );
+      state = state.copyWith(
+        items: result.items,
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final result = await _repository.getAuditLog(
+        page: state.page + 1,
+        limit: _pageSize,
+        farmId: farmId,
+      );
+      state = state.copyWith(
+        items: [...state.items, ...result.items],
+        isLoading: false,
+        page: result.page.page,
+        totalPages: result.page.totalPages,
+        total: result.page.total,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+}
+
+final platformAuditProvider = StateNotifierProvider.autoDispose<
+    PlatformAuditNotifier, PlatformAuditState>((ref) {
+  return PlatformAuditNotifier(ref.watch(platformAdminRepositoryProvider));
+});
+
+/// Журнал одной фермы. Сервер и репозиторий сужение по ферме умели с самого
+/// начала, а спросить его было неоткуда: вопрос «кто закрыл эту ферму и
+/// зачем» задают, стоя на её карточке, а не листая журнал всего сервиса.
+final platformFarmAuditProvider = StateNotifierProvider.autoDispose
+    .family<PlatformAuditNotifier, PlatformAuditState, int>((ref, farmId) {
+  return PlatformAuditNotifier(
+    ref.watch(platformAdminRepositoryProvider),
+    farmId: farmId,
+  );
 });

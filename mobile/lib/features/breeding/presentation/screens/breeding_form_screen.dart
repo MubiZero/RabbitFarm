@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
@@ -45,8 +47,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
       _femaleId = record.femaleId;
       _male = record.male;
       _female = record.female;
-      _breedingDate =
-          DateTime.tryParse(record.breedingDate) ?? DateTime.now();
+      _breedingDate = DateTime.tryParse(record.breedingDate) ?? DateTime.now();
       _status = record.status;
       _notes.text = record.notes ?? '';
     } else {
@@ -78,6 +79,16 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
       'notes': _notes.text.trim().isEmpty ? null : _notes.text.trim(),
     };
 
+    if (!_isEditing && !(ref.read(isOnlineProvider).value ?? true)) {
+      // Случку отмечают у клетки, без связи. Запись уходит в очередь и
+      // досылается сама; ожидаемую дату окрола сервер посчитает сам, когда
+      // примет её.
+      await ref
+          .read(offlineQueueProvider.notifier)
+          .enqueue(OfflineActionType.breeding, data);
+      return null;
+    }
+
     try {
       if (_isEditing) {
         await repository.updateBreeding(_record!.id, data);
@@ -103,14 +114,18 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
       title:
           _isEditing ? l10n.breedingFormEditTitle : l10n.breedingFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
-      successMessage:
-          _isEditing ? l10n.breedingFormUpdated : l10n.breedingFormCreated,
+      // Без связи запись уходит в очередь — сообщение должно говорить это,
+      // а не делать вид, что случка уже записана на сервере.
+      successMessage: _isEditing
+          ? l10n.breedingFormUpdated
+          : (online ? l10n.breedingFormCreated : l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       children: [

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Task {
 
-@IntConverter() int get id; String get title; String? get description; TaskType get type; TaskStatus get status; TaskPriority get priority;@JsonKey(name: 'due_date')@DateTimeConverter() DateTime get dueDate;@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? get completedAt;@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? get rabbitId;@JsonKey(name: 'cage_id')@NullableIntConverter() int? get cageId;@JsonKey(name: 'assigned_to')@NullableIntConverter() int? get assignedTo;@JsonKey(name: 'created_by')@NullableIntConverter() int? get createdBy;@JsonKey(name: 'is_recurring') bool? get isRecurring;@JsonKey(name: 'recurrence_rule') String? get recurrenceRule;@JsonKey(name: 'reminder_before')@NullableIntConverter() int? get reminderBefore; String? get notes;@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? get createdAt;@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? get updatedAt; RabbitRef? get rabbit; CageInfo? get cage;@JsonKey(name: 'creator') UserRef? get author;
+@IntConverter() int get id; String get title; String? get description; TaskType get type; TaskStatus get status; TaskPriority get priority;@JsonKey(name: 'due_date')@DateTimeConverter() DateTime get dueDate;@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? get completedAt;@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? get rabbitId;@JsonKey(name: 'cage_id')@NullableIntConverter() int? get cageId;@JsonKey(name: 'assigned_to')@NullableIntConverter() int? get assignedTo;@JsonKey(name: 'created_by')@NullableIntConverter() int? get createdBy;@JsonKey(name: 'is_recurring') bool? get isRecurring;@JsonKey(name: 'recurrence_rule') String? get recurrenceRule;@JsonKey(name: 'reminder_before')@NullableIntConverter() int? get reminderBefore; String? get notes;@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? get createdAt;@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? get updatedAt; RabbitRef? get rabbit; CageInfo? get cage;@JsonKey(name: 'creator') UserRef? get author;@JsonKey(name: 'assignedTo') UserRef? get assignee;
 /// Create a copy of Task
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $TaskCopyWith<Task> get copyWith => _$TaskCopyWithImpl<Task>(this as Task, _$ide
 @override
 bool operator ==(Object other) {
   final _this = this as Task;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Task&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.priority, _this.priority) || other.priority == _this.priority)&&(identical(other.dueDate, _this.dueDate) || other.dueDate == _this.dueDate)&&(identical(other.completedAt, _this.completedAt) || other.completedAt == _this.completedAt)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.cageId, _this.cageId) || other.cageId == _this.cageId)&&(identical(other.assignedTo, _this.assignedTo) || other.assignedTo == _this.assignedTo)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.isRecurring, _this.isRecurring) || other.isRecurring == _this.isRecurring)&&(identical(other.recurrenceRule, _this.recurrenceRule) || other.recurrenceRule == _this.recurrenceRule)&&(identical(other.reminderBefore, _this.reminderBefore) || other.reminderBefore == _this.reminderBefore)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit)&&(identical(other.cage, _this.cage) || other.cage == _this.cage)&&(identical(other.author, _this.author) || other.author == _this.author));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Task&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.priority, _this.priority) || other.priority == _this.priority)&&(identical(other.dueDate, _this.dueDate) || other.dueDate == _this.dueDate)&&(identical(other.completedAt, _this.completedAt) || other.completedAt == _this.completedAt)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.cageId, _this.cageId) || other.cageId == _this.cageId)&&(identical(other.assignedTo, _this.assignedTo) || other.assignedTo == _this.assignedTo)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.isRecurring, _this.isRecurring) || other.isRecurring == _this.isRecurring)&&(identical(other.recurrenceRule, _this.recurrenceRule) || other.recurrenceRule == _this.recurrenceRule)&&(identical(other.reminderBefore, _this.reminderBefore) || other.reminderBefore == _this.reminderBefore)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit)&&(identical(other.cage, _this.cage) || other.cage == _this.cage)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.assignee, _this.assignee) || other.assignee == _this.assignee));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Task;
-  return Object.hashAll([runtimeType,_this.id,_this.title,_this.description,_this.type,_this.status,_this.priority,_this.dueDate,_this.completedAt,_this.rabbitId,_this.cageId,_this.assignedTo,_this.createdBy,_this.isRecurring,_this.recurrenceRule,_this.reminderBefore,_this.notes,_this.createdAt,_this.updatedAt,_this.rabbit,_this.cage,_this.author]);
+  return Object.hashAll([runtimeType,_this.id,_this.title,_this.description,_this.type,_this.status,_this.priority,_this.dueDate,_this.completedAt,_this.rabbitId,_this.cageId,_this.assignedTo,_this.createdBy,_this.isRecurring,_this.recurrenceRule,_this.reminderBefore,_this.notes,_this.createdAt,_this.updatedAt,_this.rabbit,_this.cage,_this.author,_this.assignee]);
 }
 
 @override
 String toString() {
   final _this = this as Task;
-  return 'Task(id: ${_this.id}, title: ${_this.title}, description: ${_this.description}, type: ${_this.type}, status: ${_this.status}, priority: ${_this.priority}, dueDate: ${_this.dueDate}, completedAt: ${_this.completedAt}, rabbitId: ${_this.rabbitId}, cageId: ${_this.cageId}, assignedTo: ${_this.assignedTo}, createdBy: ${_this.createdBy}, isRecurring: ${_this.isRecurring}, recurrenceRule: ${_this.recurrenceRule}, reminderBefore: ${_this.reminderBefore}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit}, cage: ${_this.cage}, author: ${_this.author})';
+  return 'Task(id: ${_this.id}, title: ${_this.title}, description: ${_this.description}, type: ${_this.type}, status: ${_this.status}, priority: ${_this.priority}, dueDate: ${_this.dueDate}, completedAt: ${_this.completedAt}, rabbitId: ${_this.rabbitId}, cageId: ${_this.cageId}, assignedTo: ${_this.assignedTo}, createdBy: ${_this.createdBy}, isRecurring: ${_this.isRecurring}, recurrenceRule: ${_this.recurrenceRule}, reminderBefore: ${_this.reminderBefore}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit}, cage: ${_this.cage}, author: ${_this.author}, assignee: ${_this.assignee})';
 }
 
 
@@ -54,11 +54,11 @@ abstract mixin class $TaskCopyWith<$Res>  {
   factory $TaskCopyWith(Task value, $Res Function(Task) _then) = _$TaskCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String title, String? description, TaskType type, TaskStatus status, TaskPriority priority,@JsonKey(name: 'due_date')@DateTimeConverter() DateTime dueDate,@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? completedAt,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'cage_id')@NullableIntConverter() int? cageId,@JsonKey(name: 'assigned_to')@NullableIntConverter() int? assignedTo,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'is_recurring') bool? isRecurring,@JsonKey(name: 'recurrence_rule') String? recurrenceRule,@JsonKey(name: 'reminder_before')@NullableIntConverter() int? reminderBefore, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt, RabbitRef? rabbit, CageInfo? cage,@JsonKey(name: 'creator') UserRef? author
+@IntConverter() int id, String title, String? description, TaskType type, TaskStatus status, TaskPriority priority,@JsonKey(name: 'due_date')@DateTimeConverter() DateTime dueDate,@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? completedAt,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'cage_id')@NullableIntConverter() int? cageId,@JsonKey(name: 'assigned_to')@NullableIntConverter() int? assignedTo,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'is_recurring') bool? isRecurring,@JsonKey(name: 'recurrence_rule') String? recurrenceRule,@JsonKey(name: 'reminder_before')@NullableIntConverter() int? reminderBefore, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt, RabbitRef? rabbit, CageInfo? cage,@JsonKey(name: 'creator') UserRef? author,@JsonKey(name: 'assignedTo') UserRef? assignee
 });
 
 
-$RabbitRefCopyWith<$Res>? get rabbit;$CageInfoCopyWith<$Res>? get cage;$UserRefCopyWith<$Res>? get author;
+$RabbitRefCopyWith<$Res>? get rabbit;$CageInfoCopyWith<$Res>? get cage;$UserRefCopyWith<$Res>? get author;$UserRefCopyWith<$Res>? get assignee;
 
 }
 /// @nodoc
@@ -71,7 +71,7 @@ class _$TaskCopyWithImpl<$Res>
 
 /// Create a copy of Task
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? type = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? completedAt = freezed,Object? rabbitId = freezed,Object? cageId = freezed,Object? assignedTo = freezed,Object? createdBy = freezed,Object? isRecurring = freezed,Object? recurrenceRule = freezed,Object? reminderBefore = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? cage = freezed,Object? author = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? type = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? completedAt = freezed,Object? rabbitId = freezed,Object? cageId = freezed,Object? assignedTo = freezed,Object? createdBy = freezed,Object? isRecurring = freezed,Object? recurrenceRule = freezed,Object? reminderBefore = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? cage = freezed,Object? author = freezed,Object? assignee = freezed,}) {
   return _then(Task(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -94,6 +94,7 @@ as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ig
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable
 as RabbitRef?,cage: freezed == cage ? _self.cage : cage // ignore: cast_nullable_to_non_nullable
 as CageInfo?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,assignee: freezed == assignee ? _self.assignee : assignee // ignore: cast_nullable_to_non_nullable
 as UserRef?,
   ));
 }
@@ -132,6 +133,18 @@ $UserRefCopyWith<$Res>? get author {
 
   return $UserRefCopyWith<$Res>(_self.author!, (value) {
     return _then(_self.copyWith(author: value));
+  });
+}/// Create a copy of Task
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get assignee {
+    if (_self.assignee == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.assignee!, (value) {
+    return _then(_self.copyWith(assignee: value));
   });
 }
 }
@@ -215,10 +228,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author, @JsonKey(name: 'assignedTo')  UserRef? assignee)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Task() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author);case _:
+return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author,_that.assignee);case _:
   return orElse();
 
 }
@@ -236,10 +249,10 @@ return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author, @JsonKey(name: 'assignedTo')  UserRef? assignee)  $default,) {final _that = this;
 switch (_that) {
 case _Task():
-return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author);case _:
+return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author,_that.assignee);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -256,10 +269,10 @@ return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String title,  String? description,  TaskType type,  TaskStatus status,  TaskPriority priority, @JsonKey(name: 'due_date')@DateTimeConverter()  DateTime dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter()  DateTime? completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter()  int? cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter()  int? assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'is_recurring')  bool? isRecurring, @JsonKey(name: 'recurrence_rule')  String? recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter()  int? reminderBefore,  String? notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt,  RabbitRef? rabbit,  CageInfo? cage, @JsonKey(name: 'creator')  UserRef? author, @JsonKey(name: 'assignedTo')  UserRef? assignee)?  $default,) {final _that = this;
 switch (_that) {
 case _Task() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author);case _:
+return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_that.priority,_that.dueDate,_that.completedAt,_that.rabbitId,_that.cageId,_that.assignedTo,_that.createdBy,_that.isRecurring,_that.recurrenceRule,_that.reminderBefore,_that.notes,_that.createdAt,_that.updatedAt,_that.rabbit,_that.cage,_that.author,_that.assignee);case _:
   return null;
 
 }
@@ -271,7 +284,7 @@ return $default(_that.id,_that.title,_that.description,_that.type,_that.status,_
 @JsonSerializable()
 
 class _Task implements Task {
-  const _Task({@IntConverter() required this.id, required this.title, this.description, required this.type, required this.status, required this.priority, @JsonKey(name: 'due_date')@DateTimeConverter() required this.dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter() this.completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter() this.cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter() this.assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter() this.createdBy, @JsonKey(name: 'is_recurring') this.isRecurring, @JsonKey(name: 'recurrence_rule') this.recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter() this.reminderBefore, this.notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, this.rabbit, this.cage, @JsonKey(name: 'creator') this.author});
+  const _Task({@IntConverter() required this.id, required this.title, this.description, required this.type, required this.status, required this.priority, @JsonKey(name: 'due_date')@DateTimeConverter() required this.dueDate, @JsonKey(name: 'completed_at')@NullableDateTimeConverter() this.completedAt, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, @JsonKey(name: 'cage_id')@NullableIntConverter() this.cageId, @JsonKey(name: 'assigned_to')@NullableIntConverter() this.assignedTo, @JsonKey(name: 'created_by')@NullableIntConverter() this.createdBy, @JsonKey(name: 'is_recurring') this.isRecurring, @JsonKey(name: 'recurrence_rule') this.recurrenceRule, @JsonKey(name: 'reminder_before')@NullableIntConverter() this.reminderBefore, this.notes, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, this.rabbit, this.cage, @JsonKey(name: 'creator') this.author, @JsonKey(name: 'assignedTo') this.assignee});
   factory _Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -295,6 +308,7 @@ class _Task implements Task {
 @override final  RabbitRef? rabbit;
 @override final  CageInfo? cage;
 @override@JsonKey(name: 'creator') final  UserRef? author;
+@override@JsonKey(name: 'assignedTo') final  UserRef? assignee;
 
 /// Create a copy of Task
 /// with the given fields replaced by the non-null parameter values.
@@ -309,18 +323,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Task&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.type, type) || other.type == type)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.cageId, cageId) || other.cageId == cageId)&&(identical(other.assignedTo, assignedTo) || other.assignedTo == assignedTo)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.isRecurring, isRecurring) || other.isRecurring == isRecurring)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.reminderBefore, reminderBefore) || other.reminderBefore == reminderBefore)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit)&&(identical(other.cage, cage) || other.cage == cage)&&(identical(other.author, author) || other.author == author));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Task&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.type, type) || other.type == type)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.cageId, cageId) || other.cageId == cageId)&&(identical(other.assignedTo, assignedTo) || other.assignedTo == assignedTo)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.isRecurring, isRecurring) || other.isRecurring == isRecurring)&&(identical(other.recurrenceRule, recurrenceRule) || other.recurrenceRule == recurrenceRule)&&(identical(other.reminderBefore, reminderBefore) || other.reminderBefore == reminderBefore)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit)&&(identical(other.cage, cage) || other.cage == cage)&&(identical(other.author, author) || other.author == author)&&(identical(other.assignee, assignee) || other.assignee == assignee));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hashAll([runtimeType,id,title,description,type,status,priority,dueDate,completedAt,rabbitId,cageId,assignedTo,createdBy,isRecurring,recurrenceRule,reminderBefore,notes,createdAt,updatedAt,rabbit,cage,author]);
+    return Object.hashAll([runtimeType,id,title,description,type,status,priority,dueDate,completedAt,rabbitId,cageId,assignedTo,createdBy,isRecurring,recurrenceRule,reminderBefore,notes,createdAt,updatedAt,rabbit,cage,author,assignee]);
 }
 
 @override
 String toString() {
-    return 'Task(id: $id, title: $title, description: $description, type: $type, status: $status, priority: $priority, dueDate: $dueDate, completedAt: $completedAt, rabbitId: $rabbitId, cageId: $cageId, assignedTo: $assignedTo, createdBy: $createdBy, isRecurring: $isRecurring, recurrenceRule: $recurrenceRule, reminderBefore: $reminderBefore, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, cage: $cage, author: $author)';
+    return 'Task(id: $id, title: $title, description: $description, type: $type, status: $status, priority: $priority, dueDate: $dueDate, completedAt: $completedAt, rabbitId: $rabbitId, cageId: $cageId, assignedTo: $assignedTo, createdBy: $createdBy, isRecurring: $isRecurring, recurrenceRule: $recurrenceRule, reminderBefore: $reminderBefore, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, cage: $cage, author: $author, assignee: $assignee)';
 }
 
 
@@ -331,11 +345,11 @@ abstract mixin class _$TaskCopyWith<$Res> implements $TaskCopyWith<$Res> {
   factory _$TaskCopyWith(_Task value, $Res Function(_Task) _then) = __$TaskCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String title, String? description, TaskType type, TaskStatus status, TaskPriority priority,@JsonKey(name: 'due_date')@DateTimeConverter() DateTime dueDate,@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? completedAt,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'cage_id')@NullableIntConverter() int? cageId,@JsonKey(name: 'assigned_to')@NullableIntConverter() int? assignedTo,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'is_recurring') bool? isRecurring,@JsonKey(name: 'recurrence_rule') String? recurrenceRule,@JsonKey(name: 'reminder_before')@NullableIntConverter() int? reminderBefore, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt, RabbitRef? rabbit, CageInfo? cage,@JsonKey(name: 'creator') UserRef? author
+@IntConverter() int id, String title, String? description, TaskType type, TaskStatus status, TaskPriority priority,@JsonKey(name: 'due_date')@DateTimeConverter() DateTime dueDate,@JsonKey(name: 'completed_at')@NullableDateTimeConverter() DateTime? completedAt,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'cage_id')@NullableIntConverter() int? cageId,@JsonKey(name: 'assigned_to')@NullableIntConverter() int? assignedTo,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'is_recurring') bool? isRecurring,@JsonKey(name: 'recurrence_rule') String? recurrenceRule,@JsonKey(name: 'reminder_before')@NullableIntConverter() int? reminderBefore, String? notes,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt, RabbitRef? rabbit, CageInfo? cage,@JsonKey(name: 'creator') UserRef? author,@JsonKey(name: 'assignedTo') UserRef? assignee
 });
 
 
-@override $RabbitRefCopyWith<$Res>? get rabbit;@override $CageInfoCopyWith<$Res>? get cage;@override $UserRefCopyWith<$Res>? get author;
+@override $RabbitRefCopyWith<$Res>? get rabbit;@override $CageInfoCopyWith<$Res>? get cage;@override $UserRefCopyWith<$Res>? get author;@override $UserRefCopyWith<$Res>? get assignee;
 
 }
 /// @nodoc
@@ -348,7 +362,7 @@ class __$TaskCopyWithImpl<$Res>
 
 /// Create a copy of Task
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? type = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? completedAt = freezed,Object? rabbitId = freezed,Object? cageId = freezed,Object? assignedTo = freezed,Object? createdBy = freezed,Object? isRecurring = freezed,Object? recurrenceRule = freezed,Object? reminderBefore = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? cage = freezed,Object? author = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? type = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? completedAt = freezed,Object? rabbitId = freezed,Object? cageId = freezed,Object? assignedTo = freezed,Object? createdBy = freezed,Object? isRecurring = freezed,Object? recurrenceRule = freezed,Object? reminderBefore = freezed,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? cage = freezed,Object? author = freezed,Object? assignee = freezed,}) {
   return _then(_Task(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -371,6 +385,7 @@ as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ig
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable
 as RabbitRef?,cage: freezed == cage ? _self.cage : cage // ignore: cast_nullable_to_non_nullable
 as CageInfo?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,assignee: freezed == assignee ? _self.assignee : assignee // ignore: cast_nullable_to_non_nullable
 as UserRef?,
   ));
 }
@@ -410,6 +425,18 @@ $UserRefCopyWith<$Res>? get author {
 
   return $UserRefCopyWith<$Res>(_self.author!, (value) {
     return _then(_self.copyWith(author: value));
+  });
+}/// Create a copy of Task
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get assignee {
+    if (_self.assignee == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.assignee!, (value) {
+    return _then(_self.copyWith(assignee: value));
   });
 }
 }

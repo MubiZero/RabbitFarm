@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/breeding_provider.dart';
+import '../widgets/palpation_action.dart';
+import '../../domain/breeding_cycle.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/theme/theme.dart';
@@ -54,8 +56,13 @@ class BreedingDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, BreedingModel breeding,
-      bool canManage, bool canDelete) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    BreedingModel breeding,
+    bool canManage,
+    bool canDelete,
+  ) {
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -106,13 +113,16 @@ class BreedingDetailScreen extends ConsumerWidget {
                     children: [
                       Text(
                         context.l10n.breedingStatus,
-                        style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                        style: AppTypography.labelSm.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         statusText,
-                        style: AppTypography.displayMd
-                            .copyWith(color: statusColor),
+                        style: AppTypography.displayMd.copyWith(
+                          color: statusColor,
+                        ),
                       ),
                     ],
                   ),
@@ -136,7 +146,7 @@ class BreedingDetailScreen extends ConsumerWidget {
                   style: AppTypography.titleLg,
                 ),
                 const Divider(height: 24),
-                
+
                 // Самец
                 Row(
                   children: [
@@ -146,16 +156,24 @@ class BreedingDetailScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(context.l10n.breedingMale, style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
+                          Text(
+                            context.l10n.breedingMale,
+                            style: AppTypography.labelSm.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
-                            breeding.male?.name ?? context.l10n.commonNameMissing,
+                            breeding.male?.name ??
+                                context.l10n.commonNameMissing,
                             style: AppTypography.titleMd,
                           ),
                           if (breeding.male?.tagId != null)
                             Text(
                               context.l10n.breedingTag(breeding.male!.tagId!),
-                              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                              style: AppTypography.labelSm.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                         ],
                       ),
@@ -163,7 +181,8 @@ class BreedingDetailScreen extends ConsumerWidget {
                     IconButton(
                       tooltip: context.l10n.commonOpenCard,
                       icon: const Icon(Icons.arrow_forward),
-                      onPressed: () => context.push('/rabbits/${breeding.maleId}'),
+                      onPressed: () =>
+                          context.push('/rabbits/${breeding.maleId}'),
                     ),
                   ],
                 ),
@@ -179,16 +198,24 @@ class BreedingDetailScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(context.l10n.breedingFemale, style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant)),
+                          Text(
+                            context.l10n.breedingFemale,
+                            style: AppTypography.labelSm.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
-                            breeding.female?.name ?? context.l10n.commonNameMissing,
+                            breeding.female?.name ??
+                                context.l10n.commonNameMissing,
                             style: AppTypography.titleMd,
                           ),
                           if (breeding.female?.tagId != null)
                             Text(
                               context.l10n.breedingTag(breeding.female!.tagId!),
-                              style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                              style: AppTypography.labelSm.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                         ],
                       ),
@@ -196,7 +223,8 @@ class BreedingDetailScreen extends ConsumerWidget {
                     IconButton(
                       tooltip: context.l10n.commonOpenCard,
                       icon: const Icon(Icons.arrow_forward),
-                      onPressed: () => context.push('/rabbits/${breeding.femaleId}'),
+                      onPressed: () =>
+                          context.push('/rabbits/${breeding.femaleId}'),
                     ),
                   ],
                 ),
@@ -214,12 +242,8 @@ class BreedingDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  context.l10n.breedingDates,
-                  style: AppTypography.titleLg,
-                ),
+                Text(context.l10n.breedingDates, style: AppTypography.titleLg),
                 const Divider(height: 24),
-                
                 _buildDateRow(
                   context: context,
                   icon: Icons.favorite,
@@ -227,7 +251,6 @@ class BreedingDetailScreen extends ConsumerWidget {
                   date: breeding.breedingDate,
                   color: AppColors.accentViolet,
                 ),
-
                 if (breeding.expectedBirthDate != null) ...[
                   const SizedBox(height: 12),
                   _buildDateRow(
@@ -238,7 +261,6 @@ class BreedingDetailScreen extends ConsumerWidget {
                     color: AppColors.success,
                   ),
                 ],
-
                 if (breeding.palpationDate != null) ...[
                   const SizedBox(height: 12),
                   _buildDateRow(
@@ -259,14 +281,20 @@ class BreedingDetailScreen extends ConsumerWidget {
         // Беременность
         if (breeding.isPregnant != null)
           Card(
-            color: breeding.isPregnant! ? AppColors.success.withValues(alpha: 0.08) : AppColors.warning.withValues(alpha: 0.08),
+            color: breeding.isPregnant!
+                ? AppColors.success.withValues(alpha: 0.08)
+                : AppColors.warning.withValues(alpha: 0.08),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Icon(
-                    breeding.isPregnant! ? Icons.check_circle : Icons.help_outline,
-                    color: breeding.isPregnant! ? AppColors.success : AppColors.warning,
+                    breeding.isPregnant!
+                        ? Icons.check_circle
+                        : Icons.help_outline,
+                    color: breeding.isPregnant!
+                        ? AppColors.success
+                        : AppColors.warning,
                     size: 32,
                   ),
                   const SizedBox(width: 16),
@@ -276,11 +304,15 @@ class BreedingDetailScreen extends ConsumerWidget {
                       children: [
                         Text(
                           context.l10n.breedingPregnancy,
-                          style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),
+                          style: AppTypography.labelSm.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          breeding.isPregnant! ? context.l10n.breedingPregnancyYes : context.l10n.breedingPregnancyNo,
+                          breeding.isPregnant!
+                              ? context.l10n.breedingPregnancyYes
+                              : context.l10n.breedingPregnancyNo,
                           style: AppTypography.titleMd,
                         ),
                       ],
@@ -318,6 +350,25 @@ class BreedingDetailScreen extends ConsumerWidget {
           ),
         ],
 
+        // Результат прощупывания — пока его не записали. Блок «Беременность»
+        // выше до этого момента просто отсутствует, и заполнить его было
+        // неоткуда.
+        if (canManage && canRecordPalpation(breeding)) ...[
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: () async {
+              if (await recordPalpation(context, ref, breeding)) {
+                ref.invalidate(breedingDetailProvider(breedingId));
+              }
+            },
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(AppSizes.touchTargetLarge),
+            ),
+            icon: const Icon(Icons.touch_app_outlined),
+            label: Text(context.l10n.cyclePalpationAction),
+          ),
+        ],
+
         const SizedBox(height: 24),
 
         // Кнопка регистрации окрола
@@ -343,53 +394,7 @@ class BreedingDetailScreen extends ConsumerWidget {
         // Кнопка удаления
         if (canDelete)
           OutlinedButton.icon(
-            onPressed: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(context.l10n.breedingDeleteTitle),
-                  content: Text(context.l10n.breedingDeleteBody),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(context.l10n.commonCancel),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style:
-                          TextButton.styleFrom(foregroundColor: AppColors.error),
-                      child: Text(context.l10n.commonDelete),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirmed == true && context.mounted) {
-                try {
-                  await ref
-                      .read(breedingRepositoryProvider)
-                      .deleteBreeding(breedingId);
-                  ref.invalidate(breedingListProvider);
-                  ref.invalidate(breedingDetailProvider(breedingId));
-                  if (context.mounted) {
-                    context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.l10n.breedingDeleted)),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(context.l10n.commonActionFailed(
-                            errorText(context.l10n, e))),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
-                }
-              }
-            },
+            onPressed: () => _delete(context, ref),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(16),
               foregroundColor: AppColors.error,
@@ -400,6 +405,52 @@ class BreedingDetailScreen extends ConsumerWidget {
           ),
       ],
     );
+  }
+
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    // Репозиторий, список и контейнер забираем сразу: запрос уйдёт уже после
+    // того, как карточка закроется, и её `ref` к тому времени станет негодным.
+    final repository = ref.read(breedingRepositoryProvider);
+    final list = ref.read(breedingListProvider.notifier);
+    final container = ProviderScope.containerOf(context, listen: false);
+
+    list.removeBreeding(breedingId);
+
+    Object? error;
+    // Окно отмены открываем, пока карточка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму
+    // карточку закрываем, не дожидаясь окна, — подсказка живёт выше экрана и
+    // переживёт его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: l10n.breedingDeleted,
+      commit: () async {
+        try {
+          await repository.deleteBreeding(breedingId);
+          container.invalidate(breedingDetailProvider(breedingId));
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: list.refresh,
+    );
+    context.pop();
+    await pending;
+
+    if (error != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.commonActionFailed(errorText(l10n, error))),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await list.refresh();
+    }
   }
 
   Widget _buildDateRow({
@@ -419,12 +470,12 @@ class BreedingDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 label,
-                style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-              const SizedBox(height: 2),
-              Text(
-                _formatDate(date),
-                style: AppTypography.labelLg,
+                style: AppTypography.labelSm.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
+              const SizedBox(height: 2),
+              Text(_formatDate(date), style: AppTypography.labelLg),
             ],
           ),
         ),

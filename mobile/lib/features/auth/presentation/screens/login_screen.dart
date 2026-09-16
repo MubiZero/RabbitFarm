@@ -379,7 +379,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: InputDecoration(
-              labelText: context.l10n.loginCodeLabel,
+              // Подпись называет то, куда код на самом деле пришёл: на
+              // почтовом входе она говорила «Код из SMS», и человек шёл
+              // искать сообщение, которого нет.
+              labelText: _byPhone
+                  ? context.l10n.loginCodeLabel
+                  : context.l10n.loginCodeLabelEmail,
               counterText: '',
             ),
             // Шесть цифр — это весь ввод: ждать отдельного нажатия «Войти»
@@ -422,6 +427,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               style: AppTypography.labelSm
                   .copyWith(color: context.colors.onSurfaceVariant),
             ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          // Ошибся владелец в одной цифре номера — и приглашённый попадает
+          // сюда навсегда: сервер на чужой контакт отвечает успехом, но кода
+          // не создаёт (защита от перебора), поэтому ждать его бесполезно.
+          // Сам человек об этом догадаться не может — говорим прямо.
+          Text(
+            _byPhone
+                ? context.l10n.loginNoCodePhone
+                : context.l10n.loginNoCodeEmail,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

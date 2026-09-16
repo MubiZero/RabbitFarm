@@ -32,6 +32,56 @@ const mockNext = jest.fn();
 describe('TaskController', () => {
   beforeEach(() => jest.clearAllMocks());
 
+  describe('язык читателя', () => {
+    const autoTask = {
+      id: 7,
+      title: 'Поставить маточник: Мушка',
+      description: 'Подготовить клетку и поставить гнездовой ящик для Мушка',
+      title_key: 'nestBox',
+      title_params: { doe: 'Мушка' }
+    };
+
+    it('автозадача приходит на языке того, кто её запросил', async () => {
+      taskService.getTaskById.mockResolvedValue(autoTask);
+      const req = mockReq({ params: { id: '7' }, user: { id: 1, language: 'uz' } });
+      const res = mockRes();
+
+      await taskController.getById(req, res, mockNext);
+
+      const [payload] = res.json.mock.calls[0];
+      expect(payload.data.title).toBe('Uya qoʻyish: Мушка');
+    });
+
+    it('список задач переводится целиком, а не первая строка', async () => {
+      taskService.listTasks.mockResolvedValue({
+        items: [autoTask, { id: 8, title: 'Починить поилку' }],
+        page: 1,
+        limit: 20,
+        total: 2
+      });
+      const req = mockReq({ user: { id: 1, language: 'tg' } });
+      const res = mockRes();
+
+      await taskController.list(req, res, mockNext);
+
+      const [payload] = res.json.mock.calls[0];
+      expect(payload.data.items[0].title).toBe('Лона гузоштан: Мушка');
+      // Задачу, написанную человеком, переводить нечем и незачем.
+      expect(payload.data.items[1].title).toBe('Починить поилку');
+    });
+
+    it('человеку без выбранного языка достаётся русский', async () => {
+      taskService.getTaskById.mockResolvedValue(autoTask);
+      const req = mockReq({ params: { id: '7' }, user: { id: 1 } });
+      const res = mockRes();
+
+      await taskController.getById(req, res, mockNext);
+
+      const [payload] = res.json.mock.calls[0];
+      expect(payload.data.title).toBe('Поставить маточник: Мушка');
+    });
+  });
+
   describe('create', () => {
     it('should create task and return 201', async () => {
       const task = { id: 1, title: 'Feed rabbits' };

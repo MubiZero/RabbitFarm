@@ -3,6 +3,9 @@ const { Op } = require('sequelize');
 const { Rabbit, Birth, Breeding, Task, Breed, Cage } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const logger = require('../utils/logger');
+const { taskText } = require('../i18n/tasks');
+const { DEFAULT_LANGUAGE } = require('../i18n/notifications');
+const { closeAutoTasks } = require('../services/autoTaskService');
 
 /**
  * Получить список всех окролов для текущего пользователя
@@ -113,6 +116,7 @@ exports.createBirth = async (req, res, next) => {
       birth_date,
       kits_born_alive,
       kits_born_dead,
+      kits_died,
       complications,
       notes,
     } = req.body;
@@ -156,6 +160,7 @@ exports.createBirth = async (req, res, next) => {
       birth_date,
       kits_born_alive: Math.max(0, kits_born_alive || 0),
       kits_born_dead: Math.max(0, kits_born_dead || 0),
+      kits_died: Math.max(0, kits_died || 0),
       complications,
       notes,
     }, { transaction });
@@ -175,12 +180,18 @@ exports.createBirth = async (req, res, next) => {
     // 1. Weight kits (+7 days)
     const weightDate = new Date(birthDateObj);
     weightDate.setDate(weightDate.getDate() + 7);
+    // Ключ с подстановками — чтобы собрать заголовок на языке читателя;
+    // готовая строка рядом — запасной вариант для сборок, которые ключей ещё
+    // не понимают (см. `i18n/tasks`).
+    const taskParams = { doe: mother.name };
+
     await Task.create({
       farm_id: farmId,
       created_by: authorId,
       assigned_to: authorId,
-      title: `Взвесить крольчат: ${mother.name}`,
-      description: `Первое взвешивание крольчат от самки ${mother.name}`,
+      title_key: 'weighKits',
+      title_params: taskParams,
+      ...taskText('weighKits', DEFAULT_LANGUAGE, taskParams),
       type: 'checkup',
       priority: 'medium',
       due_date: weightDate,
@@ -195,8 +206,9 @@ exports.createBirth = async (req, res, next) => {
       farm_id: farmId,
       created_by: authorId,
       assigned_to: authorId,
-      title: `Проверить глаза: ${mother.name}`,
-      description: `Проверить, открылись ли глаза у крольчат самки ${mother.name}`,
+      title_key: 'eyesOpen',
+      title_params: taskParams,
+      ...taskText('eyesOpen', DEFAULT_LANGUAGE, taskParams),
       type: 'checkup',
       priority: 'medium',
       due_date: eyesDate,
@@ -211,8 +223,9 @@ exports.createBirth = async (req, res, next) => {
       farm_id: farmId,
       created_by: authorId,
       assigned_to: authorId,
-      title: `Отсадка (отъем): ${mother.name}`,
-      description: `Пора отсаживать крольчат от самки ${mother.name}`,
+      title_key: 'weaning',
+      title_params: taskParams,
+      ...taskText('weaning', DEFAULT_LANGUAGE, taskParams),
       type: 'breeding',
       priority: 'high',
       due_date: weaningDate,
@@ -221,6 +234,14 @@ exports.createBirth = async (req, res, next) => {
     }, { transaction });
 
     await transaction.commit();
+
+    // Окрол случился — три задачи вокруг него потеряли смысл разом:
+    // прощупать (ответ уже очевиден), поставить маточник и ждать окрола.
+    await closeAutoTasks({
+      farmId,
+      rabbitId: mother_id,
+      keys: ['palpation', 'nestBox', 'expectedKindling']
+    });
 
     // Загружаем созданный окрол с отношениями
     const createdBirth = await Birth.findOne({
@@ -261,6 +282,7 @@ exports.updateBirth = async (req, res, next) => {
       birth_date,
       kits_born_alive,
       kits_born_dead,
+      kits_died,
       kits_weaned,
       weaning_date,
       complications,
@@ -273,15 +295,39 @@ exports.updateBirth = async (req, res, next) => {
       return ApiResponse.notFound(res, 'Окрол не найден');
     }
 
+    // Когда карточки заведены, крольчата считаются по ним — и падёж с
+    // отсадкой отмечают на карточке. Правка чисел выводка в этот момент
+    // создаёт вторую правду: в выводке «пало двое», в поголовье те же двое
+    // живы, и какая из половин права, не знает никто.
+    const countsTouched = [kits_born_alive, kits_born_dead, kits_died, kits_weaned]
+      .some((value) => value !== undefined);
+    if (birth.kits_carded_at && countsTouched) {
+      return ApiResponse.error(
+        res,
+        'По этому окролу заведены карточки — отмечайте падёж и отсадку на карточке крольчонка',
+        409
+      );
+    }
+
     await birth.update({
       birth_date,
       kits_born_alive,
       kits_born_dead,
+      kits_died,
       kits_weaned,
       weaning_date,
       complications,
       notes,
     });
+
+    // Отсадили — задача «отсадка» сделана.
+    if (kits_weaned !== undefined || weaning_date) {
+      await closeAutoTasks({
+        farmId,
+        rabbitId: birth.mother_id,
+        keys: ['weaning']
+      });
+    }
 
     // Связи подтягиваем отдельной выборкой, а не `reload`: тот жёстко
     // подставляет условие по одному первичному ключу, и хозяйство в него не
@@ -373,6 +419,20 @@ exports.createKitsFromBirth = async (req, res, next) => {
       return ApiResponse.notFound(res, 'Окрол не найден');
     }
 
+    // Второй раз карточки по тому же выводку не заводятся. Ничто не мешало
+    // нажать кнопку дважды: оба вызова отвечали 201, шесть крольчат
+    // становились двенадцатью карточками, а `kits_born_alive` так и
+    // оставался шестью. Ферма после этого платила за поголовье, которого у
+    // неё нет.
+    if (birth.kits_carded_at) {
+      await transaction.rollback();
+      return ApiResponse.error(
+        res,
+        'По этому окролу карточки уже заведены — крольчата есть в поголовье',
+        409
+      );
+    }
+
     // Идентификаторы приходят из тела запроса, поэтому каждый проверяется на
     // принадлежность ферме: иначе крольчата уезжали в чужую клетку, а ответ
     // об оставшихся местах раскрывал заполненность чужого хозяйства.
@@ -461,6 +521,8 @@ exports.createKitsFromBirth = async (req, res, next) => {
       }, { transaction });
       kits.push(kit);
     }
+
+    await birth.update({ kits_carded_at: new Date() }, { transaction });
 
     await transaction.commit();
     return ApiResponse.created(res, kits, 'Крольчата успешно созданы');

@@ -92,10 +92,21 @@ class PinPad extends StatelessWidget {
             SizedBox(
               width: 88,
               height: 72,
-              child: IconButton(
-                tooltip: context.l10n.pinDelete,
-                onPressed: value.isEmpty ? null : _backspace,
-                icon: const Icon(Icons.backspace_outlined),
+              // Подпись через Semantics, а не `tooltip`: всплывающая
+              // подсказка живёт в слое поверх навигатора, а экран замка
+              // рисуется НАД ним (см. `PinGate` в main.dart) — и вместо
+              // клавиши «стереть» на экране появлялась красная плашка
+              // Flutter. Для голосового доступа подпись при этом та же, а
+              // всплывающая подсказка на клавише цифрового кода всё равно
+              // бесполезна: её показывают долгим нажатием, которого здесь
+              // никто не делает.
+              child: Semantics(
+                label: context.l10n.pinDelete,
+                button: true,
+                child: IconButton(
+                  onPressed: value.isEmpty ? null : _backspace,
+                  icon: const Icon(Icons.backspace_outlined),
+                ),
               ),
             ),
           ],

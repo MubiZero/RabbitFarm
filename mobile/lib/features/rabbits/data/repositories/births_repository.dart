@@ -55,7 +55,8 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
@@ -71,7 +72,8 @@ class BirthsRepository {
   /// Получить окролы самки
   Future<List<BirthModel>> getBirthsByMother(int motherId) async {
     try {
-      final response = await _apiClient.dio.get('/births', queryParameters: {'mother_id': motherId});
+      final response = await _apiClient.dio
+          .get('/births', queryParameters: {'mother_id': motherId});
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
@@ -111,7 +113,8 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
@@ -138,7 +141,8 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return BirthModel.fromJson(apiResponse.data!);
@@ -162,7 +166,8 @@ class BirthsRepository {
       );
 
       if (!apiResponse.success) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
     } on DioException catch (e) {
       throw ApiFailure.from(e);

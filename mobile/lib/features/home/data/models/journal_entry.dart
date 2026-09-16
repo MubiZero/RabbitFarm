@@ -12,17 +12,26 @@ enum JournalKind {
   vaccination,
   task,
   note,
-  photo;
+  photo,
+
+  /// Удалённая запись: кто и что стёр.
+  ///
+  /// Единственный вид в ленте, который приходит не из своего раздела, а из
+  /// журнала фермы, — потому что самой записи больше нет. Владельцы называют
+  /// этот страх вторым после пропущенного окрола: «помощник сотрёт».
+  deletion;
 
   /// Куда ведёт тап по записи. У фото это не форма правки — своей формы у
-  /// снимка нет, — а галерея кролика, которому он принадлежит.
-  String get formRoute => switch (this) {
+  /// снимка нет, — а галерея кролика, которому он принадлежит. У удаления
+  /// открывать нечего: записи уже не существует.
+  String? get formRoute => switch (this) {
         JournalKind.feeding => '/feeding-records/form',
         JournalKind.treatment => '/medical-records/form',
         JournalKind.vaccination => '/vaccinations/form',
         JournalKind.task => '/tasks/form',
         JournalKind.note => '/notes/form',
         JournalKind.photo => '/rabbits/gallery',
+        JournalKind.deletion => null,
       };
 }
 
@@ -54,13 +63,14 @@ class JournalEntry {
   final String? imageUrl;
 
   /// Модель записи для формы правки — go_router передаёт её как `extra`.
-  final Object formArgs;
+  /// У удаления пусто: открывать нечего.
+  final Object? formArgs;
 
   const JournalEntry({
     required this.kind,
     required this.at,
     required this.hasTime,
-    required this.formArgs,
+    this.formArgs,
     this.title,
     this.rabbitName,
     this.cageNumber,

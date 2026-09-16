@@ -21,6 +21,23 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(255),
       allowNull: false
     },
+
+    /// Шаблон заголовка для задач, которые завёл сам сервер (см. `i18n/tasks`).
+    ///
+    /// Есть ключ — заголовок и описание собираются при выдаче на языке того,
+    /// кто их читает, а `title` служит запасным вариантом. Нет ключа — задачу
+    /// написал человек, и трогать её текст нельзя.
+    title_key: {
+      type: DataTypes.STRING(64),
+      allowNull: true
+    },
+
+    /// Подстановки к шаблону — кличка самки на момент создания задачи.
+    title_params: {
+      type: DataTypes.JSON,
+      allowNull: true
+    },
+
     description: {
       type: DataTypes.TEXT,
       allowNull: true

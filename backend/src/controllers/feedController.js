@@ -80,8 +80,15 @@ exports.getLowStock = async (req, res, next) => {
 
 exports.adjustStock = async (req, res, next) => {
   try {
-    const { quantity, operation } = req.body;
-    const feed = await feedService.adjustStock(req.params.id, req.farmId, quantity, operation);
+    const { quantity, operation, cost } = req.body;
+    const feed = await feedService.adjustStock(
+      req.params.id,
+      req.farmId,
+      quantity,
+      operation,
+      // Кто внёс — сотрудник, а не хозяин: в книге расход подписывается им.
+      { cost, userId: req.user.id }
+    );
     return ApiResponse.success(res, feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`);
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);

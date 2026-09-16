@@ -224,8 +224,8 @@ final feedByIdProvider =
 });
 
 /// Provider for creating a feed
-final createFeedProvider =
-    FutureProvider.autoDispose.family<Feed, FeedCreate>((ref, feedCreate) async {
+final createFeedProvider = FutureProvider.autoDispose
+    .family<Feed, FeedCreate>((ref, feedCreate) async {
   final repository = ref.watch(feedsRepositoryProvider);
   final feed = await repository.createFeed(feedCreate);
 
@@ -249,13 +249,15 @@ final deleteFeedProvider =
 });
 
 /// Provider for feed statistics
-final feedStatisticsProvider = FutureProvider.autoDispose<FeedStatistics>((ref) async {
+final feedStatisticsProvider =
+    FutureProvider.autoDispose<FeedStatistics>((ref) async {
   final repository = ref.watch(feedsRepositoryProvider);
   return repository.getStatistics();
 });
 
 /// Provider for low stock feeds
-final lowStockFeedsProvider = FutureProvider.autoDispose<List<Feed>>((ref) async {
+final lowStockFeedsProvider =
+    FutureProvider.autoDispose<List<Feed>>((ref) async {
   final repository = ref.watch(feedsRepositoryProvider);
   return repository.getLowStockFeeds();
 });
@@ -273,7 +275,8 @@ final adjustFeedStockProvider = FutureProvider.autoDispose
 });
 
 /// Provider for filtering feeds by type
-final feedsByTypeProvider = Provider.autoDispose.family<List<Feed>, FeedType?>((ref, type) {
+final feedsByTypeProvider =
+    Provider.autoDispose.family<List<Feed>, FeedType?>((ref, type) {
   final feedsState = ref.watch(feedsProvider);
 
   if (type == null) {
@@ -284,7 +287,8 @@ final feedsByTypeProvider = Provider.autoDispose.family<List<Feed>, FeedType?>((
 });
 
 /// Provider for checking if feed has low stock
-final feedHasLowStockProvider = Provider.autoDispose.family<bool, Feed>((ref, feed) {
+final feedHasLowStockProvider =
+    Provider.autoDispose.family<bool, Feed>((ref, feed) {
   return feed.currentStock <= feed.minStock;
 });
 

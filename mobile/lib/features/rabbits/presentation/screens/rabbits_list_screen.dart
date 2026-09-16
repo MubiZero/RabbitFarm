@@ -94,8 +94,7 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
                 icon: Icons.pets_outlined,
                 title: context.l10n.rabbitsEmptyTitle,
                 subtitle: context.l10n.rabbitsEmptyBody,
-                actionLabel:
-                    canManage ? context.l10n.rabbitsEmptyAction : null,
+                actionLabel: canManage ? context.l10n.rabbitsEmptyAction : null,
                 onAction: canManage ? () => context.push('/rabbits/new') : null,
               ),
         itemBuilder: (context, rabbit, _) => RabbitListCard(
@@ -150,14 +149,13 @@ class _Header extends StatelessWidget {
             AppFilterChipData(
               label: l10n.rabbitsFilterAll,
               isSelected: filter.sex == null && filter.status == null,
-              onTap: () =>
-                  onFilter(filter.withSex(null).withStatus(null)),
+              onTap: () => onFilter(filter.withSex(null).withStatus(null)),
             ),
             AppFilterChipData(
               label: l10n.rabbitsFilterMales,
               isSelected: filter.sex == 'male',
-              onTap: () =>
-                  onFilter(filter.withSex(filter.sex == 'male' ? null : 'male')),
+              onTap: () => onFilter(
+                  filter.withSex(filter.sex == 'male' ? null : 'male')),
               color: sexColor(context, 'male'),
             ),
             AppFilterChipData(

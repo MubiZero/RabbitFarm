@@ -39,9 +39,25 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: 0
     },
+    // Пало до отсадки. Считается выводком целиком: на ферме говорят «из
+    // восьми осталось шесть», а не перечисляют крольчат поимённо.
+    kits_died: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
     kits_weaned: {
       type: DataTypes.INTEGER,
       defaultValue: 0
+    },
+    // Когда по этому выводку завели карточки крольчат. Пока пусто —
+    // крольчата существуют только числами выше, и падёж с отсадкой
+    // отмечают здесь же. Как только заведены — счёт идёт по карточкам, а
+    // числа замораживаются: две правды об одних и тех же животных
+    // расходились молча и врали и в отчётах, и в потреблении тарифа.
+    kits_carded_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     },
     weaning_date: {
       type: DataTypes.DATEONLY,

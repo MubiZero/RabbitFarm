@@ -37,40 +37,41 @@ class RabbitDetailScreen extends ConsumerWidget {
         actions: [
           if (canManage)
             rabbitAsync.whenOrNull(
-              data: (rabbit) => PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'edit') {
-                  context.push('/rabbits/${rabbit.id}/edit', extra: rabbit);
-                } else if (value == 'delete') {
-                  _showDeleteDialog(context, ref, rabbit);
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.edit_outlined),
-                    title: Text(context.l10n.cageEdit),
-                  ),
-                ),
-                if (canDelete)
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.delete_outline,
-                          color: AppColors.error),
-                      title: Text(
-                        context.l10n.commonDelete,
-                        style: AppTypography.bodyLg
-                            .copyWith(color: AppColors.error),
+                  data: (rabbit) => PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        context.push('/rabbits/${rabbit.id}/edit',
+                            extra: rabbit);
+                      } else if (value == 'delete') {
+                        _delete(context, ref, rabbit);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.edit_outlined),
+                          title: Text(context.l10n.cageEdit),
+                        ),
                       ),
-                    ),
+                      if (canDelete)
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.delete_outline,
+                                color: AppColors.error),
+                            title: Text(
+                              context.l10n.commonDelete,
+                              style: AppTypography.bodyLg
+                                  .copyWith(color: AppColors.error),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-            ) ??
+                ) ??
                 const SizedBox(),
         ],
       ),
@@ -83,13 +84,16 @@ class RabbitDetailScreen extends ConsumerWidget {
           value: rabbitAsync,
           onRetry: () => ref.invalidate(rabbitDetailProvider(rabbitId)),
           skeleton: (_) => const SkeletonList(itemHeight: 120),
-          builder: (rabbit) => _buildContent(context, rabbit),
+          builder: (rabbit) => _buildContent(context, ref, rabbit),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, RabbitModel rabbit) {
+  Widget _buildContent(
+      BuildContext context, WidgetRef ref, RabbitModel rabbit) {
+    final canManageFinance =
+        ref.watch(canProvider(FarmCapability.manageFinance));
     final age = formatAge(rabbit.birthDate);
     final photoUrl = ImageUrlHelper.getFullImageUrl(rabbit.photoUrl);
 
@@ -115,18 +119,23 @@ class RabbitDetailScreen extends ConsumerWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           height: 250,
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                           child: const Center(
                             child: CircularProgressIndicator(),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           height: 250,
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                           child: Icon(
                             Icons.broken_image,
                             size: 64,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -137,13 +146,19 @@ class RabbitDetailScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.touch_app, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        Icon(Icons.touch_app,
+                            size: 16,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
                           context.l10n.rabbitTapToZoom,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -203,9 +218,12 @@ class RabbitDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           context.l10n.rabbitTagLine(rabbit.tagId!),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -223,21 +241,29 @@ class RabbitDetailScreen extends ConsumerWidget {
             children: [
               _buildInfoRow(context, context.l10n.rabbitBreed,
                   rabbit.breed?.name ?? context.l10n.rabbitBreedUnknown),
-              _buildInfoRow(
-                  context, context.l10n.rabbitSex, sexLabel(context, rabbit.sex)),
+              _buildInfoRow(context, context.l10n.rabbitSex,
+                  sexLabel(context, rabbit.sex)),
               _buildInfoRow(context, context.l10n.rabbitAge, age),
               _buildInfoRow(
                 context,
                 context.l10n.rabbitBirthDate,
                 DateFormat('d MMMM y', 'ru').format(rabbit.birthDate),
               ),
+              // Только у покупного: у рождённого на ферме этой даты нет, и
+              // пустая строка «Когда купили» сбивала бы с толку.
+              if (rabbit.acquiredDate != null)
+                _buildInfoRow(
+                  context,
+                  context.l10n.rabbitAcquiredDate,
+                  DateFormat('d MMMM y', 'ru').format(rabbit.acquiredDate!),
+                ),
               if (rabbit.color != null)
                 _buildInfoRow(context, context.l10n.rabbitColor, rabbit.color!),
               if (rabbit.currentWeight != null)
                 _buildInfoRow(
                   context,
                   context.l10n.rabbitWeight,
-                  formatQuantity(rabbit.currentWeight!, 'кг'),
+                  formatQuantity(rabbit.currentWeight!, context.l10n.unitKg),
                 ),
             ],
           ),
@@ -252,64 +278,104 @@ class RabbitDetailScreen extends ConsumerWidget {
                   context.l10n.rabbitQuickActions,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WeightHistoryScreen(rabbit: rabbit),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.scale),
-                      label: Text(context.l10n.rabbitWeightHistory),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WeightHistoryScreen(rabbit: rabbit),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.scale),
+                    label: Text(context.l10n.rabbitWeightHistory),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.push(
+                        '/rabbits/${rabbit.id}/pedigree?name=${Uri.encodeComponent(rabbit.label)}',
+                      );
+                    },
+                    icon: const Icon(Icons.account_tree),
+                    label: Text(context.l10n.rabbitPedigree),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PhotoGalleryScreen(
+                            rabbitId: rabbit.id,
+                            rabbitLabel: rabbit.label,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: Text(context.l10n.galleryTitle),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                // Продажа отсюда же и по той же причине, что падёж: в общей
+                // форме статус «Продан» ставился без цены и без дня, и
+                // главный доход фермы не попадал в книгу вовсе. Выбывшему
+                // кролику пункт не нужен, а записывает продажу тот, кто
+                // вправе вести деньги.
+                if (!rabbitStatusesTerminal.contains(rabbit.status) &&
+                    canManageFinance) ...[
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        context.push(
-                          '/rabbits/${rabbit.id}/pedigree?name=${Uri.encodeComponent(rabbit.label)}',
-                        );
-                      },
-                      icon: const Icon(Icons.account_tree),
-                      label: Text(context.l10n.rabbitPedigree),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PhotoGalleryScreen(
-                              rabbitId: rabbit.id,
-                              rabbitLabel: rabbit.label,
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.photo_library_outlined),
-                      label: Text(context.l10n.galleryTitle),
-                      style: ElevatedButton.styleFrom(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          context.push('/rabbits/sale', extra: rabbit),
+                      icon: const Icon(Icons.sell_outlined),
+                      label: Text(context.l10n.saleFormTitle),
+                      style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
                 ],
+                // Отметить падёж отсюда же: иначе это делают правкой статуса
+                // в общей форме, где дата и причина смерти вообще не
+                // спрашиваются. Павшему кролику пункт уже не нужен.
+                if (rabbit.status != rabbitStatusDead) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          context.push('/rabbits/death', extra: rabbit),
+                      icon: const Icon(Icons.heart_broken_outlined),
+                      label: Text(context.l10n.deathFormTitle),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -328,15 +394,19 @@ class RabbitDetailScreen extends ConsumerWidget {
                       child: Text(
                         context.l10n.rabbitCondition,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                     ),
-                    StatusBadge(status: RabbitStatusX.fromString(rabbit.status)),
+                    StatusBadge(
+                        status: RabbitStatusX.fromString(rabbit.status)),
                   ],
                 ),
               ),
-              _buildInfoRow(context, context.l10n.rabbitPurpose, _getPurposeText(context, rabbit.purpose)),
+              _buildInfoRow(context, context.l10n.rabbitPurpose,
+                  _getPurposeText(context, rabbit.purpose)),
             ],
           ),
           const SizedBox(height: 16),
@@ -347,9 +417,11 @@ class RabbitDetailScreen extends ConsumerWidget {
               context,
               title: context.l10n.rabbitPlacement,
               children: [
-                _buildInfoRow(context, context.l10n.rabbitCage, rabbit.cage!.number),
+                _buildInfoRow(
+                    context, context.l10n.rabbitCage, rabbit.cage!.number),
                 if (rabbit.cage!.location != null)
-                  _buildInfoRow(context, context.l10n.rabbitLocation, rabbit.cage!.location!),
+                  _buildInfoRow(context, context.l10n.rabbitLocation,
+                      rabbit.cage!.location!),
               ],
             ),
           const SizedBox(height: 16),
@@ -531,7 +603,9 @@ class RabbitDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(Icons.arrow_forward_ios,
+                size: 16,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -597,48 +671,48 @@ class RabbitDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, WidgetRef ref, RabbitModel rabbit) {
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
+  Future<void> _delete(
+      BuildContext context, WidgetRef ref, RabbitModel rabbit) async {
+    final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.rabbitDetailDeleteTitle),
-        content: Text(context.l10n.rabbitDetailDeleteBody(rabbit.label)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await ref.read(rabbitsRepositoryProvider).deleteRabbit(rabbit.id);
-                ref.read(rabbitsListProvider.notifier).refresh();
-                if (context.mounted) {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.l10n.rabbitDetailDeleted),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(errorText(l10n, e)),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              }
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
+    // Репозиторий и список забираем сразу: запрос уйдёт уже после того, как
+    // карточка закроется.
+    final repository = ref.read(rabbitsRepositoryProvider);
+    final list = ref.read(rabbitsListProvider.notifier);
+
+    list.removeRabbit(rabbit.id);
+
+    Object? error;
+    // Окно отмены открываем, пока карточка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму
+    // карточку закрываем, не дожидаясь окна, — подсказка живёт выше экрана и
+    // переживёт его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: l10n.rabbitDetailDeleted,
+      commit: () async {
+        try {
+          await repository.deleteRabbit(rabbit.id);
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: list.refresh,
     );
+    context.pop();
+    await pending;
+
+    if (error != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, error)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await list.refresh();
+    }
   }
 }

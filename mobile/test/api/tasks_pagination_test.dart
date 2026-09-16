@@ -75,7 +75,8 @@ void main() {
       }
     });
 
-    final page = (await repository.getTasks(limit: 20))['pagination'] as PageInfo;
+    final page =
+        (await repository.getTasks(limit: 20))['pagination'] as PageInfo;
 
     expect(page.totalPages, 3);
     expect(page.hasMore, isTrue);
@@ -83,11 +84,8 @@ void main() {
 
   test('конверт без пагинации не роняет разбор', () async {
     // Так отвечают эндпоинты, отдающие список без страниц.
-    final repository = _repository({
-      'success': true,
-      'message': 'ok',
-      'data': <dynamic>[]
-    });
+    final repository =
+        _repository({'success': true, 'message': 'ok', 'data': <dynamic>[]});
 
     final result = await repository.getTasks();
 

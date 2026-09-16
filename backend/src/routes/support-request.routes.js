@@ -45,6 +45,15 @@ router.post(
 
 /**
  * @swagger
+ * /support-requests:
+ *   get:
+ *     summary: Свои обращения со статусом и ответом поддержки
+ *     tags: [SupportRequests]
+ */
+router.get('/', authenticateEvenIfFarmBlocked, supportRequestController.listMine);
+
+/**
+ * @swagger
  * /support-requests/contact:
  *   get:
  *     summary: Официальный email/телефон поддержки, если заданы платформенным админом

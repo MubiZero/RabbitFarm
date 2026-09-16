@@ -59,7 +59,8 @@ class VaccinationsState {
       vaccinations: vaccinations ?? this.vaccinations,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      rabbitIdFilter: clearRabbitId ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
+      rabbitIdFilter:
+          clearRabbitId ? null : (rabbitIdFilter ?? this.rabbitIdFilter),
       typeFilter: clearType ? null : (typeFilter ?? this.typeFilter),
       fromDateFilter:
           clearFromDate ? null : (fromDateFilter ?? this.fromDateFilter),
@@ -90,7 +91,8 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
             vaccineType: state.typeFilter,
             upcoming: true,
           ),
-        VaccinationView.all || VaccinationView.last30Days =>
+        VaccinationView.all ||
+        VaccinationView.last30Days =>
           await _repository.getVaccinations(
             limit: 50,
             rabbitId: state.rabbitIdFilter,
@@ -158,6 +160,16 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
       state = state.copyWith(error: e.toString());
       return false;
     }
+  }
+
+  /// Убрать прививку из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место — `load()`.
+  void removeVaccination(int id) {
+    state = state.copyWith(
+      vaccinations: state.vaccinations.where((v) => v.id != id).toList(),
+    );
   }
 
   Future<bool> deleteVaccination(int id) async {

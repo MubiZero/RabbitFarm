@@ -5,6 +5,7 @@ class AppFilterChipData {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+
   /// Optional chip accent color. MUST be a semantic token from AppColors
   /// (e.g. AppColors.success, AppColors.error, AppColors.accentOcean).
   /// Never pass a hardcoded hex Color.
@@ -49,7 +50,8 @@ class AppFilterBar extends StatelessWidget {
               chip.label,
               style: AppTypography.labelSm.copyWith(
                 color: chip.isSelected ? color : onSurfaceVariant,
-                fontWeight: chip.isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontWeight:
+                    chip.isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
             selected: chip.isSelected,

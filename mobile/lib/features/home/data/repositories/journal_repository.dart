@@ -36,6 +36,11 @@ class JournalRepository {
   Future<List<JournalEntry>> load({
     required DateTime from,
     required DateTime to,
+
+    /// Показывать ли удаления. Спрашиваются отдельно, потому что сервер
+    /// отдаёт журнал фермы только владельцу и управляющему: работнику
+    /// запрос вернул бы 403 и обрушил бы всю ленту заодно.
+    bool includeDeletions = false,
   }) async {
     final sources = await Future.wait([
       _feedings(from, to),
@@ -44,6 +49,7 @@ class JournalRepository {
       _closedTasks(),
       _notes(from, to),
       _photos(from, to),
+      if (includeDeletions) _deletions(from, to),
     ]);
 
     // Границы периода проверяются ещё раз здесь: у задач сервер их вовсе не
@@ -112,7 +118,8 @@ class JournalRepository {
       hasTime: false,
       // Диагноз точнее симптомов, но его ставят не всегда — тогда в строке
       // остаётся то, с чего лечение началось.
-      title: diagnosis == null || diagnosis.isEmpty ? record.symptoms : diagnosis,
+      title:
+          diagnosis == null || diagnosis.isEmpty ? record.symptoms : diagnosis,
       rabbitName: _text(item['rabbit'], 'name'),
       author: record.veterinarian,
       formArgs: record,
@@ -208,6 +215,30 @@ class JournalRepository {
       author: note.author?.fullName,
       formArgs: note,
     );
+  }
+
+  /// Что удалили за этот срок — из журнала фермы.
+  ///
+  /// Единственный источник, который не фильтруется сервером по датам: журнал
+  /// отдаётся страницами, свежее сверху, и срок обрезается уже здесь, общей
+  /// проверкой границ в [load].
+  Future<List<JournalEntry>> _deletions(DateTime from, DateTime to) async {
+    final items = await _items('/staff/audit', {
+      'limit': _pageLimit,
+      'scope': 'data',
+    });
+
+    return [
+      for (final item in items)
+        JournalEntry(
+          kind: JournalKind.deletion,
+          at: DateTime.tryParse(item['created_at']?.toString() ?? '') ??
+              DateTime.now(),
+          hasTime: true,
+          title: item['entity_label']?.toString(),
+          author: _text(item['actor'], 'full_name'),
+        ),
+    ];
   }
 
   Future<List<JournalEntry>> _photos(DateTime from, DateTime to) async {

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/date_labels.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../staff/presentation/providers/staff_provider.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
 import '../utils/task_labels.dart';
@@ -71,10 +73,10 @@ class TasksListScreen extends ConsumerWidget {
       s.statusFilter != null ||
       s.priorityFilter != null ||
       s.overdueOnly ||
-      s.todayOnly;
+      s.todayOnly ||
+      s.assignedToFilter != null;
 
-  Future<void> _complete(
-      BuildContext context, WidgetRef ref, Task task) async {
+  Future<void> _complete(BuildContext context, WidgetRef ref, Task task) async {
     final messenger = ScaffoldMessenger.of(context);
     final done = context.l10n.tasksCompleted;
     final failed = context.l10n.tasksCompleteFailed;
@@ -142,10 +144,36 @@ class _ActiveFilters extends ConsumerWidget {
               label: context.l10n.tasksTodayChip,
               onRemove: () => notifier.setFilters(todayOnly: false),
             ),
+          if (state.assignedToFilter != null)
+            _FilterChip(
+              label: _assigneeChipLabel(context, ref, state.assignedToFilter!),
+              onRemove: () => notifier.setFilters(clearAssignedTo: true),
+            ),
         ],
       ),
     );
   }
+}
+
+/// Кем подписан фильтр по исполнителю.
+///
+/// Свои задачи называются «мои», а не собственным именем: человек и так
+/// знает, кто он. Чужое имя берётся из состава фермы, а если состав ещё не
+/// приехал или работника уже убрали — остаётся общее слово, но фильтр при
+/// этом виден и снимается.
+String _assigneeChipLabel(BuildContext context, WidgetRef ref, int userId) {
+  if (userId == ref.watch(currentUserIdProvider)) {
+    return context.l10n.tasksAssigneeMineChip;
+  }
+
+  final name = ref
+      .watch(farmMembersProvider)
+      .value
+      ?.where((m) => m.id == userId)
+      .firstOrNull
+      ?.fullName;
+
+  return name ?? context.l10n.tasksFilterAssignee;
 }
 
 class _FilterChip extends StatelessWidget {
@@ -177,6 +205,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
   late TaskPriority? _priority;
   late bool _overdueOnly;
   late bool _todayOnly;
+  late int? _assignedTo;
 
   @override
   void initState() {
@@ -187,6 +216,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
     _priority = state.priorityFilter;
     _overdueOnly = state.overdueOnly;
     _todayOnly = state.todayOnly;
+    _assignedTo = state.assignedToFilter;
   }
 
   @override
@@ -250,6 +280,11 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
               ],
               onChanged: (v) => setState(() => _priority = v),
             ),
+            const SizedBox(height: AppSpacing.md),
+            _AssigneeFilterField(
+              value: _assignedTo,
+              onChanged: (v) => setState(() => _assignedTo = v),
+            ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(context.l10n.tasksFilterOverdueOnly),
@@ -287,6 +322,8 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                             clearPriority: _priority == null,
                             overdueOnly: _overdueOnly,
                             todayOnly: _todayOnly,
+                            assignedTo: _assignedTo,
+                            clearAssignedTo: _assignedTo == null,
                           );
                       Navigator.pop(context);
                     },
@@ -298,6 +335,52 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Выбор, чьи задачи показывать.
+///
+/// Работнику хватает «моих»: состава фермы он не видит, и подставлять ему
+/// пустой список не за чем. Владельцу и управляющему список нужен целиком —
+/// вопрос «что на Иване» они задают чаще, чем «что на мне».
+class _AssigneeFilterField extends ConsumerWidget {
+  final int? value;
+  final ValueChanged<int?> onChanged;
+
+  const _AssigneeFilterField({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final myId = ref.watch(currentUserIdProvider);
+    final canSeeStaff = ref.watch(canProvider(FarmCapability.viewStaff));
+    final members = canSeeStaff
+        ? (ref.watch(farmMembersProvider).value ?? const [])
+        : const [];
+
+    return DropdownButtonFormField<int?>(
+      initialValue: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: l10n.tasksFilterAssignee,
+        prefixIcon: const Icon(Icons.person_outline),
+      ),
+      items: [
+        DropdownMenuItem(value: null, child: Text(l10n.tasksFilterAssigneeAny)),
+        if (myId != null)
+          DropdownMenuItem(
+            value: myId,
+            child: Text(l10n.tasksFilterAssigneeMine),
+          ),
+        for (final member in members)
+          if (member.isActive && member.id != myId)
+            DropdownMenuItem(
+              value: member.id,
+              child: Text(member.fullName),
+            ),
+      ],
+      onChanged: onChanged,
     );
   }
 }
@@ -338,7 +421,8 @@ class _TaskCard extends StatelessWidget {
               color: priorityColor.withValues(alpha: 0.12),
               borderRadius: AppRadius.smAll,
             ),
-            child: Icon(taskTypeIcon(task.type), color: priorityColor, size: 20),
+            child:
+                Icon(taskTypeIcon(task.type), color: priorityColor, size: 20),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -396,7 +480,9 @@ class _TaskCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      overdue ? Icons.event_busy_outlined : Icons.event_outlined,
+                      overdue
+                          ? Icons.event_busy_outlined
+                          : Icons.event_outlined,
                       size: 14,
                       color: overdue
                           ? AppColors.error
@@ -414,6 +500,32 @@ class _TaskCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                // Чьё это дело. Сервер кладёт исполнителя в каждый ответ и
+                // шлёт ему личный пуш, а список об этом молчал: на ферме с
+                // работниками нельзя было понять, кому поручено.
+                if (task.assignee != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        size: 14,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          task.assignee!.fullName,
+                          style: AppTypography.labelSm.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (task.description?.trim().isNotEmpty == true) ...[
                   const SizedBox(height: AppSpacing.sm),
                   Text(

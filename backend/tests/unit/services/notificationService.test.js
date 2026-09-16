@@ -134,6 +134,102 @@ describe('notificationService', () => {
     });
   });
 
+  describe('язык уведомления', () => {
+    beforeEach(() => {
+      firebaseConfig.isConfigured = true;
+    });
+
+    it('шлёт каждому на его языке — одним запросом на язык', async () => {
+      DeviceToken.findAll.mockResolvedValue([
+        { token: 'ru-token', user_id: 5 },
+        { token: 'tg-token', user_id: 6 },
+        { token: 'ru-token-2', user_id: 5 }
+      ]);
+      User.findAll.mockResolvedValue([
+        { id: 5, language: 'ru' },
+        { id: 6, language: 'tg' }
+      ]);
+      mockMessaging.sendEachForMulticast.mockResolvedValue({
+        responses: [{ success: true }, { success: true }]
+      });
+
+      await notificationService.sendToUsers(1, [5, 6], {
+        i18n: { key: 'feedDigest', params: { count: 2 } },
+        data: { type: 'feed_digest' }
+      });
+
+      expect(mockMessaging.sendEachForMulticast).toHaveBeenCalledTimes(2);
+
+      const calls = mockMessaging.sendEachForMulticast.mock.calls.map(c => c[0]);
+      const russian = calls.find(c => c.tokens.includes('ru-token'));
+      const tajik = calls.find(c => c.tokens.includes('tg-token'));
+
+      expect(russian.tokens).toEqual(['ru-token', 'ru-token-2']);
+      expect(russian.notification.title).toBe('Мало корма');
+      expect(tajik.notification.title).toBe('Хӯрок кам мондааст');
+    });
+
+    it('человеку без языка достаётся русский, а не пустое уведомление', async () => {
+      DeviceToken.findAll.mockResolvedValue([{ token: 'tok', user_id: 5 }]);
+      // Пользователя могли удалить между выборкой токенов и этим запросом.
+      User.findAll.mockResolvedValue([]);
+      mockMessaging.sendEachForMulticast.mockResolvedValue({
+        responses: [{ success: true }]
+      });
+
+      await notificationService.sendToUsers(1, [5], {
+        i18n: { key: 'feedDigest', params: { count: 1 } }
+      });
+
+      const [payload] = mockMessaging.sendEachForMulticast.mock.calls[0];
+      expect(payload.notification.title).toBe('Мало корма');
+    });
+
+    it('готовый текст (объявление админа) языками не трогает', async () => {
+      DeviceToken.findAll.mockResolvedValue([{ token: 'tok', user_id: 5 }]);
+      mockMessaging.sendEachForMulticast.mockResolvedValue({
+        responses: [{ success: true }]
+      });
+
+      await notificationService.sendToUsers(1, [5], {
+        title: 'Объявление',
+        body: 'Текст от администратора'
+      });
+
+      expect(User.findAll).not.toHaveBeenCalled();
+      const [payload] = mockMessaging.sendEachForMulticast.mock.calls[0];
+      expect(payload.notification.title).toBe('Объявление');
+    });
+
+    it('протухшие токены убирает и при разбивке по языкам', async () => {
+      DeviceToken.findAll.mockResolvedValue([
+        { token: 'ru-token', user_id: 5 },
+        { token: 'tg-token', user_id: 6 }
+      ]);
+      User.findAll.mockResolvedValue([
+        { id: 5, language: 'ru' },
+        { id: 6, language: 'tg' }
+      ]);
+      mockMessaging.sendEachForMulticast.mockResolvedValue({
+        responses: [
+          {
+            success: false,
+            error: { code: 'messaging/registration-token-not-registered' }
+          }
+        ]
+      });
+
+      const result = await notificationService.sendToUsers(1, [5, 6], {
+        i18n: { key: 'feedDigest', params: { count: 1 } }
+      });
+
+      expect(result).toEqual({ sent: 0, failed: 2 });
+      expect(DeviceToken.destroy).toHaveBeenCalledWith({
+        where: { farm_id: 1, token: { [Op.in]: ['ru-token', 'tg-token'] } }
+      });
+    });
+  });
+
   describe('sendToRoles', () => {
     it('находит участников фермы с нужной ролью и шлёт им', async () => {
       User.findAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);

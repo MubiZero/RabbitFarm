@@ -54,8 +54,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-              failedTemplate(errorText(l10n, e))),
+          content: Text(failedTemplate(errorText(l10n, e))),
           backgroundColor: AppColors.error,
         ),
       );
@@ -109,7 +108,50 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
     );
   }
 
+  /// Кого сюда поселить: нового или уже заведённого.
+  ///
+  /// До сих пор клетка умела только принимать кролика из стада, а завести
+  /// нового прямо здесь было нельзя — приходилось уходить в раздел кроликов
+  /// и там вспоминать номер клетки, у которой только что стоял.
   Future<void> _addRabbit() async {
+    final newcomer = await showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              minTileHeight: AppSizes.touchTarget,
+              leading: const Icon(Icons.add_circle_outline),
+              title: Text(sheetContext.l10n.cageAddNewRabbit),
+              subtitle: Text(sheetContext.l10n.cageAddNewRabbitHint),
+              onTap: () => Navigator.of(sheetContext).pop(true),
+            ),
+            ListTile(
+              minTileHeight: AppSizes.touchTarget,
+              leading: const Icon(Icons.move_to_inbox_outlined),
+              title: Text(sheetContext.l10n.cageSettleExisting),
+              subtitle: Text(sheetContext.l10n.cageSettleExistingHint),
+              onTap: () => Navigator.of(sheetContext).pop(false),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
+    if (newcomer == null || !mounted) return;
+
+    if (newcomer) {
+      await context.push('/rabbits/new?cage=${widget.cageId}');
+      if (mounted) await _refresh();
+      return;
+    }
+
+    await _settleExisting();
+  }
+
+  Future<void> _settleExisting() async {
     final rabbit = await showModalBottomSheet<RabbitModel>(
       context: context,
       isScrollControlled: true,
@@ -137,6 +179,12 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
             ? context.l10n.cageTitle
             : context.l10n.cageTitleNumbered(cage.number)),
         actions: [
+          if (cage != null)
+            IconButton(
+              tooltip: context.l10n.cageTagsTitle,
+              icon: const Icon(Icons.qr_code_2_outlined),
+              onPressed: () => context.push('/cages/tags?cage=${cage.id}'),
+            ),
           if (canManage && cage != null)
             IconButton(
               tooltip: context.l10n.cageEdit,
@@ -193,6 +241,21 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       ),
       children: [
         _CageSummary(cage: cage),
+        const SizedBox(height: AppSpacing.lg),
+        // Кормят клетку целиком, а не каждого жителя по очереди, — и делают
+        // это стоя у неё. Форма кормления умеет принимать клетку с самого
+        // начала, но попасть в неё отсюда было нельзя.
+        if (canManage)
+          SizedBox(
+            width: double.infinity,
+            height: AppSizes.touchTarget,
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  context.push('/feeding-records/form?cage=${cage.id}'),
+              icon: const Icon(Icons.restaurant_outlined),
+              label: Text(context.l10n.cageFeedThis),
+            ),
+          ),
         const SizedBox(height: AppSpacing.xl),
         AppSectionTitle(
           context.l10n.cageResidents,
@@ -287,6 +350,25 @@ class _CageSummary extends StatelessWidget {
               ),
             ],
           ),
+          // Размер клетки записывают в форме, а прочитать его было негде —
+          // хотя именно он отвечает, влезет ли сюда самка с гнездом.
+          if (cage.size?.trim().isNotEmpty == true) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Icon(Icons.straighten_outlined,
+                    size: 20, color: context.colors.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    cage.size!.trim(),
+                    style: AppTypography.bodyMd
+                        .copyWith(color: context.colors.onSurface),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -395,8 +477,8 @@ class _ResidentTile extends StatelessWidget {
                     leading: const Icon(Icons.logout, color: AppColors.error),
                     title: Text(
                       context.l10n.cageRemoveConfirm,
-                      style: AppTypography.bodyLg
-                          .copyWith(color: AppColors.error),
+                      style:
+                          AppTypography.bodyLg.copyWith(color: AppColors.error),
                     ),
                   ),
                 ),
@@ -441,7 +523,8 @@ class _CagePickerSheet extends ConsumerWidget {
                 AppSpacing.xl,
               ),
               itemCount: available.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.sm),
               itemBuilder: (context, i) {
                 final cage = available[i];
                 final occupied =

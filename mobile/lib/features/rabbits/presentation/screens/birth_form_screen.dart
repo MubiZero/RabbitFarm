@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/offline_queue/offline_queue.dart';
+import '../../../../core/providers/connectivity.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/birth_model.dart';
 import '../../data/models/breeding_model.dart';
@@ -94,6 +96,16 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
       return null;
     }
 
+    if (!(ref.read(isOnlineProvider).value ?? true)) {
+      // Окрол записывают у клетки, где связи обычно нет. Запись уходит в
+      // очередь и досылается сама; карточки крольчат предложить не можем —
+      // их диалогу нужен id окрола, которого до отправки не существует.
+      await ref
+          .read(offlineQueueProvider.notifier)
+          .enqueue(OfflineActionType.birth, data);
+      return null;
+    }
+
     final created = await notifier.createBirth(data);
     if (created == null) return ref.read(birthsProvider).error ?? failed;
     await notifier.loadBirths();
@@ -124,12 +136,17 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
       title: _isEditing ? l10n.birthFormEditTitle : l10n.birthFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
-      successMessage: _isEditing ? l10n.birthFormUpdated : l10n.birthFormCreated,
+      // Без связи запись уходит в очередь, и сообщение обязано говорить
+      // именно это, а не притворяться, что окрол уже дошёл до сервера.
+      successMessage: _isEditing
+          ? l10n.birthFormUpdated
+          : (online ? l10n.birthFormCreated : l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       children: [
@@ -186,7 +203,10 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
               ),
               validator: (v) => _validateCount(v, required: false),
             ),
-            if (!_isEditing)
+            // Без связи карточки крольчат не завести: диалогу нужен окрол с
+            // присвоенным сервером id. Переключатель, который ничего не
+            // сделает, хуже его отсутствия — поэтому прячем.
+            if (!_isEditing && online)
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.birthFormAutoKits),

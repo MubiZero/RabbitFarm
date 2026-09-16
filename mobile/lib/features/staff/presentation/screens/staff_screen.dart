@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/access/farm_access.dart';
+import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/phone_utils.dart';
 import '../../data/models/staff_models.dart';
 import '../providers/staff_provider.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+
+/// Роль словами языка приложения. Раньше названия ролей лежали русскими
+/// строками прямо в модели — таджикский фермер видел их по-русски.
+String _roleLabel(BuildContext context, FarmRole role) => switch (role) {
+      FarmRole.owner => context.l10n.roleOwner,
+      FarmRole.manager => context.l10n.roleManager,
+      FarmRole.worker => context.l10n.roleWorker,
+    };
+
+/// Дата дня и месяца на языке приложения («5 марта»).
+String _dayLabel(BuildContext context, DateTime date) =>
+    DateFormat('d MMMM', dateSymbolsLocale(Localizations.localeOf(context)))
+        .format(date);
 
 /// Кто работает на ферме: состав, приглашения и доступы.
 class StaffScreen extends ConsumerWidget {
@@ -20,21 +35,28 @@ class StaffScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final membersAsync = ref.watch(farmMembersProvider);
+    // Управляющий видит, кто работает на ферме, но состав меняет только
+    // владелец — так же, как на сервере. Поэтому здесь спрятаны не сами
+    // карточки, а всё, что состав меняет: приглашение, роли, доступ, передача
+    // хозяйства.
+    final canManage = ref.watch(canProvider(FarmCapability.manageStaff));
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.staffTitle)),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _inviteDialog(context, ref),
-        icon: const Icon(Icons.person_add_alt),
-        label: Text(context.l10n.staffInvite),
-      ),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(
+              onPressed: () => _inviteDialog(context, ref),
+              icon: const Icon(Icons.person_add_alt),
+              label: Text(context.l10n.staffInvite),
+            )
+          : null,
       body: membersAsync.when(
         loading: () => const _StaffSkeleton(),
         error: (error, _) => AppErrorState(
           message: error.toString(),
           onRetry: () => ref.invalidate(farmMembersProvider),
         ),
-        data: (members) => _buildContent(context, ref, members),
+        data: (members) => _buildContent(context, ref, members, canManage),
       ),
     );
   }
@@ -43,6 +65,7 @@ class StaffScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<FarmMember> members,
+    bool canManage,
   ) {
     final staff = members.where((m) => !m.isOwner).toList();
     final owner = members.where((m) => m.isOwner).toList();
@@ -88,20 +111,20 @@ class StaffScreen extends ConsumerWidget {
             for (final member in staff)
               _MemberCard(
                 member: member,
-                onChangeRole: (role) => _updateMember(
-                  context,
-                  ref,
-                  member,
-                  role: role,
-                ),
-                onToggleAccess: () => _updateMember(
-                  context,
-                  ref,
-                  member,
-                  isActive: !member.isActive,
-                ),
-                onTransferOwnership: () =>
-                    _transferOwnership(context, ref, member),
+                onChangeRole: canManage
+                    ? (role) => _updateMember(context, ref, member, role: role)
+                    : null,
+                onToggleAccess: canManage
+                    ? () => _updateMember(
+                          context,
+                          ref,
+                          member,
+                          isActive: !member.isActive,
+                        )
+                    : null,
+                onTransferOwnership: canManage
+                    ? () => _transferOwnership(context, ref, member)
+                    : null,
               ),
           const SizedBox(height: 24),
           invitationsAsync.when(
@@ -113,24 +136,58 @@ class StaffScreen extends ConsumerWidget {
                 style: AppTypography.bodyMd.copyWith(color: AppColors.error),
               ),
             ),
-            data: (invitations) => invitations.isEmpty
-                ? const SizedBox.shrink()
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppGroupLabel(context.l10n.staffPendingInvites),
-                      const SizedBox(height: 12),
-                      for (final invitation in invitations)
-                        _InvitationCard(
-                          invitation: invitation,
-                          onRevoke: () =>
-                              _revokeInvitation(context, ref, invitation),
-                        ),
-                    ],
-                  ),
+            data: (invitations) =>
+                _buildInvitations(context, ref, invitations, canManage),
           ),
         ],
       ),
+    );
+  }
+
+  /// Приглашения двумя группами.
+  ///
+  /// Просроченное приглашение выглядело как живое — с датой в прошлом и
+  /// единственным действием «Отозвать»; владелец видел, что человека
+  /// «ждут», а войти тот уже не мог. Теперь просроченные стоят отдельно, и
+  /// у обеих групп есть «Пригласить заново»: живое приглашение тоже нужно
+  /// звать повторно — хотя бы чтобы снова достать ссылку, которую владелец
+  /// закрыл, не переслав.
+  Widget _buildInvitations(
+    BuildContext context,
+    WidgetRef ref,
+    List<FarmInvitation> invitations,
+    bool canManage,
+  ) {
+    if (invitations.isEmpty) return const SizedBox.shrink();
+
+    final live = invitations.where((i) => !i.isExpired).toList();
+    final expired = invitations.where((i) => i.isExpired).toList();
+
+    Widget card(FarmInvitation invitation) => _InvitationCard(
+          invitation: invitation,
+          onRevoke: canManage
+              ? () => _revokeInvitation(context, ref, invitation)
+              : null,
+          onResend: canManage
+              ? () => _resendInvitation(context, ref, invitation)
+              : null,
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (live.isNotEmpty) ...[
+          AppGroupLabel(context.l10n.staffPendingInvites),
+          const SizedBox(height: AppSpacing.md),
+          for (final invitation in live) card(invitation),
+        ],
+        if (expired.isNotEmpty) ...[
+          if (live.isNotEmpty) const SizedBox(height: AppSpacing.md),
+          AppGroupLabel(context.l10n.staffExpiredInvites),
+          const SizedBox(height: AppSpacing.md),
+          for (final invitation in expired) card(invitation),
+        ],
+      ],
     );
   }
 
@@ -249,6 +306,33 @@ class StaffScreen extends ConsumerWidget {
       await ref.read(staffRepositoryProvider).revokeInvitation(invitation.id);
       ref.invalidate(farmInvitationsProvider);
       messenger.showSnackBar(SnackBar(content: Text(revoked)));
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, e)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  /// Позвать того же человека ещё раз: сервер продлевает срок и повторяет
+  /// отправку, а владелец снова видит ссылку — ту самую, которую нужно
+  /// переслать, если SMS не уходит.
+  Future<void> _resendInvitation(
+    BuildContext context,
+    WidgetRef ref,
+    FarmInvitation invitation,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    try {
+      final created = await ref
+          .read(staffRepositoryProvider)
+          .resendInvitation(invitation.id);
+      ref.invalidate(farmInvitationsProvider);
+      if (!context.mounted) return;
+      await _showInvitedDialog(context, created);
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
@@ -425,13 +509,13 @@ class StaffScreen extends ConsumerWidget {
                         RadioListTile<FarmRole>(
                           value: FarmRole.worker,
                           title: Text(context.l10n.roleWorker),
-                          subtitle: Text(FarmRole.worker.description),
+                          subtitle: Text(context.l10n.roleWorkerDescription),
                           contentPadding: EdgeInsets.zero,
                         ),
                         RadioListTile<FarmRole>(
                           value: FarmRole.manager,
                           title: Text(context.l10n.roleManager),
-                          subtitle: Text(FarmRole.manager.description),
+                          subtitle: Text(context.l10n.roleManagerDescription),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ],
@@ -468,52 +552,104 @@ class StaffScreen extends ConsumerWidget {
     await _showInvitedDialog(context, created);
   }
 
-  /// Приглашение выписано: объясняем владельцу, что делать работнику.
-  /// Диктовать нечего — код придёт самому работнику, когда он введёт свой
-  /// номер или почту на экране входа.
+  /// Приглашение выписано: говорим владельцу, что на самом деле произошло.
+  ///
+  /// Раньше здесь стояло «ничего передавать не нужно» — и это было неправдой
+  /// для приглашения по телефону: SMS не уходила вовсе (шлюз принимает
+  /// только заранее одобренные шаблоны), работник ничего не получал и ждал.
+  /// На телефон сообщение не уходит вовсе, на почту — уходит письмо.
+  /// Ушло — сказать об этом и замолчать: ссылка под «мы уже позвали» только
+  /// заставляет гадать, нужно ли ещё что-то сделать. Не ушло — дать ссылку
+  /// для пересылки руками, в тот мессенджер, которым человек пользуется.
   Future<void> _showInvitedDialog(
     BuildContext context,
     CreatedInvitation invitation,
   ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final link = invitation.messageSent ? null : invitation.inviteLink;
+
+    final body = invitation.phone != null
+        ? l10n.staffInvitedPhoneBody(formatTjPhone(invitation.phone!))
+        : (invitation.messageSent
+            ? l10n.staffInvitedEmailBody(invitation.contact)
+            : l10n.staffInvitedEmailFailedBody(invitation.contact));
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.staffInvitedTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              invitation.phone != null
-                  ? context.l10n
-                      .staffInvitedPhoneBody(formatTjPhone(invitation.phone!))
-                  : context.l10n.staffInvitedEmailBody(invitation.contact),
-              style: AppTypography.bodyMd.copyWith(
-                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+        title: Text(l10n.staffInvitedTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                body,
+                style: AppTypography.bodyMd
+                    .copyWith(color: dialogContext.colors.onSurfaceVariant),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.staffValidUntil(
-                  DateFormat('d MMMM', 'ru').format(invitation.expiresAt)),
-              style: AppTypography.labelSm.copyWith(
-                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+              if (link != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  l10n.staffInviteLinkLabel,
+                  style: AppTypography.labelSm
+                      .copyWith(color: dialogContext.colors.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                // Ссылка видна целиком: владелец может продиктовать или
+                // набрать её руками, если копировать некуда.
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: dialogContext.colors.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: SelectableText(
+                    link,
+                    style: AppTypography.labelSm
+                        .copyWith(color: dialogContext.colors.onSurface),
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.staffValidUntil(
+                    _dayLabel(dialogContext, invitation.expiresAt)),
+                style: AppTypography.labelSm
+                    .copyWith(color: dialogContext.colors.onSurfaceVariant),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
+          if (link != null)
+            TextButton.icon(
+              // Диалог закрывается сразу: дальше владелец идёт вставлять
+              // приглашение в мессенджер, а подтверждение под открытым
+              // диалогом всё равно оказалось бы за затемнением.
+              onPressed: () async {
+                await Clipboard.setData(
+                  ClipboardData(text: l10n.staffInviteMessage(link)),
+                );
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+                messenger.showSnackBar(
+                  SnackBar(content: Text(l10n.staffInviteCopied)),
+                );
+              },
+              icon: const Icon(Icons.copy_outlined),
+              label: Text(l10n.staffInviteCopy),
+            ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(context.l10n.commonClose),
+            child: Text(l10n.commonClose),
           ),
         ],
       ),
     );
   }
-
 }
-
 
 class _MemberCard extends StatelessWidget {
   final FarmMember member;
@@ -571,8 +707,9 @@ class _MemberCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     inactive
-                        ? '${member.role.label} · доступ закрыт'
-                        : member.role.label,
+                        ? '${_roleLabel(context, member.role)} · '
+                            '${context.l10n.staffAccessClosedBadge}'
+                        : _roleLabel(context, member.role),
                     style: AppTypography.labelSm.copyWith(
                       color: inactive ? AppColors.warning : cs.primary,
                     ),
@@ -607,7 +744,9 @@ class _MemberCard extends StatelessWidget {
                     ),
                   PopupMenuItem(
                     value: 'access',
-                    child: Text(inactive ? context.l10n.staffOpenAccess : context.l10n.staffCloseAccess),
+                    child: Text(inactive
+                        ? context.l10n.staffOpenAccess
+                        : context.l10n.staffCloseAccess),
                   ),
                   if (!inactive) ...[
                     const PopupMenuDivider(),
@@ -637,50 +776,93 @@ class _MemberCard extends StatelessWidget {
 
 class _InvitationCard extends StatelessWidget {
   final FarmInvitation invitation;
-  final VoidCallback onRevoke;
+  final VoidCallback? onRevoke;
+  final VoidCallback? onResend;
 
-  const _InvitationCard({required this.invitation, required this.onRevoke});
+  const _InvitationCard({
+    required this.invitation,
+    this.onRevoke,
+    this.onResend,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = context.colors;
+    final expired = invitation.isExpired;
+    final day = _dayLabel(context, invitation.expiresAt);
+    final role = _roleLabel(context, invitation.role);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: AppCard(
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              invitation.phone != null
-                  ? Icons.sms_outlined
-                  : Icons.mark_email_unread_outlined,
-              color: cs.onSurfaceVariant,
+            Row(
+              children: [
+                Icon(
+                  // У просроченного приглашения свой значок: строку с датой
+                  // на карточке читают не всегда, а «песочные часы» видно
+                  // сразу.
+                  expired
+                      ? Icons.hourglass_disabled_outlined
+                      : (invitation.phone != null
+                          ? Icons.sms_outlined
+                          : Icons.mark_email_unread_outlined),
+                  color: expired ? AppColors.warning : cs.onSurfaceVariant,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        invitation.contact,
+                        style:
+                            AppTypography.bodyMd.copyWith(color: cs.onSurface),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        expired
+                            ? context.l10n.staffInviteCardExpired(role, day)
+                            : context.l10n.staffInviteCardLive(role, day),
+                        style: AppTypography.labelSm.copyWith(
+                          color:
+                              expired ? AppColors.warning : cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    invitation.contact,
-                    style: AppTypography.bodyMd.copyWith(color: cs.onSurface),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${invitation.role.label} · до '
-                    '${DateFormat('d MMMM', 'ru_RU').format(invitation.expiresAt)}',
-                    style: AppTypography.labelSm
-                        .copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
+            if (onResend != null || onRevoke != null)
+              // Кнопки под строкой, а не в ней: два действия рядом с
+              // контактом сжимали бы его до многоточия на первом же длинном
+              // адресе.
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: AppSpacing.sm,
+                  children: [
+                    if (onRevoke != null)
+                      TextButton(
+                        onPressed: onRevoke,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.error,
+                        ),
+                        child: Text(context.l10n.staffRevoke),
+                      ),
+                    if (onResend != null)
+                      TextButton(
+                        onPressed: onResend,
+                        child: Text(context.l10n.staffInviteAgain),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            TextButton(
-              onPressed: onRevoke,
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: Text(context.l10n.staffRevoke),
-            ),
           ],
         ),
       ),

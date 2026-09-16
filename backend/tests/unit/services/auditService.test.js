@@ -2,7 +2,11 @@ jest.mock('../../../src/models', () => ({
   AdminAuditLog: {
     create: jest.fn(),
     findAndCountAll: jest.fn()
-  }
+  },
+  // Журнал отдаётся с именами админа и фермы — сервису нужны сами модели,
+  // чтобы собрать include.
+  User: {},
+  Farm: { findByPk: jest.fn(), update: jest.fn() }
 }));
 jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
@@ -76,11 +80,19 @@ describe('AuditService', () => {
       expect(AdminAuditLog.findAndCountAll).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {},
-          order: [['created_at', 'DESC']],
+          // Второй ключ сортировки: одно обращение к панели пишет несколько
+          // строк одной секундой, и без него страницы разъезжались бы между
+          // запросами — одна запись показывалась дважды, другая ни разу.
+          order: [['created_at', 'DESC'], ['id', 'DESC']],
           limit: 20,
           offset: 0
         })
       );
+
+      // Имена админа и фермы приезжают вместе с записью: журнал читает
+      // человек, и «Админ №3 · Ферма №7» ему не говорит ничего.
+      const options = AdminAuditLog.findAndCountAll.mock.calls[0][0];
+      expect(options.include.map((i) => i.as).sort()).toEqual(['admin', 'farm']);
       expect(result.items).toEqual([{ id: 2 }, { id: 1 }]);
       expect(result.pagination).toEqual({ page: 1, limit: 20, total: 2, totalPages: 1 });
     });

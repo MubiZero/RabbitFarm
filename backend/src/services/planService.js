@@ -20,6 +20,41 @@ class PlanService {
     return Plan.findAll({ order: [['id', 'ASC']] });
   }
 
+  /**
+   * Тарифы вместе с числом ферм на каждом.
+   *
+   * Нужно там, где тариф трогают: удаление стирает его физически и обнуляет
+   * `plan_id` у ферм, и без числа админ не знает, задевает он одну ферму или
+   * половину сервиса. Считаем только живые хозяйства — мягко удалённая ферма
+   * никого не касается.
+   *
+   * Отдельным методом, а не внутри `list`: `list` возвращает экземпляры
+   * Sequelize, а здесь — простые объекты с приписанным числом.
+   */
+  async listWithFarmCount() {
+    const [plans, counts] = await Promise.all([
+      this.list(),
+      Farm.findAll({
+        attributes: [
+          'plan_id',
+          [Farm.sequelize.fn('COUNT', Farm.sequelize.col('id')), 'total']
+        ],
+        where: { deleted_at: null },
+        group: ['plan_id'],
+        raw: true
+      })
+    ]);
+
+    const byPlan = new Map(
+      counts.map((row) => [row.plan_id, Number(row.total)])
+    );
+
+    return plans.map((plan) => ({
+      ...plan.toJSON(),
+      farms_count: byPlan.get(plan.id) || 0
+    }));
+  }
+
   async getById(planId) {
     const plan = await Plan.findByPk(planId);
     if (!plan) {

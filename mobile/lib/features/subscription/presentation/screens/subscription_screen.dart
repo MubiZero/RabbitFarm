@@ -59,12 +59,25 @@ class _Content extends ConsumerWidget {
         );
         return;
       }
-      // Проверили и банк ещё не подтвердил — не ошибка запроса, а обычный
-      // промежуточный исход: без сообщения кнопка просто молча перестаёт
-      // крутиться, и непонятно, сработала ли проверка вообще.
-      final justChecked = previous?.status == PaymentFlowStatus.checking &&
-          next.status == PaymentFlowStatus.awaitingPayment;
-      if (justChecked) {
+      if (previous?.status != PaymentFlowStatus.checking) return;
+
+      // Спросить банк не получилось вовсе — и это не то же самое, что «банк
+      // ещё не подтвердил». Раньше обрыв связи показывался человеку как
+      // состояние платежа, которого никто не проверял.
+      if (next.status == PaymentFlowStatus.checkFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.subscriptionCheckFailed),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      // Проверили и банк ещё не подтвердил — обычный промежуточный исход:
+      // без сообщения кнопка просто молча перестаёт крутиться, и непонятно,
+      // сработала ли проверка вообще.
+      if (next.status == PaymentFlowStatus.awaitingPayment) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.subscriptionPaymentPending)),
         );
@@ -106,8 +119,12 @@ class _Content extends ConsumerWidget {
           const SizedBox(height: AppSpacing.lg),
           if (flow.status == PaymentFlowStatus.completed)
             _CompletedCard()
+          else if (flow.status == PaymentFlowStatus.declined)
+            const _DeclinedCard()
           else if (flow.order != null)
-            _PayingCard(order: flow.order!, checking: flow.status == PaymentFlowStatus.checking)
+            _PayingCard(
+                order: flow.order!,
+                checking: flow.status == PaymentFlowStatus.checking)
           else if (plan!.price != null)
             _PayButton(loading: flow.status == PaymentFlowStatus.creating),
         ],
@@ -142,7 +159,8 @@ class _PlanInfoCard extends StatelessWidget {
               Text(
                 plan.price == null
                     ? l10n.subscriptionFree
-                    : l10n.subscriptionPricePerPeriod(plan.price!.toStringAsFixed(0)),
+                    : l10n.subscriptionPricePerPeriod(
+                        plan.price!.toStringAsFixed(0)),
                 style: AppTypography.labelLg
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),
@@ -165,7 +183,8 @@ class _PlanInfoCard extends StatelessWidget {
                       ? l10n.subscriptionForever
                       : plan.isExpired
                           ? l10n.subscriptionExpired(_dayFormat.format(expires))
-                          : l10n.subscriptionExpiresOn(_dayFormat.format(expires)),
+                          : l10n.subscriptionExpiresOn(
+                              _dayFormat.format(expires)),
                   style: AppTypography.bodyMd.copyWith(
                     color: plan.isExpired
                         ? AppColors.warning
@@ -191,7 +210,8 @@ class _PayButton extends ConsumerWidget {
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: loading ? null : () => ref.read(paymentFlowProvider.notifier).pay(),
+        onPressed:
+            loading ? null : () => ref.read(paymentFlowProvider.notifier).pay(),
         child: loading
             ? const SizedBox(
                 width: 20,
@@ -199,6 +219,58 @@ class _PayButton extends ConsumerWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Text(context.l10n.subscriptionPay),
+      ),
+    );
+  }
+}
+
+/// Банк отказал.
+///
+/// Состояние окончательное, и повторная проверка того же заказа ничего не
+/// изменит — значит и предлагать её нельзя. До сих пор отказ вообще не
+/// доезжал до приложения: сервер не записывал его ни в одной ветке, и
+/// человек бесконечно жал «Проверить оплату».
+class _DeclinedCard extends ConsumerWidget {
+  const _DeclinedCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+
+    return AppCard(
+      variant: AppCardVariant.error,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.error_outline, color: AppColors.error),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.subscriptionPaymentDeclined,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.subscriptionPaymentDeclinedHint,
+            style: AppTypography.bodyMd
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SizedBox(
+            width: double.infinity,
+            height: AppSizes.touchTargetLarge,
+            child: FilledButton(
+              onPressed: () => ref.read(paymentFlowProvider.notifier).reset(),
+              child: Text(l10n.subscriptionPayAgain),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -230,7 +302,8 @@ class _PayingCard extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () => _openPaymentPage(deepLink ?? url!, fallback: url),
+                onPressed: () =>
+                    _openPaymentPage(deepLink ?? url!, fallback: url),
                 child: Text(l10n.subscriptionOpenPaymentPage),
               ),
             ),
@@ -261,7 +334,8 @@ class _PayingCard extends ConsumerWidget {
     final uri = Uri.parse(primary);
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened && fallback != null && fallback != primary) {
-      await launchUrl(Uri.parse(fallback), mode: LaunchMode.externalApplication);
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 }

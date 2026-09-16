@@ -48,7 +48,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       final paginatedData = apiResponse.data!;
@@ -57,8 +58,8 @@ class RabbitsRepository {
           .toList();
 
       // Read pagination nested object returned by backend
-      final pagination = (paginatedData['pagination'] ?? const <String, dynamic>{})
-          as Map<String, dynamic>;
+      final pagination = (paginatedData['pagination'] ??
+          const <String, dynamic>{}) as Map<String, dynamic>;
 
       int toInt(dynamic v) {
         if (v is int) return v;
@@ -103,7 +104,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -123,7 +125,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -143,10 +146,28 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Выставить назначение всему живому поголовью. Возвращает, скольких это
+  /// на самом деле задело: экран подтверждает решение числом, и итог обязан
+  /// с ним совпасть.
+  Future<int> setPurposeForAll(String purpose) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.rabbitsPurpose,
+        data: {'purpose': purpose},
+      );
+
+      final data = response.data['data'];
+      return data is Map ? (data['changed'] as num?)?.toInt() ?? 0 : 0;
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
@@ -172,7 +193,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitStatistics.fromJson(apiResponse.data!);
@@ -192,7 +214,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -204,9 +227,11 @@ class RabbitsRepository {
   }
 
   // Add weight record
-  Future<RabbitWeight> addWeightRecord(int rabbitId, AddWeightRequest request) async {
+  Future<RabbitWeight> addWeightRecord(
+      int rabbitId, AddWeightRequest request) async {
     try {
-      final response = await _apiClient.addWeightRecord(rabbitId, request.toJson());
+      final response =
+          await _apiClient.addWeightRecord(rabbitId, request.toJson());
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,
@@ -214,7 +239,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitWeight.fromJson(apiResponse.data!);
@@ -224,9 +250,11 @@ class RabbitsRepository {
   }
 
   // Upload photo
-  Future<RabbitModel> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+  Future<RabbitModel> uploadPhoto(int rabbitId, String filePath,
+      {Uint8List? bytes}) async {
     try {
-      final response = await _apiClient.uploadPhoto(rabbitId, filePath, bytes: bytes);
+      final response =
+          await _apiClient.uploadPhoto(rabbitId, filePath, bytes: bytes);
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,
@@ -234,7 +262,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -254,7 +283,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitModel.fromJson(apiResponse.data!);
@@ -274,7 +304,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return apiResponse.data!
@@ -291,6 +322,7 @@ class RabbitsRepository {
     String filePath, {
     Uint8List? bytes,
     String? caption,
+    DateTime? takenAt,
   }) async {
     try {
       final response = await _apiClient.uploadGalleryPhoto(
@@ -298,6 +330,7 @@ class RabbitsRepository {
         filePath,
         bytes: bytes,
         caption: caption,
+        takenAt: takenAt,
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -306,7 +339,8 @@ class RabbitsRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return RabbitPhoto.fromJson(apiResponse.data!);

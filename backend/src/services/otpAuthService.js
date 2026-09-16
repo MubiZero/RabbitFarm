@@ -3,9 +3,10 @@ const { User, Farm, Invitation, LoginOtp } = require('../models');
 const authService = require('./authService');
 const planService = require('./planService');
 const logger = require('../utils/logger');
-const { generateOtp, hashOtp } = require('../utils/otp');
+const { generateOtp, hashOtp, otpMatches } = require('../utils/otp');
 const { normalizeTjPhone, isTjPhone } = require('../utils/phone');
 const payomSmsTransport = require('./notifications/payomSmsTransport');
+const payomConfig = require('../config/payom');
 const emailTransport = require('./notifications/emailTransport');
 
 const OTP_TTL_MINUTES = 10;
@@ -113,7 +114,7 @@ class OtpAuthService {
         await payomSmsTransport.sendTemplateSms({
           templateKey: 'user.verification_code',
           telephone: identifier,
-          variables: { 'text-1': 'RabbitFarm', 'code-1': code }
+          variables: { 'text-1': payomConfig.senderLabel, 'code-1': code }
         });
       } else {
         await emailTransport.sendLoginCodeEmail({ to: identifier, code });
@@ -138,9 +139,16 @@ class OtpAuthService {
   async verifyOtp(contact, code) {
     const { identifier, channel } = this.resolveContact(contact);
 
+    // Второй ключ сортировки не для красоты: `created_at` — `datetime` без
+    // долей секунды, и два кода, запрошенных в одну секунду (человек нажал
+    // «выслать ещё раз», не дождавшись SMS), по нему неразличимы — база
+    // вправе вернуть любой из них. Тогда свежий код, который человек и
+    // получил, проверялся против старой записи и отвергался как неверный, а
+    // счётчик промахов рос не на той. `id` — автоинкремент, то есть
+    // настоящий порядок появления.
     const record = await LoginOtp.findOne({
       where: { identifier },
-      order: [['created_at', 'DESC']]
+      order: [['created_at', 'DESC'], ['id', 'DESC']]
     });
     if (!record) {
       throw new Error('OTP_INVALID');
@@ -158,7 +166,7 @@ class OtpAuthService {
       throw new Error('OTP_EXPIRED');
     }
 
-    if (hashOtp(code) !== record.token_hash) {
+    if (!otpMatches(code, record.token_hash)) {
       await record.increment('attempts');
       throw new Error('OTP_INVALID');
     }
@@ -166,7 +174,7 @@ class OtpAuthService {
     await record.destroy();
 
     const user = await this.findUserByContact(identifier, channel, {
-      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose'] }]
     });
 
     if (user) {
@@ -211,7 +219,7 @@ class OtpAuthService {
     }
     await invitation.update({ accepted_at: new Date() });
 
-    const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['id', 'status'] });
+    const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['id', 'status', 'default_purpose'] });
     const userJson = newUser.toJSON();
     userJson.farm = farm ? { id: farm.id, status: farm.status } : null;
 

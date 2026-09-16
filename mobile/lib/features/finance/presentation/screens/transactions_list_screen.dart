@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
@@ -49,9 +50,8 @@ class _TransactionsListScreenState
           ),
           IconButton(
             tooltip: context.l10n.commonFilters,
-            icon: Icon(state.hasFilters
-                ? Icons.filter_list_alt
-                : Icons.filter_list),
+            icon: Icon(
+                state.hasFilters ? Icons.filter_list_alt : Icons.filter_list),
             onPressed: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -347,16 +347,23 @@ class _ActiveFilters extends ConsumerWidget {
   }
 }
 
-class _TransactionCard extends StatelessWidget {
+class _TransactionCard extends ConsumerWidget {
   final Transaction transaction;
   final VoidCallback onTap;
 
   const _TransactionCard({required this.transaction, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isIncome = transaction.type == TransactionType.income;
     final color = isIncome ? AppColors.success : AppColors.error;
+    // Автора называем только на чужих строках. На ферме из одного человека
+    // все проводки его собственные, и подпись «Записал Иван» под каждой была
+    // бы шумом; на ферме с наёмным управляющим она проступает ровно там, где
+    // отвечает на вопрос «кто это провёл».
+    final author = transaction.author;
+    final me = ref.watch(currentUserIdProvider);
+    final showAuthor = author != null && author.id != me;
 
     return AppCard(
       onTap: onTap,
@@ -413,6 +420,14 @@ class _TransactionCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                if (showAuthor)
+                  Text(
+                    context.l10n.financeAuthorLine(author.fullName),
+                    style: AppTypography.labelSm
+                        .copyWith(color: context.colors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),
@@ -427,52 +442,119 @@ class _TransactionCard extends StatelessWidget {
   }
 }
 
+/// Снимок чека в карточке операции.
+///
+/// Чек — единственное подтверждение траты, и смотреть его приходят именно
+/// сюда: в списке видна сумма, а вопрос «а за что это» возникает уже у
+/// конкретной строки. По тапу снимок открывается целиком — с телефона в
+/// руке мелкий чек не прочитать.
+class _Receipt extends StatelessWidget {
+  final String url;
+
+  const _Receipt({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    final fullUrl = ImageUrlHelper.getFullImageUrl(url);
+    if (fullUrl == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.txFormReceipt,
+            style: AppTypography.labelSm
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          InkWell(
+            onTap: () => showDialog<void>(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                insetPadding: const EdgeInsets.all(AppSpacing.md),
+                child: InteractiveViewer(
+                  child: Image.network(fullUrl),
+                ),
+              ),
+            ),
+            borderRadius: AppRadius.mdAll,
+            child: ClipRRect(
+              borderRadius: AppRadius.mdAll,
+              child: SizedBox(
+                height: 160,
+                width: double.infinity,
+                child: Image.network(
+                  fullUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => ColoredBox(
+                    color: context.colors.surfaceContainerHighest,
+                    child: Center(
+                      child: Text(
+                        context.l10n.txFormReceiptFailed,
+                        style: AppTypography.labelSm.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DetailsSheet extends ConsumerWidget {
   final Transaction transaction;
 
   const _DetailsSheet({required this.transaction});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.financeDeleteTitle),
-        content: Text(context.l10n.financeDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.financeDeleted;
     final failed = context.l10n.financeDeleteFailed;
     final l10n = context.l10n;
+    final notifier = ref.read(transactionsProvider.notifier);
+    // Репозиторий забираем сразу: запрос уйдёт уже после того, как шторка
+    // закроется, а вместе с ней перестанет быть годным её `ref`.
+    final repository = ref.read(transactionsRepositoryProvider);
 
-    try {
-      await ref.read(deleteTransactionProvider(transaction.id).future);
-      ref
-          .read(transactionsProvider.notifier)
-          .removeTransaction(transaction.id);
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } catch (e) {
+    notifier.removeTransaction(transaction.id);
+
+    Object? error;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.financeDeleted,
+      commit: () async {
+        try {
+          await repository.deleteTransaction(transaction.id);
+        } catch (e) {
+          error = e;
+        }
+      },
+      onUndo: notifier.refresh,
+    );
+    navigator.pop();
+    await pending;
+
+    if (error != null) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('$failed: ${errorText(l10n, e)}'),
+          content: Text('$failed: ${errorText(l10n, error)}'),
           backgroundColor: AppColors.error,
         ),
       );
+      await notifier.refresh();
     }
   }
 
@@ -553,12 +635,20 @@ class _DetailsSheet extends ConsumerWidget {
               value: DateFormat('d MMMM y', 'ru')
                   .format(transaction.transactionDate),
             ),
+            if (transaction.author != null)
+              _Row(
+                icon: Icons.person_outline,
+                label: context.l10n.financeAuthor,
+                value: transaction.author!.fullName,
+              ),
             if (transaction.rabbit != null)
               _Row(
                 icon: Icons.pets_outlined,
                 label: context.l10n.txFormRabbit,
                 value: transaction.rabbit!.label,
               ),
+            if (transaction.receiptUrl?.isNotEmpty == true)
+              _Receipt(url: transaction.receiptUrl!),
             if (transaction.description?.trim().isNotEmpty == true)
               _Row(
                 icon: Icons.notes,

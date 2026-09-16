@@ -43,7 +43,8 @@ class AppCrashView extends StatelessWidget {
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   l10n?.commonSomethingWrong ?? _fallbackTitle,
-                  style: AppTypography.titleMd.copyWith(color: colors.onSurface),
+                  style:
+                      AppTypography.titleMd.copyWith(color: colors.onSurface),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),

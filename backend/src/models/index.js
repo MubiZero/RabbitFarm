@@ -38,6 +38,7 @@ const Payment = require('./Payment')(sequelize);
 const Plan = require('./Plan')(sequelize);
 const AdminAuditLog = require('./AdminAuditLog')(sequelize);
 const FarmAuditLog = require('./FarmAuditLog')(sequelize);
+const Notification = require('./Notification')(sequelize);
 const Announcement = require('./Announcement')(sequelize);
 const SupportRequest = require('./SupportRequest')(sequelize);
 const SupportContact = require('./SupportContact')(sequelize);
@@ -193,6 +194,10 @@ AdminAuditLog.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 
 // Журнал кадровых действий — наоборот, имущество фермы: читает его владелец
 // своей фермы, а не платформа.
+Farm.hasMany(Notification, { foreignKey: 'farm_id', onDelete: 'CASCADE' });
+User.hasMany(Notification, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Notification.belongsTo(User, { foreignKey: 'user_id' });
+
 Farm.hasMany(FarmAuditLog, { as: 'staffAuditLog', foreignKey: 'farm_id', onDelete: 'CASCADE' });
 FarmAuditLog.belongsTo(Farm, { as: 'farm', foreignKey: 'farm_id' });
 FarmAuditLog.belongsTo(User, { as: 'actor', foreignKey: 'actor_id' });
@@ -217,7 +222,13 @@ SupportRequest.belongsTo(User, { as: 'author', foreignKey: 'user_id' });
 require('../utils/tenancy').attach({
   Breed, Cage, Feed, Rabbit, RabbitWeight, Breeding, Birth,
   Vaccination, MedicalRecord, FeedingRecord, Transaction, Task, Photo, Note,
-  Invitation, DeviceToken, Payment, FarmAuditLog
+  Invitation, DeviceToken, Payment, FarmAuditLog, Notification
+});
+
+// Удаление записей фермы оставляет след в журнале — см. utils/deletionAudit.
+require('../utils/deletionAudit').attachDeletionAudit({
+  Rabbit, Cage, Breed, Feed, FeedingRecord, MedicalRecord,
+  Vaccination, Task, Note, Transaction, Birth, Breeding
 });
 
 // Export models and sequelize instance
@@ -249,6 +260,7 @@ module.exports = {
   Plan,
   AdminAuditLog,
   FarmAuditLog,
+  Notification,
   Announcement,
   SupportRequest,
   SupportContact

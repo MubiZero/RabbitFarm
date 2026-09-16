@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
@@ -64,12 +65,10 @@ class VaccinationsListScreen extends ConsumerWidget {
                 icon: Icons.vaccines_outlined,
                 title: context.l10n.vaccinationsEmptyTitle,
                 subtitle: context.l10n.vaccinationsEmptyBody,
-                actionLabel: canRecord
-                    ? context.l10n.vaccinationsEmptyAction
-                    : null,
-                onAction: canRecord
-                    ? () => context.push('/vaccinations/form')
-                    : null,
+                actionLabel:
+                    canRecord ? context.l10n.vaccinationsEmptyAction : null,
+                onAction:
+                    canRecord ? () => context.push('/vaccinations/form') : null,
               ),
         itemBuilder: (context, vaccination, _) => _VaccinationCard(
           vaccination: vaccination,
@@ -166,8 +165,7 @@ class _ActiveFilters extends ConsumerWidget {
               label: Text(
                   '${context.l10n.vaccinationsFrom} ${format.format(state.fromDateFilter!)}'),
               deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () =>
-                  notifier.setDateFilter(null, state.toDateFilter),
+              onDeleted: () => notifier.setDateFilter(null, state.toDateFilter),
             ),
           if (state.toDateFilter != null)
             InputChip(
@@ -252,6 +250,13 @@ class _VaccinationCard extends StatelessWidget {
             _Line(
               icon: Icons.person_outline,
               text: vaccination.veterinarian!.trim(),
+            ),
+          // Прививки — статья, которая повторяется каждый сезон, и до сих пор
+          // их стоимость не показывалась нигде: поля не было в модели вовсе.
+          if ((vaccination.cost ?? 0) > 0)
+            _Line(
+              icon: Icons.payments_outlined,
+              text: formatMoney(vaccination.cost!),
             ),
         ],
       ),
@@ -463,8 +468,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
-                      final notifier =
-                          ref.read(vaccinationsProvider.notifier);
+                      final notifier = ref.read(vaccinationsProvider.notifier);
                       notifier.setTypeFilter(_type);
                       notifier.setDateFilter(_from, _to);
                       Navigator.pop(context);
@@ -591,45 +595,37 @@ class _DetailsSheet extends ConsumerWidget {
 
   const _DetailsSheet({required this.vaccination});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.vaccinationsDeleteTitle),
-        content: Text(context.l10n.vaccinationsDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.vaccinationsDeleted;
     final failed = context.l10n.vaccinationsDeleteFailed;
+    final notifier = ref.read(vaccinationsProvider.notifier);
 
-    final success = await ref
-        .read(vaccinationsProvider.notifier)
-        .deleteVaccination(vaccination.id);
+    notifier.removeVaccination(vaccination.id);
 
-    // Раньше при неудаче не происходило ничего: шторка оставалась открытой,
-    // и было непонятно, удалилось или нет.
-    if (success) {
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } else {
+    var success = true;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.vaccinationsDeleted,
+      commit: () async =>
+          success = await notifier.deleteVaccination(vaccination.id),
+      onUndo: notifier.load,
+    );
+    navigator.pop();
+    await pending;
+
+    // При неудаче строка возвращается на место, иначе останется впечатление,
+    // что прививку удалили.
+    if (!success) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await notifier.load();
     }
   }
 
@@ -717,6 +713,12 @@ class _DetailsSheet extends ConsumerWidget {
                   icon: Icons.person_outline,
                   label: context.l10n.vaccinationsVet,
                   value: vaccination.veterinarian!.trim(),
+                ),
+              if ((vaccination.cost ?? 0) > 0)
+                _DetailRow(
+                  icon: Icons.payments_outlined,
+                  label: context.l10n.medCost,
+                  value: formatMoney(vaccination.cost!),
                 ),
               if (vaccination.notes?.trim().isNotEmpty == true)
                 _DetailRow(

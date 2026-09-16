@@ -157,6 +157,16 @@ describe('birthController', () => {
       Task.create.mock.calls.forEach(([task]) => {
         expect(task).toMatchObject({ farm_id: 1, created_by: 1, assigned_to: 1 });
       });
+      // Ключ шаблона и подстановки: заголовок собирается на языке читателя,
+      // а готовая строка остаётся запасной.
+      expect(Task.create.mock.calls.map(([task]) => task.title_key)).toEqual([
+        'weighKits',
+        'eyesOpen',
+        'weaning'
+      ]);
+      Task.create.mock.calls.forEach(([task]) => {
+        expect(task.title_params).toEqual({ doe: 'Doe' });
+      });
     });
 
     it('should create birth with breeding_id', async () => {
@@ -403,8 +413,12 @@ describe('birthController', () => {
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(mockTx.commit).toHaveBeenCalled();
-      // birth.update should NOT be called — kits_weaned must remain unchanged at birth
-      expect(birth.update).not.toHaveBeenCalled();
+      // Запись об окроле трогается ровно одним полем — отметкой о том, что
+      // карточки заведены. Счётчики выводка (`kits_weaned` и остальные)
+      // заведение карточек не меняет: отсадка — отдельное событие.
+      const [patch] = birth.update.mock.calls[0];
+      expect(Object.keys(patch)).toEqual(['kits_carded_at']);
+      expect(patch.kits_carded_at).toBeInstanceOf(Date);
     });
 
     it('should use name_prefix when provided', async () => {

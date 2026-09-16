@@ -1,6 +1,7 @@
 const JWTUtil = require('../utils/jwt');
 const ApiResponse = require('../utils/apiResponse');
 const { User, TokenBlacklist, Farm } = require('../models');
+const { withRequestContext } = require('../utils/requestContext');
 
 /**
  * Authentication middleware
@@ -70,7 +71,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
       req.user = user;
       req.farmId = user.farm_id;
       req.impersonatedBy = decoded.impersonated_by;
-      return next();
+      return withRequestContext(req, res, next);
     }
 
     // Статус хозяйства проверяется здесь, а не по контроллерам: это
@@ -103,7 +104,10 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     // формула жила в коде, и любая её копия мимо этого места давала другой
     // ответ. Теперь хозяйство записано у пользователя, и читать нечего.
     req.farmId = user.farm_id;
-    next();
+    // Дальше запрос идёт внутри контекста вошедшего: хуки моделей, до
+    // которых `req` не доезжает, узнают из него, кто удалил запись
+    // (см. utils/requestContext).
+    withRequestContext(req, res, next);
   } catch (error) {
     if (error.message.includes('token')) {
       return ApiResponse.unauthorized(res, error.message);

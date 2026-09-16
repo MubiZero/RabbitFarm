@@ -106,11 +106,23 @@ class BreedsNotifier extends StateNotifier<BreedsState> {
     }
   }
 
+  /// Убрать породу из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `loadBreeds()`.
+  void removeBreed(int id) {
+    state = state.copyWith(
+      breeds: state.breeds.where((breed) => breed.id != id).toList(),
+    );
+  }
+
   /// Удалить породу
   Future<bool> deleteBreed(int id) async {
     try {
       await _repository.deleteBreed(id);
-      final updatedBreeds = state.breeds.where((breed) => breed.id != id).toList();
+      final updatedBreeds =
+          state.breeds.where((breed) => breed.id != id).toList();
 
       state = state.copyWith(breeds: updatedBreeds);
       return true;
@@ -127,7 +139,8 @@ class BreedsNotifier extends StateNotifier<BreedsState> {
 }
 
 /// Provider для StateNotifier пород
-final breedsProvider = StateNotifierProvider<BreedsNotifier, BreedsState>((ref) {
+final breedsProvider =
+    StateNotifierProvider<BreedsNotifier, BreedsState>((ref) {
   final repository = ref.watch(breedsRepositoryProvider);
   return BreedsNotifier(repository);
 });

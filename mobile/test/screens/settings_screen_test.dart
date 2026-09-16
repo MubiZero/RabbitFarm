@@ -24,7 +24,9 @@ UserModel _user({bool digestEnabled = true}) => UserModel(
 /// Профиль готов сразу, без сети — как в `farm_status_banner_test.dart`.
 class _FakeAuthRepository extends AuthRepository {
   _FakeAuthRepository(this.user, {this.updateFailure})
-      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()), storage: const FlutterSecureStorage());
+      : super(
+            apiClient: ApiClient(storage: const FlutterSecureStorage()),
+            storage: const FlutterSecureStorage());
 
   UserModel user;
   final Object? updateFailure;
@@ -77,6 +79,10 @@ void main() {
       await tester.pumpAndSettle();
 
       final switchFinder = _digestSwitch();
+      // Строки настроек рассчитаны на нажатие в перчатке (56dp), и на
+      // экране высотой 600 переключатель лежит ниже сгиба.
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
       expect(tester.widget<Switch>(switchFinder).value, isTrue);
 
       await tester.tap(switchFinder);
@@ -95,6 +101,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final switchFinder = _digestSwitch();
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
       await tester.tap(switchFinder);
       await tester.pumpAndSettle();
 

@@ -70,6 +70,12 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Чтобы записывать заметки голосом, а не набирать их в перчатках.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Чтобы превращать надиктованные заметки в текст записи.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Чтобы читать метку на клетке и снимать кроликов.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

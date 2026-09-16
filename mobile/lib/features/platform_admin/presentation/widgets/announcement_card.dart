@@ -130,8 +130,7 @@ class _ChannelLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final failed = delivery?.hasFailures ?? false;
-    final color =
-        failed ? AppColors.error : context.colors.onSurfaceVariant;
+    final color = failed ? AppColors.error : context.colors.onSurfaceVariant;
 
     final result = switch (delivery) {
       // Статистики нет только у записей, сделанных до её появления. Молчать об

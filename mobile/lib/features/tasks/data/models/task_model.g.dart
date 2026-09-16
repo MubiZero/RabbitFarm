@@ -36,6 +36,9 @@ _Task _$TaskFromJson(Map<String, dynamic> json) => _Task(
   author: json['creator'] == null
       ? null
       : UserRef.fromJson(json['creator'] as Map<String, dynamic>),
+  assignee: json['assignedTo'] == null
+      ? null
+      : UserRef.fromJson(json['assignedTo'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TaskToJson(_Task instance) => <String, dynamic>{
@@ -64,6 +67,7 @@ Map<String, dynamic> _$TaskToJson(_Task instance) => <String, dynamic>{
   'rabbit': instance.rabbit,
   'cage': instance.cage,
   'creator': instance.author,
+  'assignedTo': instance.assignee,
 };
 
 const _$TaskTypeEnumMap = {

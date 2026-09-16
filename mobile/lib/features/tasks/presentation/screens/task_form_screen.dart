@@ -5,6 +5,8 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../staff/data/models/staff_models.dart';
+import '../../../staff/presentation/providers/staff_provider.dart';
 import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
 import '../utils/task_labels.dart';
@@ -67,6 +69,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   late TaskPriority _priority;
   late DateTime _dueDate;
   TaskRepeat? _repeat;
+  int? _assignedTo;
 
   bool _touched = false;
 
@@ -85,6 +88,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _priority = _task?.priority ?? TaskPriority.medium;
     _dueDate = _task?.dueDate ?? DateTime.now().add(const Duration(days: 1));
     _repeat = TaskRepeat.fromValue(_task?.recurrenceRule);
+    _assignedTo = _task?.assignedTo;
 
     for (final c in [_title, _description, _notes]) {
       c.addListener(_markTouched);
@@ -122,6 +126,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             dueDate: _dueDate,
             rabbitId: _task!.rabbitId,
             cageId: _task!.cageId,
+            assignedTo: _assignedTo,
             isRecurring: _repeat != null,
             recurrenceRule: _repeat?.value,
             reminderBefore: _task!.reminderBefore,
@@ -137,6 +142,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             status: _status,
             priority: _priority,
             dueDate: _dueDate,
+            assignedTo: _assignedTo,
             isRecurring: _repeat != null,
             recurrenceRule: _repeat?.value,
             notes: _optional(_notes),
@@ -149,40 +155,46 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     }
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.taskFormDeleteTitle),
-        content: Text(context.l10n.taskFormDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.taskFormDeleted;
     final failed = context.l10n.taskFormDeleteFailed;
+    // Действия и список забираем сразу: запрос уйдёт уже после того, как
+    // экран закроется.
+    final actions = ref.read(taskActionsProvider);
+    final list = ref.read(tasksListProvider.notifier);
+    final taskId = _task!.id;
 
-    try {
-      await ref.read(taskActionsProvider).deleteTask(_task!.id);
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-      if (navigator.canPop()) navigator.pop();
-    } catch (_) {
+    list.removeTask(taskId);
+
+    var failedToDelete = false;
+    // Окно отмены открываем, пока форма ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму форму
+    // закрываем, не дожидаясь окна, — подсказка живёт выше экрана и переживёт
+    // его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.taskFormDeleted,
+      commit: () async {
+        try {
+          await actions.deleteTask(taskId);
+        } catch (_) {
+          failedToDelete = true;
+        }
+      },
+      onUndo: list.refresh,
+    );
+    if (navigator.canPop()) navigator.pop();
+    await pending;
+
+    if (failedToDelete) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await list.refresh();
     }
   }
 
@@ -195,9 +207,8 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ? context.l10n.taskFormEditTitle
           : context.l10n.taskFormNewTitle,
       formKey: _formKey,
-      submitLabel: _isEditing
-          ? context.l10n.commonSave
-          : context.l10n.taskFormCreate,
+      submitLabel:
+          _isEditing ? context.l10n.commonSave : context.l10n.taskFormCreate,
       successMessage: _isEditing
           ? context.l10n.taskFormUpdated
           : context.l10n.taskFormCreated,
@@ -306,6 +317,16 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   _touched = true;
                 }),
               ),
+            _AssigneeField(
+              value: _assignedTo,
+              // Имя из самой задачи: если исполнителя с фермы уже убрали,
+              // список его не вернёт, а показать, на ком дело висит, надо.
+              currentName: _task?.assignee?.fullName,
+              onChanged: (v) => setState(() {
+                _assignedTo = v;
+                _touched = true;
+              }),
+            ),
             DropdownButtonFormField<TaskRepeat?>(
               initialValue: _repeat,
               decoration: InputDecoration(
@@ -347,6 +368,92 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Кому поручено дело.
+///
+/// Показываем только тем, кто вправе видеть состав фермы: работнику сервер
+/// список людей не отдаёт (`GET /staff` — manager и owner), и выпадающий
+/// список у него всё равно остался бы пустым. Сам работник исполнителя себе
+/// не выбирает — задачу ему поручают.
+class _AssigneeField extends ConsumerWidget {
+  final int? value;
+  final String? currentName;
+  final ValueChanged<int?> onChanged;
+
+  const _AssigneeField({
+    required this.value,
+    required this.currentName,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(canProvider(FarmCapability.viewStaff))) {
+      return const SizedBox.shrink();
+    }
+
+    final members = ref.watch(farmMembersProvider);
+
+    return members.when(
+      // Пока состав едет, поле стоит на месте и не прыгает: показываем его
+      // недоступным с тем исполнителем, который уже записан.
+      loading: () => _dropdown(context, const [], enabled: false),
+      // Не приехал — прячем: выбор, который нечем наполнить, хуже отсутствия.
+      error: (_, __) => const SizedBox.shrink(),
+      data: (list) => _dropdown(
+        context,
+        [
+          for (final m in list)
+            if (m.isActive) m
+        ],
+      ),
+    );
+  }
+
+  Widget _dropdown(
+    BuildContext context,
+    List<FarmMember> members, {
+    bool enabled = true,
+  }) {
+    final known = members.any((m) => m.id == value);
+
+    return DropdownButtonFormField<int?>(
+      initialValue: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: context.l10n.taskFormAssignee,
+        prefixIcon: const Icon(Icons.person_outline),
+        helperText: context.l10n.taskFormAssigneeHelp,
+        helperMaxLines: 2,
+      ),
+      items: [
+        DropdownMenuItem(
+          value: null,
+          child: Text(context.l10n.taskFormAssigneeNobody),
+        ),
+        // Исполнитель, которого больше нет в составе: уволенный работник или
+        // ещё не приехавший список. Без этого пункта Dropdown не нашёл бы
+        // своего значения, а тихая подстановка «не назначен» стёрла бы
+        // поручение при первом же сохранении формы.
+        if (value != null && !known)
+          DropdownMenuItem(
+            value: value,
+            child: Text(currentName ?? context.l10n.taskFormAssignee),
+          ),
+        for (final member in members)
+          DropdownMenuItem(
+            value: member.id,
+            child: Text(
+              member.fullName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+      ],
+      onChanged: enabled ? onChanged : null,
     );
   }
 }

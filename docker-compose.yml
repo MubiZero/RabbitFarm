@@ -87,7 +87,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:?задайте JWT_SECRET в .env}
       - JWT_EXPIRE=15m
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?задайте JWT_REFRESH_SECRET в .env}
-      - JWT_REFRESH_EXPIRE=7d
+      - JWT_REFRESH_EXPIRE=90d
       # Список источников для браузера через запятую. Мобильные клиенты
       # ходят без Origin и под ограничение не попадают.
       - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:8080,http://localhost:3000}

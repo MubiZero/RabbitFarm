@@ -8,7 +8,18 @@ jest.mock('../../../src/models', () => ({
   User: { findAll: jest.fn() },
   Vaccination: { count: jest.fn() },
   Task: { findAll: jest.fn() },
-  Feed: { count: jest.fn() }
+  Feed: { count: jest.fn() },
+  Breeding: { findAll: jest.fn() },
+  Birth: {},
+  Rabbit: {},
+  Cage: {}
+}));
+// Счёт просроченных прививок переехал в общий помощник: он считает
+// кроликов, а не строки истории, и делает это запросом с подзапросом —
+// подменять здесь модель было бы подменой чужой логики.
+jest.mock('../../../src/utils/vaccinationDue', () => ({
+  overdueRabbits: jest.fn().mockResolvedValue(0),
+  upcomingRabbits: jest.fn().mockResolvedValue(0)
 }));
 jest.mock('../../../src/services/notificationService', () => ({
   sendToRoles: jest.fn(),
@@ -18,17 +29,27 @@ jest.mock('../../../src/utils/logger', () => ({
   info: jest.fn(), error: jest.fn(), warn: jest.fn()
 }));
 
-const { Farm, User, Vaccination, Task, Feed } = require('../../../src/models');
+const { NEST_BOX_BEFORE_BIRTH } = require('../../../src/utils/breedingCycle');
+const { Farm, User, Task, Feed, Breeding } = require('../../../src/models');
+const { overdueRabbits } = require('../../../src/utils/vaccinationDue');
+const logger = require('../../../src/utils/logger');
 const notificationService = require('../../../src/services/notificationService');
 const { runDigest } = require('../../../src/jobs/notificationDigestJob');
 
 describe('notificationDigestJob.runDigest', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    Vaccination.count.mockResolvedValue(0);
+    overdueRabbits.mockResolvedValue(0);
     Feed.count.mockResolvedValue(0);
     Task.findAll.mockResolvedValue([]);
+    Breeding.findAll.mockResolvedValue([]);
     User.findAll.mockResolvedValue([{ id: 10 }, { id: 11 }]);
+  });
+
+  // Обход ферм проглатывает исключения в logger.error, поэтому забытая
+  // модель в моке дала бы зелёный тест при полностью упавшем дайджесте.
+  afterEach(() => {
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('не рассылает дайджест мягко удалённым фермам — входить туда всё равно нельзя', async () => {
@@ -43,7 +64,7 @@ describe('notificationDigestJob.runDigest', () => {
 
   it('обходит все живые фермы и шлёт только тем, кто не выключил дайджест', async () => {
     Farm.findAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);
-    Vaccination.count.mockResolvedValue(3);
+    overdueRabbits.mockResolvedValue(3);
 
     await runDigest();
 
@@ -59,7 +80,7 @@ describe('notificationDigestJob.runDigest', () => {
 
   it('никого не выключивших дайджест — не шлёт вовсе, а не пустому списку', async () => {
     Farm.findAll.mockResolvedValue([{ id: 1 }]);
-    Vaccination.count.mockResolvedValue(3);
+    overdueRabbits.mockResolvedValue(3);
     User.findAll.mockResolvedValue([]);
 
     await runDigest();
@@ -77,7 +98,77 @@ describe('notificationDigestJob.runDigest', () => {
     await runDigest();
 
     expect(notificationService.sendToUsers).toHaveBeenCalledWith(1, [42], expect.objectContaining({
-      title: 'Просроченная задача'
+      i18n: expect.objectContaining({ key: 'taskOverdue' })
     }));
+
+    // Название задачи вычисляется на языке получателя уже при отправке:
+    // у автозадач в базе лежит только русский запасной вариант.
+    const [, , payload] = notificationService.sendToUsers.mock.calls[0];
+    expect(payload.i18n.params('ru')).toEqual({ task: 'Почистить клетку' });
+  });
+  describe('предупреждение о скором окроле', () => {
+    const femaleInCage = (number) => ({
+      id: 7,
+      name: 'Мушка',
+      tag_id: 'A-0231',
+      Cage: number === null ? null : { number }
+    });
+
+    it('зовёт поставить маточник и называет клетку, а не самку', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1 }]);
+      Breeding.findAll.mockResolvedValue([
+        { id: 99, female: femaleInCage('14'), Births: [] }
+      ]);
+
+      await runDigest();
+
+      // Текст собирается уже на языке получателя — джоб передаёт составные
+      // части, а не готовую русскую строку.
+      expect(notificationService.sendToUsers).toHaveBeenCalledWith(1, [10, 11], {
+        i18n: { key: 'kindlingSoon', params: { cageNumber: '14', femaleName: 'Мушка' } },
+        data: { type: 'kindling_soon', route: '/breeding/99' }
+      });
+    });
+
+    // Срок берётся из общей константы, а не переписывается числом: задача
+    // «поставить маточник» и этот пуш — одно и то же дело, и разъехавшись
+    // на сутки, они звали человека в разные дни.
+    it('спрашивает окролы ровно за столько дней, за сколько ставят маточник', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1 }]);
+
+      const expected = new Date();
+      expected.setDate(expected.getDate() + NEST_BOX_BEFORE_BIRTH);
+      const expectedDate = expected.toISOString().split('T')[0];
+
+      await runDigest();
+
+      expect(Breeding.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ expected_birth_date: expectedDate })
+      }));
+    });
+
+    it('молчит про самку, которая уже окотилась', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1 }]);
+      Breeding.findAll.mockResolvedValue([
+        { id: 99, female: femaleInCage('14'), Births: [{ id: 3 }] }
+      ]);
+
+      await runDigest();
+
+      expect(notificationService.sendToUsers).not.toHaveBeenCalled();
+    });
+
+    it('без клетки зовёт самку по кличке, а не молчит', async () => {
+      Farm.findAll.mockResolvedValue([{ id: 1 }]);
+      Breeding.findAll.mockResolvedValue([
+        { id: 99, female: femaleInCage(null), Births: [] }
+      ]);
+
+      await runDigest();
+
+      expect(notificationService.sendToUsers).toHaveBeenCalledWith(1, [10, 11], expect.objectContaining({
+        i18n: { key: 'kindlingSoon', params: { cageNumber: null, femaleName: 'Мушка' } }
+      }));
+    });
   });
 });

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/json/double_converter.dart';
 import '../../../../core/json/int_converter.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 
@@ -54,13 +55,30 @@ abstract class Vaccination with _$Vaccination {
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'vaccination_date') @DateOnlyConverter() required DateTime vaccinationDate,
-    @JsonKey(name: 'next_vaccination_date') @NullableDateOnlyConverter() DateTime? nextVaccinationDate,
+    @JsonKey(name: 'vaccination_date')
+    @DateOnlyConverter()
+    required DateTime vaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @NullableDateOnlyConverter()
+    DateTime? nextVaccinationDate,
     @JsonKey(name: 'batch_number') String? batchNumber,
     String? veterinarian,
+
+    /// Сколько стоила прививка.
+    ///
+    /// Не просто число в карточке: на него сервер заводит расход фермы —
+    /// ровно так же, как на стоимость лечения (`autoExpenseService`). Поля не
+    /// было в модели вовсе, поэтому приложение его не отправляло ни разу, и
+    /// готовая автоматика не срабатывала никогда. Прививки — статья, которая
+    /// на ферме повторяется каждый сезон.
+    @DoubleConverter() double? cost,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     // Related rabbit info (from API) - не сериализуем, создаем вручную
     /// Кролик, которого лечили или прививали.
     ///
@@ -88,6 +106,7 @@ class VaccinationRequest {
   final DateTime? nextVaccinationDate;
   final String? batchNumber;
   final String? veterinarian;
+  final double? cost;
   final String? notes;
 
   const VaccinationRequest({
@@ -98,6 +117,7 @@ class VaccinationRequest {
     this.nextVaccinationDate,
     this.batchNumber,
     this.veterinarian,
+    this.cost,
     this.notes,
   });
 
@@ -113,6 +133,10 @@ class VaccinationRequest {
           'batch_number': batchNumber,
         if (veterinarian != null && veterinarian!.isNotEmpty)
           'veterinarian': veterinarian,
+        // Ноль шлём наравне с числом: убранная стоимость должна снять и
+        // заведённый на неё расход, а пропущенное поле сервер понял бы как
+        // «не трогать» и оставил бы трату сиротой.
+        if (cost != null) 'cost': cost,
         if (notes != null && notes!.isNotEmpty) 'notes': notes,
       };
 }
@@ -153,7 +177,9 @@ abstract class UpcomingVaccinationItem with _$UpcomingVaccinationItem {
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     @JsonKey(name: 'vaccine_name') required String vaccineName,
     @JsonKey(name: 'vaccine_type') required VaccineType vaccineType,
-    @JsonKey(name: 'next_vaccination_date') @DateOnlyConverter() required DateTime nextVaccinationDate,
+    @JsonKey(name: 'next_vaccination_date')
+    @DateOnlyConverter()
+    required DateTime nextVaccinationDate,
     @JsonKey(name: 'days_until') required int daysUntil,
     @JsonKey(name: 'is_overdue') bool? isOverdue,
   }) = _UpcomingVaccinationItem;

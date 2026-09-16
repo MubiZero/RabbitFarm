@@ -54,4 +54,13 @@ async function sendAnnouncementEmail({ to, subject, text }) {
   return sendEmail({ to, subject, text });
 }
 
-module.exports = { sendLoginCodeEmail, sendAnnouncementEmail };
+/**
+ * Приглашение на ферму. Единственное письмо тому, у кого учётки ещё нет, —
+ * текст и заголовок приходят готовыми из `i18n/notifications`, на языке
+ * позвавшего.
+ */
+async function sendInvitationEmail({ to, subject, text }) {
+  return sendEmail({ to, subject, text });
+}
+
+module.exports = { sendLoginCodeEmail, sendAnnouncementEmail, sendInvitationEmail };

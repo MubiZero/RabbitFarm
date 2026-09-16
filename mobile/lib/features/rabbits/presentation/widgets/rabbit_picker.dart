@@ -105,9 +105,8 @@ class RabbitPickerField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FormField<RabbitModel>(
       initialValue: selected,
-      validator: (_) => required && _text == null
-          ? context.l10n.rabbitPickerRequired
-          : null,
+      validator: (_) =>
+          required && _text == null ? context.l10n.rabbitPickerRequired : null,
       builder: (field) => InkWell(
         borderRadius: AppRadius.mdAll,
         onTap: enabled
@@ -217,7 +216,8 @@ class _RabbitPickerSheetState extends ConsumerState<RabbitPickerSheet> {
       setState(() {
         _results = page.items
             .where((r) => r.id != widget.excludeId)
-            .where((r) => widget.excludeCageId == null ||
+            .where((r) =>
+                widget.excludeCageId == null ||
                 r.cageId != widget.excludeCageId)
             .toList();
         _loading = false;

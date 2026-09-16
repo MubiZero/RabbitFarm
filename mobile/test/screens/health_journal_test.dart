@@ -127,8 +127,8 @@ Future<void> _pumpJournal(
       // Право на ежедневные записи есть у всех трёх ролей, поэтому «роль без
       // права» изображается прямой подменой возможности.
       if (!canRecord)
-        canProvider.overrideWith((ref, capability) =>
-            capability != FarmCapability.recordDailyWork),
+        canProvider.overrideWith(
+            (ref, capability) => capability != FarmCapability.recordDailyWork),
       vaccinationsRepositoryProvider.overrideWithValue(
         _FakeVaccinationsRepository(vaccinations, error: error),
       ),

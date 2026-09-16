@@ -91,7 +91,8 @@ class SkeletonCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SkeletonBox(width: glyph, height: glyph, borderRadius: AppRadius.mdAll),
+          SkeletonBox(
+              width: glyph, height: glyph, borderRadius: AppRadius.mdAll),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(

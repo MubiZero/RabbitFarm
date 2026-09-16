@@ -35,7 +35,8 @@ class LocaleNotifier extends AsyncNotifier<Locale> {
     // держим русский всем подряд — это тот самый явный выбор, которого от
     // языкового переключателя ждут, просто с разумным стартовым значением.
     final deviceCode = PlatformDispatcher.instance.locale.languageCode;
-    final matches = supportedAppLocales.any((l) => l.languageCode == deviceCode);
+    final matches =
+        supportedAppLocales.any((l) => l.languageCode == deviceCode);
     return Locale(matches ? deviceCode : 'ru');
   }
 

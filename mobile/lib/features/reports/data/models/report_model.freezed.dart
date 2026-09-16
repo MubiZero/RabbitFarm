@@ -3979,7 +3979,12 @@ as String,
 /// @nodoc
 mixin _$PopulationData {
 
-@JsonKey(name: 'total_rabbits')@IntConverter() int get totalRabbits;@JsonKey(name: 'by_breed') List<BreedCount> get byBreed;
+@JsonKey(name: 'total_rabbits')@IntConverter() int get totalRabbits;@JsonKey(name: 'by_breed') List<BreedCount> get byBreed;/// Сколько кроликов на племя, сколько на мясо, сколько на продажу.
+///
+/// Назначение до сих пор жило одним фильтром списка: поле обязательное,
+/// заполняется на каждом кролике, а числа по нему не показывал ни один
+/// экран. Пусто у старого сервера — поэтому со значением по умолчанию.
+@JsonKey(name: 'by_purpose') List<PurposeCount> get byPurpose;
 /// Create a copy of PopulationData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3993,20 +3998,20 @@ $PopulationDataCopyWith<PopulationData> get copyWith => _$PopulationDataCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as PopulationData;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PopulationData&&(identical(other.totalRabbits, _this.totalRabbits) || other.totalRabbits == _this.totalRabbits)&&const DeepCollectionEquality().equals(other.byBreed, _this.byBreed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PopulationData&&(identical(other.totalRabbits, _this.totalRabbits) || other.totalRabbits == _this.totalRabbits)&&const DeepCollectionEquality().equals(other.byBreed, _this.byBreed)&&const DeepCollectionEquality().equals(other.byPurpose, _this.byPurpose));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PopulationData;
-  return Object.hash(runtimeType,_this.totalRabbits,const DeepCollectionEquality().hash(_this.byBreed));
+  return Object.hash(runtimeType,_this.totalRabbits,const DeepCollectionEquality().hash(_this.byBreed),const DeepCollectionEquality().hash(_this.byPurpose));
 }
 
 @override
 String toString() {
   final _this = this as PopulationData;
-  return 'PopulationData(totalRabbits: ${_this.totalRabbits}, byBreed: ${_this.byBreed})';
+  return 'PopulationData(totalRabbits: ${_this.totalRabbits}, byBreed: ${_this.byBreed}, byPurpose: ${_this.byPurpose})';
 }
 
 
@@ -4017,7 +4022,7 @@ abstract mixin class $PopulationDataCopyWith<$Res>  {
   factory $PopulationDataCopyWith(PopulationData value, $Res Function(PopulationData) _then) = _$PopulationDataCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'total_rabbits')@IntConverter() int totalRabbits,@JsonKey(name: 'by_breed') List<BreedCount> byBreed
+@JsonKey(name: 'total_rabbits')@IntConverter() int totalRabbits,@JsonKey(name: 'by_breed') List<BreedCount> byBreed,@JsonKey(name: 'by_purpose') List<PurposeCount> byPurpose
 });
 
 
@@ -4034,11 +4039,12 @@ class _$PopulationDataCopyWithImpl<$Res>
 
 /// Create a copy of PopulationData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalRabbits = null,Object? byBreed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalRabbits = null,Object? byBreed = null,Object? byPurpose = null,}) {
   return _then(PopulationData(
 totalRabbits: null == totalRabbits ? _self.totalRabbits : totalRabbits // ignore: cast_nullable_to_non_nullable
 as int,byBreed: null == byBreed ? _self.byBreed : byBreed // ignore: cast_nullable_to_non_nullable
-as List<BreedCount>,
+as List<BreedCount>,byPurpose: null == byPurpose ? _self.byPurpose : byPurpose // ignore: cast_nullable_to_non_nullable
+as List<PurposeCount>,
   ));
 }
 
@@ -4123,10 +4129,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed, @JsonKey(name: 'by_purpose')  List<PurposeCount> byPurpose)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PopulationData() when $default != null:
-return $default(_that.totalRabbits,_that.byBreed);case _:
+return $default(_that.totalRabbits,_that.byBreed,_that.byPurpose);case _:
   return orElse();
 
 }
@@ -4144,10 +4150,10 @@ return $default(_that.totalRabbits,_that.byBreed);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed, @JsonKey(name: 'by_purpose')  List<PurposeCount> byPurpose)  $default,) {final _that = this;
 switch (_that) {
 case _PopulationData():
-return $default(_that.totalRabbits,_that.byBreed);case _:
+return $default(_that.totalRabbits,_that.byBreed,_that.byPurpose);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -4164,10 +4170,10 @@ return $default(_that.totalRabbits,_that.byBreed);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'total_rabbits')@IntConverter()  int totalRabbits, @JsonKey(name: 'by_breed')  List<BreedCount> byBreed, @JsonKey(name: 'by_purpose')  List<PurposeCount> byPurpose)?  $default,) {final _that = this;
 switch (_that) {
 case _PopulationData() when $default != null:
-return $default(_that.totalRabbits,_that.byBreed);case _:
+return $default(_that.totalRabbits,_that.byBreed,_that.byPurpose);case _:
   return null;
 
 }
@@ -4179,7 +4185,7 @@ return $default(_that.totalRabbits,_that.byBreed);case _:
 @JsonSerializable()
 
 class _PopulationData implements PopulationData {
-  const _PopulationData({@JsonKey(name: 'total_rabbits')@IntConverter() required this.totalRabbits, @JsonKey(name: 'by_breed') required  List<BreedCount> byBreed}): _byBreed = byBreed;
+  const _PopulationData({@JsonKey(name: 'total_rabbits')@IntConverter() required this.totalRabbits, @JsonKey(name: 'by_breed') required  List<BreedCount> byBreed, @JsonKey(name: 'by_purpose')  List<PurposeCount> byPurpose = const []}): _byBreed = byBreed,_byPurpose = byPurpose;
   factory _PopulationData.fromJson(Map<String, dynamic> json) => _$PopulationDataFromJson(json);
 
 @override@JsonKey(name: 'total_rabbits')@IntConverter() final  int totalRabbits;
@@ -4188,6 +4194,23 @@ class _PopulationData implements PopulationData {
   if (_byBreed is EqualUnmodifiableListView) return _byBreed;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_byBreed);
+}
+
+/// Сколько кроликов на племя, сколько на мясо, сколько на продажу.
+///
+/// Назначение до сих пор жило одним фильтром списка: поле обязательное,
+/// заполняется на каждом кролике, а числа по нему не показывал ни один
+/// экран. Пусто у старого сервера — поэтому со значением по умолчанию.
+ final  List<PurposeCount> _byPurpose;
+/// Сколько кроликов на племя, сколько на мясо, сколько на продажу.
+///
+/// Назначение до сих пор жило одним фильтром списка: поле обязательное,
+/// заполняется на каждом кролике, а числа по нему не показывал ни один
+/// экран. Пусто у старого сервера — поэтому со значением по умолчанию.
+@override@JsonKey(name: 'by_purpose') List<PurposeCount> get byPurpose {
+  if (_byPurpose is EqualUnmodifiableListView) return _byPurpose;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_byPurpose);
 }
 
 
@@ -4204,18 +4227,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PopulationData&&(identical(other.totalRabbits, totalRabbits) || other.totalRabbits == totalRabbits)&&const DeepCollectionEquality().equals(other.byBreed, _byBreed));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PopulationData&&(identical(other.totalRabbits, totalRabbits) || other.totalRabbits == totalRabbits)&&const DeepCollectionEquality().equals(other.byBreed, _byBreed)&&const DeepCollectionEquality().equals(other.byPurpose, _byPurpose));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,totalRabbits,const DeepCollectionEquality().hash(_byBreed));
+    return Object.hash(runtimeType,totalRabbits,const DeepCollectionEquality().hash(_byBreed),const DeepCollectionEquality().hash(_byPurpose));
 }
 
 @override
 String toString() {
-    return 'PopulationData(totalRabbits: $totalRabbits, byBreed: $byBreed)';
+    return 'PopulationData(totalRabbits: $totalRabbits, byBreed: $byBreed, byPurpose: $byPurpose)';
 }
 
 
@@ -4226,7 +4249,7 @@ abstract mixin class _$PopulationDataCopyWith<$Res> implements $PopulationDataCo
   factory _$PopulationDataCopyWith(_PopulationData value, $Res Function(_PopulationData) _then) = __$PopulationDataCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'total_rabbits')@IntConverter() int totalRabbits,@JsonKey(name: 'by_breed') List<BreedCount> byBreed
+@JsonKey(name: 'total_rabbits')@IntConverter() int totalRabbits,@JsonKey(name: 'by_breed') List<BreedCount> byBreed,@JsonKey(name: 'by_purpose') List<PurposeCount> byPurpose
 });
 
 
@@ -4243,11 +4266,12 @@ class __$PopulationDataCopyWithImpl<$Res>
 
 /// Create a copy of PopulationData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalRabbits = null,Object? byBreed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalRabbits = null,Object? byBreed = null,Object? byPurpose = null,}) {
   return _then(_PopulationData(
 totalRabbits: null == totalRabbits ? _self.totalRabbits : totalRabbits // ignore: cast_nullable_to_non_nullable
 as int,byBreed: null == byBreed ? _self._byBreed : byBreed // ignore: cast_nullable_to_non_nullable
-as List<BreedCount>,
+as List<BreedCount>,byPurpose: null == byPurpose ? _self._byPurpose : byPurpose // ignore: cast_nullable_to_non_nullable
+as List<PurposeCount>,
   ));
 }
 
@@ -4520,6 +4544,279 @@ class __$BreedCountCopyWithImpl<$Res>
   return _then(_BreedCount(
 breedId: null == breedId ? _self.breedId : breedId // ignore: cast_nullable_to_non_nullable
 as int,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$PurposeCount {
+
+ String get purpose;@IntConverter() int get count;
+/// Create a copy of PurposeCount
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PurposeCountCopyWith<PurposeCount> get copyWith => _$PurposeCountCopyWithImpl<PurposeCount>(this as PurposeCount, _$identity);
+
+  /// Serializes this PurposeCount to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PurposeCount;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurposeCount&&(identical(other.purpose, _this.purpose) || other.purpose == _this.purpose)&&(identical(other.count, _this.count) || other.count == _this.count));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PurposeCount;
+  return Object.hash(runtimeType,_this.purpose,_this.count);
+}
+
+@override
+String toString() {
+  final _this = this as PurposeCount;
+  return 'PurposeCount(purpose: ${_this.purpose}, count: ${_this.count})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PurposeCountCopyWith<$Res>  {
+  factory $PurposeCountCopyWith(PurposeCount value, $Res Function(PurposeCount) _then) = _$PurposeCountCopyWithImpl;
+@useResult
+$Res call({
+ String purpose,@IntConverter() int count
+});
+
+
+
+
+}
+/// @nodoc
+class _$PurposeCountCopyWithImpl<$Res>
+    implements $PurposeCountCopyWith<$Res> {
+  _$PurposeCountCopyWithImpl(this._self, this._then);
+
+  final PurposeCount _self;
+  final $Res Function(PurposeCount) _then;
+
+/// Create a copy of PurposeCount
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? purpose = null,Object? count = null,}) {
+  return _then(PurposeCount(
+purpose: null == purpose ? _self.purpose : purpose // ignore: cast_nullable_to_non_nullable
+as String,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PurposeCount].
+extension PurposeCountPatterns on PurposeCount {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PurposeCount value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PurposeCount() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PurposeCount value)  $default,){
+final _that = this;
+switch (_that) {
+case _PurposeCount():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PurposeCount value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PurposeCount() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String purpose, @IntConverter()  int count)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PurposeCount() when $default != null:
+return $default(_that.purpose,_that.count);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String purpose, @IntConverter()  int count)  $default,) {final _that = this;
+switch (_that) {
+case _PurposeCount():
+return $default(_that.purpose,_that.count);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String purpose, @IntConverter()  int count)?  $default,) {final _that = this;
+switch (_that) {
+case _PurposeCount() when $default != null:
+return $default(_that.purpose,_that.count);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PurposeCount implements PurposeCount {
+  const _PurposeCount({required this.purpose, @IntConverter() required this.count});
+  factory _PurposeCount.fromJson(Map<String, dynamic> json) => _$PurposeCountFromJson(json);
+
+@override final  String purpose;
+@override@IntConverter() final  int count;
+
+/// Create a copy of PurposeCount
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PurposeCountCopyWith<_PurposeCount> get copyWith => __$PurposeCountCopyWithImpl<_PurposeCount>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PurposeCountToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PurposeCount&&(identical(other.purpose, purpose) || other.purpose == purpose)&&(identical(other.count, count) || other.count == count));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,purpose,count);
+}
+
+@override
+String toString() {
+    return 'PurposeCount(purpose: $purpose, count: $count)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PurposeCountCopyWith<$Res> implements $PurposeCountCopyWith<$Res> {
+  factory _$PurposeCountCopyWith(_PurposeCount value, $Res Function(_PurposeCount) _then) = __$PurposeCountCopyWithImpl;
+@override @useResult
+$Res call({
+ String purpose,@IntConverter() int count
+});
+
+
+
+
+}
+/// @nodoc
+class __$PurposeCountCopyWithImpl<$Res>
+    implements _$PurposeCountCopyWith<$Res> {
+  __$PurposeCountCopyWithImpl(this._self, this._then);
+
+  final _PurposeCount _self;
+  final $Res Function(_PurposeCount) _then;
+
+/// Create a copy of PurposeCount
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? purpose = null,Object? count = null,}) {
+  return _then(_PurposeCount(
+purpose: null == purpose ? _self.purpose : purpose // ignore: cast_nullable_to_non_nullable
+as String,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

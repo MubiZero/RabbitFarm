@@ -14,9 +14,13 @@ abstract class RabbitWeight with _$RabbitWeight {
     @IntConverter() required int id,
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @DoubleConverter() required double weight,
-    @JsonKey(name: 'measured_at') @DateTimeConverter() required DateTime measuredAt,
+    @JsonKey(name: 'measured_at')
+    @DateTimeConverter()
+    required DateTime measuredAt,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
   }) = _RabbitWeight;
 
   factory RabbitWeight.fromJson(Map<String, dynamic> json) =>
@@ -36,10 +40,10 @@ class AddWeightRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'weight': weight,
-    // Момент времени уходит в UTC: сервер хранит время именно так,
-    // а наивная местная строка записывалась со сдвигом на часовой пояс.
-    'measured_at': const DateTimeConverter().toJson(measuredAt),
-    if (notes != null) 'notes': notes,
-  };
+        'weight': weight,
+        // Момент времени уходит в UTC: сервер хранит время именно так,
+        // а наивная местная строка записывалась со сдвигом на часовой пояс.
+        'measured_at': const DateTimeConverter().toJson(measuredAt),
+        if (notes != null) 'notes': notes,
+      };
 }

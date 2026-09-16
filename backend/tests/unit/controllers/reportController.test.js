@@ -18,6 +18,13 @@ jest.mock('../../../src/models', () => {
     sequelize: mockSequelize
   };
 });
+// Счёт по прививкам переехал в общий помощник: он считает кроликов, а не
+// строки истории, и делает это запросом с подзапросом. Подменяется граница
+// помощника, а не модель под ним.
+jest.mock('../../../src/utils/vaccinationDue', () => ({
+  overdueRabbits: jest.fn(),
+  upcomingRabbits: jest.fn()
+}));
 // Потребление фермы против тарифа считает planService — здесь достаточно
 // мокнуть сам метод, не разбирая заново Plan/Farm/User на уровне моделей.
 jest.mock('../../../src/services/planService', () => ({
@@ -25,6 +32,7 @@ jest.mock('../../../src/services/planService', () => ({
 }));
 
 const { Rabbit, Cage, Vaccination, MedicalRecord, Feed, FeedingRecord, Transaction, Task, Breeding, Birth } = require('../../../src/models');
+const { overdueRabbits, upcomingRabbits } = require('../../../src/utils/vaccinationDue');
 const planService = require('../../../src/services/planService');
 const ctrl = require('../../../src/controllers/reportController');
 
@@ -46,6 +54,8 @@ const setAllMocksToEmpty = () => {
   Rabbit.count.mockResolvedValue(0);
   Cage.count.mockResolvedValue(0);
   Vaccination.count.mockResolvedValue(0);
+  overdueRabbits.mockResolvedValue(0);
+  upcomingRabbits.mockResolvedValue(0);
   Task.count.mockResolvedValue(0);
   Feed.count.mockResolvedValue(0);
   Birth.count.mockResolvedValue(0);
@@ -92,7 +102,8 @@ describe('reportController', () => {
       setAllMocksToEmpty();
       Rabbit.count.mockResolvedValue(10);
       Cage.count.mockResolvedValue(5);
-      Vaccination.count.mockResolvedValue(3);
+      overdueRabbits.mockResolvedValue(3);
+      upcomingRabbits.mockResolvedValue(3);
       Task.count.mockResolvedValue(2);
       Feed.count.mockResolvedValue(1);
       Birth.count.mockResolvedValue(2);
@@ -149,7 +160,7 @@ describe('reportController', () => {
 
       const counted = [
         ...Rabbit.count.mock.calls, ...Rabbit.findAll.mock.calls,
-        ...Cage.count.mock.calls, ...Vaccination.count.mock.calls,
+        ...Cage.count.mock.calls,
         ...Task.count.mock.calls, ...Feed.count.mock.calls,
         ...Birth.count.mock.calls, ...Birth.findAll.mock.calls
       ].map(([options]) => options.where);
@@ -157,7 +168,7 @@ describe('reportController', () => {
       // У Transaction.sum первым аргументом идёт поле, опции — вторым.
       const money = Transaction.sum.mock.calls.map(([, options]) => options.where);
 
-      expect(counted).toHaveLength(14);
+      expect(counted).toHaveLength(12);
       expect(money).toHaveLength(2);
       for (const where of [...counted, ...money]) {
         expect(where.farm_id).toBe(7);
@@ -245,10 +256,30 @@ describe('reportController', () => {
         ...FeedingRecord.findAll.mock.calls
       ];
 
-      expect(calls).toHaveLength(9);
+      // Число — не самоцель: оно ловит запрос, добавленный в отчёт мимо
+      // фильтра по ферме. Прибавился раздел — проверьте его `where` и
+      // поправьте число здесь.
+      expect(calls).toHaveLength(10);
       for (const [options] of calls) {
         expect(options.where.farm_id).toBe(7);
       }
+    });
+
+    // Разбивка по породам стоит на экране прямо под общим поголовьем. Пока она
+    // считала всех подряд, а поголовье — только живых, после первого года
+    // продаж два числа на одном экране противоречили друг другу.
+    it('считает породы по тем же живым, что и общее поголовье', async () => {
+      setAllMocksToEmpty();
+
+      await ctrl.getFarmReport(mockReq({ query: {} }), mockRes(), mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+
+      const [[byBreed]] = Rabbit.findAll.mock.calls;
+      const [[total]] = Rabbit.count.mock.calls;
+
+      expect(byBreed.where.status).toBeDefined();
+      expect(byBreed.where.status).toEqual(total.where.status);
     });
   });
 
@@ -536,6 +567,37 @@ describe('reportController', () => {
       await ctrl.getHealthReport(req, res, mockNext);
 
       expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    // Прививки и лечения — две плитки рядом под одним переключателем срока.
+    // Лечения отбирались только по ферме: «за месяц» рядом с прививками
+    // показывало число за всё время фермы.
+    it('считает лечения за тот же срок, что и прививки', async () => {
+      Vaccination.findAll.mockResolvedValue([]);
+      MedicalRecord.findAll.mockResolvedValue([]);
+
+      await ctrl.getHealthReport(
+        mockReq({ query: { from_date: '2024-01-01', to_date: '2024-12-31' } }),
+        mockRes(),
+        mockNext
+      );
+
+      expect(mockNext).not.toHaveBeenCalled();
+
+      const [[byOutcome]] = MedicalRecord.findAll.mock.calls;
+      const [[byType]] = Vaccination.findAll.mock.calls;
+
+      expect(byOutcome.where.started_at).toEqual(byType.where.vaccination_date);
+    });
+
+    it('без срока лечения считаются за всё время, как и прививки', async () => {
+      Vaccination.findAll.mockResolvedValue([]);
+      MedicalRecord.findAll.mockResolvedValue([]);
+
+      await ctrl.getHealthReport(mockReq({ query: {} }), mockRes(), mockNext);
+
+      const [[byOutcome]] = MedicalRecord.findAll.mock.calls;
+      expect(byOutcome.where.started_at).toBeUndefined();
     });
   });
 });

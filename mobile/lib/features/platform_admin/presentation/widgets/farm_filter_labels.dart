@@ -25,6 +25,7 @@ String farmFilterLabel(BuildContext context, PlatformFarmFilter filter) {
     // срез одним касанием; сервер это же значение подставляет по умолчанию,
     // если `days` не передан.
     PlatformFarmFilter.inactiveDays => l10n.platformFilterInactive(30),
+    PlatformFarmFilter.deleted => l10n.platformFilterDeleted,
   };
 }
 
@@ -35,6 +36,9 @@ Color? farmFilterColor(PlatformFarmFilter filter) => switch (filter) {
       PlatformFarmFilter.atLimit => AppColors.error,
       PlatformFarmFilter.suspended => AppColors.error,
       PlatformFarmFilter.expired => AppColors.warning,
+      // Удалённые фермы тревожны не сами по себе, а сроком: через 30 дней
+      // отменять будет нечего.
+      PlatformFarmFilter.deleted => AppColors.error,
       PlatformFarmFilter.noPlan => null,
       PlatformFarmFilter.inactiveDays => null,
     };

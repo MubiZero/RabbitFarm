@@ -257,7 +257,13 @@ describe('AuthService', () => {
       const user = await authService.getProfile(1);
       expect(user).toEqual(mockUser);
       expect(User.findByPk).toHaveBeenCalledWith(1, expect.objectContaining({
-        include: [{ model: Farm, as: 'farm', attributes: ['id', 'status'] }]
+        // Вместе со статусом доступа приезжает назначение хозяйства: форма
+        // нового кролика подставляет его, не спрашивая человека.
+        include: [{
+          model: Farm,
+          as: 'farm',
+          attributes: ['id', 'status', 'default_purpose']
+        }]
       }));
     });
 

@@ -58,17 +58,25 @@ abstract class Task with _$Task {
     required TaskStatus status,
     required TaskPriority priority,
     @JsonKey(name: 'due_date') @DateTimeConverter() required DateTime dueDate,
-    @JsonKey(name: 'completed_at') @NullableDateTimeConverter() DateTime? completedAt,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
     @JsonKey(name: 'created_by') @NullableIntConverter() int? createdBy,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
+    @JsonKey(name: 'reminder_before')
+    @NullableIntConverter()
+    int? reminderBefore,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     // Связи, которые сервер кладёт в ответ.
     //
     // Кролика и клетку задачи отдают урезанными — `['id','name','tag_id']` и
@@ -82,6 +90,12 @@ abstract class Task with _$Task {
     // Постановщик задачи. Приходит не отовсюду: в списке и в карточке есть,
     // а «ближайшие» и «отметить выполненной» его не прикладывают.
     @JsonKey(name: 'creator') UserRef? author,
+    // Исполнитель. Сервер кладёт его рядом с числовым `assigned_to` во все
+    // ответы по задачам, включая «ближайшие», — и шлёт исполнителю личный
+    // пуш при назначении. Раньше модель разбирала только число, поэтому имя
+    // человека, которому поручено дело, не показывал ни один экран: на ферме
+    // с работниками список задач не отвечал на вопрос «чьё это».
+    @JsonKey(name: 'assignedTo') UserRef? assignee,
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -102,7 +116,9 @@ abstract class TaskCreate with _$TaskCreate {
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
+    @JsonKey(name: 'reminder_before')
+    @NullableIntConverter()
+    int? reminderBefore,
     String? notes,
   }) = _TaskCreate;
 
@@ -120,13 +136,17 @@ abstract class TaskUpdate with _$TaskUpdate {
     TaskStatus? status,
     TaskPriority? priority,
     @JsonKey(name: 'due_date') @NullableDateTimeConverter() DateTime? dueDate,
-    @JsonKey(name: 'completed_at') @NullableDateTimeConverter() DateTime? completedAt,
+    @JsonKey(name: 'completed_at')
+    @NullableDateTimeConverter()
+    DateTime? completedAt,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
     @JsonKey(name: 'cage_id') @NullableIntConverter() int? cageId,
     @JsonKey(name: 'assigned_to') @NullableIntConverter() int? assignedTo,
     @JsonKey(name: 'is_recurring') bool? isRecurring,
     @JsonKey(name: 'recurrence_rule') String? recurrenceRule,
-    @JsonKey(name: 'reminder_before') @NullableIntConverter() int? reminderBefore,
+    @JsonKey(name: 'reminder_before')
+    @NullableIntConverter()
+    int? reminderBefore,
     String? notes,
   }) = _TaskUpdate;
 
@@ -139,13 +159,20 @@ abstract class TaskUpdate with _$TaskUpdate {
 abstract class TaskStatistics with _$TaskStatistics {
   const factory TaskStatistics({
     @JsonKey(name: 'total_pending') @IntConverter() required int totalPending,
-    @JsonKey(name: 'total_in_progress') @IntConverter() required int totalInProgress,
-    @JsonKey(name: 'total_completed') @IntConverter() required int totalCompleted,
-    @JsonKey(name: 'total_cancelled') @IntConverter() required int totalCancelled,
+    @JsonKey(name: 'total_in_progress')
+    @IntConverter()
+    required int totalInProgress,
+    @JsonKey(name: 'total_completed')
+    @IntConverter()
+    required int totalCompleted,
+    @JsonKey(name: 'total_cancelled')
+    @IntConverter()
+    required int totalCancelled,
     @JsonKey(name: 'overdue_count') @IntConverter() required int overdueCount,
     @JsonKey(name: 'today_count') @IntConverter() required int todayCount,
     @JsonKey(name: 'tasks_by_type') required List<TaskTypeCount> tasksByType,
-    @JsonKey(name: 'tasks_by_priority') required List<TaskPriorityCount> tasksByPriority,
+    @JsonKey(name: 'tasks_by_priority')
+    required List<TaskPriorityCount> tasksByPriority,
   }) = _TaskStatistics;
 
   factory TaskStatistics.fromJson(Map<String, dynamic> json) =>

@@ -16,7 +16,8 @@ class BreedingPlannerScreen extends ConsumerStatefulWidget {
   const BreedingPlannerScreen({super.key});
 
   @override
-  ConsumerState<BreedingPlannerScreen> createState() => _BreedingPlannerScreenState();
+  ConsumerState<BreedingPlannerScreen> createState() =>
+      _BreedingPlannerScreenState();
 }
 
 class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
@@ -53,7 +54,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                     Expanded(
                       child: Text(
                         context.l10n.plannerIntro,
-                        style: AppTypography.labelSm.copyWith(color: AppColors.accentOcean),
+                        style: AppTypography.labelSm
+                            .copyWith(color: AppColors.accentOcean),
                       ),
                     ),
                   ],
@@ -70,7 +72,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               icon: Icons.male,
               color: AppColors.accentOcean,
               selectedId: _selectedMaleId,
-              rabbits: rabbitsState.rabbits.where((r) => r.sex == 'male').toList(),
+              rabbits:
+                  rabbitsState.rabbits.where((r) => r.sex == 'male').toList(),
               onChanged: (id) {
                 setState(() {
                   _selectedMaleId = id;
@@ -91,7 +94,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               icon: Icons.female,
               color: AppColors.accentRose,
               selectedId: _selectedFemaleId,
-              rabbits: rabbitsState.rabbits.where((r) => r.sex == 'female').toList(),
+              rabbits:
+                  rabbitsState.rabbits.where((r) => r.sex == 'female').toList(),
               onChanged: (id) {
                 setState(() {
                   _selectedFemaleId = id;
@@ -120,11 +124,13 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                      Icon(Icons.error_outline,
+                          size: 48, color: AppColors.error),
                       const SizedBox(height: 16),
                       Text(
                         context.l10n.plannerAnalysisFailed,
-                        style: AppTypography.titleLg.copyWith(color: AppColors.error),
+                        style: AppTypography.titleLg
+                            .copyWith(color: AppColors.error),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -176,8 +182,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
               initialValue: selectedId,
               decoration: InputDecoration(
                 hintText: context.l10n.rabbitPickerTitle,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               items: rabbits.map<DropdownMenuItem<int>>((rabbit) {
                 return DropdownMenuItem(
@@ -246,7 +252,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 const SizedBox(height: 16),
                 Text(
                   context.l10n.plannerCoefficient,
-                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: AppTypography.bodyMd.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -255,7 +262,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(20),
@@ -268,7 +276,8 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                 const SizedBox(height: 8),
                 Text(
                   riskLevel.description,
-                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: AppTypography.bodyMd.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -317,8 +326,12 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
                             ),
                           ),
                           Text(
-                            context.l10n.plannerGenerations(ancestor.closestGeneration),
-                            style: AppTypography.labelSm.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            context.l10n
+                                .plannerGenerations(ancestor.closestGeneration),
+                            style: AppTypography.labelSm.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -409,7 +422,7 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(16),
-              ),
+            ),
             icon: const Icon(Icons.add),
             label: Text(
               context.l10n.plannerPlan,
@@ -447,8 +460,10 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
       final repository = ref.read(pedigreeRepositoryProvider);
 
       // Загружаем родословные обоих кроликов
-      final malePedigree = await repository.getPedigree(_selectedMaleId!, generations: 5);
-      final femalePedigree = await repository.getPedigree(_selectedFemaleId!, generations: 5);
+      final malePedigree =
+          await repository.getPedigree(_selectedMaleId!, generations: 5);
+      final femalePedigree =
+          await repository.getPedigree(_selectedFemaleId!, generations: 5);
 
       // Анализируем инбридинг
       final analysis = InbreedingAnalyzer.analyze(malePedigree, femalePedigree);

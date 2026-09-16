@@ -44,7 +44,11 @@ const updateMemberSchema = Joi.object({
 
 const listAuditQuerySchema = Joi.object({
   page: listQuery.page,
-  limit: listQuery.limit
+  limit: listQuery.limit,
+  // Какой срез журнала нужен: кадровые действия, удаление записей фермы или
+  // всё вместе. Разные экраны спрашивают разное — владелец в разделе
+  // «Работники» смотрит кадровое, в «Журнале» — удаления.
+  scope: Joi.string().valid('staff', 'data', 'all').default('all')
 });
 
 module.exports = {

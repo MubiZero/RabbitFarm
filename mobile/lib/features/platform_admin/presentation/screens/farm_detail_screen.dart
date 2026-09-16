@@ -13,6 +13,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
+import '../widgets/audit_entry_card.dart';
 import '../widgets/farm_delete_dialog.dart';
 import '../widgets/farm_extras_dialog.dart';
 import '../widgets/farm_impersonate_dialog.dart';
@@ -43,7 +44,8 @@ class FarmDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         // Пока ферма грузится, названия ещё нет — но и пустой заголовок
         // оставлять нельзя.
-        title: Text(value.value?.name ?? context.l10n.platformFarmTitleFallback),
+        title:
+            Text(value.value?.name ?? context.l10n.platformFarmTitleFallback),
       ),
       body: AppAsyncView<PlatformFarmDetail>(
         value: value,
@@ -102,8 +104,9 @@ class FarmDetailScreen extends ConsumerWidget {
                 title: context.l10n.platformFarmSectionExtras,
                 child: _ExtrasCard(
                   farm: farm,
-                  onEdit:
-                      farm.isDeleted ? null : () => _editExtras(context, ref, farm),
+                  onEdit: farm.isDeleted
+                      ? null
+                      : () => _editExtras(context, ref, farm),
                 ),
               ),
               _Section(
@@ -121,6 +124,12 @@ class FarmDetailScreen extends ConsumerWidget {
               _Section(
                 title: context.l10n.platformFarmSectionFacts,
                 child: _FactsCard(farm: farm),
+              ),
+              // Журнал именно этой фермы: вопрос «кто закрыл её и зачем»
+              // задают здесь, а не листая журнал всего сервиса.
+              _Section(
+                title: context.l10n.platformFarmSectionAudit,
+                child: _FarmAudit(farmId: farm.id),
               ),
               _Section(
                 title: context.l10n.platformFarmSectionExport,
@@ -170,13 +179,40 @@ class FarmDetailScreen extends ConsumerWidget {
     // Выбрали то же самое — запрос не нужен.
     if (choice == farm.status) return;
 
+    // Вернуть в «Работает как обычно» ферму с истёкшим тарифом можно, но
+    // ночная задача переведёт её обратно в `read_only` (planExpiryReminderJob)
+    // — и админ узнавал об этом наутро от самой фермы. Рычаг, который держит
+    // доступ, другой: продление тарифа.
+    final expiresAt = farm.planExpiresAt;
+    final revertsTonight = choice == 'active' &&
+        expiresAt != null &&
+        expiresAt.isBefore(DateTime.now());
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: Icon(farmStatusIcon(choice), color: farmStatusColor(context, choice)),
+        icon: Icon(farmStatusIcon(choice),
+            color: farmStatusColor(context, choice)),
         title: Text(l10n.platformFarmStatusConfirmTitle),
-        content: Text(
-          l10n.platformFarmStatusConfirmBody(farmStatusLabel(context, choice)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.platformFarmStatusConfirmBody(
+                farmStatusLabel(context, choice),
+              ),
+            ),
+            if (revertsTonight) ...[
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.platformFarmStatusExpiredWarning(
+                  DateFormat('d MMMM y', 'ru').format(expiresAt),
+                ),
+                style: TextStyle(color: AppColors.warning),
+              ),
+            ],
+          ],
         ),
         actions: [
           TextButton(
@@ -219,7 +255,8 @@ class FarmDetailScreen extends ConsumerWidget {
   ) async {
     final l10n = context.l10n;
 
-    final reason = await showFarmImpersonateDialog(context, farmName: farm.name);
+    final reason =
+        await showFarmImpersonateDialog(context, farmName: farm.name);
     if (reason == null || !context.mounted) return;
 
     final messenger = ScaffoldMessenger.of(context);
@@ -259,9 +296,10 @@ class FarmDetailScreen extends ConsumerWidget {
   ) async {
     final l10n = context.l10n;
     final now = DateTime.now();
-    final initial = farm.planExpiresAt != null && farm.planExpiresAt!.isAfter(now)
-        ? farm.planExpiresAt!
-        : now.add(const Duration(days: 30));
+    final initial =
+        farm.planExpiresAt != null && farm.planExpiresAt!.isAfter(now)
+            ? farm.planExpiresAt!
+            : now.add(const Duration(days: 30));
 
     final picked = await showDatePicker(
       context: context,
@@ -276,7 +314,8 @@ class FarmDetailScreen extends ConsumerWidget {
         .read(platformFarmDetailProvider(farm.id).notifier)
         .extendPlan(picked);
 
-    _report(messenger, l10n, error: error, success: l10n.platformFarmPlanExtended);
+    _report(messenger, l10n,
+        error: error, success: l10n.platformFarmPlanExtended);
   }
 
   Future<void> _editExtras(
@@ -293,9 +332,8 @@ class FarmDetailScreen extends ConsumerWidget {
     // Пустой выбор — это снятие поблажки, и сказать об этом надо именно так:
     // «обновлена» на снятие звучало бы как «что-то поменяли, а что — гадай».
     final cleared = choice.extraRabbits == null && choice.extraStaff == null;
-    final done = cleared
-        ? l10n.platformFarmExtrasCleared
-        : l10n.platformFarmExtrasSaved;
+    final done =
+        cleared ? l10n.platformFarmExtrasCleared : l10n.platformFarmExtrasSaved;
 
     final error = await ref
         .read(platformFarmDetailProvider(farm.id).notifier)
@@ -430,7 +468,8 @@ class _OwnerCard extends StatelessWidget {
         children: [
           Text(
             owner!.fullName,
-            style: AppTypography.titleMd.copyWith(color: context.colors.onSurface),
+            style:
+                AppTypography.titleMd.copyWith(color: context.colors.onSurface),
           ),
           const SizedBox(height: AppSpacing.sm),
           if (contacts.isEmpty)
@@ -604,7 +643,9 @@ class _PlanCard extends StatelessWidget {
               Icon(
                 Icons.event_outlined,
                 size: 16,
-                color: expired ? AppColors.warning : context.colors.onSurfaceVariant,
+                color: expired
+                    ? AppColors.warning
+                    : context.colors.onSurfaceVariant,
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -612,8 +653,10 @@ class _PlanCard extends StatelessWidget {
                   expires == null
                       ? l10n.platformFarmPlanForever
                       : expired
-                          ? l10n.platformFarmPlanExpired(_dayFormat.format(expires))
-                          : l10n.platformFarmPlanExpires(_dayFormat.format(expires)),
+                          ? l10n.platformFarmPlanExpired(
+                              _dayFormat.format(expires))
+                          : l10n.platformFarmPlanExpires(
+                              _dayFormat.format(expires)),
                   style: AppTypography.bodyMd.copyWith(
                     color: expired
                         ? AppColors.warning
@@ -748,8 +791,8 @@ class _UsageCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     context.l10n.platformAtLimit,
-                    style: AppTypography.labelSm
-                        .copyWith(color: AppColors.error),
+                    style:
+                        AppTypography.labelSm.copyWith(color: AppColors.error),
                   ),
                 ),
               ],
@@ -1104,8 +1147,85 @@ class _Muted extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: AppTypography.bodyMd
-          .copyWith(color: context.colors.onSurfaceVariant),
+      style:
+          AppTypography.bodyMd.copyWith(color: context.colors.onSurfaceVariant),
+    );
+  }
+}
+
+/// Что админы делали с этой фермой.
+///
+/// Первые несколько строк прямо на карточке, дальше — общий журнал: полный
+/// список с постраничной подгрузкой здесь был бы вторым бесконечным списком
+/// внутри карточки, которую и так листают.
+class _FarmAudit extends ConsumerWidget {
+  const _FarmAudit({required this.farmId});
+
+  final int farmId;
+
+  static const _preview = 5;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(platformFarmAuditProvider(farmId));
+    // Тарифы — чтобы смена тарифа читалась названием, а не номером. Не
+    // приехали — строка показывается как есть, ждать их незачем.
+    final plans = ref.watch(platformPlansProvider).value ?? const <Plan>[];
+
+    // Журнал не приехал — так и говорим. Пустой список здесь означал бы
+    // «админы эту ферму не трогали», а это утверждение, которого мы не знаем:
+    // молчание сети выдавать за молчание журнала нельзя.
+    if (state.error != null && state.items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                errorText(context.l10n, state.error!),
+                style: AppTypography.bodyMd
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+            ),
+            TextButton(
+              onPressed:
+                  ref.read(platformFarmAuditProvider(farmId).notifier).load,
+              child: Text(context.l10n.commonRetry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Text(
+          // Крутящийся кружок внутри карточки, которую и так листают, — лишнее
+          // движение; строка отличает «ещё смотрим» от «не трогали».
+          state.isLoading
+              ? context.l10n.platformFarmAuditLoading
+              : context.l10n.platformFarmAuditEmpty,
+          style: AppTypography.bodyMd
+              .copyWith(color: context.colors.onSurfaceVariant),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final entry in state.items.take(_preview))
+          AuditEntryCard(entry: entry, plans: plans),
+        if (state.total > _preview)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => context.push('/platform-admin?tab=audit'),
+              child: Text(context.l10n.platformFarmAuditAll),
+            ),
+          ),
+      ],
     );
   }
 }

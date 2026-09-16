@@ -3,15 +3,18 @@ import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../../../../core/api/api_failure.dart';
+import '../../../../core/api/paginated.dart';
+import '../../../../core/models/support_contact.dart';
+import '../models/support_request.dart';
 
-/// Обращение фермы в поддержку.
+/// Одна страница собственных обращений фермы.
+typedef SupportRequestsPage = ({List<SupportRequest> items, PageInfo page});
+
+/// Обращения фермы в поддержку — отправка и своя переписка.
 ///
 /// Доступно любой роли, включая ферму с закрытым доступом (`suspended`,
 /// `read_only`) — эндпоинт не проверяет статус хозяйства (см.
 /// `backend/src/middleware/auth.js`, `authenticateEvenIfFarmBlocked`).
-/// Своей истории обращений у фермы нет: отвечает поддержка тем же способом,
-/// каким связывалась бы и раньше, — читать список видит только платформенный
-/// админ (см. `PlatformAdminRepository.getSupportRequests`).
 class SupportRepository {
   final ApiClient _apiClient;
 
@@ -25,24 +28,39 @@ class SupportRepository {
     }
   }
 
+  /// Свои обращения, свежие сверху. Чужих ферма не видит — срез по хозяйству
+  /// делает сервер.
+  Future<SupportRequestsPage> list({int page = 1, int limit = 20}) async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.supportRequests,
+        queryParameters: {'page': page, 'limit': limit},
+      );
+
+      final data = response.data['data'];
+      final items = [
+        for (final item in itemsOf(data))
+          SupportRequest.fromJson(item as Map<String, dynamic>),
+      ];
+      return (
+        items: items,
+        page: PageInfo.of(data, fallbackCount: items.length),
+      );
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
   /// Официальный email/телефон поддержки, если платформенный админ их задал.
   /// Пустые поля — норма, не ошибка: контакт может быть не настроен.
   Future<SupportContact> getContact() async {
     try {
       final response = await _apiClient.get(ApiEndpoints.supportContact);
-      final data = response.data['data'] as Map<String, dynamic>;
-      return SupportContact(email: data['email'] as String?, phone: data['phone'] as String?);
+      return SupportContact.fromJson(
+        response.data['data'] as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
   }
-}
-
-class SupportContact {
-  final String? email;
-  final String? phone;
-
-  const SupportContact({this.email, this.phone});
-
-  bool get isEmpty => email == null && phone == null;
 }

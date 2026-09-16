@@ -10,9 +10,11 @@ const {
   Transaction,
   Photo,
   User,
+  Farm,
   sequelize
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
+const { closeAutoTasks } = require('./autoTaskService');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
 const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
@@ -30,6 +32,16 @@ class RabbitService {
    */
   async createRabbit(rabbitData) {
     await planService.assertRabbitLimit(rabbitData.farm_id);
+
+    // Назначение не прислали — берём то, что хозяйство назвало своим.
+    // Проставлять его в каждой карточке руками никто не станет: ферма
+    // обычно держит кроликов для чего-то одного.
+    if (!rabbitData.purpose) {
+      const farm = await Farm.findByPk(rabbitData.farm_id, {
+        attributes: ['default_purpose']
+      });
+      rabbitData.purpose = farm?.default_purpose || 'breeding';
+    }
 
     const transaction = await sequelize.transaction();
     try {
@@ -253,6 +265,39 @@ class RabbitService {
    * @param {Object} updateData - Data to update
    * @returns {Object} Updated rabbit
    */
+  /**
+   * Назначение сразу всему живому поголовью фермы.
+   *
+   * Большинство хозяйств держат кроликов для чего-то одного, и назначение на
+   * такой ферме — свойство хозяйства, а не двухсот отдельных карточек.
+   * Выставлять его по одному никто не станет, и поле оставалось тем, чем
+   * было: фильтром, который ничего не отбирает.
+   *
+   * Выбывших не трогаем: назначение проданного кролика — это запись о том,
+   * кем он был, и переписывать её задним числом незачем.
+   */
+  async setPurposeForAll(farmId, purpose) {
+    // Раз хозяйство выставило назначение всему поголовью, оно же и
+    // назначение хозяйства: следующий заведённый кролик получит его сам.
+    // Иначе фермер выставляет «мясо» двумстам кроликам и назавтра снова
+    // отвечает на тот же вопрос в форме двести первого.
+    await Farm.update({ default_purpose: purpose }, { where: { id: farmId } });
+
+    const [changed] = await Rabbit.update(
+      { purpose },
+      {
+        where: {
+          farm_id: farmId,
+          status: { [Op.notIn]: ['dead', 'sold'] },
+          purpose: { [Op.ne]: purpose }
+        }
+      }
+    );
+
+    logger.info('Bulk rabbit purpose set', { farmId, purpose, changed });
+    return changed;
+  }
+
   async updateRabbit(rabbitId, farmId, updateData) {
     const transaction = await sequelize.transaction();
     try {
@@ -324,6 +369,22 @@ class RabbitService {
         else if (!updateData.cage_id && rabbit.cage_id) updateData.cage_id = null;
       }
 
+      // Кролик выбыл — проставляем дату выбытия, если её не прислали.
+      //
+      // Поголовье в недельной сводке считается по датам, а не по статусу
+      // (`reportController`): кролик без `sold_date`/`death_date` остаётся в
+      // графике живым навсегда. Дату присылает форма продажи и форма падежа;
+      // когда статус меняют иначе, днём выбытия считаем сегодняшний — это
+      // ближе к правде, чем «не выбыл вовсе».
+      const TERMINAL_DATE = { sold: 'sold_date', dead: 'death_date' };
+      const terminalDate = TERMINAL_DATE[updateData.status];
+      if (terminalDate &&
+          updateData.status !== rabbit.status &&
+          !updateData[terminalDate] &&
+          !rabbit[terminalDate]) {
+        updateData[terminalDate] = new Date();
+      }
+
       // Check if father exists and is male
       if (updateData.father_id) {
         if (updateData.father_id === rabbitId) throw new Error('CANNOT_BE_OWN_FATHER');
@@ -383,6 +444,13 @@ class RabbitService {
       }
 
       await transaction.commit();
+
+      // Кролик выбыл — все заведённые сервером задачи по нему потеряли
+      // смысл: взвесить павшего или поставить маточник проданной самке
+      // никто не пойдёт, а в дайджест они уходили каждое утро.
+      if (['dead', 'sold'].includes(updateData.status)) {
+        await closeAutoTasks({ farmId, rabbitId: rabbit.id });
+      }
 
       if (oldPhotoUrl) {
         await deleteFile(oldPhotoUrl);

@@ -141,7 +141,12 @@ void main() {
         'rabbits_count': '48',
         'staff_count': '2',
         'owner': {'id': '10', 'full_name': 'Пётр Иванов', 'phone': '+992...'},
-        'plan': {'id': '1', 'name': 'Базовый', 'max_rabbits': 200, 'max_staff': 5},
+        'plan': {
+          'id': '1',
+          'name': 'Базовый',
+          'max_rabbits': 200,
+          'max_staff': 5
+        },
         'last_active': '2026-08-15T00:00:00.000Z',
       });
 
@@ -308,8 +313,8 @@ void main() {
     });
 
     test('поблажка без срока считается бессрочной', () {
-      final farm =
-          PlatformFarmDetail.fromJson(farmJson(extraStaff: 2, extrasUntil: null));
+      final farm = PlatformFarmDetail.fromJson(
+          farmJson(extraStaff: 2, extrasUntil: null));
 
       expect(farm.hasActiveExtras, isTrue);
       expect(farm.effectiveStaffLimit, 5);

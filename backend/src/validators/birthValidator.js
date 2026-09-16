@@ -43,6 +43,7 @@ const createBirthSchema = Joi.object({
 
   kits_born_alive: kitsCount.default(0),
   kits_born_dead: kitsCount.default(0),
+  kits_died: kitsCount.default(0),
 
   complications: Joi.string().max(2000).allow(null, ''),
   notes: Joi.string().max(2000).allow(null, '')
@@ -55,6 +56,7 @@ const updateBirthSchema = Joi.object({
   }),
   kits_born_alive: kitsCount,
   kits_born_dead: kitsCount,
+  kits_died: kitsCount,
   kits_weaned: kitsCount,
   weaning_date: Joi.date().allow(null).messages({
     'date.base': 'Неверная дата отсадки'

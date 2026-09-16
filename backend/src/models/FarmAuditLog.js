@@ -6,8 +6,9 @@ const { DataTypes } = require('sequelize');
  * только в `logger.info`, то есть в стдауте сервера: владелец не мог
  * посмотреть, кто и когда понизил работника, не имея доступа к серверу.
  *
- * Пишется хелпером `services/farmAuditService` из `staffService`, читается
- * через `GET /staff/audit`.
+ * Пишется хелпером `services/farmAuditService` — из `staffService` про
+ * кадровые действия и из хуков моделей про удаление записей фермы
+ * (`utils/deletionAudit`). Читается через `GET /staff/audit`.
  *
  * Неизменяемая запись: `updatedAt` нет, строку журнала не редактируют.
  * В отличие от `AdminAuditLog` (журнал платформенного админа, глобальный),
@@ -38,6 +39,21 @@ module.exports = (sequelize) => {
     action: {
       type: DataTypes.STRING(100),
       allowNull: false
+    },
+    // Над чем действовали, когда это не человек, а запись фермы: кролик,
+    // клетка, кормление. Подпись хранится строкой — после удаления сходить
+    // за ней уже некуда, а «удалён кролик №417» ничего не говорит.
+    entity_type: {
+      type: DataTypes.STRING(40),
+      allowNull: true
+    },
+    entity_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    entity_label: {
+      type: DataTypes.STRING(120),
+      allowNull: true
     },
     before: {
       type: DataTypes.JSON,

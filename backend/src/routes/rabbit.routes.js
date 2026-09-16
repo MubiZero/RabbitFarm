@@ -9,6 +9,7 @@ const {
   createRabbitSchema,
   updateRabbitSchema,
   listRabbitsQuerySchema,
+  bulkPurposeSchema,
   addWeightSchema
 } = require('../validators/rabbitValidator');
 const vaccinationController = require('../controllers/vaccinationController');
@@ -152,6 +153,23 @@ router.post(
   upload.single('photo'),
   validate(createRabbitSchema),
   rabbitController.create
+);
+
+/**
+ * @route   PATCH /api/v1/rabbits/purpose
+ * @desc    Назначение сразу всему живому поголовью фермы
+ * @access  Private (Owner only)
+ *
+ * Выше `/:id` намеренно: иначе `purpose` разобралось бы как идентификатор.
+ * Только владелец — это решение по хозяйству целиком, а не правка карточки:
+ * помощник, переписавший назначение двумстам кроликам, вернуть их сможет
+ * только по одному.
+ */
+router.patch(
+  '/purpose',
+  authorize(['owner']),
+  validate(bulkPurposeSchema),
+  rabbitController.setPurposeForAll
 );
 
 /**

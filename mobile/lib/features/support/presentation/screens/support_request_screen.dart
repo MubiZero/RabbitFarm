@@ -2,145 +2,90 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/models/support_contact.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../data/repositories/support_repository.dart';
+import '../../data/models/support_request.dart';
 import '../providers/support_provider.dart';
+import '../widgets/my_support_request_card.dart';
+import 'support_request_form_screen.dart';
 
-/// Написать в поддержку — одно поле, без темы и категории: выбирать раздел
-/// в форме на два поля означало бы заставить ферму классифицировать
-/// собственную проблему за поддержку (см. `supportRequestValidator.js`).
+/// Поддержка: свои обращения и ответы на них.
 ///
-/// Своей истории обращений экран не показывает: отвечает поддержка тем же
-/// способом, каким связывалась бы и раньше, — увидеть текст обращения после
-/// отправки можно только заново его вспомнив.
-class SupportRequestScreen extends ConsumerStatefulWidget {
+/// Раньше это была дорога в один конец — форма отправки и тишина: человек не
+/// узнавал ни что обращение приняли, ни что на него ответили. Теперь экран
+/// начинается с истории, а написать новое — кнопка, которая видна всегда:
+/// сюда приходят с поломкой, и лишний шаг до формы здесь дороже обычного.
+class SupportRequestScreen extends ConsumerWidget {
   const SupportRequestScreen({super.key});
 
-  @override
-  ConsumerState<SupportRequestScreen> createState() =>
-      _SupportRequestScreenState();
-}
-
-class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
-  static const _minLength = 10;
-  static const _maxLength = 2000;
-
-  final _text = TextEditingController();
-  bool _sending = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _text.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _text.dispose();
-    super.dispose();
-  }
-
-  bool get _isDirty => _text.text.trim().isNotEmpty;
-
-  bool get _isValid => _text.text.trim().length >= _minLength;
-
-  Future<void> _submit() async {
-    if (!_isValid || _sending) return;
-
-    setState(() => _sending = true);
-    final l10n = context.l10n;
-    final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-
-    Object? error;
-    try {
-      await ref.read(supportRepositoryProvider).create(_text.text.trim());
-    } catch (e) {
-      error = e;
+  Future<void> _compose(BuildContext context, WidgetRef ref) async {
+    final sent = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const SupportRequestFormScreen()),
+    );
+    if (sent == true) {
+      await ref.read(mySupportRequestsProvider.notifier).load();
     }
-    if (!mounted) return;
-    setState(() => _sending = false);
-
-    if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    messenger.showSnackBar(SnackBar(content: Text(l10n.supportRequestSent)));
-    if (navigator.canPop()) navigator.pop();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final state = ref.watch(mySupportRequestsProvider);
+    final notifier = ref.read(mySupportRequestsProvider.notifier);
     final contact = ref.watch(supportContactProvider).value;
 
-    return PopScope(
-      canPop: !_isDirty && !_sending,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop || _sending) return;
-        if (await confirmDiscardChanges(context) && context.mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(title: Text(l10n.supportRequestTitle)),
-        body: ListView(
-          padding: const EdgeInsets.all(AppSpacing.screenH),
-          children: [
-            Text(
-              l10n.supportRequestHint,
-              style: AppTypography.bodyMd
-                  .copyWith(color: context.colors.onSurfaceVariant),
+    final header = contact != null && !contact.isEmpty
+        ? Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.lg,
+              AppSpacing.screenH,
+              0,
             ),
-            if (contact != null && !contact.isEmpty) ...[
-              const SizedBox(height: AppSpacing.md),
-              _ContactCard(contact: contact),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-            TextField(
-              controller: _text,
-              enabled: !_sending,
-              maxLength: _maxLength,
-              minLines: 5,
-              maxLines: 10,
-              keyboardType: TextInputType.multiline,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                hintText: l10n.supportRequestPlaceholder,
-                alignLabelWithHint: true,
-                errorText: _text.text.isNotEmpty && !_isValid
-                    ? l10n.supportRequestTooShort
-                    : null,
-              ),
-            ),
-          ],
+            child: SupportContactCard(contact: contact),
+          )
+        : null;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.supportRequestTitle)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _compose(context, ref),
+        icon: const Icon(Icons.edit_outlined),
+        label: Text(l10n.supportRequestNew),
+      ),
+      body: PagedListView<SupportRequest>(
+        items: state.items,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
+        onRefresh: notifier.load,
+        onLoadMore: notifier.loadMore,
+        header: header,
+        empty: AppEmptyState(
+          icon: Icons.support_agent_outlined,
+          title: l10n.supportRequestsEmptyTitle,
+          subtitle: l10n.supportRequestsEmptyBody,
+          // Подпись длиннее, чем на круглой кнопке: посреди пустого экрана
+          // «Написать» без продолжения не говорит, кому пишут.
+          actionLabel: l10n.supportRequestsEmptyAction,
+          onAction: () => _compose(context, ref),
         ),
-        bottomNavigationBar: AppSubmitBar(
-          label: l10n.supportRequestSend,
-          busy: _sending,
-          onPressed: _isValid ? _submit : null,
-        ),
+        itemBuilder: (context, request, _) =>
+            MySupportRequestCard(request: request),
       ),
     );
   }
 }
 
-/// Официальный email/телефон поддержки — рядом с формой обращения, не
-/// вместо неё: платформенный админ мог их не задать, тогда карточка не
-/// показывается вовсе (см. `supportContactProvider`).
-class _ContactCard extends StatelessWidget {
+/// Официальный email/телефон поддержки — рядом с обращениями, не вместо них:
+/// платформенный админ мог их не задать, тогда карточка не показывается вовсе
+/// (см. `supportContactProvider`).
+class SupportContactCard extends StatelessWidget {
   final SupportContact contact;
 
-  const _ContactCard({required this.contact});
+  const SupportContactCard({super.key, required this.contact});
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +101,9 @@ class _ContactCard extends StatelessWidget {
         children: [
           Text(
             l10n.supportContactHint,
-            style: AppTypography.labelSm
-                .copyWith(color: context.colors.onSurfaceVariant),
+            style: AppTypography.labelSm.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           if (contact.phone != null)
@@ -170,7 +116,8 @@ class _ContactCard extends StatelessWidget {
             _ContactRow(
               icon: Icons.email_outlined,
               label: contact.email!,
-              onTap: () => launchUrl(Uri(scheme: 'mailto', path: contact.email)),
+              onTap: () =>
+                  launchUrl(Uri(scheme: 'mailto', path: contact.email)),
             ),
         ],
       ),
@@ -183,24 +130,33 @@ class _ContactRow extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ContactRow({required this.icon, required this.label, required this.onTap});
+  const _ContactRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.sm),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Container(
+        // Звонят и пишут в поддержку в тех же перчатках, что и работают с
+        // остальным приложением, — строка обязана держать общий минимум.
+        constraints: const BoxConstraints(minHeight: AppSizes.touchTarget),
+        alignment: Alignment.centerLeft,
         child: Row(
           children: [
-            Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+            Icon(icon, size: 18, color: context.colors.primary),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              label,
-              style: AppTypography.bodyMd.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                decoration: TextDecoration.underline,
+            Expanded(
+              child: Text(
+                label,
+                style: AppTypography.bodyMd.copyWith(
+                  color: context.colors.primary,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ],

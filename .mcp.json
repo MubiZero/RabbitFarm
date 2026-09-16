@@ -6,6 +6,14 @@
         "-y",
         "@upstash/context7-mcp"
       ]
+    },
+    "dart": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "dart",
+        "mcp-server"
+      ]
     }
   }
 }

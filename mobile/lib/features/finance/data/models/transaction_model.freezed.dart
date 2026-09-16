@@ -22,7 +22,14 @@ mixin _$Transaction {
 /// в transactionService.js), — и разбор в полную модель упал бы. Раньше
 /// связь просто выбрасывали: продажа конкретного кролика приходила с его
 /// именем, а в книге стояла безликая строка «Продажа кролика».
-@JsonKey(name: 'rabbit') RabbitRef? get rabbit;
+@JsonKey(name: 'rabbit') RabbitRef? get rabbit;/// Кто провёл операцию.
+///
+/// Сервер прикладывает автора к каждому ответу (`TRANSACTION_INCLUDE`), а
+/// книга денег его не показывала — числовой `created_by` ничего не
+/// говорит. Для фермы с наёмным управляющим «кто это записал» — главный
+/// вопрос к денежной странице, и ответ на него всё это время лежал в
+/// ответе неразобранным.
+@JsonKey(name: 'creator') UserRef? get author;
 /// Create a copy of Transaction
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -36,20 +43,20 @@ $TransactionCopyWith<Transaction> get copyWith => _$TransactionCopyWithImpl<Tran
 @override
 bool operator ==(Object other) {
   final _this = this as Transaction;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Transaction&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.transactionDate, _this.transactionDate) || other.transactionDate == _this.transactionDate)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.receiptUrl, _this.receiptUrl) || other.receiptUrl == _this.receiptUrl)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Transaction&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.transactionDate, _this.transactionDate) || other.transactionDate == _this.transactionDate)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.receiptUrl, _this.receiptUrl) || other.receiptUrl == _this.receiptUrl)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rabbit, _this.rabbit) || other.rabbit == _this.rabbit)&&(identical(other.author, _this.author) || other.author == _this.author));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Transaction;
-  return Object.hash(runtimeType,_this.id,_this.type,_this.category,_this.amount,_this.transactionDate,_this.rabbitId,_this.description,_this.receiptUrl,_this.createdBy,_this.createdAt,_this.updatedAt,_this.rabbit);
+  return Object.hash(runtimeType,_this.id,_this.type,_this.category,_this.amount,_this.transactionDate,_this.rabbitId,_this.description,_this.receiptUrl,_this.createdBy,_this.createdAt,_this.updatedAt,_this.rabbit,_this.author);
 }
 
 @override
 String toString() {
   final _this = this as Transaction;
-  return 'Transaction(id: ${_this.id}, type: ${_this.type}, category: ${_this.category}, amount: ${_this.amount}, transactionDate: ${_this.transactionDate}, rabbitId: ${_this.rabbitId}, description: ${_this.description}, receiptUrl: ${_this.receiptUrl}, createdBy: ${_this.createdBy}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit})';
+  return 'Transaction(id: ${_this.id}, type: ${_this.type}, category: ${_this.category}, amount: ${_this.amount}, transactionDate: ${_this.transactionDate}, rabbitId: ${_this.rabbitId}, description: ${_this.description}, receiptUrl: ${_this.receiptUrl}, createdBy: ${_this.createdBy}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rabbit: ${_this.rabbit}, author: ${_this.author})';
 }
 
 
@@ -60,11 +67,11 @@ abstract mixin class $TransactionCopyWith<$Res>  {
   factory $TransactionCopyWith(Transaction value, $Res Function(Transaction) _then) = _$TransactionCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, TransactionType type, TransactionCategory category,@DoubleConverter() double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit
+@IntConverter() int id, TransactionType type, TransactionCategory category,@DoubleConverter() double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'creator') UserRef? author
 });
 
 
-$RabbitRefCopyWith<$Res>? get rabbit;
+$RabbitRefCopyWith<$Res>? get rabbit;$UserRefCopyWith<$Res>? get author;
 
 }
 /// @nodoc
@@ -77,7 +84,7 @@ class _$TransactionCopyWithImpl<$Res>
 
 /// Create a copy of Transaction
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,Object? createdBy = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,Object? createdBy = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? author = freezed,}) {
   return _then(Transaction(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
@@ -91,7 +98,8 @@ as String?,createdBy: freezed == createdBy ? _self.createdBy : createdBy // igno
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable
-as RabbitRef?,
+as RabbitRef?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,
   ));
 }
 /// Create a copy of Transaction
@@ -105,6 +113,18 @@ $RabbitRefCopyWith<$Res>? get rabbit {
 
   return $RabbitRefCopyWith<$Res>(_self.rabbit!, (value) {
     return _then(_self.copyWith(rabbit: value));
+  });
+}/// Create a copy of Transaction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.author!, (value) {
+    return _then(_self.copyWith(author: value));
   });
 }
 }
@@ -188,10 +208,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'creator')  UserRef? author)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Transaction() when $default != null:
-return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit);case _:
+return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit,_that.author);case _:
   return orElse();
 
 }
@@ -209,10 +229,10 @@ return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactio
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'creator')  UserRef? author)  $default,) {final _that = this;
 switch (_that) {
 case _Transaction():
-return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit);case _:
+return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit,_that.author);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -229,10 +249,10 @@ return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactio
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  TransactionType type,  TransactionCategory category, @DoubleConverter()  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter()  int? createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter()  DateTime? createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter()  DateTime? updatedAt, @JsonKey(name: 'rabbit')  RabbitRef? rabbit, @JsonKey(name: 'creator')  UserRef? author)?  $default,) {final _that = this;
 switch (_that) {
 case _Transaction() when $default != null:
-return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit);case _:
+return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl,_that.createdBy,_that.createdAt,_that.updatedAt,_that.rabbit,_that.author);case _:
   return null;
 
 }
@@ -244,7 +264,7 @@ return $default(_that.id,_that.type,_that.category,_that.amount,_that.transactio
 @JsonSerializable()
 
 class _Transaction implements Transaction {
-  const _Transaction({@IntConverter() required this.id, required this.type, required this.category, @DoubleConverter() required this.amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter() required this.transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, this.description, @JsonKey(name: 'receipt_url') this.receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter() this.createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, @JsonKey(name: 'rabbit') this.rabbit});
+  const _Transaction({@IntConverter() required this.id, required this.type, required this.category, @DoubleConverter() required this.amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter() required this.transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, this.description, @JsonKey(name: 'receipt_url') this.receiptUrl, @JsonKey(name: 'created_by')@NullableIntConverter() this.createdBy, @JsonKey(name: 'created_at')@NullableDateTimeConverter() this.createdAt, @JsonKey(name: 'updated_at')@NullableDateTimeConverter() this.updatedAt, @JsonKey(name: 'rabbit') this.rabbit, @JsonKey(name: 'creator') this.author});
   factory _Transaction.fromJson(Map<String, dynamic> json) => _$TransactionFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -265,6 +285,14 @@ class _Transaction implements Transaction {
 /// связь просто выбрасывали: продажа конкретного кролика приходила с его
 /// именем, а в книге стояла безликая строка «Продажа кролика».
 @override@JsonKey(name: 'rabbit') final  RabbitRef? rabbit;
+/// Кто провёл операцию.
+///
+/// Сервер прикладывает автора к каждому ответу (`TRANSACTION_INCLUDE`), а
+/// книга денег его не показывала — числовой `created_by` ничего не
+/// говорит. Для фермы с наёмным управляющим «кто это записал» — главный
+/// вопрос к денежной странице, и ответ на него всё это время лежал в
+/// ответе неразобранным.
+@override@JsonKey(name: 'creator') final  UserRef? author;
 
 /// Create a copy of Transaction
 /// with the given fields replaced by the non-null parameter values.
@@ -279,18 +307,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Transaction&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.description, description) || other.description == description)&&(identical(other.receiptUrl, receiptUrl) || other.receiptUrl == receiptUrl)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Transaction&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.description, description) || other.description == description)&&(identical(other.receiptUrl, receiptUrl) || other.receiptUrl == receiptUrl)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rabbit, rabbit) || other.rabbit == rabbit)&&(identical(other.author, author) || other.author == author));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,type,category,amount,transactionDate,rabbitId,description,receiptUrl,createdBy,createdAt,updatedAt,rabbit);
+    return Object.hash(runtimeType,id,type,category,amount,transactionDate,rabbitId,description,receiptUrl,createdBy,createdAt,updatedAt,rabbit,author);
 }
 
 @override
 String toString() {
-    return 'Transaction(id: $id, type: $type, category: $category, amount: $amount, transactionDate: $transactionDate, rabbitId: $rabbitId, description: $description, receiptUrl: $receiptUrl, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit)';
+    return 'Transaction(id: $id, type: $type, category: $category, amount: $amount, transactionDate: $transactionDate, rabbitId: $rabbitId, description: $description, receiptUrl: $receiptUrl, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, rabbit: $rabbit, author: $author)';
 }
 
 
@@ -301,11 +329,11 @@ abstract mixin class _$TransactionCopyWith<$Res> implements $TransactionCopyWith
   factory _$TransactionCopyWith(_Transaction value, $Res Function(_Transaction) _then) = __$TransactionCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, TransactionType type, TransactionCategory category,@DoubleConverter() double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit
+@IntConverter() int id, TransactionType type, TransactionCategory category,@DoubleConverter() double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl,@JsonKey(name: 'created_by')@NullableIntConverter() int? createdBy,@JsonKey(name: 'created_at')@NullableDateTimeConverter() DateTime? createdAt,@JsonKey(name: 'updated_at')@NullableDateTimeConverter() DateTime? updatedAt,@JsonKey(name: 'rabbit') RabbitRef? rabbit,@JsonKey(name: 'creator') UserRef? author
 });
 
 
-@override $RabbitRefCopyWith<$Res>? get rabbit;
+@override $RabbitRefCopyWith<$Res>? get rabbit;@override $UserRefCopyWith<$Res>? get author;
 
 }
 /// @nodoc
@@ -318,7 +346,7 @@ class __$TransactionCopyWithImpl<$Res>
 
 /// Create a copy of Transaction
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,Object? createdBy = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,Object? createdBy = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rabbit = freezed,Object? author = freezed,}) {
   return _then(_Transaction(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
@@ -332,7 +360,8 @@ as String?,createdBy: freezed == createdBy ? _self.createdBy : createdBy // igno
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,rabbit: freezed == rabbit ? _self.rabbit : rabbit // ignore: cast_nullable_to_non_nullable
-as RabbitRef?,
+as RabbitRef?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserRef?,
   ));
 }
 
@@ -347,6 +376,18 @@ $RabbitRefCopyWith<$Res>? get rabbit {
 
   return $RabbitRefCopyWith<$Res>(_self.rabbit!, (value) {
     return _then(_self.copyWith(rabbit: value));
+  });
+}/// Create a copy of Transaction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserRefCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserRefCopyWith<$Res>(_self.author!, (value) {
+    return _then(_self.copyWith(author: value));
   });
 }
 }

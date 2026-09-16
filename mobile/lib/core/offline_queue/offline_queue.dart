@@ -9,21 +9,36 @@ import '../cache/list_cache.dart';
 import '../error/error_handling.dart';
 import '../providers/connectivity.dart';
 import '../providers/session.dart';
+import '../../features/breeding/presentation/providers/breeding_provider.dart';
 import '../../features/feeding/presentation/providers/feeding_records_provider.dart';
 import '../../features/feeding/presentation/providers/feeds_provider.dart';
 import '../../features/home/presentation/providers/journal_provider.dart';
 import '../../features/notes/data/models/note_model.dart';
 import '../../features/notes/presentation/providers/notes_provider.dart';
+import '../../features/rabbits/data/repositories/births_repository.dart';
+import '../../features/rabbits/presentation/providers/births_provider.dart';
+import '../../features/rabbits/presentation/providers/rabbits_provider.dart';
 import '../../features/tasks/presentation/providers/tasks_provider.dart';
 
 /// Действие из `FarmCapability.recordDailyWork`, отложенное до появления сети.
 ///
-/// Кормление, отметка задачи и заметка — операции добавления: одна ферма,
-/// низкий риск конфликта. Поэтому и разрешение при повторной отправке
-/// простое — запись уходит как есть, без слияния с тем, что могло случиться
-/// на сервере за это время (CRDT было бы оверинжинирингом для этого
-/// масштаба).
-enum OfflineActionType { feedingRecord, taskComplete, note }
+/// Все они — операции добавления: одна ферма, низкий риск конфликта. Поэтому
+/// и разрешение при повторной отправке простое — запись уходит как есть, без
+/// слияния с тем, что могло случиться на сервере за это время (CRDT было бы
+/// оверинжинирингом для этого масштаба).
+///
+/// Окрол и случка попали сюда позже остальных и по самой прямой причине:
+/// именно за ними человек достаёт телефон, стоя между клетками, где связи
+/// обычно и нет. Записывать их приходится там, где стоишь, а не там, где
+/// ловит.
+enum OfflineActionType {
+  feedingRecord,
+  taskComplete,
+  note,
+  birth,
+  breeding,
+  rabbitDeath,
+}
 
 /// Одно отложенное действие на диске.
 class OfflineQueueItem {
@@ -51,11 +66,11 @@ class OfflineQueueItem {
       );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'type': type.name,
-    'payload': payload,
-    'queued_at': queuedAt.toIso8601String(),
-  };
+        'id': id,
+        'type': type.name,
+        'payload': payload,
+        'queued_at': queuedAt.toIso8601String(),
+      };
 }
 
 /// Хранилище очереди на диске.
@@ -77,13 +92,13 @@ Map<String, dynamic> _itemToJson(OfflineQueueItem item) => item.toJson();
 /// Очередь действий, накопленных без связи, и их отправка.
 final offlineQueueProvider =
     StateNotifierProvider<OfflineQueueController, List<OfflineQueueItem>>((
-      ref,
-    ) {
-      // Сменился пользователь — пересоздаём контроллер с новым scope, иначе он
-      // продолжил бы читать/писать очередь предыдущего аккаунта.
-      ref.watch(sessionRevisionProvider);
-      return OfflineQueueController(ref, ref.read(cacheScopeProvider));
-    });
+  ref,
+) {
+  // Сменился пользователь — пересоздаём контроллер с новым scope, иначе он
+  // продолжил бы читать/писать очередь предыдущего аккаунта.
+  ref.watch(sessionRevisionProvider);
+  return OfflineQueueController(ref, ref.read(cacheScopeProvider));
+});
 
 /// Итог одной попытки отправить элемент очереди.
 enum _SendResult {
@@ -186,6 +201,12 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
           await _sendTaskComplete(item.payload);
         case OfflineActionType.note:
           await _sendNote(item.payload);
+        case OfflineActionType.birth:
+          await _sendBirth(item.payload);
+        case OfflineActionType.breeding:
+          await _sendBreeding(item.payload);
+        case OfflineActionType.rabbitDeath:
+          await _sendRabbitDeath(item.payload);
       }
       return _SendResult.done;
     } catch (e, stack) {
@@ -204,9 +225,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
       (e.kind == ApiFailureKind.offline || e.kind == ApiFailureKind.timeout);
 
   Future<void> _sendFeedingRecord(Map<String, dynamic> payload) async {
-    await _ref
-        .read(feedingRecordsRepositoryProvider)
-        .createFeedingRecordsBulk(
+    await _ref.read(feedingRecordsRepositoryProvider).createFeedingRecordsBulk(
           feedId: payload['feed_id'] as int,
           quantityPerRecipient: (payload['quantity'] as num).toDouble(),
           fedAt: DateTime.parse(payload['fed_at'] as String),
@@ -238,6 +257,41 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
         .read(notesRepositoryProvider)
         .createNote(NoteCreate.fromJson(payload));
     if (!mounted) return;
+    _ref.invalidate(journalFeedProvider);
+  }
+
+  /// Карточки крольчат отсюда не заводятся: их диалогу нужен окрол с уже
+  /// присвоенным сервером id, а человек давно ушёл с той формы. Список
+  /// окролов после отправки покажет запись, и завести их можно оттуда.
+  Future<void> _sendBirth(Map<String, dynamic> payload) async {
+    await _ref.read(birthsRepositoryProvider).createBirth(payload);
+    if (!mounted) return;
+    // Именно invalidate, а не `notifier.loadBirths()`: очередь досылает
+    // записи фоном, и списка окролов на экране может не быть вовсе —
+    // поднимать его ради обновления значило бы создать провайдер, который
+    // никто не слушает. Открытый экран перечитает себя сам.
+    _ref.invalidate(birthsProvider);
+    _ref.invalidate(journalFeedProvider);
+  }
+
+  Future<void> _sendBreeding(Map<String, dynamic> payload) async {
+    await _ref.read(breedingRepositoryProvider).createBreeding(payload);
+    if (!mounted) return;
+    _ref.invalidate(breedingListProvider);
+    _ref.invalidate(journalFeedProvider);
+  }
+
+  /// Падёж — единственное здесь изменение существующей записи, а не новая.
+  /// Конфликта это не добавляет: смерть — состояние окончательное, и вторая
+  /// такая же отметка поверх первой ничего не портит.
+  Future<void> _sendRabbitDeath(Map<String, dynamic> payload) async {
+    final id = payload['rabbit_id'] as int;
+    final data = Map<String, dynamic>.from(payload)..remove('rabbit_id');
+
+    await _ref.read(rabbitsRepositoryProvider).updateRabbit(id, data);
+    if (!mounted) return;
+    _ref.invalidate(rabbitsListProvider);
+    _ref.invalidate(rabbitDetailProvider(id));
     _ref.invalidate(journalFeedProvider);
   }
 }

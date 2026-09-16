@@ -37,8 +37,7 @@ class PinRepository {
   Future<bool> wasDeclined() async =>
       await _storage.read(key: _declinedKey) == '1';
 
-  Future<void> markDeclined() =>
-      _storage.write(key: _declinedKey, value: '1');
+  Future<void> markDeclined() => _storage.write(key: _declinedKey, value: '1');
 
   Future<void> setPin(String pin) async {
     final salt = _generateSalt();

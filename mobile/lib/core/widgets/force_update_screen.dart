@@ -29,7 +29,8 @@ class ForceUpdateScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.system_update_outlined, size: 72, color: colors.primary),
+                Icon(Icons.system_update_outlined,
+                    size: 72, color: colors.primary),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   context.l10n.forceUpdateTitle,
@@ -39,7 +40,8 @@ class ForceUpdateScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   context.l10n.forceUpdateHint,
-                  style: AppTypography.bodyMd.copyWith(color: colors.onSurfaceVariant),
+                  style: AppTypography.bodyMd
+                      .copyWith(color: colors.onSurfaceVariant),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.lg),

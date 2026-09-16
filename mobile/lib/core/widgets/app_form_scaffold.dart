@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
 import '../l10n/l10n_context.dart';
+import 'app_slide_to_confirm.dart';
 import '../l10n/error_text.dart';
 
 /// Каркас экрана-формы: заголовок, прокручиваемые поля и кнопка сохранения,
@@ -41,6 +42,13 @@ class AppFormScaffold extends StatefulWidget {
 
   final List<Widget>? actions;
 
+  /// Подтверждать сдвигом, а не нажатием.
+  ///
+  /// Для форм, чью запись не отменить: отметку падежа ставят у клетки, в
+  /// перчатке, и случайное касание кнопки внизу экрана там — обычное дело.
+  /// Сдвиг пальцем случайно не происходит.
+  final bool confirmBySlide;
+
   const AppFormScaffold({
     super.key,
     required this.title,
@@ -51,6 +59,7 @@ class AppFormScaffold extends StatefulWidget {
     required this.successMessage,
     this.isDirty,
     this.actions,
+    this.confirmBySlide = false,
   });
 
   @override
@@ -123,6 +132,7 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
           label: widget.submitLabel,
           busy: _submitting,
           onPressed: _submit,
+          slide: widget.confirmBySlide,
         ),
       ),
     );
@@ -141,11 +151,15 @@ class AppSubmitBar extends StatelessWidget {
   /// что заполнено ещё не всё, до попытки отправки.
   final VoidCallback? onPressed;
 
+  /// Подтверждение сдвигом вместо нажатия — см. `AppFormScaffold.confirmBySlide`.
+  final bool slide;
+
   const AppSubmitBar({
     super.key,
     required this.label,
     required this.onPressed,
     this.busy = false,
+    this.slide = false,
   });
 
   @override
@@ -162,19 +176,25 @@ class AppSubmitBar extends StatelessWidget {
           AppSpacing.screenH,
           AppSpacing.md,
         ),
-        child: FilledButton(
-          onPressed: busy ? null : onPressed,
-          child: busy
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(label),
-        ),
+        child: slide && !busy && onPressed != null
+            ? AppSlideToConfirm(
+                label: label,
+                color: context.colors.primary,
+                onConfirmed: onPressed!,
+              )
+            : FilledButton(
+                onPressed: busy ? null : onPressed,
+                child: busy
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(label),
+              ),
       ),
     );
   }

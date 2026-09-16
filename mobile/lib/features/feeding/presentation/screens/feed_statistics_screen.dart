@@ -66,24 +66,19 @@ class FeedStatisticsScreen extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: StatTile(
-                  icon: Icons.inventory_2_outlined,
-                  label: context.l10n.feedStatsPositions,
-                  value: '${stats.totalFeeds}',
-                  accent: AppColors.accentOcean,
-                ),
+          StatTileRow(
+            tiles: [
+              StatTile(
+                icon: Icons.inventory_2_outlined,
+                label: context.l10n.feedStatsPositions,
+                value: '${stats.totalFeeds}',
+                accent: AppColors.accentOcean,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatTile(
-                  icon: Icons.warning_amber_rounded,
-                  label: context.l10n.feedStatsLow,
-                  value: '${stats.lowStockCount}',
-                  accent: hasLowStock ? AppColors.warning : AppColors.success,
-                ),
+              StatTile(
+                icon: Icons.warning_amber_rounded,
+                label: context.l10n.feedStatsLow,
+                value: '${stats.lowStockCount}',
+                accent: hasLowStock ? AppColors.warning : AppColors.success,
               ),
             ],
           ),
@@ -104,8 +99,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                       Text(
                         context.l10n.feedStatsValue,
                         style: AppTypography.labelSm.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -181,7 +175,6 @@ class FeedStatisticsScreen extends ConsumerWidget {
   }
 }
 
-
 class _LowStockRow extends StatelessWidget {
   final LowStockItem item;
 
@@ -191,7 +184,8 @@ class _LowStockRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     // Доля от минимального остатка: чем короче полоса, тем срочнее закупка.
-    final fraction = item.minStock <= 0 ? 1.0 : item.currentStock / item.minStock;
+    final fraction =
+        item.minStock <= 0 ? 1.0 : item.currentStock / item.minStock;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -225,14 +219,15 @@ class _LowStockRow extends StatelessWidget {
                     value: fraction.clamp(0.0, 1.0),
                     minHeight: 6,
                     backgroundColor: cs.surfaceContainerHighest,
-                    valueColor:
-                        const AlwaysStoppedAnimation(AppColors.warning),
+                    valueColor: const AlwaysStoppedAnimation(AppColors.warning),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Text(
-                context.l10n.feedStatsMinimum(formatQuantity(item.minStock, item.unit)),
+                context.l10n.feedStatsMinimum(
+                  formatQuantity(item.minStock, item.unit),
+                ),
                 style: AppTypography.labelSm.copyWith(
                   color: cs.onSurfaceVariant,
                 ),

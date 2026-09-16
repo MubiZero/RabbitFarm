@@ -31,7 +31,8 @@ class PedigreeRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw ApiFailure(ApiFailureKind.server, serverText: apiResponse.message);
+        throw ApiFailure(ApiFailureKind.server,
+            serverText: apiResponse.message);
       }
 
       return PedigreeModel.fromJson(apiResponse.data!);

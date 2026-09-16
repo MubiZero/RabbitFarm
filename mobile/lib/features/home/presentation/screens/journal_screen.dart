@@ -70,7 +70,10 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
   Widget _loaded(List<JournalEntry> entries) {
     final visible = _kind == null
         ? entries
-        : [for (final entry in entries) if (entry.kind == _kind) entry];
+        : [
+            for (final entry in entries)
+              if (entry.kind == _kind) entry
+          ];
 
     return RefreshIndicator(
       onRefresh: _refresh,
@@ -215,9 +218,11 @@ class _EntryCard extends ConsumerWidget {
     final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
     final color = entry.kind.domain.color(context);
 
+    final route = entry.kind.formRoute;
+
     return AppCard(
-      onTap: canRecord
-          ? () => context.push(entry.kind.formRoute, extra: entry.formArgs)
+      onTap: canRecord && route != null
+          ? () => context.push(route, extra: entry.formArgs)
           : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,6 +352,7 @@ String _kindLabel(BuildContext context, JournalKind kind) => switch (kind) {
       JournalKind.task => context.l10n.journalKindTask,
       JournalKind.note => context.l10n.journalKindNote,
       JournalKind.photo => context.l10n.journalKindPhoto,
+      JournalKind.deletion => context.l10n.journalKindDeletion,
     };
 
 extension _JournalKindVisuals on JournalKind {
@@ -357,6 +363,7 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.task => AppDomain.tasks,
         JournalKind.note => AppDomain.admin,
         JournalKind.photo => AppDomain.livestock,
+        JournalKind.deletion => AppDomain.admin,
       };
 
   IconData get icon => switch (this) {
@@ -366,5 +373,6 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.task => Icons.check_circle_outline,
         JournalKind.photo => Icons.photo_camera_outlined,
         JournalKind.note => Icons.sticky_note_2_outlined,
+        JournalKind.deletion => Icons.delete_outline,
       };
 }

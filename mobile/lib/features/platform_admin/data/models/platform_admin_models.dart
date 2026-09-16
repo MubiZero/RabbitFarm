@@ -26,6 +26,13 @@ abstract class Plan with _$Plan {
     @DoubleConverter() double? price,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
     @JsonKey(name: 'is_default') @Default(false) bool isDefault,
+
+    /// Сколько живых ферм сейчас на этом тарифе.
+    ///
+    /// Нужно там, где тариф трогают: удаление стирает его и обнуляет `plan_id`
+    /// у ферм. Раньше сервер этого числа не отдавал, и диалог удаления молчал
+    /// о том, задевает он одну ферму или половину сервиса.
+    @JsonKey(name: 'farms_count') @Default(0) @IntConverter() int farmsCount,
   }) = _Plan;
 
   const Plan._();
@@ -78,34 +85,85 @@ abstract class PlatformFarm with _$PlatformFarm {
     required String name,
     UserRef? owner,
     Plan? plan,
-    @JsonKey(name: 'rabbits_count') @IntConverter() @Default(0) int rabbitsCount,
+    @JsonKey(name: 'rabbits_count')
+    @IntConverter()
+    @Default(0)
+    int rabbitsCount,
     @JsonKey(name: 'staff_count') @IntConverter() @Default(0) int staffCount,
-    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
     // Последний вход кого-либо из фермы — `max(users.last_login_at)`. `null`
     // значит «никто ещё не заходил», а не «неизвестно»: разница важна для
     // фильтра «не заходили N дней».
-    @JsonKey(name: 'last_active') @NullableDateTimeConverter() DateTime? lastActiveAt,
+    @JsonKey(name: 'last_active')
+    @NullableDateTimeConverter()
+    DateTime? lastActiveAt,
+    // Доступ хозяйства — `active` / `read_only` / `suspended`. Строкой, а не
+    // enum, по той же причине, что и у [PlatformFarmDetail]: незнакомое
+    // значение не должно ронять разбор всей строки списка.
+    @Default('active') String status,
+    // Мягкое удаление. Пусто = ферма жива. В обычном списке таких нет вовсе —
+    // сервер отдаёт их только в срезе «Удалённые».
+    @JsonKey(name: 'deleted_at')
+    @NullableDateTimeConverter()
+    DateTime? deletedAt,
+    // Разовая поблажка сверх тарифа. В списке она нужна не для показа, а для
+    // счёта: без неё ферма с выданной добавкой «упиралась в предел» там, где
+    // сервер её пропускает.
+    @JsonKey(name: 'extra_rabbits') @NullableIntConverter() int? extraRabbits,
+    @JsonKey(name: 'extra_staff') @NullableIntConverter() int? extraStaff,
+    @JsonKey(name: 'extras_until')
+    @NullableDateTimeConverter()
+    DateTime? extrasUntil,
   }) = _PlatformFarm;
 
   const PlatformFarm._();
 
-  /// Доля израсходованного поголовья, 0..1. `null` — предела нет и делить
-  /// не от чего.
-  double? get rabbitsUsage => _usage(rabbitsCount, plan?.maxRabbits);
+  bool get isDeleted => deletedAt != null;
+
+  bool get isActive => status == 'active';
+  bool get isReadOnly => status == 'read_only';
+  bool get isSuspended => status == 'suspended';
+
+  /// Поблажка выдана и ещё действует — та же договорённость, что и на
+  /// сервере: пустой срок при ненулевой добавке значит «бессрочно».
+  bool get hasActiveExtras =>
+      (extraRabbits != null || extraStaff != null) &&
+      (extrasUntil == null || extrasUntil!.isAfter(DateTime.now()));
+
+  /// Предел поголовья с учётом действующей поблажки — тот же, по которому
+  /// сервер реально откажет (`planService.getEffectiveLimit`).
+  int? get effectiveRabbitsLimit => _effective(plan?.maxRabbits, extraRabbits);
 
   /// То же по составу фермы.
-  double? get staffUsage => _usage(staffCount, plan?.maxStaff);
+  int? get effectiveStaffLimit => _effective(plan?.maxStaff, extraStaff);
+
+  /// Доля израсходованного поголовья, 0..1. `null` — предела нет и делить
+  /// не от чего.
+  double? get rabbitsUsage => _usage(rabbitsCount, effectiveRabbitsLimit);
+
+  /// То же по составу фермы.
+  double? get staffUsage => _usage(staffCount, effectiveStaffLimit);
 
   /// Ферма упёрлась хотя бы в один из своих пределов — дальше сервер начнёт
   /// отказывать в создании записей.
   bool get isAtLimit =>
-      _reached(rabbitsCount, plan?.maxRabbits) ||
-      _reached(staffCount, plan?.maxStaff);
+      _reached(rabbitsCount, effectiveRabbitsLimit) ||
+      _reached(staffCount, effectiveStaffLimit);
+
+  /// Строка требует внимания админа: упёрлась в предел, закрыта или удалена.
+  /// Именно её списки подсвечивают тревожной рамкой.
+  bool get needsAttention => isAtLimit || isSuspended || isDeleted;
+
+  int? _effective(int? limit, int? extra) {
+    if (limit == null) return null;
+    return limit + (hasActiveExtras ? (extra ?? 0) : 0);
+  }
 
   /// Ферма подошла к пределу вплотную: осталась пятая часть или меньше.
   bool get isNearLimit =>
-      !isAtLimit &&
-      ((rabbitsUsage ?? 0) >= 0.8 || (staffUsage ?? 0) >= 0.8);
+      !isAtLimit && ((rabbitsUsage ?? 0) >= 0.8 || (staffUsage ?? 0) >= 0.8);
 
   static double? _usage(int used, int? limit) {
     if (limit == null || limit <= 0) return null;
@@ -156,7 +214,9 @@ abstract class FarmPayment with _$FarmPayment {
     required String currency,
     required String status,
     String? description,
-    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
   }) = _FarmPayment;
 
   factory FarmPayment.fromJson(Map<String, dynamic> json) =>
@@ -190,15 +250,23 @@ abstract class PlatformFarmDetail with _$PlatformFarmDetail {
     @JsonKey(name: 'extras_until')
     @NullableDateTimeConverter()
     DateTime? extrasUntil,
-    @JsonKey(name: 'rabbits_count') @IntConverter() @Default(0) int rabbitsCount,
+    @JsonKey(name: 'rabbits_count')
+    @IntConverter()
+    @Default(0)
+    int rabbitsCount,
     @JsonKey(name: 'staff_count') @IntConverter() @Default(0) int staffCount,
-    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
     @JsonKey(name: 'last_active')
     @NullableDateTimeConverter()
     DateTime? lastActiveAt,
     @Default([]) List<FarmStaffMember> staff,
     @Default([]) List<FarmPayment> payments,
-    @JsonKey(name: 'storage_bytes') @IntConverter() @Default(0) int storageBytes,
+    @JsonKey(name: 'storage_bytes')
+    @IntConverter()
+    @Default(0)
+    int storageBytes,
     // Мягкое удаление: доступ фермы закрыт сразу, а записи физически уходят
     // через окно ожидания. Пусто = ферма жива.
     @JsonKey(name: 'deleted_at')
@@ -296,10 +364,19 @@ abstract class PlatformFarmsSummary with _$PlatformFarmsSummary {
 abstract class PlatformSummary with _$PlatformSummary {
   const factory PlatformSummary({
     @Default(PlatformFarmsSummary()) PlatformFarmsSummary farms,
-    @JsonKey(name: 'registrations_30d') @IntConverter() @Default(0) int registrations30d,
+    @JsonKey(name: 'registrations_30d')
+    @IntConverter()
+    @Default(0)
+    int registrations30d,
     @JsonKey(name: 'inactive_30d') @IntConverter() @Default(0) int inactive30d,
-    @JsonKey(name: 'rabbits_total') @IntConverter() @Default(0) int rabbitsTotal,
-    @JsonKey(name: 'storage_bytes') @IntConverter() @Default(0) int storageBytes,
+    @JsonKey(name: 'rabbits_total')
+    @IntConverter()
+    @Default(0)
+    int rabbitsTotal,
+    @JsonKey(name: 'storage_bytes')
+    @IntConverter()
+    @Default(0)
+    int storageBytes,
   }) = _PlatformSummary;
 
   factory PlatformSummary.fromJson(Map<String, dynamic> json) =>
@@ -407,7 +484,9 @@ abstract class Announcement with _$Announcement {
     @Default(0)
     int recipientsCount,
     AnnouncementStats? stats,
-    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
   }) = _Announcement;
 
   const Announcement._();
@@ -473,15 +552,88 @@ abstract class SupportRequest with _$SupportRequest {
     @IntConverter() required int id,
     required String text,
     @Default('new') String status,
+
+    /// Что поддержка ответила, закрывая обращение. `null` — закрыли молча.
+    String? answer,
+    @JsonKey(name: 'resolved_at')
+    @NullableDateTimeConverter()
+    DateTime? resolvedAt,
     SupportRequestFarm? farm,
     UserRef? author,
-    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime createdAt,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
   }) = _SupportRequest;
 
   const SupportRequest._();
 
   bool get isResolved => status == 'resolved';
 
+  /// Ответ есть и его есть что показать: пустую строку сервер вернуть может,
+  /// а рисовать ради неё блок «Ответ» — обманывать.
+  bool get hasAnswer => (answer?.trim().isNotEmpty ?? false);
+
   factory SupportRequest.fromJson(Map<String, dynamic> json) =>
       _$SupportRequestFromJson(json);
+}
+
+/// Одно действие платформенного админа в журнале.
+///
+/// Сервер пишет строку на каждое мутирующее действие (`auditService`) и
+/// отдаёт её как есть: ни имени админа, ни названия фермы в ответе нет —
+/// только идентификаторы. Поэтому `adminId`/`farmId` здесь и остаются
+/// числами, а не превращаются в `UserRef` с пустыми полями: выдуманное имя
+/// хуже честного номера.
+///
+/// `action` — строка, а не enum, по той же причине, что и `status` у
+/// [PlatformFarmDetail]: сервер заводит новые действия раньше приложения, и
+/// незнакомое не должно ронять разбор всей страницы журнала.
+///
+/// `before`/`after` — произвольные снимки полей, своей формы у каждого
+/// действия. Типизировать их одним классом нечем: у `plan.update` это тариф
+/// целиком, у `farm.status` — одно поле, у `farm.impersonate` — объяснение
+/// админа. Разбирает их экран журнала, и только то, что знает.
+@freezed
+abstract class AdminAuditEntry with _$AdminAuditEntry {
+  const factory AdminAuditEntry({
+    @IntConverter() required int id,
+    @JsonKey(name: 'admin_id') @IntConverter() required int adminId,
+    required String action,
+    @JsonKey(name: 'farm_id') @NullableIntConverter() int? farmId,
+
+    /// Кто это сделал и над какой фермой — именами.
+    ///
+    /// Раньше строка журнала читалась как «Админ №3 · Ферма №7»: данные
+    /// лежали полные, а до человека доезжали номера. Связи обнуляемые —
+    /// ферму могли снести, и запись о том, кто это сделал, обязана её
+    /// пережить.
+    UserRef? admin,
+    SupportRequestFarm? farm,
+    Map<String, dynamic>? before,
+    Map<String, dynamic>? after,
+    String? ip,
+    @JsonKey(name: 'created_at')
+    @DateTimeConverter()
+    required DateTime createdAt,
+  }) = _AdminAuditEntry;
+
+  const AdminAuditEntry._();
+
+  /// Действие относится к конкретной ферме, а не ко всему сервису: смена
+  /// тарифа фермы — да, правка самого тарифа — нет.
+  bool get isAboutFarm => farmId != null;
+
+  /// Номер вместо имени — для запасного варианта: ферму могли снести, а
+  /// запись о том, кто это сделал, обязана её пережить.
+  String get adminFallback => '#$adminId';
+  String get farmFallback => '#$farmId';
+
+  Object? _value(String field) => after?[field] ?? before?[field];
+
+  /// Значение поля из снимка «как стало», а если действие только читало —
+  /// из «как было». Ключи здесь те же, что пишет сервер.
+  Object? valueOf(String field) => _value(field);
+
+  factory AdminAuditEntry.fromJson(Map<String, dynamic> json) =>
+      _$AdminAuditEntryFromJson(json);
 }

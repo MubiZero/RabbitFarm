@@ -35,8 +35,13 @@ class BirthsNotifier extends Notifier<BirthsState> {
   @override
   BirthsState build() {
     _repository = ref.watch(birthsRepositoryProvider);
-    loadBirths();
-    return BirthsState();
+    // Через microtask, а не прямым вызовом: `loadBirths` первой же строкой
+    // присваивает `state`, а во время build провайдер ещё не существует —
+    // riverpod бросает «provider depending on itself», загрузка обрывается
+    // на первой строке, и список окролов оставался пустым до тех пор, пока
+    // что-нибудь не дёрнет обновление ещё раз.
+    Future.microtask(loadBirths);
+    return BirthsState(isLoading: true);
   }
 
   /// Загрузить список окролов
@@ -87,11 +92,23 @@ class BirthsNotifier extends Notifier<BirthsState> {
     }
   }
 
+  /// Убрать окрол из списка, не трогая сервер.
+  ///
+  /// Удаление идёт с окном на отмену: строка должна исчезнуть сразу, а запрос
+  /// уходит только когда окно закрылось. Вернуть строку на место —
+  /// `loadBirths()`.
+  void removeBirth(int id) {
+    state = state.copyWith(
+      births: state.births.where((birth) => birth.id != id).toList(),
+    );
+  }
+
   /// Удалить окрол
   Future<bool> deleteBirth(int id) async {
     try {
       await _repository.deleteBirth(id);
-      final updatedBirths = state.births.where((birth) => birth.id != id).toList();
+      final updatedBirths =
+          state.births.where((birth) => birth.id != id).toList();
 
       state = state.copyWith(births: updatedBirths);
       return true;
@@ -135,10 +152,12 @@ class BirthsNotifier extends Notifier<BirthsState> {
 }
 
 /// Provider для окролов
-final birthsProvider = NotifierProvider<BirthsNotifier, BirthsState>(BirthsNotifier.new);
+final birthsProvider =
+    NotifierProvider<BirthsNotifier, BirthsState>(BirthsNotifier.new);
 
 /// Provider для окролов конкретной самки
-final birthsByMotherProvider = FutureProvider.family<List<BirthModel>, int>((ref, motherId) async {
+final birthsByMotherProvider =
+    FutureProvider.family<List<BirthModel>, int>((ref, motherId) async {
   final repository = ref.watch(birthsRepositoryProvider);
   return repository.getBirthsByMother(motherId);
 });

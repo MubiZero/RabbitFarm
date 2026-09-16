@@ -198,7 +198,8 @@ class ApiClient {
     return _dio.get('${ApiEndpoints.rabbits}/$rabbitId/weights');
   }
 
-  Future<Response> uploadPhoto(int rabbitId, String filePath, {Uint8List? bytes}) async {
+  Future<Response> uploadPhoto(int rabbitId, String filePath,
+      {Uint8List? bytes}) async {
     final MultipartFile file;
 
     if (kIsWeb && bytes != null) {
@@ -235,6 +236,7 @@ class ApiClient {
     String filePath, {
     Uint8List? bytes,
     String? caption,
+    DateTime? takenAt,
   }) async {
     final MultipartFile file;
 
@@ -247,6 +249,9 @@ class ApiClient {
     final formData = FormData.fromMap({
       'photo': file,
       if (caption != null && caption.isNotEmpty) 'caption': caption,
+      // Дату отдаём только когда знаем её наверняка: пустое поле честнее
+      // сегодняшнего числа под снимком, сделанным неделю назад.
+      if (takenAt != null) 'taken_at': takenAt.toIso8601String(),
     });
 
     return _dio.post(

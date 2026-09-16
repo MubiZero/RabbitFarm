@@ -143,6 +143,32 @@ class _FakeRepository extends PlatformAdminRepository {
     return farm;
   }
 
+  /// Журнал, суженный до одной фермы. `farmId` записывается: сужение — весь
+  /// смысл секции, без него на карточке был бы журнал всего сервиса.
+  final auditFarmIds = <int?>[];
+
+  @override
+  Future<AuditPage> getAuditLog({
+    int page = 1,
+    int limit = 20,
+    int? farmId,
+  }) async {
+    auditFarmIds.add(farmId);
+    return (
+      items: [
+        AdminAuditEntry(
+          id: 1,
+          adminId: 7,
+          action: 'farm_status',
+          farmId: farmId,
+          admin: const UserRef(id: 7, fullName: 'Админ Админов'),
+          createdAt: DateTime(2026, 9, 10, 12),
+        ),
+      ],
+      page: PageInfo(page: 1, limit: limit, total: 1, totalPages: 1),
+    );
+  }
+
   @override
   Future<PlatformFarmDetail> updateFarmStatus(int farmId, String status) async {
     statusCalls.add(status);
@@ -354,7 +380,8 @@ void main() {
       await _settle(tester);
 
       // Все три уровня видны сразу — вместе с тем, что каждый означает.
-      expect(find.widgetWithText(ListTile, 'Работает как обычно'), findsOneWidget);
+      expect(
+          find.widgetWithText(ListTile, 'Работает как обычно'), findsOneWidget);
       expect(find.widgetWithText(ListTile, 'Только чтение'), findsOneWidget);
       expect(find.widgetWithText(ListTile, 'Доступ закрыт'), findsOneWidget);
 
@@ -372,6 +399,50 @@ void main() {
       expect(find.text('Доступ обновлён'), findsOneWidget);
       // Карточка обновилась из ответа, без второй загрузки.
       expect(find.text('Только чтение'), findsWidgets);
+    });
+
+    // Вернуть в «Работает как обычно» ферму с истёкшим тарифом можно, но
+    // ночная задача переведёт её обратно в `read_only`. Админ узнавал об этом
+    // наутро от самой фермы.
+    testWidgets('возврат просроченной фермы предупреждает о ночном откате', (
+      tester,
+    ) async {
+      final repository = _FakeRepository(
+        farm: _farm(
+          status: 'read_only',
+          planExpiresAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Изменить доступ'));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(ListTile, 'Работает как обычно'));
+      await _settle(tester);
+
+      expect(find.textContaining('Ночная проверка'), findsOneWidget);
+    });
+
+    testWidgets('у фермы с действующим тарифом предупреждения нет', (
+      tester,
+    ) async {
+      final repository = _FakeRepository(
+        farm: _farm(
+          status: 'read_only',
+          planExpiresAt: DateTime.now().add(const Duration(days: 20)),
+        ),
+      );
+      await tester.pumpWidget(_screen(repository));
+      await _settle(tester);
+
+      await tester.tap(find.text('Изменить доступ'));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(ListTile, 'Работает как обычно'));
+      await _settle(tester);
+
+      expect(find.text('Изменить доступ?'), findsOneWidget);
+      expect(find.textContaining('Ночная проверка'), findsNothing);
     });
 
     testWidgets('отказ от подтверждения ничего не отправляет', (tester) async {
@@ -423,8 +494,7 @@ void main() {
       await tester.tap(find.text('Сохранить'));
       await _settle(tester);
 
-      expect(repository.extrasCalls,
-          [(rabbits: 50, staff: null, until: null)]);
+      expect(repository.extrasCalls, [(rabbits: 50, staff: null, until: null)]);
       expect(find.text('Поблажка обновлена'), findsOneWidget);
       // Предел на полосе — с добавкой, а сам тариф остался прежним.
       expect(find.text('26 из 80'), findsOneWidget);
@@ -465,8 +535,8 @@ void main() {
       await tester.tap(find.text('Снять поблажку'));
       await _settle(tester);
 
-      expect(repository.extrasCalls,
-          [(rabbits: null, staff: null, until: null)]);
+      expect(
+          repository.extrasCalls, [(rabbits: null, staff: null, until: null)]);
       expect(find.text('Поблажка снята'), findsOneWidget);
       expect(
         find.text('Поблажек нет — действуют пределы тарифа'),
@@ -620,7 +690,8 @@ void main() {
 
   group('Удаление и восстановление фермы', () {
     /// Высота под весь экран: раздел удаления идёт последним.
-    Future<void> openDangerZone(WidgetTester tester) => _settle(tester, height: 4600);
+    Future<void> openDangerZone(WidgetTester tester) =>
+        _settle(tester, height: 4600);
 
     /// Кнопка «Удалить» в диалоге — та, что оживает от набранного названия.
     TextButton confirmButton(WidgetTester tester) =>
@@ -728,13 +799,15 @@ void main() {
       // Пока ферма на пути к удалению, её доступ и поблажки не правят.
       expect(
         tester
-            .widget<TextButton>(find.widgetWithText(TextButton, 'Изменить доступ'))
+            .widget<TextButton>(
+                find.widgetWithText(TextButton, 'Изменить доступ'))
             .onPressed,
         isNull,
       );
       expect(
         tester
-            .widget<TextButton>(find.widgetWithText(TextButton, 'Выдать поблажку'))
+            .widget<TextButton>(
+                find.widgetWithText(TextButton, 'Выдать поблажку'))
             .onPressed,
         isNull,
       );
@@ -758,13 +831,16 @@ void main() {
 
       // Подписка держит список живым — как открытая вкладка «Фермы», с
       // которой в карточку и заходят.
-      container.listen(platformFarmsProvider, (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmsProvider, (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmsProvider).farms.isEmpty) {
         await Future<void>.delayed(Duration.zero);
       }
-      expect(container.read(platformFarmsProvider).farms.single.rabbitsCount, 1);
+      expect(
+          container.read(platformFarmsProvider).farms.single.rabbitsCount, 1);
 
-      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmDetailProvider(1), (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmDetailProvider(1)).isLoading) {
         await Future<void>.delayed(Duration.zero);
       }
@@ -774,7 +850,8 @@ void main() {
 
       expect(error, isNull);
       // Строка списка обновилась целиком из ответа, без перезагрузки страницы.
-      expect(container.read(platformFarmsProvider).farms.single.rabbitsCount, 26);
+      expect(
+          container.read(platformFarmsProvider).farms.single.rabbitsCount, 26);
       expect(container.read(platformFarmsProvider).farms.single.staffCount, 2);
     });
 
@@ -785,7 +862,8 @@ void main() {
       ]);
       addTearDown(container.dispose);
 
-      container.listen(platformFarmDetailProvider(1), (_, __) {}, fireImmediately: true);
+      container.listen(platformFarmDetailProvider(1), (_, __) {},
+          fireImmediately: true);
       while (container.read(platformFarmDetailProvider(1)).isLoading) {
         await Future<void>.delayed(Duration.zero);
       }
@@ -796,6 +874,26 @@ void main() {
       expect(error, isNull);
       // Список никто не смотрит — запрашивать его страницу незачем.
       expect(container.exists(platformFarmsProvider), isFalse);
+    });
+  });
+
+  // Вопрос «кто закрыл эту ферму и зачем» задают, стоя на её карточке.
+  // Сервер и репозиторий сужение по ферме умели с самого начала, а спросить
+  // его было неоткуда.
+  group('Журнал одной фермы', () {
+    testWidgets('карточка показывает, что админы делали именно с этой фермой', (
+      tester,
+    ) async {
+      final repository = _FakeRepository();
+      await tester.pumpWidget(_screen(repository));
+      // Секция журнала лежит ближе к концу карточки: окно повыше, чтобы
+      // ListView успел её построить.
+      await _settle(tester, height: 5000);
+
+      expect(repository.auditFarmIds, [1]);
+      // Подписи групп на этом экране пишутся прописными (`AppGroupLabel`).
+      expect(find.text('ЧТО С НЕЙ ДЕЛАЛИ'), findsOneWidget);
+      expect(find.textContaining('Админ Админов'), findsWidgets);
     });
   });
 }

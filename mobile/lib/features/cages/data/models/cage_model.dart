@@ -16,13 +16,21 @@ abstract class CageModel with _$CageModel {
     @IntConverter() required int capacity,
     String? location,
     required String condition, // good, needs_repair, broken
-    @JsonKey(name: 'last_cleaned_at') @NullableDateTimeConverter() DateTime? lastCleanedAt,
+    @JsonKey(name: 'last_cleaned_at')
+    @NullableDateTimeConverter()
+    DateTime? lastCleanedAt,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
     // Related data
     List<RabbitModel>? rabbits,
-    @JsonKey(name: 'current_occupancy') @NullableIntConverter() int? currentOccupancy,
+    @JsonKey(name: 'current_occupancy')
+    @NullableIntConverter()
+    int? currentOccupancy,
     @JsonKey(name: 'is_full') bool? isFull,
     @JsonKey(name: 'is_available') bool? isAvailable,
   }) = _CageModel;
@@ -72,8 +80,12 @@ abstract class CageConditionStats with _$CageConditionStats {
 abstract class CageOccupancyStats with _$CageOccupancyStats {
   const factory CageOccupancyStats({
     @JsonKey(name: 'total_capacity') @IntConverter() required int totalCapacity,
-    @JsonKey(name: 'current_occupancy') @IntConverter() required int currentOccupancy,
-    @JsonKey(name: 'available_spaces') @IntConverter() required int availableSpaces,
+    @JsonKey(name: 'current_occupancy')
+    @IntConverter()
+    required int currentOccupancy,
+    @JsonKey(name: 'available_spaces')
+    @IntConverter()
+    required int availableSpaces,
     @JsonKey(name: 'occupancy_rate') @IntConverter() required int occupancyRate,
     @JsonKey(name: 'full_cages') @IntConverter() required int fullCages,
     @JsonKey(name: 'empty_cages') @IntConverter() required int emptyCages,

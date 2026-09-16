@@ -55,7 +55,7 @@ abstract class BreedingModel with _$BreedingModel {
           ? RabbitModel.fromJson(json['male'] as Map<String, dynamic>)
           : null,
       female: (json['female'] is Map<String, dynamic> &&
-                _hasFullRabbitPayload(json['female'] as Map<String, dynamic>))
+              _hasFullRabbitPayload(json['female'] as Map<String, dynamic>))
           ? RabbitModel.fromJson(json['female'] as Map<String, dynamic>)
           : null,
       actualBirthDate: _birthField(json['birth'], 'birth_date'),

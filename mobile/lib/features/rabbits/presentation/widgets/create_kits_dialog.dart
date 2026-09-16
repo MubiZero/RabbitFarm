@@ -94,8 +94,8 @@ class _CreateKitsDialogState extends ConsumerState<CreateKitsDialog> {
         children: [
           Text(
             l10n.birthsKitsDialogBody(widget.birth.kitsBornAlive),
-            style: AppTypography.bodyLg
-                .copyWith(color: context.colors.onSurface),
+            style:
+                AppTypography.bodyLg.copyWith(color: context.colors.onSurface),
           ),
           const SizedBox(height: AppSpacing.lg),
           TextField(

@@ -6,6 +6,7 @@ import '../providers/breeds_provider.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/widgets/undo_delete.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/utils/format_utils.dart';
@@ -55,7 +56,9 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          ref.read(breedsProvider.notifier).updateSearchQuery('');
+                          ref
+                              .read(breedsProvider.notifier)
+                              .updateSearchQuery('');
                         },
                       )
                     : null,
@@ -164,7 +167,10 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         if (breed.purpose != null)
                           Text(
                             breedPurposeLabel(context, breed.purpose),
-                            style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            style: AppTypography.bodyMd.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
                           ),
                       ],
                     ),
@@ -176,7 +182,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                         if (value == 'edit') {
                           _showBreedForm(context, breed);
                         } else if (value == 'delete') {
-                          _confirmDelete(context, breed);
+                          _delete(context, breed);
                         }
                       },
                       itemBuilder: (context) => [
@@ -209,11 +215,13 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
               ),
 
               // Описание
-              if (breed.description != null && breed.description!.isNotEmpty) ...[
+              if (breed.description != null &&
+                  breed.description!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
                   breed.description!,
-                  style: AppTypography.bodyMd.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: AppTypography.bodyMd.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -228,7 +236,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
                   if (breed.averageWeight != null)
                     _buildInfoChip(
                       Icons.monitor_weight,
-                      formatQuantity(breed.averageWeight!, 'кг'),
+                      formatQuantity(breed.averageWeight!, context.l10n.unitKg),
                       AppColors.accentOcean,
                     ),
                   if (breed.averageLitterSize != null)
@@ -262,49 +270,32 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     context.push('/breeds/form', extra: breed);
   }
 
-  Future<void> _confirmDelete(BuildContext context, BreedModel breed) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.breedsDeleteTitle),
-        content: Text(context.l10n.breedsDeleteBody(breed.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
+  Future<void> _delete(BuildContext context, BreedModel breed) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final notifier = ref.read(breedsProvider.notifier);
+
+    notifier.removeBreed(breed.id);
+
+    var success = true;
+    await deleteWithUndo(
+      context,
+      message: l10n.breedsDeleted,
+      commit: () async => success = await notifier.deleteBreed(breed.id),
+      onUndo: notifier.loadBreeds,
     );
 
-    if (confirmed == true && context.mounted) {
-      final l10n = context.l10n;
-      final success = await ref.read(breedsProvider.notifier).deleteBreed(breed.id);
-
-      if (context.mounted) {
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.breedsDeleted),
-              backgroundColor: AppColors.success,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                errorText(l10n, ref.read(breedsProvider).error),
-              ),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      }
+    if (!success) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorText(l10n, ref.read(breedsProvider).error)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      await notifier.loadBreeds();
     }
   }
 }

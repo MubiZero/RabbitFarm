@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/utils/exif_date.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -75,8 +76,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
                   title: context.l10n.galleryEmptyTitle,
                   subtitle: context.l10n.galleryEmptyBody,
                   actionLabel: canManage ? context.l10n.galleryAdd : null,
-                  onAction:
-                      canManage ? () => _addPhoto(context, ref) : null,
+                  onAction: canManage ? () => _addPhoto(context, ref) : null,
                 )
               : _grid(context, ref, photos, canManage),
         ),
@@ -242,11 +242,24 @@ class PhotoGalleryScreen extends ConsumerWidget {
     Uint8List? bytes;
     if (kIsWeb) bytes = await image.readAsBytes();
 
+    // Снято прямо сейчас — дату знаем точно и без EXIF. Для снимка из
+    // галереи спрашиваем сам файл: `image_picker` даты не отдаёт, а
+    // время изменения файла врёт — у всего, что скопировали на телефон,
+    // оно сегодняшнее.
+    //
+    // EXIF может и не найтись: пересланное через мессенджер приходит без
+    // него, да и пересжатие при выборе снимка метаданные часто срезает.
+    // Тогда дата остаётся пустой — это честнее выдуманной.
+    final takenAt = source == ImageSource.camera
+        ? DateTime.now()
+        : await exifTakenAt(bytes ?? await image.readAsBytes());
+
     await ref.read(galleryNotifierProvider.notifier).upload(
           rabbitId,
           image.path,
           bytes: bytes,
           caption: caption,
+          takenAt: takenAt,
         );
 
     final state = ref.read(galleryNotifierProvider);
@@ -299,33 +312,22 @@ class PhotoGalleryScreen extends ConsumerWidget {
     WidgetRef ref,
     RabbitPhoto photo,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.galleryDeleteTitle),
-        content: Text(context.l10n.galleryDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    final deleted = l10n.galleryDeleted;
+    final notifier = ref.read(galleryNotifierProvider.notifier);
+    // Итог удаления читаем через общий контейнер: экран к тому моменту может
+    // быть уже закрыт, а его `ref` — негодным.
+    final container = ProviderScope.containerOf(context, listen: false);
 
-    await ref.read(galleryNotifierProvider.notifier).delete(rabbitId, photo.id);
+    // Снимок пропадает из сетки не сразу, а когда окно отмены закрылось:
+    // сетку рисует ответ сервера, и до самого удаления перечитывать нечего.
+    await deleteWithUndo(
+      context,
+      message: l10n.galleryDeleted,
+      commit: () => notifier.delete(rabbitId, photo.id),
+    );
 
-    final state = ref.read(galleryNotifierProvider);
+    final state = container.read(galleryNotifierProvider);
     if (state.hasError) {
       messenger.showSnackBar(
         SnackBar(
@@ -333,10 +335,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
           backgroundColor: AppColors.error,
         ),
       );
-      return;
     }
-
-    messenger.showSnackBar(SnackBar(content: Text(deleted)));
   }
 }
 
@@ -383,7 +382,8 @@ class _PhotoTile extends StatelessWidget {
                 left: 6,
                 bottom: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.55),
                     borderRadius: AppRadius.smAll,

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/core/access/farm_access.dart';
 import 'package:mobile/core/api/api_client.dart';
 import 'package:mobile/core/api/api_failure.dart';
+import 'package:mobile/core/models/user_ref.dart';
 import 'package:mobile/core/providers/connectivity.dart';
 import 'package:mobile/features/home/presentation/screens/today_screen.dart';
 import 'package:mobile/features/reports/data/models/report_model.dart';
@@ -39,14 +40,18 @@ Task _task({
   required int id,
   required String title,
   required DateTime dueDate,
-}) => Task(
-  id: id,
-  title: title,
-  type: TaskType.feeding,
-  status: TaskStatus.pending,
-  priority: TaskPriority.high,
-  dueDate: dueDate,
-);
+  UserRef? assignee,
+}) =>
+    Task(
+      id: id,
+      title: title,
+      type: TaskType.feeding,
+      status: TaskStatus.pending,
+      priority: TaskPriority.high,
+      dueDate: dueDate,
+      assignedTo: assignee?.id,
+      assignee: assignee,
+    );
 
 DateTime _daysAgo(int days) {
   final now = DateTime.now();
@@ -62,7 +67,7 @@ DateTime _daysAgo(int days) {
 /// настоящая логика провайдера — и порядок строк, и откат отметки.
 class _FakeTasksRepository extends TasksRepository {
   _FakeTasksRepository(this.tasks, {this.completeError})
-    : super(ApiClient(storage: const FlutterSecureStorage()));
+      : super(ApiClient(storage: const FlutterSecureStorage()));
 
   final List<Task> tasks;
   final Object? completeError;
@@ -155,28 +160,31 @@ Widget _wrap({
   DashboardReport dashboard = _calmDashboard,
   TasksRepository? repository,
   FarmRoleAccess role = FarmRoleAccess.owner,
+  int? viewerId,
   bool online = true,
-}) => testAppScreen(
-  // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
-  // на каждом экране с самого первого кадра (см. `main.dart`) — здесь
-  // экран собирается без него, и без прогрева провайдер только начинал
-  // бы подписку на поток в момент самого нажатия, а `.value` в этот
-  // момент ещё `null` и код читал бы связь как «есть» по умолчанию.
-  Consumer(
-    builder: (context, ref, _) {
-      ref.watch(isOnlineProvider);
-      return const TodayScreen();
-    },
-  ),
-  overrides: <Override>[
-    dashboardReportProvider.overrideWith((ref) async => dashboard),
-    tasksRepositoryProvider.overrideWithValue(
-      repository ?? _FakeTasksRepository(const []),
-    ),
-    farmRoleProvider.overrideWithValue(role),
-    isOnlineProvider.overrideWith((ref) => Stream.value(online)),
-  ],
-);
+}) =>
+    testAppScreen(
+      // В настоящем приложении `isOnlineProvider` наблюдает `OfflineBanner`
+      // на каждом экране с самого первого кадра (см. `main.dart`) — здесь
+      // экран собирается без него, и без прогрева провайдер только начинал
+      // бы подписку на поток в момент самого нажатия, а `.value` в этот
+      // момент ещё `null` и код читал бы связь как «есть» по умолчанию.
+      Consumer(
+        builder: (context, ref, _) {
+          ref.watch(isOnlineProvider);
+          return const TodayScreen();
+        },
+      ),
+      overrides: <Override>[
+        dashboardReportProvider.overrideWith((ref) async => dashboard),
+        tasksRepositoryProvider.overrideWithValue(
+          repository ?? _FakeTasksRepository(const []),
+        ),
+        farmRoleProvider.overrideWithValue(role),
+        currentUserIdProvider.overrideWithValue(viewerId),
+        isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+      ],
+    );
 
 void main() {
   setUpAll(() async {
@@ -457,5 +465,36 @@ void main() {
         expect(find.text('Кролики'), findsNothing);
       },
     );
+  });
+
+  // Владелец, открывший «Сегодня» на ферме с работниками, должен видеть, кого
+  // ждать по каждой строке. Своё имя под собственными делами он бы читал как
+  // шум — поэтому подпись только на чужих.
+  testWidgets('на «Сегодня» чужая задача подписана исполнителем, своя — нет', (
+    tester,
+  ) async {
+    const owner = UserRef(id: 1, fullName: 'Пётр Владелец');
+    const worker = UserRef(id: 2, fullName: 'Иван Работник');
+
+    final repository = _FakeTasksRepository([
+      _task(
+        id: 1,
+        title: 'Почистить клетки',
+        dueDate: _daysAgo(0),
+        assignee: worker,
+      ),
+      _task(
+        id: 2,
+        title: 'Раздать корм',
+        dueDate: _daysAgo(0),
+        assignee: owner,
+      ),
+    ]);
+
+    await tester.pumpWidget(_wrap(repository: repository, viewerId: owner.id));
+    await _settle(tester);
+
+    expect(find.text('Исполнитель: Иван Работник'), findsOneWidget);
+    expect(find.text('Исполнитель: Пётр Владелец'), findsNothing);
   });
 }

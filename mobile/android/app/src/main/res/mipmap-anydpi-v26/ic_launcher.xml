@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive-иконка: Android сам обрезает её под форму, принятую на
+     устройстве (круг, квадрат со скруглением, «капля»). Поэтому слои
+     раздельные, а кролик на переднем занимает меньше половины холста —
+     всё, что дальше центральной зоны 66dp из 108dp, может быть срезано.
+     monochrome — тот же силуэт для тем оформления Android 13. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/>
+</adaptive-icon>

@@ -5,19 +5,48 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/cages/presentation/utils/cage_tag.dart';
 import '../utils/phone_utils.dart';
 import 'app_router.dart';
 
-/// Схема приложения. Не Universal/App Links: для них нужен домен с
-/// `.well-known` и Associated Domains в профиле Apple — этого у проекта пока
-/// нет, а кастомной схемы для своей же ссылки из SMS/мессенджера достаточно.
+/// Схема приложения. Остаётся ради QR-меток на клетках и ради ссылок,
+/// выданных до перехода на https: перехватывать `rabbitfarm://` умеет любая
+/// сборка, без домена и без проверки.
 const _scheme = 'rabbitfarm';
 
-/// Номер из ссылки-приглашения `rabbitfarm://join?phone=+992…`.
+/// Домен, ссылки которого принадлежат приложению. Тот же адрес отдаёт
+/// сервер в приглашении и он же вшит в SMS-шаблон payom.
+const _publicHost = String.fromEnvironment(
+  'APP_PUBLIC_HOST',
+  defaultValue: 'rabbitfarm.mubi.dev',
+);
+
+/// Путь страницы приглашения. Короткий не ради красоты: значение в SMS
+/// обрезается шлюзом по длине, и длинный адрес приехал бы обрубком.
+const _invitePath = '/i';
+
+/// Ссылка-приглашение: `https://<домен>/i`.
 ///
-/// Ссылку выдаёт сервер вместе с приглашением по телефону
-/// (`staffController.createInvitation`). Секретного в ней нет: код приходит
-/// отдельной SMS — ссылка только открывает приложение на нужном номере.
+/// Одна на всех — с установленным приложением её перехватывает приложение
+/// (Universal Links на iOS, App Links на Android), без него открывается
+/// страница с магазинами и веб-версией. Ни кода, ни номера в ней нет:
+/// человек входит обычным кодом на свой контакт, и этот же вход активирует
+/// приглашение.
+bool isInviteLink(Uri uri) {
+  if (uri.scheme != 'https' || uri.host != _publicHost) return false;
+
+  final path = uri.path.endsWith('/') && uri.path.length > 1
+      ? uri.path.substring(0, uri.path.length - 1)
+      : uri.path;
+  return path == _invitePath;
+}
+
+/// Номер из старой ссылки-приглашения `rabbitfarm://join?phone=+992…`.
+///
+/// Такие ссылки могли остаться в переписке у тех, кого звали раньше, —
+/// разбор оставлен, чтобы они по-прежнему открывали вход с подставленным
+/// номером. Новые приглашения номера не несут.
+///
 /// Возвращает `null` для всего, что не разобралось: открывать экран входа с
 /// чужим или мусорным номером хуже, чем просто открыть приложение.
 String? phoneFromInviteLink(Uri uri) {
@@ -74,11 +103,23 @@ String? takePendingInvitePhone() {
 }
 
 void _open(Uri uri) {
-  // Сам URL в лог не пишем: в нём номер телефона живого человека.
-  final phone = phoneFromInviteLink(uri);
-  if (phone == null) return;
+  // Метка с клетки, прочитанная чужим сканером (камерой телефона, любым
+  // приложением для QR): наш экран сканирования сюда не приходит — он
+  // открывает клетку сам, не выходя из приложения.
+  final cageId = cageIdFromTag(uri.toString());
+  if (cageId != null) {
+    // Не вошедшего роутер завернёт на вход, и это верно: чужая ферма по
+    // ссылке открываться не должна.
+    rootNavigatorKey.currentContext?.push('/cages/$cageId');
+    return;
+  }
 
-  pendingInvitePhone.value = phone;
+  // Сам URL в лог не пишем: в старых ссылках в нём номер телефона живого
+  // человека.
+  final phone = phoneFromInviteLink(uri);
+  if (phone == null && !isInviteLink(uri)) return;
+
+  if (phone != null) pendingInvitePhone.value = phone;
 
   // Приложение уже работало и человек не на входе — ведём его туда сами.
   // Вошедшего в аккаунт `redirect` вернёт с `/login` на «Сегодня», и это

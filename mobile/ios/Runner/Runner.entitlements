@@ -4,5 +4,13 @@
 <dict>
 	<key>aps-environment</key>
 	<string>development</string>
+	<!-- Ссылка-приглашение https://rabbitfarm.mubi.dev/i открывается самим
+	     приложением, а не Safari. Домен обязан отдавать
+	     /.well-known/apple-app-site-association с нашим Team ID; пока не
+	     отдаёт, ссылка открывает страницу в браузере. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:rabbitfarm.mubi.dev</string>
+	</array>
 </dict>
 </plist>

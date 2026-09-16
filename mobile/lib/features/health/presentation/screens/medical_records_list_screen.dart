@@ -35,15 +35,14 @@ class _MedicalRecordsListScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  Future<void> _load() => ref
-      .read(medicalRecordsProvider.notifier)
-      .loadMedicalRecords(
-        outcome: _outcome == null ? null : medicalOutcomeValue(_outcome!),
-        fromDate: _from,
-        toDate: _to,
-        sortBy: 'started_at',
-        sortOrder: 'DESC',
-      );
+  Future<void> _load() =>
+      ref.read(medicalRecordsProvider.notifier).loadMedicalRecords(
+            outcome: _outcome == null ? null : medicalOutcomeValue(_outcome!),
+            fromDate: _from,
+            toDate: _to,
+            sortBy: 'started_at',
+            sortOrder: 'DESC',
+          );
 
   void _setOutcome(MedicalOutcome? outcome) {
     setState(() => _outcome = outcome);
@@ -148,8 +147,7 @@ class _MedicalRecordsListScreenState
       title: context.l10n.medEmptyTitle,
       subtitle: context.l10n.medEmptyBody,
       actionLabel: canRecord ? context.l10n.medEmptyAction : null,
-      onAction:
-          canRecord ? () => context.push('/medical-records/form') : null,
+      onAction: canRecord ? () => context.push('/medical-records/form') : null,
     );
   }
 
@@ -389,42 +387,40 @@ class _DetailsSheet extends ConsumerWidget {
 
   const _DetailsSheet({required this.record});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.medDeleteTitle),
-        content: Text(context.l10n.medDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.medDeleted;
     final failed = context.l10n.medDeleteFailed;
+    final notifier = ref.read(medicalRecordsProvider.notifier);
 
-    try {
-      await ref
-          .read(medicalRecordsProvider.notifier)
-          .deleteMedicalRecord(record.id);
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } catch (_) {
+    notifier.removeMedicalRecord(record.id);
+
+    var failedToDelete = false;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.medDeleted,
+      commit: () async {
+        try {
+          await notifier.deleteMedicalRecord(record.id);
+        } catch (_) {
+          failedToDelete = true;
+        }
+      },
+      onUndo: notifier.refresh,
+    );
+    navigator.pop();
+    await pending;
+
+    if (failedToDelete) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
+      await notifier.refresh();
     }
   }
 
@@ -506,7 +502,15 @@ class _DetailsSheet extends ConsumerWidget {
                 _Row(
                   icon: Icons.medication_outlined,
                   label: context.l10n.medMedication,
-                  value: record.medication!.trim(),
+                  // Дозировку спрашивали и не показывали нигде, хотя порознь
+                  // обе половины — полуинструкция: название препарата без
+                  // дозы не говорит, сколько колоть, а доза без названия —
+                  // чего именно.
+                  value: [
+                    record.medication!.trim(),
+                    if (record.dosage?.trim().isNotEmpty == true)
+                      record.dosage!.trim(),
+                  ].join(', '),
                 ),
               _Row(
                 icon: Icons.event_available_outlined,
@@ -632,8 +636,7 @@ class _StatisticsSheet extends ConsumerWidget {
                   color: AppColors.warning,
                 ),
                 _StatLine(
-                  label:
-                      medicalOutcomeLabel(context, MedicalOutcome.recovered),
+                  label: medicalOutcomeLabel(context, MedicalOutcome.recovered),
                   value: '${stats.byOutcome.recovered}',
                   color: AppColors.success,
                 ),
@@ -722,8 +725,8 @@ class _StatLine extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTypography.bodyMd
-                .copyWith(color: context.colors.onSurface),
+            style:
+                AppTypography.bodyMd.copyWith(color: context.colors.onSurface),
           ),
           Text(
             value,

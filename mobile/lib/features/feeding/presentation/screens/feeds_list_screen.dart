@@ -102,11 +102,12 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
     final writtenOff = context.l10n.feedsWrittenOff;
     final failed = context.l10n.feedsAdjustFailed;
 
-    final quantity = await showDialog<double>(
+    final answer = await showDialog<StockDialogResult>(
       context: context,
       builder: (_) => _StockDialog(feed: feed, isAddition: isAddition),
     );
-    if (quantity == null) return;
+    if (answer == null) return;
+    final quantity = answer.quantity;
 
     final amount = formatQuantity(quantity, feed.unit.displayName);
     final done = isAddition ? refilled(amount) : writtenOff(amount);
@@ -116,6 +117,7 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
           StockAdjustment(
             quantity: quantity,
             operation: isAddition ? 'add' : 'subtract',
+            cost: answer.cost,
           ),
         );
 
@@ -214,15 +216,17 @@ class _FeedCard extends StatelessWidget {
                   children: [
                     Text(
                       feed.name,
-                      style: AppTypography.titleMd
-                          .copyWith(color: context.colors.onSurface),
+                      style: AppTypography.titleMd.copyWith(
+                        color: context.colors.onSurface,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       feed.type.displayName,
-                      style: AppTypography.labelSm
-                          .copyWith(color: context.colors.onSurfaceVariant),
+                      style: AppTypography.labelSm.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -236,8 +240,9 @@ class _FeedCard extends StatelessWidget {
                   ),
                   Text(
                     '${context.l10n.feedsMinStock} ${formatQuantity(feed.minStock, feed.unit.displayName)}',
-                    style: AppTypography.labelSm
-                        .copyWith(color: context.colors.onSurfaceVariant),
+                    style: AppTypography.labelSm.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -247,13 +252,17 @@ class _FeedCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Row(
               children: [
-                const Icon(Icons.warning_amber_outlined,
-                    size: 16, color: AppColors.warning),
+                const Icon(
+                  Icons.warning_amber_outlined,
+                  size: 16,
+                  color: AppColors.warning,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   context.l10n.feedsLowStockWarning,
-                  style: AppTypography.labelSm
-                      .copyWith(color: AppColors.warning),
+                  style: AppTypography.labelSm.copyWith(
+                    color: AppColors.warning,
+                  ),
                 ),
               ],
             ),
@@ -307,19 +316,27 @@ class _StockDialog extends StatefulWidget {
   State<_StockDialog> createState() => _StockDialogState();
 }
 
+/// Что человек ответил в окне пополнения.
+typedef StockDialogResult = ({double quantity, double? cost});
+
 class _StockDialogState extends State<_StockDialog> {
   final _formKey = GlobalKey<FormState>();
   final _quantity = TextEditingController();
+  final _cost = TextEditingController();
 
   @override
   void dispose() {
     _quantity.dispose();
+    _cost.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    Navigator.pop(context, parseDecimal(_quantity.text));
+    Navigator.pop(context, (
+      quantity: parseDecimal(_quantity.text),
+      cost: widget.isAddition ? parseDecimal(_cost.text) : null,
+    ));
   }
 
   @override
@@ -328,7 +345,8 @@ class _StockDialogState extends State<_StockDialog> {
 
     return AlertDialog(
       title: Text(
-          widget.isAddition ? l10n.feedsRefillTitle : l10n.feedsWriteOffTitle),
+        widget.isAddition ? l10n.feedsRefillTitle : l10n.feedsWriteOffTitle,
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -337,23 +355,30 @@ class _StockDialogState extends State<_StockDialog> {
           children: [
             Text(
               widget.feed.name,
-              style: AppTypography.titleMd
-                  .copyWith(color: context.colors.onSurface),
+              style: AppTypography.titleMd.copyWith(
+                color: context.colors.onSurface,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              l10n.feedsCurrentStock(formatQuantity(
-                  widget.feed.currentStock, widget.feed.unit.displayName)),
-              style: AppTypography.bodyMd
-                  .copyWith(color: context.colors.onSurfaceVariant),
+              l10n.feedsCurrentStock(
+                formatQuantity(
+                  widget.feed.currentStock,
+                  widget.feed.unit.displayName,
+                ),
+              ),
+              style: AppTypography.bodyMd.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             TextFormField(
               controller: _quantity,
               autofocus: true,
               // Дробный ввод: мешки и килограммы редко бывают целыми.
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: l10n.feedsQuantity,
                 suffixText: widget.feed.unit.displayName,
@@ -368,6 +393,34 @@ class _StockDialogState extends State<_StockDialog> {
                 return null;
               },
             ),
+            // Стоимость спрашивается только при пополнении и остаётся
+            // необязательной: «добавил» значит и «закупил мешок», и
+            // «пересчитал, оказалось больше». Заполнили — в книге появится
+            // расход; корм обычно главная статья затрат фермы, и до сих пор
+            // его там не было вовсе.
+            if (widget.isAddition) ...[
+              const SizedBox(height: AppSpacing.lg),
+              TextFormField(
+                controller: _cost,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  labelText: l10n.feedsPaidLabel,
+                  helperText: l10n.feedsPaidHint,
+                  helperMaxLines: 2,
+                ),
+                onFieldSubmitted: (_) => _submit(),
+                validator: (v) {
+                  final raw = v?.trim() ?? '';
+                  if (raw.isEmpty) return null;
+                  final value = parseDecimal(raw);
+                  if (value == null) return l10n.commonNumberInvalid;
+                  if (value <= 0) return l10n.feedsQuantityPositive;
+                  return null;
+                },
+              ),
+            ],
           ],
         ),
       ),
@@ -376,10 +429,7 @@ class _StockDialogState extends State<_StockDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(l10n.commonCancel),
         ),
-        TextButton(
-          onPressed: _submit,
-          child: Text(l10n.commonApply),
-        ),
+        TextButton(onPressed: _submit, child: Text(l10n.commonApply)),
       ],
     );
   }
@@ -390,43 +440,39 @@ class _FeedDetailsSheet extends ConsumerWidget {
 
   const _FeedDetailsSheet({required this.feed});
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.feedsDeleteTitle),
-        content: Text(context.l10n.feedsDeleteBody(feed.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.feedsDeleted;
     final failed = context.l10n.feedsDeleteFailed;
+    final notifier = ref.read(feedsProvider.notifier);
 
-    final error = await ref.read(feedsProvider.notifier).deleteFeed(feed.id);
-    if (error == null) {
-      navigator.pop();
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-    } else {
+    notifier.removeFeed(feed.id);
+
+    Object? error;
+    // Окно отмены открываем, пока шторка ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. А саму
+    // шторку закрываем, не дожидаясь окна, — решение человек уже принял, и
+    // подсказка живёт выше шторки.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.feedsDeleted,
+      commit: () async => error = await notifier.deleteFeed(feed.id),
+      onUndo: notifier.refresh,
+    );
+    navigator.pop();
+    await pending;
+
+    if (error != null) {
       messenger.showSnackBar(
         SnackBar(
           content: Text('$failed: $error'),
           backgroundColor: AppColors.error,
         ),
       );
+      await notifier.refresh();
     }
   }
 
@@ -465,13 +511,15 @@ class _FeedDetailsSheet extends ConsumerWidget {
                     children: [
                       Text(
                         feed.name,
-                        style: AppTypography.titleLg
-                            .copyWith(color: context.colors.onSurface),
+                        style: AppTypography.titleLg.copyWith(
+                          color: context.colors.onSurface,
+                        ),
                       ),
                       Text(
                         feed.type.displayName,
-                        style: AppTypography.labelSm
-                            .copyWith(color: context.colors.onSurfaceVariant),
+                        style: AppTypography.labelSm.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -495,25 +543,21 @@ class _FeedDetailsSheet extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
-            Row(
-              children: [
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.inventory_2_outlined,
-                    label: context.l10n.feedsInStock,
-                    value: formatQuantity(
-                        feed.currentStock, feed.unit.displayName),
-                    accent: low ? AppColors.warning : AppColors.success,
+            StatTileRow(
+              tiles: [
+                StatTile(
+                  icon: Icons.inventory_2_outlined,
+                  label: context.l10n.feedsInStock,
+                  value: formatQuantity(
+                    feed.currentStock,
+                    feed.unit.displayName,
                   ),
+                  accent: low ? AppColors.warning : AppColors.success,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.low_priority,
-                    label: context.l10n.feedsMinStock,
-                    value:
-                        formatQuantity(feed.minStock, feed.unit.displayName),
-                  ),
+                StatTile(
+                  icon: Icons.low_priority,
+                  label: context.l10n.feedsMinStock,
+                  value: formatQuantity(feed.minStock, feed.unit.displayName),
                 ),
               ],
             ),

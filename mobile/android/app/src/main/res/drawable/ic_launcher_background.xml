@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Тот же зелёный, что у акцента приложения по умолчанию
+     (AppColors.accentEmerald), с уходом в тень книзу: плоская заливка на
+     крупных размерах выглядит мёртвой. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#10B981"
+        android:endColor="#047857"
+        android:type="linear"/>
+</shape>

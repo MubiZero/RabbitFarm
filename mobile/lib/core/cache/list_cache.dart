@@ -42,11 +42,20 @@ Future<void> initListCache() => Hive.initFlutter();
 /// тем более с диска, где оно пережило бы и перезапуск.
 Future<void> clearListCaches() async {
   for (final name in ListCacheBoxes.all) {
-    try {
-      await Hive.deleteBoxFromDisk(name);
-    } catch (e) {
-      debugPrint('ListCache: не удалось очистить $name: $e');
-    }
+    await clearListCache(name);
+  }
+}
+
+/// Забыть кэш одного списка.
+///
+/// Нужен там, где устарел не весь кэш, а один его вид: например, задачи после
+/// смены языка — их заголовки сервер собирает на языке читателя, и лежащие на
+/// диске остались на прежнем.
+Future<void> clearListCache(String name) async {
+  try {
+    await Hive.deleteBoxFromDisk(name);
+  } catch (e) {
+    debugPrint('ListCache: не удалось очистить $name: $e');
   }
 }
 
@@ -100,7 +109,8 @@ class ListCache<T> {
 
     try {
       final box = await _box();
-      final head = items.length > _maxItems ? items.sublist(0, _maxItems) : items;
+      final head =
+          items.length > _maxItems ? items.sublist(0, _maxItems) : items;
       await box.put(scope, jsonEncode([for (final item in head) toJson(item)]));
     } catch (e) {
       // Кэш — удобство, а не обязательство: не сохранился, значит в следующий

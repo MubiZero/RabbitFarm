@@ -9,6 +9,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
 import '../widgets/plan_card.dart';
+import '../widgets/plan_delete_dialog.dart';
 
 /// Тарифы сервиса: что вообще можно назначить ферме.
 class PlatformPlansTab extends ConsumerWidget {
@@ -25,7 +26,8 @@ class PlatformPlansTab extends ConsumerWidget {
       builder: (plans) => RefreshIndicator(
         onRefresh: () async => ref.invalidate(platformPlansProvider),
         child: plans.isEmpty
-            ? _EmptyPlans(onCreate: () => context.push('/platform-admin/plans/form'))
+            ? _EmptyPlans(
+                onCreate: () => context.push('/platform-admin/plans/form'))
             : ListView.separated(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.screenH,
@@ -34,7 +36,8 @@ class PlatformPlansTab extends ConsumerWidget {
                   AppSpacing.fabSafeBottom,
                 ),
                 itemCount: plans.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, i) => PlanCard(
                   plan: plans[i],
                   onEdit: () => context.push(
@@ -53,26 +56,7 @@ class PlatformPlansTab extends ConsumerWidget {
     final l10n = context.l10n;
     final deleted = l10n.platformPlanDeleted;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.platformPlanDeleteTitle),
-        content: Text(l10n.platformPlanDeleteBody(plan.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
+    if (!await showPlanDeleteDialog(context, plan: plan)) return;
 
     try {
       await ref.read(platformAdminRepositoryProvider).deletePlan(plan.id);

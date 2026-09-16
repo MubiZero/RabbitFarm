@@ -46,14 +46,22 @@ abstract class MedicalRecord with _$MedicalRecord {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required DateTime startedAt,
     @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
-    @JsonKey(defaultValue: MedicalOutcome.ongoing) required MedicalOutcome outcome,
+    @JsonKey(defaultValue: MedicalOutcome.ongoing)
+    required MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
     String? notes,
-    @JsonKey(name: 'created_at') @NullableDateTimeConverter() DateTime? createdAt,
-    @JsonKey(name: 'updated_at') @NullableDateTimeConverter() DateTime? updatedAt,
+    @JsonKey(name: 'created_at')
+    @NullableDateTimeConverter()
+    DateTime? createdAt,
+    @JsonKey(name: 'updated_at')
+    @NullableDateTimeConverter()
+    DateTime? updatedAt,
+
     /// Кролик, которого лечили или прививали.
     ///
     /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
@@ -77,7 +85,9 @@ abstract class MedicalRecordCreate with _$MedicalRecordCreate {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required DateTime startedAt,
     @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     @JsonKey(defaultValue: 'ongoing') String? outcome,
     double? cost,
@@ -99,7 +109,9 @@ abstract class MedicalRecordUpdate with _$MedicalRecordUpdate {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') @NullableDateOnlyConverter() DateTime? startedAt,
+    @JsonKey(name: 'started_at')
+    @NullableDateOnlyConverter()
+    DateTime? startedAt,
     @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
     String? outcome,
     double? cost,
@@ -117,7 +129,8 @@ abstract class MedicalStatistics with _$MedicalStatistics {
   const factory MedicalStatistics({
     @JsonKey(name: 'total_records') required int totalRecords,
     @JsonKey(name: 'by_outcome') required MedicalOutcomeStats byOutcome,
-    @JsonKey(name: 'ongoing_treatments') required List<OngoingTreatment> ongoingTreatments,
+    @JsonKey(name: 'ongoing_treatments')
+    required List<OngoingTreatment> ongoingTreatments,
     @JsonKey(name: 'total_cost') required double totalCost,
     @JsonKey(name: 'this_year') required int thisYear,
     @JsonKey(name: 'last_month') required int lastMonth,
@@ -149,7 +162,9 @@ abstract class OngoingTreatment with _$OngoingTreatment {
     @JsonKey(name: 'rabbit_id') @IntConverter() required int rabbitId,
     @JsonKey(name: 'rabbit_name') String? rabbitName,
     String? diagnosis,
-    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required DateTime startedAt,
     @JsonKey(name: 'days_ongoing') required int daysOngoing,
     String? symptoms,
   }) = _OngoingTreatment;
@@ -169,13 +184,17 @@ abstract class MedicalRecordWithDays with _$MedicalRecordWithDays {
     String? treatment,
     String? medication,
     String? dosage,
-    @JsonKey(name: 'started_at') @DateOnlyConverter() required DateTime startedAt,
+    @JsonKey(name: 'started_at')
+    @DateOnlyConverter()
+    required DateTime startedAt,
     @JsonKey(name: 'ended_at') @NullableDateOnlyConverter() DateTime? endedAt,
-    @JsonKey(defaultValue: MedicalOutcome.ongoing) required MedicalOutcome outcome,
+    @JsonKey(defaultValue: MedicalOutcome.ongoing)
+    required MedicalOutcome outcome,
     @DoubleConverter() double? cost,
     String? veterinarian,
     String? notes,
     @JsonKey(name: 'days_ongoing') required int daysOngoing,
+
     /// Кролик, которого лечили или прививали.
     ///
     /// Сервер шлёт его урезанным — id, кличка, бирка, пол, дата рождения, —
@@ -201,4 +220,3 @@ abstract class CostReport with _$CostReport {
   factory CostReport.fromJson(Map<String, dynamic> json) =>
       _$CostReportFromJson(json);
 }
-

@@ -266,6 +266,11 @@ backend/
 │   │   ├── swagger.js              # OpenAPI-схема
 │   │   └── validateEnv.js          # Проверка обязательных переменных окружения при старте
 │   │
+│   ├── i18n/
+│   │   ├── notifications.js        # Тексты пушей и писем на ru/en/tg/uz (язык — из профиля)
+│   │   └── tasks.js                # Тексты автозадач: в базе ключ и подстановки,
+│   │                                 текст собирается на языке читателя
+│   │
 │   ├── middleware/                 # Без отдельного upload.js — загрузка идёт через config/multer.js
 │   │   ├── auth.js                 # JWT verification
 │   │   ├── validation.js           # Request validation
@@ -323,7 +328,8 @@ backend/
 │   │   ├── authService.js          # Регистрация, вход, токены
 │   │   ├── staffService.js         # Работники, приглашения, передача хозяйства
 │   │   ├── noteService.js          # Заметки
-│   │   ├── notificationService.js  # Push-уведомления (FCM), опционально — молчит без Firebase
+│   │   ├── notificationService.js  # Push-уведомления (FCM), опционально — молчит без Firebase;
+│   │   │                             шлёт каждому на его языке (`users.language`)
 │   │   ├── notifications/          # Транспорты дайджеста/объявлений
 │   │   │   ├── emailTransport.js   # Email через собственный SMTP (Stalwart)
 │   │   │   └── payomSmsTransport.js # SMS через Payom, только заранее одобренные шаблоны

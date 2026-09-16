@@ -71,7 +71,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get offlineBanner =>
-      'Нет связи — кормление, задачи и заметки сохранятся и отправятся позже';
+      'Нет связи — записи сохранятся и отправятся, когда связь появится';
 
   @override
   String get offlineActionQueued =>
@@ -162,7 +162,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pinSetupExplanation =>
-      'Этим кодом вы будете открывать приложение на этом телефоне — SMS больше ждать не придётся.';
+      'Этим кодом вы будете открывать приложение на этом телефоне — кода из SMS или письма больше ждать не придётся.';
 
   @override
   String get pinSkip => 'Не сейчас';
@@ -355,15 +355,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get activationChecklistDismiss => 'Скрыть';
-
-  @override
-  String get activationChecklistAddCage => 'Добавьте клетку';
-
-  @override
-  String get activationChecklistAddRabbit => 'Добавьте кролика';
-
-  @override
-  String get activationChecklistFirstFeeding => 'Внесите первое кормление';
 
   @override
   String get menuProfile => 'Профиль';
@@ -834,6 +825,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tasksFilterTodayOnly => 'Только на сегодня';
 
   @override
+  String get tasksFilterAssignee => 'Исполнитель';
+
+  @override
+  String get tasksFilterAssigneeAny => 'Любой';
+
+  @override
+  String get tasksFilterAssigneeMine => 'Только мои';
+
+  @override
+  String get tasksAssigneeMineChip => 'Мои задачи';
+
+  @override
   String get tasksEmptyTitle => 'Задач пока нет';
 
   @override
@@ -977,6 +980,20 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get taskFormRepeatHelp =>
       'Когда задачу отметят выполненной, следующая создастся сама.';
+
+  @override
+  String get taskFormAssignee => 'Исполнитель';
+
+  @override
+  String get taskFormAssigneeNobody => 'Никому не поручена';
+
+  @override
+  String get taskFormAssigneeHelp => 'Исполнителю придёт уведомление о задаче.';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Исполнитель: $name';
+  }
 
   @override
   String get taskFormNotesLabel => 'Примечания';
@@ -1855,6 +1872,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get financeDescription => 'Описание';
 
   @override
+  String get financeAuthor => 'Кто записал';
+
+  @override
+  String financeAuthorLine(String name) {
+    return 'Записал $name';
+  }
+
+  @override
   String get financeTypeIncome => 'Доход';
 
   @override
@@ -1912,6 +1937,24 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get txFormDescription => 'Описание';
+
+  @override
+  String get txFormReceipt => 'Чек';
+
+  @override
+  String get txFormReceiptShoot => 'Снять чек';
+
+  @override
+  String get txFormReceiptFromGallery => 'Из галереи';
+
+  @override
+  String get txFormReceiptReplace => 'Переснять';
+
+  @override
+  String get txFormReceiptRemove => 'Убрать чек';
+
+  @override
+  String get txFormReceiptFailed => 'Не удалось получить снимок';
 
   @override
   String get txFormCreated => 'Операция записана';
@@ -2311,20 +2354,54 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDigestToggle => 'Дайджест по хозяйству';
 
   @override
+  String get settingsHerd => 'Поголовье';
+
+  @override
+  String get settingsPurposeAll => 'Назначение всем кроликам';
+
+  @override
+  String get settingsPurposeAllHint =>
+      'Большинство ферм держат кроликов для чего-то одного. Выставьте раз — и не отвечайте на этот вопрос в каждой карточке.';
+
+  @override
+  String get settingsPurposeAllTitle => 'Выставить назначение всем?';
+
+  @override
+  String settingsPurposeAllBody(String purpose) {
+    return 'Всем живым кроликам фермы будет проставлено «$purpose». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному. Новые кролики тоже будут заводиться с этим назначением.';
+  }
+
+  @override
+  String get settingsPurposeAllApply => 'Выставить';
+
+  @override
+  String settingsPurposeAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Изменено $count кроликов.',
+      few: 'Изменено $count кролика.',
+      one: 'Изменён $count кролик.',
+      zero: 'Менять было нечего — у всех уже так.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsAbout => 'О приложении';
 
   @override
   String get settingsVersion => 'Версия';
 
   @override
-  String get settingsSupport => 'Написать в поддержку';
+  String get settingsSupport => 'Поддержка';
 
   @override
   String get supportRequestTitle => 'Поддержка';
 
   @override
   String get supportRequestHint =>
-      'Опишите, что случилось, — ответим по тому же аккаунту, с которого пришло обращение.';
+      'Опишите, что случилось. Ответ придёт на этот же экран и уведомлением на телефон.';
 
   @override
   String get supportRequestPlaceholder =>
@@ -2918,12 +2995,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String staffInvitedPhoneBody(String phone) {
-    return 'Он вводит номер $phone на входе в приложение и код, который придёт ему в SMS. Ничего передавать не нужно.';
+    return 'Работнику на $phone SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.';
   }
 
   @override
   String staffInvitedEmailBody(String email) {
-    return 'Он вводит почту $email на входе в приложение и код, который придёт ему письмом. Ничего передавать не нужно.';
+    return 'Письмо с приглашением ушло на $email. Работник войдёт по этому адресу — код придёт ему письмом.';
   }
 
   @override
@@ -3008,6 +3085,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get rabbitBirthDate => 'Дата рождения';
+
+  @override
+  String get rabbitAcquiredDate => 'Когда купили';
+
+  @override
+  String get rabbitAcquiredDateEmpty => 'Родился на ферме';
 
   @override
   String get rabbitColor => 'Окрас';
@@ -3400,6 +3483,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get reportsByBreed => 'Поголовье по породам';
 
   @override
+  String get reportsByPurpose => 'По назначению';
+
+  @override
   String reportsBreedUnknown(int id) {
     return 'Порода №$id';
   }
@@ -3627,6 +3713,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get platformPlanDeleteTitle => 'Удалить тариф?';
 
   @override
+  String platformPlanDeleteFarms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'На нём сейчас $count ферм — они станут работать без ограничений.',
+      few: 'На нём сейчас $count фермы — они станут работать без ограничений.',
+      one: 'На нём сейчас $count ферма — она станет работать без ограничений.',
+      zero: 'На этом тарифе сейчас нет ни одной фермы.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String platformPlanDeleteBody(String name) {
     return '«$name» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.';
   }
@@ -3806,6 +3905,23 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformFarmStatusUpdated => 'Доступ обновлён';
+
+  @override
+  String get platformFarmSectionAudit => 'Что с ней делали';
+
+  @override
+  String get platformFarmAuditEmpty => 'Админы эту ферму не трогали.';
+
+  @override
+  String get platformFarmAuditLoading => 'Смотрим журнал…';
+
+  @override
+  String get platformFarmAuditAll => 'Весь журнал';
+
+  @override
+  String platformFarmStatusExpiredWarning(String date) {
+    return 'Тариф истёк $date. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.';
+  }
 
   @override
   String get platformFarmPlanForever => 'Бессрочно';
@@ -4068,7 +4184,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get platformSupportRequestsEmptyBody =>
-      'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Написать в поддержку.';
+      'Здесь появятся вопросы от ферм — фермер пишет через Настройки → Поддержка.';
 
   @override
   String get platformSupportRequestNew => 'новое';
@@ -4292,4 +4408,755 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emptyNoRecordsBody => 'Добавьте первую.';
+
+  @override
+  String get onbWelcomeTitle => 'RabbitFarm';
+
+  @override
+  String get onbWelcomeBody =>
+      'Клетки, случки, окролы, корма и деньги — всё записано и всегда под рукой. Приложение само напомнит, когда ставить маточник и делать прививки.';
+
+  @override
+  String get onbWelcomeStart => 'Начать';
+
+  @override
+  String get onbWelcomeHaveAccount => 'У меня уже есть ферма';
+
+  @override
+  String get onbHerdTitle => 'Сколько у вас кроликов?';
+
+  @override
+  String get onbHerdSubtitle => 'Примерно, вместе с молодняком.';
+
+  @override
+  String get onbHerdUpTo20 => 'До 20';
+
+  @override
+  String get onbHerdUpTo20Hint => 'Держу для себя';
+
+  @override
+  String get onbHerdUpTo100 => 'От 20 до 100';
+
+  @override
+  String get onbHerdUpTo100Hint => 'Небольшое хозяйство';
+
+  @override
+  String get onbHerdUpTo500 => 'От 100 до 500';
+
+  @override
+  String get onbHerdUpTo500Hint => 'Ферма на продажу';
+
+  @override
+  String get onbHerdOver500 => 'Больше 500';
+
+  @override
+  String get onbHerdOver500Hint => 'Крупное хозяйство';
+
+  @override
+  String get onbFocusTitle => 'Что записывать в первую очередь?';
+
+  @override
+  String get onbFocusSubtitle =>
+      'Отметьте всё, что подходит. Остальное никуда не денется.';
+
+  @override
+  String get onbFocusBreeding => 'Случки и окролы';
+
+  @override
+  String get onbFocusFeeding => 'Корма и расход';
+
+  @override
+  String get onbFocusHealth => 'Прививки и лечение';
+
+  @override
+  String get onbFocusMoney => 'Продажи и расходы';
+
+  @override
+  String get onbFocusNext => 'Дальше';
+
+  @override
+  String get onbCrewTitle => 'Кто будет работать в приложении?';
+
+  @override
+  String get onbCrewSubtitle => 'Это можно изменить в любой момент.';
+
+  @override
+  String get onbCrewAlone => 'Только я';
+
+  @override
+  String get onbCrewAloneHint => 'Ни приглашений, ни настроек доступа';
+
+  @override
+  String get onbCrewHelpers => 'Я и помощники';
+
+  @override
+  String get onbCrewHelpersHint =>
+      'Каждый записывает со своего телефона, и видно, кто что внёс';
+
+  @override
+  String get onbDoneTitle => 'С чего начнём';
+
+  @override
+  String get onbDoneSubtitle => 'Эти шаги будут ждать на главном экране.';
+
+  @override
+  String get onbDoneCreate => 'Создать ферму';
+
+  @override
+  String get onbBack => 'Назад';
+
+  @override
+  String get onbSkip => 'Пропустить';
+
+  @override
+  String get firstStepCages => 'Завести клетки';
+
+  @override
+  String get firstStepRabbits => 'Добавить самок и самцов';
+
+  @override
+  String get firstStepBreeding => 'Записать первую случку';
+
+  @override
+  String get firstStepFeeding => 'Отметить первое кормление';
+
+  @override
+  String get firstStepHealth => 'Отметить первую прививку';
+
+  @override
+  String get firstStepMoney => 'Записать первую продажу';
+
+  @override
+  String get firstStepHelpers => 'Пригласить помощника';
+
+  @override
+  String get activationChecklistFarmCreated => 'Ферма создана';
+
+  @override
+  String activationChecklistProgress(int done, int total) {
+    return '$done из $total';
+  }
+
+  @override
+  String get deathFormTitle => 'Отметить падёж';
+
+  @override
+  String get deathFormRabbit => 'Кролик';
+
+  @override
+  String get deathFormDate => 'Дата';
+
+  @override
+  String get deathFormReason => 'Причина';
+
+  @override
+  String get deathFormReasonHint => 'Отчего пал — если знаете';
+
+  @override
+  String get deathFormSubmit => 'Отметить';
+
+  @override
+  String get deathFormSaved => 'Падёж отмечен';
+
+  @override
+  String get saleFormTitle => 'Записать продажу';
+
+  @override
+  String get saleFormRabbit => 'Кролик';
+
+  @override
+  String get saleFormAmount => 'Цена';
+
+  @override
+  String get saleFormAmountHelp =>
+      'Сумма попадёт в книгу доходов, кролик перейдёт в проданные.';
+
+  @override
+  String get saleFormAmountEmpty => 'Укажите, за сколько продали';
+
+  @override
+  String get saleFormDate => 'День продажи';
+
+  @override
+  String get saleFormBuyer => 'Покупатель';
+
+  @override
+  String get saleFormBuyerHint => 'Кому продали — если хотите запомнить';
+
+  @override
+  String get saleFormSubmit => 'Записать';
+
+  @override
+  String get saleFormSaved => 'Продажа записана';
+
+  @override
+  String get quickRecordDeath => 'Падёж';
+
+  @override
+  String get notificationPrimerTitle => 'Напомним поставить маточник';
+
+  @override
+  String get notificationPrimerBody =>
+      'За два дня до окрола придёт напоминание — успеете подготовить клетку. Ещё напомним про прививки и дела на день.';
+
+  @override
+  String get notificationPrimerAllow => 'Включить напоминания';
+
+  @override
+  String get notificationPrimerDecline => 'Не сейчас';
+
+  @override
+  String get settingsNotificationsOff => 'Уведомления выключены';
+
+  @override
+  String get settingsNotificationsTurnOn => 'Включить';
+
+  @override
+  String get rabbitFormMore => 'Дополнительно';
+
+  @override
+  String get rabbitFormSexRequired => 'Выберите, самец это или самка';
+
+  @override
+  String get rabbitFormCageNone => 'Без клетки';
+
+  @override
+  String rabbitFormCageFull(String number) {
+    return '$number — занята полностью';
+  }
+
+  @override
+  String get commonOptional => 'необязательно';
+
+  @override
+  String get unitKg => 'кг';
+
+  @override
+  String get kindlingPlanAction => 'План окролов';
+
+  @override
+  String get kindlingPlanPickMonth => 'План окролов на какой месяц?';
+
+  @override
+  String get kindlingPlanThisMonth => 'На этот месяц';
+
+  @override
+  String get kindlingPlanNextMonth => 'На следующий месяц';
+
+  @override
+  String kindlingPlanEmpty(String month) {
+    return 'На $month окролов не ожидается';
+  }
+
+  @override
+  String kindlingPlanSheetTitle(String month) {
+    return 'План окролов — $month';
+  }
+
+  @override
+  String get kindlingPlanNestHint => 'Маточник ставят за три дня до окрола';
+
+  @override
+  String get kindlingPlanColBirth => 'Окрол';
+
+  @override
+  String get kindlingPlanColFemale => 'Самка';
+
+  @override
+  String get kindlingPlanColCage => 'Клетка';
+
+  @override
+  String get kindlingPlanColBred => 'Случка';
+
+  @override
+  String get kindlingPlanColNest => 'Маточник';
+
+  @override
+  String get kindlingPlanColMark => 'Отметка';
+
+  @override
+  String kindlingPlanPrintedAt(String date) {
+    return 'Напечатано $date';
+  }
+
+  @override
+  String get commonUndo => 'Вернуть';
+
+  @override
+  String get journalKindDeletion => 'Удаление';
+
+  @override
+  String get voiceDictate => 'Надиктовать';
+
+  @override
+  String get voiceStop => 'Остановить запись';
+
+  @override
+  String get voiceUnavailable => 'Этот телефон не умеет распознавать речь';
+
+  @override
+  String get cageAddNewRabbit => 'Завести нового';
+
+  @override
+  String get cageAddNewRabbitHint => 'Кролик, которого ещё нет в приложении';
+
+  @override
+  String get cageSettleExisting => 'Поселить из стада';
+
+  @override
+  String get cageSettleExistingHint => 'Перевести сюда уже заведённого';
+
+  @override
+  String get cageFeedThis => 'Покормить клетку';
+
+  @override
+  String get cageTagsTitle => 'Метки на клетки';
+
+  @override
+  String get cageTagsPrint => 'Распечатать';
+
+  @override
+  String get cageTagsPrintHint =>
+      'Вырежьте по рамке и повесьте на клетку — камера откроет её в приложении.';
+
+  @override
+  String get cageTagsEmptyTitle => 'Клеток пока нет';
+
+  @override
+  String get cageTagsEmptyBody =>
+      'Заведите клетку — метку можно будет напечатать сразу.';
+
+  @override
+  String get cageScanTitle => 'Прочитать метку';
+
+  @override
+  String get cageScanHint => 'Наведите камеру на метку клетки';
+
+  @override
+  String get cageScanNoCamera =>
+      'Камера недоступна. Проверьте разрешение в настройках телефона.';
+
+  @override
+  String get slideToDelete => 'Сдвиньте, чтобы удалить';
+
+  @override
+  String get birthsKitsDied => 'Пало';
+
+  @override
+  String get birthsKitDeathAction => 'Отметить падёж';
+
+  @override
+  String get birthsKitsCardedHint =>
+      'Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.';
+
+  @override
+  String get birthsKitDeathTitle => 'Сколько крольчат пало?';
+
+  @override
+  String birthsKitDeathHint(int alive) {
+    return 'Осталось живых: $alive';
+  }
+
+  @override
+  String get birthsKitDeathSaved => 'Записано';
+
+  @override
+  String get birthsKitsAlive => 'Живых';
+
+  @override
+  String get loginCodeLabelEmail => 'Код из письма';
+
+  @override
+  String get cyclePalpationAction => 'Прощупала';
+
+  @override
+  String get cyclePalpationTitle => 'Что показало прощупывание?';
+
+  @override
+  String get cyclePalpationPregnant => 'Сукрольная';
+
+  @override
+  String get cyclePalpationPregnantHint =>
+      'Самка станет беременной, впереди окрол';
+
+  @override
+  String get cyclePalpationEmpty => 'Пустая';
+
+  @override
+  String get cyclePalpationEmptyHint =>
+      'Цикл закрывается — самку можно крыть заново';
+
+  @override
+  String get cyclePalpationSavedPregnant => 'Записано: сукрольная';
+
+  @override
+  String get cyclePalpationSavedEmpty => 'Записано: пустая';
+
+  @override
+  String get birthsWeaningAction => 'Отсадили';
+
+  @override
+  String get birthsWeaningTitle => 'Сколько крольчат отсадили?';
+
+  @override
+  String birthsWeaningHint(int alive) {
+    return 'Живых в выводке: $alive';
+  }
+
+  @override
+  String birthsWeaningAll(int count) {
+    return 'Всех: $count';
+  }
+
+  @override
+  String get birthsWeaningFewer => 'Или сколько-то меньше';
+
+  @override
+  String get birthsWeaningSaved => 'Отсадка записана';
+
+  @override
+  String get subscriptionCheckFailed =>
+      'Не удалось проверить оплату — нет связи с сервером';
+
+  @override
+  String get subscriptionPaymentDeclined => 'Банк отклонил оплату';
+
+  @override
+  String get subscriptionPaymentDeclinedHint =>
+      'Деньги не списаны. Проверьте карту и попробуйте ещё раз.';
+
+  @override
+  String get subscriptionPayAgain => 'Оплатить заново';
+
+  @override
+  String get supportRequestNew => 'Написать';
+
+  @override
+  String get supportRequestNewTitle => 'Новое обращение';
+
+  @override
+  String get supportRequestsEmptyTitle => 'Обращений пока нет';
+
+  @override
+  String get supportRequestsEmptyBody =>
+      'Напишите, если что-то не работает или непонятно. Ответ придёт сюда же и уведомлением на телефон.';
+
+  @override
+  String get supportRequestsEmptyAction => 'Написать в поддержку';
+
+  @override
+  String get supportRequestStatusWaiting => 'Ждём ответа';
+
+  @override
+  String get supportRequestStatusAnswered => 'Поддержка ответила';
+
+  @override
+  String get supportRequestAnswerTitle => 'Ответ поддержки';
+
+  @override
+  String get supportRequestClosedWithoutAnswer =>
+      'Обращение закрыто без письменного ответа.';
+
+  @override
+  String get platformSupportAnswerTitle => 'Ответ автору';
+
+  @override
+  String get platformSupportResolveTitle => 'Закрыть обращение';
+
+  @override
+  String get platformSupportResolveBody =>
+      'Напишите ответ — он придёт автору уведомлением и письмом. Оставьте поле пустым, если разобрались без переписки.';
+
+  @override
+  String get platformSupportResolveAnswerLabel => 'Ответ автору';
+
+  @override
+  String get platformSupportResolveAnswerHint =>
+      'Например: обновите приложение — в новой версии это исправлено';
+
+  @override
+  String get platformSupportResolveSendAnswer => 'Отправить ответ';
+
+  @override
+  String get platformSupportResolveWithoutAnswer => 'Закрыть без ответа';
+
+  @override
+  String get platformSupportContactTitle => 'Контакт поддержки';
+
+  @override
+  String get platformSupportContactBody =>
+      'Этот телефон и почту фермы видят на своём экране обращений. Оставьте пустыми, если прямого контакта нет.';
+
+  @override
+  String get platformSupportContactPhone => 'Телефон';
+
+  @override
+  String get platformSupportContactPhoneHint => '+992 00 000 00 00';
+
+  @override
+  String get platformSupportContactEmail => 'Почта';
+
+  @override
+  String get platformSupportContactEmailHint => 'support@example.com';
+
+  @override
+  String get platformSupportContactEmailInvalid =>
+      'Проверьте адрес — в нём нет знака @';
+
+  @override
+  String get platformSupportContactSaved => 'Контакт поддержки сохранён';
+
+  @override
+  String get notificationsTitle => 'Уведомления';
+
+  @override
+  String get notificationsEmptyTitle => 'Пока тихо';
+
+  @override
+  String get notificationsEmptyBody =>
+      'Здесь появится то, о чём приложение сообщало: просроченные прививки, кончающийся корм, скорый окрол.';
+
+  @override
+  String get platformFilterDeleted => 'Удалённые';
+
+  @override
+  String platformFarmDeletedShort(String date) {
+    return 'Удалена $date';
+  }
+
+  @override
+  String get platformFarmsDeletedEmptyTitle => 'Удалённых ферм нет';
+
+  @override
+  String get platformFarmsDeletedEmptyBody =>
+      'Ничего не ждёт окончательной очистки. Удалённая ферма остаётся здесь 30 дней — этого срока хватает, чтобы передумать.';
+
+  @override
+  String get platformPlanDeleteDefaultWarning =>
+      'Это тариф по умолчанию. После удаления новые фермы будут появляться вовсе без тарифа, пока таким не отмечен другой.';
+
+  @override
+  String get platformPlanDeleteIrreversible =>
+      'Отменить нельзя: тариф придётся заводить заново и назначать фермам вручную.';
+
+  @override
+  String get platformTabAudit => 'Журнал';
+
+  @override
+  String get platformAuditEmptyTitle => 'Журнал пуст';
+
+  @override
+  String get platformAuditEmptyBody =>
+      'Сюда попадает каждое действие админа: смена тарифа, доступ фермы, вход под клиентом, удаление.';
+
+  @override
+  String countAuditRecords(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записи',
+      many: '$count записей',
+      few: '$count записи',
+      one: '$count запись',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String platformAuditAdmin(String id) {
+    return 'Админ $id';
+  }
+
+  @override
+  String platformAuditFarm(String id) {
+    return 'Ферма $id';
+  }
+
+  @override
+  String get platformAuditWholeService => 'Весь сервис';
+
+  @override
+  String platformAuditIp(String ip) {
+    return 'IP $ip';
+  }
+
+  @override
+  String platformAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String platformAuditDetail(String field, String value) {
+    return '$field: $value';
+  }
+
+  @override
+  String get platformAuditValueNone => 'не задано';
+
+  @override
+  String get platformAuditActionPlanCreate => 'Создан тариф';
+
+  @override
+  String get platformAuditActionPlanUpdate => 'Изменён тариф';
+
+  @override
+  String get platformAuditActionPlanDelete => 'Удалён тариф';
+
+  @override
+  String get platformAuditActionPlanAssign => 'Смена тарифа фермы';
+
+  @override
+  String get platformAuditActionFarmStatus => 'Смена доступа фермы';
+
+  @override
+  String get platformAuditActionFarmExtras => 'Поблажка сверх тарифа';
+
+  @override
+  String get platformAuditActionFarmExtendPlan => 'Тариф продлён вручную';
+
+  @override
+  String get platformAuditActionFarmExport => 'Выгрузка данных фермы';
+
+  @override
+  String get platformAuditActionFarmImpersonate => 'Вход под клиентом';
+
+  @override
+  String get platformAuditActionFarmDelete => 'Удаление фермы';
+
+  @override
+  String get platformAuditActionFarmRestore => 'Восстановление фермы';
+
+  @override
+  String get platformAuditActionAnnouncementSend => 'Отправлено объявление';
+
+  @override
+  String get platformAuditActionSupportResolve => 'Обращение закрыто';
+
+  @override
+  String get platformAuditActionSupportContact => 'Изменён контакт поддержки';
+
+  @override
+  String platformAuditActionUnknown(String action) {
+    return 'Действие «$action»';
+  }
+
+  @override
+  String get platformAuditFieldName => 'Название';
+
+  @override
+  String get platformAuditFieldLimits => 'Пределы';
+
+  @override
+  String get platformAuditFieldPrice => 'Цена';
+
+  @override
+  String get platformAuditFieldRabbitsLimit => 'Кроликов по тарифу';
+
+  @override
+  String get platformAuditFieldStaffLimit => 'Людей по тарифу';
+
+  @override
+  String get platformAuditFieldPlan => 'Тариф';
+
+  @override
+  String get platformAuditFieldStatus => 'Доступ';
+
+  @override
+  String get platformAuditFieldPlanExpiry => 'Срок тарифа';
+
+  @override
+  String get platformAuditFieldExtras => 'Поблажка';
+
+  @override
+  String get platformAuditFieldReason => 'Зачем';
+
+  @override
+  String get platformAuditPlanEnabled => 'Тариф снова выдаётся фермам';
+
+  @override
+  String get platformAuditPlanDisabled => 'Тариф больше не выдаётся фермам';
+
+  @override
+  String get platformAuditPlanBecameDefault => 'Стал тарифом по умолчанию';
+
+  @override
+  String get platformAuditPlanNoLongerDefault => 'Больше не тариф по умолчанию';
+
+  @override
+  String platformAuditPlanRef(int id) {
+    return 'Тариф №$id';
+  }
+
+  @override
+  String platformAuditSupportAnswered(int id) {
+    return 'Обращение №$id — с ответом автору';
+  }
+
+  @override
+  String platformAuditSupportClosed(int id) {
+    return 'Обращение №$id — без ответа';
+  }
+
+  @override
+  String get feedsPaidLabel => 'Сколько заплатили';
+
+  @override
+  String get feedsPaidHint =>
+      'Если это закупка — сумма попадёт в расходы. Пересчитали остаток — оставьте пустым.';
+
+  @override
+  String staffInvitedEmailFailedBody(String email) {
+    return 'Письмо на $email отправить не удалось — перешлите работнику приглашение сами.';
+  }
+
+  @override
+  String get staffInviteLinkLabel => 'Ссылка-приглашение';
+
+  @override
+  String get staffInviteCopy => 'Скопировать приглашение';
+
+  @override
+  String get staffInviteCopied =>
+      'Приглашение скопировано — вставьте его в сообщение работнику';
+
+  @override
+  String staffInviteMessage(String link) {
+    return 'Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: $link';
+  }
+
+  @override
+  String get staffExpiredInvites => 'Срок вышел';
+
+  @override
+  String staffInviteCardLive(String role, String date) {
+    return '$role · до $date';
+  }
+
+  @override
+  String staffInviteCardExpired(String role, String date) {
+    return '$role · срок истёк $date';
+  }
+
+  @override
+  String get staffInviteAgain => 'Пригласить заново';
+
+  @override
+  String get loginNoCodePhone =>
+      'Кода нет? Спросите у владельца фермы, на какой номер он вас пригласил.';
+
+  @override
+  String get loginNoCodeEmail =>
+      'Кода нет? Спросите у владельца фермы, на какую почту он вас пригласил.';
+
+  @override
+  String get platformPlanDefaultBadge => 'новым фермам';
+
+  @override
+  String get staffAccessClosedBadge => 'доступ закрыт';
+
+  @override
+  String get roleManagerDescription => 'Ведёт поголовье, корма и финансы';
+
+  @override
+  String get roleWorkerDescription => 'Смотрит данные и отмечает работу';
 }

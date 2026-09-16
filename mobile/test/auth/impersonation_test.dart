@@ -13,8 +13,8 @@ class _FakeAdapter implements HttpClientAdapter {
   final Map<String, dynamic> profile;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options, Stream<Uint8List>? _,
-      Future<void>? __) async {
+  Future<ResponseBody> fetch(
+      RequestOptions options, Stream<Uint8List>? _, Future<void>? __) async {
     final body = options.path.contains('me')
         ? {'success': true, 'message': 'ok', 'data': profile}
         : {'success': true, 'message': 'ok', 'data': <String, dynamic>{}};
@@ -75,7 +75,9 @@ void main() {
     expect(await repository.isImpersonating(), isTrue);
   });
 
-  test('без сохранённого refresh-токена админа не путает его отсутствие с чужим', () async {
+  test(
+      'без сохранённого refresh-токена админа не путает его отсутствие с чужим',
+      () async {
     // У админа мог не быть refresh-токена на момент входа под клиентом
     // (маловероятно, но откладывать нечего — значит и не пишем).
     final storage = FakeStorage({
@@ -92,7 +94,9 @@ void main() {
     expect(storage.values.containsKey('admin_refresh_token'), isFalse);
   });
 
-  test('восстановление возвращает токены и профиль админа, снимает пометки просмотра', () async {
+  test(
+      'восстановление возвращает токены и профиль админа, снимает пометки просмотра',
+      () async {
     final storage = FakeStorage({
       'access_token': 'owner-access',
       'admin_access_token': 'admin-access',
@@ -122,7 +126,9 @@ void main() {
     expect(await repository.isImpersonating(), isFalse);
   });
 
-  test('обычный выход стирает и отложенную сессию просмотра — не только текущую', () async {
+  test(
+      'обычный выход стирает и отложенную сессию просмотра — не только текущую',
+      () async {
     final storage = FakeStorage({
       'access_token': 'owner-access',
       'refresh_token': 'r',

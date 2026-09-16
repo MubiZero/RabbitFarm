@@ -240,7 +240,7 @@ describe('Auth API', () => {
         .send({ email: 'verify@example.com' });
       const otp = await LoginOtp.findOne({
         where: { identifier: 'verify@example.com' },
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC'], ['id', 'DESC']]
       });
       await otp.update({
         token_hash: hashOtp(KNOWN_CODE),
@@ -262,7 +262,7 @@ describe('Auth API', () => {
           .send({ email: 'verify@example.com' });
         const otp = await LoginOtp.findOne({
           where: { identifier: 'verify@example.com' },
-          order: [['created_at', 'DESC']]
+          order: [['created_at', 'DESC'], ['id', 'DESC']]
         });
         await otp.update({ token_hash: hashOtp(KNOWN_CODE) });
 
@@ -279,6 +279,44 @@ describe('Auth API', () => {
         expect(res.status).toBe(429);
         expect(res.body.error.code).toBe('OTP_LOCKED');
       });
+
+    // Человек жмёт «выслать ещё раз», не дождавшись SMS, — и два кода
+    // ложатся в одну секунду. `created_at` в базе без долей секунды, поэтому
+    // без второго ключа сортировки база вправе вернуть любой из двух: свежий
+    // код, который человек и получил, отвергался как неверный. Здесь обе
+    // записи создаются с одинаковым `created_at` намеренно — иначе поймать
+    // это можно только случайно, раз в десяток прогонов.
+    it('из двух кодов одной секунды принимается последний', async () => {
+      // Регистрация заводит первый код, повторный запрос — второй.
+      // Неизвестному контакту сервер кодов не создаёт вовсе.
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email: 'same_second@example.com', full_name: 'Тот же Секунд' });
+      await request(app)
+        .post('/api/v1/auth/otp/request')
+        .send({ email: 'same_second@example.com' });
+
+      const codes = await LoginOtp.findAll({
+        where: { identifier: 'same_second@example.com' },
+        order: [['id', 'ASC']]
+      });
+      expect(codes).toHaveLength(2);
+
+      const sameSecond = new Date('2026-09-15T10:00:00Z');
+      await codes[0].update({ created_at: sameSecond, token_hash: hashOtp('111111') }, { silent: true });
+      await codes[1].update({ created_at: sameSecond, token_hash: hashOtp('222222') }, { silent: true });
+
+      // Старый код больше не действует.
+      const stale = await request(app)
+        .post('/api/v1/auth/otp/verify')
+        .send({ email: 'same_second@example.com', code: '111111' });
+      expect(stale.status).toBe(400);
+
+      const fresh = await request(app)
+        .post('/api/v1/auth/otp/verify')
+        .send({ email: 'same_second@example.com', code: '222222' });
+      expect(fresh.status).toBe(200);
+    });
 
     it('отключённый аккаунт не пускают даже с верным кодом', async () => {
       await request(app)

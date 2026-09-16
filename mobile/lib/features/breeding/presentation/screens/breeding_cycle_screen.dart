@@ -11,6 +11,8 @@ import '../../../rabbits/data/models/breeding_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../domain/breeding_cycle.dart';
 import '../providers/breeding_provider.dart';
+import '../widgets/kindling_plan_button.dart';
+import '../widgets/palpation_action.dart';
 
 /// Разведение — одна лента цикла от случки до отсадки.
 ///
@@ -56,7 +58,7 @@ class BreedingCycleScreen extends ConsumerWidget {
                 // запас под круглую кнопку: список не дёргается, когда
                 // приезжают данные.
                 skeleton: (_) => const SkeletonList(
-                  itemHeight: 148,
+                  itemHeight: 168,
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.screenH,
                     AppSpacing.lg,
@@ -78,6 +80,7 @@ class BreedingCycleScreen extends ConsumerWidget {
                   status: breedingCycleStatus(breeding, now: now),
                   canManage: canManage,
                   now: now,
+                  onPalpation: () => recordPalpation(context, ref, breeding),
                 ),
               ),
             ),
@@ -110,8 +113,9 @@ class _Header extends StatelessWidget {
           Expanded(
             child: Text(
               context.l10n.cycleTitle,
-              style: AppTypography.displayMd
-                  .copyWith(color: context.colors.onSurface),
+              style: AppTypography.displayMd.copyWith(
+                color: context.colors.onSurface,
+              ),
             ),
           ),
           if (canManage)
@@ -120,11 +124,20 @@ class _Header extends StatelessWidget {
               icon: const Icon(Icons.favorite_outline, size: 18),
               label: Text(context.l10n.cycleFindPair),
             ),
+          // Печать доступна всем: лист на гвозде читает тот, кто ходит по
+          // клеткам, а не тот, кому разрешено заводить записи.
+          const KindlingPlanButton(),
         ],
       ),
     );
   }
 }
+
+/// По этой ленте и работают — стоя у клетки и в перчатке, поэтому её кнопкам
+/// штатных 36 точек высоты `TextButton` мало.
+final _actionStyle = TextButton.styleFrom(
+  minimumSize: const Size(0, AppSizes.touchTarget),
+);
 
 /// Строка ленты: кто, какой день цикла и что делать дальше.
 class _CycleTile extends StatelessWidget {
@@ -132,12 +145,14 @@ class _CycleTile extends StatelessWidget {
   final BreedingCycleStatus status;
   final bool canManage;
   final DateTime now;
+  final VoidCallback onPalpation;
 
   const _CycleTile({
     required this.breeding,
     required this.status,
     required this.canManage,
     required this.now,
+    required this.onPalpation,
   });
 
   @override
@@ -145,6 +160,9 @@ class _CycleTile extends StatelessWidget {
     final overdue = status.isOverdue(now: now);
     final accent = overdue ? AppColors.error : _stageColor(context);
     final day = status.dayOfCycle;
+    // Действия заводит только тот, кому это разрешено на сервере: кнопка,
+    // которая приводит к отказу, читается как поломка приложения.
+    final actions = canManage ? _actions(context) : const <Widget>[];
 
     return AppCard(
       onTap: () => context.push('/breeding/${breeding.id}'),
@@ -153,14 +171,18 @@ class _CycleTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.female,
-                  size: 18, color: AppColors.domainBreeding),
+              const Icon(
+                Icons.female,
+                size: 18,
+                color: AppColors.domainBreeding,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
                   _rabbitLabel(context, breeding.female),
-                  style: AppTypography.titleMd
-                      .copyWith(color: context.colors.onSurface),
+                  style: AppTypography.titleMd.copyWith(
+                    color: context.colors.onSurface,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -171,8 +193,9 @@ class _CycleTile extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   context.l10n.cycleDay(day),
-                  style: AppTypography.labelSm
-                      .copyWith(color: context.colors.onSurfaceVariant),
+                  style: AppTypography.labelSm.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ],
@@ -182,8 +205,9 @@ class _CycleTile extends StatelessWidget {
             padding: const EdgeInsets.only(left: AppSpacing.xl),
             child: Text(
               context.l10n.cycleMaleLine(_rabbitLabel(context, breeding.male)),
-              style: AppTypography.labelSm
-                  .copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.labelSm.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -206,8 +230,9 @@ class _CycleTile extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         _whenLabel(context, status.actionDate!),
-                        style: AppTypography.labelSm
-                            .copyWith(color: context.colors.onSurfaceVariant),
+                        style: AppTypography.labelSm.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ],
@@ -215,25 +240,40 @@ class _CycleTile extends StatelessWidget {
               ),
             ],
           ),
-          // Окрол заводит только тот, кому это разрешено на сервере: кнопка,
-          // которая приводит к отказу, читается как поломка приложения.
-          if (canManage &&
-              status.stage == BreedingCycleStage.birthExpected) ...[
+          if (actions.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () =>
-                    context.push('/births/new', extra: breeding),
-                icon: const Icon(Icons.add, size: 18),
-                label: Text(context.l10n.cycleRecordBirth),
-              ),
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: AppSpacing.sm,
+              children: actions,
             ),
           ],
         ],
       ),
     );
   }
+
+  /// Что по этой случке можно сделать прямо из ленты.
+  ///
+  /// Прощупывание и запись окрола не исключают друг друга: к самке, которую
+  /// не щупали, срок окрола подходит всё равно, и прятать одно ради другого
+  /// значит заставить фермера искать кнопку в другом углу приложения.
+  List<Widget> _actions(BuildContext context) => [
+        if (canRecordPalpation(breeding))
+          TextButton.icon(
+            onPressed: onPalpation,
+            style: _actionStyle,
+            icon: const Icon(Icons.touch_app_outlined, size: 18),
+            label: Text(context.l10n.cyclePalpationAction),
+          ),
+        if (status.stage == BreedingCycleStage.birthExpected)
+          TextButton.icon(
+            onPressed: () => context.push('/births/new', extra: breeding),
+            style: _actionStyle,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(context.l10n.cycleRecordBirth),
+          ),
+      ];
 
   String _rabbitLabel(BuildContext context, RabbitModel? rabbit) {
     final name = rabbit?.name?.trim();

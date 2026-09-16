@@ -12,6 +12,7 @@ import '../../../cages/presentation/providers/cages_provider.dart';
 import '../../../home/presentation/providers/journal_provider.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
+import '../../../../core/voice/voice_input.dart';
 import '../../data/models/note_model.dart';
 import '../providers/notes_provider.dart';
 
@@ -100,38 +101,41 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     }
   }
 
+  /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
+  /// диалог подтверждения ничего не защищает, а несколько секунд на отмену —
+  /// защищают.
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.l10n.noteFormDeleteTitle),
-        content: Text(context.l10n.noteFormDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(context.l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final done = context.l10n.noteFormDeleted;
     final failed = context.l10n.noteFormDeleteFailed;
+    final repository = ref.read(notesRepositoryProvider);
+    // Лента журнала перечитывается запросом, а запрос уйдёт уже после того,
+    // как экран закроется. Поэтому держимся за общий контейнер провайдеров —
+    // он живёт выше экрана, в отличие от его `ref`.
+    final container = ProviderScope.containerOf(context, listen: false);
+    final noteId = _note!.id;
 
-    try {
-      await ref.read(notesRepositoryProvider).deleteNote(_note!.id);
-      ref.invalidate(journalFeedProvider);
-      messenger.showSnackBar(SnackBar(content: Text(done)));
-      if (navigator.canPop()) navigator.pop();
-    } catch (_) {
+    var failedToDelete = false;
+    // Окно отмены открываем, пока форма ещё на экране: `deleteWithUndo`
+    // забирает всё нужное из контекста сразу, до первого ожидания. Саму форму
+    // закрываем, не дожидаясь окна, — подсказка живёт выше экрана и переживёт
+    // его закрытие.
+    final pending = deleteWithUndo(
+      context,
+      message: context.l10n.noteFormDeleted,
+      commit: () async {
+        try {
+          await repository.deleteNote(noteId);
+          container.invalidate(journalFeedProvider);
+        } catch (_) {
+          failedToDelete = true;
+        }
+      },
+    );
+    if (navigator.canPop()) navigator.pop();
+    await pending;
+
+    if (failedToDelete) {
       messenger.showSnackBar(
         SnackBar(content: Text(failed), backgroundColor: AppColors.error),
       );
@@ -148,16 +152,15 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
           ? context.l10n.noteFormEditTitle
           : context.l10n.noteFormNewTitle,
       formKey: _formKey,
-      submitLabel: _isEditing
-          ? context.l10n.commonSave
-          : context.l10n.noteFormCreate,
+      submitLabel:
+          _isEditing ? context.l10n.commonSave : context.l10n.noteFormCreate,
       // Пока связи нет, заметка при сохранении уйдёт в очередь, а не на
       // сервер — сообщение об успехе должно говорить именно это.
       successMessage: _isEditing
           ? context.l10n.noteFormUpdated
           : (online
-                ? context.l10n.noteFormCreated
-                : context.l10n.offlineActionQueued),
+              ? context.l10n.noteFormCreated
+              : context.l10n.offlineActionQueued),
       onSubmit: _save,
       isDirty: () => _touched,
       actions: [
@@ -181,6 +184,9 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
               decoration: InputDecoration(
                 labelText: context.l10n.noteFormContentLabel,
                 prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+                // Заметку пишут у клетки, одной рукой и в перчатке —
+                // надиктовать её быстрее, чем набрать.
+                suffixIcon: VoiceInputButton(controller: _content),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? context.l10n.noteFormContentEmpty

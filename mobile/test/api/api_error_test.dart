@@ -26,7 +26,8 @@ void main() {
     });
 
     test('понимает сообщение верхним уровнем', () {
-      expect(serverMessage(_error({'message': 'Что-то не так'})), 'Что-то не так');
+      expect(
+          serverMessage(_error({'message': 'Что-то не так'})), 'Что-то не так');
     });
 
     test('не падает на не-JSON ответе', () {

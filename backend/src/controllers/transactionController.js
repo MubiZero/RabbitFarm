@@ -1,4 +1,5 @@
 const transactionService = require('../services/transactionService');
+const fileStorage = require('../utils/fileStorage');
 const ApiResponse = require('../utils/apiResponse');
 
 /**
@@ -8,6 +9,14 @@ const ApiResponse = require('../utils/apiResponse');
 
 exports.create = async (req, res, next) => {
   try {
+    // Чек снимают телефоном у кассы, поэтому он приходит файлом, а не
+    // ссылкой: поле `receipt_url` существовало с самого начала, но взять
+    // этот URL человеку было негде.
+    delete req.body.receipt_attached;
+    if (req.file) {
+      req.body.receipt_url = await fileStorage.uploadFile(req.farmId, 'receipts', req.file);
+    }
+
     const transaction = await transactionService.createTransaction({
       ...req.body,
       farm_id: req.farmId,
@@ -44,7 +53,23 @@ exports.list = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    delete req.body.receipt_attached;
+    if (req.file) {
+      req.body.receipt_url = await fileStorage.uploadFile(req.farmId, 'receipts', req.file);
+    }
+
+    // Прежний чек убирается и когда его заменили, и когда сняли: файл,
+    // на который больше никто не ссылается, иначе остаётся в хранилище
+    // навсегда и молча занимает место фермы по тарифу.
+    const previous = req.body.receipt_url !== undefined
+      ? await transactionService.getTransactionById(req.params.id, req.farmId).catch(() => null)
+      : null;
+
     const transaction = await transactionService.updateTransaction(req.params.id, req.farmId, req.body);
+
+    if (previous && previous.receipt_url && previous.receipt_url !== transaction.receipt_url) {
+      await fileStorage.deleteFile(previous.receipt_url);
+    }
     return ApiResponse.success(res, transaction, 'Транзакция успешно обновлена');
   } catch (error) {
     if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404);

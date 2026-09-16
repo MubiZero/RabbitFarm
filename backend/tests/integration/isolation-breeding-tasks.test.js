@@ -348,8 +348,8 @@ describe('Изоляция ферм: случки, окролы и задачи'
       // именуются по самке, поэтому по названию видно, чья это ферма.
       expect(titles(ownA)).toContain(`Пальпация: ${farmA.femaleName}`);
       expect(titles(ownB)).not.toContain(`Пальпация: ${farmA.femaleName}`);
-      expect(titles(ownA)).toContain(`Отсадка (отъем): ${farmA.femaleName}`);
-      expect(titles(ownB)).not.toContain(`Отсадка (отъем): ${farmA.femaleName}`);
+      expect(titles(ownA)).toContain(`Отсадка (отъём): ${farmA.femaleName}`);
+      expect(titles(ownB)).not.toContain(`Отсадка (отъём): ${farmA.femaleName}`);
     });
 
     it('работник видит задачи своей фермы', async () => {

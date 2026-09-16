@@ -1,5 +1,6 @@
 const { Transaction, Rabbit, User } = require('../models');
 const { Op, fn, col } = require('sequelize');
+const fileStorage = require('../utils/fileStorage');
 const logger = require('../utils/logger');
 
 const TRANSACTION_INCLUDE = [
@@ -54,7 +55,15 @@ class TransactionService {
       if (rabbit && type === 'income' &&
         category?.startsWith('sale_')) {
         if (rabbit.status !== 'sold' && rabbit.status !== 'dead') {
-          await rabbit.update({ status: 'sold', cage_id: null }, { transaction: t });
+          // Дата выбытия — день самой продажи, а не день, когда о ней вспомнили
+          // записать. По ней считается поголовье в сводке за неделю: без
+          // `sold_date` проданный кролик оставался в графике живым, потому что
+          // выбытие определяется только датой, а не статусом.
+          await rabbit.update({
+            status: 'sold',
+            sold_date: data.transaction_date,
+            cage_id: null
+          }, { transaction: t });
         }
       }
 
@@ -153,7 +162,11 @@ class TransactionService {
   async deleteTransaction(id, farmId) {
     const transaction = await Transaction.findOne({ where: { id, farm_id: farmId } });
     if (!transaction) throw new Error('TRANSACTION_NOT_FOUND');
+    // Чек уходит вместе с проводкой: снимок, на который больше никто не
+    // ссылается, иначе занимает место фермы по тарифу до конца времён.
+    const receiptUrl = transaction.receipt_url;
     await transaction.destroy();
+    if (receiptUrl) await fileStorage.deleteFile(receiptUrl);
     logger.info('Transaction deleted', { transactionId: id });
     return { success: true };
   }

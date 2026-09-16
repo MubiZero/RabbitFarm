@@ -21,6 +21,32 @@ exports.create = async (req, res, next) => {
 };
 
 /**
+ * Свои обращения — со статусом и ответом поддержки.
+ *
+ * Без этого списка обращение было дорогой в один конец: человек отправлял
+ * текст и не мог ни перечитать написанное, ни узнать, ответили ли ему.
+ */
+exports.listMine = async (req, res, next) => {
+  try {
+    const result = await supportRequestService.listForFarm(req.farmId, {
+      page: req.query.page,
+      limit: req.query.limit
+    });
+
+    return ApiResponse.paginated(
+      res,
+      result.items,
+      result.pagination.page,
+      result.pagination.limit,
+      result.pagination.total,
+      'Обращения получены'
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Официальный email/телефон поддержки, если платформенный админ их задал —
  * рядом с внутренней фичей «Обращения», не вместо неё.
  */

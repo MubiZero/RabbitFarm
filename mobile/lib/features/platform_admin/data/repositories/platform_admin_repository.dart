@@ -5,6 +5,7 @@ import '../../../../core/api/api_endpoints.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../../core/api/paginated.dart';
 import '../../../../core/json/date_time_converter.dart';
+import '../../../../core/models/support_contact.dart';
 import '../models/platform_admin_models.dart';
 
 /// Одна страница списка ферм: сами фермы и сведения о том, есть ли ещё.
@@ -15,6 +16,9 @@ typedef AnnouncementsPage = ({List<Announcement> items, PageInfo page});
 
 /// То же для обращений в поддержку.
 typedef SupportRequestsPage = ({List<SupportRequest> items, PageInfo page});
+
+/// То же для журнала действий админа.
+typedef AuditPage = ({List<AdminAuditEntry> items, PageInfo page});
 
 /// Тарифы и фермы всего сервиса — то, чем распоряжается платформенный админ.
 ///
@@ -110,7 +114,10 @@ class PlatformAdminRepository {
         for (final item in itemsOf(data))
           PlatformFarm.fromJson(item as Map<String, dynamic>),
       ];
-      return (items: items, page: PageInfo.of(data, fallbackCount: items.length));
+      return (
+        items: items,
+        page: PageInfo.of(data, fallbackCount: items.length),
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
@@ -236,8 +243,9 @@ class PlatformAdminRepository {
   /// сервером при первом же добавленном поле.
   Future<Map<String, dynamic>> exportFarm(int farmId) async {
     try {
-      final response =
-          await _apiClient.get(ApiEndpoints.platformFarmExport(farmId));
+      final response = await _apiClient.get(
+        ApiEndpoints.platformFarmExport(farmId),
+      );
       return Map<String, dynamic>.from(response.data['data'] as Map);
     } on DioException catch (e) {
       throw ApiFailure.from(e);
@@ -264,9 +272,44 @@ class PlatformAdminRepository {
   /// Отменить удаление, пока окно ожидания не вышло.
   Future<PlatformFarmDetail> restoreFarm(int farmId) async {
     try {
-      final response =
-          await _apiClient.post(ApiEndpoints.platformFarmRestore(farmId));
+      final response = await _apiClient.post(
+        ApiEndpoints.platformFarmRestore(farmId),
+      );
       return PlatformFarmDetail.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Журнал действий платформенного админа, свежие сверху.
+  ///
+  /// `farmId` сужает журнал до одной фермы — сервер принимает его тем же
+  /// эндпоинтом. Имён ни админа, ни фермы в ответе нет: сервер отдаёт строки
+  /// журнала как есть, только с идентификаторами.
+  Future<AuditPage> getAuditLog({
+    int page = 1,
+    int limit = 20,
+    int? farmId,
+  }) async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.platformAudit,
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (farmId != null) 'farm_id': farmId,
+        },
+      );
+
+      final data = response.data['data'];
+      final items = [
+        for (final item in itemsOf(data))
+          AdminAuditEntry.fromJson(item as Map<String, dynamic>),
+      ];
+      return (
+        items: items,
+        page: PageInfo.of(data, fallbackCount: items.length),
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
@@ -288,7 +331,10 @@ class PlatformAdminRepository {
         for (final item in itemsOf(data))
           Announcement.fromJson(item as Map<String, dynamic>),
       ];
-      return (items: items, page: PageInfo.of(data, fallbackCount: items.length));
+      return (
+        items: items,
+        page: PageInfo.of(data, fallbackCount: items.length),
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
@@ -328,19 +374,59 @@ class PlatformAdminRepository {
         for (final item in itemsOf(data))
           SupportRequest.fromJson(item as Map<String, dynamic>),
       ];
-      return (items: items, page: PageInfo.of(data, fallbackCount: items.length));
+      return (
+        items: items,
+        page: PageInfo.of(data, fallbackCount: items.length),
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
   }
 
-  /// Отметить обращение разобранным. Повторный вызов не ошибка — сервер
-  /// просто возвращает то же обращение (см. `supportRequestService.resolve`).
-  Future<SupportRequest> resolveSupportRequest(int id) async {
+  /// Отметить обращение разобранным, по желанию — с ответом автору. Повторный
+  /// вызов не ошибка: сервер просто возвращает то же обращение (см.
+  /// `supportRequestService.resolve`).
+  ///
+  /// Пустой ответ не отправляется вовсе, а не уходит пустой строкой: письмо и
+  /// пуш автору шлёт сервер и ровно тогда, когда текст есть, — пустая строка
+  /// означала бы «прислать человеку пустое письмо».
+  Future<SupportRequest> resolveSupportRequest(int id, {String? answer}) async {
     try {
-      final response =
-          await _apiClient.patch(ApiEndpoints.platformSupportRequestResolve(id));
+      final trimmed = answer?.trim();
+      final response = await _apiClient.patch(
+        ApiEndpoints.platformSupportRequestResolve(id),
+        data: trimmed == null || trimmed.isEmpty ? null : {'answer': trimmed},
+      );
       return SupportRequest.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Официальный контакт поддержки — тот, что видит ферма на экране
+  /// обращений.
+  Future<SupportContact> getSupportContact() async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.platformSupportContact,
+      );
+      return SupportContact.fromJson(
+        response.data['data'] as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  Future<SupportContact> updateSupportContact(SupportContact contact) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiEndpoints.platformSupportContact,
+        data: contact.toJson(),
+      );
+      return SupportContact.fromJson(
+        response.data['data'] as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
