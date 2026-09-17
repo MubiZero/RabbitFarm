@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
@@ -72,15 +73,17 @@ class VaccinationsRepository {
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
 
-      // Сервер отдаёт страницы всегда; если поля не пришли, считаем, что
-      // список кончился, — иначе экран звал бы следующую страницу без конца.
-      final pagination = data['pagination'] as Map<String, dynamic>?;
+      // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+      // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+      // читали мы `total_pages`, и список всегда считал себя законченным на
+      // первой странице.
+      final info = PageInfo.of(data, fallbackCount: items.length);
       return PaginatedResponse<Vaccination>(
         items: items,
-        total: (pagination?['total'] as num?)?.toInt() ?? items.length,
-        page: (pagination?['page'] as num?)?.toInt() ?? page,
-        limit: (pagination?['limit'] as num?)?.toInt() ?? limit,
-        totalPages: (pagination?['total_pages'] as num?)?.toInt() ?? 1,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
       );
     } on DioException catch (e) {
       throw ApiFailure.from(e);

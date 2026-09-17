@@ -56,19 +56,18 @@ class MedicalRecordsRepository {
             .map((json) => MedicalRecord.fromJson(json as Map<String, dynamic>))
             .toList();
 
-        // Сведений о страницах может не быть у старого ответа — тогда
-        // считаем список законченным, иначе экран звал бы следующую
-        // страницу без конца.
-        final pagination =
-            data is Map<String, dynamic> ? data['pagination'] : null;
-        final map = pagination is Map<String, dynamic> ? pagination : null;
+        // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+        // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+        // читали мы `total_pages`, и список всегда считал себя законченным на
+        // первой странице.
+        final info = PageInfo.of(data, fallbackCount: items.length);
 
         return PaginatedResponse<MedicalRecord>(
           items: items,
-          total: (map?['total'] as num?)?.toInt() ?? items.length,
-          page: (map?['page'] as num?)?.toInt() ?? (page ?? 1),
-          limit: (map?['limit'] as num?)?.toInt() ?? (limit ?? items.length),
-          totalPages: (map?['total_pages'] as num?)?.toInt() ?? 1,
+          total: info.total,
+          page: info.page,
+          limit: info.limit,
+          totalPages: info.totalPages,
         );
       }
 

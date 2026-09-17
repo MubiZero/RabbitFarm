@@ -36,17 +36,18 @@ class NotificationsRepository {
           AppNotification.fromJson(item as Map<String, dynamic>),
       ];
 
-      final data = response.data['data'];
-      final pagination =
-          data is Map<String, dynamic> ? data['pagination'] : null;
-      final map = pagination is Map<String, dynamic> ? pagination : null;
+      // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+      // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+      // читали мы `total_pages`, и список всегда считал себя законченным на
+      // первой странице.
+      final info = PageInfo.of(response.data['data'], fallbackCount: items.length);
 
       return PaginatedResponse<AppNotification>(
         items: items,
-        total: (map?['total'] as num?)?.toInt() ?? items.length,
-        page: (map?['page'] as num?)?.toInt() ?? page,
-        limit: (map?['limit'] as num?)?.toInt() ?? limit,
-        totalPages: (map?['total_pages'] as num?)?.toInt() ?? 1,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
       );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
