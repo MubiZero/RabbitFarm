@@ -63,6 +63,7 @@ String? _byCode(AppLocalizations l10n, String? code) => switch (code) {
       'USER_EXISTS' => l10n.errorCodeUserExists,
       'PHONE_EXISTS' => l10n.errorCodePhoneExists,
       'PHONE_LOGIN_UNAVAILABLE' => l10n.errorCodePhoneLoginUnavailable,
+      'NOT_RECORD_AUTHOR' => l10n.errorCodeNotRecordAuthor,
       'PAYMENTS_UNAVAILABLE_IN_COUNTRY' =>
         l10n.errorCodePaymentsUnavailableInCountry,
       _ => null,

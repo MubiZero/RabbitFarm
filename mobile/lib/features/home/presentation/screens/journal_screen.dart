@@ -353,6 +353,7 @@ String _kindLabel(BuildContext context, JournalKind kind) => switch (kind) {
       JournalKind.note => context.l10n.journalKindNote,
       JournalKind.photo => context.l10n.journalKindPhoto,
       JournalKind.deletion => context.l10n.journalKindDeletion,
+      JournalKind.edit => context.l10n.farmAuditActionUpdated,
     };
 
 extension _JournalKindVisuals on JournalKind {
@@ -364,6 +365,7 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.note => AppDomain.admin,
         JournalKind.photo => AppDomain.livestock,
         JournalKind.deletion => AppDomain.admin,
+        JournalKind.edit => AppDomain.admin,
       };
 
   IconData get icon => switch (this) {
@@ -374,5 +376,6 @@ extension _JournalKindVisuals on JournalKind {
         JournalKind.photo => Icons.photo_camera_outlined,
         JournalKind.note => Icons.sticky_note_2_outlined,
         JournalKind.deletion => Icons.delete_outline,
+        JournalKind.edit => Icons.edit_outlined,
       };
 }

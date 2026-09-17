@@ -886,4 +886,371 @@ as bool,
 
 }
 
+
+/// @nodoc
+mixin _$FarmAuditEntry {
+
+@IntConverter() int get id;/// Машинный код действия: `feeding_record.updated`, `staff.role_changed`.
+/// Разбирается на экране — сервер заводит новые действия раньше, чем
+/// приложение о них узнаёт.
+ String get action;@JsonKey(name: 'created_at')@DateTimeConverter() DateTime get at; FarmMember? get actor; FarmMember? get target;@JsonKey(name: 'entity_type') String? get entityType;@JsonKey(name: 'entity_label') String? get entityLabel;/// Снимки изменённых полей. У удаления их нет: запись ушла целиком.
+ Map<String, dynamic>? get before; Map<String, dynamic>? get after;
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FarmAuditEntryCopyWith<FarmAuditEntry> get copyWith => _$FarmAuditEntryCopyWithImpl<FarmAuditEntry>(this as FarmAuditEntry, _$identity);
+
+  /// Serializes this FarmAuditEntry to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as FarmAuditEntry;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FarmAuditEntry&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.action, _this.action) || other.action == _this.action)&&(identical(other.at, _this.at) || other.at == _this.at)&&(identical(other.actor, _this.actor) || other.actor == _this.actor)&&(identical(other.target, _this.target) || other.target == _this.target)&&(identical(other.entityType, _this.entityType) || other.entityType == _this.entityType)&&(identical(other.entityLabel, _this.entityLabel) || other.entityLabel == _this.entityLabel)&&const DeepCollectionEquality().equals(other.before, _this.before)&&const DeepCollectionEquality().equals(other.after, _this.after));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as FarmAuditEntry;
+  return Object.hash(runtimeType,_this.id,_this.action,_this.at,_this.actor,_this.target,_this.entityType,_this.entityLabel,const DeepCollectionEquality().hash(_this.before),const DeepCollectionEquality().hash(_this.after));
+}
+
+@override
+String toString() {
+  final _this = this as FarmAuditEntry;
+  return 'FarmAuditEntry(id: ${_this.id}, action: ${_this.action}, at: ${_this.at}, actor: ${_this.actor}, target: ${_this.target}, entityType: ${_this.entityType}, entityLabel: ${_this.entityLabel}, before: ${_this.before}, after: ${_this.after})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FarmAuditEntryCopyWith<$Res>  {
+  factory $FarmAuditEntryCopyWith(FarmAuditEntry value, $Res Function(FarmAuditEntry) _then) = _$FarmAuditEntryCopyWithImpl;
+@useResult
+$Res call({
+@IntConverter() int id, String action,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime at, FarmMember? actor, FarmMember? target,@JsonKey(name: 'entity_type') String? entityType,@JsonKey(name: 'entity_label') String? entityLabel, Map<String, dynamic>? before, Map<String, dynamic>? after
+});
+
+
+$FarmMemberCopyWith<$Res>? get actor;$FarmMemberCopyWith<$Res>? get target;
+
+}
+/// @nodoc
+class _$FarmAuditEntryCopyWithImpl<$Res>
+    implements $FarmAuditEntryCopyWith<$Res> {
+  _$FarmAuditEntryCopyWithImpl(this._self, this._then);
+
+  final FarmAuditEntry _self;
+  final $Res Function(FarmAuditEntry) _then;
+
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? action = null,Object? at = null,Object? actor = freezed,Object? target = freezed,Object? entityType = freezed,Object? entityLabel = freezed,Object? before = freezed,Object? after = freezed,}) {
+  return _then(FarmAuditEntry(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
+as String,at: null == at ? _self.at : at // ignore: cast_nullable_to_non_nullable
+as DateTime,actor: freezed == actor ? _self.actor : actor // ignore: cast_nullable_to_non_nullable
+as FarmMember?,target: freezed == target ? _self.target : target // ignore: cast_nullable_to_non_nullable
+as FarmMember?,entityType: freezed == entityType ? _self.entityType : entityType // ignore: cast_nullable_to_non_nullable
+as String?,entityLabel: freezed == entityLabel ? _self.entityLabel : entityLabel // ignore: cast_nullable_to_non_nullable
+as String?,before: freezed == before ? _self.before : before // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,after: freezed == after ? _self.after : after // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
+  ));
+}
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FarmMemberCopyWith<$Res>? get actor {
+    if (_self.actor == null) {
+    return null;
+  }
+
+  return $FarmMemberCopyWith<$Res>(_self.actor!, (value) {
+    return _then(_self.copyWith(actor: value));
+  });
+}/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FarmMemberCopyWith<$Res>? get target {
+    if (_self.target == null) {
+    return null;
+  }
+
+  return $FarmMemberCopyWith<$Res>(_self.target!, (value) {
+    return _then(_self.copyWith(target: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [FarmAuditEntry].
+extension FarmAuditEntryPatterns on FarmAuditEntry {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FarmAuditEntry value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FarmAuditEntry() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FarmAuditEntry value)  $default,){
+final _that = this;
+switch (_that) {
+case _FarmAuditEntry():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FarmAuditEntry value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FarmAuditEntry() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String action, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime at,  FarmMember? actor,  FarmMember? target, @JsonKey(name: 'entity_type')  String? entityType, @JsonKey(name: 'entity_label')  String? entityLabel,  Map<String, dynamic>? before,  Map<String, dynamic>? after)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FarmAuditEntry() when $default != null:
+return $default(_that.id,_that.action,_that.at,_that.actor,_that.target,_that.entityType,_that.entityLabel,_that.before,_that.after);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String action, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime at,  FarmMember? actor,  FarmMember? target, @JsonKey(name: 'entity_type')  String? entityType, @JsonKey(name: 'entity_label')  String? entityLabel,  Map<String, dynamic>? before,  Map<String, dynamic>? after)  $default,) {final _that = this;
+switch (_that) {
+case _FarmAuditEntry():
+return $default(_that.id,_that.action,_that.at,_that.actor,_that.target,_that.entityType,_that.entityLabel,_that.before,_that.after);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String action, @JsonKey(name: 'created_at')@DateTimeConverter()  DateTime at,  FarmMember? actor,  FarmMember? target, @JsonKey(name: 'entity_type')  String? entityType, @JsonKey(name: 'entity_label')  String? entityLabel,  Map<String, dynamic>? before,  Map<String, dynamic>? after)?  $default,) {final _that = this;
+switch (_that) {
+case _FarmAuditEntry() when $default != null:
+return $default(_that.id,_that.action,_that.at,_that.actor,_that.target,_that.entityType,_that.entityLabel,_that.before,_that.after);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FarmAuditEntry extends FarmAuditEntry {
+  const _FarmAuditEntry({@IntConverter() required this.id, required this.action, @JsonKey(name: 'created_at')@DateTimeConverter() required this.at, this.actor, this.target, @JsonKey(name: 'entity_type') this.entityType, @JsonKey(name: 'entity_label') this.entityLabel,  Map<String, dynamic>? before,  Map<String, dynamic>? after}): _before = before,_after = after,super._();
+  factory _FarmAuditEntry.fromJson(Map<String, dynamic> json) => _$FarmAuditEntryFromJson(json);
+
+@override@IntConverter() final  int id;
+/// Машинный код действия: `feeding_record.updated`, `staff.role_changed`.
+/// Разбирается на экране — сервер заводит новые действия раньше, чем
+/// приложение о них узнаёт.
+@override final  String action;
+@override@JsonKey(name: 'created_at')@DateTimeConverter() final  DateTime at;
+@override final  FarmMember? actor;
+@override final  FarmMember? target;
+@override@JsonKey(name: 'entity_type') final  String? entityType;
+@override@JsonKey(name: 'entity_label') final  String? entityLabel;
+/// Снимки изменённых полей. У удаления их нет: запись ушла целиком.
+ final  Map<String, dynamic>? _before;
+/// Снимки изменённых полей. У удаления их нет: запись ушла целиком.
+@override Map<String, dynamic>? get before {
+  final value = _before;
+  if (value == null) return null;
+  if (_before is EqualUnmodifiableMapView) return _before;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+ final  Map<String, dynamic>? _after;
+@override Map<String, dynamic>? get after {
+  final value = _after;
+  if (value == null) return null;
+  if (_after is EqualUnmodifiableMapView) return _after;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FarmAuditEntryCopyWith<_FarmAuditEntry> get copyWith => __$FarmAuditEntryCopyWithImpl<_FarmAuditEntry>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FarmAuditEntryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FarmAuditEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.action, action) || other.action == action)&&(identical(other.at, at) || other.at == at)&&(identical(other.actor, actor) || other.actor == actor)&&(identical(other.target, target) || other.target == target)&&(identical(other.entityType, entityType) || other.entityType == entityType)&&(identical(other.entityLabel, entityLabel) || other.entityLabel == entityLabel)&&const DeepCollectionEquality().equals(other.before, _before)&&const DeepCollectionEquality().equals(other.after, _after));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,action,at,actor,target,entityType,entityLabel,const DeepCollectionEquality().hash(_before),const DeepCollectionEquality().hash(_after));
+}
+
+@override
+String toString() {
+    return 'FarmAuditEntry(id: $id, action: $action, at: $at, actor: $actor, target: $target, entityType: $entityType, entityLabel: $entityLabel, before: $before, after: $after)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FarmAuditEntryCopyWith<$Res> implements $FarmAuditEntryCopyWith<$Res> {
+  factory _$FarmAuditEntryCopyWith(_FarmAuditEntry value, $Res Function(_FarmAuditEntry) _then) = __$FarmAuditEntryCopyWithImpl;
+@override @useResult
+$Res call({
+@IntConverter() int id, String action,@JsonKey(name: 'created_at')@DateTimeConverter() DateTime at, FarmMember? actor, FarmMember? target,@JsonKey(name: 'entity_type') String? entityType,@JsonKey(name: 'entity_label') String? entityLabel, Map<String, dynamic>? before, Map<String, dynamic>? after
+});
+
+
+@override $FarmMemberCopyWith<$Res>? get actor;@override $FarmMemberCopyWith<$Res>? get target;
+
+}
+/// @nodoc
+class __$FarmAuditEntryCopyWithImpl<$Res>
+    implements _$FarmAuditEntryCopyWith<$Res> {
+  __$FarmAuditEntryCopyWithImpl(this._self, this._then);
+
+  final _FarmAuditEntry _self;
+  final $Res Function(_FarmAuditEntry) _then;
+
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? action = null,Object? at = null,Object? actor = freezed,Object? target = freezed,Object? entityType = freezed,Object? entityLabel = freezed,Object? before = freezed,Object? after = freezed,}) {
+  return _then(_FarmAuditEntry(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
+as String,at: null == at ? _self.at : at // ignore: cast_nullable_to_non_nullable
+as DateTime,actor: freezed == actor ? _self.actor : actor // ignore: cast_nullable_to_non_nullable
+as FarmMember?,target: freezed == target ? _self.target : target // ignore: cast_nullable_to_non_nullable
+as FarmMember?,entityType: freezed == entityType ? _self.entityType : entityType // ignore: cast_nullable_to_non_nullable
+as String?,entityLabel: freezed == entityLabel ? _self.entityLabel : entityLabel // ignore: cast_nullable_to_non_nullable
+as String?,before: freezed == before ? _self._before : before // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,after: freezed == after ? _self._after : after // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
+  ));
+}
+
+/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FarmMemberCopyWith<$Res>? get actor {
+    if (_self.actor == null) {
+    return null;
+  }
+
+  return $FarmMemberCopyWith<$Res>(_self.actor!, (value) {
+    return _then(_self.copyWith(actor: value));
+  });
+}/// Create a copy of FarmAuditEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FarmMemberCopyWith<$Res>? get target {
+    if (_self.target == null) {
+    return null;
+  }
+
+  return $FarmMemberCopyWith<$Res>(_self.target!, (value) {
+    return _then(_self.copyWith(target: value));
+  });
+}
+}
+
 // dart format on

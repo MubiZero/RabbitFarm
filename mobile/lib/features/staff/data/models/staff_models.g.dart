@@ -76,3 +76,33 @@ Map<String, dynamic> _$CreatedInvitationToJson(_CreatedInvitation instance) =>
       'invite_link': instance.inviteLink,
       'message_sent': instance.messageSent,
     };
+
+_FarmAuditEntry _$FarmAuditEntryFromJson(Map<String, dynamic> json) =>
+    _FarmAuditEntry(
+      id: const IntConverter().fromJson(json['id'] as Object),
+      action: json['action'] as String,
+      at: const DateTimeConverter().fromJson(json['created_at'] as Object),
+      actor: json['actor'] == null
+          ? null
+          : FarmMember.fromJson(json['actor'] as Map<String, dynamic>),
+      target: json['target'] == null
+          ? null
+          : FarmMember.fromJson(json['target'] as Map<String, dynamic>),
+      entityType: json['entity_type'] as String?,
+      entityLabel: json['entity_label'] as String?,
+      before: json['before'] as Map<String, dynamic>?,
+      after: json['after'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$FarmAuditEntryToJson(_FarmAuditEntry instance) =>
+    <String, dynamic>{
+      'id': const IntConverter().toJson(instance.id),
+      'action': instance.action,
+      'created_at': const DateTimeConverter().toJson(instance.at),
+      'actor': instance.actor,
+      'target': instance.target,
+      'entity_type': instance.entityType,
+      'entity_label': instance.entityLabel,
+      'before': instance.before,
+      'after': instance.after,
+    };

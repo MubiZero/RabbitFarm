@@ -5369,4 +5369,54 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get roleWorkerDescription =>
       'Maʼlumotlarni koʻradi va ishni belgilaydi';
+
+  @override
+  String get farmAuditTitle => 'Oʻzgarishlar daftari';
+
+  @override
+  String get farmAuditEmptyTitle => 'Hozircha yozuv yoʻq';
+
+  @override
+  String get farmAuditEmptyBody =>
+      'Har bir tuzatish va har bir oʻchirish shu yerga tushadi: kim, qachon va nimani oʻzgartirdi.';
+
+  @override
+  String get farmAuditActionUpdated => 'Tuzatildi';
+
+  @override
+  String get farmAuditActionDeleted => 'Oʻchirildi';
+
+  @override
+  String get farmAuditActionRoleChanged => 'Rol almashdi';
+
+  @override
+  String get farmAuditActionDeactivated => 'Ruxsat yopildi';
+
+  @override
+  String get farmAuditActionActivated => 'Ruxsat ochildi';
+
+  @override
+  String get farmAuditActionOwnership => 'Xoʻjalik topshirildi';
+
+  @override
+  String farmAuditActionUnknown(String action) {
+    return '$action';
+  }
+
+  @override
+  String farmAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String farmAuditChanged(String field) {
+    return 'Oʻzgardi: $field';
+  }
+
+  @override
+  String get farmAuditNoValue => 'boʻsh';
+
+  @override
+  String get errorCodeNotRecordAuthor =>
+      'Boshqaning yozuvini faqat menejer yoki egasi tuzatadi';
 }

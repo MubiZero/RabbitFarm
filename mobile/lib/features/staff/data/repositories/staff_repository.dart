@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/paginated.dart';
+import '../../../../shared/models/api_response.dart';
 import '../models/staff_models.dart';
 import '../../../../core/api/api_failure.dart';
 
@@ -109,6 +111,43 @@ class StaffRepository {
     try {
       final response = await _apiClient.post('/staff/$id/transfer-ownership');
       return FarmMember.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+  }
+
+  /// Журнал фермы: кто, когда и что сделал.
+  ///
+  /// Один список на кадровые действия и на работу с записями — владелец
+  /// приходит сюда с вопросом «что у меня в хозяйстве поменялось», а не
+  /// «покажи мне подмножество по типу события». Сервер их различает
+  /// ([scope] `staff` или `data`), и разделить список всегда успеем.
+  Future<PaginatedResponse<FarmAuditEntry>> getAuditLog({
+    int page = 1,
+    int limit = 30,
+    String scope = 'all',
+  }) async {
+    try {
+      final response = await _apiClient.get('/staff/audit', queryParameters: {
+        'page': page,
+        'limit': limit,
+        'scope': scope,
+      });
+
+      final data = response.data['data'];
+      final items = [
+        for (final item in itemsOf(data))
+          FarmAuditEntry.fromJson(item as Map<String, dynamic>),
+      ];
+      final info = PageInfo.of(data, fallbackCount: items.length);
+
+      return PaginatedResponse<FarmAuditEntry>(
+        items: items,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

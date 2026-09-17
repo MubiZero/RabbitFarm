@@ -1637,5 +1637,19 @@
 
   "staffAccessClosedBadge": "access closed",
   "roleManagerDescription": "Runs the herd, the feed and the money",
-  "roleWorkerDescription": "Reads the records and marks work done"
+  "roleWorkerDescription": "Reads the records and marks work done",
+  "farmAuditTitle": "Change log",
+  "farmAuditEmptyTitle": "Nothing logged yet",
+  "farmAuditEmptyBody": "Every edit and every deletion lands here: who, when and what they changed.",
+  "farmAuditActionUpdated": "Edited",
+  "farmAuditActionDeleted": "Deleted",
+  "farmAuditActionRoleChanged": "Role changed",
+  "farmAuditActionDeactivated": "Access closed",
+  "farmAuditActionActivated": "Access opened",
+  "farmAuditActionOwnership": "Farm handed over",
+  "farmAuditActionUnknown": "{action}",
+  "farmAuditChange": "{field}: {before} → {after}",
+  "farmAuditChanged": "Changed: {field}",
+  "farmAuditNoValue": "empty",
+  "errorCodeNotRecordAuthor": "Only a manager or the owner edits records made by others"
 }

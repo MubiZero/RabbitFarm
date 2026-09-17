@@ -5353,4 +5353,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleWorkerDescription => 'Reads the records and marks work done';
+
+  @override
+  String get farmAuditTitle => 'Change log';
+
+  @override
+  String get farmAuditEmptyTitle => 'Nothing logged yet';
+
+  @override
+  String get farmAuditEmptyBody =>
+      'Every edit and every deletion lands here: who, when and what they changed.';
+
+  @override
+  String get farmAuditActionUpdated => 'Edited';
+
+  @override
+  String get farmAuditActionDeleted => 'Deleted';
+
+  @override
+  String get farmAuditActionRoleChanged => 'Role changed';
+
+  @override
+  String get farmAuditActionDeactivated => 'Access closed';
+
+  @override
+  String get farmAuditActionActivated => 'Access opened';
+
+  @override
+  String get farmAuditActionOwnership => 'Farm handed over';
+
+  @override
+  String farmAuditActionUnknown(String action) {
+    return '$action';
+  }
+
+  @override
+  String farmAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String farmAuditChanged(String field) {
+    return 'Changed: $field';
+  }
+
+  @override
+  String get farmAuditNoValue => 'empty';
+
+  @override
+  String get errorCodeNotRecordAuthor =>
+      'Only a manager or the owner edits records made by others';
 }

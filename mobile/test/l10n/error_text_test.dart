@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/api/api_failure.dart';
 import 'package:mobile/core/l10n/error_text.dart';
-import 'package:mobile/l10n/generated/app_localizations.dart';
 import 'package:mobile/l10n/generated/app_localizations_ru.dart';
 import 'package:mobile/l10n/generated/app_localizations_tg.dart';
 

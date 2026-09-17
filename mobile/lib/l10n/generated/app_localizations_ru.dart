@@ -5424,4 +5424,54 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get roleWorkerDescription => 'Смотрит данные и отмечает работу';
+
+  @override
+  String get farmAuditTitle => 'Журнал изменений';
+
+  @override
+  String get farmAuditEmptyTitle => 'Записей пока нет';
+
+  @override
+  String get farmAuditEmptyBody =>
+      'Сюда попадает каждая правка и каждое удаление: кто, когда и что изменил.';
+
+  @override
+  String get farmAuditActionUpdated => 'Исправлено';
+
+  @override
+  String get farmAuditActionDeleted => 'Удалено';
+
+  @override
+  String get farmAuditActionRoleChanged => 'Смена роли';
+
+  @override
+  String get farmAuditActionDeactivated => 'Доступ закрыт';
+
+  @override
+  String get farmAuditActionActivated => 'Доступ открыт';
+
+  @override
+  String get farmAuditActionOwnership => 'Хозяйство передано';
+
+  @override
+  String farmAuditActionUnknown(String action) {
+    return '$action';
+  }
+
+  @override
+  String farmAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String farmAuditChanged(String field) {
+    return 'Изменено: $field';
+  }
+
+  @override
+  String get farmAuditNoValue => 'пусто';
+
+  @override
+  String get errorCodeNotRecordAuthor =>
+      'Чужую запись исправляет управляющий или владелец';
 }

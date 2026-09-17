@@ -2207,5 +2207,22 @@
 
   "staffAccessClosedBadge": "доступ закрыт",
   "roleManagerDescription": "Ведёт поголовье, корма и финансы",
-  "roleWorkerDescription": "Смотрит данные и отмечает работу"
+  "roleWorkerDescription": "Смотрит данные и отмечает работу",
+  "farmAuditTitle": "Журнал изменений",
+  "farmAuditEmptyTitle": "Записей пока нет",
+  "farmAuditEmptyBody": "Сюда попадает каждая правка и каждое удаление: кто, когда и что изменил.",
+  "farmAuditActionUpdated": "Исправлено",
+  "farmAuditActionDeleted": "Удалено",
+  "farmAuditActionRoleChanged": "Смена роли",
+  "farmAuditActionDeactivated": "Доступ закрыт",
+  "farmAuditActionActivated": "Доступ открыт",
+  "farmAuditActionOwnership": "Хозяйство передано",
+  "farmAuditActionUnknown": "{action}",
+  "@farmAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "farmAuditChange": "{field}: {before} → {after}",
+  "@farmAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "farmAuditChanged": "Изменено: {field}",
+  "@farmAuditChanged": {"placeholders": {"field": {"type": "String"}}},
+  "farmAuditNoValue": "пусто",
+  "errorCodeNotRecordAuthor": "Чужую запись исправляет управляющий или владелец"
 }

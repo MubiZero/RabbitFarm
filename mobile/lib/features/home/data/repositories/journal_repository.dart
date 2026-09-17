@@ -37,10 +37,10 @@ class JournalRepository {
     required DateTime from,
     required DateTime to,
 
-    /// Показывать ли удаления. Спрашиваются отдельно, потому что сервер
-    /// отдаёт журнал фермы только владельцу и управляющему: работнику
+    /// Показывать ли удаления и правки. Спрашиваются отдельно, потому что
+    /// сервер отдаёт журнал фермы только владельцу и управляющему: работнику
     /// запрос вернул бы 403 и обрушил бы всю ленту заодно.
-    bool includeDeletions = false,
+    bool includeFarmLog = false,
   }) async {
     final sources = await Future.wait([
       _feedings(from, to),
@@ -49,7 +49,7 @@ class JournalRepository {
       _closedTasks(),
       _notes(from, to),
       _photos(from, to),
-      if (includeDeletions) _deletions(from, to),
+      if (includeFarmLog) _farmLog(from, to),
     ]);
 
     // Границы периода проверяются ещё раз здесь: у задач сервер их вовсе не
@@ -217,12 +217,16 @@ class JournalRepository {
     );
   }
 
-  /// Что удалили за этот срок — из журнала фермы.
+  /// Что удалили и что исправили за этот срок — из журнала фермы.
   ///
   /// Единственный источник, который не фильтруется сервером по датам: журнал
   /// отдаётся страницами, свежее сверху, и срок обрезается уже здесь, общей
   /// проверкой границ в [load].
-  Future<List<JournalEntry>> _deletions(DateTime from, DateTime to) async {
+  ///
+  /// Правка приходит отсюда же, а не из своего раздела: в разделе запись
+  /// показана уже исправленной и подписана тем, кто завёл её изначально, —
+  /// о самой правке она не говорит ничего.
+  Future<List<JournalEntry>> _farmLog(DateTime from, DateTime to) async {
     final items = await _items('/staff/audit', {
       'limit': _pageLimit,
       'scope': 'data',
@@ -231,7 +235,9 @@ class JournalRepository {
     return [
       for (final item in items)
         JournalEntry(
-          kind: JournalKind.deletion,
+          kind: (item['action']?.toString() ?? '').endsWith('.updated')
+              ? JournalKind.edit
+              : JournalKind.deletion,
           at: DateTime.tryParse(item['created_at']?.toString() ?? '') ??
               DateTime.now(),
           hasTime: true,

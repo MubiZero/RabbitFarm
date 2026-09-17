@@ -9479,6 +9479,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Смотрит данные и отмечает работу'**
   String get roleWorkerDescription;
+
+  /// No description provided for @farmAuditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал изменений'**
+  String get farmAuditTitle;
+
+  /// No description provided for @farmAuditEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей пока нет'**
+  String get farmAuditEmptyTitle;
+
+  /// No description provided for @farmAuditEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сюда попадает каждая правка и каждое удаление: кто, когда и что изменил.'**
+  String get farmAuditEmptyBody;
+
+  /// No description provided for @farmAuditActionUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исправлено'**
+  String get farmAuditActionUpdated;
+
+  /// No description provided for @farmAuditActionDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалено'**
+  String get farmAuditActionDeleted;
+
+  /// No description provided for @farmAuditActionRoleChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена роли'**
+  String get farmAuditActionRoleChanged;
+
+  /// No description provided for @farmAuditActionDeactivated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закрыт'**
+  String get farmAuditActionDeactivated;
+
+  /// No description provided for @farmAuditActionActivated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ открыт'**
+  String get farmAuditActionActivated;
+
+  /// No description provided for @farmAuditActionOwnership.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство передано'**
+  String get farmAuditActionOwnership;
+
+  /// No description provided for @farmAuditActionUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'{action}'**
+  String farmAuditActionUnknown(String action);
+
+  /// No description provided for @farmAuditChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'{field}: {before} → {after}'**
+  String farmAuditChange(String field, String before, String after);
+
+  /// No description provided for @farmAuditChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменено: {field}'**
+  String farmAuditChanged(String field);
+
+  /// No description provided for @farmAuditNoValue.
+  ///
+  /// In ru, this message translates to:
+  /// **'пусто'**
+  String get farmAuditNoValue;
+
+  /// No description provided for @errorCodeNotRecordAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чужую запись исправляет управляющий или владелец'**
+  String get errorCodeNotRecordAuthor;
 }
 
 class _AppLocalizationsDelegate
