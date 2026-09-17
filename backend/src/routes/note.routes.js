@@ -3,6 +3,7 @@ const router = express.Router();
 const noteController = require('../controllers/noteController');
 const { createNoteSchema, updateNoteSchema, listNotesQuerySchema } = require('../validators/noteValidator');
 const { authenticate, authorize } = require('../middleware/auth');
+const { allowOwnRecord } = require('../middleware/recordAuthor');
 const validate = require('../middleware/validation');
 
 /**
@@ -89,7 +90,12 @@ router.use(authenticate);
 router.post('/', validate(createNoteSchema), noteController.create);
 router.get('/', validate(listNotesQuerySchema, 'query'), noteController.list);
 router.get('/:id', noteController.getById);
-router.put('/:id', validate(updateNoteSchema), noteController.update);
+router.put(
+  '/:id',
+  allowOwnRecord('Note', 'created_by'),
+  validate(updateNoteSchema),
+  noteController.update
+);
 router.delete('/:id', authorize(['manager', 'owner']), noteController.delete);
 
 module.exports = router;

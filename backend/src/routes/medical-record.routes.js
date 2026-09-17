@@ -3,6 +3,7 @@ const router = express.Router();
 const medicalRecordController = require('../controllers/medicalRecordController');
 const { createMedicalRecordSchema, updateMedicalRecordSchema, listMedicalRecordsQuerySchema } = require('../validators/medicalRecordValidator');
 const { authenticate, authorize } = require('../middleware/auth');
+const { allowOwnRecord } = require('../middleware/recordAuthor');
 const validate = require('../middleware/validation');
 
 /**
@@ -123,7 +124,12 @@ router.get('/costs', authorize(['manager']), medicalRecordController.getCosts);
 router.post('/', validate(createMedicalRecordSchema), medicalRecordController.create);
 router.get('/', validate(listMedicalRecordsQuerySchema, 'query'), medicalRecordController.list);
 router.get('/:id', medicalRecordController.getById);
-router.put('/:id', validate(updateMedicalRecordSchema), medicalRecordController.update);
+router.put(
+  '/:id',
+  allowOwnRecord('MedicalRecord', 'created_by'),
+  validate(updateMedicalRecordSchema),
+  medicalRecordController.update
+);
 router.delete('/:id', authorize(['owner']), medicalRecordController.delete);
 
 module.exports = router;

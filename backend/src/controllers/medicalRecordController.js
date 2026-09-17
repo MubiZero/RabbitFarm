@@ -1,7 +1,14 @@
-const { MedicalRecord, Rabbit, Breed, sequelize } = require('../models');
+const { MedicalRecord, Rabbit, Breed, sequelize, User } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
+
+/**
+ * Кто завёл запись. Лечение и прививки до сих пор были единственными
+ * записями фермы без автора: в ленте «Журнал» подписаны и кормление, и
+ * заметки, а «кто это лечил» спросить было не у кого.
+ */
+const AUTHOR_INCLUDE = { model: User, as: 'author', attributes: ['id', 'full_name'] };
 
 /**
  * Medical Record controller
@@ -33,7 +40,12 @@ class MedicalRecordController {
         return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика');
       }
 
-      const medicalRecord = await MedicalRecord.create({ ...req.body, farm_id: req.farmId }, { transaction: t });
+      // Автор берётся из сеанса, а не из тела запроса: подпись, которую
+      // можно прислать любую, ничего не подтверждает.
+      const medicalRecord = await MedicalRecord.create(
+        { ...req.body, farm_id: req.farmId, created_by: req.user.id },
+        { transaction: t }
+      );
 
       // Automation 1: Status Update
       if (['died', 'euthanized'].includes(outcome)) {
@@ -62,6 +74,7 @@ class MedicalRecordController {
       const result = await MedicalRecord.findOne({
         where: { id: medicalRecord.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -90,6 +103,7 @@ class MedicalRecordController {
       const medicalRecord = await MedicalRecord.findOne({
         where: { id: req.params.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -160,6 +174,7 @@ class MedicalRecordController {
       const medicalRecords = await MedicalRecord.findAndCountAll({
         where,
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -215,6 +230,7 @@ class MedicalRecordController {
         where: { rabbit_id: rabbitId, farm_id: req.farmId },
         order: [['started_at', 'DESC']],
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -298,6 +314,7 @@ class MedicalRecordController {
       const result = await MedicalRecord.findOne({
         where: { id: medicalRecord.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
