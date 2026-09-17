@@ -918,6 +918,90 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @errorCodeRabbitNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик не найден'**
+  String get errorCodeRabbitNotFound;
+
+  /// No description provided for @errorCodeCageNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка не найдена'**
+  String get errorCodeCageNotFound;
+
+  /// No description provided for @errorCodeBreedNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода не найдена'**
+  String get errorCodeBreedNotFound;
+
+  /// No description provided for @errorCodeFeedNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм не найден'**
+  String get errorCodeFeedNotFound;
+
+  /// No description provided for @errorCodeTaskNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача не найдена'**
+  String get errorCodeTaskNotFound;
+
+  /// No description provided for @errorCodeCageFull.
+  ///
+  /// In ru, this message translates to:
+  /// **'В клетке нет свободных мест'**
+  String get errorCodeCageFull;
+
+  /// No description provided for @errorCodeTagIdExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Такое клеймо уже занято'**
+  String get errorCodeTagIdExists;
+
+  /// No description provided for @errorCodeRabbitLimitReached.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигнут предел поголовья по тарифу'**
+  String get errorCodeRabbitLimitReached;
+
+  /// No description provided for @errorCodeStaffLimitReached.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигнут предел работников по тарифу'**
+  String get errorCodeStaffLimitReached;
+
+  /// No description provided for @errorCodeInsufficientStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'На складе не хватает корма'**
+  String get errorCodeInsufficientStock;
+
+  /// No description provided for @errorCodeUserExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта почта уже занята'**
+  String get errorCodeUserExists;
+
+  /// No description provided for @errorCodePhoneExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот номер уже занят'**
+  String get errorCodePhoneExists;
+
+  /// No description provided for @errorCodePhoneLoginUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'В вашей стране код по СМС не приходит — войдите по почте'**
+  String get errorCodePhoneLoginUnavailable;
+
+  /// No description provided for @errorCodePaymentsUnavailableInCountry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплата картой в вашей стране пока недоступна — напишите в поддержку'**
+  String get errorCodePaymentsUnavailableInCountry;
+
   /// No description provided for @taskReminderLabel.
   ///
   /// In ru, this message translates to:
@@ -9395,6 +9479,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Смотрит данные и отмечает работу'**
   String get roleWorkerDescription;
+
+  /// No description provided for @farmAuditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал изменений'**
+  String get farmAuditTitle;
+
+  /// No description provided for @farmAuditEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей пока нет'**
+  String get farmAuditEmptyTitle;
+
+  /// No description provided for @farmAuditEmptyBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сюда попадает каждая правка и каждое удаление: кто, когда и что изменил.'**
+  String get farmAuditEmptyBody;
+
+  /// No description provided for @farmAuditActionUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исправлено'**
+  String get farmAuditActionUpdated;
+
+  /// No description provided for @farmAuditActionDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалено'**
+  String get farmAuditActionDeleted;
+
+  /// No description provided for @farmAuditActionRoleChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена роли'**
+  String get farmAuditActionRoleChanged;
+
+  /// No description provided for @farmAuditActionDeactivated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закрыт'**
+  String get farmAuditActionDeactivated;
+
+  /// No description provided for @farmAuditActionActivated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ открыт'**
+  String get farmAuditActionActivated;
+
+  /// No description provided for @farmAuditActionOwnership.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство передано'**
+  String get farmAuditActionOwnership;
+
+  /// No description provided for @farmAuditActionUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'{action}'**
+  String farmAuditActionUnknown(String action);
+
+  /// No description provided for @farmAuditChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'{field}: {before} → {after}'**
+  String farmAuditChange(String field, String before, String after);
+
+  /// No description provided for @farmAuditChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменено: {field}'**
+  String farmAuditChanged(String field);
+
+  /// No description provided for @farmAuditNoValue.
+  ///
+  /// In ru, this message translates to:
+  /// **'пусто'**
+  String get farmAuditNoValue;
+
+  /// No description provided for @errorCodeNotRecordAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чужую запись исправляет управляющий или владелец'**
+  String get errorCodeNotRecordAuthor;
 }
 
 class _AppLocalizationsDelegate

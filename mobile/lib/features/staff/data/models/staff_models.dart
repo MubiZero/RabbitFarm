@@ -113,3 +113,46 @@ abstract class CreatedInvitation with _$CreatedInvitation {
   factory CreatedInvitation.fromJson(Map<String, dynamic> json) =>
       _$CreatedInvitationFromJson(json);
 }
+
+/// Одна строка журнала фермы: кто, когда и что сделал.
+///
+/// Сюда попадает и кадровое (сменил роль, закрыл доступ, передал хозяйство),
+/// и работа с записями — удаление и правка. Отличаются они наличием
+/// [entityType]: у кадрового действия предмет — человек ([target]), у
+/// остальных — кролик, клетка, кормление.
+///
+/// Владелец приходит сюда с вопросом «кто исправил мою запись»: до журнала
+/// изменений правка не оставляла следа нигде, и запись после неё
+/// по-прежнему была подписана тем, кто завёл её изначально.
+@freezed
+abstract class FarmAuditEntry with _$FarmAuditEntry {
+  const factory FarmAuditEntry({
+    @IntConverter() required int id,
+
+    /// Машинный код действия: `feeding_record.updated`, `staff.role_changed`.
+    /// Разбирается на экране — сервер заводит новые действия раньше, чем
+    /// приложение о них узнаёт.
+    required String action,
+    @JsonKey(name: 'created_at') @DateTimeConverter() required DateTime at,
+    FarmMember? actor,
+    FarmMember? target,
+    @JsonKey(name: 'entity_type') String? entityType,
+    @JsonKey(name: 'entity_label') String? entityLabel,
+
+    /// Снимки изменённых полей. У удаления их нет: запись ушла целиком.
+    Map<String, dynamic>? before,
+    Map<String, dynamic>? after,
+  }) = _FarmAuditEntry;
+
+  const FarmAuditEntry._();
+
+  /// Кадровое действие или работа с записями — по этому и различаются
+  /// строки в журнале.
+  bool get isStaffAction => entityType == null;
+
+  /// Правка, а не удаление: только у неё есть «было» и «стало».
+  bool get isUpdate => action.endsWith('.updated');
+
+  factory FarmAuditEntry.fromJson(Map<String, dynamic> json) =>
+      _$FarmAuditEntryFromJson(json);
+}

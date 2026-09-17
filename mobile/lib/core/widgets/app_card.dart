@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_radius.dart';
 
 enum AppCardVariant { default_, highlighted, error }
 
@@ -31,17 +33,17 @@ class AppCard extends StatelessWidget {
 
     return Material(
       color: surface,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadius.lgAll,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.lgAll,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: effectiveBorder, width: 1),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppRadius.lgAll,
           ),
-          padding: padding ?? const EdgeInsets.all(16),
+          padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
           child: child,
         ),
       ),

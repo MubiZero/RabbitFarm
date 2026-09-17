@@ -17,6 +17,7 @@ import 'package:mobile/features/rabbits/data/repositories/breeds_repository.dart
 import 'package:mobile/features/rabbits/presentation/screens/rabbit_form_screen.dart';
 
 import '../support/test_app.dart';
+import 'package:mobile/shared/models/api_response.dart';
 
 /// Поля, которые человек заполняет, а приложение нигде не показывает — или
 /// наоборот, показывает то, чего негде заполнить. Хуже прочих была стоимость
@@ -30,7 +31,7 @@ class _FakeVaccinationsRepository extends VaccinationsRepository {
   final List<Map<String, dynamic>> sent = [];
 
   @override
-  Future<List<Vaccination>> getVaccinations({
+  Future<PaginatedResponse<Vaccination>> getVaccinations({
     int page = 1,
     int limit = 50,
     int? rabbitId,
@@ -41,7 +42,13 @@ class _FakeVaccinationsRepository extends VaccinationsRepository {
     String sortBy = 'vaccination_date',
     String sortOrder = 'DESC',
   }) async =>
-      const [];
+      const PaginatedResponse<Vaccination>(
+        items: [],
+        total: 0,
+        page: 1,
+        limit: 50,
+        totalPages: 0,
+      );
 
   @override
   Future<Vaccination> createVaccination(VaccinationRequest request) async {

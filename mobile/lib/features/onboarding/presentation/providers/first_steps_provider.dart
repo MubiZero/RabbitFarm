@@ -37,7 +37,7 @@ final firstStepDoneProvider =
       final shots = await ref
           .watch(vaccinationsRepositoryProvider)
           .getVaccinations(limit: 1);
-      return shots.isNotEmpty;
+      return shots.items.isNotEmpty;
 
     case FirstStep.money:
       final entries = await ref

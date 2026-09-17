@@ -9,6 +9,7 @@ import 'package:mobile/features/rabbits/data/repositories/births_repository.dart
 import 'package:mobile/features/rabbits/presentation/screens/births_list_screen.dart';
 
 import '../support/test_app.dart';
+import 'package:mobile/shared/models/api_response.dart';
 
 /// Крольчонок жил в приложении двумя способами сразу: числом в выводке и,
 /// если нажали «Завести карточки», — строкой в поголовье. Половины друг о
@@ -22,7 +23,17 @@ class _FakeBirthsRepository extends BirthsRepository {
   final BirthModel _birth;
 
   @override
-  Future<List<BirthModel>> getBirths() async => [_birth];
+  Future<PaginatedResponse<BirthModel>> getBirths({
+    int page = 1,
+    int limit = 30,
+  }) async =>
+      PaginatedResponse<BirthModel>(
+        items: [_birth],
+        total: [_birth].length,
+        page: page,
+        limit: limit,
+        totalPages: 1,
+      );
 }
 
 BirthModel _birth({String? cardedAt}) => BirthModel(

@@ -64,6 +64,13 @@ module.exports = (sequelize) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    // Кто завёл запись. Обнуляемая: у записей старше этой колонки автора
+    // взять неоткуда, а уход человека с фермы не должен уносить историю
+    // его работы.
+    created_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'medical_records',

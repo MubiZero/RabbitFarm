@@ -9,21 +9,34 @@ class BirthsState {
   final bool isLoading;
   final Object? error;
 
+  /// Какая страница загружена и есть ли следующая. Без этого список
+  /// обрывался на пятидесятой записи и выглядел полным: у фермы, которая
+  /// ведёт окролы третий год, старые выводки просто переставали
+  /// показываться.
+  final int currentPage;
+  final bool hasMore;
+
   BirthsState({
     this.births = const [],
     this.isLoading = false,
     this.error,
+    this.currentPage = 1,
+    this.hasMore = false,
   });
 
   BirthsState copyWith({
     List<BirthModel>? births,
     bool? isLoading,
     Object? error,
+    int? currentPage,
+    bool? hasMore,
   }) {
     return BirthsState(
       births: births ?? this.births,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      currentPage: currentPage ?? this.currentPage,
+      hasMore: hasMore ?? this.hasMore,
     );
   }
 }
@@ -44,21 +57,47 @@ class BirthsNotifier extends Notifier<BirthsState> {
     return BirthsState(isLoading: true);
   }
 
-  /// Загрузить список окролов
+  /// Размер страницы — как у остальных списков хозяйства.
+  static const _pageSize = 30;
+
+  /// Загрузить список окролов — первую страницу.
   Future<void> loadBirths() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final births = await _repository.getBirths();
+      final page = await _repository.getBirths(page: 1, limit: _pageSize);
       state = state.copyWith(
-        births: births,
+        births: page.items,
         isLoading: false,
+        currentPage: page.page,
+        hasMore: page.page < page.totalPages,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
       );
+    }
+  }
+
+  /// Догрузить следующую страницу.
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final page = await _repository.getBirths(
+        page: state.currentPage + 1,
+        limit: _pageSize,
+      );
+      state = state.copyWith(
+        births: [...state.births, ...page.items],
+        isLoading: false,
+        currentPage: page.page,
+        hasMore: page.page < page.totalPages,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 

@@ -5,6 +5,7 @@ import '../../../../core/api/api_endpoints.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../../core/api/paginated.dart';
 import '../models/notification_model.dart';
+import '../../../../shared/models/api_response.dart';
 
 /// Лента уведомлений с сервера.
 ///
@@ -16,16 +17,38 @@ class NotificationsRepository {
 
   final ApiClient _api;
 
-  Future<List<AppNotification>> load({int page = 1, int limit = 30}) async {
+  /// Страница ленты вместе со сведениями о следующей.
+  ///
+  /// Раньше метод отдавал только записи: лента показывала первые тридцать
+  /// сообщений и дальше не листалась — всё, что старше, было не достать.
+  Future<PaginatedResponse<AppNotification>> load({
+    int page = 1,
+    int limit = 30,
+  }) async {
     try {
       final response = await _api.get(
         ApiEndpoints.notifications,
         queryParameters: {'page': page, 'limit': limit},
       );
-      return [
+
+      final items = [
         for (final item in itemsOf(response.data['data']))
           AppNotification.fromJson(item as Map<String, dynamic>),
       ];
+
+      // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+      // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+      // читали мы `total_pages`, и список всегда считал себя законченным на
+      // первой странице.
+      final info = PageInfo.of(response.data['data'], fallbackCount: items.length);
+
+      return PaginatedResponse<AppNotification>(
+        items: items,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

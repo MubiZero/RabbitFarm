@@ -9,6 +9,7 @@ import 'package:mobile/features/notifications/presentation/providers/notificatio
 import 'package:mobile/features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../support/test_app.dart';
+import 'package:mobile/shared/models/api_response.dart';
 
 /// Лента существует ровно потому, что пуш — канал ненадёжный по устройству:
 /// человек мог отказать в разрешении, удалить приложение, потерять токен.
@@ -27,8 +28,17 @@ class _FakeNotificationsRepository extends NotificationsRepository {
   int markCalls = 0;
 
   @override
-  Future<List<AppNotification>> load({int page = 1, int limit = 30}) async =>
-      items;
+  Future<PaginatedResponse<AppNotification>> load({
+    int page = 1,
+    int limit = 30,
+  }) async =>
+      PaginatedResponse<AppNotification>(
+        items: items,
+        total: items.length,
+        page: page,
+        limit: limit,
+        totalPages: 1,
+      );
 
   @override
   Future<int> unreadCount() async => unread;

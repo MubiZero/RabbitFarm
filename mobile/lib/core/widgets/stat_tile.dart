@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import 'app_card.dart';
+import '../theme/app_radius.dart';
 
 /// Крупная метрика: значение на первом плане, подпись — вторым.
 /// Рассчитана на строку из 2-3 плиток (`Expanded`), поэтому текст переносится
@@ -35,26 +36,26 @@ class StatTile extends StatelessWidget {
       label: '$label: $value',
       excludeSemantics: true,
       child: AppCard(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.smAll,
               ),
               child: Icon(icon, size: 18, color: color),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               value,
               style: AppTypography.titleLg.copyWith(color: color),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               label,
               style: AppTypography.labelSm.copyWith(color: cs.onSurfaceVariant),

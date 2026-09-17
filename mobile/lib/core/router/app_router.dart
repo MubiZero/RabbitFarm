@@ -71,6 +71,7 @@ import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/support/presentation/screens/support_request_screen.dart';
+import '../../features/staff/presentation/screens/farm_audit_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/platform_admin/data/models/platform_admin_models.dart';
 import '../../features/platform_admin/presentation/screens/platform_admin_screen.dart';
@@ -720,6 +721,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/staff',
         name: 'staff',
         builder: (context, state) => const StaffScreen(),
+      ),
+      // Журнал изменений фермы. Сервер отдаёт его только владельцу и
+      // управляющему (`GET /staff/audit`), и вход на экран стоит там же, где
+      // состав фермы, — работник его не видит.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/staff/audit',
+        name: 'farm-audit',
+        builder: (context, state) => const FarmAuditScreen(),
       ),
       // Работает даже при закрытом доступе фермы (см.
       // `authenticateEvenIfFarmBlocked` на бэкенде) — маршрут сам по себе

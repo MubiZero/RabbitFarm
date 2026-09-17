@@ -1,7 +1,14 @@
-const { Vaccination, Rabbit, Breed, sequelize } = require('../models');
+const { Vaccination, Rabbit, Breed, sequelize, User } = require('../models');
 const ApiResponse = require('../utils/apiResponse');
 const { syncAutoExpense } = require('../services/autoExpenseService');
 const { Op } = require('sequelize');
+
+/**
+ * Кто завёл запись. Лечение и прививки до сих пор были единственными
+ * записями фермы без автора: в ленте «Журнал» подписаны и кормление, и
+ * заметки, а «кто это лечил» спросить было не у кого.
+ */
+const AUTHOR_INCLUDE = { model: User, as: 'author', attributes: ['id', 'full_name'] };
 
 /**
  * Vaccination controller
@@ -33,7 +40,12 @@ class VaccinationController {
         return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика');
       }
 
-      const vaccination = await Vaccination.create({ ...req.body, farm_id: req.farmId }, { transaction: t });
+      // Автор берётся из сеанса, а не из тела запроса: подпись, которую
+      // можно прислать любую, ничего не подтверждает.
+      const vaccination = await Vaccination.create(
+        { ...req.body, farm_id: req.farmId, created_by: req.user.id },
+        { transaction: t }
+      );
 
       // Automation: Financial Transaction
       await syncAutoExpense({
@@ -53,6 +65,7 @@ class VaccinationController {
       const result = await Vaccination.findOne({
         where: { id: vaccination.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -81,6 +94,7 @@ class VaccinationController {
       const vaccination = await Vaccination.findOne({
         where: { id: req.params.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -156,6 +170,7 @@ class VaccinationController {
       const vaccinations = await Vaccination.findAndCountAll({
         where,
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -211,6 +226,7 @@ class VaccinationController {
         where: { rabbit_id: rabbitId, farm_id: req.farmId },
         order: [['vaccination_date', 'DESC']],
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',
@@ -282,6 +298,7 @@ class VaccinationController {
       const result = await Vaccination.findOne({
         where: { id: vaccination.id, farm_id: req.farmId },
         include: [
+          AUTHOR_INCLUDE,
           {
             model: Rabbit,
             as: 'rabbit',

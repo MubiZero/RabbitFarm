@@ -46,6 +46,6 @@ final journalFeedProvider = FutureProvider.autoDispose
         to: period.to(now),
         // Кто что удалил — вопрос хозяйский, и сервер отдаёт эти записи
         // только владельцу и управляющему.
-        includeDeletions: ref.watch(canProvider(FarmCapability.viewStaff)),
+        includeFarmLog: ref.watch(canProvider(FarmCapability.viewStaff)),
       );
 });

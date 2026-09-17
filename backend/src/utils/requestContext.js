@@ -15,10 +15,20 @@ const { AsyncLocalStorage } = require('async_hooks');
  */
 const storage = new AsyncLocalStorage();
 
-/** Middleware: выполнить остаток запроса внутри контекста вошедшего. */
+/**
+ * Middleware: выполнить остаток запроса внутри контекста вошедшего.
+ *
+ * Адрес запроса лежит рядом с автором, потому что журнал изменений отличает
+ * правку записи от её побочного следствия ровно по нему: сохранённое
+ * кормление списывает корм со склада, и без адреса эти два изменения в хуках
+ * моделей неразличимы.
+ */
 function withRequestContext(req, res, next) {
   if (!req.user) return next();
-  storage.run({ userId: req.user.id, farmId: req.farmId }, next);
+  storage.run(
+    { userId: req.user.id, farmId: req.farmId, path: req.originalUrl || req.url },
+    next
+  );
 }
 
 /** Текущий контекст или `null`, если код выполняется вне запроса (cron, тест). */

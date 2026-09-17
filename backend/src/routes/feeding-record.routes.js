@@ -8,6 +8,7 @@ const {
   listFeedingRecordsQuerySchema
 } = require('../validators/feedingRecordValidator');
 const { authenticate, authorize } = require('../middleware/auth');
+const { allowOwnRecord } = require('../middleware/recordAuthor');
 const validate = require('../middleware/validation');
 
 /**
@@ -167,7 +168,12 @@ router.post('/', validate(createFeedingRecordSchema), feedingRecordController.cr
 router.post('/bulk', validate(bulkCreateFeedingRecordsSchema), feedingRecordController.createBulk);
 router.get('/', validate(listFeedingRecordsQuerySchema, 'query'), feedingRecordController.list);
 router.get('/:id', feedingRecordController.getById);
-router.put('/:id', validate(updateFeedingRecordSchema), feedingRecordController.update);
+router.put(
+  '/:id',
+  allowOwnRecord('FeedingRecord', 'fed_by'),
+  validate(updateFeedingRecordSchema),
+  feedingRecordController.update
+);
 router.delete('/:id', authorize(['manager', 'owner']), feedingRecordController.delete);
 
 module.exports = router;

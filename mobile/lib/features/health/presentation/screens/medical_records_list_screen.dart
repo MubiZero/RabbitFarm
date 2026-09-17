@@ -51,7 +51,7 @@ class _MedicalRecordsListScreenState
 
   @override
   Widget build(BuildContext context) {
-    final recordsAsync = ref.watch(medicalRecordsProvider);
+    final state = ref.watch(medicalRecordsProvider);
     final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
 
     return Scaffold(
@@ -76,41 +76,24 @@ class _MedicalRecordsListScreenState
           ),
         ],
       ),
-      body: RefreshIndicator(
+      // Список догружается прокруткой: раньше он показывал первую сотню и
+      // выглядел полным — остальное лечение увидеть было нельзя.
+      body: PagedListView<MedicalRecord>(
+        items: state.records,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
         onRefresh: _load,
-        child: Column(
-          children: [
-            _OutcomeTabs(selected: _outcome, onSelect: _setOutcome),
-            Expanded(
-              child: AppAsyncView<List<MedicalRecord>>(
-                value: recordsAsync,
-                onRetry: _load,
-                skeleton: (_) => const SkeletonList(itemHeight: 130),
-                builder: (records) => records.isEmpty
-                    ? _empty(canRecord)
-                    : ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.screenH,
-                          AppSpacing.md,
-                          AppSpacing.screenH,
-                          AppSpacing.fabSafeBottom,
-                        ),
-                        itemCount: records.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: AppSpacing.md),
-                        itemBuilder: (context, i) => _RecordCard(
-                          record: records[i],
-                          onTap: () => showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) => _DetailsSheet(record: records[i]),
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-          ],
+        onLoadMore: ref.read(medicalRecordsProvider.notifier).loadMore,
+        header: _OutcomeTabs(selected: _outcome, onSelect: _setOutcome),
+        empty: _empty(canRecord),
+        itemBuilder: (context, record, _) => _RecordCard(
+          record: record,
+          onTap: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => _DetailsSheet(record: record),
+          ),
         ),
       ),
       floatingActionButton: canRecord

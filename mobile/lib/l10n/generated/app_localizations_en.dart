@@ -442,6 +442,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickNeedsConnection => 'Needs connection';
 
   @override
+  String get errorCodeRabbitNotFound => 'Rabbit not found';
+
+  @override
+  String get errorCodeCageNotFound => 'Cage not found';
+
+  @override
+  String get errorCodeBreedNotFound => 'Breed not found';
+
+  @override
+  String get errorCodeFeedNotFound => 'Feed not found';
+
+  @override
+  String get errorCodeTaskNotFound => 'Task not found';
+
+  @override
+  String get errorCodeCageFull => 'The cage is full';
+
+  @override
+  String get errorCodeTagIdExists => 'This tag is already taken';
+
+  @override
+  String get errorCodeRabbitLimitReached => 'Plan limit for rabbits reached';
+
+  @override
+  String get errorCodeStaffLimitReached => 'Plan limit for staff reached';
+
+  @override
+  String get errorCodeInsufficientStock => 'Not enough feed in stock';
+
+  @override
+  String get errorCodeUserExists => 'This email is already taken';
+
+  @override
+  String get errorCodePhoneExists => 'This number is already taken';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'SMS codes do not reach your country — sign in by email';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Card payment is not available in your country yet — message support';
+
+  @override
   String get taskReminderLabel => 'Remind in advance';
 
   @override
@@ -5309,4 +5353,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleWorkerDescription => 'Reads the records and marks work done';
+
+  @override
+  String get farmAuditTitle => 'Change log';
+
+  @override
+  String get farmAuditEmptyTitle => 'Nothing logged yet';
+
+  @override
+  String get farmAuditEmptyBody =>
+      'Every edit and every deletion lands here: who, when and what they changed.';
+
+  @override
+  String get farmAuditActionUpdated => 'Edited';
+
+  @override
+  String get farmAuditActionDeleted => 'Deleted';
+
+  @override
+  String get farmAuditActionRoleChanged => 'Role changed';
+
+  @override
+  String get farmAuditActionDeactivated => 'Access closed';
+
+  @override
+  String get farmAuditActionActivated => 'Access opened';
+
+  @override
+  String get farmAuditActionOwnership => 'Farm handed over';
+
+  @override
+  String farmAuditActionUnknown(String action) {
+    return '$action';
+  }
+
+  @override
+  String farmAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String farmAuditChanged(String field) {
+    return 'Changed: $field';
+  }
+
+  @override
+  String get farmAuditNoValue => 'empty';
+
+  @override
+  String get errorCodeNotRecordAuthor =>
+      'Only a manager or the owner edits records made by others';
 }

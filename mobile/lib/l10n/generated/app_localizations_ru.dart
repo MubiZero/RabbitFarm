@@ -441,6 +441,52 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String get errorCodeRabbitNotFound => 'Кролик не найден';
+
+  @override
+  String get errorCodeCageNotFound => 'Клетка не найдена';
+
+  @override
+  String get errorCodeBreedNotFound => 'Порода не найдена';
+
+  @override
+  String get errorCodeFeedNotFound => 'Корм не найден';
+
+  @override
+  String get errorCodeTaskNotFound => 'Задача не найдена';
+
+  @override
+  String get errorCodeCageFull => 'В клетке нет свободных мест';
+
+  @override
+  String get errorCodeTagIdExists => 'Такое клеймо уже занято';
+
+  @override
+  String get errorCodeRabbitLimitReached =>
+      'Достигнут предел поголовья по тарифу';
+
+  @override
+  String get errorCodeStaffLimitReached =>
+      'Достигнут предел работников по тарифу';
+
+  @override
+  String get errorCodeInsufficientStock => 'На складе не хватает корма';
+
+  @override
+  String get errorCodeUserExists => 'Эта почта уже занята';
+
+  @override
+  String get errorCodePhoneExists => 'Этот номер уже занят';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'В вашей стране код по СМС не приходит — войдите по почте';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Оплата картой в вашей стране пока недоступна — напишите в поддержку';
+
+  @override
   String get taskReminderLabel => 'Напомнить заранее';
 
   @override
@@ -5378,4 +5424,54 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get roleWorkerDescription => 'Смотрит данные и отмечает работу';
+
+  @override
+  String get farmAuditTitle => 'Журнал изменений';
+
+  @override
+  String get farmAuditEmptyTitle => 'Записей пока нет';
+
+  @override
+  String get farmAuditEmptyBody =>
+      'Сюда попадает каждая правка и каждое удаление: кто, когда и что изменил.';
+
+  @override
+  String get farmAuditActionUpdated => 'Исправлено';
+
+  @override
+  String get farmAuditActionDeleted => 'Удалено';
+
+  @override
+  String get farmAuditActionRoleChanged => 'Смена роли';
+
+  @override
+  String get farmAuditActionDeactivated => 'Доступ закрыт';
+
+  @override
+  String get farmAuditActionActivated => 'Доступ открыт';
+
+  @override
+  String get farmAuditActionOwnership => 'Хозяйство передано';
+
+  @override
+  String farmAuditActionUnknown(String action) {
+    return '$action';
+  }
+
+  @override
+  String farmAuditChange(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String farmAuditChanged(String field) {
+    return 'Изменено: $field';
+  }
+
+  @override
+  String get farmAuditNoValue => 'пусто';
+
+  @override
+  String get errorCodeNotRecordAuthor =>
+      'Чужую запись исправляет управляющий или владелец';
 }

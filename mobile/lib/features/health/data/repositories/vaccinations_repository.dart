@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/paginated.dart';
 import '../../../../core/providers/session.dart';
 import '../../../../core/providers/api_providers.dart';
 import '../../../../shared/models/api_response.dart';
@@ -15,7 +16,13 @@ class VaccinationsRepository {
       : _apiClient = apiClient;
 
   /// Получить список вакцинаций с фильтрацией и пагинацией
-  Future<List<Vaccination>> getVaccinations({
+  /// Страница прививок вместе со сведениями о том, есть ли следующая.
+  ///
+  /// Раньше метод возвращал только записи, а `pagination` из ответа
+  /// выбрасывал — список молча обрывался на пятидесятой записи, и узнать об
+  /// этом было неоткуда: ни счётчика, ни «показать ещё». На ферме, где
+  /// прививки идут третий год, половина истории просто не показывалась.
+  Future<PaginatedResponse<Vaccination>> getVaccinations({
     int page = 1,
     int limit = 50,
     int? rabbitId,
@@ -62,9 +69,22 @@ class VaccinationsRepository {
         throw const ApiFailure(ApiFailureKind.server);
       }
 
-      return itemsJson
+      final items = itemsJson
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
+
+      // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+      // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+      // читали мы `total_pages`, и список всегда считал себя законченным на
+      // первой странице.
+      final info = PageInfo.of(data, fallbackCount: items.length);
+      return PaginatedResponse<Vaccination>(
+        items: items,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     } on ApiFailure {

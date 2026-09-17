@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import 'api_failure.dart';
+
 /// Сообщение сервера из стандартного конверта ошибок API:
 /// `{ success: false, error: { code, message } }`.
 ///
@@ -28,11 +30,20 @@ String? serverErrorCode(DioException e) {
   return error is Map ? error['code'] as String? : null;
 }
 
-/// Выполнить запрос, превратив ошибку Dio в понятное пользователю исключение.
+/// Выполнить запрос, превратив ошибку Dio в разобранный отказ.
 ///
 /// Без обёртки наружу уходит сырой DioException, и экран показывает
 /// «Ошибка: DioException [bad response]: This exception was thrown because…»
 /// — техническую английскую простыню вместо сообщения сервера.
+///
+/// Бросается `ApiFailure`, а не обычный `Exception`: тот терял и вид отказа,
+/// и код. Из-за этого при пропавшей связи человек читал «Не удалось
+/// загрузить задачи» — приложение знало, что сети нет, но сказать об этом не
+/// могло: обёртка уже подменила отказ строкой. Остальные репозитории давно
+/// бросают `ApiFailure`, здесь миграцию просто не довели.
+///
+/// `fallbackMessage` остаётся запасным текстом на случай, когда сервер не
+/// сказал ничего вразумительного.
 Future<T> guardRequest<T>(
   Future<T> Function() request,
   String fallbackMessage,
@@ -40,6 +51,22 @@ Future<T> guardRequest<T>(
   try {
     return await request();
   } on DioException catch (e) {
-    throw Exception(serverMessage(e) ?? fallbackMessage);
+    final failure = ApiFailure.from(e);
+    // Свой текст подставляем, только если сервер промолчал: его подробность
+    // конкретнее нашей заготовки.
+    if (failure.serverText != null && failure.serverText!.trim().isNotEmpty) {
+      throw failure;
+    }
+    throw ApiFailure(
+      failure.kind,
+      serverText: failure.kind == ApiFailureKind.offline ||
+              failure.kind == ApiFailureKind.timeout
+          // Для пропавшей связи заготовка экрана («не удалось загрузить»)
+          // хуже, чем честное «нет связи» из общего словаря: подставлять её
+          // нечего.
+          ? null
+          : fallbackMessage,
+      code: failure.code,
+    );
   }
 }

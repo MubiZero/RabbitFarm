@@ -8,6 +8,7 @@ import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../utils/rabbit_labels.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Экран отображения родословной кролика
 ///
@@ -57,7 +58,7 @@ class PedigreeScreen extends ConsumerWidget {
         loading: () => const SkeletonList(itemHeight: 96),
         // Раньше здесь был тупик: сообщение и кнопка «назад», без повтора.
         error: (error, _) => AppErrorState(
-          message: error.toString(),
+          message: errorText(context.l10n, error),
           onRetry: () => ref.invalidate(pedigreeProvider(rabbitId)),
         ),
       ),

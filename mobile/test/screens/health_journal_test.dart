@@ -16,6 +16,7 @@ import 'package:mobile/features/health/presentation/screens/health_journal_scree
 import 'package:mobile/features/rabbits/data/models/rabbit_model.dart';
 
 import '../support/test_app.dart';
+import 'package:mobile/shared/models/api_response.dart';
 
 /// В записях здоровья кролик приходит краткой ссылкой, а не полной моделью:
 /// сервер отдаёт только id, кличку и клеймо.
@@ -67,7 +68,7 @@ class _FakeVaccinationsRepository extends VaccinationsRepository {
   final Object? error;
 
   @override
-  Future<List<Vaccination>> getVaccinations({
+  Future<PaginatedResponse<Vaccination>> getVaccinations({
     int page = 1,
     int limit = 50,
     int? rabbitId,
@@ -79,7 +80,13 @@ class _FakeVaccinationsRepository extends VaccinationsRepository {
     String sortOrder = 'DESC',
   }) async {
     if (error != null) throw error!;
-    return vaccinations;
+    return PaginatedResponse<Vaccination>(
+      items: vaccinations,
+      total: vaccinations.length,
+      page: page,
+      limit: limit,
+      totalPages: 1,
+    );
   }
 }
 
@@ -91,7 +98,7 @@ class _FakeMedicalRecordsRepository extends MedicalRecordsRepository {
   final Object? error;
 
   @override
-  Future<List<MedicalRecord>> getMedicalRecords({
+  Future<PaginatedResponse<MedicalRecord>> getMedicalRecords({
     int? page,
     int? limit,
     String? sortBy,
@@ -103,7 +110,13 @@ class _FakeMedicalRecordsRepository extends MedicalRecordsRepository {
     bool? ongoing,
   }) async {
     if (error != null) throw error!;
-    return records;
+    return PaginatedResponse<MedicalRecord>(
+      items: records,
+      total: records.length,
+      page: page ?? 1,
+      limit: limit ?? records.length,
+      totalPages: 1,
+    );
   }
 }
 

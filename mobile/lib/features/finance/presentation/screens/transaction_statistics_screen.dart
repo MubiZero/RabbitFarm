@@ -11,6 +11,7 @@ import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Аналитика финансов: доходы, расходы, прибыль и структура по категориям.
 class TransactionStatisticsScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,7 @@ class _TransactionStatisticsScreenState
             child: statsAsync.when(
               loading: () => const _StatisticsSkeleton(),
               error: (error, _) => AppErrorState(
-                message: error.toString(),
+                message: errorText(context.l10n, error),
                 onRetry: () =>
                     ref.invalidate(financialStatisticsProvider(_params)),
               ),

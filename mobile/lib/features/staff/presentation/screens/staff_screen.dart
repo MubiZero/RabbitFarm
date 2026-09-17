@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/access/farm_access.dart';
@@ -42,7 +43,18 @@ class StaffScreen extends ConsumerWidget {
     final canManage = ref.watch(canProvider(FarmCapability.manageStaff));
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.staffTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.staffTitle),
+        actions: [
+          // Журнал живёт здесь, а не в настройках: вопрос «кто исправил мою
+          // запись» человек задаёт, глядя на список тех, кто мог это сделать.
+          IconButton(
+            tooltip: context.l10n.farmAuditTitle,
+            icon: const Icon(Icons.history),
+            onPressed: () => context.push('/staff/audit'),
+          ),
+        ],
+      ),
       floatingActionButton: canManage
           ? FloatingActionButton.extended(
               onPressed: () => _inviteDialog(context, ref),
@@ -53,7 +65,7 @@ class StaffScreen extends ConsumerWidget {
       body: membersAsync.when(
         loading: () => const _StaffSkeleton(),
         error: (error, _) => AppErrorState(
-          message: error.toString(),
+          message: errorText(context.l10n, error),
           onRetry: () => ref.invalidate(farmMembersProvider),
         ),
         data: (members) => _buildContent(context, ref, members, canManage),

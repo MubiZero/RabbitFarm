@@ -122,7 +122,7 @@ final healthJournalProvider = FutureProvider.autoDispose
   await Future.wait([
     vaccinationsRepository
         .getVaccinations(limit: _sourceLimit, rabbitId: rabbitId)
-        .then(vaccinations.addAll),
+        .then((page) => vaccinations.addAll(page.items)),
     medicalRepository
         .getMedicalRecords(
           limit: _sourceLimit,
@@ -130,7 +130,7 @@ final healthJournalProvider = FutureProvider.autoDispose
           sortBy: 'started_at',
           sortOrder: 'DESC',
         )
-        .then(treatments.addAll),
+        .then((page) => treatments.addAll(page.items)),
   ]);
 
   return <HealthEntry>[

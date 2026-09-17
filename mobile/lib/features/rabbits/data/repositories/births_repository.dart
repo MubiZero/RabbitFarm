@@ -16,9 +16,21 @@ class BirthsRepository {
   BirthsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
 
   /// Получить список всех окролов
-  Future<List<BirthModel>> getBirths() async {
+  /// Страница окролов вместе со сведениями о следующей.
+  ///
+  /// Раньше метод не принимал страницу вовсе и брал то, что сервер отдаёт по
+  /// умолчанию, — список обрывался на пятидесятой записи и выглядел полным.
+  /// У фермы, которая ведёт окролы третий год, старые выводки просто
+  /// переставали показываться.
+  Future<PaginatedResponse<BirthModel>> getBirths({
+    int page = 1,
+    int limit = 30,
+  }) async {
     try {
-      final response = await _apiClient.dio.get('/births');
+      final response = await _apiClient.dio.get(
+        '/births',
+        queryParameters: {'page': page, 'limit': limit},
+      );
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
@@ -32,9 +44,24 @@ class BirthsRepository {
             serverText: responseData['message'] as String?);
       }
 
-      return itemsOf(responseData['data'])
+      final items = itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
+
+      // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+      // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+      // читали мы `total_pages`, и список всегда считал себя законченным на
+      // первой странице.
+      final info =
+          PageInfo.of(responseData['data'], fallbackCount: items.length);
+
+      return PaginatedResponse<BirthModel>(
+        items: items,
+        total: info.total,
+        page: info.page,
+        limit: info.limit,
+        totalPages: info.totalPages,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     } on ApiFailure {

@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/medical_record_model.dart';
 import '../../../../core/api/api_failure.dart';
+import '../../../../shared/models/api_response.dart';
 
 /// Repository for medical records operations
 class MedicalRecordsRepository {
@@ -12,7 +13,11 @@ class MedicalRecordsRepository {
   MedicalRecordsRepository(this._apiClient);
 
   /// Get list of medical records with optional filters
-  Future<List<MedicalRecord>> getMedicalRecords({
+  /// Страница записей о лечении вместе со сведениями о следующей.
+  ///
+  /// Раньше метод отдавал только записи, а сведения о страницах терял —
+  /// список молча обрывался и выглядел полным.
+  Future<PaginatedResponse<MedicalRecord>> getMedicalRecords({
     int? page,
     int? limit,
     String? sortBy,
@@ -47,12 +52,32 @@ class MedicalRecordsRepository {
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        return itemsOf(data)
+        final items = itemsOf(data)
             .map((json) => MedicalRecord.fromJson(json as Map<String, dynamic>))
             .toList();
+
+        // Разбор страницы — общий (`core/api/paginated.dart`). Собранный
+        // здесь вручную он молча врал: сервер называет поле `totalPages`, а
+        // читали мы `total_pages`, и список всегда считал себя законченным на
+        // первой странице.
+        final info = PageInfo.of(data, fallbackCount: items.length);
+
+        return PaginatedResponse<MedicalRecord>(
+          items: items,
+          total: info.total,
+          page: info.page,
+          limit: info.limit,
+          totalPages: info.totalPages,
+        );
       }
 
-      return [];
+      return PaginatedResponse<MedicalRecord>(
+        items: const [],
+        total: 0,
+        page: page ?? 1,
+        limit: limit ?? 0,
+        totalPages: 0,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }
