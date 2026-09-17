@@ -9689,6 +9689,126 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Название хозяйства набрано неточно'**
   String get errorCodeConfirmNameMismatch;
+
+  /// No description provided for @healthSheetAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта здоровья'**
+  String get healthSheetAction;
+
+  /// No description provided for @healthSheetPrint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напечатать'**
+  String get healthSheetPrint;
+
+  /// No description provided for @healthSheetShare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить таблицей'**
+  String get healthSheetShare;
+
+  /// No description provided for @healthSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта здоровья: {name}'**
+  String healthSheetTitle(String name);
+
+  /// No description provided for @healthSheetNoVaccinations.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививок не записано'**
+  String get healthSheetNoVaccinations;
+
+  /// No description provided for @healthSheetNoTreatments.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечения не записано'**
+  String get healthSheetNoTreatments;
+
+  /// No description provided for @healthSheetNextDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая'**
+  String get healthSheetNextDate;
+
+  /// No description provided for @healthSheetPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок'**
+  String get healthSheetPeriod;
+
+  /// No description provided for @healthSheetColKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что'**
+  String get healthSheetColKind;
+
+  /// No description provided for @healthSheetColWhat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцина или диагноз'**
+  String get healthSheetColWhat;
+
+  /// No description provided for @healthSheetColDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подробности'**
+  String get healthSheetColDetails;
+
+  /// No description provided for @healthSheetEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'У этого кролика ещё нет ни прививок, ни лечения'**
+  String get healthSheetEmpty;
+
+  /// No description provided for @financeSheetAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Книга доходов и расходов'**
+  String get financeSheetAction;
+
+  /// No description provided for @financeSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы и расходы'**
+  String get financeSheetTitle;
+
+  /// No description provided for @financeSheetPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'За срок с {from} по {to}'**
+  String financeSheetPeriod(String from, String to);
+
+  /// No description provided for @financeSheetEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот срок операций не записано'**
+  String get financeSheetEmpty;
+
+  /// No description provided for @financeSheetColKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приход или расход'**
+  String get financeSheetColKind;
+
+  /// No description provided for @exportShareSubject.
+  ///
+  /// In ru, this message translates to:
+  /// **'{title} — «Кроличья ферма»'**
+  String exportShareSubject(String title);
+
+  /// No description provided for @financeSheetLastMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прошлый месяц'**
+  String get financeSheetLastMonth;
+
+  /// No description provided for @financeSheetThisYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот год'**
+  String get financeSheetThisYear;
 }
 
 class _AppLocalizationsDelegate

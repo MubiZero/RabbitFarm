@@ -16,6 +16,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../health/presentation/widgets/health_sheet_button.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -35,6 +36,12 @@ class RabbitDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(rabbitAsync.value?.name ?? context.l10n.navRabbits),
         actions: [
+          // Карта здоровья — то, что несут ветеринару. Видна всем, кто видит
+          // самого кролика: это чтение, а не правка.
+          rabbitAsync.whenOrNull(
+                data: (rabbit) => HealthSheetButton(rabbit: rabbit),
+              ) ??
+              const SizedBox(),
           if (canManage)
             rabbitAsync.whenOrNull(
                   data: (rabbit) => PopupMenuButton<String>(

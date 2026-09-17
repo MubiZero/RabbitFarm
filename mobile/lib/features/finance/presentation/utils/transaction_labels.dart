@@ -10,23 +10,29 @@ import '../../data/models/transaction_model.dart';
 /// Подписи берутся из переводов, поэтому это функции, а не свойства
 /// перечисления: слово зависит от языка, а перечисление о языке не знает.
 String transactionTypeLabel(BuildContext context, TransactionType type) =>
-    switch (type) {
-      TransactionType.income => context.l10n.financeTypeIncome,
-      TransactionType.expense => context.l10n.financeTypeExpense,
-    };
+    typeTexts(context.l10n)[type]!;
 
 String transactionCategoryLabel(
         BuildContext context, TransactionCategory category) =>
-    switch (category) {
-      TransactionCategory.saleRabbit => context.l10n.txCategorySaleRabbit,
-      TransactionCategory.saleMeat => context.l10n.txCategorySaleMeat,
-      TransactionCategory.saleFur => context.l10n.txCategorySaleFur,
-      TransactionCategory.breedingFee => context.l10n.txCategoryBreedingFee,
-      TransactionCategory.feed => context.l10n.txCategoryFeed,
-      TransactionCategory.veterinary => context.l10n.txCategoryVeterinary,
-      TransactionCategory.equipment => context.l10n.txCategoryEquipment,
-      TransactionCategory.utilities => context.l10n.txCategoryUtilities,
-      TransactionCategory.other => context.l10n.txCategoryOther,
+    categoryTexts(context.l10n)[category]!;
+
+/// Те же подписи, но переводами-значением: книга доходов и расходов
+/// собирается после `await`, когда обращаться к `BuildContext` уже небезопасно.
+Map<TransactionType, String> typeTexts(AppLocalizations l10n) => {
+      TransactionType.income: l10n.financeTypeIncome,
+      TransactionType.expense: l10n.financeTypeExpense,
+    };
+
+Map<TransactionCategory, String> categoryTexts(AppLocalizations l10n) => {
+      TransactionCategory.saleRabbit: l10n.txCategorySaleRabbit,
+      TransactionCategory.saleMeat: l10n.txCategorySaleMeat,
+      TransactionCategory.saleFur: l10n.txCategorySaleFur,
+      TransactionCategory.breedingFee: l10n.txCategoryBreedingFee,
+      TransactionCategory.feed: l10n.txCategoryFeed,
+      TransactionCategory.veterinary: l10n.txCategoryVeterinary,
+      TransactionCategory.equipment: l10n.txCategoryEquipment,
+      TransactionCategory.utilities: l10n.txCategoryUtilities,
+      TransactionCategory.other: l10n.txCategoryOther,
     };
 
 extension TransactionTypeVisuals on TransactionType {

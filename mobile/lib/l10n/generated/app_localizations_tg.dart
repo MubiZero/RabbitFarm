@@ -5456,4 +5456,71 @@ class AppLocalizationsTg extends AppLocalizations {
   @override
   String get errorCodeConfirmNameMismatch =>
       'Номи хоҷагӣ нодуруст навишта шудааст';
+
+  @override
+  String get healthSheetAction => 'Корти саломатӣ';
+
+  @override
+  String get healthSheetPrint => 'Чоп кардан';
+
+  @override
+  String get healthSheetShare => 'Ҳамчун ҷадвал фиристодан';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Корти саломатӣ: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'Эмгузаронӣ сабт нашудааст';
+
+  @override
+  String get healthSheetNoTreatments => 'Табобат сабт нашудааст';
+
+  @override
+  String get healthSheetNextDate => 'Оянда';
+
+  @override
+  String get healthSheetPeriod => 'Мӯҳлат';
+
+  @override
+  String get healthSheetColKind => 'Чӣ';
+
+  @override
+  String get healthSheetColWhat => 'Ваксина ё ташхис';
+
+  @override
+  String get healthSheetColDetails => 'Тафсилот';
+
+  @override
+  String get healthSheetEmpty =>
+      'Ин харгӯш ҳанӯз на эмгузаронӣ дорад, на табобат';
+
+  @override
+  String get financeSheetAction => 'Дафтари даромад ва хароҷот';
+
+  @override
+  String get financeSheetTitle => 'Даромад ва хароҷот';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return 'Барои мӯҳлати аз $from то $to';
+  }
+
+  @override
+  String get financeSheetEmpty => 'Дар ин мӯҳлат амалиёт сабт нашудааст';
+
+  @override
+  String get financeSheetColKind => 'Даромад ё хароҷот';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — «Фермаи харгӯш»';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Моҳи гузашта';
+
+  @override
+  String get financeSheetThisYear => 'Соли ҷорӣ';
 }

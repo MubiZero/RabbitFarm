@@ -5475,4 +5475,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorCodeConfirmNameMismatch => 'The farm name does not match';
+
+  @override
+  String get healthSheetAction => 'Health record';
+
+  @override
+  String get healthSheetPrint => 'Print';
+
+  @override
+  String get healthSheetShare => 'Send as a table';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Health record: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'No vaccinations recorded';
+
+  @override
+  String get healthSheetNoTreatments => 'No treatments recorded';
+
+  @override
+  String get healthSheetNextDate => 'Next';
+
+  @override
+  String get healthSheetPeriod => 'Dates';
+
+  @override
+  String get healthSheetColKind => 'Kind';
+
+  @override
+  String get healthSheetColWhat => 'Vaccine or diagnosis';
+
+  @override
+  String get healthSheetColDetails => 'Details';
+
+  @override
+  String get healthSheetEmpty =>
+      'This rabbit has no vaccinations and no treatments yet';
+
+  @override
+  String get financeSheetAction => 'Income and expense book';
+
+  @override
+  String get financeSheetTitle => 'Income and expenses';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return 'For $from to $to';
+  }
+
+  @override
+  String get financeSheetEmpty => 'No entries recorded for these dates';
+
+  @override
+  String get financeSheetColKind => 'Income or expense';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — Rabbit Farm';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Last month';
+
+  @override
+  String get financeSheetThisYear => 'This year';
 }

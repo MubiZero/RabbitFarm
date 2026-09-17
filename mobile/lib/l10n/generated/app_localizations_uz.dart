@@ -5492,4 +5492,70 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get errorCodeConfirmNameMismatch => 'Xoʻjalik nomi notoʻgʻri yozilgan';
+
+  @override
+  String get healthSheetAction => 'Sogʻliq kartasi';
+
+  @override
+  String get healthSheetPrint => 'Chop etish';
+
+  @override
+  String get healthSheetShare => 'Jadval qilib yuborish';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Sogʻliq kartasi: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'Emlash yozilmagan';
+
+  @override
+  String get healthSheetNoTreatments => 'Davolash yozilmagan';
+
+  @override
+  String get healthSheetNextDate => 'Keyingisi';
+
+  @override
+  String get healthSheetPeriod => 'Muddat';
+
+  @override
+  String get healthSheetColKind => 'Nima';
+
+  @override
+  String get healthSheetColWhat => 'Vaksina yoki tashxis';
+
+  @override
+  String get healthSheetColDetails => 'Tafsilotlar';
+
+  @override
+  String get healthSheetEmpty => 'Bu quyonda hali na emlash, na davolash bor';
+
+  @override
+  String get financeSheetAction => 'Daromad va xarajat daftari';
+
+  @override
+  String get financeSheetTitle => 'Daromad va xarajat';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return '$from dan $to gacha boʻlgan muddat uchun';
+  }
+
+  @override
+  String get financeSheetEmpty => 'Bu muddatda amaliyot yozilmagan';
+
+  @override
+  String get financeSheetColKind => 'Kirim yoki chiqim';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — «Quyon fermasi»';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Oʻtgan oy';
+
+  @override
+  String get financeSheetThisYear => 'Shu yil';
 }

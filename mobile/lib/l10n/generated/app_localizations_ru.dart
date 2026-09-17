@@ -5548,4 +5548,71 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorCodeConfirmNameMismatch =>
       'Название хозяйства набрано неточно';
+
+  @override
+  String get healthSheetAction => 'Карта здоровья';
+
+  @override
+  String get healthSheetPrint => 'Напечатать';
+
+  @override
+  String get healthSheetShare => 'Отправить таблицей';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Карта здоровья: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'Прививок не записано';
+
+  @override
+  String get healthSheetNoTreatments => 'Лечения не записано';
+
+  @override
+  String get healthSheetNextDate => 'Следующая';
+
+  @override
+  String get healthSheetPeriod => 'Срок';
+
+  @override
+  String get healthSheetColKind => 'Что';
+
+  @override
+  String get healthSheetColWhat => 'Вакцина или диагноз';
+
+  @override
+  String get healthSheetColDetails => 'Подробности';
+
+  @override
+  String get healthSheetEmpty =>
+      'У этого кролика ещё нет ни прививок, ни лечения';
+
+  @override
+  String get financeSheetAction => 'Книга доходов и расходов';
+
+  @override
+  String get financeSheetTitle => 'Доходы и расходы';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return 'За срок с $from по $to';
+  }
+
+  @override
+  String get financeSheetEmpty => 'За этот срок операций не записано';
+
+  @override
+  String get financeSheetColKind => 'Приход или расход';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — «Кроличья ферма»';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Прошлый месяц';
+
+  @override
+  String get financeSheetThisYear => 'Этот год';
 }
