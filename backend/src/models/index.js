@@ -151,6 +151,9 @@ Rabbit.hasMany(Birth, { as: 'births', foreignKey: 'mother_id', onDelete: 'RESTRI
 RabbitWeight.belongsTo(Rabbit, { foreignKey: 'rabbit_id' });
 Vaccination.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
 MedicalRecord.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+// Кто завёл запись о лечении и о прививке — те же имя и связь, что у заметок.
+Vaccination.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
+MedicalRecord.belongsTo(User, { as: 'author', foreignKey: 'created_by' });
 
 Feed.hasMany(FeedingRecord, { foreignKey: 'feed_id', onDelete: 'RESTRICT' });
 FeedingRecord.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
@@ -242,8 +245,8 @@ require('../utils/tenancy').attach({
   Invitation, DeviceToken, Payment, FarmAuditLog, Notification
 });
 
-// Удаление записей фермы оставляет след в журнале — см. utils/deletionAudit.
-require('../utils/deletionAudit').attachDeletionAudit({
+// Удаление и правка записей фермы оставляют след в журнале — см. utils/changeAudit.
+require('../utils/changeAudit').attachChangeAudit({
   Rabbit, Cage, Breed, Feed, FeedingRecord, MedicalRecord,
   Vaccination, Task, Note, Transaction, Birth, Breeding
 });
