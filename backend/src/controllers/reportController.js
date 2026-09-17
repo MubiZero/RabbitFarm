@@ -15,7 +15,6 @@ const ApiResponse = require('../utils/apiResponse');
 const {
   startOfDayInZone,
   nextDayInZone,
-  todayInZone,
   daysAgoInZone
 } = require('../utils/dateRange');
 const planService = require('../services/planService');

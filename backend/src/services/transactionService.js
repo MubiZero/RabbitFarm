@@ -59,7 +59,6 @@ class TransactionService {
         }
       }
 
-      const rabbit = rabbits.length === 1 ? rabbits[0] : null;
 
       const transaction = await Transaction.create({
         farm_id: farmId,
