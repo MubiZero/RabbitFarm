@@ -319,11 +319,15 @@ describe('AuthService', () => {
         // И страна с тем, что из неё следует: в валюте хозяйства
         // показываются все его суммы, а по часовому поясу считаются сутки
         // в отчётах.
+        //
+        // Название — ради экрана удаления учётной записи: владелец набирает
+        // его руками, подтверждая, что удаление намеренное.
         include: [{
           model: Farm,
           as: 'farm',
           attributes: [
-            'id', 'status', 'default_purpose', 'country', 'currency', 'timezone'
+            'id', 'name', 'status', 'default_purpose', 'country', 'currency',
+            'timezone'
           ]
         }]
       }));

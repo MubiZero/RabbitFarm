@@ -5474,4 +5474,78 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorCodeNotRecordAuthor =>
       'Чужую запись исправляет управляющий или владелец';
+
+  @override
+  String get deleteAccountTitle => 'Удаление учётной записи';
+
+  @override
+  String get deleteAccountOpen => 'Удалить учётную запись';
+
+  @override
+  String get deleteAccountOwnerHeadline => 'Это удалит хозяйство целиком';
+
+  @override
+  String get deleteAccountOwnerBody =>
+      'Вы владелец, поэтому вместе с вашей учётной записью уходит и хозяйство — со всеми его данными. Доступ пропадёт сразу и у вас, и у ваших работников.';
+
+  @override
+  String get deleteAccountOwnerWhatGoes =>
+      'Пропадут поголовье и клетки, кормление и корма, лечение и прививки, случки и окролы, деньги, задачи, заметки и фотографии.';
+
+  @override
+  String get deleteAccountGracePeriod =>
+      'Тридцать дней данные ещё лежат на сервере: если передумаете, напишите в поддержку — хозяйство вернут. После этого срока данные стираются окончательно.';
+
+  @override
+  String deleteAccountTypeName(String name) {
+    return 'Наберите название хозяйства «$name», чтобы подтвердить';
+  }
+
+  @override
+  String get deleteAccountTypeNameUnknown =>
+      'Наберите название своего хозяйства, чтобы подтвердить';
+
+  @override
+  String get deleteAccountFarmNameHint => 'Название хозяйства';
+
+  @override
+  String get deleteAccountOwnerAction => 'Удалить хозяйство';
+
+  @override
+  String get deleteAccountOwnerDialogTitle => 'Удалить хозяйство?';
+
+  @override
+  String get deleteAccountOwnerDialogBody =>
+      'Доступ закроется сразу — и у вас, и у работников. Через тридцать дней данные сотрутся окончательно.';
+
+  @override
+  String get deleteAccountStaffHeadline => 'Это удалит вашу учётную запись';
+
+  @override
+  String get deleteAccountStaffBody =>
+      'Хозяйство не ваше, поэтому оно и его данные остаются. Удалится только ваш вход в приложение.';
+
+  @override
+  String get deleteAccountStaffWhatStays =>
+      'Записи, которые вы завели — кормление, лечение, прививки, — остаются хозяйству: это его данные. Владелец сможет позвать вас заново, но это будет новая учётная запись.';
+
+  @override
+  String get deleteAccountStaffAction => 'Удалить учётную запись';
+
+  @override
+  String get deleteAccountStaffDialogTitle => 'Удалить учётную запись?';
+
+  @override
+  String get deleteAccountStaffDialogBody =>
+      'Вход в приложение пропадёт сразу. Вернуть учётную запись нельзя.';
+
+  @override
+  String get deleteAccountConfirm => 'Удалить';
+
+  @override
+  String get deleteAccountDone => 'Удалено';
+
+  @override
+  String get errorCodeConfirmNameMismatch =>
+      'Название хозяйства набрано неточно';
 }

@@ -197,6 +197,28 @@ class AuthRepository {
   Future<void> clearCachedProfile() => _storage.delete(key: _profileKey);
 
   // Logout
+  /// Удалить свою учётную запись.
+  ///
+  /// [confirmName] — название хозяйства, набранное владельцем: оно
+  /// подтверждает, что удаление намеренное. Совпадение проверяет сервер, а
+  /// не экран: проверке на устройстве здесь доверять нечего.
+  ///
+  /// Токены стираются здесь же: возвращаться этой сессии уже некуда.
+  Future<void> deleteAccount({String? confirmName}) async {
+    try {
+      await _apiClient.delete(
+        ApiEndpoints.deleteAccount,
+        data: {if (confirmName != null) 'confirm_name': confirmName},
+      );
+    } on DioException catch (e) {
+      throw ApiFailure.from(e);
+    }
+
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'refresh_token');
+    await clearCachedProfile();
+  }
+
   Future<void> logout() async {
     try {
       // Сервер гасит именно тот refresh-токен, который ему передали. Раньше

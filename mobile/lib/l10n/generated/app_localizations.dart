@@ -9563,6 +9563,132 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Чужую запись исправляет управляющий или владелец'**
   String get errorCodeNotRecordAuthor;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление учётной записи'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись'**
+  String get deleteAccountOpen;
+
+  /// No description provided for @deleteAccountOwnerHeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это удалит хозяйство целиком'**
+  String get deleteAccountOwnerHeadline;
+
+  /// No description provided for @deleteAccountOwnerBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы владелец, поэтому вместе с вашей учётной записью уходит и хозяйство — со всеми его данными. Доступ пропадёт сразу и у вас, и у ваших работников.'**
+  String get deleteAccountOwnerBody;
+
+  /// No description provided for @deleteAccountOwnerWhatGoes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропадут поголовье и клетки, кормление и корма, лечение и прививки, случки и окролы, деньги, задачи, заметки и фотографии.'**
+  String get deleteAccountOwnerWhatGoes;
+
+  /// No description provided for @deleteAccountGracePeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тридцать дней данные ещё лежат на сервере: если передумаете, напишите в поддержку — хозяйство вернут. После этого срока данные стираются окончательно.'**
+  String get deleteAccountGracePeriod;
+
+  /// No description provided for @deleteAccountTypeName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наберите название хозяйства «{name}», чтобы подтвердить'**
+  String deleteAccountTypeName(String name);
+
+  /// No description provided for @deleteAccountTypeNameUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наберите название своего хозяйства, чтобы подтвердить'**
+  String get deleteAccountTypeNameUnknown;
+
+  /// No description provided for @deleteAccountFarmNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название хозяйства'**
+  String get deleteAccountFarmNameHint;
+
+  /// No description provided for @deleteAccountOwnerAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить хозяйство'**
+  String get deleteAccountOwnerAction;
+
+  /// No description provided for @deleteAccountOwnerDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить хозяйство?'**
+  String get deleteAccountOwnerDialogTitle;
+
+  /// No description provided for @deleteAccountOwnerDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закроется сразу — и у вас, и у работников. Через тридцать дней данные сотрутся окончательно.'**
+  String get deleteAccountOwnerDialogBody;
+
+  /// No description provided for @deleteAccountStaffHeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это удалит вашу учётную запись'**
+  String get deleteAccountStaffHeadline;
+
+  /// No description provided for @deleteAccountStaffBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство не ваше, поэтому оно и его данные остаются. Удалится только ваш вход в приложение.'**
+  String get deleteAccountStaffBody;
+
+  /// No description provided for @deleteAccountStaffWhatStays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записи, которые вы завели — кормление, лечение, прививки, — остаются хозяйству: это его данные. Владелец сможет позвать вас заново, но это будет новая учётная запись.'**
+  String get deleteAccountStaffWhatStays;
+
+  /// No description provided for @deleteAccountStaffAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись'**
+  String get deleteAccountStaffAction;
+
+  /// No description provided for @deleteAccountStaffDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись?'**
+  String get deleteAccountStaffDialogTitle;
+
+  /// No description provided for @deleteAccountStaffDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход в приложение пропадёт сразу. Вернуть учётную запись нельзя.'**
+  String get deleteAccountStaffDialogBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалено'**
+  String get deleteAccountDone;
+
+  /// No description provided for @errorCodeConfirmNameMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название хозяйства набрано неточно'**
+  String get errorCodeConfirmNameMismatch;
 }
 
 class _AppLocalizationsDelegate

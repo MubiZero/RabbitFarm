@@ -158,10 +158,18 @@ const updateProfileSchema = Joi.object({
     })
 });
 
+// Владелец удаляет хозяйство целиком, поэтому набирает его название руками:
+// именно это отличает намеренное удаление от случайного нажатия. Работнику
+// подтверждать нечем — его учётка не уносит с собой чужие данные.
+const deleteAccountSchema = Joi.object({
+  confirm_name: Joi.string().allow('').optional()
+});
+
 module.exports = {
   registerSchema,
   refreshTokenSchema,
   updateProfileSchema,
   requestOtpSchema,
-  verifyOtpSchema
+  verifyOtpSchema,
+  deleteAccountSchema
 };
