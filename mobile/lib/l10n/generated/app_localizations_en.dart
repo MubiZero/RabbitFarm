@@ -442,6 +442,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickNeedsConnection => 'Needs connection';
 
   @override
+  String get errorCodeRabbitNotFound => 'Rabbit not found';
+
+  @override
+  String get errorCodeCageNotFound => 'Cage not found';
+
+  @override
+  String get errorCodeBreedNotFound => 'Breed not found';
+
+  @override
+  String get errorCodeFeedNotFound => 'Feed not found';
+
+  @override
+  String get errorCodeTaskNotFound => 'Task not found';
+
+  @override
+  String get errorCodeCageFull => 'The cage is full';
+
+  @override
+  String get errorCodeTagIdExists => 'This tag is already taken';
+
+  @override
+  String get errorCodeRabbitLimitReached => 'Plan limit for rabbits reached';
+
+  @override
+  String get errorCodeStaffLimitReached => 'Plan limit for staff reached';
+
+  @override
+  String get errorCodeInsufficientStock => 'Not enough feed in stock';
+
+  @override
+  String get errorCodeUserExists => 'This email is already taken';
+
+  @override
+  String get errorCodePhoneExists => 'This number is already taken';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'SMS codes do not reach your country — sign in by email';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Card payment is not available in your country yet — message support';
+
+  @override
   String get taskReminderLabel => 'Remind in advance';
 
   @override

@@ -11,6 +11,7 @@ import '../utils/feed_labels.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Аналитика склада кормов: состав запаса, его стоимость и что заканчивается.
 class FeedStatisticsScreen extends ConsumerWidget {
@@ -25,7 +26,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
       body: statsAsync.when(
         loading: () => const _FeedStatisticsSkeleton(),
         error: (error, _) => AppErrorState(
-          message: error.toString(),
+          message: errorText(context.l10n, error),
           onRetry: () => ref.invalidate(feedStatisticsProvider),
         ),
         data: (stats) => _buildContent(context, ref, stats),

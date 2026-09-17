@@ -3,12 +3,26 @@ import '../api/api_failure.dart';
 
 /// Текст ошибки для человека.
 ///
-/// Подробность сервера идёт вперёд общего описания: он знает про ферму то,
-/// чего не знает клиент («Клетка №3 занята» вместо «Сервер не принял данные»).
+/// Порядок такой: сначала перевод по коду отказа, затем подробность сервера,
+/// и только потом общее описание по виду ошибки.
+///
+/// Код вперёд текста — потому что тексты сервера написаны по-русски
+/// (`utils/apiResponse.js`, `validators/messages.js`), и на таджикском или
+/// узбекском экране человек получал русскую фразу. Язык читателя сервер
+/// знает, но пользуется им только для push-уведомлений.
+///
+/// Подробность сервера остаётся запасной, а не выбрасывается: он знает про
+/// ферму то, чего не знает клиент («Недостаточно места в клетке матери,
+/// свободно: 2»), и для кода, которого мы ещё не перевели, русская
+/// конкретика полезнее общего «не удалось».
+///
 /// Переводы передаются значением, а не через `BuildContext`: текст ошибки
 /// собирается после `await`, когда обращаться к контексту уже небезопасно.
 String errorText(AppLocalizations l10n, Object? error) {
   if (error is ApiFailure) {
+    final byCode = _byCode(l10n, error.code);
+    if (byCode != null) return byCode;
+
     final serverText = error.serverText?.trim();
     if (serverText != null && serverText.isNotEmpty) return serverText;
 
@@ -32,3 +46,24 @@ String errorText(AppLocalizations l10n, Object? error) {
   }
   return text.isEmpty ? l10n.commonUnknownError : text;
 }
+
+/// Перевод по коду отказа. `null` — код незнакомый, дальше пробуем текст
+/// сервера.
+String? _byCode(AppLocalizations l10n, String? code) => switch (code) {
+      'RABBIT_NOT_FOUND' => l10n.errorCodeRabbitNotFound,
+      'CAGE_NOT_FOUND' => l10n.errorCodeCageNotFound,
+      'BREED_NOT_FOUND' => l10n.errorCodeBreedNotFound,
+      'FEED_NOT_FOUND' => l10n.errorCodeFeedNotFound,
+      'TASK_NOT_FOUND' => l10n.errorCodeTaskNotFound,
+      'CAGE_FULL' => l10n.errorCodeCageFull,
+      'TAG_ID_EXISTS' => l10n.errorCodeTagIdExists,
+      'RABBIT_LIMIT_REACHED' => l10n.errorCodeRabbitLimitReached,
+      'STAFF_LIMIT_REACHED' => l10n.errorCodeStaffLimitReached,
+      'INSUFFICIENT_STOCK' => l10n.errorCodeInsufficientStock,
+      'USER_EXISTS' => l10n.errorCodeUserExists,
+      'PHONE_EXISTS' => l10n.errorCodePhoneExists,
+      'PHONE_LOGIN_UNAVAILABLE' => l10n.errorCodePhoneLoginUnavailable,
+      'PAYMENTS_UNAVAILABLE_IN_COUNTRY' =>
+        l10n.errorCodePaymentsUnavailableInCountry,
+      _ => null,
+    };

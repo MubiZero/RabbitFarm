@@ -11,6 +11,7 @@ import '../utils/feed_labels.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/l10n/error_text.dart';
 
 /// Аналитика кормлений: сколько раз кормили, чем и на какую сумму.
 class FeedingStatisticsScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,7 @@ class _FeedingStatisticsScreenState
             child: statsAsync.when(
               loading: () => const _FeedingStatisticsSkeleton(),
               error: (error, _) => AppErrorState(
-                message: error.toString(),
+                message: errorText(context.l10n, error),
                 onRetry: () =>
                     ref.invalidate(feedingStatisticsProvider(_params)),
               ),

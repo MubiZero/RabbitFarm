@@ -443,6 +443,52 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickNeedsConnection => 'Aloqa kerak';
 
   @override
+  String get errorCodeRabbitNotFound => 'Quyon topilmadi';
+
+  @override
+  String get errorCodeCageNotFound => 'Katak topilmadi';
+
+  @override
+  String get errorCodeBreedNotFound => 'Zot topilmadi';
+
+  @override
+  String get errorCodeFeedNotFound => 'Yem topilmadi';
+
+  @override
+  String get errorCodeTaskNotFound => 'Vazifa topilmadi';
+
+  @override
+  String get errorCodeCageFull => 'Katakda boʻsh joy yoʻq';
+
+  @override
+  String get errorCodeTagIdExists => 'Bu tamgʻa allaqachon band';
+
+  @override
+  String get errorCodeRabbitLimitReached =>
+      'Tarif boʻyicha quyonlar chegarasiga yetdingiz';
+
+  @override
+  String get errorCodeStaffLimitReached =>
+      'Tarif boʻyicha xodimlar chegarasiga yetdingiz';
+
+  @override
+  String get errorCodeInsufficientStock => 'Omborda yem yetarli emas';
+
+  @override
+  String get errorCodeUserExists => 'Bu pochta allaqachon band';
+
+  @override
+  String get errorCodePhoneExists => 'Bu raqam allaqachon band';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'Sizning mamlakatingizga SMS kod kelmaydi — pochta orqali kiring';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Mamlakatingizda karta bilan toʻlov hozircha mavjud emas — qoʻllab-quvvatlashga yozing';
+
+  @override
   String get taskReminderLabel => 'Oldindan eslatish';
 
   @override

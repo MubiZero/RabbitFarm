@@ -443,6 +443,52 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickNeedsConnection => 'Алоқа лозим аст';
 
   @override
+  String get errorCodeRabbitNotFound => 'Харгӯш ёфт нашуд';
+
+  @override
+  String get errorCodeCageNotFound => 'Қафас ёфт нашуд';
+
+  @override
+  String get errorCodeBreedNotFound => 'Зот ёфт нашуд';
+
+  @override
+  String get errorCodeFeedNotFound => 'Хӯрок ёфт нашуд';
+
+  @override
+  String get errorCodeTaskNotFound => 'Вазифа ёфт нашуд';
+
+  @override
+  String get errorCodeCageFull => 'Дар қафас ҷои холӣ нест';
+
+  @override
+  String get errorCodeTagIdExists => 'Ин тамға аллакай банд аст';
+
+  @override
+  String get errorCodeRabbitLimitReached =>
+      'Бо тариф ҳадди шумораи харгӯшҳо расид';
+
+  @override
+  String get errorCodeStaffLimitReached =>
+      'Бо тариф ҳадди шумораи коргарон расид';
+
+  @override
+  String get errorCodeInsufficientStock => 'Дар анбор хӯрок намерасад';
+
+  @override
+  String get errorCodeUserExists => 'Ин почта аллакай банд аст';
+
+  @override
+  String get errorCodePhoneExists => 'Ин рақам аллакай банд аст';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'Дар кишвари шумо рамз бо СМС намеояд — бо почта ворид шавед';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Пардохт бо корт дар кишвари шумо ҳоло дастрас нест — ба дастгирӣ нависед';
+
+  @override
   String get taskReminderLabel => 'Пешакӣ хотиррасон кардан';
 
   @override

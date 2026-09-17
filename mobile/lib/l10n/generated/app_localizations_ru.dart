@@ -441,6 +441,52 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String get errorCodeRabbitNotFound => 'Кролик не найден';
+
+  @override
+  String get errorCodeCageNotFound => 'Клетка не найдена';
+
+  @override
+  String get errorCodeBreedNotFound => 'Порода не найдена';
+
+  @override
+  String get errorCodeFeedNotFound => 'Корм не найден';
+
+  @override
+  String get errorCodeTaskNotFound => 'Задача не найдена';
+
+  @override
+  String get errorCodeCageFull => 'В клетке нет свободных мест';
+
+  @override
+  String get errorCodeTagIdExists => 'Такое клеймо уже занято';
+
+  @override
+  String get errorCodeRabbitLimitReached =>
+      'Достигнут предел поголовья по тарифу';
+
+  @override
+  String get errorCodeStaffLimitReached =>
+      'Достигнут предел работников по тарифу';
+
+  @override
+  String get errorCodeInsufficientStock => 'На складе не хватает корма';
+
+  @override
+  String get errorCodeUserExists => 'Эта почта уже занята';
+
+  @override
+  String get errorCodePhoneExists => 'Этот номер уже занят';
+
+  @override
+  String get errorCodePhoneLoginUnavailable =>
+      'В вашей стране код по СМС не приходит — войдите по почте';
+
+  @override
+  String get errorCodePaymentsUnavailableInCountry =>
+      'Оплата картой в вашей стране пока недоступна — напишите в поддержку';
+
+  @override
   String get taskReminderLabel => 'Напомнить заранее';
 
   @override

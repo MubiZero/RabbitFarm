@@ -918,6 +918,90 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @errorCodeRabbitNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик не найден'**
+  String get errorCodeRabbitNotFound;
+
+  /// No description provided for @errorCodeCageNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетка не найдена'**
+  String get errorCodeCageNotFound;
+
+  /// No description provided for @errorCodeBreedNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода не найдена'**
+  String get errorCodeBreedNotFound;
+
+  /// No description provided for @errorCodeFeedNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм не найден'**
+  String get errorCodeFeedNotFound;
+
+  /// No description provided for @errorCodeTaskNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задача не найдена'**
+  String get errorCodeTaskNotFound;
+
+  /// No description provided for @errorCodeCageFull.
+  ///
+  /// In ru, this message translates to:
+  /// **'В клетке нет свободных мест'**
+  String get errorCodeCageFull;
+
+  /// No description provided for @errorCodeTagIdExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Такое клеймо уже занято'**
+  String get errorCodeTagIdExists;
+
+  /// No description provided for @errorCodeRabbitLimitReached.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигнут предел поголовья по тарифу'**
+  String get errorCodeRabbitLimitReached;
+
+  /// No description provided for @errorCodeStaffLimitReached.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигнут предел работников по тарифу'**
+  String get errorCodeStaffLimitReached;
+
+  /// No description provided for @errorCodeInsufficientStock.
+  ///
+  /// In ru, this message translates to:
+  /// **'На складе не хватает корма'**
+  String get errorCodeInsufficientStock;
+
+  /// No description provided for @errorCodeUserExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта почта уже занята'**
+  String get errorCodeUserExists;
+
+  /// No description provided for @errorCodePhoneExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот номер уже занят'**
+  String get errorCodePhoneExists;
+
+  /// No description provided for @errorCodePhoneLoginUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'В вашей стране код по СМС не приходит — войдите по почте'**
+  String get errorCodePhoneLoginUnavailable;
+
+  /// No description provided for @errorCodePaymentsUnavailableInCountry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплата картой в вашей стране пока недоступна — напишите в поддержку'**
+  String get errorCodePaymentsUnavailableInCountry;
+
   /// No description provided for @taskReminderLabel.
   ///
   /// In ru, this message translates to:

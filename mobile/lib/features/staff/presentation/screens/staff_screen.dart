@@ -53,7 +53,7 @@ class StaffScreen extends ConsumerWidget {
       body: membersAsync.when(
         loading: () => const _StaffSkeleton(),
         error: (error, _) => AppErrorState(
-          message: error.toString(),
+          message: errorText(context.l10n, error),
           onRetry: () => ref.invalidate(farmMembersProvider),
         ),
         data: (members) => _buildContent(context, ref, members, canManage),
