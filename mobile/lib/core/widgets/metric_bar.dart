@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_typography.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_radius.dart';
 
 /// Строка разбивки: подпись, точное значение и полоса, показывающая долю
 /// от максимума в наборе. Полоса нужна для сравнения на глаз, число — чтобы
@@ -28,7 +30,7 @@ class MetricBar extends StatelessWidget {
     final reduceMotion = MediaQuery.of(context).disableAnimations;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,7 +38,7 @@ class MetricBar extends StatelessWidget {
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 16, color: cs.onSurfaceVariant),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
               ],
               Expanded(
                 child: Text(
@@ -46,16 +48,16 @@ class MetricBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 value,
                 style: AppTypography.labelLg.copyWith(color: cs.onSurface),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.sm),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: AppRadius.pillAll,
             child: TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: fraction.clamp(0.0, 1.0)),
               duration: Duration(milliseconds: reduceMotion ? 0 : 300),

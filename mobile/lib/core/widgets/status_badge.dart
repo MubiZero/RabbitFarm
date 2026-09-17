@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../l10n/l10n_context.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_radius.dart';
 
 enum RabbitStatus {
   active,
@@ -60,10 +62,13 @@ class StatusBadge extends StatelessWidget {
         AppColors.readableOn(color, Theme.of(context).brightness);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadius.pillAll,
       ),
       child: Text(
         label,
