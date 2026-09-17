@@ -18,6 +18,8 @@ import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/countries/farm_currency.dart';
+import '../../../rabbits/presentation/widgets/rabbit_multi_picker.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -41,6 +43,19 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
   RabbitModel? _rabbit;
   String? _rabbitLabel;
   int? _rabbitId;
+
+  /// Партия: продажа нескольких кроликов одной сделкой.
+  ///
+  /// Только для новой записи о продаже. Правка партии не предлагается: у
+  /// операции уже есть связанные кролики, и менять их состав задним числом
+  /// значило бы разъехаться с тем, что уже списано из стада.
+  bool _batchSale = false;
+  List<RabbitModel> _batch = const [];
+
+  bool get _isSaleCategory =>
+      _category == TransactionCategory.saleRabbit ||
+      _category == TransactionCategory.saleMeat ||
+      _category == TransactionCategory.saleFur;
   bool _touched = false;
 
   /// Снимок чека: приложенный сейчас и уже сохранённый раньше.
@@ -136,7 +151,11 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               category: _category,
               amount: amount,
               transactionDate: _date,
-              rabbitId: _rabbitId,
+              // Партия уходит списком, одиночная продажа — как раньше.
+              rabbitId: _batchSale ? null : _rabbitId,
+              rabbitIds: _batchSale && _batch.isNotEmpty
+                  ? _batch.map((r) => r.id).toList()
+                  : null,
               description: description,
             ),
             receiptPath: _receipt?.path,
@@ -278,7 +297,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               decoration: InputDecoration(
                 labelText: l10n.txFormAmount,
                 prefixIcon: const Icon(Icons.payments_outlined),
-                suffixText: kCurrencySymbol,
+                suffixText: context.currencySymbol,
               ),
               validator: (v) {
                 final value = parseDecimal(v);
@@ -297,20 +316,48 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
               prefixIcon: Icons.event_outlined,
               lastDate: DateTime.now(),
             ),
-            // Поле было спрятано целиком, если список кроликов ещё не
-            // загрузился: привязать операцию к животному было нельзя,
-            // и причина этого нигде не объяснялась.
-            RabbitPickerField(
-              label: l10n.txFormRabbit,
-              selected: _rabbit,
-              selectedLabel: _rabbitId != null ? _rabbitLabel : null,
-              onChanged: (rabbit) => setState(() {
-                _rabbit = rabbit;
-                _rabbitLabel = null;
-                _rabbitId = rabbit?.id;
-                _touched = true;
-              }),
-            ),
+            // Партия предлагается только там, где она бывает: продажа. Для
+            // расхода на корм список кроликов не нужен вовсе.
+            if (!_isEditing && _isSaleCategory)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.transactionSaleBatch),
+                value: _batchSale,
+                onChanged: (value) => setState(() {
+                  _batchSale = value;
+                  // Выбор не переносим между режимами: один кролик и партия
+                  // — разные сделки, и молча превращать одно в другое
+                  // значит записать не то, что человек видел на экране.
+                  _rabbit = null;
+                  _rabbitId = null;
+                  _rabbitLabel = null;
+                  _batch = const [];
+                  _touched = true;
+                }),
+              ),
+            if (!_isEditing && _isSaleCategory && _batchSale)
+              RabbitMultiPickerField(
+                selected: _batch,
+                onChanged: (rabbits) => setState(() {
+                  _batch = rabbits;
+                  _touched = true;
+                }),
+              )
+            else
+              // Поле было спрятано целиком, если список кроликов ещё не
+              // загрузился: привязать операцию к животному было нельзя,
+              // и причина этого нигде не объяснялась.
+              RabbitPickerField(
+                label: l10n.txFormRabbit,
+                selected: _rabbit,
+                selectedLabel: _rabbitId != null ? _rabbitLabel : null,
+                onChanged: (rabbit) => setState(() {
+                  _rabbit = rabbit;
+                  _rabbitLabel = null;
+                  _rabbitId = rabbit?.id;
+                  _touched = true;
+                }),
+              ),
             TextFormField(
               controller: _description,
               textCapitalization: TextCapitalization.sentences,

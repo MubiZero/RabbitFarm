@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../../../../core/api/paginated.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/api/api_endpoints.dart';
 import '../models/transaction_model.dart';
 import '../../../../core/api/api_failure.dart';
 
@@ -85,8 +86,10 @@ class TransactionsRepository {
   /// Get transactions for specific rabbit
   Future<RabbitTransactionsSummary> getRabbitTransactions(int rabbitId) async {
     try {
+      // Путь собирался вручную и терял идентификатор кролика: запрос уходил
+      // на «/rabbits//transactions» и не мог вернуть ничего осмысленного.
       final response = await _apiClient.get(
-        '/rabbits//transactions',
+        ApiEndpoints.rabbitTransactions(rabbitId),
       );
 
       if (response.data['success'] == true) {

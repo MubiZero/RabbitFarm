@@ -136,6 +136,73 @@
   "farmTitle": "Xoʻjalik",
   "navQuickTitle": "Nimani yozamiz",
   "quickRecordFeeding": "Oziqlantirishni yozish",
+  "quickNeedsConnection": "Aloqa kerak",
+  "taskReminderLabel": "Oldindan eslatish",
+  "taskReminderNone": "Eslatilmasin",
+  "taskReminder15m": "15 daqiqa oldin",
+  "taskReminder1h": "Bir soat oldin",
+  "taskReminder3h": "3 soat oldin",
+  "taskReminder1d": "Bir kun oldin",
+  "taskReminder2d": "Ikki kun oldin",
+  "bulkHerdTitle": "Bir nechta qoʻshish",
+  "bulkHerdSubtitle": "Mavjud podani koʻchirish uchun",
+  "bulkHerdCount": "Nechta bosh",
+  "bulkHerdTagPrefix": "Tamgʻa boshi",
+  "bulkHerdTagPrefixHint": "Masalan, R- — R-001, R-002 boʻladi",
+  "bulkHerdTagPrefixEmpty": "Tamgʻa boʻlmasa, boʻsh qoldiring",
+  "bulkHerdCountInvalid": "1 dan 100 gacha",
+  "bulkHerdDone": "{count, plural, one{{count} ta quyon qoʻshildi} other{{count} ta quyon qoʻshildi}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Partiyada kim bor",
+  "rabbitMultiPickerLabel": "Quyonlar",
+  "rabbitMultiPickerEmpty": "Hech kim tanlanmadi",
+  "rabbitMultiPickerDone": "Tayyor",
+  "rabbitMultiPickerSelected": "{count, plural, one{{count} ta tanlandi} other{{count} ta tanlandi}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Partiya bilan sotish",
+  "ageYears": "{count, plural, one{{count} yosh} other{{count} yosh}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} y {months} oy",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Granula",
+  "feedTypeHay": "Pichan",
+  "feedTypeVegetables": "Sabzavot",
+  "feedTypeGrain": "Don",
+  "feedTypeSupplements": "Qoʻshimchalar",
+  "feedTypeOther": "Boshqa",
+  "feedUnitKg": "kg",
+  "feedUnitLiter": "l",
+  "feedUnitPiece": "dona",
+  "vaccineTypeVhd": "QGVK",
+  "vaccineTypeMyxomatosis": "Miksomatoz",
+  "vaccineTypePasteurellosis": "Pasterellyoz",
+  "vaccineTypeOther": "Boshqa",
+  "vaccineFullVhd": "Quyonlarning virusli gemorragik kasalligi (QGVK)",
+  "offlineRejectedTitle": "{count, plural, one{{count} yozuv saqlanmadi} other{{count} yozuv saqlanmadi}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Server ularni qabul qilmadi — qaytadan yozing.",
+  "offlineRejectedDismiss": "Tushunarli",
   "quickRecordVaccination": "Emlashni yozish",
   "quickCreateTask": "Vazifa yaratish",
   "quickRecordNote": "Eslatma qoldirish",
@@ -627,6 +694,7 @@
   "rabbitsFilterFemales": "Urgʻochilar",
   "rabbitsFilterActive": "Ishda",
   "rabbitsFilterSold": "Sotilgan",
+  "rabbitsFilterDead": "Nobud boʻlgan",
   "sexMale": "Erkak",
   "sexFemale": "Urgʻochi",
   "sexUnknown": "Jinsi koʻrsatilmagan",
@@ -729,7 +797,10 @@
   "supportContactHint": "Yoki toʻgʻridan-toʻgʻri bogʻlaning:",
   "settingsPrivacyPolicy": "Maxfiylik siyosati",
   "settingsLogout": "Akkauntdan chiqish",
-  "settingsThemeLight": "Yorug''",
+  "logoutDialogTitle": "Akkauntdan chiqilsinmi?",
+  "logoutDialogBody": "Yozuvlar serverda qoladi — kirganingizdan keyin ularni yana koʻrasiz.",
+  "logoutDialogConfirm": "Chiqish",
+  "settingsThemeLight": "Yorugʻ",
   "settingsThemeSystem": "Tizimdagidek",
   "settingsThemeDark": "Qorongʻi",
   "settingsSubscription": "Tarif",
@@ -743,6 +814,9 @@
   "subscriptionExpired": "Muddati {date}da tugagan",
   "subscriptionPricePerPeriod": "{price} s / 30 kun",
   "subscriptionPay": "Toʻlash",
+  "subscriptionPayAbroadTitle": "Karta bilan toʻlov hozircha faqat Tojikistonda",
+  "subscriptionPayAbroadBody": "Tarifni qoʻlda uzaytiramiz — qoʻllab-quvvatlashga yozing, javob berishadi.",
+  "subscriptionPayAbroadAction": "Qoʻllab-quvvatlashga yozish",
   "subscriptionOpenPaymentPage": "Toʻlov sahifasini ochish",
   "subscriptionAfterPayingHint": "Ochilgan havola orqali toʻlang, keyin bu yerga qaytib «Toʻlovni tekshirish» tugmasini bosing.",
   "subscriptionCheckPayment": "Toʻlovni tekshirish",
@@ -1321,6 +1395,15 @@
   "onbDoneCreate": "Xoʻjalik yaratish",
   "onbBack": "Orqaga",
   "onbSkip": "Oʻtkazib yuborish",
+  "onbCountryTitle": "Xoʻjaligingiz qayerda?",
+  "onbCountrySubtitle": "Valyuta, vaqt va kirish usuli shunga bogʻliq",
+  "countryTJ": "Tojikiston",
+  "countryUZ": "Oʻzbekiston",
+  "countryKG": "Qirgʻiziston",
+  "countryKZ": "Qozogʻiston",
+  "countryRU": "Rossiya",
+  "countryAF": "Afgʻoniston",
+  "loginSmsUnavailable": "Sizning mamlakatingizga SMS kod kelmaydi — pochta orqali kiring",
   "firstStepCages": "Kataklarni kiriting",
   "firstStepRabbits": "Urgʻochi va erkaklarni qoʻshing",
   "firstStepBreeding": "Birinchi juftlashni yozing",

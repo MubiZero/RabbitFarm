@@ -110,6 +110,11 @@ abstract class TransactionCreate with _$TransactionCreate {
     @DateOnlyConverter()
     required DateTime transactionDate,
     @JsonKey(name: 'rabbit_id') @NullableIntConverter() int? rabbitId,
+
+    /// Партия: тридцать голов в ресторан — одна сделка, а не тридцать строк
+    /// в книге. Сервер по этому списку выводит всех из поголовья и
+    /// связывает их с операцией.
+    @JsonKey(name: 'rabbit_ids', includeIfNull: false) List<int>? rabbitIds,
     String? description,
     @JsonKey(name: 'receipt_url') String? receiptUrl,
   }) = _TransactionCreate;

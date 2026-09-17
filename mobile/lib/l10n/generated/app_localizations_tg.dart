@@ -440,6 +440,164 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickRecordFeeding => 'Хӯрокдиҳиро сабт кардан';
 
   @override
+  String get quickNeedsConnection => 'Алоқа лозим аст';
+
+  @override
+  String get taskReminderLabel => 'Пешакӣ хотиррасон кардан';
+
+  @override
+  String get taskReminderNone => 'Хотиррасон накардан';
+
+  @override
+  String get taskReminder15m => '15 дақиқа пеш';
+
+  @override
+  String get taskReminder1h => 'Як соат пеш';
+
+  @override
+  String get taskReminder3h => '3 соат пеш';
+
+  @override
+  String get taskReminder1d => 'Як рӯз пеш';
+
+  @override
+  String get taskReminder2d => 'Ду рӯз пеш';
+
+  @override
+  String get bulkHerdTitle => 'Якчандтоӣ илова кардан';
+
+  @override
+  String get bulkHerdSubtitle => 'Барои кӯчонидани рамаи мавҷуда';
+
+  @override
+  String get bulkHerdCount => 'Чанд сар';
+
+  @override
+  String get bulkHerdTagPrefix => 'Оғози тамға';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Масалан, R- — R-001, R-002 мешавад';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Агар тамға набошад, холӣ монед';
+
+  @override
+  String get bulkHerdCountInvalid => 'Аз 1 то 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count харгӯш илова шуд',
+      one: '$count харгӯш илова шуд',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Кӣ дар даста';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Харгӯшҳо';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Касе интихоб нашуд';
+
+  @override
+  String get rabbitMultiPickerDone => 'Тайёр';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Интихоб шуданд $count',
+      one: 'Интихоб шуд $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Дастаҷамъӣ фурӯхтан';
+
+  @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сол',
+      one: '$count сол',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '$years с $months моҳ';
+  }
+
+  @override
+  String get feedTypePellets => 'Гранула';
+
+  @override
+  String get feedTypeHay => 'Хасбеда';
+
+  @override
+  String get feedTypeVegetables => 'Сабзавот';
+
+  @override
+  String get feedTypeGrain => 'Ғалла';
+
+  @override
+  String get feedTypeSupplements => 'Иловагиҳо';
+
+  @override
+  String get feedTypeOther => 'Дигар';
+
+  @override
+  String get feedUnitKg => 'кг';
+
+  @override
+  String get feedUnitLiter => 'л';
+
+  @override
+  String get feedUnitPiece => 'дона';
+
+  @override
+  String get vaccineTypeVhd => 'БГВХ';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Миксоматоз';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Пастереллёз';
+
+  @override
+  String get vaccineTypeOther => 'Дигар';
+
+  @override
+  String get vaccineFullVhd => 'Бемории геморрагии вирусии харгӯшҳо (БГВХ)';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сабт нигоҳ дошта нашуданд',
+      one: '$count сабт нигоҳ дошта нашуд',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'Сервер онҳоро қабул накард — аз нав нависед.';
+
+  @override
+  String get offlineRejectedDismiss => 'Фаҳмидам';
+
+  @override
   String get quickRecordVaccination => 'Эмкуниро сабт кардан';
 
   @override
@@ -2079,6 +2237,9 @@ class AppLocalizationsTg extends AppLocalizations {
   String get rabbitsFilterSold => 'Фурӯхташуда';
 
   @override
+  String get rabbitsFilterDead => 'Талафшуда';
+
+  @override
   String get sexMale => 'Нар';
 
   @override
@@ -2393,6 +2554,16 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsLogout => 'Аз ҳисоб баромадан';
 
   @override
+  String get logoutDialogTitle => 'Аз ҳисоб баромадан?';
+
+  @override
+  String get logoutDialogBody =>
+      'Сабтҳо дар сервер мемонанд — пас аз воридшавӣ онҳоро дубора мебинед.';
+
+  @override
+  String get logoutDialogConfirm => 'Баромадан';
+
+  @override
   String get settingsThemeLight => 'Равшан';
 
   @override
@@ -2440,6 +2611,17 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get subscriptionPay => 'Пардохт кардан';
+
+  @override
+  String get subscriptionPayAbroadTitle =>
+      'Пардохт бо корт ҳоло танҳо дар Тоҷикистон';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Мо тарифро дастӣ дароз мекунем — ба дастгирӣ нависед, ҷавоб медиҳанд.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Ба дастгирӣ навиштан';
 
   @override
   String get subscriptionOpenPaymentPage => 'Саҳифаи пардохтро кушодан';
@@ -4421,6 +4603,35 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get onbSkip => 'Гузарондан';
+
+  @override
+  String get onbCountryTitle => 'Хоҷагии шумо дар куҷост?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст';
+
+  @override
+  String get countryTJ => 'Тоҷикистон';
+
+  @override
+  String get countryUZ => 'Ӯзбекистон';
+
+  @override
+  String get countryKG => 'Қирғизистон';
+
+  @override
+  String get countryKZ => 'Қазоқистон';
+
+  @override
+  String get countryRU => 'Русия';
+
+  @override
+  String get countryAF => 'Афғонистон';
+
+  @override
+  String get loginSmsUnavailable =>
+      'Дар кишвари шумо рамз бо СМС намеояд — бо почта ворид шавед';
 
   @override
   String get firstStepCages => 'Қафасҳоро эҷод кунед';

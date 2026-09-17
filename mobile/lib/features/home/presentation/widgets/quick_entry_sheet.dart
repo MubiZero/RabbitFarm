@@ -6,6 +6,7 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../providers/quick_entry_usage_provider.dart';
+import '../../../../core/providers/connectivity.dart';
 
 /// Всё, что человек может записать, в одном списке.
 ///
@@ -21,12 +22,22 @@ class QuickEntryAction {
   final AppDomain domain;
   final FarmCapability capability;
 
+  /// Переживёт ли эта запись отсутствие связи (см. `OfflineActionType`).
+  ///
+  /// Меню показывало все двенадцать действий одинаковыми, а досылались
+  /// семь. Человек выводил правило пробами — «программа помнит записи без
+  /// сети» — и обжигался на том действии, которое в очередь не попадает.
+  /// Это хуже отсутствующей функции: интерфейс не молчит, он вводит в
+  /// заблуждение.
+  final bool worksOffline;
+
   const QuickEntryAction({
     required this.icon,
     required this.label,
     required this.route,
     required this.domain,
     required this.capability,
+    this.worksOffline = false,
   });
 }
 
@@ -48,6 +59,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.restaurant_outlined,
           label: l10n.quickRecordFeeding,
           route: '/feeding-records/form',
+          worksOffline: true,
           domain: AppDomain.feeding,
           capability: FarmCapability.recordDailyWork,
         ),
@@ -55,6 +67,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.medical_services_outlined,
           label: l10n.quickRecordTreatment,
           route: '/medical-records/form',
+          worksOffline: true,
           domain: AppDomain.health,
           capability: FarmCapability.recordDailyWork,
         ),
@@ -62,6 +75,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.vaccines_outlined,
           label: l10n.quickRecordVaccination,
           route: '/vaccinations/form',
+          worksOffline: true,
           domain: AppDomain.health,
           capability: FarmCapability.recordDailyWork,
         ),
@@ -76,6 +90,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.heart_broken_outlined,
           label: l10n.quickRecordDeath,
           route: '/rabbits/death',
+          worksOffline: true,
           domain: AppDomain.livestock,
           capability: FarmCapability.recordDailyWork,
         ),
@@ -83,6 +98,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.sticky_note_2_outlined,
           label: l10n.quickRecordNote,
           route: '/notes/form',
+          worksOffline: true,
           domain: AppDomain.admin,
           capability: FarmCapability.recordDailyWork,
         ),
@@ -95,6 +111,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.favorite_outline,
           label: l10n.quickRecordBreeding,
           route: '/breeding/new',
+          worksOffline: true,
           domain: AppDomain.breeding,
           capability: FarmCapability.manageLivestock,
         ),
@@ -102,6 +119,7 @@ List<QuickEntryGroup> quickEntryGroups(BuildContext context) {
           icon: Icons.child_care_outlined,
           label: l10n.quickRecordBirth,
           route: '/births/new',
+          worksOffline: true,
           domain: AppDomain.breeding,
           capability: FarmCapability.manageLivestock,
         ),
@@ -257,6 +275,7 @@ class _QuickEntrySheet extends ConsumerWidget {
                         ),
                         child: _ActionRow(
                           action: action,
+                          offline: !(ref.watch(isOnlineProvider).value ?? true),
                           onTap: () => _open(context, ref, action),
                         ),
                       ),
@@ -285,14 +304,24 @@ class _ActionRow extends StatelessWidget {
   final QuickEntryAction action;
   final VoidCallback onTap;
 
-  const _ActionRow({required this.action, required this.onTap});
+  /// Связи нет прямо сейчас. Тогда действия, которые её переживут, остаются
+  /// как есть, а остальные честно подписаны — до того, как человек заполнит
+  /// форму и нажмёт «Сохранить», а не после.
+  final bool offline;
+
+  const _ActionRow({
+    required this.action,
+    required this.onTap,
+    this.offline = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final color = action.domain.color(context);
+    final unavailable = offline && !action.worksOffline;
 
     return Material(
-      color: color.withValues(alpha: 0.08),
+      color: color.withValues(alpha: unavailable ? 0.04 : 0.08),
       borderRadius: AppRadius.mdAll,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -304,13 +333,27 @@ class _ActionRow extends StatelessWidget {
               Icon(action.icon, color: color, size: 22),
               const SizedBox(width: AppSpacing.lg),
               Expanded(
-                child: Text(
-                  action.label,
-                  style: AppTypography.titleMd
-                      .copyWith(color: context.colors.onSurface),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      action.label,
+                      style: AppTypography.titleMd.copyWith(
+                        color: unavailable
+                            ? context.colors.onSurfaceVariant
+                            : context.colors.onSurface,
+                      ),
+                    ),
+                    if (unavailable)
+                      Text(
+                        context.l10n.quickNeedsConnection,
+                        style: AppTypography.labelSm
+                            .copyWith(color: context.colors.onSurfaceVariant),
+                      ),
+                  ],
                 ),
               ),
-              Icon(Icons.chevron_right,
+              Icon(unavailable ? Icons.cloud_off_outlined : Icons.chevron_right,
                   size: 20, color: context.colors.onSurfaceVariant),
             ],
           ),

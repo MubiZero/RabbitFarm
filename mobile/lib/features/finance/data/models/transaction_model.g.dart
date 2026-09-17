@@ -74,6 +74,9 @@ _TransactionCreate _$TransactionCreateFromJson(Map<String, dynamic> json) =>
         json['transaction_date'] as Object,
       ),
       rabbitId: const NullableIntConverter().fromJson(json['rabbit_id']),
+      rabbitIds: (json['rabbit_ids'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
       description: json['description'] as String?,
       receiptUrl: json['receipt_url'] as String?,
     );
@@ -87,6 +90,7 @@ Map<String, dynamic> _$TransactionCreateToJson(_TransactionCreate instance) =>
         instance.transactionDate,
       ),
       'rabbit_id': const NullableIntConverter().toJson(instance.rabbitId),
+      'rabbit_ids': ?instance.rabbitIds,
       'description': instance.description,
       'receipt_url': instance.receiptUrl,
     };

@@ -135,6 +135,73 @@
   "farmTitle": "Farm",
   "navQuickTitle": "What to record",
   "quickRecordFeeding": "Log a feeding",
+  "quickNeedsConnection": "Needs connection",
+  "taskReminderLabel": "Remind in advance",
+  "taskReminderNone": "No reminder",
+  "taskReminder15m": "15 minutes before",
+  "taskReminder1h": "An hour before",
+  "taskReminder3h": "3 hours before",
+  "taskReminder1d": "A day before",
+  "taskReminder2d": "Two days before",
+  "bulkHerdTitle": "Add several",
+  "bulkHerdSubtitle": "For moving a herd you already have",
+  "bulkHerdCount": "How many",
+  "bulkHerdTagPrefix": "Tag prefix",
+  "bulkHerdTagPrefixHint": "For example, R- gives R-001, R-002",
+  "bulkHerdTagPrefixEmpty": "Leave empty if there are no tags",
+  "bulkHerdCountInvalid": "From 1 to 100",
+  "bulkHerdDone": "{count, plural, one{{count} rabbit added} other{{count} rabbits added}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Who is in the batch",
+  "rabbitMultiPickerLabel": "Rabbits",
+  "rabbitMultiPickerEmpty": "No one selected",
+  "rabbitMultiPickerDone": "Done",
+  "rabbitMultiPickerSelected": "{count, plural, one{{count} selected} other{{count} selected}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Sell as a batch",
+  "ageYears": "{count, plural, one{{count} year} other{{count} years}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years}y {months}m",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Pellets",
+  "feedTypeHay": "Hay",
+  "feedTypeVegetables": "Vegetables",
+  "feedTypeGrain": "Grain",
+  "feedTypeSupplements": "Supplements",
+  "feedTypeOther": "Other",
+  "feedUnitKg": "kg",
+  "feedUnitLiter": "l",
+  "feedUnitPiece": "pcs",
+  "vaccineTypeVhd": "RHD",
+  "vaccineTypeMyxomatosis": "Myxomatosis",
+  "vaccineTypePasteurellosis": "Pasteurellosis",
+  "vaccineTypeOther": "Other",
+  "vaccineFullVhd": "Rabbit haemorrhagic disease (RHD)",
+  "offlineRejectedTitle": "{count, plural, one{{count} record was not saved} other{{count} records were not saved}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "The server rejected them — please enter them again.",
+  "offlineRejectedDismiss": "Got it",
   "quickRecordVaccination": "Log a vaccination",
   "quickCreateTask": "Create a task",
   "quickRecordNote": "Leave a note",
@@ -626,6 +693,7 @@
   "rabbitsFilterFemales": "Females",
   "rabbitsFilterActive": "Active",
   "rabbitsFilterSold": "Sold",
+  "rabbitsFilterDead": "Dead",
   "sexMale": "Male",
   "sexFemale": "Female",
   "sexUnknown": "Sex not specified",
@@ -728,6 +796,9 @@
   "supportContactHint": "Or reach out directly:",
   "settingsPrivacyPolicy": "Privacy policy",
   "settingsLogout": "Sign out",
+  "logoutDialogTitle": "Sign out?",
+  "logoutDialogBody": "Your records stay on the server — you will see them again after signing in.",
+  "logoutDialogConfirm": "Sign out",
   "settingsThemeLight": "Light",
   "settingsThemeSystem": "System",
   "settingsThemeDark": "Dark",
@@ -742,6 +813,9 @@
   "subscriptionExpired": "Expired on {date}",
   "subscriptionPricePerPeriod": "{price} somoni / 30 days",
   "subscriptionPay": "Pay",
+  "subscriptionPayAbroadTitle": "Card payment is available in Tajikistan only for now",
+  "subscriptionPayAbroadBody": "We will extend your plan manually — message support and they will reply.",
+  "subscriptionPayAbroadAction": "Message support",
   "subscriptionOpenPaymentPage": "Open payment page",
   "subscriptionAfterPayingHint": "Pay using the link that opens, then come back here and tap \"Check payment.\"",
   "subscriptionCheckPayment": "Check payment",
@@ -1320,6 +1394,15 @@
   "onbDoneCreate": "Create my farm",
   "onbBack": "Back",
   "onbSkip": "Skip",
+  "onbCountryTitle": "Where is your farm?",
+  "onbCountrySubtitle": "Currency, time and sign-in method depend on this",
+  "countryTJ": "Tajikistan",
+  "countryUZ": "Uzbekistan",
+  "countryKG": "Kyrgyzstan",
+  "countryKZ": "Kazakhstan",
+  "countryRU": "Russia",
+  "countryAF": "Afghanistan",
+  "loginSmsUnavailable": "SMS codes do not reach your country — sign in by email",
   "firstStepCages": "Set up your cages",
   "firstStepRabbits": "Add your does and bucks",
   "firstStepBreeding": "Record your first mating",

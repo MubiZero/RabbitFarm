@@ -67,6 +67,20 @@ const createTransactionSchema = Joi.object({
       'number.positive': 'ID кролика должен быть положительным'
     }),
 
+  // Партия: тридцать голов в ресторан — одна сделка. Потолок тот же, что у
+  // карточек крольчат: больше за раз не набирают руками, а случайный
+  // список на тысячу записей означал бы ошибку, а не продажу.
+  rabbit_ids: Joi.array()
+    .items(Joi.number().integer().positive())
+    .min(1)
+    .max(100)
+    .unique()
+    .messages({
+      'array.min': 'Выберите хотя бы одного кролика',
+      'array.max': 'За раз можно продать не больше 100 кроликов',
+      'array.unique': 'Кролик указан дважды'
+    }),
+
   description: Joi.string()
     .max(2000)
     .allow(null, '')

@@ -8,6 +8,48 @@ const fileStorage = require('../utils/fileStorage');
  */
 class RabbitController {
   /**
+   * Завести сразу несколько кроликов одним образцом.
+   * POST /api/v1/rabbits/bulk
+   *
+   * Так переносят на приложение уже существующее стадо: заводить триста
+   * голов по одной форме никто не станет, и перенос останавливался здесь.
+   */
+  async createBulk(req, res, next) {
+    try {
+      const rabbits = await rabbitService.createRabbitsBulk({
+        ...req.body,
+        farm_id: req.farmId
+      });
+
+      return ApiResponse.created(
+        res,
+        { created: rabbits.length, items: rabbits },
+        `Заведено кроликов: ${rabbits.length}`
+      );
+    } catch (error) {
+      if (error.message === 'RABBIT_LIMIT_REACHED') {
+        return ApiResponse.badRequest(res, 'Достигнут лимит кроликов по тарифу фермы', 'RABBIT_LIMIT_REACHED');
+      }
+      if (error.message === 'BULK_COUNT_INVALID') {
+        return ApiResponse.badRequest(res, 'За раз можно завести от 1 до 100 кроликов', 'BULK_COUNT_INVALID');
+      }
+      if (error.message === 'BREED_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Порода не найдена');
+      }
+      if (error.message === 'CAGE_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Клетка не найдена');
+      }
+      if (error.message === 'CAGE_FULL') {
+        return ApiResponse.badRequest(res, 'В клетке не хватит места для всей группы', 'CAGE_FULL');
+      }
+      if (error.message === 'TAG_ID_EXISTS') {
+        return ApiResponse.conflict(res, 'Клеймо из этого ряда уже занято — выберите другое начало');
+      }
+      return next(error);
+    }
+  }
+
+  /**
    * Create new rabbit
    * POST /api/v1/rabbits
    */
@@ -303,7 +345,7 @@ class RabbitController {
    */
   async listFarmPhotos(req, res, next) {
     try {
-      const result = await rabbitService.listFarmGalleryPhotos(req.farmId, req.query);
+      const result = await rabbitService.listFarmGalleryPhotos(req.farmId, req.query, req.farmTimezone);
       return ApiResponse.paginated(res, result.items, result.page, result.limit, result.total, 'Лента фото получена');
     } catch (error) {
       next(error);

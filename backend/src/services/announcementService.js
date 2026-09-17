@@ -85,6 +85,12 @@ class AnnouncementService {
 
     if (usedChannels.includes('email')) {
       for (const user of users) {
+        // Вход по номеру телефона почты не требует, поэтому у части хозяев её
+        // просто нет. Письмо на пустой адрес уходило в отправку и падало там,
+        // попадая в статистику как «не доставлено» — рядом с настоящими
+        // отказами, из-за которых стоит беспокоиться.
+        if (!user.email) continue;
+
         try {
           await sendAnnouncementEmail({ to: user.email, subject: title, text: body });
           stats.email.sent += 1;

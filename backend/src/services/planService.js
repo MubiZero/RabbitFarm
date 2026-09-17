@@ -1,5 +1,6 @@
 const { Plan, Farm, Rabbit, User } = require('../models');
 const logger = require('../utils/logger');
+const { countryConfig } = require('../config/countries');
 
 /**
  * Тарифные планы и проверка лимитов фермы.
@@ -179,14 +180,19 @@ class PlanService {
   /**
    * Бросает `RABBIT_LIMIT_REACHED`, если по тарифу фермы больше нельзя
    * заводить кроликов. Вызывается перед созданием кролика.
+   *
+   * `adding` — сколько карточек заводят разом. Карточки крольчат из окрола
+   * создаются пачкой до 30 штук, и проверка по одной пропускала ферму далеко
+   * за предел тарифа: одиночное добавление лимит соблюдало, а окрол его
+   * обходил.
    */
-  async assertRabbitLimit(farmId) {
+  async assertRabbitLimit(farmId, adding = 1) {
     const farm = await this._getFarmWithPlan(farmId);
     const maxRabbits = this.getEffectiveLimit(farm, 'rabbits');
     if (!maxRabbits) return;
 
     const count = await Rabbit.count({ where: { farm_id: farmId } });
-    if (count >= maxRabbits) {
+    if (count + adding > maxRabbits) {
       throw new Error('RABBIT_LIMIT_REACHED');
     }
   }
@@ -252,6 +258,15 @@ class PlanService {
     }
     if (this.isPlanFree(farm.plan)) {
       throw new Error('PLAN_FREE');
+    }
+
+    // Карту принимает банк «Эсхата», и карта другой страны через него не
+    // пройдёт. Отдавать такой ферме счёт значило бы вести её к оплате,
+    // которая заведомо сорвётся, — а это ровно тот тупик, что вычищал
+    // docs/plans/DEAD-ENDS.md. Продление идёт через поддержку, и экран
+    // подписки говорит об этом прямо.
+    if (!countryConfig(farm.country).payments) {
+      throw new Error('PAYMENTS_UNAVAILABLE_IN_COUNTRY');
     }
 
     // `plan` отдельным полем, а не разбором `description`: его сохраняет

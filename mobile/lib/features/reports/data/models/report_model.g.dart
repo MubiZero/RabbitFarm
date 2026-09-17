@@ -235,7 +235,7 @@ Map<String, dynamic> _$FarmReportToJson(_FarmReport instance) =>
     };
 
 _ReportPeriod _$ReportPeriodFromJson(Map<String, dynamic> json) =>
-    _ReportPeriod(from: json['from'] as String, to: json['to'] as String);
+    _ReportPeriod(from: json['from'] as String?, to: json['to'] as String?);
 
 Map<String, dynamic> _$ReportPeriodToJson(_ReportPeriod instance) =>
     <String, dynamic>{'from': instance.from, 'to': instance.to};

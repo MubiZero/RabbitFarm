@@ -71,6 +71,12 @@ void main() {
     expect(find.text('RabbitFarm'), findsOneWidget);
 
     await _tap(tester, 'Начать');
+
+    // Первым делом — страна: от неё зависят валюта, часовой пояс и то,
+    // предлагать ли вход по СМС, поэтому спрашивают её раньше всего.
+    expect(find.text('Где ваше хозяйство?'), findsOneWidget);
+    await _tap(tester, 'Таджикистан');
+
     expect(find.text('Сколько у вас кроликов?'), findsOneWidget);
 
     // Ответ на вопрос с одним выбором сразу ведёт дальше: подтверждать его
@@ -94,6 +100,9 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool('onboarding_seen'), isTrue);
+    // Страну регистрация отправит на сервер — из неё выводятся валюта
+    // хозяйства и часовой пояс.
+    expect(prefs.getString('selected_country'), 'TJ');
     expect(
       jsonDecode(prefs.getString('onboarding_answers')!),
       containsPair('herd_size', 'upTo500'),
@@ -141,6 +150,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await _tap(tester, 'Начать');
+    await _tap(tester, 'Таджикистан');
     await _tap(tester, 'До 20');
     expect(find.text('Что записывать в первую очередь?'), findsOneWidget);
 
@@ -150,5 +160,23 @@ void main() {
     expect(find.text('Сколько у вас кроликов?'), findsOneWidget);
     // Выбранный ответ не потерян: возврат — это уточнение, а не сброс.
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
+  });
+
+  testWidgets('страна подсказывает валюту и способ входа до регистрации', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    await _tap(tester, 'Начать');
+
+    // Последствия выбора видно сразу, а не после регистрации: чем здесь
+    // считают деньги и как входят.
+    expect(find.textContaining('с · Телефон'), findsOneWidget);
+    expect(find.textContaining('soʻm · Почта'), findsOneWidget);
+
+    await _tap(tester, 'Узбекистан');
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('selected_country'), 'UZ');
   });
 }

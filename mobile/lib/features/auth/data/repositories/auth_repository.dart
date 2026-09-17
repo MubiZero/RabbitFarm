@@ -30,6 +30,7 @@ class AuthRepository {
     String? phone,
     String? email,
     String? farmName,
+    String? country,
   }) async {
     assert((phone == null) != (email == null),
         'Регистрация идёт либо по телефону, либо по почте');
@@ -39,6 +40,10 @@ class AuthRepository {
         if (phone != null) 'phone': phone,
         if (email != null) 'email': email,
         if (farmName != null) 'farm_name': farmName,
+        // Страна названа в знакомстве, до регистрации. Сервер выводит из неё
+        // валюту хозяйства и часовой пояс — они дальше живут в ферме, а не
+        // пересчитываются каждый раз.
+        if (country != null) 'country': country,
       });
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

@@ -6,12 +6,21 @@ const { Farm, User, Task, Feed, Breeding, Birth, Rabbit, Cage } = require('../mo
 const notificationService = require('../services/notificationService');
 const { taskTitle } = require('../i18n/tasks');
 const logger = require('../utils/logger');
+const { hourInZone } = require('../utils/dateRange');
 
-// 08:00 каждый день, время сервера (пояс задан через TZ, см. backend/Dockerfile:
-// без него контейнер живёт в UTC). Не «раз в 24 часа от старта», как
-// tokenCleanup — важно бить в одно и то же время суток, а не плыть вместе
-// с рестартами.
-const CRON_SCHEDULE = '0 8 * * *';
+// Раз в час — чтобы поймать восемь утра в каждом часовом поясе.
+//
+// Раньше здесь стояло '0 8 * * *', то есть восемь утра **сервера**. Пока все
+// хозяйства были таджикскими, это и было их утро. Ферма в другом поясе
+// получала бы «доброе утро, вот что на сегодня» посреди ночи — а сводку, не
+// прочитанную утром, читать уже незачем.
+//
+// Не «раз в 24 часа от старта», как tokenCleanup: важно бить в одно и то же
+// время суток, а не плыть вместе с рестартами.
+const CRON_SCHEDULE = '0 * * * *';
+
+/** Час хозяйства, в который уходит утренняя сводка. */
+const DIGEST_HOUR = 8;
 
 /**
  * Кому в этой ферме уходит дайджест: владельцы и менеджеры, кто его не
@@ -149,12 +158,19 @@ async function _notifyUpcomingKindlings(farmId, now, recipients) {
   }
 }
 
-async function runDigest() {
+async function runDigest(now = new Date()) {
   // Мягко удалённые фермы обходим: доступ им уже закрыт (`authenticate`), и
   // пуш «у вас просрочены вакцинации» ушёл бы туда, куда нельзя войти.
-  const farms = await Farm.findAll({ attributes: ['id'], where: { deleted_at: null } });
+  const farms = await Farm.findAll({
+    attributes: ['id', 'timezone'],
+    where: { deleted_at: null }
+  });
 
   for (const farm of farms) {
+    // Каждому хозяйству — в его восемь утра. Задача просыпается каждый час и
+    // берёт только те фермы, у которых этот час сейчас и наступил.
+    if (hourInZone(farm.timezone, now) !== DIGEST_HOUR) continue;
+
     try {
       await runDigestForFarm(farm.id);
     } catch (error) {

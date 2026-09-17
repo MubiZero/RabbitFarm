@@ -219,9 +219,14 @@ class _BirthCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    // Выживаемость считается по тем, кто дожил, а не по тем, кто родился
+    // живым: павшие после окрола крольчата (kitsDied) в неё не входили, и
+    // выводок, из которого половина погибла в первую неделю, показывал те же
+    // сто процентов, что и благополучный.
     final total = birth.kitsBornAlive + birth.kitsBornDead;
-    final survival =
-        total > 0 ? (birth.kitsBornAlive / total * 100).round() : 0;
+    final survivors =
+        (birth.kitsBornAlive - birth.kitsDied).clamp(0, birth.kitsBornAlive);
+    final survival = total > 0 ? (survivors / total * 100).round() : 0;
 
     final mother = birth.mother ??
         ref

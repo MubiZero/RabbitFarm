@@ -12,7 +12,9 @@ jest.mock('../../../src/models', () => {
         transaction: jest.fn()
       }
     },
-    Rabbit: { findOne: jest.fn(), findByPk: jest.fn() },
+    Rabbit: { findOne: jest.fn(), findByPk: jest.fn(), findAll: jest.fn() },
+    // Участники сделки пишутся связями: одна операция — много кроликов.
+    TransactionRabbit: { bulkCreate: jest.fn(), findAll: jest.fn(), destroy: jest.fn() },
     Farm: { findOne: jest.fn(), findByPk: jest.fn(), create: jest.fn() },
     User: { findByPk: jest.fn() },
     sequelize: mockSequelize
@@ -25,7 +27,7 @@ jest.mock('../../../src/utils/logger', () => ({
   warn: jest.fn()
 }));
 
-const { Transaction, Rabbit } = require('../../../src/models');
+const { Transaction, Rabbit, TransactionRabbit } = require('../../../src/models');
 const transactionService = require('../../../src/services/transactionService');
 
 const createMockTransaction = (overrides = {}) => ({
@@ -80,14 +82,15 @@ describe('TransactionService', () => {
     });
 
     it('should throw RABBIT_NOT_FOUND when rabbit_id does not belong to user', async () => {
-      Rabbit.findOne.mockResolvedValue(null);
+      // Чужого кролика в ферме нет — сделка отбивается целиком.
+      Rabbit.findAll.mockResolvedValue([]);
 
       await expect(
         transactionService.createTransaction({ type: 'expense', category: 'vet', amount: 100, rabbit_id: 99, farm_id: 1, author_id: 7 })
       ).rejects.toThrow('RABBIT_NOT_FOUND');
 
-      expect(Rabbit.findOne).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { id: 99, farm_id: 1 } })
+      expect(Rabbit.findAll).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: [99], farm_id: 1 } })
       );
       expect(Transaction.create).not.toHaveBeenCalled();
       expect(mockDbTransaction.rollback).toHaveBeenCalled();
@@ -95,7 +98,7 @@ describe('TransactionService', () => {
 
     it('should mark rabbit as sold on income/sale transaction', async () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -119,7 +122,7 @@ describe('TransactionService', () => {
 
     it('should mark rabbit as sold on any sale_* category', async () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_meat', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -142,7 +145,7 @@ describe('TransactionService', () => {
 
     it('should NOT update rabbit status when rabbit is already sold', async () => {
       const mockRabbit = { id: 1, status: 'sold', update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -164,7 +167,7 @@ describe('TransactionService', () => {
 
     it('should NOT update rabbit status when rabbit is dead', async () => {
       const mockRabbit = { id: 1, status: 'dead', update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -186,7 +189,7 @@ describe('TransactionService', () => {
 
     it('should mark healthy rabbit as sold on sale transaction', async () => {
       const mockRabbit = { id: 1, status: 'healthy', update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'sale_rabbit', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -210,7 +213,7 @@ describe('TransactionService', () => {
 
     it('should NOT mark rabbit as sold on non-sale income', async () => {
       const mockRabbit = { id: 1, update: jest.fn().mockResolvedValue(true) };
-      Rabbit.findOne.mockResolvedValue(mockRabbit);
+      Rabbit.findAll.mockResolvedValue([mockRabbit]);
 
       const mockTx = createMockTransaction({ type: 'income', category: 'other', rabbit_id: 1 });
       Transaction.create.mockResolvedValue(mockTx);
@@ -226,6 +229,102 @@ describe('TransactionService', () => {
       });
 
       expect(mockRabbit.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('продажа партией', () => {
+    it('одна сделка выводит из поголовья всех кроликов партии', async () => {
+      // Тридцать голов в ресторан — одна строка в книге, а не тридцать.
+      const first = { id: 1, status: 'healthy', update: jest.fn() };
+      const second = { id: 2, status: 'healthy', update: jest.fn() };
+      Rabbit.findAll.mockResolvedValue([first, second]);
+
+      const mockTx = createMockTransaction({ id: 50, type: 'income', category: 'sale_meat' });
+      Transaction.create.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
+
+      await transactionService.createTransaction({
+        type: 'income',
+        category: 'sale_meat',
+        amount: 9000,
+        rabbit_ids: [1, 2],
+        transaction_date: '2026-09-16',
+        farm_id: 1,
+        author_id: 7
+      });
+
+      // Оба выбыли, у обоих проставлен день продажи.
+      for (const rabbit of [first, second]) {
+        expect(rabbit.update).toHaveBeenCalledWith(
+          expect.objectContaining({ status: 'sold', sold_date: '2026-09-16' }),
+          expect.anything()
+        );
+      }
+
+      // Участники записаны связями.
+      expect(TransactionRabbit.bulkCreate).toHaveBeenCalledWith(
+        [
+          { transaction_id: 50, rabbit_id: 1, farm_id: 1 },
+          { transaction_id: 50, rabbit_id: 2, farm_id: 1 }
+        ],
+        expect.anything()
+      );
+
+      // Одиночная колонка у партии пустая: иначе один из тридцати выглядел
+      // бы «главным».
+      expect(Transaction.create).toHaveBeenCalledWith(
+        expect.objectContaining({ rabbit_id: null }),
+        expect.anything()
+      );
+    });
+
+    it('чужой кролик в партии отбивает сделку целиком', async () => {
+      // Половина проданной партии — это расхождение денег с поголовьем,
+      // которое потом никто не найдёт.
+      Rabbit.findAll.mockResolvedValue([{ id: 1, status: 'healthy', update: jest.fn() }]);
+
+      await expect(
+        transactionService.createTransaction({
+          type: 'income',
+          category: 'sale_meat',
+          amount: 9000,
+          rabbit_ids: [1, 999],
+          farm_id: 1,
+          author_id: 7
+        })
+      ).rejects.toThrow('RABBIT_NOT_FOUND');
+
+      // Ни денег, ни выбытия: сделка не состоялась целиком.
+      expect(Transaction.create).not.toHaveBeenCalled();
+      expect(TransactionRabbit.bulkCreate).not.toHaveBeenCalled();
+    });
+
+    it('одиночная продажа сохраняет прежнюю колонку rabbit_id', async () => {
+      const rabbit = { id: 7, status: 'healthy', update: jest.fn() };
+      Rabbit.findAll.mockResolvedValue([rabbit]);
+
+      const mockTx = createMockTransaction({ id: 51, type: 'income', category: 'sale_rabbit' });
+      Transaction.create.mockResolvedValue(mockTx);
+      Transaction.findOne.mockResolvedValue(mockTx);
+
+      await transactionService.createTransaction({
+        type: 'income',
+        category: 'sale_rabbit',
+        amount: 300,
+        rabbit_id: 7,
+        farm_id: 1,
+        author_id: 7
+      });
+
+      expect(Transaction.create).toHaveBeenCalledWith(
+        expect.objectContaining({ rabbit_id: 7 }),
+        expect.anything()
+      );
+      // И связь тоже пишется — «кто участвовал» читается одним способом.
+      expect(TransactionRabbit.bulkCreate).toHaveBeenCalledWith(
+        [{ transaction_id: 51, rabbit_id: 7, farm_id: 1 }],
+        expect.anything()
+      );
     });
   });
 

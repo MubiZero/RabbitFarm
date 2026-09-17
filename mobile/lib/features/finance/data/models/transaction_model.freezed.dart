@@ -396,7 +396,10 @@ $UserRefCopyWith<$Res>? get author {
 /// @nodoc
 mixin _$TransactionCreate {
 
- TransactionType get type; TransactionCategory get category; double get amount;@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime get transactionDate;@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? get rabbitId; String? get description;@JsonKey(name: 'receipt_url') String? get receiptUrl;
+ TransactionType get type; TransactionCategory get category; double get amount;@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime get transactionDate;@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? get rabbitId;/// Партия: тридцать голов в ресторан — одна сделка, а не тридцать строк
+/// в книге. Сервер по этому списку выводит всех из поголовья и
+/// связывает их с операцией.
+@JsonKey(name: 'rabbit_ids', includeIfNull: false) List<int>? get rabbitIds; String? get description;@JsonKey(name: 'receipt_url') String? get receiptUrl;
 /// Create a copy of TransactionCreate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -410,20 +413,20 @@ $TransactionCreateCopyWith<TransactionCreate> get copyWith => _$TransactionCreat
 @override
 bool operator ==(Object other) {
   final _this = this as TransactionCreate;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionCreate&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.transactionDate, _this.transactionDate) || other.transactionDate == _this.transactionDate)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.receiptUrl, _this.receiptUrl) || other.receiptUrl == _this.receiptUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionCreate&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.transactionDate, _this.transactionDate) || other.transactionDate == _this.transactionDate)&&(identical(other.rabbitId, _this.rabbitId) || other.rabbitId == _this.rabbitId)&&const DeepCollectionEquality().equals(other.rabbitIds, _this.rabbitIds)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.receiptUrl, _this.receiptUrl) || other.receiptUrl == _this.receiptUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as TransactionCreate;
-  return Object.hash(runtimeType,_this.type,_this.category,_this.amount,_this.transactionDate,_this.rabbitId,_this.description,_this.receiptUrl);
+  return Object.hash(runtimeType,_this.type,_this.category,_this.amount,_this.transactionDate,_this.rabbitId,const DeepCollectionEquality().hash(_this.rabbitIds),_this.description,_this.receiptUrl);
 }
 
 @override
 String toString() {
   final _this = this as TransactionCreate;
-  return 'TransactionCreate(type: ${_this.type}, category: ${_this.category}, amount: ${_this.amount}, transactionDate: ${_this.transactionDate}, rabbitId: ${_this.rabbitId}, description: ${_this.description}, receiptUrl: ${_this.receiptUrl})';
+  return 'TransactionCreate(type: ${_this.type}, category: ${_this.category}, amount: ${_this.amount}, transactionDate: ${_this.transactionDate}, rabbitId: ${_this.rabbitId}, rabbitIds: ${_this.rabbitIds}, description: ${_this.description}, receiptUrl: ${_this.receiptUrl})';
 }
 
 
@@ -434,7 +437,7 @@ abstract mixin class $TransactionCreateCopyWith<$Res>  {
   factory $TransactionCreateCopyWith(TransactionCreate value, $Res Function(TransactionCreate) _then) = _$TransactionCreateCopyWithImpl;
 @useResult
 $Res call({
- TransactionType type, TransactionCategory category, double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl
+ TransactionType type, TransactionCategory category, double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'rabbit_ids', includeIfNull: false) List<int>? rabbitIds, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl
 });
 
 
@@ -451,14 +454,15 @@ class _$TransactionCreateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionCreate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? rabbitIds = freezed,Object? description = freezed,Object? receiptUrl = freezed,}) {
   return _then(TransactionCreate(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as TransactionType,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as TransactionCategory,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,transactionDate: null == transactionDate ? _self.transactionDate : transactionDate // ignore: cast_nullable_to_non_nullable
 as DateTime,rabbitId: freezed == rabbitId ? _self.rabbitId : rabbitId // ignore: cast_nullable_to_non_nullable
-as int?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as int?,rabbitIds: freezed == rabbitIds ? _self.rabbitIds : rabbitIds // ignore: cast_nullable_to_non_nullable
+as List<int>?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,receiptUrl: freezed == receiptUrl ? _self.receiptUrl : receiptUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -545,10 +549,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'rabbit_ids', includeIfNull: false)  List<int>? rabbitIds,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TransactionCreate() when $default != null:
-return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl);case _:
+return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.rabbitIds,_that.description,_that.receiptUrl);case _:
   return orElse();
 
 }
@@ -566,10 +570,10 @@ return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'rabbit_ids', includeIfNull: false)  List<int>? rabbitIds,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)  $default,) {final _that = this;
 switch (_that) {
 case _TransactionCreate():
-return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl);case _:
+return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.rabbitIds,_that.description,_that.receiptUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -586,10 +590,10 @@ return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TransactionType type,  TransactionCategory category,  double amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter()  DateTime transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter()  int? rabbitId, @JsonKey(name: 'rabbit_ids', includeIfNull: false)  List<int>? rabbitIds,  String? description, @JsonKey(name: 'receipt_url')  String? receiptUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _TransactionCreate() when $default != null:
-return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.description,_that.receiptUrl);case _:
+return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_that.rabbitId,_that.rabbitIds,_that.description,_that.receiptUrl);case _:
   return null;
 
 }
@@ -601,7 +605,7 @@ return $default(_that.type,_that.category,_that.amount,_that.transactionDate,_th
 @JsonSerializable()
 
 class _TransactionCreate implements TransactionCreate {
-  const _TransactionCreate({required this.type, required this.category, required this.amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter() required this.transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, this.description, @JsonKey(name: 'receipt_url') this.receiptUrl});
+  const _TransactionCreate({required this.type, required this.category, required this.amount, @JsonKey(name: 'transaction_date')@DateOnlyConverter() required this.transactionDate, @JsonKey(name: 'rabbit_id')@NullableIntConverter() this.rabbitId, @JsonKey(name: 'rabbit_ids', includeIfNull: false)  List<int>? rabbitIds, this.description, @JsonKey(name: 'receipt_url') this.receiptUrl}): _rabbitIds = rabbitIds;
   factory _TransactionCreate.fromJson(Map<String, dynamic> json) => _$TransactionCreateFromJson(json);
 
 @override final  TransactionType type;
@@ -609,6 +613,21 @@ class _TransactionCreate implements TransactionCreate {
 @override final  double amount;
 @override@JsonKey(name: 'transaction_date')@DateOnlyConverter() final  DateTime transactionDate;
 @override@JsonKey(name: 'rabbit_id')@NullableIntConverter() final  int? rabbitId;
+/// Партия: тридцать голов в ресторан — одна сделка, а не тридцать строк
+/// в книге. Сервер по этому списку выводит всех из поголовья и
+/// связывает их с операцией.
+ final  List<int>? _rabbitIds;
+/// Партия: тридцать голов в ресторан — одна сделка, а не тридцать строк
+/// в книге. Сервер по этому списку выводит всех из поголовья и
+/// связывает их с операцией.
+@override@JsonKey(name: 'rabbit_ids', includeIfNull: false) List<int>? get rabbitIds {
+  final value = _rabbitIds;
+  if (value == null) return null;
+  if (_rabbitIds is EqualUnmodifiableListView) return _rabbitIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 @override final  String? description;
 @override@JsonKey(name: 'receipt_url') final  String? receiptUrl;
 
@@ -625,18 +644,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionCreate&&(identical(other.type, type) || other.type == type)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&(identical(other.description, description) || other.description == description)&&(identical(other.receiptUrl, receiptUrl) || other.receiptUrl == receiptUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionCreate&&(identical(other.type, type) || other.type == type)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.rabbitId, rabbitId) || other.rabbitId == rabbitId)&&const DeepCollectionEquality().equals(other.rabbitIds, _rabbitIds)&&(identical(other.description, description) || other.description == description)&&(identical(other.receiptUrl, receiptUrl) || other.receiptUrl == receiptUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,type,category,amount,transactionDate,rabbitId,description,receiptUrl);
+    return Object.hash(runtimeType,type,category,amount,transactionDate,rabbitId,const DeepCollectionEquality().hash(_rabbitIds),description,receiptUrl);
 }
 
 @override
 String toString() {
-    return 'TransactionCreate(type: $type, category: $category, amount: $amount, transactionDate: $transactionDate, rabbitId: $rabbitId, description: $description, receiptUrl: $receiptUrl)';
+    return 'TransactionCreate(type: $type, category: $category, amount: $amount, transactionDate: $transactionDate, rabbitId: $rabbitId, rabbitIds: $rabbitIds, description: $description, receiptUrl: $receiptUrl)';
 }
 
 
@@ -647,7 +666,7 @@ abstract mixin class _$TransactionCreateCopyWith<$Res> implements $TransactionCr
   factory _$TransactionCreateCopyWith(_TransactionCreate value, $Res Function(_TransactionCreate) _then) = __$TransactionCreateCopyWithImpl;
 @override @useResult
 $Res call({
- TransactionType type, TransactionCategory category, double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl
+ TransactionType type, TransactionCategory category, double amount,@JsonKey(name: 'transaction_date')@DateOnlyConverter() DateTime transactionDate,@JsonKey(name: 'rabbit_id')@NullableIntConverter() int? rabbitId,@JsonKey(name: 'rabbit_ids', includeIfNull: false) List<int>? rabbitIds, String? description,@JsonKey(name: 'receipt_url') String? receiptUrl
 });
 
 
@@ -664,14 +683,15 @@ class __$TransactionCreateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionCreate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? description = freezed,Object? receiptUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? category = null,Object? amount = null,Object? transactionDate = null,Object? rabbitId = freezed,Object? rabbitIds = freezed,Object? description = freezed,Object? receiptUrl = freezed,}) {
   return _then(_TransactionCreate(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as TransactionType,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as TransactionCategory,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,transactionDate: null == transactionDate ? _self.transactionDate : transactionDate // ignore: cast_nullable_to_non_nullable
 as DateTime,rabbitId: freezed == rabbitId ? _self.rabbitId : rabbitId // ignore: cast_nullable_to_non_nullable
-as int?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as int?,rabbitIds: freezed == rabbitIds ? _self._rabbitIds : rabbitIds // ignore: cast_nullable_to_non_nullable
+as List<int>?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,receiptUrl: freezed == receiptUrl ? _self.receiptUrl : receiptUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

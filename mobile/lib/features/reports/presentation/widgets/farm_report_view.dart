@@ -141,7 +141,7 @@ class FarmReportView extends ConsumerWidget {
                 ReportFigure(
                   icon: Icons.inventory_2_outlined,
                   label: context.l10n.reportsFeedUsed,
-                  value: formatQuantity(row.total, unitLabel(row.unit)),
+                  value: formatQuantity(row.total, unitLabel(context, row.unit)),
                 ),
             ],
           )

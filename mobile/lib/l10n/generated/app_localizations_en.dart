@@ -439,6 +439,164 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickRecordFeeding => 'Log a feeding';
 
   @override
+  String get quickNeedsConnection => 'Needs connection';
+
+  @override
+  String get taskReminderLabel => 'Remind in advance';
+
+  @override
+  String get taskReminderNone => 'No reminder';
+
+  @override
+  String get taskReminder15m => '15 minutes before';
+
+  @override
+  String get taskReminder1h => 'An hour before';
+
+  @override
+  String get taskReminder3h => '3 hours before';
+
+  @override
+  String get taskReminder1d => 'A day before';
+
+  @override
+  String get taskReminder2d => 'Two days before';
+
+  @override
+  String get bulkHerdTitle => 'Add several';
+
+  @override
+  String get bulkHerdSubtitle => 'For moving a herd you already have';
+
+  @override
+  String get bulkHerdCount => 'How many';
+
+  @override
+  String get bulkHerdTagPrefix => 'Tag prefix';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'For example, R- gives R-001, R-002';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Leave empty if there are no tags';
+
+  @override
+  String get bulkHerdCountInvalid => 'From 1 to 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rabbits added',
+      one: '$count rabbit added',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Who is in the batch';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Rabbits';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'No one selected';
+
+  @override
+  String get rabbitMultiPickerDone => 'Done';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '$count selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Sell as a batch';
+
+  @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count years',
+      one: '$count year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '${years}y ${months}m';
+  }
+
+  @override
+  String get feedTypePellets => 'Pellets';
+
+  @override
+  String get feedTypeHay => 'Hay';
+
+  @override
+  String get feedTypeVegetables => 'Vegetables';
+
+  @override
+  String get feedTypeGrain => 'Grain';
+
+  @override
+  String get feedTypeSupplements => 'Supplements';
+
+  @override
+  String get feedTypeOther => 'Other';
+
+  @override
+  String get feedUnitKg => 'kg';
+
+  @override
+  String get feedUnitLiter => 'l';
+
+  @override
+  String get feedUnitPiece => 'pcs';
+
+  @override
+  String get vaccineTypeVhd => 'RHD';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Myxomatosis';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Pasteurellosis';
+
+  @override
+  String get vaccineTypeOther => 'Other';
+
+  @override
+  String get vaccineFullVhd => 'Rabbit haemorrhagic disease (RHD)';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records were not saved',
+      one: '$count record was not saved',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'The server rejected them — please enter them again.';
+
+  @override
+  String get offlineRejectedDismiss => 'Got it';
+
+  @override
   String get quickRecordVaccination => 'Log a vaccination';
 
   @override
@@ -2087,6 +2245,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rabbitsFilterSold => 'Sold';
 
   @override
+  String get rabbitsFilterDead => 'Dead';
+
+  @override
   String get sexMale => 'Male';
 
   @override
@@ -2401,6 +2562,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLogout => 'Sign out';
 
   @override
+  String get logoutDialogTitle => 'Sign out?';
+
+  @override
+  String get logoutDialogBody =>
+      'Your records stay on the server — you will see them again after signing in.';
+
+  @override
+  String get logoutDialogConfirm => 'Sign out';
+
+  @override
   String get settingsThemeLight => 'Light';
 
   @override
@@ -2447,6 +2618,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscriptionPay => 'Pay';
+
+  @override
+  String get subscriptionPayAbroadTitle =>
+      'Card payment is available in Tajikistan only for now';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'We will extend your plan manually — message support and they will reply.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Message support';
 
   @override
   String get subscriptionOpenPaymentPage => 'Open payment page';
@@ -4446,6 +4628,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onbSkip => 'Skip';
+
+  @override
+  String get onbCountryTitle => 'Where is your farm?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Currency, time and sign-in method depend on this';
+
+  @override
+  String get countryTJ => 'Tajikistan';
+
+  @override
+  String get countryUZ => 'Uzbekistan';
+
+  @override
+  String get countryKG => 'Kyrgyzstan';
+
+  @override
+  String get countryKZ => 'Kazakhstan';
+
+  @override
+  String get countryRU => 'Russia';
+
+  @override
+  String get countryAF => 'Afghanistan';
+
+  @override
+  String get loginSmsUnavailable =>
+      'SMS codes do not reach your country — sign in by email';
 
   @override
   String get firstStepCages => 'Set up your cages';

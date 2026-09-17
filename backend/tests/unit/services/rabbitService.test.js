@@ -43,6 +43,31 @@ describe('RabbitService', () => {
       expect(sequelize.transaction).not.toHaveBeenCalled();
     });
 
+    it('пустая бирка записывается как NULL, а не пустой строкой', async () => {
+      // Уникальный индекс unique_user_rabbit_tag рассчитан на NULL: «кролики
+      // без бирки друг другу не мешают». Пустая строка для него — обычное
+      // значение, поэтому второй кролик без бирки упирался в сырой конфликт
+      // «Такая запись уже существует». В мелком хозяйстве биркой не метят
+      // почти никого, и до этого доходили на втором же кролике.
+      const mockRabbit = createMockRabbit();
+      Breed.findOne.mockResolvedValue({ id: 1 });
+      Rabbit.create.mockResolvedValue(mockRabbit);
+      Rabbit.findOne.mockResolvedValue(mockRabbit);
+
+      await rabbitService.createRabbit({
+        breed_id: 1, farm_id: 1, tag_id: '   ', status: 'healthy'
+      });
+
+      expect(Rabbit.create).toHaveBeenCalledWith(
+        expect.objectContaining({ tag_id: null }),
+        expect.anything()
+      );
+      // Проверка на дубликат по пустой бирке не нужна и не должна бежать.
+      expect(Rabbit.findOne).not.toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.objectContaining({ tag_id: '   ' }) })
+      );
+    });
+
     it('должен бросать BREED_NOT_FOUND если порода не существует', async () => {
       Breed.findOne.mockResolvedValue(null);
 

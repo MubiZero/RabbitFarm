@@ -334,6 +334,55 @@ describe('TaskService', () => {
 
   // ─── deleteTask ───────────────────────────────────────────────────────────
 
+  describe('перенос срока сбрасывает отметку о напоминании', () => {
+    const taskWithReminder = (overrides = {}) => ({
+      id: 5,
+      farm_id: 1,
+      due_date: new Date('2026-09-20T08:00:00.000Z'),
+      reminder_before: 60,
+      assigned_to: 9,
+      update: jest.fn().mockResolvedValue(undefined),
+      ...overrides
+    });
+
+    it('новый срок — напомнить заново', async () => {
+      // Иначе перенос срока на неделю означал бы, что напоминание не придёт
+      // вовсе: по этой задаче оно «уже отправлено».
+      const task = taskWithReminder();
+      Task.findOne.mockResolvedValue(task);
+
+      await taskService.updateTask(5, 1, {
+        due_date: '2026-09-27T08:00:00.000Z'
+      }, 9);
+
+      expect(task.update).toHaveBeenCalledWith(
+        expect.objectContaining({ reminder_sent_at: null })
+      );
+    });
+
+    it('новое время напоминания — тоже заново', async () => {
+      const task = taskWithReminder();
+      Task.findOne.mockResolvedValue(task);
+
+      await taskService.updateTask(5, 1, { reminder_before: 1440 }, 9);
+
+      expect(task.update).toHaveBeenCalledWith(
+        expect.objectContaining({ reminder_sent_at: null })
+      );
+    });
+
+    it('правка заметки отметку не трогает', async () => {
+      // Напоминание уже ушло и по тому же сроку второй раз не нужно.
+      const task = taskWithReminder();
+      Task.findOne.mockResolvedValue(task);
+
+      await taskService.updateTask(5, 1, { notes: 'взять вакцину' }, 9);
+
+      const [payload] = task.update.mock.calls[0];
+      expect(payload).not.toHaveProperty('reminder_sent_at');
+    });
+  });
+
   describe('deleteTask', () => {
     it('should delete task successfully', async () => {
       const mockTask = createMockTask();

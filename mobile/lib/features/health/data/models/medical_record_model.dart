@@ -19,22 +19,6 @@ enum MedicalOutcome {
   euthanized,
 }
 
-/// Extension to get display names for medical outcomes
-extension MedicalOutcomeDisplay on MedicalOutcome {
-  String get displayName {
-    switch (this) {
-      case MedicalOutcome.recovered:
-        return 'Выздоровел';
-      case MedicalOutcome.ongoing:
-        return 'Лечение продолжается';
-      case MedicalOutcome.died:
-        return 'Умер';
-      case MedicalOutcome.euthanized:
-        return 'Эвтаназия';
-    }
-  }
-}
-
 /// Medical Record model
 @freezed
 abstract class MedicalRecord with _$MedicalRecord {

@@ -16,6 +16,7 @@ import 'core/l10n/date_locale.dart';
 import 'core/l10n/framework_locale_fallback.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/app_version.dart';
+import 'core/countries/farm_currency.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/router/app_router.dart';
@@ -23,6 +24,7 @@ import 'core/router/deep_links.dart';
 import 'core/widgets/force_update_screen.dart';
 import 'core/widgets/offline_banner.dart';
 import 'core/widgets/offline_queue_gate.dart';
+import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/auth/presentation/providers/language_sync.dart';
 import 'features/auth/presentation/widgets/farm_status_banner.dart';
 import 'features/auth/presentation/widgets/pin_gate.dart';
@@ -175,11 +177,20 @@ class MyApp extends ConsumerWidget {
           // должно быть видно ни данных фермы, ни того, что за плашки на них
           // наложены.
           : PinGate(
-              child: ImpersonationBanner(
-                child: FarmStatusBanner(
-                  child: OfflineQueueGate(
-                    child:
-                        OfflineBanner(child: child ?? const SizedBox.shrink()),
+              // Валюта хозяйства — снаружи экранов, потому что суммы
+              // показываются в двух десятках мест: протаскивать её в каждое
+              // параметром значило бы, что где-то забудут, и часть экранов
+              // считала бы в чужой валюте.
+              child: FarmCurrencyScope(
+                symbol: symbolForCurrency(
+                  ref.watch(authProvider).user?.farm?.currency,
+                ),
+                child: ImpersonationBanner(
+                  child: FarmStatusBanner(
+                    child: OfflineQueueGate(
+                      child: OfflineBanner(
+                          child: child ?? const SizedBox.shrink()),
+                    ),
                   ),
                 ),
               ),

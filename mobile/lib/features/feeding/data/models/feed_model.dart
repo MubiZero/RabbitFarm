@@ -22,26 +22,6 @@ enum FeedType {
   other,
 }
 
-/// Extension to get display names for feed types
-extension FeedTypeDisplay on FeedType {
-  String get displayName {
-    switch (this) {
-      case FeedType.pellets:
-        return 'Гранулы';
-      case FeedType.hay:
-        return 'Сено';
-      case FeedType.vegetables:
-        return 'Овощи';
-      case FeedType.grain:
-        return 'Зерно';
-      case FeedType.supplements:
-        return 'Добавки';
-      case FeedType.other:
-        return 'Другое';
-    }
-  }
-}
-
 /// Feed unit types
 enum FeedUnit {
   @JsonValue('kg')
@@ -50,20 +30,6 @@ enum FeedUnit {
   liter,
   @JsonValue('piece')
   piece,
-}
-
-/// Extension to get display names for feed units
-extension FeedUnitDisplay on FeedUnit {
-  String get displayName {
-    switch (this) {
-      case FeedUnit.kg:
-        return 'кг';
-      case FeedUnit.liter:
-        return 'л';
-      case FeedUnit.piece:
-        return 'шт';
-    }
-  }
 }
 
 /// Feed model

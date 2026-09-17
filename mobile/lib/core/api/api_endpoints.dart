@@ -44,6 +44,8 @@ class ApiEndpoints {
 
   /// Назначение сразу всему живому поголовью фермы.
   static const String rabbitsPurpose = '/rabbits/purpose';
+  /// Перенос стада: до ста кроликов одним образцом.
+  static const String rabbitsBulk = '/rabbits/bulk';
 
   // Breeds endpoints
   static const String breeds = '/breeds';

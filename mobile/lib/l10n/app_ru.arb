@@ -184,6 +184,73 @@
   "farmTitle": "Хозяйство",
   "navQuickTitle": "Что записать",
   "quickRecordFeeding": "Записать кормление",
+  "quickNeedsConnection": "Нужна связь",
+  "taskReminderLabel": "Напомнить заранее",
+  "taskReminderNone": "Не напоминать",
+  "taskReminder15m": "За 15 минут",
+  "taskReminder1h": "За час",
+  "taskReminder3h": "За 3 часа",
+  "taskReminder1d": "За день",
+  "taskReminder2d": "За два дня",
+  "bulkHerdTitle": "Завести несколько",
+  "bulkHerdSubtitle": "Так переносят стадо, которое уже есть",
+  "bulkHerdCount": "Сколько голов",
+  "bulkHerdTagPrefix": "Начало клейма",
+  "bulkHerdTagPrefixHint": "Например, R- — получится R-001, R-002",
+  "bulkHerdTagPrefixEmpty": "Оставьте пустым, если бирок нет",
+  "bulkHerdCountInvalid": "От 1 до 100",
+  "bulkHerdDone": "{count, plural, one{Заведён {count} кролик} few{Заведено {count} кролика} many{Заведено {count} кроликов} other{Заведено {count} кролика}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Кто в партии",
+  "rabbitMultiPickerLabel": "Кролики",
+  "rabbitMultiPickerEmpty": "Никто не выбран",
+  "rabbitMultiPickerDone": "Готово",
+  "rabbitMultiPickerSelected": "{count, plural, one{Выбран {count}} few{Выбрано {count}} many{Выбрано {count}} other{Выбрано {count}}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Продать партией",
+  "ageYears": "{count, plural, one{{count} год} few{{count} года} many{{count} лет} other{{count} года}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} г {months} мес",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Гранулы",
+  "feedTypeHay": "Сено",
+  "feedTypeVegetables": "Овощи",
+  "feedTypeGrain": "Зерно",
+  "feedTypeSupplements": "Добавки",
+  "feedTypeOther": "Другое",
+  "feedUnitKg": "кг",
+  "feedUnitLiter": "л",
+  "feedUnitPiece": "шт",
+  "vaccineTypeVhd": "ВГБК",
+  "vaccineTypeMyxomatosis": "Миксоматоз",
+  "vaccineTypePasteurellosis": "Пастереллёз",
+  "vaccineTypeOther": "Другое",
+  "vaccineFullVhd": "Вирусная геморрагическая болезнь кроликов (ВГБК)",
+  "offlineRejectedTitle": "{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Их не принял сервер — запишите заново.",
+  "offlineRejectedDismiss": "Понятно",
   "quickRecordVaccination": "Записать вакцинацию",
   "quickCreateTask": "Создать задачу",
   "quickRecordNote": "Оставить заметку",
@@ -856,6 +923,7 @@
   "rabbitsFilterFemales": "Самки",
   "rabbitsFilterActive": "В работе",
   "rabbitsFilterSold": "Проданы",
+  "rabbitsFilterDead": "Павшие",
   "sexMale": "Самец",
   "sexFemale": "Самка",
   "sexUnknown": "Пол не указан",
@@ -976,6 +1044,9 @@
   "supportContactHint": "Или свяжитесь напрямую:",
   "settingsPrivacyPolicy": "Политика конфиденциальности",
   "settingsLogout": "Выйти из аккаунта",
+  "logoutDialogTitle": "Выйти из аккаунта?",
+  "logoutDialogBody": "Записи останутся на сервере — вы снова увидите их после входа.",
+  "logoutDialogConfirm": "Выйти",
   "settingsThemeLight": "Светлая",
   "settingsThemeSystem": "Как в системе",
   "settingsThemeDark": "Тёмная",
@@ -1007,6 +1078,9 @@
     }
   },
   "subscriptionPay": "Оплатить",
+  "subscriptionPayAbroadTitle": "Оплата картой пока только в Таджикистане",
+  "subscriptionPayAbroadBody": "Мы продлим тариф вручную — напишите в поддержку, и вам ответят.",
+  "subscriptionPayAbroadAction": "Написать в поддержку",
   "subscriptionOpenPaymentPage": "Открыть страницу оплаты",
   "subscriptionAfterPayingHint": "Оплатите по открывшейся ссылке, затем вернитесь сюда и нажмите «Проверить оплату».",
   "subscriptionCheckPayment": "Проверить оплату",
@@ -1866,6 +1940,15 @@
   "onbDoneCreate": "Создать ферму",
   "onbBack": "Назад",
   "onbSkip": "Пропустить",
+  "onbCountryTitle": "Где ваше хозяйство?",
+  "onbCountrySubtitle": "От этого зависят валюта, время и способ входа",
+  "countryTJ": "Таджикистан",
+  "countryUZ": "Узбекистан",
+  "countryKG": "Кыргызстан",
+  "countryKZ": "Казахстан",
+  "countryRU": "Россия",
+  "countryAF": "Афганистан",
+  "loginSmsUnavailable": "В вашей стране код по СМС не приходит — входите по почте",
   "firstStepCages": "Завести клетки",
   "firstStepRabbits": "Добавить самок и самцов",
   "firstStepBreeding": "Записать первую случку",

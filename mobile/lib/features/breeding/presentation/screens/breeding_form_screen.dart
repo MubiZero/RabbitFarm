@@ -192,6 +192,7 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
               lastDate: DateTime.now().add(const Duration(days: 365)),
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _status,
               decoration: InputDecoration(
                 labelText: l10n.breedingStatus,

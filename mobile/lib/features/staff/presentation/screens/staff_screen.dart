@@ -372,12 +372,17 @@ class StaffScreen extends ConsumerWidget {
                 setDialogState(() => fieldError = l10n.staffInvitePhoneInvalid);
                 return;
               }
-              if (fullName.isEmpty) {
-                setDialogState(() => fieldError = l10n.staffInviteNameEmpty);
-                return;
-              }
             } else if (email.isEmpty || !email.contains('@')) {
               setDialogState(() => fieldError = l10n.loginEmailInvalid);
+              return;
+            }
+
+            // Имя нужно для обоих способов: сервер требует его всегда
+            // (staffValidator.createInvitationSchema). Пока поле показывали
+            // только для телефона, приглашение по почте отвечало отказом про
+            // поле, которого человек не видел.
+            if (fullName.isEmpty) {
+              setDialogState(() => fieldError = l10n.staffInviteNameEmpty);
               return;
             }
 
@@ -394,7 +399,7 @@ class StaffScreen extends ConsumerWidget {
                   await ref.read(staffRepositoryProvider).createInvitation(
                         email: byPhone ? null : email,
                         phone: byPhone ? phone : null,
-                        fullName: byPhone ? fullName : null,
+                        fullName: fullName,
                         role: role,
                       );
               navigator.pop(invitation);
@@ -450,7 +455,7 @@ class StaffScreen extends ConsumerWidget {
                             }),
                   ),
                   const SizedBox(height: 16),
-                  if (byPhone) ...[
+                  if (byPhone)
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
@@ -460,18 +465,8 @@ class StaffScreen extends ConsumerWidget {
                         labelText: context.l10n.loginPhoneLabel,
                         hintText: context.l10n.staffInvitePhoneHint,
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: nameController,
-                      textCapitalization: TextCapitalization.words,
-                      enabled: !isSending,
-                      decoration: InputDecoration(
-                        labelText: context.l10n.staffInviteNameLabel,
-                        hintText: context.l10n.staffInviteNameHint,
-                      ),
-                    ),
-                  ] else
+                    )
+                  else
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -482,6 +477,20 @@ class StaffScreen extends ConsumerWidget {
                         hintText: context.l10n.staffInviteEmailHint,
                       ),
                     ),
+                  const SizedBox(height: 12),
+                  // Имя спрашиваем независимо от способа приглашения: сервер
+                  // требует его всегда, а показывали поле только в ветке
+                  // «по телефону» — приглашение по почте отвечало отказом про
+                  // невидимое поле и не проходило ни разу.
+                  TextField(
+                    controller: nameController,
+                    textCapitalization: TextCapitalization.words,
+                    enabled: !isSending,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.staffInviteNameLabel,
+                      hintText: context.l10n.staffInviteNameHint,
+                    ),
+                  ),
                   if (fieldError != null) ...[
                     const SizedBox(height: 8),
                     Text(

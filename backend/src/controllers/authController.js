@@ -35,6 +35,13 @@ class AuthController {
       if (error.message === 'PHONE_EXISTS') {
         return ApiResponse.conflict(res, 'Пользователь с таким телефоном уже существует', 'PHONE_EXISTS');
       }
+      if (error.message === 'PHONE_LOGIN_UNAVAILABLE') {
+        return ApiResponse.badRequest(
+          res,
+          'В этой стране вход по СМС недоступен — зарегистрируйтесь по почте',
+          'PHONE_LOGIN_UNAVAILABLE'
+        );
+      }
       next(error);
     }
   }

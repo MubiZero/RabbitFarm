@@ -10,6 +10,7 @@ import '../providers/feeds_provider.dart';
 import '../utils/feed_labels.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Аналитика склада кормов: состав запаса, его стоимость и что заканчивается.
 class FeedStatisticsScreen extends ConsumerWidget {
@@ -104,7 +105,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        formatMoney(stats.totalStockValue),
+                        context.money(stats.totalStockValue),
                         style: AppTypography.displayMd.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -125,7 +126,7 @@ class FeedStatisticsScreen extends ConsumerWidget {
                   for (final entry in presentTypes)
                     MetricBar(
                       icon: entry.key.icon,
-                      label: entry.key.displayName,
+                      label: feedTypeLabel(context, entry.key),
                       value: '${entry.value}',
                       fraction: maxCount == 0 ? 0 : entry.value / maxCount,
                       color: entry.key.color,

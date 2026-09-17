@@ -128,11 +128,21 @@ class VaccinationsRepository {
   }
 
   /// Создать новую запись о вакцинации
-  Future<Vaccination> createVaccination(VaccinationRequest request) async {
+  Future<Vaccination> createVaccination(VaccinationRequest request) =>
+      createVaccinationFromJson(request.toJson());
+
+  /// То же, но из готового тела запроса.
+  ///
+  /// Нужно отложенной очереди: она хранит запись на диске уже
+  /// сериализованной и собирать из неё обратно типизированный объект
+  /// незачем — тип вакцины пришлось бы разбирать вторым парсером, который
+  /// разойдётся с первым при первой же правке перечисления.
+  Future<Vaccination> createVaccinationFromJson(
+      Map<String, dynamic> data) async {
     try {
       final response = await _apiClient.dio.post(
         '/vaccinations',
-        data: request.toJson(),
+        data: data,
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

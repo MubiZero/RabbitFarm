@@ -2,7 +2,7 @@ const { FeedingRecord, Feed, Rabbit, Cage, User, sequelize } = require('../model
 const logger = require('../utils/logger');
 const ApiResponse = require('../utils/apiResponse');
 const { Op } = require('sequelize');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const { startOfDayInZone, nextDayInZone } = require('../utils/dateRange');
 
 /**
  * Feeding Record Controller
@@ -266,14 +266,14 @@ exports.list = async (req, res, next) => {
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
-        where.fed_at[Op.gte] = startOfDayUtc(from_date);
+        where.fed_at[Op.gte] = startOfDayInZone(from_date, req.farmTimezone);
       }
       // fed_at хранит момент времени, а период задан календарной датой.
       // Сравнение `<= to_date` означало «не позже полуночи последнего дня»,
       // поэтому всё, накормленное в этот день, из выборки выпадало — а по
       // умолчанию период заканчивается сегодняшним днём.
       if (to_date) {
-        where.fed_at[Op.lt] = nextDayUtc(to_date);
+        where.fed_at[Op.lt] = nextDayInZone(to_date, req.farmTimezone);
       }
     }
 
@@ -486,11 +486,11 @@ exports.getStatistics = async (req, res, next) => {
     if (from_date || to_date) {
       where.fed_at = {};
       if (from_date) {
-        where.fed_at[Op.gte] = startOfDayUtc(from_date);
+        where.fed_at[Op.gte] = startOfDayInZone(from_date, req.farmTimezone);
       }
       // Та же граница, что и в списке: конец периода — начало следующего дня.
       if (to_date) {
-        where.fed_at[Op.lt] = nextDayUtc(to_date);
+        where.fed_at[Op.lt] = nextDayInZone(to_date, req.farmTimezone);
       }
     }
 

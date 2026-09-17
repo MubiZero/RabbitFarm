@@ -18,7 +18,9 @@ void main() {
       final record = FeedingRecord.fromJson(_feedingListItem());
 
       expect(record.feed?.name, 'Комбикорм для кроликов ПК-90');
-      expect(record.feed?.unit.displayName, 'кг');
+      // Подпись единицы переехала в словарь (`feedUnitLabel`): модель
+      // данных хранит код, а как он называется — решает язык экрана.
+      expect(record.feed?.unit, FeedUnit.kg);
       expect(record.rabbit?.name, 'Бусинка');
       expect(record.cage?.number, 'C1');
       expect(record.author?.fullName, 'Пётр Иванов');

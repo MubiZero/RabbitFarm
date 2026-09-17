@@ -1,30 +1,23 @@
-/// Возраст кролика в человекочитаемом виде: «5 мес», «2 года», «1 г 3 мес».
-String formatAge(DateTime birthDate) {
+import 'package:flutter/widgets.dart';
+
+import '../l10n/l10n_context.dart';
+
+/// Возраст кролика словами: «5 мес», «2 года», «1 г 3 мес».
+///
+/// Раньше здесь лежала своя таблица русских окончаний — три ветвления на
+/// «год/года/лет» и столько же на месяцы. На таджикском и узбекском экране
+/// возраст всё равно оставался русским, а в приложении для этого давно есть
+/// ICU-плюрал: правила окончаний в нём свои у каждого языка, и писать их
+/// руками не нужно.
+String formatAge(BuildContext context, DateTime birthDate) {
   final months = (DateTime.now().difference(birthDate).inDays / 30).floor();
-  final years = (months / 12).floor();
+  final years = months ~/ 12;
 
   if (years > 0) {
     final remainingMonths = months % 12;
-    if (remainingMonths > 0) {
-      return '$years г $remainingMonths мес';
-    }
-    return '$years ${_pluralYears(years)}';
+    return remainingMonths > 0
+        ? context.l10n.ageYearsMonths(years, remainingMonths)
+        : context.l10n.ageYears(years);
   }
-  return '$months ${_pluralMonths(months)}';
-}
-
-String _pluralYears(int years) {
-  if (years % 10 == 1 && years % 100 != 11) return 'год';
-  if ([2, 3, 4].contains(years % 10) && ![12, 13, 14].contains(years % 100)) {
-    return 'года';
-  }
-  return 'лет';
-}
-
-String _pluralMonths(int months) {
-  if (months % 10 == 1 && months % 100 != 11) return 'месяц';
-  if ([2, 3, 4].contains(months % 10) && ![12, 13, 14].contains(months % 100)) {
-    return 'месяца';
-  }
-  return 'месяцев';
+  return context.l10n.periodMonths(months);
 }

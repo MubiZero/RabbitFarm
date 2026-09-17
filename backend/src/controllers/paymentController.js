@@ -60,6 +60,15 @@ class PaymentController {
       if (error.message === 'NO_PLAN') {
         return ApiResponse.badRequest(res, 'Ферме не назначен тариф', 'NO_PLAN');
       }
+      if (error.message === 'PAYMENTS_UNAVAILABLE_IN_COUNTRY') {
+        // Не «что-то пошло не так»: человек должен понять, что делать
+        // дальше, а не пробовать ту же кнопку ещё раз.
+        return ApiResponse.badRequest(
+          res,
+          'Оплата картой в вашей стране пока недоступна — продлите тариф через поддержку',
+          'PAYMENTS_UNAVAILABLE_IN_COUNTRY'
+        );
+      }
       if (error.message === 'PLAN_FREE') {
         return ApiResponse.badRequest(res, 'Текущий тариф бесплатный, оплата не требуется', 'PLAN_FREE');
       }

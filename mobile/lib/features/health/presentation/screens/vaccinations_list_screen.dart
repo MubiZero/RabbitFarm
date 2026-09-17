@@ -6,10 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
+import '../../../../core/countries/farm_currency.dart';
+import '../utils/medical_labels.dart';
 
 /// Список прививок.
 class VaccinationsListScreen extends ConsumerWidget {
@@ -156,7 +157,7 @@ class _ActiveFilters extends ConsumerWidget {
         children: [
           if (state.typeFilter != null)
             InputChip(
-              label: Text(state.typeFilter!.displayName),
+              label: Text(vaccineTypeLabel(context, state.typeFilter!)),
               deleteIcon: const Icon(Icons.close, size: 16),
               onDeleted: () => notifier.setTypeFilter(null),
             ),
@@ -256,7 +257,7 @@ class _VaccinationCard extends StatelessWidget {
           if ((vaccination.cost ?? 0) > 0)
             _Line(
               icon: Icons.payments_outlined,
-              text: formatMoney(vaccination.cost!),
+              text: context.money(vaccination.cost!),
             ),
         ],
       ),
@@ -345,7 +346,7 @@ class _TypeChip extends StatelessWidget {
       VaccineType.other => context.colors.onSurfaceVariant,
     };
 
-    return _Badge(label: type.displayName, color: color);
+    return _Badge(label: vaccineTypeLabel(context, type), color: color);
   }
 }
 
@@ -415,7 +416,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
               children: [
                 for (final type in VaccineType.values)
                   ChoiceChip(
-                    label: Text(type.displayName),
+                    label: Text(vaccineTypeLabel(context, type)),
                     selected: _type == type,
                     onSelected: (selected) =>
                         setState(() => _type = selected ? type : null),
@@ -683,7 +684,8 @@ class _DetailsSheet extends ConsumerWidget {
               _DetailRow(
                 icon: Icons.category_outlined,
                 label: context.l10n.vaccinationsTypeLabel,
-                value: vaccination.vaccineType.fullName,
+                value:
+                    vaccineTypeFullLabel(context, vaccination.vaccineType),
               ),
               if (vaccination.rabbit != null)
                 _DetailRow(
@@ -718,7 +720,7 @@ class _DetailsSheet extends ConsumerWidget {
                 _DetailRow(
                   icon: Icons.payments_outlined,
                   label: context.l10n.medCost,
-                  value: formatMoney(vaccination.cost!),
+                  value: context.money(vaccination.cost!),
                 ),
               if (vaccination.notes?.trim().isNotEmpty == true)
                 _DetailRow(

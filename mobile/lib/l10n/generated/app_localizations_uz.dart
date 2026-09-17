@@ -440,6 +440,165 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickRecordFeeding => 'Oziqlantirishni yozish';
 
   @override
+  String get quickNeedsConnection => 'Aloqa kerak';
+
+  @override
+  String get taskReminderLabel => 'Oldindan eslatish';
+
+  @override
+  String get taskReminderNone => 'Eslatilmasin';
+
+  @override
+  String get taskReminder15m => '15 daqiqa oldin';
+
+  @override
+  String get taskReminder1h => 'Bir soat oldin';
+
+  @override
+  String get taskReminder3h => '3 soat oldin';
+
+  @override
+  String get taskReminder1d => 'Bir kun oldin';
+
+  @override
+  String get taskReminder2d => 'Ikki kun oldin';
+
+  @override
+  String get bulkHerdTitle => 'Bir nechta qoʻshish';
+
+  @override
+  String get bulkHerdSubtitle => 'Mavjud podani koʻchirish uchun';
+
+  @override
+  String get bulkHerdCount => 'Nechta bosh';
+
+  @override
+  String get bulkHerdTagPrefix => 'Tamgʻa boshi';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Masalan, R- — R-001, R-002 boʻladi';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Tamgʻa boʻlmasa, boʻsh qoldiring';
+
+  @override
+  String get bulkHerdCountInvalid => '1 dan 100 gacha';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta quyon qoʻshildi',
+      one: '$count ta quyon qoʻshildi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Partiyada kim bor';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Quyonlar';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Hech kim tanlanmadi';
+
+  @override
+  String get rabbitMultiPickerDone => 'Tayyor';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta tanlandi',
+      one: '$count ta tanlandi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Partiya bilan sotish';
+
+  @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count yosh',
+      one: '$count yosh',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '$years y $months oy';
+  }
+
+  @override
+  String get feedTypePellets => 'Granula';
+
+  @override
+  String get feedTypeHay => 'Pichan';
+
+  @override
+  String get feedTypeVegetables => 'Sabzavot';
+
+  @override
+  String get feedTypeGrain => 'Don';
+
+  @override
+  String get feedTypeSupplements => 'Qoʻshimchalar';
+
+  @override
+  String get feedTypeOther => 'Boshqa';
+
+  @override
+  String get feedUnitKg => 'kg';
+
+  @override
+  String get feedUnitLiter => 'l';
+
+  @override
+  String get feedUnitPiece => 'dona';
+
+  @override
+  String get vaccineTypeVhd => 'QGVK';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Miksomatoz';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Pasterellyoz';
+
+  @override
+  String get vaccineTypeOther => 'Boshqa';
+
+  @override
+  String get vaccineFullVhd =>
+      'Quyonlarning virusli gemorragik kasalligi (QGVK)';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count yozuv saqlanmadi',
+      one: '$count yozuv saqlanmadi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody =>
+      'Server ularni qabul qilmadi — qaytadan yozing.';
+
+  @override
+  String get offlineRejectedDismiss => 'Tushunarli';
+
+  @override
   String get quickRecordVaccination => 'Emlashni yozish';
 
   @override
@@ -2093,6 +2252,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get rabbitsFilterSold => 'Sotilgan';
 
   @override
+  String get rabbitsFilterDead => 'Nobud boʻlgan';
+
+  @override
   String get sexMale => 'Erkak';
 
   @override
@@ -2407,7 +2569,17 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsLogout => 'Akkauntdan chiqish';
 
   @override
-  String get settingsThemeLight => 'Yorug\'';
+  String get logoutDialogTitle => 'Akkauntdan chiqilsinmi?';
+
+  @override
+  String get logoutDialogBody =>
+      'Yozuvlar serverda qoladi — kirganingizdan keyin ularni yana koʻrasiz.';
+
+  @override
+  String get logoutDialogConfirm => 'Chiqish';
+
+  @override
+  String get settingsThemeLight => 'Yorugʻ';
 
   @override
   String get settingsThemeSystem => 'Tizimdagidek';
@@ -2454,6 +2626,17 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get subscriptionPay => 'Toʻlash';
+
+  @override
+  String get subscriptionPayAbroadTitle =>
+      'Karta bilan toʻlov hozircha faqat Tojikistonda';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Tarifni qoʻlda uzaytiramiz — qoʻllab-quvvatlashga yozing, javob berishadi.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Qoʻllab-quvvatlashga yozish';
 
   @override
   String get subscriptionOpenPaymentPage => 'Toʻlov sahifasini ochish';
@@ -4454,6 +4637,35 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get onbSkip => 'Oʻtkazib yuborish';
+
+  @override
+  String get onbCountryTitle => 'Xoʻjaligingiz qayerda?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'Valyuta, vaqt va kirish usuli shunga bogʻliq';
+
+  @override
+  String get countryTJ => 'Tojikiston';
+
+  @override
+  String get countryUZ => 'Oʻzbekiston';
+
+  @override
+  String get countryKG => 'Qirgʻiziston';
+
+  @override
+  String get countryKZ => 'Qozogʻiston';
+
+  @override
+  String get countryRU => 'Rossiya';
+
+  @override
+  String get countryAF => 'Afgʻoniston';
+
+  @override
+  String get loginSmsUnavailable =>
+      'Sizning mamlakatingizga SMS kod kelmaydi — pochta orqali kiring';
 
   @override
   String get firstStepCages => 'Kataklarni kiriting';

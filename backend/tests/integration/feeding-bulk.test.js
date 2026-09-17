@@ -187,11 +187,17 @@ describe('Кормление пачкой', () => {
    * fed_at — момент времени, а период задаётся календарной датой. Пока
    * верхняя граница сравнивалась как `<= to_date`, она означала полночь
    * последнего дня, и всё, что записано в этот день, пропадало из выборок.
+   *
+   * Сутки считаются в поясе хозяйства. Ферма здесь таджикская (умолчание
+   * `farms.timezone`), поэтому её 1 мая — это промежуток с 30 апреля 19:00
+   * до 1 мая 19:00 по Гринвичу.
    */
   describe('Верхняя граница периода', () => {
     let lateRecordId;
+    let nextDayRecordId;
 
     beforeAll(async () => {
+      // 23:30 первого мая по часам хозяйства.
       const res = await request(app)
         .post(`${API}/feeding-records`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -199,10 +205,39 @@ describe('Кормление пачкой', () => {
           feed_id: feedId,
           cage_id: cageIds[0],
           quantity: 2,
-          fed_at: '2024-05-01T23:30:00Z',
+          fed_at: '2024-05-01T18:30:00Z',
           notes: 'Поздний вечер последнего дня периода'
         });
       lateRecordId = res.body.data.id;
+
+      // 04:30 второго мая по часам хозяйства — по Гринвичу ещё первое.
+      // Раньше такая запись попадала в первое мая, хотя для фермы это уже
+      // следующие сутки.
+      const nextDay = await request(app)
+        .post(`${API}/feeding-records`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          feed_id: feedId,
+          cage_id: cageIds[0],
+          quantity: 3,
+          fed_at: '2024-05-01T23:30:00Z',
+          notes: 'Раннее утро следующего дня хозяйства'
+        });
+      nextDayRecordId = nextDay.body.data.id;
+    });
+
+    it('запись раннего утра относится к следующим суткам хозяйства', async () => {
+      const first = await request(app)
+        .get(`${API}/feeding-records?from_date=2024-05-01&to_date=2024-05-01`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+      expect(first.body.data.items.map((item) => item.id))
+        .not.toContain(nextDayRecordId);
+
+      const second = await request(app)
+        .get(`${API}/feeding-records?from_date=2024-05-02&to_date=2024-05-02`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+      expect(second.body.data.items.map((item) => item.id))
+        .toContain(nextDayRecordId);
     });
 
     it('запись в конце последнего дня видна в списке', async () => {
@@ -233,10 +268,24 @@ describe('Кормление пачкой', () => {
       expect(res.body.data.feeding.total_feeding_records).toBe(1);
     });
 
-    it('сегодняшнее кормление попадает в отчёт за период по умолчанию', async () => {
-      // Период по умолчанию заканчивается сегодняшним днём — именно на нём
-      // отчёт показывал «Кормления: 0» при живых записях в базе.
+    it('сегодняшнее кормление попадает в отчёт за сегодняшний день', async () => {
+      // Верхняя граница периода — момент, а fed_at хранит время: сравнение
+      // с полуночью отсекало всё, записанное сегодня, и отчёт показывал
+      // «Кормления: 0» при живых записях в базе.
+      //
+      // Период задаётся явно. Раньше здесь не было параметров вовсе, и
+      // проверка держалась на умолчании «последние 30 дней», которое сервер
+      // подставлял сам. Умолчание убрано: при выборе «всё время» оно давало
+      // вкладке «Ферма» месяц, пока «Деньги» и «Здоровье» считали за всю
+      // историю — три вкладки под одним переключателем срока называли
+      // разные числа.
       const justNow = new Date(Date.now() - 60 * 1000).toISOString();
+      const today = new Date();
+      const todayIso = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0')
+      ].join('-');
 
       await request(app)
         .post(`${API}/feeding-records`)
@@ -249,16 +298,29 @@ describe('Кормление пачкой', () => {
         });
 
       const res = await request(app)
-        .get(`${API}/reports/farm`)
+        .get(`${API}/reports/farm?from_date=${todayIso}&to_date=${todayIso}`)
         .set('Authorization', `Bearer ${ownerToken}`);
 
       expect(res.status).toBe(200);
-      // Остальные записи файла датированы 2024 годом и в последние 30 дней
-      // не попадают, поэтому счётчик равен ровно одной сегодняшней записи.
+      // Остальные записи файла датированы 2024 годом, поэтому в сегодняшний
+      // день попадает ровно одна — только что созданная.
       expect(res.body.data.feeding.total_feeding_records).toBe(1);
       expect(res.body.data.feeding.consumption_by_unit).toEqual([
         { unit: 'kg', total: '1.00' }
       ]);
+    });
+
+    it('без указания периода отчёт считает за всё время', async () => {
+      // Пустой период означает «за всё время» — одинаково для вкладок
+      // «Ферма», «Деньги» и «Здоровье». Записи 2024 года в счёт входят.
+      const res = await request(app)
+        .get(`${API}/reports/farm`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.period).toEqual({ from: null, to: null });
+      expect(res.body.data.feeding.total_feeding_records)
+        .toBeGreaterThan(1);
     });
   });
 });

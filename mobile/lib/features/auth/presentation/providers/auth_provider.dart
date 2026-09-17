@@ -273,6 +273,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? phone,
     String? email,
     String? farmName,
+    String? country,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -282,6 +283,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         phone: phone,
         email: email,
         farmName: farmName,
+        country: country,
       );
 
       state = state.copyWith(isLoading: false);

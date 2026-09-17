@@ -438,6 +438,172 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickRecordFeeding => 'Записать кормление';
 
   @override
+  String get quickNeedsConnection => 'Нужна связь';
+
+  @override
+  String get taskReminderLabel => 'Напомнить заранее';
+
+  @override
+  String get taskReminderNone => 'Не напоминать';
+
+  @override
+  String get taskReminder15m => 'За 15 минут';
+
+  @override
+  String get taskReminder1h => 'За час';
+
+  @override
+  String get taskReminder3h => 'За 3 часа';
+
+  @override
+  String get taskReminder1d => 'За день';
+
+  @override
+  String get taskReminder2d => 'За два дня';
+
+  @override
+  String get bulkHerdTitle => 'Завести несколько';
+
+  @override
+  String get bulkHerdSubtitle => 'Так переносят стадо, которое уже есть';
+
+  @override
+  String get bulkHerdCount => 'Сколько голов';
+
+  @override
+  String get bulkHerdTagPrefix => 'Начало клейма';
+
+  @override
+  String get bulkHerdTagPrefixHint => 'Например, R- — получится R-001, R-002';
+
+  @override
+  String get bulkHerdTagPrefixEmpty => 'Оставьте пустым, если бирок нет';
+
+  @override
+  String get bulkHerdCountInvalid => 'От 1 до 100';
+
+  @override
+  String bulkHerdDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Заведено $count кролика',
+      many: 'Заведено $count кроликов',
+      few: 'Заведено $count кролика',
+      one: 'Заведён $count кролик',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rabbitMultiPickerTitle => 'Кто в партии';
+
+  @override
+  String get rabbitMultiPickerLabel => 'Кролики';
+
+  @override
+  String get rabbitMultiPickerEmpty => 'Никто не выбран';
+
+  @override
+  String get rabbitMultiPickerDone => 'Готово';
+
+  @override
+  String rabbitMultiPickerSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Выбрано $count',
+      many: 'Выбрано $count',
+      few: 'Выбрано $count',
+      one: 'Выбран $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transactionSaleBatch => 'Продать партией';
+
+  @override
+  String ageYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count года',
+      many: '$count лет',
+      few: '$count года',
+      one: '$count год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageYearsMonths(int years, int months) {
+    return '$years г $months мес';
+  }
+
+  @override
+  String get feedTypePellets => 'Гранулы';
+
+  @override
+  String get feedTypeHay => 'Сено';
+
+  @override
+  String get feedTypeVegetables => 'Овощи';
+
+  @override
+  String get feedTypeGrain => 'Зерно';
+
+  @override
+  String get feedTypeSupplements => 'Добавки';
+
+  @override
+  String get feedTypeOther => 'Другое';
+
+  @override
+  String get feedUnitKg => 'кг';
+
+  @override
+  String get feedUnitLiter => 'л';
+
+  @override
+  String get feedUnitPiece => 'шт';
+
+  @override
+  String get vaccineTypeVhd => 'ВГБК';
+
+  @override
+  String get vaccineTypeMyxomatosis => 'Миксоматоз';
+
+  @override
+  String get vaccineTypePasteurellosis => 'Пастереллёз';
+
+  @override
+  String get vaccineTypeOther => 'Другое';
+
+  @override
+  String get vaccineFullVhd =>
+      'Вирусная геморрагическая болезнь кроликов (ВГБК)';
+
+  @override
+  String offlineRejectedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записи не сохранились',
+      many: '$count записей не сохранились',
+      few: '$count записи не сохранились',
+      one: '$count запись не сохранилась',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineRejectedBody => 'Их не принял сервер — запишите заново.';
+
+  @override
+  String get offlineRejectedDismiss => 'Понятно';
+
+  @override
   String get quickRecordVaccination => 'Записать вакцинацию';
 
   @override
@@ -2112,6 +2278,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitsFilterSold => 'Проданы';
 
   @override
+  String get rabbitsFilterDead => 'Павшие';
+
+  @override
   String get sexMale => 'Самец';
 
   @override
@@ -2427,6 +2596,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsLogout => 'Выйти из аккаунта';
 
   @override
+  String get logoutDialogTitle => 'Выйти из аккаунта?';
+
+  @override
+  String get logoutDialogBody =>
+      'Записи останутся на сервере — вы снова увидите их после входа.';
+
+  @override
+  String get logoutDialogConfirm => 'Выйти';
+
+  @override
   String get settingsThemeLight => 'Светлая';
 
   @override
@@ -2474,6 +2653,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get subscriptionPay => 'Оплатить';
+
+  @override
+  String get subscriptionPayAbroadTitle =>
+      'Оплата картой пока только в Таджикистане';
+
+  @override
+  String get subscriptionPayAbroadBody =>
+      'Мы продлим тариф вручную — напишите в поддержку, и вам ответят.';
+
+  @override
+  String get subscriptionPayAbroadAction => 'Написать в поддержку';
 
   @override
   String get subscriptionOpenPaymentPage => 'Открыть страницу оплаты';
@@ -4507,6 +4697,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onbSkip => 'Пропустить';
+
+  @override
+  String get onbCountryTitle => 'Где ваше хозяйство?';
+
+  @override
+  String get onbCountrySubtitle =>
+      'От этого зависят валюта, время и способ входа';
+
+  @override
+  String get countryTJ => 'Таджикистан';
+
+  @override
+  String get countryUZ => 'Узбекистан';
+
+  @override
+  String get countryKG => 'Кыргызстан';
+
+  @override
+  String get countryKZ => 'Казахстан';
+
+  @override
+  String get countryRU => 'Россия';
+
+  @override
+  String get countryAF => 'Афганистан';
+
+  @override
+  String get loginSmsUnavailable =>
+      'В вашей стране код по СМС не приходит — входите по почте';
 
   @override
   String get firstStepCages => 'Завести клетки';

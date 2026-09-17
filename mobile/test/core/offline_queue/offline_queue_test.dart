@@ -28,6 +28,11 @@ import 'package:mobile/features/rabbits/data/models/breeding_model.dart';
 import 'package:mobile/features/rabbits/data/models/rabbit_model.dart';
 import 'package:mobile/features/rabbits/data/repositories/births_repository.dart';
 import 'package:mobile/features/rabbits/data/repositories/rabbits_repository.dart';
+import 'package:mobile/features/health/data/models/medical_record_model.dart';
+import 'package:mobile/features/health/data/models/vaccination_model.dart';
+import 'package:mobile/features/health/data/repositories/medical_records_repository.dart';
+import 'package:mobile/features/health/presentation/providers/medical_records_provider.dart';
+import 'package:mobile/features/health/data/repositories/vaccinations_repository.dart';
 import 'package:mobile/features/rabbits/presentation/providers/rabbits_provider.dart';
 
 /// Репозиторий задач без сети: только то, что нужно очереди — список для
@@ -250,6 +255,49 @@ Future<void> _settle() async {
   }
 }
 
+/// Лечение и прививка: очередь шлёт их готовым телом запроса, поэтому от
+/// репозитория нужен только приём Map и возможность отказать.
+class _FakeMedicalRepository extends MedicalRecordsRepository {
+  _FakeMedicalRepository({this.error})
+      : super(ApiClient(storage: const FlutterSecureStorage()));
+
+  final Object? error;
+  final sent = <Map<String, dynamic>>[];
+
+  @override
+  Future<MedicalRecord> createMedicalRecordFromJson(
+      Map<String, dynamic> data) async {
+    if (error != null) throw error!;
+    sent.add(data);
+    return MedicalRecord(
+      id: 1,
+      rabbitId: data['rabbit_id'] as int,
+      symptoms: data['symptoms'] as String? ?? '',
+      startedAt: DateTime.parse(data['started_at'] as String),
+      outcome: MedicalOutcome.ongoing,
+    );
+  }
+}
+
+class _FakeVaccinationsRepository extends VaccinationsRepository {
+  _FakeVaccinationsRepository()
+      : super(apiClient: ApiClient(storage: const FlutterSecureStorage()));
+  final sent = <Map<String, dynamic>>[];
+
+  @override
+  Future<Vaccination> createVaccinationFromJson(
+      Map<String, dynamic> data) async {
+    sent.add(data);
+    return Vaccination(
+      id: 1,
+      rabbitId: data['rabbit_id'] as int,
+      vaccineName: data['vaccine_name'] as String,
+      vaccineType: VaccineType.other,
+      vaccinationDate: DateTime.parse(data['vaccination_date'] as String),
+    );
+  }
+}
+
 ProviderContainer _container({
   required Stream<bool> online,
   String? scope,
@@ -259,6 +307,8 @@ ProviderContainer _container({
   BirthsRepository? births,
   BreedingRepository? breeding,
   RabbitsRepository? rabbits,
+  MedicalRecordsRepository? medical,
+  VaccinationsRepository? vaccinations,
 }) {
   final container = ProviderContainer(
     overrides: [
@@ -272,6 +322,10 @@ ProviderContainer _container({
       if (breeding != null)
         breedingRepositoryProvider.overrideWithValue(breeding),
       if (rabbits != null) rabbitsRepositoryProvider.overrideWithValue(rabbits),
+      if (medical != null)
+        medicalRecordsRepositoryProvider.overrideWithValue(medical),
+      if (vaccinations != null)
+        vaccinationsRepositoryProvider.overrideWithValue(vaccinations),
     ],
   );
   addTearDown(container.dispose);
@@ -448,6 +502,70 @@ void main() {
           'death_date': '2026-09-14',
           'death_reason': 'Не ела два дня',
         });
+      });
+
+      test('лечение и прививка тоже уходят через очередь', () async {
+        // Их фермер назвал первыми: укол ставят, стоя рядом с кроликом в
+        // сарае, где связи нет. До сих пор такая запись пропадала молча —
+        // форма говорила «сохранено», а записи не было.
+        final medical = _FakeMedicalRepository();
+        final vaccinations = _FakeVaccinationsRepository();
+        final container = _container(
+          online: Stream.value(true),
+          medical: medical,
+          vaccinations: vaccinations,
+        );
+        await _settle();
+
+        final controller = container.read(offlineQueueProvider.notifier);
+        await controller.enqueue(OfflineActionType.medicalRecord, {
+          'rabbit_id': 7,
+          'symptoms': 'Не ест второй день',
+          'started_at': '2026-09-16',
+        });
+        await controller.enqueue(OfflineActionType.vaccination, {
+          'rabbit_id': 7,
+          'vaccine_name': 'ВГБК',
+          'vaccine_type': 'other',
+          'vaccination_date': '2026-09-16',
+        });
+
+        await controller.flush();
+
+        expect(container.read(offlineQueueProvider), isEmpty);
+        expect(medical.sent.single['symptoms'], 'Не ест второй день');
+        expect(vaccinations.sent.single['vaccine_name'], 'ВГБК');
+      });
+
+      test('отвергнутая сервером запись не пропадает молча', () async {
+        // Повторами такой отказ не лечится, но и выбрасывать запись нельзя:
+        // человек доверил очереди работу вместо того, чтобы держать её в
+        // голове, и должен узнать, что записывать придётся заново.
+        final medical = _FakeMedicalRepository(
+          error: const ApiFailure(ApiFailureKind.invalid),
+        );
+        final container = _container(
+          online: Stream.value(true),
+          medical: medical,
+        );
+        await _settle();
+
+        final controller = container.read(offlineQueueProvider.notifier);
+        await controller.enqueue(OfflineActionType.medicalRecord, {
+          'rabbit_id': 7,
+          'symptoms': 'Хромает',
+          'started_at': '2026-09-16',
+        });
+
+        await controller.flush();
+
+        // Из очереди ушла — повторять бессмысленно.
+        expect(container.read(offlineQueueProvider), isEmpty);
+        // Но человеку про неё скажут.
+        final rejected = container.read(offlineRejectedProvider);
+        expect(rejected, hasLength(1));
+        expect(rejected.single.type, OfflineActionType.medicalRecord);
+        expect(rejected.single.payload['symptoms'], 'Хромает');
       });
 
       test(

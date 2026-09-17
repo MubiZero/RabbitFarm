@@ -17,7 +17,11 @@ const { Op, Sequelize } = require('sequelize');
 const { closeAutoTasks } = require('./autoTaskService');
 const logger = require('../utils/logger');
 const { deleteFile } = require('../utils/fileStorage');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  DEFAULT_TIMEZONE
+} = require('../utils/dateRange');
 const planService = require('./planService');
 
 /**
@@ -108,6 +112,17 @@ class RabbitService {
         }
       }
 
+      // Пустое клеймо — это его отсутствие, а не значение. Форма при пустом
+      // поле шлёт пустую строку, и она доезжала до базы как обычное
+      // значение: уникальный индекс (unique_user_rabbit_tag) рассчитан на
+      // NULL — «кролики без бирки друг другу не мешают», — а две пустые
+      // строки он считает дубликатом. Проверка ниже такую строку пропускала
+      // (условие ложно), и наружу вылезал сырой конфликт «Такая запись уже
+      // существует» на втором же кролике без бирки.
+      if (!rabbitData.tag_id || !String(rabbitData.tag_id).trim()) {
+        rabbitData.tag_id = null;
+      }
+
       // Клеймо уникально в пределах фермы: у соседа может быть такое же
       if (rabbitData.tag_id) {
         const existing = await Rabbit.findOne({
@@ -141,6 +156,91 @@ class RabbitService {
     } catch (error) {
       await transaction.rollback();
       logger.error('Create rabbit error', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Завести сразу несколько кроликов по одному образцу.
+   *
+   * Так переносят на приложение уже существующее стадо: у фермы триста
+   * голов, порода одна-две, пол известен, возраст примерный. Заводить их по
+   * одному — триста заполненных форм, и именно на этом перенос
+   * останавливался, не начавшись.
+   *
+   * Клеймо каждому даётся своё: либо по образцу `R-001`, `R-002`, либо
+   * никакого — тогда в базе NULL, и кролики без бирки друг другу не мешают.
+   */
+  async createRabbitsBulk({ count, tag_prefix, farm_id: farmId, ...template }) {
+    const total = parseInt(count, 10);
+    if (Number.isNaN(total) || total < 1 || total > 100) {
+      throw new Error('BULK_COUNT_INVALID');
+    }
+
+    // Лимит тарифа проверяется на всю пачку сразу, до первой записи: иначе
+    // ферма ушла бы за предел и узнала об этом на середине переноса.
+    await planService.assertRabbitLimit(farmId, total);
+
+    const breed = await Breed.findOne({
+      where: { id: template.breed_id, farm_id: farmId }
+    });
+    if (!breed) throw new Error('BREED_NOT_FOUND');
+
+    if (template.cage_id) {
+      const cage = await Cage.findOne({
+        where: { id: template.cage_id, farm_id: farmId }
+      });
+      if (!cage) throw new Error('CAGE_NOT_FOUND');
+
+      const occupied = await Rabbit.count({
+        where: { cage_id: template.cage_id, farm_id: farmId }
+      });
+      if (occupied + total > cage.capacity) {
+        throw new Error('CAGE_FULL');
+      }
+    }
+
+    // Назначение — то же, что у одиночного кролика: хозяйство называет его
+    // один раз.
+    let purpose = template.purpose;
+    if (!purpose) {
+      const farm = await Farm.findByPk(farmId, {
+        attributes: ['default_purpose']
+      });
+      purpose = farm?.default_purpose || 'breeding';
+    }
+
+    const prefix = (tag_prefix || '').trim();
+    const rows = [];
+    for (let i = 1; i <= total; i++) {
+      rows.push({
+        ...template,
+        farm_id: farmId,
+        purpose,
+        tag_id: prefix ? `${prefix}${String(i).padStart(3, '0')}` : null
+      });
+    }
+
+    const transaction = await sequelize.transaction();
+    try {
+      // Клейма проверяются одним запросом: сто отдельных проверок внутри
+      // транзакции держали бы её открытой дольше самой вставки.
+      if (prefix) {
+        const taken = await Rabbit.findOne({
+          where: { farm_id: farmId, tag_id: rows.map((row) => row.tag_id) },
+          transaction
+        });
+        if (taken) throw new Error('TAG_ID_EXISTS');
+      }
+
+      const created = await Rabbit.bulkCreate(rows, { transaction });
+      await transaction.commit();
+
+      logger.info('Rabbits created in bulk', { farmId, count: created.length });
+      return created;
+    } catch (error) {
+      if (!transaction.finished) await transaction.rollback();
+      logger.error('Bulk rabbit create error', { error: error.message });
       throw error;
     }
   }
@@ -405,6 +505,13 @@ class RabbitService {
         if (!mother) throw new Error('MOTHER_NOT_FOUND_OR_INVALID_SEX');
       }
 
+      // То же, что при создании: очистка поля бирки означает её отсутствие.
+      // Пустая строка ломается об уникальный индекс, рассчитанный на NULL.
+      if (updateData.tag_id !== undefined &&
+          (!updateData.tag_id || !String(updateData.tag_id).trim())) {
+        updateData.tag_id = null;
+      }
+
       // Клеймо уникально в пределах фермы (если его меняют)
       if (updateData.tag_id && updateData.tag_id !== rabbit.tag_id) {
         const existing = await Rabbit.findOne({
@@ -660,7 +767,7 @@ class RabbitService {
    * @param {Number} farmId - id хозяйства
    * @param {Object} filters - { page, limit, sort_by, sort_order, from_date, to_date }
    */
-  async listFarmGalleryPhotos(farmId, filters = {}) {
+  async listFarmGalleryPhotos(farmId, filters = {}, timeZone = DEFAULT_TIMEZONE) {
     const {
       page = 1,
       limit = 50,
@@ -675,8 +782,8 @@ class RabbitService {
 
     if (from_date || to_date) {
       where.created_at = {};
-      if (from_date) where.created_at[Op.gte] = startOfDayUtc(from_date);
-      if (to_date) where.created_at[Op.lt] = nextDayUtc(to_date);
+      if (from_date) where.created_at[Op.gte] = startOfDayInZone(from_date, timeZone);
+      if (to_date) where.created_at[Op.lt] = nextDayInZone(to_date, timeZone);
     }
 
     const { count, rows } = await Photo.findAndCountAll({

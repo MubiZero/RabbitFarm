@@ -135,6 +135,73 @@
   "farmTitle": "Хоҷагӣ",
   "navQuickTitle": "Чиро сабт кунем",
   "quickRecordFeeding": "Хӯрокдиҳиро сабт кардан",
+  "quickNeedsConnection": "Алоқа лозим аст",
+  "taskReminderLabel": "Пешакӣ хотиррасон кардан",
+  "taskReminderNone": "Хотиррасон накардан",
+  "taskReminder15m": "15 дақиқа пеш",
+  "taskReminder1h": "Як соат пеш",
+  "taskReminder3h": "3 соат пеш",
+  "taskReminder1d": "Як рӯз пеш",
+  "taskReminder2d": "Ду рӯз пеш",
+  "bulkHerdTitle": "Якчандтоӣ илова кардан",
+  "bulkHerdSubtitle": "Барои кӯчонидани рамаи мавҷуда",
+  "bulkHerdCount": "Чанд сар",
+  "bulkHerdTagPrefix": "Оғози тамға",
+  "bulkHerdTagPrefixHint": "Масалан, R- — R-001, R-002 мешавад",
+  "bulkHerdTagPrefixEmpty": "Агар тамға набошад, холӣ монед",
+  "bulkHerdCountInvalid": "Аз 1 то 100",
+  "bulkHerdDone": "{count, plural, one{{count} харгӯш илова шуд} other{{count} харгӯш илова шуд}}",
+  "@bulkHerdDone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rabbitMultiPickerTitle": "Кӣ дар даста",
+  "rabbitMultiPickerLabel": "Харгӯшҳо",
+  "rabbitMultiPickerEmpty": "Касе интихоб нашуд",
+  "rabbitMultiPickerDone": "Тайёр",
+  "rabbitMultiPickerSelected": "{count, plural, one{Интихоб шуд {count}} other{Интихоб шуданд {count}}}",
+  "@rabbitMultiPickerSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionSaleBatch": "Дастаҷамъӣ фурӯхтан",
+  "ageYears": "{count, plural, one{{count} сол} other{{count} сол}}",
+  "@ageYears": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ageYearsMonths": "{years} с {months} моҳ",
+  "@ageYearsMonths": {
+    "placeholders": {
+      "years": { "type": "int" },
+      "months": { "type": "int" }
+    }
+  },
+  "feedTypePellets": "Гранула",
+  "feedTypeHay": "Хасбеда",
+  "feedTypeVegetables": "Сабзавот",
+  "feedTypeGrain": "Ғалла",
+  "feedTypeSupplements": "Иловагиҳо",
+  "feedTypeOther": "Дигар",
+  "feedUnitKg": "кг",
+  "feedUnitLiter": "л",
+  "feedUnitPiece": "дона",
+  "vaccineTypeVhd": "БГВХ",
+  "vaccineTypeMyxomatosis": "Миксоматоз",
+  "vaccineTypePasteurellosis": "Пастереллёз",
+  "vaccineTypeOther": "Дигар",
+  "vaccineFullVhd": "Бемории геморрагии вирусии харгӯшҳо (БГВХ)",
+  "offlineRejectedTitle": "{count, plural, one{{count} сабт нигоҳ дошта нашуд} other{{count} сабт нигоҳ дошта нашуданд}}",
+  "@offlineRejectedTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "offlineRejectedBody": "Сервер онҳоро қабул накард — аз нав нависед.",
+  "offlineRejectedDismiss": "Фаҳмидам",
   "quickRecordVaccination": "Эмкуниро сабт кардан",
   "quickCreateTask": "Вазифа сохтан",
   "quickRecordNote": "Қайд гузоштан",
@@ -626,6 +693,7 @@
   "rabbitsFilterFemales": "Модаҳо",
   "rabbitsFilterActive": "Дар кор",
   "rabbitsFilterSold": "Фурӯхташуда",
+  "rabbitsFilterDead": "Талафшуда",
   "sexMale": "Нар",
   "sexFemale": "Мода",
   "sexUnknown": "Ҷинс ишора нашудааст",
@@ -728,6 +796,9 @@
   "supportContactHint": "Ё бевосита алоқа кунед:",
   "settingsPrivacyPolicy": "Сиёсати махфият",
   "settingsLogout": "Аз ҳисоб баромадан",
+  "logoutDialogTitle": "Аз ҳисоб баромадан?",
+  "logoutDialogBody": "Сабтҳо дар сервер мемонанд — пас аз воридшавӣ онҳоро дубора мебинед.",
+  "logoutDialogConfirm": "Баромадан",
   "settingsThemeLight": "Равшан",
   "settingsThemeSystem": "Мисли система",
   "settingsThemeDark": "Торик",
@@ -742,6 +813,9 @@
   "subscriptionExpired": "Мӯҳлаташ {date} гузашт",
   "subscriptionPricePerPeriod": "{price} сомонӣ / 30 рӯз",
   "subscriptionPay": "Пардохт кардан",
+  "subscriptionPayAbroadTitle": "Пардохт бо корт ҳоло танҳо дар Тоҷикистон",
+  "subscriptionPayAbroadBody": "Мо тарифро дастӣ дароз мекунем — ба дастгирӣ нависед, ҷавоб медиҳанд.",
+  "subscriptionPayAbroadAction": "Ба дастгирӣ навиштан",
   "subscriptionOpenPaymentPage": "Саҳифаи пардохтро кушодан",
   "subscriptionAfterPayingHint": "Бо ҳамон истинод пардохт кунед, баъд ба ин ҷо баргардед ва «Пардохтро санҷидан»-ро зер кунед.",
   "subscriptionCheckPayment": "Пардохтро санҷидан",
@@ -1320,6 +1394,15 @@
   "onbDoneCreate": "Хоҷагӣ сохтан",
   "onbBack": "Бозгашт",
   "onbSkip": "Гузарондан",
+  "onbCountryTitle": "Хоҷагии шумо дар куҷост?",
+  "onbCountrySubtitle": "Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст",
+  "countryTJ": "Тоҷикистон",
+  "countryUZ": "Ӯзбекистон",
+  "countryKG": "Қирғизистон",
+  "countryKZ": "Қазоқистон",
+  "countryRU": "Русия",
+  "countryAF": "Афғонистон",
+  "loginSmsUnavailable": "Дар кишвари шумо рамз бо СМС намеояд — бо почта ворид шавед",
   "firstStepCages": "Қафасҳоро эҷод кунед",
   "firstStepRabbits": "Модаҳо ва нарҳоро илова кунед",
   "firstStepBreeding": "Ҷуфтшавии якумро сабт кунед",

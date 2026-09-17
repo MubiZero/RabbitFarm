@@ -19,35 +19,6 @@ enum VaccineType {
   other, // Другое
 }
 
-/// Extension for VaccineType display names
-extension VaccineTypeExtension on VaccineType {
-  String get displayName {
-    switch (this) {
-      case VaccineType.vhd:
-        return 'ВГБК';
-      case VaccineType.myxomatosis:
-        return 'Миксоматоз';
-      case VaccineType.pasteurellosis:
-        return 'Пастереллез';
-      case VaccineType.other:
-        return 'Другое';
-    }
-  }
-
-  String get fullName {
-    switch (this) {
-      case VaccineType.vhd:
-        return 'Вирусная геморрагическая болезнь кроликов (ВГБК)';
-      case VaccineType.myxomatosis:
-        return 'Миксоматоз';
-      case VaccineType.pasteurellosis:
-        return 'Пастереллез';
-      case VaccineType.other:
-        return 'Другое';
-    }
-  }
-}
-
 @freezed
 abstract class Vaccination with _$Vaccination {
   const factory Vaccination({

@@ -53,6 +53,12 @@ class StatusBadge extends StatelessWidget {
         ),
     };
 
+    // Подложка — тот же цвет с прозрачностью, а текст читаемого оттенка:
+    // сам цвет на своей же бледной подложке давал 1.91–3.10 при норме 4.5,
+    // и «Продан» в светлой теме просто сливался.
+    final textColor =
+        AppColors.readableOn(color, Theme.of(context).brightness);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -61,7 +67,7 @@ class StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTypography.labelSm.copyWith(color: color),
+        style: AppTypography.labelSm.copyWith(color: textColor),
       ),
     );
   }

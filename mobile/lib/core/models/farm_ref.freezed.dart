@@ -19,7 +19,13 @@ mixin _$FarmRef {
 @IntConverter() int get id; String get status;/// Кого это хозяйство держит: назначение, которое форма подставляет
 /// новому кролику. Пусто — хозяйство ещё не сказало, и действует
 /// «племя», как и на сервере.
-@JsonKey(name: 'default_purpose') String? get defaultPurpose;
+@JsonKey(name: 'default_purpose') String? get defaultPurpose;/// Страна хозяйства и то, что из неё следует. Валюта нужна, чтобы суммы
+/// показывались своим знаком, а не одним на весь сервис; страна — чтобы
+/// экран подписки знал, принимаем ли мы здесь оплату картой.
+///
+/// Значений может не быть у ответа старого сервера — тогда действуют
+/// таджикские умолчания, как и было до появления выбора страны.
+ String? get country; String? get currency; String? get timezone;
 /// Create a copy of FarmRef
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -33,20 +39,20 @@ $FarmRefCopyWith<FarmRef> get copyWith => _$FarmRefCopyWithImpl<FarmRef>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as FarmRef;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FarmRef&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.defaultPurpose, _this.defaultPurpose) || other.defaultPurpose == _this.defaultPurpose));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FarmRef&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.defaultPurpose, _this.defaultPurpose) || other.defaultPurpose == _this.defaultPurpose)&&(identical(other.country, _this.country) || other.country == _this.country)&&(identical(other.currency, _this.currency) || other.currency == _this.currency)&&(identical(other.timezone, _this.timezone) || other.timezone == _this.timezone));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as FarmRef;
-  return Object.hash(runtimeType,_this.id,_this.status,_this.defaultPurpose);
+  return Object.hash(runtimeType,_this.id,_this.status,_this.defaultPurpose,_this.country,_this.currency,_this.timezone);
 }
 
 @override
 String toString() {
   final _this = this as FarmRef;
-  return 'FarmRef(id: ${_this.id}, status: ${_this.status}, defaultPurpose: ${_this.defaultPurpose})';
+  return 'FarmRef(id: ${_this.id}, status: ${_this.status}, defaultPurpose: ${_this.defaultPurpose}, country: ${_this.country}, currency: ${_this.currency}, timezone: ${_this.timezone})';
 }
 
 
@@ -57,7 +63,7 @@ abstract mixin class $FarmRefCopyWith<$Res>  {
   factory $FarmRefCopyWith(FarmRef value, $Res Function(FarmRef) _then) = _$FarmRefCopyWithImpl;
 @useResult
 $Res call({
-@IntConverter() int id, String status,@JsonKey(name: 'default_purpose') String? defaultPurpose
+@IntConverter() int id, String status,@JsonKey(name: 'default_purpose') String? defaultPurpose, String? country, String? currency, String? timezone
 });
 
 
@@ -74,11 +80,14 @@ class _$FarmRefCopyWithImpl<$Res>
 
 /// Create a copy of FarmRef
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? defaultPurpose = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? defaultPurpose = freezed,Object? country = freezed,Object? currency = freezed,Object? timezone = freezed,}) {
   return _then(FarmRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,defaultPurpose: freezed == defaultPurpose ? _self.defaultPurpose : defaultPurpose // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String?,timezone: freezed == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -164,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose,  String? country,  String? currency,  String? timezone)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FarmRef() when $default != null:
-return $default(_that.id,_that.status,_that.defaultPurpose);case _:
+return $default(_that.id,_that.status,_that.defaultPurpose,_that.country,_that.currency,_that.timezone);case _:
   return orElse();
 
 }
@@ -185,10 +194,10 @@ return $default(_that.id,_that.status,_that.defaultPurpose);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose,  String? country,  String? currency,  String? timezone)  $default,) {final _that = this;
 switch (_that) {
 case _FarmRef():
-return $default(_that.id,_that.status,_that.defaultPurpose);case _:
+return $default(_that.id,_that.status,_that.defaultPurpose,_that.country,_that.currency,_that.timezone);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +214,10 @@ return $default(_that.id,_that.status,_that.defaultPurpose);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@IntConverter()  int id,  String status, @JsonKey(name: 'default_purpose')  String? defaultPurpose,  String? country,  String? currency,  String? timezone)?  $default,) {final _that = this;
 switch (_that) {
 case _FarmRef() when $default != null:
-return $default(_that.id,_that.status,_that.defaultPurpose);case _:
+return $default(_that.id,_that.status,_that.defaultPurpose,_that.country,_that.currency,_that.timezone);case _:
   return null;
 
 }
@@ -220,7 +229,7 @@ return $default(_that.id,_that.status,_that.defaultPurpose);case _:
 @JsonSerializable()
 
 class _FarmRef implements FarmRef {
-  const _FarmRef({@IntConverter() required this.id, required this.status, @JsonKey(name: 'default_purpose') this.defaultPurpose});
+  const _FarmRef({@IntConverter() required this.id, required this.status, @JsonKey(name: 'default_purpose') this.defaultPurpose, this.country, this.currency, this.timezone});
   factory _FarmRef.fromJson(Map<String, dynamic> json) => _$FarmRefFromJson(json);
 
 @override@IntConverter() final  int id;
@@ -229,6 +238,15 @@ class _FarmRef implements FarmRef {
 /// новому кролику. Пусто — хозяйство ещё не сказало, и действует
 /// «племя», как и на сервере.
 @override@JsonKey(name: 'default_purpose') final  String? defaultPurpose;
+/// Страна хозяйства и то, что из неё следует. Валюта нужна, чтобы суммы
+/// показывались своим знаком, а не одним на весь сервис; страна — чтобы
+/// экран подписки знал, принимаем ли мы здесь оплату картой.
+///
+/// Значений может не быть у ответа старого сервера — тогда действуют
+/// таджикские умолчания, как и было до появления выбора страны.
+@override final  String? country;
+@override final  String? currency;
+@override final  String? timezone;
 
 /// Create a copy of FarmRef
 /// with the given fields replaced by the non-null parameter values.
@@ -243,18 +261,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FarmRef&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.defaultPurpose, defaultPurpose) || other.defaultPurpose == defaultPurpose));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FarmRef&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.defaultPurpose, defaultPurpose) || other.defaultPurpose == defaultPurpose)&&(identical(other.country, country) || other.country == country)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.timezone, timezone) || other.timezone == timezone));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,status,defaultPurpose);
+    return Object.hash(runtimeType,id,status,defaultPurpose,country,currency,timezone);
 }
 
 @override
 String toString() {
-    return 'FarmRef(id: $id, status: $status, defaultPurpose: $defaultPurpose)';
+    return 'FarmRef(id: $id, status: $status, defaultPurpose: $defaultPurpose, country: $country, currency: $currency, timezone: $timezone)';
 }
 
 
@@ -265,7 +283,7 @@ abstract mixin class _$FarmRefCopyWith<$Res> implements $FarmRefCopyWith<$Res> {
   factory _$FarmRefCopyWith(_FarmRef value, $Res Function(_FarmRef) _then) = __$FarmRefCopyWithImpl;
 @override @useResult
 $Res call({
-@IntConverter() int id, String status,@JsonKey(name: 'default_purpose') String? defaultPurpose
+@IntConverter() int id, String status,@JsonKey(name: 'default_purpose') String? defaultPurpose, String? country, String? currency, String? timezone
 });
 
 
@@ -282,11 +300,14 @@ class __$FarmRefCopyWithImpl<$Res>
 
 /// Create a copy of FarmRef
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? defaultPurpose = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? defaultPurpose = freezed,Object? country = freezed,Object? currency = freezed,Object? timezone = freezed,}) {
   return _then(_FarmRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,defaultPurpose: freezed == defaultPurpose ? _self.defaultPurpose : defaultPurpose // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String?,timezone: freezed == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

@@ -3706,7 +3706,7 @@ $FeedingDataCopyWith<$Res> get feeding {
 /// @nodoc
 mixin _$ReportPeriod {
 
- String get from; String get to;
+ String? get from; String? get to;
 /// Create a copy of ReportPeriod
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3744,7 +3744,7 @@ abstract mixin class $ReportPeriodCopyWith<$Res>  {
   factory $ReportPeriodCopyWith(ReportPeriod value, $Res Function(ReportPeriod) _then) = _$ReportPeriodCopyWithImpl;
 @useResult
 $Res call({
- String from, String to
+ String? from, String? to
 });
 
 
@@ -3761,11 +3761,11 @@ class _$ReportPeriodCopyWithImpl<$Res>
 
 /// Create a copy of ReportPeriod
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? from = null,Object? to = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? from = freezed,Object? to = freezed,}) {
   return _then(ReportPeriod(
-from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
-as String,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
-as String,
+from: freezed == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as String?,to: freezed == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -3850,7 +3850,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String from,  String to)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? from,  String? to)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReportPeriod() when $default != null:
 return $default(_that.from,_that.to);case _:
@@ -3871,7 +3871,7 @@ return $default(_that.from,_that.to);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String from,  String to)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? from,  String? to)  $default,) {final _that = this;
 switch (_that) {
 case _ReportPeriod():
 return $default(_that.from,_that.to);case _:
@@ -3891,7 +3891,7 @@ return $default(_that.from,_that.to);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String from,  String to)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? from,  String? to)?  $default,) {final _that = this;
 switch (_that) {
 case _ReportPeriod() when $default != null:
 return $default(_that.from,_that.to);case _:
@@ -3906,11 +3906,11 @@ return $default(_that.from,_that.to);case _:
 @JsonSerializable()
 
 class _ReportPeriod implements ReportPeriod {
-  const _ReportPeriod({required this.from, required this.to});
+  const _ReportPeriod({this.from, this.to});
   factory _ReportPeriod.fromJson(Map<String, dynamic> json) => _$ReportPeriodFromJson(json);
 
-@override final  String from;
-@override final  String to;
+@override final  String? from;
+@override final  String? to;
 
 /// Create a copy of ReportPeriod
 /// with the given fields replaced by the non-null parameter values.
@@ -3947,7 +3947,7 @@ abstract mixin class _$ReportPeriodCopyWith<$Res> implements $ReportPeriodCopyWi
   factory _$ReportPeriodCopyWith(_ReportPeriod value, $Res Function(_ReportPeriod) _then) = __$ReportPeriodCopyWithImpl;
 @override @useResult
 $Res call({
- String from, String to
+ String? from, String? to
 });
 
 
@@ -3964,11 +3964,11 @@ class __$ReportPeriodCopyWithImpl<$Res>
 
 /// Create a copy of ReportPeriod
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? from = null,Object? to = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? from = freezed,Object? to = freezed,}) {
   return _then(_ReportPeriod(
-from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
-as String,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
-as String,
+from: freezed == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as String?,to: freezed == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

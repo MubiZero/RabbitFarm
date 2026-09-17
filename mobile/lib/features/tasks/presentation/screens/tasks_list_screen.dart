@@ -240,6 +240,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
             ),
             const SizedBox(height: AppSpacing.lg),
             DropdownButtonFormField<TaskType>(
+              isExpanded: true,
               initialValue: _type,
               decoration:
                   InputDecoration(labelText: context.l10n.tasksFilterType),
@@ -254,6 +255,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
             ),
             const SizedBox(height: AppSpacing.md),
             DropdownButtonFormField<TaskStatus>(
+              isExpanded: true,
               initialValue: _status,
               decoration:
                   InputDecoration(labelText: context.l10n.tasksFilterStatus),
@@ -268,6 +270,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
             ),
             const SizedBox(height: AppSpacing.md),
             DropdownButtonFormField<TaskPriority>(
+              isExpanded: true,
               initialValue: _priority,
               decoration:
                   InputDecoration(labelText: context.l10n.tasksFilterPriority),

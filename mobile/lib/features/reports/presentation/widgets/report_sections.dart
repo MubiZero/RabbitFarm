@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/countries/farm_currency.dart';
 
 /// Общие кирпичи трёх отчётов.
 ///
@@ -15,16 +16,13 @@ import '../../../../core/widgets/widgets.dart';
 
 /// Выбор периода отчёта.
 ///
-/// «Всё время» из [StatsPeriod] здесь намеренно нет: сервер, не получив
-/// `from_date`, считает отчёт по ферме за последние 30 дней. Подпись обещала бы
-/// историю фермы целиком, а цифры пришли бы за месяц — это хуже, чем не
-/// предлагать такой выбор вовсе.
+/// «Всё время» вернулось в список: раньше его убрали, потому что сервер, не
+/// получив `from_date`, считал отчёт по ферме за последние 30 дней — подпись
+/// обещала бы историю целиком, а числа пришли бы за месяц. Теперь пустой
+/// период на сервере и означает «за всё время», одинаково для всех трёх
+/// вкладок, и предлагать этот выбор снова честно.
 class ReportPeriodBar extends StatelessWidget {
-  static const periods = [
-    StatsPeriod.month,
-    StatsPeriod.quarter,
-    StatsPeriod.year,
-  ];
+  static const periods = StatsPeriod.values;
 
   final StatsPeriod selected;
   final ValueChanged<StatsPeriod> onChanged;
@@ -56,15 +54,26 @@ class ReportPeriodBar extends StatelessWidget {
 /// подставить свои границы, и человек должен видеть, за что на самом деле
 /// посчитаны числа под этой подписью.
 class ReportPeriodCaption extends StatelessWidget {
-  final String from;
-  final String to;
+  final String? from;
+  final String? to;
 
   const ReportPeriodCaption({super.key, required this.from, required this.to});
 
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+
+    // Границ нет — значит показан весь срок жизни хозяйства. Подставлять сюда
+    // сегодняшнюю дату было бы враньём о периоде.
+    final caption = (from == null && to == null)
+        ? context.l10n.periodAll
+        : context.l10n.reportsPeriodRange(
+            _format(from, locale),
+            _format(to, locale),
+          );
+
     return Text(
-      context.l10n.reportsPeriodRange(_format(from), _format(to)),
+      caption,
       style: AppTypography.labelSm
           .copyWith(color: context.colors.onSurfaceVariant),
     );
@@ -73,10 +82,11 @@ class ReportPeriodCaption extends StatelessWidget {
   /// Даты приходят строкой «2026-08-21». Неразобранную строку показываем как
   /// есть: подставить сегодняшнее число вместо непонятного значения — значит
   /// соврать о периоде.
-  String _format(String raw) {
+  String _format(String? raw, Locale locale) {
+    if (raw == null) return '—';
     final date = DateTime.tryParse(raw);
     if (date == null) return raw;
-    return DateFormat('d MMMM yyyy', 'ru_RU').format(date);
+    return DateFormat('d MMMM yyyy', dateSymbolsLocale(locale)).format(date);
   }
 }
 
@@ -268,7 +278,7 @@ class ReportMoneySummary extends StatelessWidget {
               child: StatTile(
                 icon: Icons.arrow_upward,
                 label: context.l10n.financeIncome,
-                value: formatMoney(income),
+                value: context.money(income),
                 accent: AppColors.success,
               ),
             ),
@@ -277,7 +287,7 @@ class ReportMoneySummary extends StatelessWidget {
               child: StatTile(
                 icon: Icons.arrow_downward,
                 label: context.l10n.financeExpenses,
-                value: formatMoney(expenses),
+                value: context.money(expenses),
                 accent: AppColors.error,
               ),
             ),
@@ -307,7 +317,7 @@ class ReportMoneySummary extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      formatMoney(netProfit.abs()),
+                      context.money(netProfit.abs()),
                       style: AppTypography.displayMd.copyWith(
                         color: isProfit ? AppColors.success : AppColors.error,
                         fontFeatures: const [FontFeature.tabularFigures()],

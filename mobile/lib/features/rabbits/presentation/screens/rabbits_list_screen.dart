@@ -65,7 +65,19 @@ class _RabbitsListScreenState extends ConsumerState<RabbitsListScreen> {
     final canManage = ref.watch(canProvider(FarmCapability.manageLivestock));
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.rabbitsTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.rabbitsTitle),
+        actions: [
+          // Перенос стада, которое уже есть: заводить триста голов по одной
+          // форме никто не станет, и на этом перенос останавливался.
+          if (canManage)
+            IconButton(
+              tooltip: context.l10n.bulkHerdTitle,
+              icon: const Icon(Icons.library_add_outlined),
+              onPressed: () => context.push('/rabbits/bulk'),
+            ),
+        ],
+      ),
       body: PagedListView<RabbitModel>(
         items: state.rabbits,
         isLoading: state.isLoading,
@@ -178,6 +190,16 @@ class _Header extends StatelessWidget {
               onTap: () => onFilter(
                   filter.withStatus(filter.status == 'sold' ? null : 'sold')),
               color: AppColors.warning,
+            ),
+            // Павших отбирать было нечем, хотя статус такой есть: чтобы
+            // посмотреть падёж за сезон, приходилось листать всё стадо
+            // глазами.
+            AppFilterChipData(
+              label: l10n.rabbitsFilterDead,
+              isSelected: filter.status == 'dead',
+              onTap: () => onFilter(
+                  filter.withStatus(filter.status == 'dead' ? null : 'dead')),
+              color: AppColors.error,
             ),
           ],
         ),

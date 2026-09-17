@@ -912,6 +912,252 @@ abstract class AppLocalizations {
   /// **'Записать кормление'**
   String get quickRecordFeeding;
 
+  /// No description provided for @quickNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужна связь'**
+  String get quickNeedsConnection;
+
+  /// No description provided for @taskReminderLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напомнить заранее'**
+  String get taskReminderLabel;
+
+  /// No description provided for @taskReminderNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не напоминать'**
+  String get taskReminderNone;
+
+  /// No description provided for @taskReminder15m.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 15 минут'**
+  String get taskReminder15m;
+
+  /// No description provided for @taskReminder1h.
+  ///
+  /// In ru, this message translates to:
+  /// **'За час'**
+  String get taskReminder1h;
+
+  /// No description provided for @taskReminder3h.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 3 часа'**
+  String get taskReminder3h;
+
+  /// No description provided for @taskReminder1d.
+  ///
+  /// In ru, this message translates to:
+  /// **'За день'**
+  String get taskReminder1d;
+
+  /// No description provided for @taskReminder2d.
+  ///
+  /// In ru, this message translates to:
+  /// **'За два дня'**
+  String get taskReminder2d;
+
+  /// No description provided for @bulkHerdTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести несколько'**
+  String get bulkHerdTitle;
+
+  /// No description provided for @bulkHerdSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Так переносят стадо, которое уже есть'**
+  String get bulkHerdSubtitle;
+
+  /// No description provided for @bulkHerdCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сколько голов'**
+  String get bulkHerdCount;
+
+  /// No description provided for @bulkHerdTagPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начало клейма'**
+  String get bulkHerdTagPrefix;
+
+  /// No description provided for @bulkHerdTagPrefixHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, R- — получится R-001, R-002'**
+  String get bulkHerdTagPrefixHint;
+
+  /// No description provided for @bulkHerdTagPrefixEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставьте пустым, если бирок нет'**
+  String get bulkHerdTagPrefixEmpty;
+
+  /// No description provided for @bulkHerdCountInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'От 1 до 100'**
+  String get bulkHerdCountInvalid;
+
+  /// No description provided for @bulkHerdDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Заведён {count} кролик} few{Заведено {count} кролика} many{Заведено {count} кроликов} other{Заведено {count} кролика}}'**
+  String bulkHerdDone(int count);
+
+  /// No description provided for @rabbitMultiPickerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто в партии'**
+  String get rabbitMultiPickerTitle;
+
+  /// No description provided for @rabbitMultiPickerLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики'**
+  String get rabbitMultiPickerLabel;
+
+  /// No description provided for @rabbitMultiPickerEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никто не выбран'**
+  String get rabbitMultiPickerEmpty;
+
+  /// No description provided for @rabbitMultiPickerDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get rabbitMultiPickerDone;
+
+  /// No description provided for @rabbitMultiPickerSelected.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Выбран {count}} few{Выбрано {count}} many{Выбрано {count}} other{Выбрано {count}}}'**
+  String rabbitMultiPickerSelected(int count);
+
+  /// No description provided for @transactionSaleBatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продать партией'**
+  String get transactionSaleBatch;
+
+  /// No description provided for @ageYears.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} год} few{{count} года} many{{count} лет} other{{count} года}}'**
+  String ageYears(int count);
+
+  /// No description provided for @ageYearsMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'{years} г {months} мес'**
+  String ageYearsMonths(int years, int months);
+
+  /// No description provided for @feedTypePellets.
+  ///
+  /// In ru, this message translates to:
+  /// **'Гранулы'**
+  String get feedTypePellets;
+
+  /// No description provided for @feedTypeHay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сено'**
+  String get feedTypeHay;
+
+  /// No description provided for @feedTypeVegetables.
+  ///
+  /// In ru, this message translates to:
+  /// **'Овощи'**
+  String get feedTypeVegetables;
+
+  /// No description provided for @feedTypeGrain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зерно'**
+  String get feedTypeGrain;
+
+  /// No description provided for @feedTypeSupplements.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавки'**
+  String get feedTypeSupplements;
+
+  /// No description provided for @feedTypeOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get feedTypeOther;
+
+  /// No description provided for @feedUnitKg.
+  ///
+  /// In ru, this message translates to:
+  /// **'кг'**
+  String get feedUnitKg;
+
+  /// No description provided for @feedUnitLiter.
+  ///
+  /// In ru, this message translates to:
+  /// **'л'**
+  String get feedUnitLiter;
+
+  /// No description provided for @feedUnitPiece.
+  ///
+  /// In ru, this message translates to:
+  /// **'шт'**
+  String get feedUnitPiece;
+
+  /// No description provided for @vaccineTypeVhd.
+  ///
+  /// In ru, this message translates to:
+  /// **'ВГБК'**
+  String get vaccineTypeVhd;
+
+  /// No description provided for @vaccineTypeMyxomatosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Миксоматоз'**
+  String get vaccineTypeMyxomatosis;
+
+  /// No description provided for @vaccineTypePasteurellosis.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пастереллёз'**
+  String get vaccineTypePasteurellosis;
+
+  /// No description provided for @vaccineTypeOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get vaccineTypeOther;
+
+  /// No description provided for @vaccineFullVhd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вирусная геморрагическая болезнь кроликов (ВГБК)'**
+  String get vaccineFullVhd;
+
+  /// No description provided for @offlineRejectedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}'**
+  String offlineRejectedTitle(int count);
+
+  /// No description provided for @offlineRejectedBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Их не принял сервер — запишите заново.'**
+  String get offlineRejectedBody;
+
+  /// No description provided for @offlineRejectedDismiss.
+  ///
+  /// In ru, this message translates to:
+  /// **'Понятно'**
+  String get offlineRejectedDismiss;
+
   /// No description provided for @quickRecordVaccination.
   ///
   /// In ru, this message translates to:
@@ -3822,6 +4068,12 @@ abstract class AppLocalizations {
   /// **'Проданы'**
   String get rabbitsFilterSold;
 
+  /// No description provided for @rabbitsFilterDead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Павшие'**
+  String get rabbitsFilterDead;
+
   /// No description provided for @sexMale.
   ///
   /// In ru, this message translates to:
@@ -4398,6 +4650,24 @@ abstract class AppLocalizations {
   /// **'Выйти из аккаунта'**
   String get settingsLogout;
 
+  /// No description provided for @logoutDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта?'**
+  String get logoutDialogTitle;
+
+  /// No description provided for @logoutDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записи останутся на сервере — вы снова увидите их после входа.'**
+  String get logoutDialogBody;
+
+  /// No description provided for @logoutDialogConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get logoutDialogConfirm;
+
   /// No description provided for @settingsThemeLight.
   ///
   /// In ru, this message translates to:
@@ -4481,6 +4751,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Оплатить'**
   String get subscriptionPay;
+
+  /// No description provided for @subscriptionPayAbroadTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оплата картой пока только в Таджикистане'**
+  String get subscriptionPayAbroadTitle;
+
+  /// No description provided for @subscriptionPayAbroadBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мы продлим тариф вручную — напишите в поддержку, и вам ответят.'**
+  String get subscriptionPayAbroadBody;
+
+  /// No description provided for @subscriptionPayAbroadAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Написать в поддержку'**
+  String get subscriptionPayAbroadAction;
 
   /// No description provided for @subscriptionOpenPaymentPage.
   ///
@@ -7907,6 +8195,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пропустить'**
   String get onbSkip;
+
+  /// No description provided for @onbCountryTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Где ваше хозяйство?'**
+  String get onbCountryTitle;
+
+  /// No description provided for @onbCountrySubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'От этого зависят валюта, время и способ входа'**
+  String get onbCountrySubtitle;
+
+  /// No description provided for @countryTJ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таджикистан'**
+  String get countryTJ;
+
+  /// No description provided for @countryUZ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Узбекистан'**
+  String get countryUZ;
+
+  /// No description provided for @countryKG.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кыргызстан'**
+  String get countryKG;
+
+  /// No description provided for @countryKZ.
+  ///
+  /// In ru, this message translates to:
+  /// **'Казахстан'**
+  String get countryKZ;
+
+  /// No description provided for @countryRU.
+  ///
+  /// In ru, this message translates to:
+  /// **'Россия'**
+  String get countryRU;
+
+  /// No description provided for @countryAF.
+  ///
+  /// In ru, this message translates to:
+  /// **'Афганистан'**
+  String get countryAF;
+
+  /// No description provided for @loginSmsUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'В вашей стране код по СМС не приходит — входите по почте'**
+  String get loginSmsUnavailable;
 
   /// No description provided for @firstStepCages.
   ///

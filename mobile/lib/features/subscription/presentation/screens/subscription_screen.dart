@@ -12,6 +12,8 @@ import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 import '../../data/models/payment_order.dart';
 import '../providers/payment_provider.dart';
+import '../../../../core/countries/countries.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 final _dayFormat = DateFormat('dd.MM.yyyy');
 
@@ -207,6 +209,16 @@ class _PayButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Карту принимает таджикский банк, и карта другой страны через него не
+    // пройдёт. Показывать кнопку, которая заведомо упрётся в отказ, — это
+    // тупик того же сорта, что вычищал docs/plans/DEAD-ENDS.md: человек
+    // жмёт, получает ошибку и не знает, что делать. Поэтому вместо кнопки
+    // сразу стоит работающий путь.
+    final farm = ref.watch(authProvider).user?.farm;
+    if (!countryByCode(farm?.country).payments) {
+      return const _PayThroughSupport();
+    }
+
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
@@ -370,6 +382,48 @@ class _CompletedCard extends StatelessWidget {
               context.l10n.subscriptionPaymentCompleted,
               style: AppTypography.bodyLg
                   .copyWith(color: context.colors.onSurface),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Продление там, где карту принять не можем.
+///
+/// Не заглушка «недоступно», а объяснение и дверь: ферма с истёкшим тарифом
+/// не должна оказаться запертой — именно это уже случалось, когда кнопка
+/// оплаты отвечала отказом и отправляла в поддержку, которая молчала.
+class _PayThroughSupport extends StatelessWidget {
+  const _PayThroughSupport();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.subscriptionPayAbroadTitle,
+            style:
+                AppTypography.titleMd.copyWith(color: context.colors.onSurface),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            l10n.subscriptionPayAbroadBody,
+            style: AppTypography.bodyMd
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => context.push('/support'),
+              icon: const Icon(Icons.support_agent_outlined, size: 18),
+              label: Text(l10n.subscriptionPayAbroadAction),
             ),
           ),
         ],

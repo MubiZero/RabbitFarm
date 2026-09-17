@@ -214,6 +214,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
                 final cages = cagesAsync.value ?? const [];
 
                 return DropdownButtonFormField<int?>(
+                  isExpanded: true,
                   initialValue: _cageId,
                   decoration: InputDecoration(
                     labelText: context.l10n.noteFormCageLabel,

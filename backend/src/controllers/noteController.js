@@ -29,7 +29,7 @@ exports.getById = async (req, res, next) => {
 
 exports.list = async (req, res, next) => {
   try {
-    const result = await noteService.listNotes(req.farmId, req.query);
+    const result = await noteService.listNotes(req.farmId, req.query, req.farmTimezone);
     return ApiResponse.paginated(res, result.items, result.page, result.limit, result.total, 'Список заметок получен');
   } catch (error) {
     next(error);

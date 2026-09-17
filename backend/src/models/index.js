@@ -28,6 +28,7 @@ const MedicalRecord = require('./MedicalRecord')(sequelize);
 const Feed = require('./Feed')(sequelize);
 const FeedingRecord = require('./FeedingRecord')(sequelize);
 const Transaction = require('./Transaction')(sequelize);
+const TransactionRabbit = require('./TransactionRabbit')(sequelize);
 const Task = require('./Task')(sequelize);
 const Photo = require('./Photo')(sequelize);
 const Note = require('./Note')(sequelize);
@@ -158,6 +159,22 @@ FeedingRecord.belongsTo(Cage, { as: 'cage', foreignKey: 'cage_id' });
 FeedingRecord.belongsTo(User, { as: 'fedBy', foreignKey: 'fed_by' });
 
 Transaction.belongsTo(Rabbit, { as: 'rabbit', foreignKey: 'rabbit_id' });
+
+// Партия: одна сделка — много кроликов. Связи пишутся всегда, в том числе
+// для одиночной операции, поэтому «кто участвовал» читается одним способом,
+// а не двумя (см. migrations/20260916000002).
+Transaction.belongsToMany(Rabbit, {
+  as: 'rabbits',
+  through: TransactionRabbit,
+  foreignKey: 'transaction_id',
+  otherKey: 'rabbit_id'
+});
+Rabbit.belongsToMany(Transaction, {
+  as: 'transactions',
+  through: TransactionRabbit,
+  foreignKey: 'rabbit_id',
+  otherKey: 'transaction_id'
+});
 // Автоматический расход живёт ровно столько, сколько запись, из которой он
 // создан: иначе в ведомости остаётся сирота со ссылкой на удалённое лечение.
 MedicalRecord.hasOne(Transaction, { as: 'expense', foreignKey: 'medical_record_id', onDelete: 'CASCADE' });
@@ -233,6 +250,7 @@ require('../utils/deletionAudit').attachDeletionAudit({
 
 // Export models and sequelize instance
 module.exports = {
+  TransactionRabbit,
   Farm,
   Invitation,
   sequelize,

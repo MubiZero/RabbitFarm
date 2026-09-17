@@ -94,6 +94,12 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: 'Minutes before due date'
     },
+    // Отметка о доставке: задача проверяет напоминания чаще, чем раз в
+    // сутки, и без неё один и тот же сигнал уходил бы каждый проход.
+    reminder_sent_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true

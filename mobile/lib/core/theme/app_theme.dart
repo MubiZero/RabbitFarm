@@ -33,15 +33,20 @@ class AppTheme {
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: accent,
-      onPrimary: Colors.white,
+      // Белый на акценте не читается ни в одной теме: 2.15–4.23 при норме
+      // 4.5. Обе темы строятся этой же функцией, поэтому надпись на кнопке
+      // «Сохранить» была бледной и в тёмной, и в светлой.
+      onPrimary: AppColors.onAccent,
       primaryContainer: accent.withValues(alpha: 0.15),
       onPrimaryContainer: accent,
       secondary: accent,
-      onSecondary: Colors.white,
+      onSecondary: AppColors.onAccent,
       secondaryContainer: accent.withValues(alpha: 0.1),
       onSecondaryContainer: accent,
       error: AppColors.error,
-      onError: Colors.white,
+      // Красный тоже средней светлоты: белый на нём даёт 3.76, тёмный —
+      // 4.74. Правило то же, что у акцентов.
+      onError: AppColors.onAccent,
       errorContainer: AppColors.error.withValues(alpha: 0.12),
       onErrorContainer: AppColors.error,
       surface: surface,
@@ -126,9 +131,11 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: accent,
-          foregroundColor: Colors.white,
+          // Кнопки задают цвет надписи сами и мимо onPrimary — если менять
+          // только схему, надпись здесь останется белой и нечитаемой.
+          foregroundColor: AppColors.onAccent,
           disabledBackgroundColor: accent.withValues(alpha: 0.3),
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+          disabledForegroundColor: AppColors.onAccent.withValues(alpha: 0.7),
           minimumSize: buttonSize,
           shape: buttonShape,
           elevation: 0,
@@ -142,9 +149,11 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: accent,
-          foregroundColor: Colors.white,
+          // Кнопки задают цвет надписи сами и мимо onPrimary — если менять
+          // только схему, надпись здесь останется белой и нечитаемой.
+          foregroundColor: AppColors.onAccent,
           disabledBackgroundColor: accent.withValues(alpha: 0.3),
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+          disabledForegroundColor: AppColors.onAccent.withValues(alpha: 0.7),
           minimumSize: buttonSize,
           shape: buttonShape,
           elevation: 0,
@@ -182,7 +191,7 @@ class AppTheme {
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: accent,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.onAccent,
         elevation: 0,
         focusElevation: 0,
         hoverElevation: 0,
@@ -288,7 +297,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.lgAll),
         headerBackgroundColor: accent,
-        headerForegroundColor: Colors.white,
+        headerForegroundColor: AppColors.onAccent,
       ),
 
       progressIndicatorTheme: ProgressIndicatorThemeData(

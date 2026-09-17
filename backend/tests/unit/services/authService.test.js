@@ -107,6 +107,62 @@ describe('AuthService', () => {
       }
     });
 
+    it('из страны выводит валюту хозяйства и его часовой пояс', async () => {
+      const { mockTransaction } = arrangeSuccess();
+
+      await authService.register({
+        email: 'new@example.com',
+        full_name: 'Новый Фермер',
+        country: 'UZ'
+      });
+
+      // Валюта и пояс не пересчитываются каждый раз из страны, а ложатся в
+      // ферму: валюта не должна меняться под ногами у уже записанных сумм,
+      // а пояс хозяйство может поправить само.
+      expect(Farm.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          country: 'UZ',
+          currency: 'UZS',
+          timezone: 'Asia/Tashkent'
+        }),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+    });
+
+    it('без страны заводит таджикское хозяйство, как было до выбора страны', async () => {
+      arrangeSuccess();
+
+      await authService.register({
+        email: 'new@example.com',
+        full_name: 'Новый Фермер'
+      });
+
+      expect(Farm.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          country: 'TJ',
+          currency: 'TJS',
+          timezone: 'Asia/Dushanbe'
+        }),
+        expect.anything()
+      );
+    });
+
+    it('не заводит хозяйство на телефон там, куда код по СМС не доходит', async () => {
+      arrangeSuccess();
+      User.findOne.mockResolvedValue(null);
+
+      // Шлюз у нас таджикский. Выдать человеку телефонный логин, на который
+      // мы физически не можем прислать код, — значит выдать логин, которым он
+      // не войдёт ни разу.
+      await expect(authService.register({
+        phone: '+998901234567',
+        full_name: 'Новый Фермер',
+        country: 'UZ'
+      })).rejects.toThrow('PHONE_LOGIN_UNAVAILABLE');
+
+      expect(Farm.create).not.toHaveBeenCalled();
+    });
+
     it('заводит ферму и делает регистрирующегося её владельцем', async () => {
       const { mockTransaction, farm } = arrangeSuccess();
 
@@ -259,10 +315,16 @@ describe('AuthService', () => {
       expect(User.findByPk).toHaveBeenCalledWith(1, expect.objectContaining({
         // Вместе со статусом доступа приезжает назначение хозяйства: форма
         // нового кролика подставляет его, не спрашивая человека.
+        //
+        // И страна с тем, что из неё следует: в валюте хозяйства
+        // показываются все его суммы, а по часовому поясу считаются сутки
+        // в отчётах.
         include: [{
           model: Farm,
           as: 'farm',
-          attributes: ['id', 'status', 'default_purpose']
+          attributes: [
+            'id', 'status', 'default_purpose', 'country', 'currency', 'timezone'
+          ]
         }]
       }));
     });

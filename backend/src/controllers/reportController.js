@@ -12,7 +12,11 @@ const {
 } = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const ApiResponse = require('../utils/apiResponse');
-const { startOfDayUtc, nextDayUtc } = require('../utils/dateRange');
+const {
+  startOfDayInZone,
+  nextDayInZone,
+  daysAgoInZone
+} = require('../utils/dateRange');
 const planService = require('../services/planService');
 
 /**
@@ -54,13 +58,12 @@ exports.getDashboard = async (req, res, next) => {
     // отчёт те же операции показывал — два экрана называли разные суммы про
     // одни и те же деньги.
 
-    // Pre-compute date boundaries used by multiple queries
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
+    // Границы считаются в поясе хозяйства, а не процесса. Колонки здесь —
+    // DATEONLY (календарный день), поэтому и границы календарные: сравнивать
+    // день с моментом значит терять или прихватывать сутки на краю.
+    const timeZone = req.farmTimezone;
+    const thirtyDaysAgo = daysAgoInZone(30, timeZone);
+    const sevenDaysAgo = daysAgoInZone(6, timeZone);
 
     // Run all independent queries in parallel
     const [
@@ -212,20 +215,22 @@ exports.getDashboard = async (req, res, next) => {
     // --- History Calculations for Charts (in-memory, uses query results) ---
 
     // 1. Rabbits History (Last 7 days)
+    //
+    // Конец дня — начало следующего дня хозяйства: у фермы за пределами
+    // пояса сервера столбики графика съезжали на сутки.
     const rabbitsHistory = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const endOfDay = new Date(d.setHours(23, 59, 59, 999));
+      const day = daysAgoInZone(i, timeZone);
+      const endOfDay = nextDayInZone(day, timeZone);
 
       const count = allRabbits.filter(r => {
         const created = new Date(r.created_at);
         const dead = r.death_date ? new Date(r.death_date) : null;
         const sold = r.sold_date ? new Date(r.sold_date) : null;
 
-        if (created > endOfDay) return false;
-        if (dead && dead <= endOfDay) return false;
-        if (sold && sold <= endOfDay) return false;
+        if (created >= endOfDay) return false;
+        if (dead && dead < endOfDay) return false;
+        if (sold && sold < endOfDay) return false;
         return true;
       }).length;
       rabbitsHistory.push(count);
@@ -234,9 +239,9 @@ exports.getDashboard = async (req, res, next) => {
     // 2. Births History (Last 7 days)
     const birthsHistory = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateString = d.toISOString().split('T')[0];
+      // toISOString() давал день по Гринвичу: до рассвета столбик за сегодня
+      // оказывался вчерашним и всегда пустым.
+      const dateString = daysAgoInZone(i, timeZone);
 
       const birthsOnDay = recentBirthsList.filter(b => b.birth_date === dateString);
       const totalKits = birthsOnDay.reduce((sum, b) => sum + (b.kits_born_alive || 0), 0);
@@ -295,27 +300,45 @@ exports.getFarmReport = async (req, res, next) => {
   try {
     const { from_date, to_date } = req.query;
 
-    // Default date range: last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const defaultDateFrom = thirtyDaysAgo.toISOString().split('T')[0];
-    const defaultDateTo = new Date().toISOString().split('T')[0];
-
-    const effectiveFromDate = from_date || defaultDateFrom;
-    const effectiveToDate = to_date || defaultDateTo;
+    // Период берём ровно таким, каким его прислал клиент, без умолчаний.
+    // Раньше здесь подставлялись «последние 30 дней», и при выборе «всё
+    // время» — когда клиент не шлёт границ вовсе — эта вкладка показывала
+    // месяц, пока соседние «Деньги» и «Здоровье» считали за всё время. Три
+    // вкладки под одним переключателем срока называли разные числа, хотя
+    // экран обещает им общий период.
+    //
+    // Умолчание вдобавок считалось через toISOString(), то есть по Гринвичу,
+    // а сервер живёт в Душанбе (TZ=Asia/Dushanbe): с полуночи до 5 утра
+    // «сегодня» отставало на календарный день, и сегодняшние записи выпадали
+    // из отчёта.
+    const effectiveFromDate = from_date || null;
+    const effectiveToDate = to_date || null;
 
     const farmId = req.farmId;
-    const period = { [Op.gte]: effectiveFromDate, [Op.lte]: effectiveToDate };
+
+    const period = {};
+    if (effectiveFromDate) period[Op.gte] = effectiveFromDate;
+    if (effectiveToDate) period[Op.lte] = effectiveToDate;
+
+    // Пустой период означает «за всё время»: столбец в условие не добавляем
+    // вовсе, иначе Sequelize получит пустой объект вместо сравнения.
+    const hasPeriod = Boolean(effectiveFromDate || effectiveToDate);
+    const byPeriod = (column) => (hasPeriod ? { [column]: period } : {});
 
     // Отдельная граница для колонок со временем. Остальные даты в отчёте —
     // DATEONLY, там сравнение идёт день с днём. А fed_at хранит момент, и
     // `<= '2026-08-24'` означало «не позже полуночи», то есть отсекало весь
     // последний день периода. Период по умолчанию заканчивается сегодняшним
     // днём — сегодняшние кормления не попадали в отчёт никогда.
-    const feedingPeriod = {
-      [Op.gte]: startOfDayUtc(effectiveFromDate),
-      [Op.lt]: nextDayUtc(effectiveToDate)
-    };
+    const feedingPeriod = {};
+    if (effectiveFromDate) {
+      feedingPeriod[Op.gte] = startOfDayInZone(effectiveFromDate, req.farmTimezone);
+    }
+    if (effectiveToDate) {
+      feedingPeriod[Op.lt] = nextDayInZone(effectiveToDate, req.farmTimezone);
+    }
+
+    const byFeedingPeriod = () => (hasPeriod ? { fed_at: feedingPeriod } : {});
 
     // Rabbit population dynamics
     // Разбивка по породам стоит на экране прямо под общим поголовьем, а оно
@@ -350,7 +373,7 @@ exports.getFarmReport = async (req, res, next) => {
     const transactions = await Transaction.findAll({
       where: {
         farm_id: farmId,
-        transaction_date: period
+        ...byPeriod('transaction_date')
       },
       attributes: [
         'type',
@@ -364,33 +387,33 @@ exports.getFarmReport = async (req, res, next) => {
     // Отчёт заявляет период, поэтому и считать нужно за период: раньше рядом
     // с финансами за март стояло число прививок за всё время фермы.
     const vaccinationsCount = await Vaccination.count({
-      where: { farm_id: farmId, vaccination_date: period }
+      where: { farm_id: farmId, ...byPeriod('vaccination_date') }
     });
     const medicalRecordsCount = await MedicalRecord.count({
-      where: { farm_id: farmId, started_at: period }
+      where: { farm_id: farmId, ...byPeriod('started_at') }
     });
 
     // Breeding overview
     const breedingsCount = await Breeding.count({
       where: {
         farm_id: farmId,
-        breeding_date: period
+        ...byPeriod('breeding_date')
       }
     });
 
     const birthsCount = await Birth.count({
-      where: { farm_id: farmId, birth_date: period }
+      where: { farm_id: farmId, ...byPeriod('birth_date') }
     });
 
     const feedingRecordsCount = await FeedingRecord.count({
-      where: { farm_id: farmId, fed_at: feedingPeriod }
+      where: { farm_id: farmId, ...byFeedingPeriod() }
     });
 
     // Расход разбит по единицам измерения. Общая сумма складывала килограммы
     // комбикорма со штуками моркови — получалось число, которое невозможно
     // истолковать.
     const consumptionByUnit = await FeedingRecord.findAll({
-      where: { farm_id: farmId, fed_at: feedingPeriod },
+      where: { farm_id: farmId, ...byFeedingPeriod() },
       attributes: [
         [Sequelize.col('feed.unit'), 'unit'],
         [Sequelize.fn('SUM', Sequelize.col('FeedingRecord.quantity')), 'total']
