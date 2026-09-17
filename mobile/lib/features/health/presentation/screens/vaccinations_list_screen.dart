@@ -52,7 +52,9 @@ class VaccinationsListScreen extends ConsumerWidget {
         items: state.vaccinations,
         isLoading: state.isLoading,
         error: state.error,
+        hasMore: state.hasMore,
         onRefresh: notifier.load,
+        onLoadMore: notifier.loadMore,
         header: _ViewTabs(state: state),
         empty: state.hasFilters
             ? AppEmptyState(

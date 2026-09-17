@@ -16,9 +16,21 @@ class BirthsRepository {
   BirthsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
 
   /// Получить список всех окролов
-  Future<List<BirthModel>> getBirths() async {
+  /// Страница окролов вместе со сведениями о следующей.
+  ///
+  /// Раньше метод не принимал страницу вовсе и брал то, что сервер отдаёт по
+  /// умолчанию, — список обрывался на пятидесятой записи и выглядел полным.
+  /// У фермы, которая ведёт окролы третий год, старые выводки просто
+  /// переставали показываться.
+  Future<PaginatedResponse<BirthModel>> getBirths({
+    int page = 1,
+    int limit = 30,
+  }) async {
     try {
-      final response = await _apiClient.dio.get('/births');
+      final response = await _apiClient.dio.get(
+        '/births',
+        queryParameters: {'page': page, 'limit': limit},
+      );
 
       // Проверяем структуру ответа
       if (response.data is! Map<String, dynamic>) {
@@ -32,9 +44,22 @@ class BirthsRepository {
             serverText: responseData['message'] as String?);
       }
 
-      return itemsOf(responseData['data'])
+      final items = itemsOf(responseData['data'])
           .map((item) => BirthModel.fromJson(item as Map<String, dynamic>))
           .toList();
+
+      final data = responseData['data'];
+      final pagination =
+          data is Map<String, dynamic> ? data['pagination'] : null;
+      final map = pagination is Map<String, dynamic> ? pagination : null;
+
+      return PaginatedResponse<BirthModel>(
+        items: items,
+        total: (map?['total'] as num?)?.toInt() ?? items.length,
+        page: (map?['page'] as num?)?.toInt() ?? page,
+        limit: (map?['limit'] as num?)?.toInt() ?? limit,
+        totalPages: (map?['total_pages'] as num?)?.toInt() ?? 1,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     } on ApiFailure {

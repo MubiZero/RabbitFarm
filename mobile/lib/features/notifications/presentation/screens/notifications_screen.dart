@@ -44,41 +44,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (mounted) ref.invalidate(unreadNotificationsProvider);
   }
 
-  Future<void> _refresh() async {
-    ref.invalidate(notificationsFeedProvider);
-    await ref.read(notificationsFeedProvider.future);
-  }
+  Future<void> _refresh() =>
+      ref.read(notificationsFeedProvider.notifier).load();
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(notificationsFeedProvider);
+
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.notificationsTitle)),
-      body: RefreshIndicator(
+      // Лента догружается прокруткой: раньше она показывала первые тридцать
+      // сообщений, и всё, что старше, было не достать.
+      body: PagedListView<AppNotification>(
+        items: state.items,
+        isLoading: state.isLoading,
+        error: state.error,
+        hasMore: state.hasMore,
         onRefresh: _refresh,
-        child: AppAsyncView<List<AppNotification>>(
-          value: ref.watch(notificationsFeedProvider),
-          onRetry: _refresh,
-          skeleton: (_) => const SkeletonList(count: 5),
-          builder: (items) => items.isEmpty
-              ? AppEmptyState(
-                  icon: Icons.notifications_none,
-                  title: context.l10n.notificationsEmptyTitle,
-                  subtitle: context.l10n.notificationsEmptyBody,
-                )
-              : ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.screenH,
-                    AppSpacing.md,
-                    AppSpacing.screenH,
-                    AppSpacing.xxl,
-                  ),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(height: AppSpacing.md),
-                  itemBuilder: (context, i) => _NotificationCard(items[i]),
-                ),
+        onLoadMore: ref.read(notificationsFeedProvider.notifier).loadMore,
+        empty: AppEmptyState(
+          icon: Icons.notifications_none,
+          title: context.l10n.notificationsEmptyTitle,
+          subtitle: context.l10n.notificationsEmptyBody,
         ),
+        itemBuilder: (context, item, _) => _NotificationCard(item),
       ),
     );
   }

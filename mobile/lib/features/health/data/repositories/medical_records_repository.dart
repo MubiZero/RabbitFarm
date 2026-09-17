@@ -4,6 +4,7 @@ import '../../../../core/api/api_client.dart';
 import '../../../../core/api/api_endpoints.dart';
 import '../models/medical_record_model.dart';
 import '../../../../core/api/api_failure.dart';
+import '../../../../shared/models/api_response.dart';
 
 /// Repository for medical records operations
 class MedicalRecordsRepository {
@@ -12,7 +13,11 @@ class MedicalRecordsRepository {
   MedicalRecordsRepository(this._apiClient);
 
   /// Get list of medical records with optional filters
-  Future<List<MedicalRecord>> getMedicalRecords({
+  /// Страница записей о лечении вместе со сведениями о следующей.
+  ///
+  /// Раньше метод отдавал только записи, а сведения о страницах терял —
+  /// список молча обрывался и выглядел полным.
+  Future<PaginatedResponse<MedicalRecord>> getMedicalRecords({
     int? page,
     int? limit,
     String? sortBy,
@@ -47,12 +52,33 @@ class MedicalRecordsRepository {
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
-        return itemsOf(data)
+        final items = itemsOf(data)
             .map((json) => MedicalRecord.fromJson(json as Map<String, dynamic>))
             .toList();
+
+        // Сведений о страницах может не быть у старого ответа — тогда
+        // считаем список законченным, иначе экран звал бы следующую
+        // страницу без конца.
+        final pagination =
+            data is Map<String, dynamic> ? data['pagination'] : null;
+        final map = pagination is Map<String, dynamic> ? pagination : null;
+
+        return PaginatedResponse<MedicalRecord>(
+          items: items,
+          total: (map?['total'] as num?)?.toInt() ?? items.length,
+          page: (map?['page'] as num?)?.toInt() ?? (page ?? 1),
+          limit: (map?['limit'] as num?)?.toInt() ?? (limit ?? items.length),
+          totalPages: (map?['total_pages'] as num?)?.toInt() ?? 1,
+        );
       }
 
-      return [];
+      return PaginatedResponse<MedicalRecord>(
+        items: const [],
+        total: 0,
+        page: page ?? 1,
+        limit: limit ?? 0,
+        totalPages: 0,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     }

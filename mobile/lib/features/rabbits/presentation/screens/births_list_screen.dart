@@ -31,7 +31,9 @@ class BirthsListScreen extends ConsumerWidget {
         items: state.births,
         isLoading: state.isLoading,
         error: state.error,
+        hasMore: state.hasMore,
         onRefresh: notifier.loadBirths,
+        onLoadMore: notifier.loadMore,
         empty: AppEmptyState(
           icon: Icons.child_care_outlined,
           title: context.l10n.birthsEmptyTitle,

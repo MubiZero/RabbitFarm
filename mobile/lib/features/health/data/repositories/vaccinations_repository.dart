@@ -15,7 +15,13 @@ class VaccinationsRepository {
       : _apiClient = apiClient;
 
   /// Получить список вакцинаций с фильтрацией и пагинацией
-  Future<List<Vaccination>> getVaccinations({
+  /// Страница прививок вместе со сведениями о том, есть ли следующая.
+  ///
+  /// Раньше метод возвращал только записи, а `pagination` из ответа
+  /// выбрасывал — список молча обрывался на пятидесятой записи, и узнать об
+  /// этом было неоткуда: ни счётчика, ни «показать ещё». На ферме, где
+  /// прививки идут третий год, половина истории просто не показывалась.
+  Future<PaginatedResponse<Vaccination>> getVaccinations({
     int page = 1,
     int limit = 50,
     int? rabbitId,
@@ -62,9 +68,20 @@ class VaccinationsRepository {
         throw const ApiFailure(ApiFailureKind.server);
       }
 
-      return itemsJson
+      final items = itemsJson
           .map((item) => Vaccination.fromJson(item as Map<String, dynamic>))
           .toList();
+
+      // Сервер отдаёт страницы всегда; если поля не пришли, считаем, что
+      // список кончился, — иначе экран звал бы следующую страницу без конца.
+      final pagination = data['pagination'] as Map<String, dynamic>?;
+      return PaginatedResponse<Vaccination>(
+        items: items,
+        total: (pagination?['total'] as num?)?.toInt() ?? items.length,
+        page: (pagination?['page'] as num?)?.toInt() ?? page,
+        limit: (pagination?['limit'] as num?)?.toInt() ?? limit,
+        totalPages: (pagination?['total_pages'] as num?)?.toInt() ?? 1,
+      );
     } on DioException catch (e) {
       throw ApiFailure.from(e);
     } on ApiFailure {

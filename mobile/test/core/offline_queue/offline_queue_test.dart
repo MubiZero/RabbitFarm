@@ -151,7 +151,17 @@ class _FakeBirthsRepository extends BirthsRepository {
   final List<Map<String, dynamic>> created = [];
 
   @override
-  Future<List<BirthModel>> getBirths() async => const [];
+  Future<PaginatedResponse<BirthModel>> getBirths({
+    int page = 1,
+    int limit = 30,
+  }) async =>
+      PaginatedResponse<BirthModel>(
+        items: const [],
+        total: const [].length,
+        page: page,
+        limit: limit,
+        totalPages: 1,
+      );
 
   @override
   Future<BirthModel> createBirth(Map<String, dynamic> birthData) async {

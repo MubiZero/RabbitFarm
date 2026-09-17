@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../data/models/vaccination_model.dart';
 import '../../data/repositories/vaccinations_repository.dart';
+import '../../../../shared/models/api_response.dart';
 
 /// Что показывает список: всё подряд или выборку.
 ///
@@ -21,6 +22,13 @@ class VaccinationsState {
   final DateTime? toDateFilter;
   final VaccinationView view;
 
+  /// Какая страница уже загружена и есть ли следующая.
+  ///
+  /// Без этого список молча обрывался на пятидесятой записи: ни счётчика,
+  /// ни «показать ещё» — он просто выглядел полным.
+  final int currentPage;
+  final bool hasMore;
+
   const VaccinationsState({
     this.vaccinations = const [],
     this.isLoading = false,
@@ -30,6 +38,8 @@ class VaccinationsState {
     this.fromDateFilter,
     this.toDateFilter,
     this.view = VaccinationView.all,
+    this.currentPage = 1,
+    this.hasMore = false,
   });
 
   bool get hasFilters =>
@@ -54,6 +64,8 @@ class VaccinationsState {
     DateTime? toDateFilter,
     bool clearToDate = false,
     VaccinationView? view,
+    int? currentPage,
+    bool? hasMore,
   }) {
     return VaccinationsState(
       vaccinations: vaccinations ?? this.vaccinations,
@@ -66,6 +78,8 @@ class VaccinationsState {
           clearFromDate ? null : (fromDateFilter ?? this.fromDateFilter),
       toDateFilter: clearToDate ? null : (toDateFilter ?? this.toDateFilter),
       view: view ?? this.view,
+      currentPage: currentPage ?? this.currentPage,
+      hasMore: hasMore ?? this.hasMore,
     );
   }
 }
@@ -78,35 +92,75 @@ class VaccinationsNotifier extends StateNotifier<VaccinationsState> {
     load();
   }
 
-  /// Загрузить список по текущей выборке и фильтрам.
+  /// Размер страницы. Тот же, что у поголовья: список читают прокруткой, а
+  /// не листают глазами до конца.
+  static const _pageSize = 30;
+
+  /// Загрузить список по текущей выборке и фильтрам — первую страницу.
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final vaccinations = switch (state.view) {
-        VaccinationView.overdue => await _repository.getOverdueVaccinations(),
-        VaccinationView.upcoming => await _repository.getVaccinations(
-            limit: 50,
-            rabbitId: state.rabbitIdFilter,
-            vaccineType: state.typeFilter,
-            upcoming: true,
-          ),
-        VaccinationView.all ||
-        VaccinationView.last30Days =>
-          await _repository.getVaccinations(
-            limit: 50,
-            rabbitId: state.rabbitIdFilter,
-            vaccineType: state.typeFilter,
-            fromDate: state.fromDateFilter,
-            toDate: state.toDateFilter,
-          ),
-      };
+      // Просроченные приходят отдельным запросом целиком: их единицы, и
+      // страницы там ни к чему.
+      if (state.view == VaccinationView.overdue) {
+        final overdue = await _repository.getOverdueVaccinations();
+        state = state.copyWith(
+          vaccinations: overdue,
+          isLoading: false,
+          currentPage: 1,
+          hasMore: false,
+        );
+        return;
+      }
 
-      state = state.copyWith(vaccinations: vaccinations, isLoading: false);
+      final page = await _fetch(1);
+      state = state.copyWith(
+        vaccinations: page.items,
+        isLoading: false,
+        currentPage: page.page,
+        hasMore: page.page < page.totalPages,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  /// Догрузить следующую страницу.
+  ///
+  /// До сих пор список обрывался на пятидесятой записи и выглядел полным:
+  /// на ферме, где прививки идут третий год, половина истории просто не
+  /// показывалась, а посчитанный по ней итог был неверным.
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final page = await _fetch(state.currentPage + 1);
+      state = state.copyWith(
+        vaccinations: [...state.vaccinations, ...page.items],
+        isLoading: false,
+        currentPage: page.page,
+        hasMore: page.page < page.totalPages,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<PaginatedResponse<Vaccination>> _fetch(int page) =>
+      _repository.getVaccinations(
+        page: page,
+        limit: _pageSize,
+        rabbitId: state.rabbitIdFilter,
+        vaccineType: state.typeFilter,
+        upcoming: state.view == VaccinationView.upcoming ? true : null,
+        fromDate: state.view == VaccinationView.upcoming
+            ? null
+            : state.fromDateFilter,
+        toDate:
+            state.view == VaccinationView.upcoming ? null : state.toDateFilter,
+      );
 
   /// Загрузить вакцинации конкретного кролика
   Future<void> loadRabbitVaccinations(int rabbitId) async {
