@@ -31,13 +31,13 @@ class VaccinationController {
       });
       if (!rabbit) {
         await t.rollback();
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
 
       // Vitality check
       if (rabbit.status === 'dead' || rabbit.status === 'sold') {
         await t.rollback();
-        return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика');
+        return ApiResponse.badRequest(res, 'Нельзя вакцинировать мертвого или проданного кролика', 'RABBIT_NOT_ACTIVE');
       }
 
       // Автор берётся из сеанса, а не из тела запроса: подпись, которую
@@ -111,7 +111,7 @@ class VaccinationController {
       });
 
       if (!vaccination) {
-        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
+        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена', 'VACCINATION_NOT_FOUND');
       }
 
       return ApiResponse.success(res, vaccination);
@@ -219,7 +219,7 @@ class VaccinationController {
         }
       });
       if (!rabbit) {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
 
       const vaccinations = await Vaccination.findAll({
@@ -259,7 +259,7 @@ class VaccinationController {
 
       if (!vaccination) {
         await t.rollback();
-        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
+        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена', 'VACCINATION_NOT_FOUND');
       }
 
       // If rabbit_id is being updated, check if new rabbit exists and belongs to user
@@ -273,7 +273,7 @@ class VaccinationController {
         });
         if (!rabbit) {
           await t.rollback();
-          return ApiResponse.notFound(res, 'Кролик не найден');
+          return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
         }
       }
 
@@ -335,7 +335,7 @@ class VaccinationController {
       });
 
       if (!vaccination) {
-        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена');
+        return ApiResponse.notFound(res, 'Запись о вакцинации не найдена', 'VACCINATION_NOT_FOUND');
       }
 
       await vaccination.destroy();

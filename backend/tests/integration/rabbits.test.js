@@ -17,7 +17,7 @@ describe('Rabbits API', () => {
     const breedRes = await request(app)
       .post('/api/v1/breeds')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({ name: 'Серый великан', description: 'Мясная порода', average_weight: 5.0 });
+      .send({ name: 'Порода для кроликов', description: 'Мясная порода', average_weight: 5.0 });
     breedId = breedRes.body.data.id;
   });
 
@@ -153,7 +153,7 @@ describe('Rabbits API', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data.breed).toBeDefined();
-      expect(res.body.data.breed.name).toBe('Серый великан');
+      expect(res.body.data.breed.name).toBe('Порода для кроликов');
       expect(res.body.data.Breed).toBeUndefined();
     });
 
@@ -168,7 +168,7 @@ describe('Rabbits API', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.breed).toBe('Серый великан');
+      expect(res.body.data.breed).toBe('Порода для кроликов');
     });
   });
 

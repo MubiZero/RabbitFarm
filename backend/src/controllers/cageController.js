@@ -20,7 +20,7 @@ class CageController {
       const cage = await cageService.getCageById(req.params.id, req.farmId);
       return ApiResponse.success(res, cage);
     } catch (error) {
-      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
+      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       next(error);
     }
   }
@@ -46,7 +46,7 @@ class CageController {
       const cage = await cageService.updateCage(req.params.id, req.farmId, req.body);
       return ApiResponse.success(res, cage, 'Клетка успешно обновлена');
     } catch (error) {
-      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
+      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       next(error);
     }
   }
@@ -56,9 +56,9 @@ class CageController {
       await cageService.deleteCage(req.params.id, req.farmId);
       return ApiResponse.success(res, null, 'Клетка успешно удалена');
     } catch (error) {
-      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
+      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       if (error.message === 'CAGE_HAS_RABBITS') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить клетку с кроликами. Сначала переместите кроликов.');
+        return ApiResponse.badRequest(res, 'Невозможно удалить клетку с кроликами. Сначала переместите кроликов.', 'CAGE_HAS_RABBITS');
       }
       next(error);
     }
@@ -78,7 +78,7 @@ class CageController {
       const cage = await cageService.markCleaned(req.params.id, req.farmId);
       return ApiResponse.success(res, cage, 'Отметка об уборке сохранена');
     } catch (error) {
-      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена');
+      if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       next(error);
     }
   }

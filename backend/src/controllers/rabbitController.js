@@ -34,16 +34,16 @@ class RabbitController {
         return ApiResponse.badRequest(res, 'За раз можно завести от 1 до 100 кроликов', 'BULK_COUNT_INVALID');
       }
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       if (error.message === 'CAGE_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Клетка не найдена');
+        return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       }
       if (error.message === 'CAGE_FULL') {
         return ApiResponse.badRequest(res, 'В клетке не хватит места для всей группы', 'CAGE_FULL');
       }
       if (error.message === 'TAG_ID_EXISTS') {
-        return ApiResponse.conflict(res, 'Клеймо из этого ряда уже занято — выберите другое начало');
+        return ApiResponse.conflict(res, 'Клеймо из этого ряда уже занято — выберите другое начало', 'TAG_RANGE_TAKEN');
       }
       return next(error);
     }
@@ -73,25 +73,25 @@ class RabbitController {
         return ApiResponse.badRequest(res, 'Достигнут лимит кроликов по тарифу фермы', 'RABBIT_LIMIT_REACHED');
       }
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       if (error.message === 'CAGE_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Клетка не найдена');
+        return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       }
       if (error.message === 'TAG_ID_EXISTS') {
-        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует');
+        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует', 'TAG_ID_EXISTS');
       }
       // Те же отказы, что и при правке. Раньше они не разбирались здесь и
       // уходили общей пятисоткой: попытка записать в родители кролика чужой
       // фермы выглядела как поломка сервера, а не как отказ по делу.
       if (error.message === 'FATHER_NOT_FOUND_OR_INVALID_SEX') {
-        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом');
+        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом', 'FATHER_NOT_FOUND_OR_INVALID_SEX');
       }
       if (error.message === 'MOTHER_NOT_FOUND_OR_INVALID_SEX') {
-        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой');
+        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой', 'MOTHER_NOT_FOUND_OR_INVALID_SEX');
       }
       if (error.message === 'CAGE_FULL') {
-        return ApiResponse.badRequest(res, 'Клетка уже заполнена');
+        return ApiResponse.badRequest(res, 'Клетка уже заполнена', 'CAGE_FULL');
       }
       next(error);
     }
@@ -108,7 +108,7 @@ class RabbitController {
       return ApiResponse.success(res, rabbit);
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -181,31 +181,31 @@ class RabbitController {
       return ApiResponse.success(res, rabbit, 'Кролик успешно обновлен');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       if (error.message === 'CAGE_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Клетка не найдена');
+        return ApiResponse.notFound(res, 'Клетка не найдена', 'CAGE_NOT_FOUND');
       }
       if (error.message === 'TAG_ID_EXISTS') {
-        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует');
+        return ApiResponse.conflict(res, 'Кролик с таким ID клейма уже существует', 'TAG_ID_EXISTS');
       }
       if (error.message === 'CANNOT_CHANGE_SEX_WITH_HISTORY') {
-        return ApiResponse.badRequest(res, 'Нельзя менять пол после того, как у кролика появилось потомство или история случек');
+        return ApiResponse.badRequest(res, 'Нельзя менять пол после того, как у кролика появилось потомство или история случек', 'SEX_LOCKED');
       }
       if (error.message === 'FATHER_NOT_FOUND_OR_INVALID_SEX') {
-        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом');
+        return ApiResponse.badRequest(res, 'Отец не найден или должен быть самцом', 'FATHER_NOT_FOUND_OR_INVALID_SEX');
       }
       if (error.message === 'MOTHER_NOT_FOUND_OR_INVALID_SEX') {
-        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой');
+        return ApiResponse.badRequest(res, 'Мать не найдена или должна быть самкой', 'MOTHER_NOT_FOUND_OR_INVALID_SEX');
       }
       if (error.message === 'CAGE_FULL') {
-        return ApiResponse.badRequest(res, 'Клетка уже заполнена');
+        return ApiResponse.badRequest(res, 'Клетка уже заполнена', 'CAGE_FULL');
       }
       if (error.message === 'CANNOT_BE_OWN_FATHER' || error.message === 'CANNOT_BE_OWN_MOTHER') {
-        return ApiResponse.badRequest(res, 'Кролик не может быть родителем самому себе');
+        return ApiResponse.badRequest(res, 'Кролик не может быть родителем самому себе', 'CANNOT_BE_OWN_PARENT');
       }
       next(error);
     }
@@ -222,22 +222,22 @@ class RabbitController {
       return ApiResponse.success(res, null, 'Кролик успешно удален');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       if (error.message === 'RABBIT_HAS_OFFSPRING') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить кролика с потомством');
+        return ApiResponse.badRequest(res, 'Невозможно удалить кролика с потомством', 'RABBIT_HAS_OFFSPRING');
       }
       if (error.message === 'RABBIT_HAS_BREEDING_HISTORY') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть история случек');
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть история случек', 'RABBIT_HAS_BREEDINGS');
       }
       if (error.message === 'RABBIT_HAS_BIRTH_HISTORY') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить: у самки есть история окролов');
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у самки есть история окролов', 'RABBIT_HAS_BIRTHS');
       }
       if (error.message === 'RABBIT_HAS_HEALTH_HISTORY') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть медицинские записи или вакцинации');
+        return ApiResponse.badRequest(res, 'Невозможно удалить: у кролика есть медицинские записи или вакцинации', 'RABBIT_HAS_HEALTH_RECORDS');
       }
       if (error.message === 'RABBIT_HAS_FINANCIAL_HISTORY') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить: с кроликом связаны финансовые операции');
+        return ApiResponse.badRequest(res, 'Невозможно удалить: с кроликом связаны финансовые операции', 'RABBIT_HAS_TRANSACTIONS');
       }
       next(error);
     }
@@ -254,7 +254,7 @@ class RabbitController {
       return ApiResponse.success(res, weights, 'История взвешиваний получена успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -271,7 +271,7 @@ class RabbitController {
       return ApiResponse.created(res, weight, 'Вес добавлен успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -287,7 +287,7 @@ class RabbitController {
       return ApiResponse.success(res, photos, 'Галерея получена');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -300,7 +300,7 @@ class RabbitController {
   async addGalleryPhoto(req, res, next) {
     try {
       if (!req.file) {
-        return ApiResponse.badRequest(res, 'Файл не загружен');
+        return ApiResponse.badRequest(res, 'Файл не загружен', 'FILE_MISSING');
       }
 
       const photo = await rabbitService.addGalleryPhoto(req.params.id, req.farmId, {
@@ -314,7 +314,7 @@ class RabbitController {
       return ApiResponse.success(res, photo, 'Фото добавлено в галерею', 201);
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -330,10 +330,10 @@ class RabbitController {
       return ApiResponse.success(res, null, 'Фото удалено из галереи');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       if (error.message === 'PHOTO_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Фото не найдено');
+        return ApiResponse.notFound(res, 'Фото не найдено', 'PHOTO_NOT_FOUND');
       }
       next(error);
     }
@@ -378,7 +378,7 @@ class RabbitController {
       return ApiResponse.success(res, pedigree, 'Родословная получена успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -391,7 +391,7 @@ class RabbitController {
   async uploadPhoto(req, res, next) {
     try {
       if (!req.file) {
-        return ApiResponse.badRequest(res, 'Файл не загружен');
+        return ApiResponse.badRequest(res, 'Файл не загружен', 'FILE_MISSING');
       }
 
       const photoUrl = await fileStorage.uploadFile(req.farmId, 'rabbits', req.file);
@@ -405,7 +405,7 @@ class RabbitController {
       return ApiResponse.success(res, rabbit, 'Фото загружено успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }
@@ -426,7 +426,7 @@ class RabbitController {
       return ApiResponse.success(res, rabbit, 'Фото удалено успешно');
     } catch (error) {
       if (error.message === 'RABBIT_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
       next(error);
     }

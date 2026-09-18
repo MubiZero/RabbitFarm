@@ -101,9 +101,11 @@ class ApiResponse {
 
   /**
    * Unauthorized response (401)
+   * @param {String} code - машинный код: по нему приложение показывает отказ
+   *   на языке читателя, а русский текст остаётся запасным
    */
-  static unauthorized(res, message = 'Не авторизован') {
-    return this.error(res, message, 401, 'UNAUTHORIZED');
+  static unauthorized(res, message = 'Не авторизован', code = 'UNAUTHORIZED') {
+    return this.error(res, message, 401, code);
   }
 
   /**
@@ -117,9 +119,11 @@ class ApiResponse {
 
   /**
    * Not found response (404)
+   * @param {String} code - машинный код: по нему приложение показывает отказ
+   *   на языке читателя, а русский текст остаётся запасным
    */
-  static notFound(res, message = 'Запись не найдена') {
-    return this.error(res, message, 404, 'NOT_FOUND');
+  static notFound(res, message = 'Запись не найдена', code = 'NOT_FOUND') {
+    return this.error(res, message, 404, code);
   }
 
   /**

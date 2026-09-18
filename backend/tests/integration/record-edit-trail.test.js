@@ -75,7 +75,7 @@ describe('След правки записи', () => {
     const breed = await request(app)
       .post('/api/v1/breeds')
       .set(auth(ownerToken))
-      .send({ name: 'Калифорнийская' });
+      .send({ name: 'Порода для правок' });
     breedId = breed.body.data.id;
   });
 

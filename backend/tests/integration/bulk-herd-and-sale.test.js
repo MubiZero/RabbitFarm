@@ -41,7 +41,7 @@ describe('Пачка кроликов и продажа партией', () => {
     const breed = await request(app)
       .post(`${API}/breeds`)
       .set('Authorization', `Bearer ${ownerToken}`)
-      .send({ name: 'Калифорнийская' });
+      .send({ name: 'Порода для группы' });
     breedId = breed.body.data.id;
 
     const cage = await request(app)

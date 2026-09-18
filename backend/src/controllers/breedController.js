@@ -31,7 +31,7 @@ class BreedController {
       return ApiResponse.success(res, breed);
     } catch (error) {
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       next(error);
     }
@@ -48,7 +48,7 @@ class BreedController {
       return ApiResponse.created(res, breed, 'Порода успешно создана');
     } catch (error) {
       if (error.message === 'BREED_NAME_EXISTS') {
-        return ApiResponse.conflict(res, 'Порода с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Порода с таким названием уже существует', 'BREED_NAME_EXISTS');
       }
       next(error);
     }
@@ -65,10 +65,10 @@ class BreedController {
       return ApiResponse.success(res, breed, 'Порода успешно обновлена');
     } catch (error) {
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       if (error.message === 'BREED_NAME_EXISTS') {
-        return ApiResponse.conflict(res, 'Порода с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Порода с таким названием уже существует', 'BREED_NAME_EXISTS');
       }
       next(error);
     }
@@ -85,10 +85,10 @@ class BreedController {
       return ApiResponse.success(res, null, 'Порода успешно удалена');
     } catch (error) {
       if (error.message === 'BREED_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
       if (error.message === 'BREED_HAS_RABBITS') {
-        return ApiResponse.badRequest(res, 'Невозможно удалить породу, у которой есть кролики');
+        return ApiResponse.badRequest(res, 'Невозможно удалить породу, у которой есть кролики', 'BREED_HAS_RABBITS');
       }
       next(error);
     }

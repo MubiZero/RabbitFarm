@@ -95,14 +95,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
-          String message = errorText(l10n, e);
-          bool userExists = false;
-
-          if (e is DioException) {
-            message =
-                serverMessage(e) ?? e.message ?? context.l10n.registerFailed;
-            userExists = serverErrorCode(e) == 'USER_EXISTS';
-          }
+          // Слова подбирает `errorText` по коду отказа: русский текст
+          // сервера тут выигрывал у перевода, и узбекский экран отвечал
+          // «Пользователь с такой почтой уже существует».
+          final message = errorText(l10n, e);
+          final userExists = e is DioException &&
+              serverErrorCode(e) == 'USER_EXISTS';
 
           ScaffoldMessenger.of(context).showError(
             message,

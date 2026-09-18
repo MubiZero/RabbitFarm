@@ -443,6 +443,288 @@ class AppLocalizationsUz extends AppLocalizations {
   String get quickNeedsConnection => 'Aloqa kerak';
 
   @override
+  String get errorCodeSessionExpired =>
+      'Kirish muddati tugadi — qaytadan kiring';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Xoʻjalikka kirish yopilgan — egasidan soʻrang';
+
+  @override
+  String get errorCodeRegistrationClosed => 'Hisobni xoʻjalik egasi beradi';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Bu boʻlim faqat platforma maʼmuri uchun';
+
+  @override
+  String get errorCodeOtpInvalid => 'Kod notoʻgʻri';
+
+  @override
+  String get errorCodeOtpExpired => 'Kod muddati tugadi — yangisini soʻrang';
+
+  @override
+  String get errorCodeOtpLocked => 'Urinishlar juda koʻp — yangi kod soʻrang';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Kodni juda tez-tez soʻrayapsiz — biroz kuting';
+
+  @override
+  String get errorCodeRateLimited => 'Soʻrovlar juda koʻp — biroz kuting';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Ketma-ket yuklashlar koʻp — biroz kuting';
+
+  @override
+  String get errorCodeContactRequired => 'Telefon yoki pochtani kiriting';
+
+  @override
+  String get errorCodeInvalidEmail => 'Pochta xato yozilgan';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Tojik raqami kerak: +992 va toʻqqiz raqam';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'SMS yuborish hozir ishlamayapti — pochta orqali kiring';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Xat yuborish hozir ishlamayapti — telefon orqali kiring';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Xoʻjalik toʻxtatilgan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodeFarmDeleted =>
+      'Xoʻjalik oʻchirilgan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Xoʻjalik faqat oʻqish uchun — yozuvlar hozir saqlanmaydi';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Mijoz nomidan kirish — faqat oʻqish, yozuvlarni oʻzgartirib boʻlmaydi';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Ilovaning yangi versiyasi kerak — uni yangilang';
+
+  @override
+  String get errorCodeUserNotFound => 'Foydalanuvchi topilmadi';
+
+  @override
+  String get errorCodeFarmNotFound => 'Xoʻjalik topilmadi';
+
+  @override
+  String get errorCodeBirthNotFound => 'Tugʻish topilmadi';
+
+  @override
+  String get errorCodeMotherNotFound => 'Ona topilmadi';
+
+  @override
+  String get errorCodeFatherNotFound => 'Ota topilmadi';
+
+  @override
+  String get errorCodeMaleNotFound => 'Erkak quyon topilmadi';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Urgʻochi quyon topilmadi';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Juftlash topilmadi';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Yemlash yozuvi topilmadi';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Davolash yozuvi topilmadi';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Emlash yozuvi topilmadi';
+
+  @override
+  String get errorCodeNoteNotFound => 'Eslatma topilmadi';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Pul yozuvi topilmadi';
+
+  @override
+  String get errorCodePaymentNotFound => 'Toʻlov topilmadi';
+
+  @override
+  String get errorCodePlanNotFound => 'Tarif topilmadi';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Murojaat topilmadi';
+
+  @override
+  String get errorCodePhotoNotFound => 'Surat topilmadi';
+
+  @override
+  String get errorCodeMemberNotFound => 'Ishchi topilmadi';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Taklifnoma topilmadi';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Ijrochi topilmadi';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Quyon oʻlgan yoki sotilgan — unga yangi yozuv kiritilmaydi';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'Bu tugʻish uchun bolalar kartalari ochilgan — belgini oʻsha yerda qoʻying';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Kartalar soni tirik tugʻilganlardan koʻp boʻlishi mumkin emas';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Bir tugʻishda birdan oʻttizgacha bola boʻladi';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Ajratish tugʻishdan oldin boʻlishi mumkin emas';
+
+  @override
+  String get errorCodeNotAMale => 'Tanlangan quyon erkak emas';
+
+  @override
+  String get errorCodeNotAFemale => 'Tanlangan quyon urgʻochi emas';
+
+  @override
+  String get errorCodeParentIdInvalid =>
+      'Erkak yoki urgʻochi notoʻgʻri tanlangan';
+
+  @override
+  String get errorCodeBreedingSelf => 'Quyonni oʻzi bilan juftlab boʻlmaydi';
+
+  @override
+  String get errorCodeFemaleNotAvailable =>
+      'Urgʻochi hozir juftlashga tayyor emas';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Ota topilmadi yoki u erkak emas';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Ona topilmadi yoki u urgʻochi emas';
+
+  @override
+  String get errorCodeCannotBeOwnParent => 'Quyon oʻziga ota-ona boʻla olmaydi';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Jinsni endi oʻzgartirib boʻlmaydi: quyonda nasl yoki juftlash bor';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Oʻchirib boʻlmaydi: quyonning nasli bor';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Oʻchirib boʻlmaydi: quyonda juftlash bor';
+
+  @override
+  String get errorCodeRabbitHasBirths =>
+      'Oʻchirib boʻlmaydi: urgʻochida tugʻish bor';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Oʻchirib boʻlmaydi: quyonda davolash yoki emlash bor';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Oʻchirib boʻlmaydi: quyon bilan pul bogʻliq';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Avval quyonlarni koʻchiring — katak boʻsh emas';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'Zotda quyon boʻlsa, uni oʻchirib boʻlmaydi';
+
+  @override
+  String get errorCodeBreedNameExists => 'Bunday nomli zot allaqachon bor';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Bu qatordagi tamgʻalar band — boshqasidan boshlang';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Yemni oʻchirib boʻlmaydi: u bilan yemlash bor';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Ombor faqat kirim yoki chiqim bilan oʻzgaradi';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'Bir vaqtda birdan yuztagacha quyon kiritiladi';
+
+  @override
+  String get errorCodePeriodRequired => 'Yil va oyni tanlang';
+
+  @override
+  String get errorCodeFileMissing => 'Fayl tanlanmagan';
+
+  @override
+  String get errorCodeFileTooLarge => 'Fayl juda katta';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Fayl yuklanmadi — yana urinib koʻring';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Bogʻliq yozuv topilmadi — ekranni yangilang';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Xoʻjalikka tarif tayinlanmagan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodePlanFree => 'Joriy tarif bepul — toʻlash shart emas';
+
+  @override
+  String get errorCodePlanNameExists => 'Bunday nomli tarif allaqachon bor';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Sukut tarifi boshqasiga tayinlangan — belgini oʻshandan oling';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Tarif oʻchirilgan — uni yoqing yoki boshqasini tanlang';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Qabul qiluvchilar topilmadi — eʼlon kimga yoʻnaltirilganini tekshiring';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'Xoʻjalikning egasi yoʻq — mijoz nomidan kirib boʻlmaydi';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Xoʻjalik oʻchirilmagan — tiklaydigan narsa yoʻq';
+
+  @override
+  String get errorCodePlatformAdminAccount => 'Bu platforma maʼmurining hisobi';
+
+  @override
   String get errorCodeRabbitNotFound => 'Quyon topilmadi';
 
   @override

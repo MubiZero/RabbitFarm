@@ -19,9 +19,9 @@ exports.create = async (req, res, next) => {
     const task = await taskService.createTask({ ...req.body, farm_id: req.farmId, author_id: req.user.id });
     return ApiResponse.success(res, forReader(req)(task), 'Задача успешно создана', 201);
   } catch (error) {
-    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
-    if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.error(res, 'Клетка не найдена', 404);
-    if (error.message === 'ASSIGNEE_NOT_FOUND') return ApiResponse.error(res, 'Исполнитель не найден', 404);
+    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
+    if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.error(res, 'Клетка не найдена', 404, 'CAGE_NOT_FOUND');
+    if (error.message === 'ASSIGNEE_NOT_FOUND') return ApiResponse.error(res, 'Исполнитель не найден', 404, 'ASSIGNEE_NOT_FOUND');
     next(error);
   }
 };
@@ -31,7 +31,7 @@ exports.getById = async (req, res, next) => {
     const task = await taskService.getTaskById(req.params.id, req.farmId);
     return ApiResponse.success(res, forReader(req)(task), 'Задача получена');
   } catch (error) {
-    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
+    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404, 'TASK_NOT_FOUND');
     next(error);
   }
 };
@@ -53,10 +53,10 @@ exports.update = async (req, res, next) => {
     const task = await taskService.updateTask(req.params.id, req.farmId, req.body, req.user.id);
     return ApiResponse.success(res, forReader(req)(task), 'Задача успешно обновлена');
   } catch (error) {
-    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
-    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
-    if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.error(res, 'Клетка не найдена', 404);
-    if (error.message === 'ASSIGNEE_NOT_FOUND') return ApiResponse.error(res, 'Пользователь не найден', 404);
+    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404, 'TASK_NOT_FOUND');
+    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
+    if (error.message === 'CAGE_NOT_FOUND') return ApiResponse.error(res, 'Клетка не найдена', 404, 'CAGE_NOT_FOUND');
+    if (error.message === 'ASSIGNEE_NOT_FOUND') return ApiResponse.error(res, 'Пользователь не найден', 404, 'USER_NOT_FOUND');
     next(error);
   }
 };
@@ -66,7 +66,7 @@ exports.delete = async (req, res, next) => {
     await taskService.deleteTask(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Задача успешно удалена');
   } catch (error) {
-    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
+    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404, 'TASK_NOT_FOUND');
     next(error);
   }
 };
@@ -95,7 +95,7 @@ exports.completeTask = async (req, res, next) => {
     const task = await taskService.completeTask(req.params.id, req.farmId);
     return ApiResponse.success(res, forReader(req)(task), 'Задача выполнена');
   } catch (error) {
-    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404);
+    if (error.message === 'TASK_NOT_FOUND') return ApiResponse.error(res, 'Задача не найдена', 404, 'TASK_NOT_FOUND');
     next(error);
   }
 };

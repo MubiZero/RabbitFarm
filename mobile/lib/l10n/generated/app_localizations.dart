@@ -918,6 +918,486 @@ abstract class AppLocalizations {
   /// **'Нужна связь'**
   String get quickNeedsConnection;
 
+  /// No description provided for @errorCodeSessionExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход устарел — войдите заново'**
+  String get errorCodeSessionExpired;
+
+  /// No description provided for @errorCodeUserInactive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к хозяйству закрыт — спросите владельца'**
+  String get errorCodeUserInactive;
+
+  /// No description provided for @errorCodeRegistrationClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Учётную запись выдаёт владелец хозяйства'**
+  String get errorCodeRegistrationClosed;
+
+  /// No description provided for @errorCodePlatformAdminOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раздел только для администратора платформы'**
+  String get errorCodePlatformAdminOnly;
+
+  /// No description provided for @errorCodeOtpInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный код'**
+  String get errorCodeOtpInvalid;
+
+  /// No description provided for @errorCodeOtpExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок кода истёк — запросите новый'**
+  String get errorCodeOtpExpired;
+
+  /// No description provided for @errorCodeOtpLocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много попыток — запросите новый код'**
+  String get errorCodeOtpLocked;
+
+  /// No description provided for @errorCodeOtpRateLimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код запрашивают слишком часто — подождите немного'**
+  String get errorCodeOtpRateLimited;
+
+  /// No description provided for @errorCodeRateLimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много запросов — подождите немного'**
+  String get errorCodeRateLimited;
+
+  /// No description provided for @errorCodeUploadRateLimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много загрузок подряд — подождите немного'**
+  String get errorCodeUploadRateLimited;
+
+  /// No description provided for @errorCodeContactRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите телефон или почту'**
+  String get errorCodeContactRequired;
+
+  /// No description provided for @errorCodeInvalidEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Почта написана с ошибкой'**
+  String get errorCodeInvalidEmail;
+
+  /// No description provided for @errorCodeInvalidPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужен таджикский номер: +992 и девять цифр'**
+  String get errorCodeInvalidPhone;
+
+  /// No description provided for @errorCodeSmsNotConfigured.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправка СМС сейчас не работает — войдите по почте'**
+  String get errorCodeSmsNotConfigured;
+
+  /// No description provided for @errorCodeEmailNotConfigured.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправка писем сейчас не работает — войдите по телефону'**
+  String get errorCodeEmailNotConfigured;
+
+  /// No description provided for @errorCodeFarmSuspended.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство приостановлено — напишите в поддержку'**
+  String get errorCodeFarmSuspended;
+
+  /// No description provided for @errorCodeFarmDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство удалено — напишите в поддержку'**
+  String get errorCodeFarmDeleted;
+
+  /// No description provided for @errorCodeFarmReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство только для чтения — записи сейчас не сохраняются'**
+  String get errorCodeFarmReadOnly;
+
+  /// No description provided for @errorCodeImpersonationReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход под клиентом — только чтение, менять записи нельзя'**
+  String get errorCodeImpersonationReadOnly;
+
+  /// No description provided for @errorCodeUpgradeRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужна свежая версия приложения — обновите его'**
+  String get errorCodeUpgradeRequired;
+
+  /// No description provided for @errorCodeUserNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Человек не найден'**
+  String get errorCodeUserNotFound;
+
+  /// No description provided for @errorCodeFarmNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство не найдено'**
+  String get errorCodeFarmNotFound;
+
+  /// No description provided for @errorCodeBirthNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрол не найден'**
+  String get errorCodeBirthNotFound;
+
+  /// No description provided for @errorCodeMotherNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать не найдена'**
+  String get errorCodeMotherNotFound;
+
+  /// No description provided for @errorCodeFatherNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отец не найден'**
+  String get errorCodeFatherNotFound;
+
+  /// No description provided for @errorCodeMaleNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самец не найден'**
+  String get errorCodeMaleNotFound;
+
+  /// No description provided for @errorCodeFemaleNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка не найдена'**
+  String get errorCodeFemaleNotFound;
+
+  /// No description provided for @errorCodeBreedingNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Случка не найдена'**
+  String get errorCodeBreedingNotFound;
+
+  /// No description provided for @errorCodeFeedingNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о кормлении не найдена'**
+  String get errorCodeFeedingNotFound;
+
+  /// No description provided for @errorCodeMedicalRecordNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о лечении не найдена'**
+  String get errorCodeMedicalRecordNotFound;
+
+  /// No description provided for @errorCodeVaccinationNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о прививке не найдена'**
+  String get errorCodeVaccinationNotFound;
+
+  /// No description provided for @errorCodeNoteNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметка не найдена'**
+  String get errorCodeNoteNotFound;
+
+  /// No description provided for @errorCodeTransactionNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись о деньгах не найдена'**
+  String get errorCodeTransactionNotFound;
+
+  /// No description provided for @errorCodePaymentNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платёж не найден'**
+  String get errorCodePaymentNotFound;
+
+  /// No description provided for @errorCodePlanNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф не найден'**
+  String get errorCodePlanNotFound;
+
+  /// No description provided for @errorCodeSupportRequestNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обращение не найдено'**
+  String get errorCodeSupportRequestNotFound;
+
+  /// No description provided for @errorCodePhotoNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фотография не найдена'**
+  String get errorCodePhotoNotFound;
+
+  /// No description provided for @errorCodeMemberNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Работник не найден'**
+  String get errorCodeMemberNotFound;
+
+  /// No description provided for @errorCodeInvitationNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение не найдено'**
+  String get errorCodeInvitationNotFound;
+
+  /// No description provided for @errorCodeAssigneeNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель не найден'**
+  String get errorCodeAssigneeNotFound;
+
+  /// No description provided for @errorCodeRabbitNotActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик пал или продан — записи по нему больше не заводят'**
+  String get errorCodeRabbitNotActive;
+
+  /// No description provided for @errorCodeBirthHasKitCards.
+  ///
+  /// In ru, this message translates to:
+  /// **'По этому окролу заведены карточки крольчат — отмечайте на них'**
+  String get errorCodeBirthHasKitCards;
+
+  /// No description provided for @errorCodeKitsMoreThanBorn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточек не может быть больше, чем родилось живыми'**
+  String get errorCodeKitsMoreThanBorn;
+
+  /// No description provided for @errorCodeKitsCountInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Крольчат в окроле бывает от одного до тридцати'**
+  String get errorCodeKitsCountInvalid;
+
+  /// No description provided for @errorCodeWeaningBeforeBirth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отсадка не может быть раньше окрола'**
+  String get errorCodeWeaningBeforeBirth;
+
+  /// No description provided for @errorCodeNotAMale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбран не самец'**
+  String get errorCodeNotAMale;
+
+  /// No description provided for @errorCodeNotAFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрана не самка'**
+  String get errorCodeNotAFemale;
+
+  /// No description provided for @errorCodeParentIdInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самец или самка выбраны неверно'**
+  String get errorCodeParentIdInvalid;
+
+  /// No description provided for @errorCodeBreedingSelf.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролика нельзя случить с самим собой'**
+  String get errorCodeBreedingSelf;
+
+  /// No description provided for @errorCodeFemaleNotAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самка сейчас не готова к случке'**
+  String get errorCodeFemaleNotAvailable;
+
+  /// No description provided for @errorCodeFatherNotFoundOrInvalidSex.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отец не найден или это не самец'**
+  String get errorCodeFatherNotFoundOrInvalidSex;
+
+  /// No description provided for @errorCodeMotherNotFoundOrInvalidSex.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мать не найдена или это не самка'**
+  String get errorCodeMotherNotFoundOrInvalidSex;
+
+  /// No description provided for @errorCodeCannotBeOwnParent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролик не может быть родителем самому себе'**
+  String get errorCodeCannotBeOwnParent;
+
+  /// No description provided for @errorCodeSexLocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пол уже не поменять: у кролика есть потомство или случки'**
+  String get errorCodeSexLocked;
+
+  /// No description provided for @errorCodeRabbitHasOffspring.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить: у кролика есть потомство'**
+  String get errorCodeRabbitHasOffspring;
+
+  /// No description provided for @errorCodeRabbitHasBreedings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить: у кролика есть случки'**
+  String get errorCodeRabbitHasBreedings;
+
+  /// No description provided for @errorCodeRabbitHasBirths.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить: у самки есть окролы'**
+  String get errorCodeRabbitHasBirths;
+
+  /// No description provided for @errorCodeRabbitHasHealthRecords.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить: у кролика есть лечение или прививки'**
+  String get errorCodeRabbitHasHealthRecords;
+
+  /// No description provided for @errorCodeRabbitHasTransactions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить: с кроликом связаны деньги'**
+  String get errorCodeRabbitHasTransactions;
+
+  /// No description provided for @errorCodeCageHasRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала переселите кроликов — клетка не пуста'**
+  String get errorCodeCageHasRabbits;
+
+  /// No description provided for @errorCodeBreedHasRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить породу, пока в ней есть кролики'**
+  String get errorCodeBreedHasRabbits;
+
+  /// No description provided for @errorCodeBreedNameExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода с таким названием уже есть'**
+  String get errorCodeBreedNameExists;
+
+  /// No description provided for @errorCodeTagRangeTaken.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клейма из этого ряда заняты — начните с другого'**
+  String get errorCodeTagRangeTaken;
+
+  /// No description provided for @errorCodeFeedInUse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нельзя удалить корм: по нему есть кормления'**
+  String get errorCodeFeedInUse;
+
+  /// No description provided for @errorCodeStockOperationInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Склад меняют только приходом или расходом'**
+  String get errorCodeStockOperationInvalid;
+
+  /// No description provided for @errorCodeBulkCountInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'За раз заводят от одного до ста кроликов'**
+  String get errorCodeBulkCountInvalid;
+
+  /// No description provided for @errorCodePeriodRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите год и месяц'**
+  String get errorCodePeriodRequired;
+
+  /// No description provided for @errorCodeFileMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл не выбран'**
+  String get errorCodeFileMissing;
+
+  /// No description provided for @errorCodeFileTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл слишком большой'**
+  String get errorCodeFileTooLarge;
+
+  /// No description provided for @errorCodeFileUploadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл не загрузился — попробуйте ещё раз'**
+  String get errorCodeFileUploadFailed;
+
+  /// No description provided for @errorCodeRelatedRecordInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Связанная запись не найдена — обновите экран'**
+  String get errorCodeRelatedRecordInvalid;
+
+  /// No description provided for @errorCodeNoPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйству не назначен тариф — напишите в поддержку'**
+  String get errorCodeNoPlan;
+
+  /// No description provided for @errorCodePlanFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущий тариф бесплатный — платить не нужно'**
+  String get errorCodePlanFree;
+
+  /// No description provided for @errorCodePlanNameExists.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф с таким названием уже есть'**
+  String get errorCodePlanNameExists;
+
+  /// No description provided for @errorCodePlanDefaultTaken.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф по умолчанию уже назначен другому — снимите отметку с него'**
+  String get errorCodePlanDefaultTaken;
+
+  /// No description provided for @errorCodePlanDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тариф выключен — включите его или выберите другой'**
+  String get errorCodePlanDisabled;
+
+  /// No description provided for @errorCodeNoRecipients.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получателей не нашлось — проверьте, кому адресовано объявление'**
+  String get errorCodeNoRecipients;
+
+  /// No description provided for @errorCodeFarmNoOwner.
+  ///
+  /// In ru, this message translates to:
+  /// **'У хозяйства нет владельца — войти под клиентом некем'**
+  String get errorCodeFarmNoOwner;
+
+  /// No description provided for @errorCodeFarmNotDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство не было удалено — восстанавливать нечего'**
+  String get errorCodeFarmNotDeleted;
+
+  /// No description provided for @errorCodePlatformAdminAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это учётная запись администратора платформы'**
+  String get errorCodePlatformAdminAccount;
+
   /// No description provided for @errorCodeRabbitNotFound.
   ///
   /// In ru, this message translates to:

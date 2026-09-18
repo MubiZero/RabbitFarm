@@ -443,6 +443,292 @@ class AppLocalizationsTg extends AppLocalizations {
   String get quickNeedsConnection => 'Алоқа лозим аст';
 
   @override
+  String get errorCodeSessionExpired =>
+      'Мӯҳлати вуруд гузашт — аз нав ворид шавед';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Дастрасӣ ба хоҷагӣ баста шуд — аз соҳиб пурсед';
+
+  @override
+  String get errorCodeRegistrationClosed => 'Ҳисобро соҳиби хоҷагӣ медиҳад';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Ин бахш танҳо барои маъмури платформа';
+
+  @override
+  String get errorCodeOtpInvalid => 'Рамз нодуруст';
+
+  @override
+  String get errorCodeOtpExpired => 'Мӯҳлати рамз гузашт — рамзи нав пурсед';
+
+  @override
+  String get errorCodeOtpLocked => 'Кӯшишҳо аз ҳад зиёд — рамзи нав пурсед';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Рамзро хеле зуд-зуд мепурсед — каме интизор шавед';
+
+  @override
+  String get errorCodeRateLimited =>
+      'Дархостҳо аз ҳад зиёд — каме интизор шавед';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Боркуниҳо паси ҳам зиёданд — каме интизор шавед';
+
+  @override
+  String get errorCodeContactRequired => 'Телефон ё почтаро нависед';
+
+  @override
+  String get errorCodeInvalidEmail => 'Почта нодуруст навишта шудааст';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Рақами тоҷикӣ лозим аст: +992 ва нӯҳ рақам';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'Фиристодани SMS ҳоло кор намекунад — бо почта ворид шавед';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Фиристодани мактуб ҳоло кор намекунад — бо телефон ворид шавед';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Хоҷагӣ боздошта шудааст — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodeFarmDeleted =>
+      'Хоҷагӣ нест карда шуд — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Хоҷагӣ танҳо барои хондан — сабтҳо ҳоло нигоҳ дошта намешаванд';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Вуруд ба ҷои мизоҷ — танҳо хондан, сабтҳоро тағйир додан мумкин нест';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Нусхаи нави барнома лозим аст — онро навсозӣ кунед';
+
+  @override
+  String get errorCodeUserNotFound => 'Корбар ёфт нашуд';
+
+  @override
+  String get errorCodeFarmNotFound => 'Хоҷагӣ ёфт нашуд';
+
+  @override
+  String get errorCodeBirthNotFound => 'Зоиш ёфт нашуд';
+
+  @override
+  String get errorCodeMotherNotFound => 'Модар ёфт нашуд';
+
+  @override
+  String get errorCodeFatherNotFound => 'Падар ёфт нашуд';
+
+  @override
+  String get errorCodeMaleNotFound => 'Нарина ёфт нашуд';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Модина ёфт нашуд';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Ҷуфтшавӣ ёфт нашуд';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Сабти хӯрокдиҳӣ ёфт нашуд';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Сабти табобат ёфт нашуд';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Сабти эмгузаронӣ ёфт нашуд';
+
+  @override
+  String get errorCodeNoteNotFound => 'Ёддошт ёфт нашуд';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Сабти пул ёфт нашуд';
+
+  @override
+  String get errorCodePaymentNotFound => 'Пардохт ёфт нашуд';
+
+  @override
+  String get errorCodePlanNotFound => 'Таъриф ёфт нашуд';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Муроҷиат ёфт нашуд';
+
+  @override
+  String get errorCodePhotoNotFound => 'Сурат ёфт нашуд';
+
+  @override
+  String get errorCodeMemberNotFound => 'Коргар ёфт нашуд';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Даъватнома ёфт нашуд';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Иҷрокунанда ёфт нашуд';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Харгӯш мурд ё фурӯхта шуд — барои ӯ сабти нав намекунанд';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'Барои ин зоиш кортҳои харгӯшбачаҳо кушода шудаанд — дар онҳо қайд кунед';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Шумораи кортҳо аз зиндатаваллудшудагон зиёд буда наметавонад';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Дар як зоиш аз як то сӣ харгӯшбача мешавад';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Ҷудокунӣ пеш аз зоиш шуда наметавонад';
+
+  @override
+  String get errorCodeNotAMale => 'Интихобшуда нарина нест';
+
+  @override
+  String get errorCodeNotAFemale => 'Интихобшуда модина нест';
+
+  @override
+  String get errorCodeParentIdInvalid =>
+      'Нарина ё модина нодуруст интихоб шудааст';
+
+  @override
+  String get errorCodeBreedingSelf =>
+      'Харгӯшро бо худаш ҷуфт кардан мумкин нест';
+
+  @override
+  String get errorCodeFemaleNotAvailable =>
+      'Модина ҳоло барои ҷуфтшавӣ тайёр нест';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Падар ёфт нашуд ё ин нарина нест';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Модар ёфт нашуд ё ин модина нест';
+
+  @override
+  String get errorCodeCannotBeOwnParent =>
+      'Харгӯш падару модари худаш шуда наметавонад';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Ҷинсро дигар иваз кардан мумкин нест: харгӯш насл ё ҷуфтшавӣ дорад';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Нест кардан мумкин нест: харгӯш насл дорад';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Нест кардан мумкин нест: харгӯш ҷуфтшавӣ дорад';
+
+  @override
+  String get errorCodeRabbitHasBirths =>
+      'Нест кардан мумкин нест: модина зоиш дорад';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Нест кардан мумкин нест: харгӯш табобат ё эм дорад';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Нест кардан мумкин нест: бо харгӯш пул алоқаманд аст';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Аввал харгӯшҳоро кӯчонед — қафас холӣ нест';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'То даме ки дар зот харгӯш ҳаст, онро нест кардан мумкин нест';
+
+  @override
+  String get errorCodeBreedNameExists => 'Зот бо чунин ном аллакай ҳаст';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Тамғаҳои ин қатор банданд — аз дигараш сар кунед';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Хӯрокро нест кардан мумкин нест: бо он хӯрокдиҳӣ ҳаст';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Анборро танҳо бо даромад ё хароҷот тағйир медиҳанд';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'Дар як бор аз як то сад харгӯш сабт мекунанд';
+
+  @override
+  String get errorCodePeriodRequired => 'Сол ва моҳро интихоб кунед';
+
+  @override
+  String get errorCodeFileMissing => 'Файл интихоб нашудааст';
+
+  @override
+  String get errorCodeFileTooLarge => 'Файл хеле калон аст';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Файл бор нашуд — бори дигар кӯшиш кунед';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Сабти алоқаманд ёфт нашуд — экранро нав кунед';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Ба хоҷагӣ таъриф таъин нашудааст — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodePlanFree =>
+      'Таърифи ҳозира ройгон аст — пардохт лозим нест';
+
+  @override
+  String get errorCodePlanNameExists => 'Таъриф бо чунин ном аллакай ҳаст';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Таърифи пешфарз аллакай ба дигараш таъин шудааст — аломатро аз он гиред';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Таъриф хомӯш аст — онро фаъол кунед ё дигарашро интихоб кунед';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Гирандагон ёфт нашуданд — санҷед, эълон ба кӣ нигаронида шудааст';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'Хоҷагӣ соҳиб надорад — ба ҷои мизоҷ ворид шудан имконнопазир';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Хоҷагӣ нест карда нашуда буд — барқарор кардан чизе нест';
+
+  @override
+  String get errorCodePlatformAdminAccount => 'Ин ҳисоби маъмури платформа аст';
+
+  @override
   String get errorCodeRabbitNotFound => 'Харгӯш ёфт нашуд';
 
   @override

@@ -16,7 +16,7 @@ describe('Breeding API', () => {
     const breedRes = await request(app)
       .post('/api/v1/breeds')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({ name: 'Белый великан', description: 'Порода', average_weight: 5.0 });
+      .send({ name: 'Порода для случек', description: 'Порода', average_weight: 5.0 });
     const breedId = breedRes.body.data.id;
 
     // Create male rabbit

@@ -65,7 +65,7 @@ class StaffController {
       return ApiResponse.success(res, member, 'Работник обновлён');
     } catch (error) {
       if (error.message === 'MEMBER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Работник не найден');
+        return ApiResponse.notFound(res, 'Работник не найден', 'MEMBER_NOT_FOUND');
       }
       next(error);
     }
@@ -82,7 +82,7 @@ class StaffController {
       return ApiResponse.success(res, newOwner, 'Хозяйство передано');
     } catch (error) {
       if (error.message === 'MEMBER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Работник не найден');
+        return ApiResponse.notFound(res, 'Работник не найден', 'MEMBER_NOT_FOUND');
       }
       next(error);
     }
@@ -160,7 +160,7 @@ class StaffController {
       );
     } catch (error) {
       if (error.message === 'INVITATION_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Приглашение не найдено');
+        return ApiResponse.notFound(res, 'Приглашение не найдено', 'INVITATION_NOT_FOUND');
       }
       if (error.message === 'STAFF_LIMIT_REACHED') {
         return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы', 'STAFF_LIMIT_REACHED');
@@ -186,7 +186,7 @@ class StaffController {
       return ApiResponse.success(res, null, 'Приглашение отозвано');
     } catch (error) {
       if (error.message === 'INVITATION_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Приглашение не найдено');
+        return ApiResponse.notFound(res, 'Приглашение не найдено', 'INVITATION_NOT_FOUND');
       }
       next(error);
     }

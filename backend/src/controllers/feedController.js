@@ -20,7 +20,7 @@ exports.getById = async (req, res, next) => {
     const feed = await feedService.getFeedById(req.params.id, req.farmId);
     return ApiResponse.success(res, feed);
   } catch (error) {
-    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
+    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
     next(error);
   }
 };
@@ -42,7 +42,7 @@ exports.update = async (req, res, next) => {
     const feed = await feedService.updateFeed(req.params.id, req.farmId, req.body);
     return ApiResponse.success(res, feed, 'Корм успешно обновлен');
   } catch (error) {
-    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
+    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
     next(error);
   }
 };
@@ -52,9 +52,9 @@ exports.delete = async (req, res, next) => {
     await feedService.deleteFeed(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Корм успешно удален');
   } catch (error) {
-    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
+    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
     if (error.message === 'FEED_HAS_RECORDS') {
-      return ApiResponse.error(res, 'Нельзя удалить корм, так как он используется в записях кормления', 400);
+      return ApiResponse.error(res, 'Нельзя удалить корм, так как он используется в записях кормления', 400, 'FEED_IN_USE');
     }
     next(error);
   }
@@ -91,9 +91,9 @@ exports.adjustStock = async (req, res, next) => {
     );
     return ApiResponse.success(res, feed, `Остаток успешно ${operation === 'add' ? 'пополнен' : 'списан'}`);
   } catch (error) {
-    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404);
-    if (error.message === 'INSUFFICIENT_STOCK') return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
-    if (error.message === 'INVALID_OPERATION') return ApiResponse.error(res, 'Некорректная операция. Используйте "add" или "subtract"', 400);
+    if (error.message === 'FEED_NOT_FOUND') return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
+    if (error.message === 'INSUFFICIENT_STOCK') return ApiResponse.error(res, 'Недостаточно корма на складе', 400, 'INSUFFICIENT_STOCK');
+    if (error.message === 'INVALID_OPERATION') return ApiResponse.error(res, 'Некорректная операция. Используйте "add" или "subtract"', 400, 'STOCK_OPERATION_INVALID');
     next(error);
   }
 };

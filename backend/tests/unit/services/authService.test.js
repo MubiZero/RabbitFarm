@@ -13,6 +13,11 @@ jest.mock('../../../src/models', () => ({
     create: jest.fn(),
     findOne: jest.fn(),
     destroy: jest.fn()
+  },
+  // Новое хозяйство получает стартовый справочник пород в той же
+  // транзакции: без пород карточка первого кролика упирается в тупик.
+  Breed: {
+    bulkCreate: jest.fn()
   }
 }));
 jest.mock('../../../src/services/planService', () => ({
@@ -22,7 +27,7 @@ jest.mock('../../../src/services/otpAuthService', () => ({
   requestOtp: jest.fn().mockResolvedValue({ success: true })
 }));
 
-const { Farm, User, RefreshToken } = require('../../../src/models');
+const { Farm, User, RefreshToken, Breed } = require('../../../src/models');
 const planService = require('../../../src/services/planService');
 const otpAuthService = require('../../../src/services/otpAuthService');
 const authService = require('../../../src/services/authService');

@@ -20,16 +20,16 @@ class BreedingController {
             return ApiResponse.created(res, breeding, 'Случка успешно зарегистрирована');
         } catch (error) {
             if (error.message === 'MALE_NOT_FOUND') {
-                return ApiResponse.notFound(res, 'Самец не найден');
+                return ApiResponse.notFound(res, 'Самец не найден', 'MALE_NOT_FOUND');
             }
             if (error.message === 'FEMALE_NOT_FOUND') {
-                return ApiResponse.notFound(res, 'Самка не найдена');
+                return ApiResponse.notFound(res, 'Самка не найдена', 'FEMALE_NOT_FOUND');
             }
             if (error.message === 'INVALID_MALE_SEX') {
-                return ApiResponse.badRequest(res, 'Выбранный кролик не является самцом');
+                return ApiResponse.badRequest(res, 'Выбранный кролик не является самцом', 'NOT_A_MALE');
             }
             if (error.message === 'INVALID_FEMALE_SEX') {
-                return ApiResponse.badRequest(res, 'Выбранный кролик не является самкой');
+                return ApiResponse.badRequest(res, 'Выбранный кролик не является самкой', 'NOT_A_FEMALE');
             }
             next(error);
         }
@@ -45,7 +45,7 @@ class BreedingController {
             return ApiResponse.success(res, breeding);
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
-                return ApiResponse.notFound(res, 'Запись о случке не найдена');
+                return ApiResponse.notFound(res, 'Запись о случке не найдена', 'BREEDING_NOT_FOUND');
             }
             next(error);
         }
@@ -83,19 +83,19 @@ class BreedingController {
             return ApiResponse.success(res, breeding, 'Запись обновлена успешно');
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
-                return ApiResponse.notFound(res, 'Запись о случке не найдена');
+                return ApiResponse.notFound(res, 'Запись о случке не найдена', 'BREEDING_NOT_FOUND');
             }
             if (error.message === 'INVALID_MALE' || error.message === 'INVALID_FEMALE') {
-                return ApiResponse.badRequest(res, 'Некорректный ID самца или самки');
+                return ApiResponse.badRequest(res, 'Некорректный ID самца или самки', 'PARENT_ID_INVALID');
             }
             // Отказы, которых обработчик не знал, уходили общей пятисоткой:
             // человек видел «внутреннюю ошибку сервера» там, где сервер как
             // раз всё понял и отказал по делу.
             if (error.message === 'CANNOT_BREED_SAME_RABBIT') {
-                return ApiResponse.badRequest(res, 'Нельзя случить кролика с самим собой');
+                return ApiResponse.badRequest(res, 'Нельзя случить кролика с самим собой', 'BREEDING_SELF');
             }
             if (error.message === 'FEMALE_NOT_AVAILABLE') {
-                return ApiResponse.badRequest(res, 'Самка недоступна для случки');
+                return ApiResponse.badRequest(res, 'Самка недоступна для случки', 'FEMALE_NOT_AVAILABLE');
             }
             next(error);
         }
@@ -111,7 +111,7 @@ class BreedingController {
             return ApiResponse.success(res, null, 'Запись удалена успешно');
         } catch (error) {
             if (error.message === 'BREEDING_NOT_FOUND') {
-                return ApiResponse.notFound(res, 'Запись о случке не найдена');
+                return ApiResponse.notFound(res, 'Запись о случке не найдена', 'BREEDING_NOT_FOUND');
             }
             next(error);
         }

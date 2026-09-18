@@ -441,6 +441,288 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickNeedsConnection => 'Нужна связь';
 
   @override
+  String get errorCodeSessionExpired => 'Вход устарел — войдите заново';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Доступ к хозяйству закрыт — спросите владельца';
+
+  @override
+  String get errorCodeRegistrationClosed =>
+      'Учётную запись выдаёт владелец хозяйства';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Раздел только для администратора платформы';
+
+  @override
+  String get errorCodeOtpInvalid => 'Неверный код';
+
+  @override
+  String get errorCodeOtpExpired => 'Срок кода истёк — запросите новый';
+
+  @override
+  String get errorCodeOtpLocked =>
+      'Слишком много попыток — запросите новый код';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Код запрашивают слишком часто — подождите немного';
+
+  @override
+  String get errorCodeRateLimited =>
+      'Слишком много запросов — подождите немного';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Слишком много загрузок подряд — подождите немного';
+
+  @override
+  String get errorCodeContactRequired => 'Укажите телефон или почту';
+
+  @override
+  String get errorCodeInvalidEmail => 'Почта написана с ошибкой';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Нужен таджикский номер: +992 и девять цифр';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'Отправка СМС сейчас не работает — войдите по почте';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Отправка писем сейчас не работает — войдите по телефону';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Хозяйство приостановлено — напишите в поддержку';
+
+  @override
+  String get errorCodeFarmDeleted => 'Хозяйство удалено — напишите в поддержку';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Хозяйство только для чтения — записи сейчас не сохраняются';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Вход под клиентом — только чтение, менять записи нельзя';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Нужна свежая версия приложения — обновите его';
+
+  @override
+  String get errorCodeUserNotFound => 'Человек не найден';
+
+  @override
+  String get errorCodeFarmNotFound => 'Хозяйство не найдено';
+
+  @override
+  String get errorCodeBirthNotFound => 'Окрол не найден';
+
+  @override
+  String get errorCodeMotherNotFound => 'Мать не найдена';
+
+  @override
+  String get errorCodeFatherNotFound => 'Отец не найден';
+
+  @override
+  String get errorCodeMaleNotFound => 'Самец не найден';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Самка не найдена';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Случка не найдена';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Запись о кормлении не найдена';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Запись о лечении не найдена';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Запись о прививке не найдена';
+
+  @override
+  String get errorCodeNoteNotFound => 'Заметка не найдена';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Запись о деньгах не найдена';
+
+  @override
+  String get errorCodePaymentNotFound => 'Платёж не найден';
+
+  @override
+  String get errorCodePlanNotFound => 'Тариф не найден';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Обращение не найдено';
+
+  @override
+  String get errorCodePhotoNotFound => 'Фотография не найдена';
+
+  @override
+  String get errorCodeMemberNotFound => 'Работник не найден';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Приглашение не найдено';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Исполнитель не найден';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Кролик пал или продан — записи по нему больше не заводят';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'По этому окролу заведены карточки крольчат — отмечайте на них';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Карточек не может быть больше, чем родилось живыми';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Крольчат в окроле бывает от одного до тридцати';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Отсадка не может быть раньше окрола';
+
+  @override
+  String get errorCodeNotAMale => 'Выбран не самец';
+
+  @override
+  String get errorCodeNotAFemale => 'Выбрана не самка';
+
+  @override
+  String get errorCodeParentIdInvalid => 'Самец или самка выбраны неверно';
+
+  @override
+  String get errorCodeBreedingSelf => 'Кролика нельзя случить с самим собой';
+
+  @override
+  String get errorCodeFemaleNotAvailable => 'Самка сейчас не готова к случке';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Отец не найден или это не самец';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Мать не найдена или это не самка';
+
+  @override
+  String get errorCodeCannotBeOwnParent =>
+      'Кролик не может быть родителем самому себе';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Пол уже не поменять: у кролика есть потомство или случки';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Нельзя удалить: у кролика есть потомство';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Нельзя удалить: у кролика есть случки';
+
+  @override
+  String get errorCodeRabbitHasBirths => 'Нельзя удалить: у самки есть окролы';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Нельзя удалить: у кролика есть лечение или прививки';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Нельзя удалить: с кроликом связаны деньги';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Сначала переселите кроликов — клетка не пуста';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'Нельзя удалить породу, пока в ней есть кролики';
+
+  @override
+  String get errorCodeBreedNameExists => 'Порода с таким названием уже есть';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Клейма из этого ряда заняты — начните с другого';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Нельзя удалить корм: по нему есть кормления';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Склад меняют только приходом или расходом';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'За раз заводят от одного до ста кроликов';
+
+  @override
+  String get errorCodePeriodRequired => 'Выберите год и месяц';
+
+  @override
+  String get errorCodeFileMissing => 'Файл не выбран';
+
+  @override
+  String get errorCodeFileTooLarge => 'Файл слишком большой';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Файл не загрузился — попробуйте ещё раз';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Связанная запись не найдена — обновите экран';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Хозяйству не назначен тариф — напишите в поддержку';
+
+  @override
+  String get errorCodePlanFree => 'Текущий тариф бесплатный — платить не нужно';
+
+  @override
+  String get errorCodePlanNameExists => 'Тариф с таким названием уже есть';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Тариф по умолчанию уже назначен другому — снимите отметку с него';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Тариф выключен — включите его или выберите другой';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Получателей не нашлось — проверьте, кому адресовано объявление';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'У хозяйства нет владельца — войти под клиентом некем';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Хозяйство не было удалено — восстанавливать нечего';
+
+  @override
+  String get errorCodePlatformAdminAccount =>
+      'Это учётная запись администратора платформы';
+
+  @override
   String get errorCodeRabbitNotFound => 'Кролик не найден';
 
   @override
