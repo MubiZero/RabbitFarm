@@ -44,7 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.initState();
     _privacyLinkRecognizer = TapGestureRecognizer()
       ..onTap = () => launchUrl(
-            Uri.parse('https://rabbitfarm.mubi.dev/privacy.html'),
+            Uri.parse('https://rabbitfarm.click/privacy.html'),
             mode: LaunchMode.externalApplication,
           );
   }

@@ -86,9 +86,10 @@ services:
       # а не «*»: со звёздочкой куки и авторизация работают небезопасно.
       - CORS_ORIGIN=${SERVICE_URL_WEB}
       # Адрес, который уходит людям наружу: ссылка в письме и SMS-приглашении
-      # (`<адрес>/i`). Он же вшит в одобренный шаблон payom, поэтому меняться
-      # не должен — см. docs/DEPLOY.md.
-      - APP_PUBLIC_URL=${SERVICE_URL_WEB}
+      # (`<адрес>/i`). Это главный домен, то есть лендинг: страницу /i отдаёт
+      # он, а не приложение. Адрес вшит в одобренный шаблон payom, поэтому
+      # меняется только вместе с новым шаблоном — см. docs/DEPLOY.md.
+      - APP_PUBLIC_URL=${SERVICE_URL_LANDING:-https://rabbitfarm.click}
       - MAX_FILE_SIZE=${MAX_FILE_SIZE:-5242880}
       - ALLOWED_FILE_TYPES=${ALLOWED_FILE_TYPES:-image/jpeg,image/png,image/jpg,image/webp}
       - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
@@ -178,7 +179,13 @@ services:
       - SERVICE_FQDN_LANDING_80=/
       # Куда ведёт кнопка «Открыть приложение» и откуда качают Android-сборку.
       # Пустой адрес сборки — рабочее состояние: кнопка просто не показывается.
-      - APP_URL=${SERVICE_URL_WEB:-https://rabbitfarm.click}
+      - APP_URL=${SERVICE_URL_WEB:-https://app.rabbitfarm.click}
+      # Проверка ссылок доменом живёт здесь же: файлы .well-known должен
+      # отдавать тот домен, что стоит в ссылке-приглашении.
+      - APPLE_TEAM_ID=${APPLE_TEAM_ID:-}
+      - ANDROID_CERT_SHA256=${ANDROID_CERT_SHA256:-}
+      - APP_STORE_URL=${APP_STORE_URL:-}
+      - PLAY_STORE_URL=${PLAY_STORE_URL:-}
       - ANDROID_APK_URL=${ANDROID_APK_URL:-}
     # Зависимости от api нет намеренно: лендинг обязан открываться всегда,
     # даже когда бэкенд лежит.

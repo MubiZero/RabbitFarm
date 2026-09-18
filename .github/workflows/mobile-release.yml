@@ -11,7 +11,7 @@ on:
       api_url:
         description: 'Адрес API, который будет вшит в сборку'
         required: false
-        default: 'https://api.rabbitfarm.mubi.dev/api/v1'
+        default: 'https://api.rabbitfarm.click/api/v1'
 
 env:
   # 3.47.0, не более раннюю: freezed ^4.0.1 (апгрейд
@@ -19,7 +19,7 @@ env:
   # не несут, — на них `flutter pub get` отказывает.
   FLUTTER_VERSION: '3.47.0'
   # Адрес API попадает в бандл при сборке: рантайм-конфигурации у Flutter нет.
-  API_URL: ${{ github.event.inputs.api_url || vars.API_URL || 'https://api.rabbitfarm.mubi.dev/api/v1' }}
+  API_URL: ${{ github.event.inputs.api_url || vars.API_URL || 'https://api.rabbitfarm.click/api/v1' }}
 
 jobs:
   android:

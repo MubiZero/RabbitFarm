@@ -18,8 +18,16 @@ const _scheme = 'rabbitfarm';
 /// сервер в приглашении и он же вшит в SMS-шаблон payom.
 const _publicHost = String.fromEnvironment(
   'APP_PUBLIC_HOST',
-  defaultValue: 'rabbitfarm.mubi.dev',
+  defaultValue: 'rabbitfarm.click',
 );
+
+/// Домен, на котором хозяйство жило до переезда на rabbitfarm.click.
+///
+/// Приглашение живёт десять минут, но само SMS остаётся в телефоне, и
+/// человек открывает его когда дойдут руки. Перестать узнавать прежний
+/// адрес значит встретить такого работника браузером вместо приложения,
+/// поэтому старый домен разбирается наравне с новым.
+const _legacyHost = 'rabbitfarm.mubi.dev';
 
 /// Путь страницы приглашения. Короткий не ради красоты: значение в SMS
 /// обрезается шлюзом по длине, и длинный адрес приехал бы обрубком.
@@ -33,7 +41,8 @@ const _invitePath = '/i';
 /// человек входит обычным кодом на свой контакт, и этот же вход активирует
 /// приглашение.
 bool isInviteLink(Uri uri) {
-  if (uri.scheme != 'https' || uri.host != _publicHost) return false;
+  if (uri.scheme != 'https') return false;
+  if (uri.host != _publicHost && uri.host != _legacyHost) return false;
 
   final path = uri.path.endsWith('/') && uri.path.length > 1
       ? uri.path.substring(0, uri.path.length - 1)

@@ -31,7 +31,7 @@ class _LimitedStaffRepository extends StaffRepository {
   }
 }
 
-const _inviteLink = 'https://rabbitfarm.mubi.dev/i';
+const _inviteLink = 'https://rabbitfarm.click/i';
 
 /// Приглашение по телефону, которое сервер создал, но отправить не смог:
 /// SMS-шлюз принимает только заранее одобренные шаблоны.

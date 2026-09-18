@@ -309,9 +309,11 @@ function build() {
   }
 
   copyDir(path.join(SRC, 'assets'), path.join(OUT, 'assets'));
-  for (const file of ['styles.css', 'app.js', 'config.json', 'og.html']) {
+  for (const file of ['styles.css', 'app.js', 'config.json', 'og.html', 'privacy.html']) {
     fs.copyFileSync(path.join(SRC, file), path.join(OUT, file));
   }
+  // Страница приглашения: её адрес уходит в SMS, и отдаёт его главный домен.
+  copyDir(path.join(SRC, 'i'), path.join(OUT, 'i'));
 
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
