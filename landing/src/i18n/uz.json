@@ -3,12 +3,12 @@
   "locale": "uz-UZ",
   "meta": {
     "title": "RabbitFarm: quyonlar hisobi telefonda",
-    "description": "Quyonchilik xoʻjaligi uchun ilova: poda, tugʻishlar, kataklar, ozuqa, emlashlar va pul bir joyda. Aloqasiz ham ishlaydi, oʻzbekcha, tojikcha va ruscha gapiradi.",
-    "og_alt": "RabbitFarm ilovasi ekrani: poda va bugungi vazifalar"
+    "description": "Quyonchilik xoʻjaligi uchun ilova: quyonlar, tugʻish, kataklar, ozuqa, emlash va pul bir joyda. Aloqasiz ham ishlaydi, oʻzbekcha, tojikcha va ruscha gapiradi.",
+    "og_alt": "RabbitFarm ilovasi ekrani: quyonlar va bugungi vazifalar"
   },
   "nav": {
     "modules": "Ichida nima bor",
-    "field": "Katakxonada",
+    "field": "Quyonxonada",
     "price": "Narxi qancha",
     "open": "Ilovani ochish"
   },
@@ -19,7 +19,7 @@
     "cta_primary": "Ilovani ochish",
     "cta_secondary": "Android uchun yuklash",
     "cta_note_web": "Brauzerda ochiladi, hech narsa oʻrnatish shart emas.",
-    "shot_alt": "Asosiy ekran: poda, bugungi vazifalar, ozuqa qoldigʻi"
+    "shot_alt": "Asosiy ekran: quyonlar, bugungi vazifalar, ozuqa qoldigʻi"
   },
   "click": {
     "title": "Bir marta bosdingiz, yozuv tayyor",
@@ -42,8 +42,8 @@
     "title": "Butun xoʻjalik bitta joyda",
     "items": [
       {
-        "name": "Poda",
-        "text": "Har quyonga karta: zoti, jinsi, vazni, katagi, surati va bobokaloniga qadar qarindoshlari."
+        "name": "Quyonlar",
+        "text": "Har bir quyonga karta: zoti, jinsi, vazni, katagi, surati va ajdodlarigacha nasl-nasabi."
       },
       {
         "name": "Urchitish",
@@ -51,7 +51,7 @@
       },
       {
         "name": "Kataklar",
-        "text": "Kim qayerda turadi, qayerda joy bor, kimni qayerga koʻchirish. Band katak egasining nomi bilan koʻrinadi."
+        "text": "Kim qayerda turadi, qayerda joy bor, kimni qayerga koʻchirish. Band katakda oʻtirgan quyon nomi bilan koʻrinadi."
       },
       {
         "name": "Ozuqa",
@@ -72,7 +72,7 @@
     ]
   },
   "field": {
-    "title": "Katakxona uchun qilingan, kabinet uchun emas",
+    "title": "Quyonxona uchun qilingan, kabinet uchun emas",
     "items": [
       {
         "name": "Aloqa uzilsa ham ish davom etadi",
@@ -101,14 +101,14 @@
     "title": "Narxi qancha",
     "lead": "Boshlash bepul: xoʻjalikni ochasiz va birinchi quyonlarni yozasiz. Keyin tarif xoʻjalik hajmiga qarab, yaʼni quyonlar va ishchilar soniga qarab tanlanadi.",
     "points": [
-      "Bepul boshlash, kartasiz va hisobsiz",
+      "Bepul boshlash: bank kartasi ham, hisob-faktura ham kerak emas",
       "Tojikistondagi xoʻjaliklar uchun Eskhata Merchant orqali karta bilan toʻlov",
       "Boshqa davlatdagi xoʻjaliklarga hisobni qoʻllab-quvvatlash xizmati yuboradi"
     ]
   },
   "cta": {
     "title": "Oʻz xoʻjaligingizda sinab koʻring",
-    "lead": "Telefon raqami, SMS kodi, va birinchi quyonlarni yozish mumkin. Bu ikki daqiqa vaqt oladi.",
+    "lead": "Telefon raqamingizni kiritasiz, SMS kodini olasiz va birinchi quyonlaringizni yozasiz. Bu ikki daqiqa vaqt oladi.",
     "primary": "Ilovani ochish",
     "secondary": "Android uchun yuklash",
     "stores_soon": "App Store va Google Playda ilova keyinroq paydo boʻladi."
