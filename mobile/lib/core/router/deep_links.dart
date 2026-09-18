@@ -14,8 +14,8 @@ import 'app_router.dart';
 /// сборка, без домена и без проверки.
 const _scheme = 'rabbitfarm';
 
-/// Домен, ссылки которого принадлежат приложению. Тот же адрес отдаёт
-/// сервер в приглашении и он же вшит в SMS-шаблон payom.
+/// Домен, ссылки которого принадлежат приложению. Тот же адрес сервер
+/// кладёт в приглашение (`APP_PUBLIC_URL` на бэкенде).
 const _publicHost = String.fromEnvironment(
   'APP_PUBLIC_HOST',
   defaultValue: 'rabbitfarm.click',
