@@ -4702,6 +4702,11 @@ class AppLocalizationsUz extends AppLocalizations {
       'Valyuta, vaqt va kirish usuli shunga bogʻliq';
 
   @override
+  String countryLine(String country) {
+    return 'Davlat: $country';
+  }
+
+  @override
   String get countryTJ => 'Tojikiston';
 
   @override

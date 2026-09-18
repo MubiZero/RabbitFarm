@@ -84,7 +84,7 @@
       },
       {
         "name": "Bitta ham parol yoʻq",
-        "text": "Kirish SMS kodi bilan, telefonning oʻzida toʻrt xonali kod. Yodlash ham, yoʻqotish ham yoʻq."
+        "text": "Kirish bir martalik kod bilan: Tojikistonda u SMS orqali keladi, boshqa davlatlarda — pochtaga. Telefonning oʻzida esa toʻrt xonali kod. Yodlash ham, yoʻqotish ham yoʻq."
       },
       {
         "name": "Toʻrt til",
@@ -108,7 +108,7 @@
   },
   "cta": {
     "title": "Oʻz xoʻjaligingizda sinab koʻring",
-    "lead": "Telefon raqamingizni kiritasiz, SMS kodini olasiz va birinchi quyonlaringizni yozasiz. Bu ikki daqiqa vaqt oladi.",
+    "lead": "Telefon raqamingizni yoki pochtangizni kiritasiz, bir martalik kodni olasiz va birinchi quyonlaringizni yozasiz. Bu ikki daqiqa vaqt oladi.",
     "primary": "Ilovani ochish",
     "secondary": "Android uchun yuklash",
     "stores_soon": "App Store va Google Playda ilova keyinroq paydo boʻladi."

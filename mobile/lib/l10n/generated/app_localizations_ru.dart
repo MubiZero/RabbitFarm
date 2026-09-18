@@ -4762,6 +4762,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'От этого зависят валюта, время и способ входа';
 
   @override
+  String countryLine(String country) {
+    return 'Страна: $country';
+  }
+
+  @override
   String get countryTJ => 'Таджикистан';
 
   @override

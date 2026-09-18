@@ -1448,6 +1448,7 @@
   "onbSkip": "Oʻtkazib yuborish",
   "onbCountryTitle": "Xoʻjaligingiz qayerda?",
   "onbCountrySubtitle": "Valyuta, vaqt va kirish usuli shunga bogʻliq",
+  "countryLine": "Davlat: {country}",
   "countryTJ": "Tojikiston",
   "countryUZ": "Oʻzbekiston",
   "countryKG": "Qirgʻiziston",

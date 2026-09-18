@@ -10,6 +10,7 @@ import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/countries/country_picker.dart';
 import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/error_text.dart';
 
@@ -241,6 +242,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+
+                // Страна уезжает на сервер вместе с регистрацией и решает
+                // валюту хозяйства и способ входа, а спрашивают её в
+                // знакомстве — которое можно и пропустить. Исправить ответ
+                // должно быть можно там, где он применяется.
+                const CountryPickerButton(),
                 const SizedBox(height: 16),
 
                 // Контакт: на него придёт код для входа — пароля в сервисе

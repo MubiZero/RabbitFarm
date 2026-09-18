@@ -84,7 +84,7 @@
       },
       {
         "name": "No passwords at all",
-        "text": "You sign in with a code from an SMS, and the phone itself is locked by a four-digit code."
+        "text": "You sign in with a one-time code: by SMS in Tajikistan, by email everywhere else. The phone itself is locked by a four-digit code."
       },
       {
         "name": "Four languages",
@@ -108,7 +108,7 @@
   },
   "cta": {
     "title": "Try it on your own farm",
-    "lead": "A phone number, a code from an SMS, and you can enter your first rabbits. It takes a couple of minutes.",
+    "lead": "A phone number or an email, a one-time code, and you can enter your first rabbits. It takes a couple of minutes.",
     "primary": "Open the app",
     "secondary": "Download for Android",
     "stores_soon": "The app will reach the App Store and Google Play later."

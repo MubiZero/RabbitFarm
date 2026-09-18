@@ -14,6 +14,7 @@ import '../../../../core/widgets/app_brand_mark.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pin_provider.dart';
+import '../../../../core/countries/country_picker.dart';
 import '../../../../core/countries/country_provider.dart';
 
 /// Вход по коду — единственный способ попасть в аккаунт: телефон основной
@@ -290,6 +291,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Страна решает, как сюда вообще входят, а спрашивают её в
+          // знакомстве — которое можно пропустить или пройти невнимательно.
+          // Без этой строки человек с узбекским номером упирался в «неверный
+          // номер» и поменять ничего не мог.
+          const CountryPickerButton(),
+          const SizedBox(height: AppSpacing.md),
           // Телефон первым: код в SMS доходит и без интернета на телефоне,
           // почта нужна тем, у кого номер не таджикский или SMS не приходят.
           //

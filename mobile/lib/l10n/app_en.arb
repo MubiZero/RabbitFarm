@@ -1448,6 +1448,7 @@
   "onbSkip": "Skip",
   "onbCountryTitle": "Where is your farm?",
   "onbCountrySubtitle": "Currency, time and sign-in method depend on this",
+  "countryLine": "Country: {country}",
   "countryTJ": "Tajikistan",
   "countryUZ": "Uzbekistan",
   "countryKG": "Kyrgyzstan",

@@ -8310,6 +8310,12 @@ abstract class AppLocalizations {
   /// **'От этого зависят валюта, время и способ входа'**
   String get onbCountrySubtitle;
 
+  /// No description provided for @countryLine.
+  ///
+  /// In ru, this message translates to:
+  /// **'Страна: {country}'**
+  String countryLine(String country);
+
   /// No description provided for @countryTJ.
   ///
   /// In ru, this message translates to:

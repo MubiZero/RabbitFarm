@@ -4691,6 +4691,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Currency, time and sign-in method depend on this';
 
   @override
+  String countryLine(String country) {
+    return 'Country: $country';
+  }
+
+  @override
   String get countryTJ => 'Tajikistan';
 
   @override

@@ -2250,6 +2250,14 @@
   "onbSkip": "Пропустить",
   "onbCountryTitle": "Где ваше хозяйство?",
   "onbCountrySubtitle": "От этого зависят валюта, время и способ входа",
+  "countryLine": "Страна: {country}",
+  "@countryLine": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "countryTJ": "Таджикистан",
   "countryUZ": "Узбекистан",
   "countryKG": "Кыргызстан",

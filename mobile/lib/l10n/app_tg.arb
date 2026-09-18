@@ -1448,6 +1448,7 @@
   "onbSkip": "Гузарондан",
   "onbCountryTitle": "Хоҷагии шумо дар куҷост?",
   "onbCountrySubtitle": "Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст",
+  "countryLine": "Кишвар: {country}",
   "countryTJ": "Тоҷикистон",
   "countryUZ": "Ӯзбекистон",
   "countryKG": "Қирғизистон",

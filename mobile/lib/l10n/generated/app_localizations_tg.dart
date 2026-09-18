@@ -4668,6 +4668,11 @@ class AppLocalizationsTg extends AppLocalizations {
       'Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст';
 
   @override
+  String countryLine(String country) {
+    return 'Кишвар: $country';
+  }
+
+  @override
   String get countryTJ => 'Тоҷикистон';
 
   @override
