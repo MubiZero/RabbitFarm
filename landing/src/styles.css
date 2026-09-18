@@ -1,0 +1,845 @@
+/*
+ * Лендинг rabbitfarm.click.
+ *
+ * Палитра и размеры кнопок взяты у приложения (mobile/lib/core/theme и
+ * страница приглашения mobile/web/i): человек, пришедший с лендинга, должен
+ * увидеть то же самое, что на первом экране приложения, а не чужой сайт.
+ *
+ * Страница статическая, без фреймворка и без сборщика стилей: покупатель
+ * открывает её с дешёвого Android на мобильном интернете, и мегабайт
+ * JavaScript здесь стоил бы дороже любой анимации.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface-sunken: #f1efe9;
+  --text: #1b1b1a;
+  --muted: #5a5853;
+  --accent: #3f6f43;
+  --accent-strong: #325a36;
+  --accent-text: #ffffff;
+  --accent-wash: rgba(63, 111, 67, 0.09);
+  --border: #e2e0da;
+  --border-strong: #cfccc3;
+
+  /* Тень светлой темы: рассеянная + ключевая, как в m1.material.io. */
+  --shadow-low: 0 1px 2px rgba(27, 27, 26, 0.07), 0 4px 12px rgba(27, 27, 26, 0.05);
+  --shadow-high: 0 2px 4px rgba(27, 27, 26, 0.08), 0 16px 40px rgba(27, 27, 26, 0.10);
+
+  --radius-control: 14px;
+  --radius-panel: 20px;
+  --radius-block: 28px;
+
+  --dur-micro: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-in: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+  --gutter: 20px;
+  --page: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181a;
+    --surface: #1f2224;
+    /* В тёмной теме глубина делается светлее, а не тенью. */
+    --surface-sunken: #1a1d1f;
+    --text: #ecebe8;
+    --muted: #a5a39d;
+    --accent: #7fb082;
+    --accent-strong: #93bf96;
+    --accent-text: #10210f;
+    --accent-wash: rgba(127, 176, 130, 0.14);
+    --border: #2e3234;
+    --border-strong: #3d4245;
+
+    --shadow-low: none;
+    --shadow-high: none;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* 17px: страницу читают на солнце, с телефона, часто не в очках. */
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Кнопка магазина рождается скрытой и включается, только когда в
+   config.json есть адрес: без этого правила display кнопки перебивает
+   атрибут hidden, и на странице висит ссылка в никуда. */
+[hidden] {
+  display: none !important;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.section {
+  padding: 88px 0;
+}
+
+.section-sunken {
+  background: var(--surface-sunken);
+}
+
+.section-title {
+  font-size: clamp(1.7rem, 3.6vw, 2.35rem);
+  max-width: 18ch;
+}
+
+.section-lead {
+  margin-top: 16px;
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+/* --- Шапка ------------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.topbar[data-scrolled='true'] {
+  border-bottom-color: var(--border);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 68px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-weight: 700;
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand-dot {
+  color: var(--accent);
+}
+
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  margin-right: 8px;
+  align-self: center;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+  font-size: 0.97rem;
+}
+
+.topbar-nav a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  /* 44px: минимальная область нажатия, даже когда сама подпись ниже. */
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0 2px;
+  border-radius: 8px;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+
+.topbar-nav a:not(.btn):hover {
+  color: var(--text);
+}
+
+.topbar-nav a:focus-visible,
+.footer-links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.topbar .btn {
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 0.97rem;
+}
+
+@media (max-width: 860px) {
+  .topbar-nav a:not(.btn) {
+    display: none;
+  }
+}
+
+/* --- Кнопки ------------------------------------------------------------ */
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* 56px: тот же размер, что у кнопок приложения, попадают пальцем в перчатке. */
+  min-height: 56px;
+  padding: 0 26px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+
+.btn:hover {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn-primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* След касания: страница живёт на домене .click, и нажатие должно быть видно. */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: currentColor;
+  opacity: 0.22;
+  pointer-events: none;
+  animation: ripple-out var(--dur-slow) var(--ease-out) forwards;
+}
+
+@keyframes ripple-out {
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* --- Первый экран ------------------------------------------------------ */
+
+.hero {
+  padding: 56px 0 72px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+}
+
+.hero-accent {
+  color: var(--accent);
+}
+
+.hero-lead {
+  margin-top: 20px;
+  max-width: 44ch;
+  font-size: 1.14rem;
+  color: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.hero-note {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Рамка телефона: снимок экрана внутри реального устройства читается как
+   приложение, а не как картинка на сайте. */
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-block);
+  background: var(--surface);
+  box-shadow: var(--shadow-high);
+}
+
+/* height: auto обязателен: у снимков проставлены атрибуты width и height,
+   и без него браузер берёт высоту из атрибута, а aspect-ratio и обрезка
+   ниже просто не применяются. */
+.phone img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  background: var(--surface-sunken);
+}
+
+/* На первом экране телефон показан по пояс: иначе снимок в полный рост
+   уводит заголовок и кнопки за нижнюю границу окна, и человек видит
+   картинку вместо предложения. */
+.hero .phone img,
+.click-panel .phone img {
+  height: min(52vh, 520px);
+  object-fit: cover;
+  object-position: top center;
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .phone {
+    max-width: 280px;
+  }
+}
+
+/* --- Секция «один клик» ------------------------------------------------ */
+
+.click-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 40px;
+}
+
+.click-jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.job {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  padding: 0 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out),
+    transform var(--dur-micro) var(--ease-out);
+}
+
+.job:hover {
+  border-color: var(--accent);
+}
+
+.job:active {
+  transform: scale(0.99);
+}
+
+.job:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.job[aria-selected='true'] {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+}
+
+.job-mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--accent);
+}
+
+.click-hint {
+  margin-top: 18px;
+  font-size: 0.93rem;
+  color: var(--muted);
+}
+
+.click-panel {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.click-caption {
+  font-size: 1.04rem;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .click-grid,
+  .click-panel {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .click-panel .phone {
+    max-width: 260px;
+  }
+}
+
+/* --- Модули ------------------------------------------------------------ */
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.module {
+  padding: 26px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+/* Ячейки разного веса: стадо и деньги показаны снимком и занимают больше
+   места, остальное читается вторым заходом. */
+.module:nth-child(1) {
+  grid-column: span 4;
+}
+
+.module:nth-child(2) {
+  grid-column: span 2;
+}
+
+.module:nth-child(3),
+.module:nth-child(4),
+.module:nth-child(5) {
+  grid-column: span 2;
+}
+
+.module:nth-child(6) {
+  grid-column: span 4;
+}
+
+.module:nth-child(7) {
+  grid-column: span 2;
+}
+
+.module-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--accent);
+}
+
+.module h3 {
+  margin-top: 16px;
+  font-size: 1.16rem;
+}
+
+.module p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* Снимок в ячейке показывает верх экрана: в карточку не влезет телефон
+   целиком, а по шапке и первым строкам модуль узнаётся сразу. */
+.module-shot {
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-sunken);
+}
+
+.module-shot img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top center;
+}
+
+@media (max-width: 900px) {
+  .modules {
+    grid-template-columns: 1fr;
+  }
+
+  .module {
+    grid-column: span 1 !important;
+  }
+}
+
+/* --- В крольчатнике ---------------------------------------------------- */
+
+.field-list {
+  margin-top: 40px;
+  display: grid;
+  gap: 0;
+}
+
+.field-item {
+  display: grid;
+  grid-template-columns: minmax(0, 24ch) minmax(0, 1fr);
+  gap: 32px;
+  padding: 28px 0;
+  border-top: 1px solid var(--border);
+  align-items: baseline;
+}
+
+.field-item:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.field-item h3 {
+  font-size: 1.2rem;
+}
+
+.field-item p {
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .field-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* --- Данные и цена ----------------------------------------------------- */
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.price-points {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.price-points li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--muted);
+}
+
+.price-points svg {
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+.link-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  min-height: 44px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-micro) var(--ease-out);
+}
+
+.link-inline:hover {
+  border-bottom-color: var(--accent);
+}
+
+.link-inline:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+@media (max-width: 860px) {
+  .split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* --- Финальный призыв -------------------------------------------------- */
+
+.closing {
+  padding: 88px 0 96px;
+  text-align: center;
+}
+
+.closing .section-title {
+  margin-inline: auto;
+}
+
+.closing .section-lead {
+  margin-inline: auto;
+  max-width: 48ch;
+}
+
+.closing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.closing-note {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* --- Подвал ------------------------------------------------------------ */
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0 56px;
+  font-size: 0.97rem;
+  color: var(--muted);
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 40px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.footer a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.footer a:hover {
+  color: var(--text);
+  border-bottom-color: var(--border-strong);
+}
+
+.footer a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.lang {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+
+.lang:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.lang[aria-current='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* --- Появление при прокрутке -------------------------------------------
+ *
+ * Прячем блок только в браузере, где скрипты включены и есть кому его
+ * показать: `scripting: enabled` не совпадёт ни при выключенном JavaScript,
+ * ни в старом браузере, и тогда страница просто покажет всё сразу.
+ */
+
+.reveal {
+  transition: opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+
+@media (scripting: enabled) {
+  .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ripple {
+    display: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 16px;
+  }
+
+  /* На узком экране бренд и кнопка делят одну строку: без этого подпись
+     кнопки переносится на вторую строку и наезжает на логотип. */
+  .topbar-inner {
+    gap: 12px;
+    height: 60px;
+  }
+
+  .brand {
+    font-size: 1rem;
+  }
+
+  .brand-mark {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+  }
+
+  .topbar .btn {
+    padding: 0 14px;
+    font-size: 0.9rem;
+  }
+
+  .section {
+    padding: 64px 0;
+  }
+
+  .hero {
+    padding: 36px 0 56px;
+  }
+}

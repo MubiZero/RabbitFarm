@@ -14,7 +14,7 @@ class ForceUpdateScreen extends StatelessWidget {
 
   // TODO(store-links): подставить настоящие ссылки, когда приложение
   // опубликовано в App Store/Google Play.
-  static const _storeUrl = 'https://rabbitfarm.mubi.dev';
+  static const _storeUrl = 'https://rabbitfarm.click';
 
   @override
   Widget build(BuildContext context) {

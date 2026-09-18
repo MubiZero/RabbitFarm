@@ -1,0 +1,122 @@
+{
+  "lang": "uz",
+  "locale": "uz-UZ",
+  "meta": {
+    "title": "RabbitFarm: quyonlar hisobi telefonda",
+    "description": "Quyonchilik xoʻjaligi uchun ilova: poda, tugʻishlar, kataklar, ozuqa, emlashlar va pul bir joyda. Aloqasiz ham ishlaydi, oʻzbekcha, tojikcha va ruscha gapiradi.",
+    "og_alt": "RabbitFarm ilovasi ekrani: poda va bugungi vazifalar"
+  },
+  "nav": {
+    "modules": "Ichida nima bor",
+    "field": "Katakxonada",
+    "price": "Narxi qancha",
+    "open": "Ilovani ochish"
+  },
+  "hero": {
+    "title_top": "Quyonlar hisobi,",
+    "title_accent": "yurgan joyda yozib boriladi",
+    "lead": "Tugʻish, ozuqa va xarajatni kataklar yonida belgilang. Ilova bolalar sonini, ozuqa qoldigʻini va foydani oʻzi hisoblaydi.",
+    "cta_primary": "Ilovani ochish",
+    "cta_secondary": "Android uchun yuklash",
+    "cta_note_web": "Brauzerda ochiladi, hech narsa oʻrnatish shart emas.",
+    "shot_alt": "Asosiy ekran: poda, bugungi vazifalar, ozuqa qoldigʻi"
+  },
+  "click": {
+    "title": "Bir marta bosdingiz, yozuv tayyor",
+    "lead": "Kundalik ishlar bitta ekranda yigʻilgan. Ishni tanlaysiz, shakl toʻldirilgan holda ochiladi: faqat sonni yozish qoladi.",
+    "hint": "Ishni bosing va nima ochilishini koʻring",
+    "items": [
+      {
+        "label": "Ozuqa berdim",
+        "caption": "Katak va qopni belgilaysiz. Omborda ozuqa qoldigʻi oʻzi kamayadi, ozuqa tugay deganda ilova oldindan ogohlantiradi.",
+        "alt": "Oziqlantirishni yozish ekrani: katak, ozuqa va miqdor tanlash"
+      },
+      {
+        "label": "Bolalar tugʻildi",
+        "caption": "Onasini va nechtasi tirik tugʻilganini yozasiz. Tugʻish ona kartasiga tushadi, bolalar ajratilgach podaga qoʻshiladi.",
+        "alt": "Tugʻishni yozish ekrani: ona, sana, bolalar soni"
+      }
+    ]
+  },
+  "modules": {
+    "title": "Butun xoʻjalik bitta joyda",
+    "items": [
+      {
+        "name": "Poda",
+        "text": "Har quyonga karta: zoti, jinsi, vazni, katagi, surati va bobokaloniga qadar qarindoshlari."
+      },
+      {
+        "name": "Urchitish",
+        "text": "Juftlashtirish, boʻgʻozlik, tugʻish. Juftlashdan oldin ilova quyonlar yaqin qarindosh boʻlsa ogohlantiradi."
+      },
+      {
+        "name": "Kataklar",
+        "text": "Kim qayerda turadi, qayerda joy bor, kimni qayerga koʻchirish. Band katak egasining nomi bilan koʻrinadi."
+      },
+      {
+        "name": "Ozuqa",
+        "text": "Ombordagi qoldiq, kunlik sarf va ozuqa tugay deganda ogohlantirish."
+      },
+      {
+        "name": "Salomatlik",
+        "text": "Emlashlar keyingi sanasi bilan, davolash, tashxis va dori narxi."
+      },
+      {
+        "name": "Moliya",
+        "text": "Daromad va xarajat moddalar boʻyicha, oylik foyda, oxirgi amallar roʻyxati."
+      },
+      {
+        "name": "Ishchilar",
+        "text": "Telefon raqami orqali taklif, rollar va jurnal: kim nimani yozgan."
+      }
+    ]
+  },
+  "field": {
+    "title": "Katakxona uchun qilingan, kabinet uchun emas",
+    "items": [
+      {
+        "name": "Aloqa uzilsa ham ish davom etadi",
+        "text": "Yozuvlar telefonda qoladi va tarmoq tiklangach serverga oʻzi ketadi. Qaytadan yozish shart emas."
+      },
+      {
+        "name": "Qoʻl band boʻlsa, ovoz bilan ayting",
+        "text": "Izoh va vaznni ovoz bilan aytish mumkin: ilova nutqni tanib, matnni maydonga qoʻyadi."
+      },
+      {
+        "name": "Bitta ham parol yoʻq",
+        "text": "Kirish SMS kodi bilan, telefonning oʻzida toʻrt xonali kod. Yodlash ham, yoʻqotish ham yoʻq."
+      },
+      {
+        "name": "Toʻrt til",
+        "text": "Oʻzbekcha, tojikcha, ruscha va inglizcha. Har ishchi oʻz tilini tanlaydi, xoʻjalik umumiy qoladi."
+      }
+    ]
+  },
+  "data": {
+    "title": "Xoʻjalik maʼlumotlari sizniki boʻlib qoladi",
+    "text": "Dastur kodi ochiq: istagan xoʻjalik tizimni oʻz serveriga oʻrnatishi mumkin. Yozuvlar jadvalga chiqariladi, hisobotlar oddiy printerda chop etiladi.",
+    "link": "Kodni GitHubda koʻrish"
+  },
+  "price": {
+    "title": "Narxi qancha",
+    "lead": "Boshlash bepul: xoʻjalikni ochasiz va birinchi quyonlarni yozasiz. Keyin tarif xoʻjalik hajmiga qarab, yaʼni quyonlar va ishchilar soniga qarab tanlanadi.",
+    "points": [
+      "Bepul boshlash, kartasiz va hisobsiz",
+      "Tojikistondagi xoʻjaliklar uchun Eskhata Merchant orqali karta bilan toʻlov",
+      "Boshqa davlatdagi xoʻjaliklarga hisobni qoʻllab-quvvatlash xizmati yuboradi"
+    ]
+  },
+  "cta": {
+    "title": "Oʻz xoʻjaligingizda sinab koʻring",
+    "lead": "Telefon raqami, SMS kodi, va birinchi quyonlarni yozish mumkin. Bu ikki daqiqa vaqt oladi.",
+    "primary": "Ilovani ochish",
+    "secondary": "Android uchun yuklash",
+    "stores_soon": "App Store va Google Playda ilova keyinroq paydo boʻladi."
+  },
+  "footer": {
+    "lang_label": "Til",
+    "privacy": "Maxfiylik siyosati",
+    "github": "Dastur kodi",
+    "rights": "Quyonchilik xoʻjaligini boshqarish"
+  }
+}

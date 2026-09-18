@@ -34,7 +34,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Ссылка-приглашение: https://rabbitfarm.mubi.dev/i — тот же
+            <!-- Ссылка-приглашение: https://rabbitfarm.click/i — тот же
                  адрес уходит в SMS и в письме. autoVerify означает, что
                  Android при установке сходит на домен за
                  /.well-known/assetlinks.json и, найдя там отпечаток нашей
@@ -47,6 +47,12 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="rabbitfarm.click"
+                      android:path="/i"/>
+                <!-- Прежний домен остаётся: приглашения, разосланные до
+                     переезда, должны открываться приложением, а не
+                     браузером. -->
                 <data android:scheme="https"
                       android:host="rabbitfarm.mubi.dev"
                       android:path="/i"/>

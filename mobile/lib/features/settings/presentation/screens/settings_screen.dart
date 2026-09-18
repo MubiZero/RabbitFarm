@@ -222,7 +222,7 @@ class SettingsScreen extends ConsumerWidget {
                 // из mobile/web/), а не на домене API — поэтому не через
                 // ApiEndpoints.baseUrl, у него другой хост.
                 onTap: () => launchUrl(
-                  Uri.parse('https://rabbitfarm.mubi.dev/privacy.html'),
+                  Uri.parse('https://rabbitfarm.click/privacy.html'),
                   mode: LaunchMode.externalApplication,
                 ),
               ),

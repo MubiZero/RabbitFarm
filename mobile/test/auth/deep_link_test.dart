@@ -7,8 +7,14 @@ import 'package:mobile/core/router/deep_links.dart';
 void main() {
   group('isInviteLink', () {
     test('узнаёт ссылку-приглашение своего домена', () {
+      expect(isInviteLink(Uri.parse('https://rabbitfarm.click/i')), isTrue);
+      expect(isInviteLink(Uri.parse('https://rabbitfarm.click/i/')), isTrue);
+    });
+
+    test('прежний домен узнаётся тоже', () {
+      // SMS с приглашением остаётся в телефоне и после переезда: работник
+      // откроет его, когда дойдут руки, и должен попасть в приложение.
       expect(isInviteLink(Uri.parse('https://rabbitfarm.mubi.dev/i')), isTrue);
-      expect(isInviteLink(Uri.parse('https://rabbitfarm.mubi.dev/i/')), isTrue);
     });
 
     test('чужой домен приглашением не считается', () {
@@ -19,15 +25,15 @@ void main() {
     });
 
     test('другие страницы того же домена — не приглашение', () {
-      expect(isInviteLink(Uri.parse('https://rabbitfarm.mubi.dev/')), isFalse);
+      expect(isInviteLink(Uri.parse('https://rabbitfarm.click/')), isFalse);
       expect(
-        isInviteLink(Uri.parse('https://rabbitfarm.mubi.dev/privacy.html')),
+        isInviteLink(Uri.parse('https://rabbitfarm.click/privacy.html')),
         isFalse,
       );
     });
 
     test('http вместо https не принимается', () {
-      expect(isInviteLink(Uri.parse('http://rabbitfarm.mubi.dev/i')), isFalse);
+      expect(isInviteLink(Uri.parse('http://rabbitfarm.click/i')), isFalse);
     });
   });
   group('phoneFromInviteLink', () {
@@ -48,7 +54,7 @@ void main() {
 
     test('новая https-ссылка номера не несёт — и не должна', () {
       expect(
-        phoneFromInviteLink(Uri.parse('https://rabbitfarm.mubi.dev/i')),
+        phoneFromInviteLink(Uri.parse('https://rabbitfarm.click/i')),
         isNull,
       );
     });
