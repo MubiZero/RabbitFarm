@@ -10,6 +10,7 @@ import '../../data/models/feed_model.dart';
 import '../providers/feeds_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../utils/feed_labels.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Карточка корма на складе.
 class FeedFormScreen extends ConsumerStatefulWidget {
@@ -157,6 +158,16 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'feed-${_feed?.id ?? 'new'}',
+        fields: {
+          'name': _name,
+          'stock': _currentStock,
+          'minStock': _minStock,
+          'cost': _costPerUnit,
+        },
+      ),
       title: _isEditing ? l10n.feedFormEditTitle : l10n.feedFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

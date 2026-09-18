@@ -11,6 +11,7 @@ import '../../data/models/medical_record_model.dart';
 import '../providers/medical_records_provider.dart';
 import '../utils/medical_labels.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Карты лечения.
 class MedicalRecordsListScreen extends ConsumerStatefulWidget {
@@ -135,7 +136,7 @@ class _MedicalRecordsListScreenState
   }
 
   Future<void> _showPeriodFilter() async {
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     await showModalBottomSheet<void>(
       context: context,
@@ -291,7 +292,7 @@ class _RecordCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                DateFormat('d MMM y', 'ru').format(record.startedAt),
+                DateFormat('d MMM y', dateLocaleOf(context)).format(record.startedAt),
                 style: AppTypography.labelSm
                     .copyWith(color: context.colors.onSurfaceVariant),
               ),
@@ -409,7 +410,7 @@ class _DetailsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final format = DateFormat('d MMMM y', 'ru');
+    final format = DateFormat('d MMMM y', dateLocaleOf(context));
     final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 

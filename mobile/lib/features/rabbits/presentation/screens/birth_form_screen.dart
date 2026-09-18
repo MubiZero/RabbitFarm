@@ -12,6 +12,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/births_provider.dart';
 import '../widgets/create_kits_dialog.dart';
 import '../widgets/rabbit_picker.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Запись об окроле.
 class BirthFormScreen extends ConsumerStatefulWidget {
@@ -139,6 +140,16 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
     final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'birth-${_record?.id ?? 'new'}',
+        fields: {
+          'alive': _alive,
+          'dead': _dead,
+          'complications': _complications,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing ? l10n.birthFormEditTitle : l10n.birthFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

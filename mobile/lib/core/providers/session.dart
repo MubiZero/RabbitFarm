@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../cache/list_cache.dart';
+import '../forms/form_draft.dart';
 
 /// Номер текущей сессии.
 ///
@@ -21,8 +22,10 @@ final sessionRevisionProvider = StateProvider<int>((ref) => 0);
 ///
 /// Кэш списков на диске уезжает вместе с памятью: он для того и сохранён,
 /// чтобы пережить перезапуск, — а значит после выхода пережил бы и смену
-/// пользователя.
+/// пользователя. Недописанные формы — по той же причине: на общем планшете
+/// фермы следующий работник не должен увидеть чужую заметку.
 void resetSessionData(Ref ref) {
   ref.read(sessionRevisionProvider.notifier).state++;
   unawaited(clearListCaches());
+  unawaited(clearFormDrafts());
 }

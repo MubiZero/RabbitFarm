@@ -1692,5 +1692,7 @@
   "financeSheetColKind": "Income or expense",
   "exportShareSubject": "{title} — Rabbit Farm",
   "financeSheetLastMonth": "Last month",
-  "financeSheetThisYear": "This year"
+  "financeSheetThisYear": "This year",
+  "formDraftRestored": "Brought back what you had not saved",
+  "formDraftDiscard": "Clear"
 }

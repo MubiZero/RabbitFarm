@@ -11,6 +11,7 @@ import '../../../cages/presentation/providers/cages_provider.dart';
 import '../providers/breeds_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../utils/rabbit_labels.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Завести сразу несколько кроликов одним образцом.
 ///
@@ -79,6 +80,13 @@ class _BulkRabbitsScreenState extends ConsumerState<BulkRabbitsScreen> {
     final cages = ref.watch(cagesProvider);
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'bulk-rabbits',
+        fields: {
+          'tagPrefix': _tagPrefix,
+        },
+      ),
       title: l10n.bulkHerdTitle,
       formKey: _formKey,
       submitLabel: l10n.commonAdd,

@@ -11,6 +11,7 @@ import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
 import '../utils/rabbit_labels.dart';
 import '../widgets/rabbit_picker.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Отметить падёж.
 ///
@@ -88,6 +89,13 @@ class _DeathFormScreenState extends ConsumerState<DeathFormScreen> {
     final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'death-${widget.rabbit?.id ?? 'new'}',
+        fields: {
+          'reason': _reason,
+        },
+      ),
       title: l10n.deathFormTitle,
       formKey: _formKey,
       submitLabel: l10n.deathFormSubmit,

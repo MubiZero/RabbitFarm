@@ -12,6 +12,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Список клеток фермы.
 class CagesListScreen extends ConsumerStatefulWidget {
@@ -391,7 +392,7 @@ class _CageCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   context.l10n.cagesLastCleaned(
-                      DateFormat('d MMMM', 'ru').format(cage.lastCleanedAt!)),
+                      DateFormat('d MMMM', dateLocaleOf(context)).format(cage.lastCleanedAt!)),
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
                 ),

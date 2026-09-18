@@ -11,6 +11,7 @@ import '../../data/models/rabbit_model.dart';
 import '../../data/models/rabbit_weight_model.dart';
 import '../providers/weights_provider.dart';
 import '../widgets/weight_chart.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// История взвешиваний одного кролика.
 class WeightHistoryScreen extends ConsumerWidget {
@@ -230,7 +231,7 @@ class _WeightRow extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  DateFormat('d MMMM y, HH:mm', 'ru').format(weight.measuredAt),
+                  DateFormat('d MMMM y, HH:mm', dateLocaleOf(context)).format(weight.measuredAt),
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
                 ),
@@ -374,7 +375,7 @@ class _AddWeightDialogState extends ConsumerState<AddWeightDialog> {
                   prefixIcon: const Icon(Icons.event_outlined),
                 ),
                 child: Text(
-                  DateFormat('d MMMM y, HH:mm', 'ru').format(_measuredAt),
+                  DateFormat('d MMMM y, HH:mm', dateLocaleOf(context)).format(_measuredAt),
                   style: AppTypography.bodyLg
                       .copyWith(color: context.colors.onSurface),
                 ),

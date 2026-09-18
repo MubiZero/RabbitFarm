@@ -15,6 +15,7 @@ import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../../../../core/voice/voice_input.dart';
 import '../../data/models/note_model.dart';
 import '../providers/notes_provider.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Заметка по ферме — необязательно привязанная к кролику или клетке.
 class NoteFormScreen extends ConsumerStatefulWidget {
@@ -148,6 +149,13 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'note-${_note?.id ?? 'new'}',
+        fields: {
+          'content': _content,
+        },
+      ),
       title: _isEditing
           ? context.l10n.noteFormEditTitle
           : context.l10n.noteFormNewTitle,

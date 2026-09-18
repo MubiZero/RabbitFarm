@@ -2269,5 +2269,7 @@
   "exportShareSubject": "{title} — «Кроличья ферма»",
   "@exportShareSubject": {"placeholders": {"title": {"type": "String"}}},
   "financeSheetLastMonth": "Прошлый месяц",
-  "financeSheetThisYear": "Этот год"
+  "financeSheetThisYear": "Этот год",
+  "formDraftRestored": "Вернули то, что вы не успели сохранить",
+  "formDraftDiscard": "Очистить"
 }

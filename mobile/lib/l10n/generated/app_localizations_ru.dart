@@ -5615,4 +5615,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get financeSheetThisYear => 'Этот год';
+
+  @override
+  String get formDraftRestored => 'Вернули то, что вы не успели сохранить';
+
+  @override
+  String get formDraftDiscard => 'Очистить';
 }

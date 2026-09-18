@@ -20,6 +20,7 @@ import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../../../rabbits/presentation/widgets/rabbit_multi_picker.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -223,6 +224,14 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'transaction-${_record?.id ?? 'new'}',
+        fields: {
+          'amount': _amount,
+          'description': _description,
+        },
+      ),
       title: _isEditing ? l10n.txFormEditTitle : l10n.txFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

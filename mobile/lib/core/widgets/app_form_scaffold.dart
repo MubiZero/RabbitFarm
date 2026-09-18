@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../cache/cache_scope.dart';
+import '../forms/form_draft.dart';
 import '../theme/theme.dart';
 import '../l10n/l10n_context.dart';
 import 'app_slide_to_confirm.dart';
@@ -15,7 +18,7 @@ import '../l10n/error_text.dart';
 /// нажал «назад».
 ///
 /// Экрану остаётся описать поля и одну функцию сохранения.
-class AppFormScaffold extends StatefulWidget {
+class AppFormScaffold extends ConsumerStatefulWidget {
   final String title;
   final GlobalKey<FormState> formKey;
   final List<Widget> children;
@@ -49,6 +52,12 @@ class AppFormScaffold extends StatefulWidget {
   /// Сдвиг пальцем случайно не происходит.
   final bool confirmBySlide;
 
+  /// Что сохранять, если приложение убьют на полуслове.
+  ///
+  /// Перечисляются только текстовые поля: на них уходят минуты, и именно они
+  /// пропадали безвозвратно (см. `core/forms/form_draft.dart`).
+  final FormDraft? draft;
+
   const AppFormScaffold({
     super.key,
     required this.title,
@@ -60,14 +69,65 @@ class AppFormScaffold extends StatefulWidget {
     this.isDirty,
     this.actions,
     this.confirmBySlide = false,
+    this.draft,
   });
 
   @override
-  State<AppFormScaffold> createState() => _AppFormScaffoldState();
+  ConsumerState<AppFormScaffold> createState() => _AppFormScaffoldState();
 }
 
-class _AppFormScaffoldState extends State<AppFormScaffold> {
+class _AppFormScaffoldState extends ConsumerState<AppFormScaffold> {
   bool _submitting = false;
+
+  FormDraftStore get _drafts => FormDraftStore(ref.read(cacheScopeProvider));
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.draft != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _restoreDraft());
+    }
+  }
+
+  /// Недописанное возвращается молча, но с объяснением и возможностью
+  /// стереть: вопрос «продолжить?» на входе человек читает реже, чем
+  /// закрывает, а потерянный текст ему всё равно нужен.
+  Future<void> _restoreDraft() async {
+    final draft = widget.draft;
+    if (draft == null) return;
+
+    final saved = await _drafts.read(draft.key);
+    if (saved == null || saved.isEmpty || !mounted) return;
+
+    setState(() => draft.apply(saved));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.formDraftRestored),
+        action: SnackBarAction(
+          label: context.l10n.formDraftDiscard,
+          onPressed: () {
+            for (final field in draft.fields.values) {
+              field.clear();
+            }
+            _drafts.forget(draft.key);
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
+  void _saveDraft() {
+    final draft = widget.draft;
+    if (draft == null) return;
+    _drafts.write(draft.key, draft.snapshot());
+  }
+
+  void _forgetDraft() {
+    final draft = widget.draft;
+    if (draft != null) _drafts.forget(draft.key);
+  }
 
   Future<void> _submit() async {
     if (!(widget.formKey.currentState?.validate() ?? false)) return;
@@ -94,11 +154,20 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
       return;
     }
 
+    // Запись сохранена — черновику больше нечего переживать.
+    _forgetDraft();
     messenger.showSnackBar(SnackBar(content: Text(widget.successMessage)));
     if (navigator.canPop()) navigator.pop(true);
   }
 
-  Future<bool> _confirmDiscard() => confirmDiscardChanges(context);
+  /// «Выйти без сохранения» — это и отказ от черновика: человек сказал, что
+  /// написанное ему не нужно, и встречать его этим текстом в следующий раз
+  /// значило бы не услышать.
+  Future<bool> _confirmDiscard() async {
+    final discard = await confirmDiscardChanges(context);
+    if (discard) _forgetDraft();
+    return discard;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +186,10 @@ class _AppFormScaffoldState extends State<AppFormScaffold> {
           // Набор текста не перестраивает экран сам по себе, поэтому вопрос
           // «выйти без сохранения?» вычислялся по состоянию пустой формы и
           // не задавался никогда: заполненная форма закрывалась молча.
-          onChanged: () => setState(() {}),
+          onChanged: () {
+            setState(() {});
+            _saveDraft();
+          },
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.screenH),
             children: [

@@ -27,6 +27,8 @@ import '../../../cages/presentation/providers/cages_provider.dart';
 import '../../../cages/presentation/providers/herd_cages_provider.dart';
 import '../../../../core/widgets/plan_limit_dialog.dart';
 import '../../../../core/api/api_failure.dart';
+import '../../../../core/cache/cache_scope.dart';
+import '../../../../core/forms/form_draft.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -83,9 +85,48 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
   String? _currentPhotoUrl;
   Uint8List? _webImageBytes;
 
+  /// Недописанное переживает смерть приложения — как и в остальных формах
+  /// (`core/forms/form_draft.dart`). Эта форма собирает экран сама, поэтому
+  /// черновик здесь тоже ведётся вручную.
+  late final FormDraft _draft = FormDraft(
+    key: 'rabbit-${widget.rabbit?.id ?? widget.rabbitId ?? 'new'}',
+    fields: {
+      'name': _nameController,
+      'tag': _tagIdController,
+      'color': _colorController,
+      'weight': _weightController,
+      'notes': _notesController,
+    },
+  );
+
+  FormDraftStore get _drafts => FormDraftStore(ref.read(cacheScopeProvider));
+
+  Future<void> _restoreDraft() async {
+    final saved = await _drafts.read(_draft.key);
+    if (saved == null || saved.isEmpty || !mounted) return;
+
+    setState(() => _draft.apply(saved));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.formDraftRestored),
+        action: SnackBarAction(
+          label: context.l10n.formDraftDiscard,
+          onPressed: () {
+            for (final field in _draft.fields.values) {
+              field.clear();
+            }
+            _drafts.forget(_draft.key);
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreDraft());
     if (widget.rabbit != null) {
       _loadRabbitDataFromModel(widget.rabbit!);
     } else if (widget.rabbitId != null) {
@@ -390,6 +431,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             ),
           ),
         );
+        // Запись сохранена — черновику больше нечего переживать.
+        _drafts.forget(_draft.key);
         context.pop();
       }
     } catch (e) {
@@ -431,6 +474,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop || _isLoading) return;
         if (await confirmDiscardChanges(context) && context.mounted) {
+          // Сказал «выйти без сохранения» — значит написанное ему не нужно.
+          _drafts.forget(_draft.key);
           Navigator.of(context).pop();
         }
       },
@@ -444,7 +489,10 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
         ),
         body: Form(
           key: _formKey,
-          onChanged: () => setState(() => _touched = true),
+          onChanged: () {
+            setState(() => _touched = true);
+            _drafts.write(_draft.key, _draft.snapshot());
+          },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.screenH,

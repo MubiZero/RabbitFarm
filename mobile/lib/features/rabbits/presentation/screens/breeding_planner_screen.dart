@@ -7,6 +7,7 @@ import '../providers/rabbits_provider.dart';
 import '../../../../core/theme/theme.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Экран планирования случек с анализом инбридинга
 ///
@@ -483,5 +484,5 @@ class _BreedingPlannerScreenState extends ConsumerState<BreedingPlannerScreen> {
 
   /// Форматировщик дат знает сокращения месяцев для каждого языка — своя
   /// таблица здесь была лишней.
-  String _formatDate(DateTime date) => DateFormat('d MMM y', 'ru').format(date);
+  String _formatDate(DateTime date) => DateFormat('d MMM y', dateLocaleOf(context)).format(date);
 }

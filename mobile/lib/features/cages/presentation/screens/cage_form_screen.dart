@@ -7,6 +7,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Клетка: номер, тип, вместимость и состояние.
 class CageFormScreen extends ConsumerStatefulWidget {
@@ -106,6 +107,17 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
     final l10n = context.l10n;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'cage-${_cage?.id ?? 'new'}',
+        fields: {
+          'number': _number,
+          'size': _size,
+          'capacity': _capacity,
+          'location': _location,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing ? l10n.cageFormEditTitle : l10n.cageFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

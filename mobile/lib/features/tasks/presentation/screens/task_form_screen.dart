@@ -11,6 +11,7 @@ import '../../data/models/task_model.dart';
 import '../providers/tasks_provider.dart';
 import '../utils/task_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Правило повторения задачи.
 ///
@@ -245,6 +246,15 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     final canDelete = ref.watch(canProvider(FarmCapability.deleteDailyRecords));
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'task-${_task?.id ?? 'new'}',
+        fields: {
+          'title': _title,
+          'description': _description,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing
           ? context.l10n.taskFormEditTitle
           : context.l10n.taskFormNewTitle,

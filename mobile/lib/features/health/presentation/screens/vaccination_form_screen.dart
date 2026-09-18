@@ -14,6 +14,8 @@ import '../../../../core/countries/farm_currency.dart';
 import '../../../../core/offline_queue/offline_queue.dart';
 import '../../../../core/providers/connectivity.dart';
 import '../utils/medical_labels.dart';
+import '../../../../core/l10n/date_locale.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Форма записи о прививке.
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -158,9 +160,20 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final format = DateFormat('d MMMM y', 'ru');
+    final format = DateFormat('d MMMM y', dateLocaleOf(context));
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'vaccination-${_record?.id ?? 'new'}',
+        fields: {
+          'vaccine': _vaccineName,
+          'batch': _batchNumber,
+          'veterinarian': _veterinarian,
+          'cost': _cost,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing ? l10n.vaccFormEditTitle : l10n.vaccFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

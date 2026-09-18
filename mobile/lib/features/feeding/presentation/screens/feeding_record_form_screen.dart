@@ -19,6 +19,7 @@ import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
 import '../providers/feeds_provider.dart';
 import '../utils/feed_labels.dart';
+import '../../../../core/forms/form_draft.dart';
 
 enum _FeedingMode { rabbit, cage }
 
@@ -195,6 +196,14 @@ class _FeedingRecordFormScreenState
     final isBulk = !_isEditing && _recipientCount > 1;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'feeding-${_record?.id ?? 'new'}',
+        fields: {
+          'quantity': _quantity,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing ? l10n.feedingFormEditTitle : l10n.feedingFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

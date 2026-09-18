@@ -5523,4 +5523,11 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get financeSheetThisYear => 'Соли ҷорӣ';
+
+  @override
+  String get formDraftRestored =>
+      'Он чизеро, ки сабт накарда будед, баргардондем';
+
+  @override
+  String get formDraftDiscard => 'Тоза кардан';
 }

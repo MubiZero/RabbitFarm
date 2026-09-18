@@ -8,6 +8,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/platform_admin_models.dart';
 import '../providers/platform_admin_provider.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Карточка тарифа.
 ///
@@ -103,6 +104,16 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
     final l10n = context.l10n;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'plan-${_plan?.id ?? 'new'}',
+        fields: {
+          'name': _name,
+          'price': _price,
+          'maxRabbits': _maxRabbits,
+          'maxStaff': _maxStaff,
+        },
+      ),
       title: _isEditing
           ? l10n.platformPlanFormEditTitle
           : l10n.platformPlanFormNewTitle,

@@ -1692,5 +1692,7 @@
   "financeSheetColKind": "Даромад ё хароҷот",
   "exportShareSubject": "{title} — «Фермаи харгӯш»",
   "financeSheetLastMonth": "Моҳи гузашта",
-  "financeSheetThisYear": "Соли ҷорӣ"
+  "financeSheetThisYear": "Соли ҷорӣ",
+  "formDraftRestored": "Он чизеро, ки сабт накарда будед, баргардондем",
+  "formDraftDiscard": "Тоза кардан"
 }

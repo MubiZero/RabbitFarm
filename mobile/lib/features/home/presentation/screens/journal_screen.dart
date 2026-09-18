@@ -11,6 +11,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/journal_entry.dart';
 import '../providers/journal_provider.dart';
 import '../widgets/quick_entry_sheet.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Журнал — что записано за смену.
 ///
@@ -288,7 +289,7 @@ class _EntryCard extends ConsumerWidget {
                         size: 14, color: context.colors.onSurfaceVariant),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
-                      _when(),
+                      _when(context),
                       style: AppTypography.labelSm
                           .copyWith(color: context.colors.onSurfaceVariant),
                     ),
@@ -336,12 +337,12 @@ class _EntryCard extends ConsumerWidget {
 
   /// В ленте за сегодня дата у всех одна и та же, и повторять её в каждой
   /// строке незачем. У прививки и лечения времени в данных нет вовсе.
-  String _when() {
-    if (!entry.hasTime) return DateFormat('d MMMM', 'ru').format(entry.at);
+  String _when(BuildContext context) {
+    if (!entry.hasTime) return DateFormat('d MMMM', dateLocaleOf(context)).format(entry.at);
     if (period == JournalPeriod.today) {
-      return DateFormat('HH:mm', 'ru').format(entry.at);
+      return DateFormat('HH:mm', dateLocaleOf(context)).format(entry.at);
     }
-    return DateFormat('d MMM, HH:mm', 'ru').format(entry.at);
+    return DateFormat('d MMM, HH:mm', dateLocaleOf(context)).format(entry.at);
   }
 }
 

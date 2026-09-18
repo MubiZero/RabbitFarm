@@ -13,6 +13,7 @@ import '../../domain/breeding_cycle.dart';
 import '../providers/breeding_provider.dart';
 import '../widgets/kindling_plan_button.dart';
 import '../widgets/palpation_action.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Разведение — одна лента цикла от случки до отсадки.
 ///
@@ -337,7 +338,7 @@ class _CycleTile extends StatelessWidget {
                 ? l10n.cycleDueTomorrow
                 : l10n.cycleInDays(days);
 
-    final formatted = DateFormat('d MMMM', 'ru').format(date);
+    final formatted = DateFormat('d MMMM', dateLocaleOf(context)).format(date);
     // «Примерно» стоит ровно там, где дата и правда посчитана от события,
     // которое ещё не случилось. Рядом с точным сроком это слово так же врёт,
     // как его отсутствие рядом с оценкой.

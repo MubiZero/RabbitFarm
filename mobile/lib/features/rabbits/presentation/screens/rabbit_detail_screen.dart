@@ -17,6 +17,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../health/presentation/widgets/health_sheet_button.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 class RabbitDetailScreen extends ConsumerWidget {
   final int rabbitId;
@@ -263,7 +264,7 @@ class RabbitDetailScreen extends ConsumerWidget {
               _buildInfoRow(
                 context,
                 context.l10n.rabbitBirthDate,
-                DateFormat('d MMMM y', 'ru').format(rabbit.birthDate),
+                DateFormat('d MMMM y', dateLocaleOf(context)).format(rabbit.birthDate),
               ),
               // Только у покупного: у рождённого на ферме этой даты нет, и
               // пустая строка «Когда купили» сбивала бы с толку.
@@ -271,7 +272,7 @@ class RabbitDetailScreen extends ConsumerWidget {
                 _buildInfoRow(
                   context,
                   context.l10n.rabbitAcquiredDate,
-                  DateFormat('d MMMM y', 'ru').format(rabbit.acquiredDate!),
+                  DateFormat('d MMMM y', dateLocaleOf(context)).format(rabbit.acquiredDate!),
                 ),
               if (rabbit.color != null)
                 _buildInfoRow(context, context.l10n.rabbitColor, rabbit.color!),

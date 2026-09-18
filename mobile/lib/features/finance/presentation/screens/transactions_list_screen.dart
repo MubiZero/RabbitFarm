@@ -14,6 +14,7 @@ import '../widgets/finance_sheet_button.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/countries/farm_currency.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Ведомость доходов и расходов.
 class TransactionsListScreen extends ConsumerStatefulWidget {
@@ -310,7 +311,7 @@ class _ActiveFilters extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(transactionsProvider.notifier);
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -400,7 +401,7 @@ class _TransactionCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  DateFormat('d MMMM y', 'ru')
+                  DateFormat('d MMMM y', dateLocaleOf(context))
                       .format(transaction.transactionDate),
                   style: AppTypography.labelSm
                       .copyWith(color: context.colors.onSurfaceVariant),
@@ -636,7 +637,7 @@ class _DetailsSheet extends ConsumerWidget {
             _Row(
               icon: Icons.event_outlined,
               label: context.l10n.financeDate,
-              value: DateFormat('d MMMM y', 'ru')
+              value: DateFormat('d MMMM y', dateLocaleOf(context))
                   .format(transaction.transactionDate),
             ),
             if (transaction.author != null)
@@ -750,7 +751,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     return SafeArea(
       child: Padding(
