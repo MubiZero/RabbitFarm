@@ -129,8 +129,13 @@
     })
     .then(function (config) {
       if (config.appUrl) {
+        // Язык страницы едет вместе со ссылкой: приложение открывается на
+        // том же языке, а не угадывает его по настройкам телефона.
+        var lang = document.documentElement.lang || 'ru';
+        var separator = config.appUrl.indexOf('?') === -1 ? '?' : '&';
+        var target = config.appUrl + separator + 'lang=' + encodeURIComponent(lang);
         document.querySelectorAll('[data-app-link]').forEach(function (link) {
-          link.href = config.appUrl;
+          link.href = target;
         });
       }
 

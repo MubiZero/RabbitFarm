@@ -24,6 +24,11 @@ const SITE = 'https://rabbitfarm.click';
 // пересборки: так адрес магазина или нового стенда меняется одной
 // переменной окружения.
 const APP_URL = 'https://app.rabbitfarm.click';
+
+// Приложение открывается на языке страницы, с которой человек пришёл.
+// Иначе узбекская страница уводила в интерфейс на английском: приложение
+// угадывало язык по настройкам телефона, а на дешёвом Android там английский.
+const appUrl = (locale) => `${APP_URL}?lang=${locale}`;
 const REPO = 'https://github.com/MubiZero/RabbitFarm';
 
 // Русский лежит в корне: это основной язык аудитории.
@@ -156,7 +161,7 @@ ${alternates}
       <a href="#modules">${escape(t.nav.modules)}</a>
       <a href="#field">${escape(t.nav.field)}</a>
       <a href="#price">${escape(t.nav.price)}</a>
-      <a class="btn btn-primary" href="${APP_URL}" data-app-link>${escape(t.nav.open)}</a>
+      <a class="btn btn-primary" href="${appUrl(locale)}" data-app-link>${escape(t.nav.open)}</a>
     </nav>
   </div>
 </header>
@@ -169,7 +174,7 @@ ${alternates}
         <h1>${escape(t.hero.title_top)} <span class="hero-accent">${escape(t.hero.title_accent)}</span></h1>
         <p class="hero-lead">${escape(t.hero.lead)}</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="${APP_URL}" data-app-link>
+          <a class="btn btn-primary" href="${appUrl(locale)}" data-app-link>
             ${icon('arrow-right', 'btn-icon')}
             <span>${escape(t.hero.cta_primary)}</span>
           </a>
@@ -249,7 +254,7 @@ ${alternates}
       <h2 class="section-title">${escape(t.cta.title)}</h2>
       <p class="section-lead">${escape(t.cta.lead)}</p>
       <div class="closing-actions">
-        <a class="btn btn-primary" href="${APP_URL}" data-app-link>
+        <a class="btn btn-primary" href="${appUrl(locale)}" data-app-link>
           ${icon('arrow-right', 'btn-icon')}
           <span>${escape(t.cta.primary)}</span>
         </a>

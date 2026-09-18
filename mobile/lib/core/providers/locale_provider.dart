@@ -31,6 +31,17 @@ class LocaleNotifier extends AsyncNotifier<Locale> {
     final saved = prefs.getString(_kLocale);
     if (saved != null) return Locale(saved);
 
+    // Человек пришёл с витрины, и язык страницы приехал в адресе
+    // (`?lang=uz`). Это ближе к правде, чем язык телефона: узбекский фермер
+    // читал узбекскую страницу, нажимал «Открыть приложение» и попадал в
+    // английский интерфейс, потому что на дешёвом Android в настройках стоит
+    // английский. Выбор запоминается: второй раз он придёт уже без адреса.
+    final fromLink = _languageFromLaunchUrl();
+    if (fromLink != null) {
+      await prefs.setString(_kLocale, fromLink);
+      return Locale(fromLink);
+    }
+
     // Первый запуск: пробуем угадать по языку устройства, а не молчаливо
     // держим русский всем подряд — это тот самый явный выбор, которого от
     // языкового переключателя ждут, просто с разумным стартовым значением.
@@ -46,6 +57,20 @@ class LocaleNotifier extends AsyncNotifier<Locale> {
     await prefs.setString(_kLocale, locale.languageCode);
   }
 }
+
+/// Язык, названный в адресе страницы: `app.rabbitfarm.click/?lang=uz`.
+///
+/// Незнакомый или чужой язык игнорируем — иначе `?lang=fr` показал бы пустые
+/// подписи вместо интерфейса.
+String? languageFromUrl(Uri url) {
+  final asked = url.queryParameters['lang']?.toLowerCase();
+  if (asked == null) return null;
+  return supportedAppLocales.any((l) => l.languageCode == asked) ? asked : null;
+}
+
+/// Адрес, которым открыли приложение. На телефоне адреса нет — `Uri.base`
+/// там указывает на файл, и параметров в нём не бывает.
+String? _languageFromLaunchUrl() => languageFromUrl(Uri.base);
 
 final localeProvider = AsyncNotifierProvider<LocaleNotifier, Locale>(
   LocaleNotifier.new,
