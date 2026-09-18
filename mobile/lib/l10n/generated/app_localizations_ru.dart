@@ -171,7 +171,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pinSaved => 'Код сохранён';
 
   @override
-  String get pinMismatch => 'Коды не совпали — попробуйте ещё раз';
+  String get pinMismatch => 'Коды не совпали — придумайте код заново';
 
   @override
   String get pinLockPrompt => 'Введите код';

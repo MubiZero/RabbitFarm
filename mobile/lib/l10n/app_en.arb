@@ -52,7 +52,7 @@
   "pinSetupExplanation": "You''ll open the app on this phone with this code — no more waiting for a code by SMS or email.",
   "pinSkip": "Not now",
   "pinSaved": "Code saved",
-  "pinMismatch": "The codes didn''t match — try again",
+  "pinMismatch": "The codes didn''t match — pick a code again",
   "pinLockPrompt": "Enter your code",
   "pinWrong": "Wrong code",
   "pinDelete": "Delete digit",

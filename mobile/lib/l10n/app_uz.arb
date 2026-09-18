@@ -52,7 +52,7 @@
   "pinSetupExplanation": "Bu kod bilan ilovani shu telefonda ochasiz — endi SMS yoki xatdagi kodni kutib oʻtirmaysiz.",
   "pinSkip": "Hozir emas",
   "pinSaved": "Kod saqlandi",
-  "pinMismatch": "Kodlar mos kelmadi — yana urinib koʻring",
+  "pinMismatch": "Kodlar mos kelmadi — kodni boshidan oʻylab toping",
   "pinLockPrompt": "Kodni kiriting",
   "pinWrong": "Kod notoʻgʻri",
   "pinDelete": "Raqamni oʻchirish",

@@ -172,7 +172,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get pinSaved => 'Рамз захира шуд';
 
   @override
-  String get pinMismatch => 'Рамзҳо мувофиқ нашуданд — аз нав кӯшиш кунед';
+  String get pinMismatch => 'Рамзҳо мувофиқ нашуданд — рамзро аз нав созед';
 
   @override
   String get pinLockPrompt => 'Рамзро ворид кунед';

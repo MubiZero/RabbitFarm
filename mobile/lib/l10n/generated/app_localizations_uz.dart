@@ -173,7 +173,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get pinSaved => 'Kod saqlandi';
 
   @override
-  String get pinMismatch => 'Kodlar mos kelmadi — yana urinib koʻring';
+  String get pinMismatch => 'Kodlar mos kelmadi — kodni boshidan oʻylab toping';
 
   @override
   String get pinLockPrompt => 'Kodni kiriting';

@@ -417,7 +417,7 @@ abstract class AppLocalizations {
   /// No description provided for @pinMismatch.
   ///
   /// In ru, this message translates to:
-  /// **'Коды не совпали — попробуйте ещё раз'**
+  /// **'Коды не совпали — придумайте код заново'**
   String get pinMismatch;
 
   /// No description provided for @pinLockPrompt.
