@@ -14,6 +14,7 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_form_section.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
@@ -536,6 +537,22 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                         context.l10n.rabbitFormBreedsFailed,
                         style: TextStyle(color: cs.error),
                       ),
+                    )
+                  else if (breedsState.breeds.isEmpty)
+                    // Пустой справочник раньше рисовался обычным выпадающим
+                    // полем: человек жал на него, список не открывался, а
+                    // сохранение отвечало «выберите породу». Выбрать было не
+                    // из чего, и карточка первого кролика становилась тупиком.
+                    AppEmptyState(
+                      icon: Icons.category_outlined,
+                      title: context.l10n.rabbitFormBreedsEmpty,
+                      subtitle: context.l10n.rabbitFormBreedsEmptyHint,
+                      actionLabel: context.l10n.rabbitFormBreedsEmptyAction,
+                      onAction: () async {
+                        await context.push('/breeds/form');
+                        if (!context.mounted) return;
+                        ref.invalidate(breedsProvider);
+                      },
                     )
                   else
                     DropdownButtonFormField<int>(

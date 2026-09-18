@@ -1,6 +1,5 @@
 {
   "@@locale": "uz",
-
   "appName": "RabbitFarm",
   "commonRetry": "Qayta urinish",
   "commonCancel": "Bekor qilish",
@@ -168,7 +167,9 @@
   "bulkHerdDone": "{count, plural, one{{count} ta quyon qoʻshildi} other{{count} ta quyon qoʻshildi}}",
   "@bulkHerdDone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rabbitMultiPickerTitle": "Partiyada kim bor",
@@ -178,21 +179,29 @@
   "rabbitMultiPickerSelected": "{count, plural, one{{count} ta tanlandi} other{{count} ta tanlandi}}",
   "@rabbitMultiPickerSelected": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "transactionSaleBatch": "Partiya bilan sotish",
   "ageYears": "{count, plural, one{{count} yosh} other{{count} yosh}}",
   "@ageYears": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ageYearsMonths": "{years} y {months} oy",
   "@ageYearsMonths": {
     "placeholders": {
-      "years": { "type": "int" },
-      "months": { "type": "int" }
+      "years": {
+        "type": "int"
+      },
+      "months": {
+        "type": "int"
+      }
     }
   },
   "feedTypePellets": "Granula",
@@ -212,7 +221,9 @@
   "offlineRejectedTitle": "{count, plural, one{{count} yozuv saqlanmadi} other{{count} yozuv saqlanmadi}}",
   "@offlineRejectedTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "offlineRejectedBody": "Server ularni qabul qilmadi — qaytadan yozing.",
@@ -362,7 +373,11 @@
   "taskFormAssigneeHelp": "Ijrochiga vazifa haqida bildirishnoma boradi.",
   "tasksAssignedTo": "Ijrochi: {name}",
   "@tasksAssignedTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "taskFormNotesLabel": "Izohlar",
   "taskFormCreate": "Yaratish",
@@ -632,7 +647,11 @@
   "financeAuthor": "Kim yozdi",
   "financeAuthorLine": "Yozdi: {name}",
   "@financeAuthorLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "financeTypeIncome": "Daromad",
   "financeTypeExpense": "Xarajat",
@@ -792,12 +811,20 @@
   "settingsPurposeAllTitle": "Hammaga maqsad qoʻyilsinmi?",
   "settingsPurposeAllBody": "Xoʻjalikdagi barcha tirik quyonlarga «{purpose}» qoʻyiladi. Chiqib ketganlar oʻzgarmaydi. Boshqa tayinlov almashtiriladi va faqat bittalab qaytariladi. Yangi quyonlar ham shu tayinlov bilan qoʻshiladi.",
   "@settingsPurposeAllBody": {
-    "placeholders": { "purpose": { "type": "String" } }
+    "placeholders": {
+      "purpose": {
+        "type": "String"
+      }
+    }
   },
   "settingsPurposeAllApply": "Qoʻyish",
   "settingsPurposeAllDone": "{count, plural, =0{Oʻzgartiradigan narsa yoʻq — hammada allaqachon shunday.} one{{count} quyon oʻzgardi.} other{{count} quyon oʻzgardi.}}",
   "@settingsPurposeAllDone": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "settingsAbout": "Ilova haqida",
   "settingsVersion": "Versiya",
@@ -1053,6 +1080,9 @@
   "rabbitFormTagEmpty": "Birka raqamini kiriting",
   "rabbitFormBreedRequired": "Zotni tanlang",
   "rabbitFormBreedsFailed": "Zotlarni yuklab boʻlmadi",
+  "rabbitFormBreedsEmpty": "Hozircha zot yoʻq",
+  "rabbitFormBreedsEmptyHint": "Quyonni yozish uchun zot kerak. Oʻzingizda bor zotni qoʻshing.",
+  "rabbitFormBreedsEmptyAction": "Zot qoʻshish",
   "rabbitFormColor": "Rangi",
   "rabbitFormColorHint": "Kulrang, oq, qora…",
   "rabbitFormWeight": "Vazni, kg",
@@ -1198,7 +1228,11 @@
   "platformPlanDeleteTitle": "Tarif oʻchirilsinmi?",
   "platformPlanDeleteFarms": "{count, plural, =0{Hozir bu tarifda birorta ferma yoʻq.} one{Hozir unda {count} ferma bor — u cheklovsiz ishlaydi.} other{Hozir unda {count} ferma bor — ular cheklovsiz ishlaydi.}}",
   "@platformPlanDeleteFarms": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "platformPlanDeleteBody": "«{name}» roʻyxatdan yoʻqoladi, undagi fermalar esa chegarasiz ishlay boshlaydi. Ularning yozuvlariga tegilmaydi.",
   "platformPlanDeleted": "Tarif oʻchirildi",
@@ -1255,7 +1289,11 @@
   "platformFarmAuditAll": "Butun jurnal",
   "platformFarmStatusExpiredWarning": "Tarif {date} da tugagan. Tungi tekshiruv fermani yana «Faqat oʻqish» holatiga qaytaradi — kirish saqlanishi uchun avval tarifni uzaytiring.",
   "@platformFarmStatusExpiredWarning": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "platformFarmPlanForever": "Muddatsiz",
   "platformFarmPlanExpires": "{date}gacha amal qiladi",
@@ -1376,7 +1414,6 @@
   "storageUnitGb": "GB",
   "emptyNoRecordsTitle": "Yozuv yoʻq",
   "emptyNoRecordsBody": "Birinchisini qoʻshing.",
-
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Kataklar, juftlash, bolalash, ozuqa va pul — hammasi yozib boriladi va doim qoʻl ostida. Ilova oʻzi eslatadi: qachon uya qoʻyish va qachon emlash kerak.",
   "onbWelcomeStart": "Boshlash",
@@ -1427,7 +1464,6 @@
   "firstStepHelpers": "Yordamchini taklif qiling",
   "activationChecklistFarmCreated": "Xoʻjalik yaratildi",
   "activationChecklistProgress": "{done} dan {total}",
-
   "deathFormTitle": "Nobud boʻlishni qayd etish",
   "deathFormRabbit": "Quyon",
   "deathFormDate": "Sana",
@@ -1446,22 +1482,18 @@
   "saleFormSubmit": "Yozish",
   "saleFormSaved": "Sotuv yozildi",
   "quickRecordDeath": "Nobud boʻlish",
-
   "notificationPrimerTitle": "Bolalash uyasi haqida eslatamiz",
   "notificationPrimerBody": "Bolalashdan ikki kun oldin eslatma keladi — qafasni tayyorlashga ulgurasiz. Emlash va kunlik ishlar haqida ham eslatamiz.",
   "notificationPrimerAllow": "Eslatmalarni yoqish",
   "notificationPrimerDecline": "Hozir emas",
   "settingsNotificationsOff": "Bildirishnomalar oʻchiq",
   "settingsNotificationsTurnOn": "Yoqish",
-
   "rabbitFormMore": "Qoʻshimcha",
   "rabbitFormSexRequired": "Erkak yoki urgʻochi ekanini tanlang",
   "rabbitFormCageNone": "Qafassiz",
   "rabbitFormCageFull": "{number} — toʻla",
   "commonOptional": "ixtiyoriy",
-
   "unitKg": "kg",
-
   "kindlingPlanAction": "Tugʻish rejasi",
   "kindlingPlanPickMonth": "Reja qaysi oy uchun?",
   "kindlingPlanThisMonth": "Shu oy uchun",
@@ -1476,11 +1508,8 @@
   "kindlingPlanColNest": "Uya",
   "kindlingPlanColMark": "Belgi",
   "kindlingPlanPrintedAt": "Chop etildi: {date}",
-
   "commonUndo": "Qaytarish",
-
   "journalKindDeletion": "Oʻchirish",
-
   "voiceDictate": "Ovoz bilan aytish",
   "voiceStop": "Yozishni toʻxtatish",
   "voiceUnavailable": "Bu telefon nutqni tanimaydi",
@@ -1498,7 +1527,6 @@
   "cageScanHint": "Kamerani qafas belgisiga qarating",
   "cageScanNoCamera": "Kamera mavjud emas. Telefon sozlamalarida ruxsatni tekshiring.",
   "slideToDelete": "Oʻchirish uchun suring",
-
   "birthsKitsDied": "Nobud",
   "birthsKitDeathAction": "Nobud boʻlganini qayd etish",
   "birthsKitsCardedHint": "Bu nasl uchun alohida kartochkalar ochilgan — nobud boʻlish va ajratishni bolaning oʻz kartochkasida belgilang.",
@@ -1506,9 +1534,7 @@
   "birthsKitDeathHint": "Tirik qolgani: {alive}",
   "birthsKitDeathSaved": "Qayd etildi",
   "birthsKitsAlive": "Tirik",
-
   "loginCodeLabelEmail": "Xatdagi kod",
-
   "cyclePalpationAction": "Tekshirdim",
   "cyclePalpationTitle": "Tekshiruv nima koʻrsatdi?",
   "cyclePalpationPregnant": "Boʻgʻoz",
@@ -1523,12 +1549,10 @@
   "birthsWeaningAll": "Hammasini: {count}",
   "birthsWeaningFewer": "Yoki kamroq",
   "birthsWeaningSaved": "Ajratish qayd etildi",
-
   "subscriptionCheckFailed": "Toʻlovni tekshirib boʻlmadi — server bilan aloqa yoʻq",
   "subscriptionPaymentDeclined": "Bank toʻlovni rad etdi",
   "subscriptionPaymentDeclinedHint": "Pul yechilmadi. Kartani tekshiring va qayta urinib koʻring.",
   "subscriptionPayAgain": "Qayta toʻlash",
-
   "supportRequestNew": "Yozish",
   "supportRequestNewTitle": "Yangi murojaat",
   "supportRequestsEmptyTitle": "Hozircha murojaat yoʻq",
@@ -1553,14 +1577,18 @@
   "platformSupportContactEmailHint": "support@example.com",
   "platformSupportContactEmailInvalid": "Manzilni tekshiring — unda @ belgisi yoʻq",
   "platformSupportContactSaved": "Qoʻllab-quvvatlash aloqasi saqlandi",
-
   "notificationsTitle": "Bildirishnomalar",
   "notificationsEmptyTitle": "Hozircha jim",
   "notificationsEmptyBody": "Bu yerda ilova xabar bergan narsalar paydo boʻladi: muddati oʻtgan emlashlar, tugayotgan yem, yaqinlashayotgan bolalash.",
-
   "platformFilterDeleted": "Oʻchirilganlar",
   "platformFarmDeletedShort": "{date} da oʻchirilgan",
-  "@platformFarmDeletedShort": {"placeholders": {"date": {"type": "String"}}},
+  "@platformFarmDeletedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "platformFarmsDeletedEmptyTitle": "Oʻchirilgan ferma yoʻq",
   "platformFarmsDeletedEmptyBody": "Butunlay tozalashni kutayotgan narsa yoʻq. Oʻchirilgan ferma bu yerda 30 kun turadi — fikrdan qaytish uchun shu muddat yetarli.",
   "platformPlanDeleteDefaultWarning": "Bu — sukut boʻyicha tarif. Uni oʻchirgandan keyin boshqa tarif sukut boʻyicha belgilanmaguncha yangi fermalar umuman tarifsiz paydo boʻladi.",
@@ -1569,18 +1597,63 @@
   "platformAuditEmptyTitle": "Jurnal boʻsh",
   "platformAuditEmptyBody": "Har bir admin amali shu yerga tushadi: tarif almashtirish, ferma kirishi, mijoz nomidan kirish, oʻchirish.",
   "countAuditRecords": "{count, plural, one{{count} ta yozuv} other{{count} ta yozuv}}",
-  "@countAuditRecords": {"placeholders": {"count": {"type": "int"}}},
+  "@countAuditRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditAdmin": "Admin {id}",
-  "@platformAuditAdmin": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditAdmin": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFarm": "Xoʻjalik {id}",
-  "@platformAuditFarm": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditFarm": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditWholeService": "Butun xizmat",
   "platformAuditIp": "IP {ip}",
-  "@platformAuditIp": {"placeholders": {"ip": {"type": "String"}}},
+  "@platformAuditIp": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditChange": "{field}: {before} → {after}",
-  "@platformAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@platformAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditDetail": "{field}: {value}",
-  "@platformAuditDetail": {"placeholders": {"field": {"type": "String"}, "value": {"type": "String"}}},
+  "@platformAuditDetail": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditValueNone": "belgilanmagan",
   "platformAuditActionPlanCreate": "Tarif yaratildi",
   "platformAuditActionPlanUpdate": "Tarif oʻzgartirildi",
@@ -1597,7 +1670,13 @@
   "platformAuditActionSupportResolve": "Murojaat yopildi",
   "platformAuditActionSupportContact": "Yordam aloqasi oʻzgartirildi",
   "platformAuditActionUnknown": "«{action}» amali",
-  "@platformAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@platformAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFieldName": "Nomi",
   "platformAuditFieldLimits": "Chegaralar",
   "platformAuditFieldPrice": "Narxi",
@@ -1613,15 +1692,31 @@
   "platformAuditPlanBecameDefault": "Sukut boʻyicha tarifga aylandi",
   "platformAuditPlanNoLongerDefault": "Endi sukut boʻyicha tarif emas",
   "platformAuditPlanRef": "Tarif №{id}",
-  "@platformAuditPlanRef": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditPlanRef": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportAnswered": "№{id} murojaat — muallifga javob bilan",
-  "@platformAuditSupportAnswered": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditSupportAnswered": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportClosed": "№{id} murojaat — javobsiz",
-  "@platformAuditSupportClosed": {"placeholders": {"id": {"type": "int"}}},
-
+  "@platformAuditSupportClosed": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "feedsPaidLabel": "Qancha toʻladingiz",
   "feedsPaidHint": "Agar bu xarid boʻlsa, summa xarajatlarga tushadi. Faqat qoldiqni qayta sanagan boʻlsangiz — boʻsh qoldiring.",
-
   "staffInvitedEmailFailedBody": "{email} manziliga xat yuborib boʻlmadi — taklifni oʻzingiz yuboring.",
   "staffInviteLinkLabel": "Taklif havolasi",
   "staffInviteCopy": "Taklifni nusxalash",
@@ -1633,9 +1728,7 @@
   "staffInviteAgain": "Qaytadan taklif qilish",
   "loginNoCodePhone": "Kod kelmadimi? Xoʻjalik egasidan qaysi raqamga taklif qilganini soʻrang.",
   "loginNoCodeEmail": "Kod kelmadimi? Xoʻjalik egasidan qaysi pochtaga taklif qilganini soʻrang.",
-
   "platformPlanDefaultBadge": "yangi fermalarga",
-
   "staffAccessClosedBadge": "kirish yopiq",
   "roleManagerDescription": "Podani, ozuqani va pulni yuritadi",
   "roleWorkerDescription": "Maʼlumotlarni koʻradi va ishni belgilaydi",

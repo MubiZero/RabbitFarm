@@ -1,11 +1,9 @@
 {
   "@@locale": "ru",
-
   "appName": "RabbitFarm",
   "@appName": {
     "description": "Название приложения"
   },
-
   "commonRetry": "Повторить",
   "commonCancel": "Отмена",
   "commonSave": "Сохранить",
@@ -50,7 +48,6 @@
   "commonNotSpecified": "Не указано",
   "commonActions": "Действия",
   "commonEmail": "Почта",
-
   "quickGroupOften": "Часто",
   "journalPeriodToday": "Сегодня",
   "journalPeriodWeek": "Неделя",
@@ -66,7 +63,6 @@
   "journalEmptyBody": "Кормления, лечение, прививки, закрытые задачи, заметки и фото попадают сюда сами. Запишите первое — и оно появится здесь.",
   "journalNoneInViewTitle": "В этой выборке пусто",
   "journalNoneInViewBody": "Смените вид записи или срок.",
-
   "pinSetupTitle": "Код быстрого входа",
   "pinChangeTitle": "Сменить код",
   "pinSetupPrompt": "Придумайте код из 4 цифр",
@@ -80,7 +76,11 @@
   "pinDelete": "Стереть цифру",
   "pinAttemptsLeft": "{count, plural, one{Осталась {count} попытка} few{Осталось {count} попытки} other{Осталось {count} попыток}}",
   "@pinAttemptsLeft": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "pinForgot": "Забыли код?",
   "pinForgotTitle": "Забыли код?",
@@ -103,7 +103,11 @@
   "loginRequestCode": "Получить код",
   "loginCodeSentTo": "Отправили код на {phone}",
   "@loginCodeSentTo": {
-    "placeholders": { "phone": { "type": "String" } }
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
   },
   "loginCodeLabel": "Код из SMS",
   "loginCodeEmpty": "Введите код",
@@ -112,7 +116,11 @@
   "loginCodeResend": "Отправить код ещё раз",
   "loginCodeResendIn": "Отправить ещё раз через {seconds} с",
   "@loginCodeResendIn": {
-    "placeholders": { "seconds": { "type": "int" } }
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "loginCodeResent": "Код отправлен ещё раз",
   "loginCodeChangePhone": "Изменить номер",
@@ -122,9 +130,6 @@
   "loginEmailInvalid": "Похоже, в адресе опечатка",
   "loginSubmit": "Войти",
   "loginCreateFarm": "Завести свою ферму",
-
-
-
   "todayGreetingMorning": "Доброе утро",
   "todayGreetingDay": "Добрый день",
   "todayGreetingEvening": "Добрый вечер",
@@ -132,14 +137,20 @@
   "todayGreetingNamed": "{greeting}, {name}!",
   "@todayGreetingNamed": {
     "placeholders": {
-      "greeting": { "type": "String" },
-      "name": { "type": "String" }
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
     }
   },
   "todayGreetingPlain": "{greeting}!",
   "@todayGreetingPlain": {
     "placeholders": {
-      "greeting": { "type": "String" }
+      "greeting": {
+        "type": "String"
+      }
     }
   },
   "todayNeedsAttention": "Требует внимания",
@@ -153,13 +164,10 @@
   "todayAlertUpcomingVaccination": "Скоро вакцинация",
   "activationChecklistTitle": "Начало работы",
   "activationChecklistDismiss": "Скрыть",
-
   "menuProfile": "Профиль",
-
   "roleOwner": "Владелец фермы",
   "roleManager": "Управляющий",
   "roleWorker": "Работник",
-
   "navToday": "Сегодня",
   "navRabbits": "Кролики",
   "navHerd": "Стадо",
@@ -175,7 +183,6 @@
   "quickGroupDaily": "Каждый день",
   "quickGroupHerd": "Стадо",
   "quickGroupFarm": "Хозяйство",
-
   "herdTitle": "Стадо",
   "herdTabCages": "Клетки",
   "herdTabRabbits": "Кролики",
@@ -216,7 +223,9 @@
   "bulkHerdDone": "{count, plural, one{Заведён {count} кролик} few{Заведено {count} кролика} many{Заведено {count} кроликов} other{Заведено {count} кролика}}",
   "@bulkHerdDone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rabbitMultiPickerTitle": "Кто в партии",
@@ -226,21 +235,29 @@
   "rabbitMultiPickerSelected": "{count, plural, one{Выбран {count}} few{Выбрано {count}} many{Выбрано {count}} other{Выбрано {count}}}",
   "@rabbitMultiPickerSelected": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "transactionSaleBatch": "Продать партией",
   "ageYears": "{count, plural, one{{count} год} few{{count} года} many{{count} лет} other{{count} года}}",
   "@ageYears": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ageYearsMonths": "{years} г {months} мес",
   "@ageYearsMonths": {
     "placeholders": {
-      "years": { "type": "int" },
-      "months": { "type": "int" }
+      "years": {
+        "type": "int"
+      },
+      "months": {
+        "type": "int"
+      }
     }
   },
   "feedTypePellets": "Гранулы",
@@ -260,7 +277,9 @@
   "offlineRejectedTitle": "{count, plural, one{{count} запись не сохранилась} few{{count} записи не сохранились} many{{count} записей не сохранились} other{{count} записи не сохранились}}",
   "@offlineRejectedTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "offlineRejectedBody": "Их не принял сервер — запишите заново.",
@@ -271,12 +290,10 @@
   "quickAddRabbit": "Добавить кролика",
   "quickRecordBirth": "Записать окрол",
   "quickAddCage": "Добавить клетку",
-
   "formDiscardTitle": "Выйти без сохранения?",
   "formDiscardBody": "Заполненные поля будут потеряны.",
   "formDiscardStay": "Продолжить ввод",
   "formDiscardLeave": "Выйти",
-
   "cycleTitle": "Разведение",
   "cycleFindPair": "Подобрать пару",
   "cycleRecordBirth": "Записать окрол",
@@ -289,32 +306,56 @@
   "cycleStageClosed": "Цикл отработан",
   "cycleDay": "{day}-й день",
   "@cycleDay": {
-    "placeholders": { "day": { "type": "int" } }
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
   },
   "cycleMaleLine": "Самец: {name}",
   "@cycleMaleLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "cycleActionWhen": "{date} · {when}",
   "@cycleActionWhen": {
     "placeholders": {
-      "date": { "type": "String" },
-      "when": { "type": "String" }
+      "date": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
     }
   },
   "cycleApproxDate": "примерно {date}",
   "@cycleApproxDate": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "cycleDueToday": "сегодня",
   "cycleDueTomorrow": "завтра",
   "cycleInDays": "{count, plural, one{через {count} день} few{через {count} дня} many{через {count} дней} other{через {count} дня}}",
   "@cycleInDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "cycleOverdueDays": "{count, plural, one{просрочено на {count} день} few{просрочено на {count} дня} many{просрочено на {count} дней} other{просрочено на {count} дня}}",
   "@cycleOverdueDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "breedingEmptyTitle": "Случек пока нет",
   "breedingEmptyBody": "Запишите случку, и приложение подскажет ожидаемую дату окрола.",
@@ -329,12 +370,13 @@
   "breedingStatusCompleted": "Завершена",
   "breedingStatusFailed": "Неудачная",
   "breedingStatusCancelled": "Отменена",
-
   "cageTitle": "Клетка",
   "cageTitleNumbered": "Клетка {number}",
   "@cageTitleNumbered": {
     "placeholders": {
-      "number": { "type": "String" }
+      "number": {
+        "type": "String"
+      }
     }
   },
   "cageEdit": "Изменить клетку",
@@ -348,33 +390,45 @@
   "cageRemoveBody": "{name} перейдёт в список кроликов без клетки.",
   "@cageRemoveBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "cageRemoveConfirm": "Убрать",
   "cageRemoved": "{name} убран из клетки",
   "@cageRemoved": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "cageMoved": "{name} переехал в клетку {number}",
   "@cageMoved": {
     "placeholders": {
-      "name": { "type": "String" },
-      "number": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
     }
   },
   "cageSettled": "{name} поселён в клетку",
   "@cageSettled": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "commonActionFailed": "Не удалось: {reason}",
   "@commonActionFailed": {
     "placeholders": {
-      "reason": { "type": "String" }
+      "reason": {
+        "type": "String"
+      }
     }
   },
   "cageResidentMove": "Переселить",
@@ -385,7 +439,9 @@
   "cagePickCurrentCage": "Сейчас в клетке {number}",
   "@cagePickCurrentCage": {
     "placeholders": {
-      "number": { "type": "String" }
+      "number": {
+        "type": "String"
+      }
     }
   },
   "cagePickNoCage": "Без клетки",
@@ -400,44 +456,54 @@
   "cageConditionGood": "В порядке",
   "cageConditionNeedsRepair": "Нужен ремонт",
   "cageConditionBroken": "Сломана",
-
   "countTasks": "{count, plural, one{{count} задача} few{{count} задачи} many{{count} задач} other{{count} задачи}}",
   "@countTasks": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countVaccinations": "{count, plural, one{{count} прививка} few{{count} прививки} many{{count} прививок} other{{count} прививки}}",
   "@countVaccinations": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countFeedKinds": "{count, plural, one{{count} вид корма} few{{count} вида корма} many{{count} видов корма} other{{count} вида корма}}",
   "@countFeedKinds": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countRabbits": "{count, plural, one{{count} кролик} few{{count} кролика} many{{count} кроликов} other{{count} кролика}}",
   "@countRabbits": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countRecords": "{count, plural, one{{count} запись} few{{count} записи} many{{count} записей} other{{count} записи}}",
   "@countRecords": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countOperations": "{count, plural, one{{count} операция} few{{count} операции} many{{count} операций} other{{count} операции}}",
   "@countOperations": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tasksTitle": "Задачи",
   "todayTasksTitle": "Задачи на сегодня",
   "todayTasksAll": "Все задачи",
@@ -481,23 +547,38 @@
   "taskPriorityUrgent": "Срочный",
   "dueToday": "Сегодня в {time}",
   "@dueToday": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "dueTomorrow": "Завтра в {time}",
   "@dueTomorrow": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "dueOn": "{date}",
   "@dueOn": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "overdueByDays": "{count, plural, one{Просрочена на {count} день} few{Просрочена на {count} дня} many{Просрочена на {count} дней} other{Просрочена на {count} дня}}",
   "@overdueByDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "dueTodayPlain": "Сегодня",
   "dueTomorrowPlain": "Завтра",
-
   "taskFormNewTitle": "Новая задача",
   "taskFormEditTitle": "Задача",
   "taskFormSectionMain": "Основное",
@@ -515,7 +596,11 @@
   "taskFormAssigneeHelp": "Исполнителю придёт уведомление о задаче.",
   "tasksAssignedTo": "Исполнитель: {name}",
   "@tasksAssignedTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "taskFormNotesLabel": "Примечания",
   "taskFormCreate": "Создать",
@@ -547,7 +632,6 @@
   "repeatMonthly": "Раз в месяц",
   "repeatQuarterly": "Раз в квартал",
   "repeatYearly": "Раз в год",
-
   "vaccinationsTitle": "Вакцинации",
   "vaccinationsStats": "Сводка",
   "vaccinationsViewAll": "Все",
@@ -566,16 +650,28 @@
   "vaccinationsResetAll": "Сбросить всё",
   "vaccinationsNext": "Следующая {date}",
   "@vaccinationsNext": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "vaccinationsOverdueBadge": "Просрочено",
   "vaccinationsInDays": "{count, plural, one{через {count} день} few{через {count} дня} many{через {count} дней} other{через {count} дня}}",
   "@vaccinationsInDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "vaccinationsBatch": "Партия {number}",
   "@vaccinationsBatch": {
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "vaccinationsVet": "Ветеринар",
   "vaccinationsDate": "Дата прививки",
@@ -593,7 +689,6 @@
   "vaccinationsStatUpcoming": "Предстоящие",
   "vaccinationsStatNext30": "В ближайшие 30 дней",
   "vaccinationsStatOverdue": "Просрочено",
-
   "rabbitPickerTitle": "Выберите кролика",
   "rabbitPickerHint": "Кличка или номер бирки",
   "rabbitPickerEmpty": "Не выбран",
@@ -603,10 +698,13 @@
   "rabbitPickerRequired": "Выберите кролика",
   "rabbitPickerInCage": "Клетка {number}",
   "@rabbitPickerInCage": {
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "rabbitPickerNoCage": "Без клетки",
-
   "vaccFormNewTitle": "Новая прививка",
   "vaccFormEditTitle": "Прививка",
   "vaccFormSectionMain": "Основное",
@@ -631,7 +729,6 @@
   "vaccFormCreated": "Прививка записана",
   "vaccFormUpdated": "Запись обновлена",
   "vaccFormFailed": "Не удалось сохранить",
-
   "medTitle": "Лечение",
   "medEmptyTitle": "Записей о лечении нет",
   "medEmptyBody": "Заведите карту болезни — она соберёт симптомы, лечение и затраты в одном месте.",
@@ -667,7 +764,11 @@
   "medStatOngoing": "Лечатся сейчас",
   "medDaysOngoing": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}",
   "@medDaysOngoing": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "medFormNewTitle": "Новая карта",
   "medFormEditTitle": "Карта лечения",
@@ -681,7 +782,6 @@
   "medFormUpdated": "Карта обновлена",
   "medFormFailed": "Не удалось сохранить",
   "medFormCostHelp": "Сумма попадёт в расходы фермы отдельной операцией.",
-
   "medFormDosage": "Дозировка",
   "medFormEndedDate": "Дата окончания",
   "medFormNotSet": "Не указана",
@@ -689,11 +789,12 @@
   "@medFormCostLabel": {
     "description": "Знак валюты передаётся параметром — он один на всё приложение, см. kCurrencySymbol",
     "placeholders": {
-      "currency": { "type": "String" }
+      "currency": {
+        "type": "String"
+      }
     }
   },
   "commonNumberInvalid": "Введите число",
-
   "feedsTitle": "Склад кормов",
   "feedsAdd": "Добавить корм",
   "feedsEmptyTitle": "Склад пуст",
@@ -713,7 +814,11 @@
   "feedingBulkCagesPickTitle": "Какие клетки кормим",
   "feedingBulkCagesSelected": "{count, plural, one{{count} клетка} few{{count} клетки} many{{count} клеток} other{{count} клетки}}",
   "@feedingBulkCagesSelected": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "feedingBulkWholeFarm": "Вся ферма",
   "feedingBulkClearSelection": "Снять выбор",
@@ -725,11 +830,19 @@
   "feedingBulkQuantityEachHint": "Число — на одного получателя.",
   "feedingBulkQuantityEachNote": "Число — на одного получателя. Всего спишется {amount}.",
   "@feedingBulkQuantityEachNote": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedingBulkCreated": "{count, plural, one{Записано {count} кормление} few{Записано {count} кормления} many{Записано {count} кормлений} other{Записано {count} кормления}}",
   "@feedingBulkCreated": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "feedsFilterAllTypes": "Все типы",
   "feedsInStock": "На складе",
@@ -741,27 +854,42 @@
   "feedsWriteOffTitle": "Списать со склада",
   "feedsCurrentStock": "Сейчас на складе: {amount}",
   "@feedsCurrentStock": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedsQuantity": "Сколько",
   "feedsQuantityPositive": "Введите количество больше нуля",
   "feedsRefilled": "Склад пополнен на {amount}",
   "@feedsRefilled": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedsWrittenOff": "Списано {amount}",
   "@feedsWrittenOff": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedsAdjustFailed": "Не удалось изменить остаток",
   "feedsDeleteTitle": "Удалить корм?",
   "feedsDeleteBody": "«{name}» исчезнет со склада вместе с историей остатков.",
   "@feedsDeleteBody": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "feedsDeleted": "Корм удалён",
   "feedsDeleteFailed": "Не удалось удалить корм",
-
   "feedFormNewTitle": "Новый корм",
   "feedFormEditTitle": "Корм",
   "commonSectionMain": "Основное",
@@ -779,7 +907,6 @@
   "feedFormCreated": "Корм добавлен на склад",
   "feedFormUpdated": "Корм обновлён",
   "feedFormFailed": "Не удалось сохранить корм",
-
   "feedingTitle": "Кормления",
   "feedingAdd": "Записать кормление",
   "feedingEmptyTitle": "Записей о кормлении нет",
@@ -789,11 +916,19 @@
   "feedingUnknownFeed": "Корм не указан",
   "feedingForRabbit": "Кролик {name}",
   "@feedingForRabbit": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "feedingForCage": "Клетка {number}",
   "@feedingForCage": {
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "feedingForFarm": "Всей ферме",
   "feedingEdit": "Изменить",
@@ -802,7 +937,6 @@
   "feedingDeleted": "Запись удалена",
   "feedingDeleteFailed": "Не удалось удалить запись",
   "commonPeriod": "Период",
-
   "feedingFormNewTitle": "Новое кормление",
   "feedingFormEditTitle": "Кормление",
   "feedingFormSectionWhom": "Кого кормим",
@@ -819,12 +953,15 @@
   "feedingFormNotes": "Примечания",
   "feedingFormStockLeft": "осталось {amount}",
   "@feedingFormStockLeft": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedingFormUpdated": "Запись обновлена",
   "feedingFormFailed": "Не удалось сохранить запись",
   "feedingFormStockNote": "Указанное количество спишется со склада.",
-
   "financeTitle": "Финансы",
   "financeAdd": "Добавить операцию",
   "financeEmptyTitle": "Операций пока нет",
@@ -846,7 +983,11 @@
   "financeAuthor": "Кто записал",
   "financeAuthorLine": "Записал {name}",
   "@financeAuthorLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "financeTypeIncome": "Доход",
   "financeTypeExpense": "Расход",
@@ -854,7 +995,6 @@
   "financeDeleteBody": "Операция исчезнет из ведомости без возможности вернуть.",
   "financeDeleted": "Операция удалена",
   "financeDeleteFailed": "Не удалось удалить операцию",
-
   "txFormNewTitle": "Новая операция",
   "txFormEditTitle": "Операция",
   "txFormSectionKind": "Что за операция",
@@ -877,7 +1017,6 @@
   "txFormCreated": "Операция записана",
   "txFormUpdated": "Операция обновлена",
   "txFormFailed": "Не удалось сохранить операцию",
-
   "cagesTitle": "Клетки",
   "cagesAdd": "Добавить клетку",
   "cagesSearchHint": "Номер или место",
@@ -889,13 +1028,21 @@
   "cagesOccupancy": "Занято {occupied} из {capacity}",
   "@cagesOccupancy": {
     "placeholders": {
-      "occupied": { "type": "int" },
-      "capacity": { "type": "int" }
+      "occupied": {
+        "type": "int"
+      },
+      "capacity": {
+        "type": "int"
+      }
     }
   },
   "cagesLastCleaned": "Убрана {date}",
   "@cagesLastCleaned": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "cagesMarkCleaned": "Отметить уборку",
   "cagesCleaned": "Уборка отмечена",
@@ -903,7 +1050,11 @@
   "cagesDeleteTitle": "Удалить клетку?",
   "cagesDeleteBody": "Клетка {number} исчезнет из списка. Кролики из неё останутся без клетки.",
   "@cagesDeleteBody": {
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "cagesDeleted": "Клетка удалена",
   "cagesDeleteFailed": "Не удалось удалить клетку",
@@ -923,7 +1074,6 @@
   "cageFormCreated": "Клетка добавлена",
   "cageFormUpdated": "Клетка обновлена",
   "cageFormFailed": "Не удалось сохранить клетку",
-
   "rabbitsTitle": "Кролики",
   "rabbitsSearchHint": "Кличка или номер бирки",
   "herdCagesNoPlace": "Место не указано",
@@ -942,11 +1092,14 @@
   "sexFemale": "Самка",
   "sexUnknown": "Пол не указан",
   "rabbitNoTag": "Без бирки",
-
   "weightTitle": "Взвешивания",
   "weightSubtitle": "{name}",
   "@weightSubtitle": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "weightEmptyTitle": "Взвешиваний пока нет",
   "weightEmptyBody": "Записывайте вес — по нему видно, растёт кролик или что-то не так.",
@@ -964,7 +1117,6 @@
   "weightNotes": "Заметки",
   "weightSaved": "Вес записан",
   "weightSaveFailed": "Не удалось записать вес",
-
   "galleryTitle": "Галерея фото",
   "galleryEmptyTitle": "Снимков пока нет",
   "galleryEmptyBody": "Добавьте фото — на карточке останется одно, а здесь поместятся все.",
@@ -976,19 +1128,20 @@
   "galleryDeleteTitle": "Удалить фото?",
   "galleryDeleteBody": "Восстановить его будет нельзя.",
   "galleryDeleted": "Фото удалено",
-
   "pedigreeTitle": "Родословная",
   "rabbitDetailEdit": "Изменить",
   "rabbitDetailDeleteTitle": "Удалить кролика?",
   "rabbitDetailDeleteBody": "Вместе с {name} исчезнут его взвешивания, прививки и записи о лечении.",
   "@rabbitDetailDeleteBody": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "rabbitDetailDeleted": "Кролик удалён",
   "rabbitDetailDeleteFailed": "Не удалось удалить кролика",
-
   "settingsTitle": "Настройки",
-
   "healthTitle": "Здоровье",
   "healthMenuLabel": "Прививки и лечение",
   "healthKindAll": "Всё",
@@ -1003,14 +1156,15 @@
   "healthNoneForRabbitTitle": "У {name} записей о здоровье нет",
   "@healthNoneForRabbitTitle": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "healthNoneInViewBody": "Снимите фильтр — остальные записи никуда не делись.",
   "healthRecordTitle": "Что записать?",
   "healthRecordVaccination": "Прививку",
   "healthRecordTreatment": "Лечение",
-
   "farmSectionMoney": "Деньги",
   "farmTransactions": "Доходы и расходы",
   "farmSectionFeed": "Корма",
@@ -1026,7 +1180,6 @@
   "farmAbout": "О приложении",
   "farmAboutBody": "Учёт поголовья, кормов, здоровья и денег кроличьей фермы.",
   "farmLogout": "Выйти",
-
   "settingsAppearance": "Внешний вид",
   "settingsTheme": "Тема",
   "settingsAccent": "Цвет акцента",
@@ -1039,12 +1192,20 @@
   "settingsPurposeAllTitle": "Выставить назначение всем?",
   "settingsPurposeAllBody": "Всем живым кроликам фермы будет проставлено «{purpose}». Выбывшие не изменятся. У кого назначение было другим — оно заменится, вернуть можно только по одному. Новые кролики тоже будут заводиться с этим назначением.",
   "@settingsPurposeAllBody": {
-    "placeholders": { "purpose": { "type": "String" } }
+    "placeholders": {
+      "purpose": {
+        "type": "String"
+      }
+    }
   },
   "settingsPurposeAllApply": "Выставить",
   "settingsPurposeAllDone": "{count, plural, =0{Менять было нечего — у всех уже так.} one{Изменён {count} кролик.} few{Изменено {count} кролика.} other{Изменено {count} кроликов.}}",
   "@settingsPurposeAllDone": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "settingsAbout": "О приложении",
   "settingsVersion": "Версия",
@@ -1064,9 +1225,7 @@
   "settingsThemeLight": "Светлая",
   "settingsThemeSystem": "Как в системе",
   "settingsThemeDark": "Тёмная",
-
   "settingsSubscription": "Тариф",
-
   "subscriptionTitle": "Тариф",
   "subscriptionNoPlan": "Тариф не назначен",
   "subscriptionNoPlanHint": "Обратитесь в поддержку, чтобы подключить тариф.",
@@ -1076,19 +1235,25 @@
   "subscriptionExpiresOn": "Действует до {date}",
   "@subscriptionExpiresOn": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "subscriptionExpired": "Срок истёк {date}",
   "@subscriptionExpired": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "subscriptionPricePerPeriod": "{price} с / 30 дней",
   "@subscriptionPricePerPeriod": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "subscriptionPay": "Оплатить",
@@ -1100,10 +1265,7 @@
   "subscriptionCheckPayment": "Проверить оплату",
   "subscriptionPaymentCompleted": "Оплата прошла, тариф продлён",
   "subscriptionPaymentPending": "Банк ещё не подтвердил оплату — попробуйте ещё раз через минуту",
-
-
   "splashTagline": "Управление фермой",
-
   "registerTitle": "Своя ферма",
   "registerSubtitle": "Заведите ферму — доступ работникам выдадите потом",
   "registerFarmName": "Название фермы",
@@ -1121,7 +1283,6 @@
   "registerConsentPrefix": "Я принимаю ",
   "registerConsentLink": "политику конфиденциальности",
   "registerConsentRequired": "Нужно принять политику конфиденциальности, чтобы продолжить",
-
   "birthsTitle": "Окролы",
   "birthsEmptyTitle": "Окролов пока нет",
   "birthsEmptyBody": "Запишите окрол — приложение само заведёт карточки на крольчат.",
@@ -1129,7 +1290,11 @@
   "birthsMotherUnknown": "Мать не указана",
   "birthsMotherLine": "Мать: {name}",
   "@birthsMotherLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "birthsFromBreeding": "По записи о случке",
   "birthsAlive": "Живых",
@@ -1145,20 +1310,32 @@
   "birthsKitsDialogTitle": "Завести карточки крольчат?",
   "birthsKitsDialogBody": "{count, plural, one{Будет заведена {count} карточка} few{Будет заведено {count} карточки} many{Будет заведено {count} карточек} other{Будет заведено {count} карточки}}",
   "@birthsKitsDialogBody": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "birthsNamePrefix": "Начало клички",
   "birthsNamePrefixHint": "Например, Белка-",
   "birthsNamePreview": "Получится: {first}, {second}, …",
   "@birthsNamePreview": {
     "placeholders": {
-      "first": { "type": "String" },
-      "second": { "type": "String" }
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
     }
   },
   "birthsKitsCreated": "{count, plural, one{Заведена {count} карточка} few{Заведено {count} карточки} many{Заведено {count} карточек} other{Заведено {count} карточки}}",
   "@birthsKitsCreated": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "birthsKitsFailed": "Не удалось завести карточки",
   "birthFormNewTitle": "Новый окрол",
@@ -1176,7 +1353,6 @@
   "birthFormCreated": "Окрол записан",
   "birthFormUpdated": "Запись обновлена",
   "birthFormFailed": "Не удалось сохранить запись",
-
   "breedsTitle": "Породы",
   "breedsSearchHint": "Название породы",
   "breedsAdd": "Добавить породу",
@@ -1187,7 +1363,11 @@
   "breedsDeleteTitle": "Удалить породу?",
   "breedsDeleteBody": "«{name}» исчезнет из справочника. Кролики этой породы останутся, но без неё.",
   "@breedsDeleteBody": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "breedsDeleted": "Порода удалена",
   "breedsDeleteFailed": "Не удалось удалить породу",
@@ -1212,13 +1392,16 @@
   "breedFormCreated": "Порода добавлена",
   "breedFormUpdated": "Порода обновлена",
   "breedFormFailed": "Не удалось сохранить породу",
-
   "breedingDetailTitle": "Случка",
   "breedingStatus": "Статус",
   "breedingParents": "Пара",
   "breedingTag": "Бирка {tag}",
   "@breedingTag": {
-    "placeholders": { "tag": { "type": "String" } }
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
   },
   "breedingDates": "Даты",
   "breedingDate": "Дата случки",
@@ -1244,7 +1427,6 @@
   "breedingFormCreated": "Случка записана",
   "breedingFormUpdated": "Запись обновлена",
   "breedingFormFailed": "Не удалось сохранить запись",
-
   "plannerTitle": "Подбор пар",
   "plannerIntro": "Выберите самца и самку — приложение посмотрит родословную и скажет, насколько они в родстве.",
   "plannerAnalysisFailed": "Не удалось разобрать родословную",
@@ -1253,14 +1435,17 @@
   "plannerCommonAncestors": "Общие предки",
   "plannerGenerations": "{count, plural, one{{count} поколение} few{{count} поколения} many{{count} поколений} other{{count} поколения}} назад",
   "@plannerGenerations": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "plannerAdvice": "Что делать",
   "plannerPickBoth": "Выберите обоих",
   "plannerPlanned": "Случка запланирована",
   "plannerPlan": "Запланировать случку",
   "plannerPedigreeFailed": "Не удалось загрузить родословную",
-
   "staffTitle": "Работники",
   "staffInvite": "Пригласить",
   "staffOwner": "Владелец",
@@ -1270,13 +1455,21 @@
   "staffPendingInvites": "Ждут ответа",
   "staffAccessClosed": "Доступ для {name} закрыт",
   "@staffAccessClosed": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "staffSaved": "Изменения сохранены",
   "staffRevokeTitle": "Отозвать приглашение?",
   "staffRevokeBody": "Код для {email} перестанет работать. Выписать новый можно в любой момент.",
   "@staffRevokeBody": {
-    "placeholders": { "email": { "type": "String" } }
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
   },
   "staffKeep": "Оставить",
   "staffRevoke": "Отозвать",
@@ -1290,11 +1483,19 @@
   "staffInvitedTitle": "Работник приглашён",
   "staffInvitedPhoneBody": "Работнику на {phone} SMS не уходит — перешлите ему приглашение сами. По ссылке он поставит приложение и войдёт по своему номеру, код придёт ему в SMS.",
   "@staffInvitedPhoneBody": {
-    "placeholders": { "phone": { "type": "String" } }
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
   },
   "staffInvitedEmailBody": "Письмо с приглашением ушло на {email}. Работник войдёт по этому адресу — код придёт ему письмом.",
   "@staffInvitedEmailBody": {
-    "placeholders": { "email": { "type": "String" } }
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
   },
   "staffInviteChannelPhone": "По телефону",
   "staffInviteChannelEmail": "По почте",
@@ -1305,7 +1506,11 @@
   "staffInviteNameEmpty": "Укажите имя работника",
   "staffValidUntil": "Действует до {date}",
   "@staffValidUntil": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "staffMakeManager": "Сделать управляющим",
   "staffMakeWorker": "Сделать работником",
@@ -1315,18 +1520,29 @@
   "staffTransferTitle": "Передать хозяйство?",
   "staffTransferBody": "Ферма перейдёт {name}, а вы станете управляющим. Отменить это будет нельзя.",
   "@staffTransferBody": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "staffTransferConfirm": "Передать ферму",
   "staffTransferred": "Хозяйство передано {name}",
   "@staffTransferred": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
-
   "rabbitTapToZoom": "Нажмите, чтобы рассмотреть",
   "rabbitTagLine": "Бирка {tag}",
   "@rabbitTagLine": {
-    "placeholders": { "tag": { "type": "String" } }
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
   },
   "rabbitMainInfo": "Главное",
   "rabbitBreed": "Порода",
@@ -1359,7 +1575,6 @@
   "purposeFur": "На мех",
   "purposeSale": "На продажу",
   "purposePet": "Питомец",
-
   "rabbitFormNewTitle": "Новый кролик",
   "rabbitFormEditTitle": "Кролик",
   "rabbitFormPhotoAdd": "Добавить фото",
@@ -1375,6 +1590,9 @@
   "rabbitFormTagEmpty": "Введите номер бирки",
   "rabbitFormBreedRequired": "Выберите породу",
   "rabbitFormBreedsFailed": "Не удалось загрузить породы",
+  "rabbitFormBreedsEmpty": "Пород пока нет",
+  "rabbitFormBreedsEmptyHint": "Порода нужна, чтобы завести кролика. Заведите ту, что держите.",
+  "rabbitFormBreedsEmptyAction": "Завести породу",
   "rabbitFormColor": "Окрас",
   "rabbitFormColorHint": "Серый, белый, чёрный…",
   "rabbitFormWeight": "Вес, кг",
@@ -1393,14 +1611,21 @@
   "statusSold": "Продан",
   "statusDead": "Погиб",
   "purposeShow": "На выставку",
-
   "periodDays": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}",
   "@periodDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "periodMonths": "{count, plural, one{{count} месяц} few{{count} месяца} many{{count} месяцев} other{{count} месяца}}",
   "@periodMonths": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "periodYear": "Год",
   "periodAll": "Всё время",
@@ -1425,7 +1650,11 @@
   "feedStatsAllGood": "Запасов хватает по всем позициям",
   "feedStatsMinimum": "минимум {amount}",
   "@feedStatsMinimum": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "feedingStatsTitle": "Кормления в цифрах",
   "feedingStatsEmptyTitle": "За этот период кормлений не было",
@@ -1436,7 +1665,11 @@
   "feedingStatsByFeed": "По кормам",
   "feedingStatsChartTitle": "Расход по типам корма, {unit}",
   "@feedingStatsChartTitle": {
-    "placeholders": { "unit": { "type": "String" } }
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   },
   "feedingStatsChartTitlePlain": "Расход по типам корма",
   "financeStatsTitle": "Финансы в цифрах",
@@ -1447,7 +1680,6 @@
   "financeIncomeByCategory": "Доходы по категориям",
   "financeExpensesByCategory": "Расходы по категориям",
   "financeRecent": "Последние операции",
-
   "txCategorySaleRabbit": "Продажа кролика",
   "txCategorySaleMeat": "Продажа мяса",
   "txCategorySaleFur": "Продажа шкурок",
@@ -1459,15 +1691,18 @@
   "txCategoryOther": "Прочее",
   "reportsOutcomeUnknown": "Исход не указан",
   "reportsFeedUsed": "Израсходовано",
-
   "reportsTabFarm": "Ферма",
   "reportsTabHealth": "Здоровье",
   "reportsTabFinance": "Деньги",
   "reportsPeriodRange": "С {from} по {to}",
   "@reportsPeriodRange": {
     "placeholders": {
-      "from": { "type": "String" },
-      "to": { "type": "String" }
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "reportsPopulationNow": "Кроликов сейчас",
@@ -1481,7 +1716,11 @@
   "reportsByPurpose": "По назначению",
   "reportsBreedUnknown": "Порода №{id}",
   "@reportsBreedUnknown": {
-    "placeholders": { "id": { "type": "int" } }
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
   },
   "reportsMoney": "Деньги за период",
   "reportsNoActivityTitle": "За этот период записей нет",
@@ -1492,17 +1731,14 @@
   "reportsHealthEmptyBody": "Выберите период шире или отметьте прививку — отчёт посчитается сам.",
   "reportsVaccinesByName": "Прививки по вакцинам",
   "reportsRecordsByOutcome": "Лечение по исходу",
-
   "farmSectionPlatform": "Платформа",
   "farmPlatformAdmin": "Фермы и тарифы",
-
   "platformTitle": "Платформа",
   "platformTabSummary": "Сводка",
   "platformTabFarms": "Фермы",
   "platformTabPlans": "Тарифы",
   "platformTabAnnouncements": "Объявления",
   "platformTabSupport": "Обращения",
-
   "platformSummarySectionFarms": "Фермы",
   "platformSummarySectionStatus": "Состояние",
   "platformSummarySectionActivity": "Активность",
@@ -1515,20 +1751,22 @@
   "platformSummaryRegistrations30d": "Регистраций за 30 дней",
   "platformSummaryRabbitsTotal": "Поголовье всего",
   "platformSummaryStorageTotal": "Место всего",
-
   "countFarms": "{count, plural, one{{count} ферма} few{{count} фермы} many{{count} ферм} other{{count} фермы}}",
   "@countFarms": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "countAnnouncements": "{count, plural, one{{count} объявление} few{{count} объявления} many{{count} объявлений} other{{count} объявления}}",
   "@countAnnouncements": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "platformFarmsEmptyTitle": "Ферм пока нет",
   "platformFarmsEmptyBody": "Здесь будут все хозяйства сервиса — они появятся сами, как только кто-нибудь зарегистрируется.",
   "platformFarmsNothingFound": "Ничего не нашлось",
@@ -1541,14 +1779,20 @@
   "platformUsageOfLimit": "{used} из {limit}",
   "@platformUsageOfLimit": {
     "placeholders": {
-      "used": { "type": "int" },
-      "limit": { "type": "int" }
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
     }
   },
   "platformUsageUnlimited": "{used}, без предела",
   "@platformUsageUnlimited": {
     "placeholders": {
-      "used": { "type": "int" }
+      "used": {
+        "type": "int"
+      }
     }
   },
   "platformAtLimit": "Упёрлась в предел тарифа",
@@ -1557,14 +1801,18 @@
   "platformFilterInactive": "{days, plural, one{Не заходили {days} день} few{Не заходили {days} дня} many{Не заходили {days} дней} other{Не заходили {days} дней}}",
   "@platformFilterInactive": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "platformFilterExpired": "Просрочен тариф",
   "platformFilterUnknown": "Неизвестный срез: {filter}",
   "@platformFilterUnknown": {
     "placeholders": {
-      "filter": { "type": "String" }
+      "filter": {
+        "type": "String"
+      }
     }
   },
   "platformChangePlan": "Сменить тариф",
@@ -1572,13 +1820,14 @@
   "platformPlanSheetTitle": "Тариф хозяйства «{farm}»",
   "@platformPlanSheetTitle": {
     "placeholders": {
-      "farm": { "type": "String" }
+      "farm": {
+        "type": "String"
+      }
     }
   },
   "platformPlanOff": "Без тарифа — работает без ограничений",
   "platformPlanAssigned": "Тариф обновлён",
   "platformPlanInactive": "выключен",
-
   "platformPlansEmptyTitle": "Тарифов пока нет",
   "platformPlansEmptyBody": "Пока их нет, все фермы работают без ограничений. Создайте первый — и его можно будет назначать.",
   "platformPlanNew": "Новый тариф",
@@ -1586,12 +1835,18 @@
   "platformPlanDeleteTitle": "Удалить тариф?",
   "platformPlanDeleteFarms": "{count, plural, =0{На этом тарифе сейчас нет ни одной фермы.} one{На нём сейчас {count} ферма — она станет работать без ограничений.} few{На нём сейчас {count} фермы — они станут работать без ограничений.} other{На нём сейчас {count} ферм — они станут работать без ограничений.}}",
   "@platformPlanDeleteFarms": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "platformPlanDeleteBody": "«{name}» исчезнет из списка, а фермы на нём станут работать без ограничений. Их записи не тронутся.",
   "@platformPlanDeleteBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "platformPlanDeleted": "Тариф удалён",
@@ -1600,13 +1855,17 @@
   "platformPlanLimitRabbits": "{count, plural, one{до {count} кролика} few{до {count} кроликов} many{до {count} кроликов} other{до {count} кроликов}}",
   "@platformPlanLimitRabbits": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformPlanLimitStaff": "{count, plural, one{до {count} человека} few{до {count} человек} many{до {count} человек} other{до {count} человек}}",
   "@platformPlanLimitStaff": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformPlanFormNewTitle": "Новый тариф",
@@ -1626,7 +1885,6 @@
   "platformPlanFormDefaultHint": "Этот тариф автоматически достаётся каждой новой зарегистрированной ферме. Ровно один тариф может быть таким — назначить его другому можно, только сняв флаг с текущего.",
   "platformPlanFormCreated": "Тариф создан",
   "platformPlanFormUpdated": "Тариф обновлён",
-
   "platformFarmTitleFallback": "Ферма",
   "platformFarmSectionOwner": "Владелец и связь",
   "platformFarmSectionAccess": "Доступ",
@@ -1639,9 +1897,7 @@
   "platformFarmSectionFacts": "Ещё о ферме",
   "platformFarmSectionExport": "Выгрузка данных",
   "platformFarmSectionDanger": "Удаление фермы",
-
   "platformFarmContactMissing": "Ни почты, ни телефона — связаться нечем",
-
   "platformFarmStatusActive": "Работает как обычно",
   "platformFarmStatusActiveHint": "Ферма читает и записывает всё своё без помех.",
   "platformFarmStatusReadOnly": "Только чтение",
@@ -1651,21 +1907,27 @@
   "platformFarmStatusUnknown": "Неизвестное состояние: {status}",
   "@platformFarmStatusUnknown": {
     "placeholders": {
-      "status": { "type": "String" }
+      "status": {
+        "type": "String"
+      }
     }
   },
   "platformFarmStatusChange": "Изменить доступ",
   "platformFarmStatusSheetTitle": "Доступ хозяйства «{farm}»",
   "@platformFarmStatusSheetTitle": {
     "placeholders": {
-      "farm": { "type": "String" }
+      "farm": {
+        "type": "String"
+      }
     }
   },
   "platformFarmStatusConfirmTitle": "Изменить доступ?",
   "platformFarmStatusConfirmBody": "Хозяйство перейдёт в состояние «{status}». Люди на ферме увидят это сразу же, без перезахода.",
   "@platformFarmStatusConfirmBody": {
     "placeholders": {
-      "status": { "type": "String" }
+      "status": {
+        "type": "String"
+      }
     }
   },
   "platformFarmStatusApply": "Применить",
@@ -1676,25 +1938,31 @@
   "platformFarmAuditAll": "Весь журнал",
   "platformFarmStatusExpiredWarning": "Тариф истёк {date}. Ночная проверка вернёт хозяйство в «Только чтение» — чтобы доступ остался, сначала продлите тариф.",
   "@platformFarmStatusExpiredWarning": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
-
   "platformFarmPlanForever": "Бессрочно",
   "platformFarmPlanExpires": "Действует до {date}",
   "@platformFarmPlanExpires": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmPlanExpired": "Срок истёк {date}",
   "@platformFarmPlanExpired": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmPlanExtend": "Продлить вручную",
   "platformFarmPlanExtended": "Срок тарифа обновлён",
-
   "platformFarmExtrasNone": "Поблажек нет — действуют пределы тарифа",
   "platformFarmExtrasGrant": "Выдать поблажку",
   "platformFarmExtrasEdit": "Изменить",
@@ -1702,26 +1970,34 @@
   "platformFarmExtrasRabbits": "{count, plural, one{+{count} кролик} few{+{count} кролика} many{+{count} кроликов} other{+{count} кролика}}",
   "@platformFarmExtrasRabbits": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformFarmExtrasStaff": "{count, plural, one{+{count} человек} few{+{count} человека} many{+{count} человек} other{+{count} человека}}",
   "@platformFarmExtrasStaff": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformFarmExtrasUntil": "до {date}",
   "@platformFarmExtrasUntil": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmExtrasEndless": "бессрочно",
   "platformFarmExtrasExpired": "Поблажка истекла {date} — снова действуют пределы тарифа",
   "@platformFarmExtrasExpired": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmExtrasFormTitle": "Поблажка сверх тарифа",
@@ -1735,29 +2011,30 @@
   "platformFarmExtrasFormEmpty": "Укажите кроликов или людей — или снимите поблажку",
   "platformFarmExtrasSaved": "Поблажка обновлена",
   "platformFarmExtrasCleared": "Поблажка снята",
-
   "platformFarmStaffNever": "Ещё не заходил",
   "platformFarmStaffLastLogin": "Заходил {date}",
   "@platformFarmStaffLastLogin": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmStaffBlocked": "Вход закрыт",
   "platformFarmStaffEmpty": "В составе никого — даже владельца",
-
   "platformFarmPaymentsEmpty": "Платежей ещё не было",
   "platformFarmPaymentNew": "Начат",
   "platformFarmPaymentCompleted": "Оплачен",
   "platformFarmPaymentFailed": "Не прошёл",
-
   "platformFarmImpersonate": "Войти под клиентом",
   "platformFarmImpersonateHint": "Увидеть приложение так же, как видит его владелец фермы — вместо переписки «а что у вас на экране». Только чтение, 15 минут, действие попадает в журнал.",
   "platformFarmImpersonateTitle": "Войти под клиентом?",
   "platformFarmImpersonateBody": "Вы увидите {farmName} глазами владельца — без права что-либо менять. Сеанс закончится сам через 15 минут или по кнопке «Выйти».",
   "@platformFarmImpersonateBody": {
     "placeholders": {
-      "farmName": { "type": "String" }
+      "farmName": {
+        "type": "String"
+      }
     }
   },
   "platformFarmImpersonateReasonLabel": "Причина",
@@ -1767,26 +2044,27 @@
   "impersonationBanner": "Вы смотрите «{farmName}» — только чтение",
   "@impersonationBanner": {
     "placeholders": {
-      "farmName": { "type": "String" }
+      "farmName": {
+        "type": "String"
+      }
     }
   },
   "impersonationExit": "Выйти",
   "impersonationExpired": "Сеанс просмотра истёк — вы снова в своём аккаунте",
-
   "farmStatusBannerReadOnly": "Доступ только для чтения — продлите тариф, чтобы снова вносить записи",
   "farmStatusBannerSuspended": "Доступ закрыт — обратитесь в поддержку",
   "farmStatusBannerAction": "Тариф",
   "farmStatusBannerContactSupport": "Поддержка",
-
   "platformFarmExport": "Экспортировать данные",
   "platformFarmExportHint": "Снимок всех записей фермы — кролики, лечение, корма, платежи. Пригодится на просьбу «отдайте мои данные».",
   "platformFarmExportGeneratedAt": "Снимок собран {date}",
   "@platformFarmExportGeneratedAt": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
-
   "platformFarmDelete": "Удалить ферму",
   "platformFarmDeleteHint": "Доступ закроется сразу же, а записи и файлы уйдут окончательно через 30 дней. До этого ферму можно вернуть.",
   "platformFarmDeleteTitle": "Удалить ферму?",
@@ -1795,7 +2073,9 @@
   "platformFarmDeleteConfirmHint": "Наберите «{name}»",
   "@platformFarmDeleteConfirmHint": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "platformFarmDeleteMismatch": "Название не совпадает с названием фермы",
@@ -1803,18 +2083,18 @@
   "platformFarmDeletedBanner": "Ферма удалена {date}. Записи и файлы будут окончательно очищены через 30 дней после удаления.",
   "@platformFarmDeletedBanner": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "platformFarmDeletedLocked": "Пока ферма удалена, доступ и поблажки не меняются — сначала восстановите её.",
   "platformFarmRestore": "Восстановить",
   "platformFarmRestored": "Ферма восстановлена",
-
   "platformFarmStorage": "Занятое место",
   "platformFarmLastActive": "Последний вход",
   "platformFarmNeverActive": "Ещё не заходили",
   "platformFarmCreatedAt": "Ферма создана",
-
   "platformSupportRequestsEmptyTitle": "Обращений пока нет",
   "platformSupportRequestsEmptyBody": "Здесь появятся вопросы от ферм — фермер пишет через Настройки → Поддержка.",
   "platformSupportRequestNew": "новое",
@@ -1823,15 +2103,15 @@
   "countSupportRequests": "{count, plural, one{{count} обращение} few{{count} обращения} many{{count} обращений} other{{count} обращения}}",
   "@countSupportRequests": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "platformAnnouncementsEmptyTitle": "Объявлений ещё не было",
   "platformAnnouncementsEmptyBody": "Здесь останется история рассылок: что отправляли, кому и сколько дошло. Отправленное не исправить и не отозвать, поэтому список пригодится, чтобы не повторить одно и то же дважды.",
   "platformAnnouncementNew": "Новое объявление",
   "platformAnnouncementSend": "Отправить",
-
   "platformAnnouncementTargetAll": "Всем фермам",
   "platformAnnouncementTargetAllHint": "Каждому хозяйству сервиса, кроме удалённых",
   "platformAnnouncementTargetFarm": "Одной ферме",
@@ -1841,16 +2121,19 @@
   "platformAnnouncementAudienceFarm": "Ферме «{farm}»",
   "@platformAnnouncementAudienceFarm": {
     "placeholders": {
-      "farm": { "type": "String" }
+      "farm": {
+        "type": "String"
+      }
     }
   },
   "platformAnnouncementAudienceFilter": "Срез «{filter}»",
   "@platformAnnouncementAudienceFilter": {
     "placeholders": {
-      "filter": { "type": "String" }
+      "filter": {
+        "type": "String"
+      }
     }
   },
-
   "platformAnnouncementChannelPush": "Push",
   "platformAnnouncementChannelPushHint": "Уведомление в приложении фермы",
   "platformAnnouncementChannelEmail": "Почта",
@@ -1858,21 +2141,28 @@
   "platformAnnouncementReach": "{farms, plural, one{{farms} ферма} few{{farms} фермы} many{{farms} ферм} other{{farms} фермы}} · {recipients, plural, one{{recipients} получатель} few{{recipients} получателя} many{{recipients} получателей} other{{recipients} получателя}}",
   "@platformAnnouncementReach": {
     "placeholders": {
-      "farms": { "type": "int" },
-      "recipients": { "type": "int" }
+      "farms": {
+        "type": "int"
+      },
+      "recipients": {
+        "type": "int"
+      }
     }
   },
   "platformAnnouncementNobody": "Получателей не нашлось — объявление никому не ушло",
   "platformAnnouncementDelivered": "доставлено {sent} из {attempted}",
   "@platformAnnouncementDelivered": {
     "placeholders": {
-      "sent": { "type": "int" },
-      "attempted": { "type": "int" }
+      "sent": {
+        "type": "int"
+      },
+      "attempted": {
+        "type": "int"
+      }
     }
   },
   "platformAnnouncementDeliveredNobody": "отправлять было некому",
   "platformAnnouncementDeliveryUnknown": "результат не сохранён",
-
   "platformAnnouncementFormTitle": "Новое объявление",
   "platformAnnouncementFormSubject": "Заголовок",
   "platformAnnouncementFormSubjectHint": "Он же станет темой письма и заголовком push",
@@ -1885,43 +2175,47 @@
   "platformAnnouncementFormPickFilter": "Выберите срез",
   "platformAnnouncementFarmSheetTitle": "Какой ферме отправить",
   "platformAnnouncementFilterSheetTitle": "Какому срезу ферм отправить",
-
   "platformAnnouncementConfirmTitle": "Отправить объявление?",
   "platformAnnouncementConfirmBody": "Сообщение уйдёт получателям сразу же. Отозвать или исправить отправленное нельзя.",
   "platformAnnouncementConfirmAudience": "Кому: {audience}",
   "@platformAnnouncementConfirmAudience": {
     "placeholders": {
-      "audience": { "type": "String" }
+      "audience": {
+        "type": "String"
+      }
     }
   },
   "platformAnnouncementConfirmChannels": "Каналы: {channels}",
   "@platformAnnouncementConfirmChannels": {
     "placeholders": {
-      "channels": { "type": "String" }
+      "channels": {
+        "type": "String"
+      }
     }
   },
   "platformAnnouncementSentOk": "{count, plural, one{Объявление ушло {count} получателю} few{Объявление ушло {count} получателям} many{Объявление ушло {count} получателям} other{Объявление ушло {count} получателям}}",
   "@platformAnnouncementSentOk": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformAnnouncementSentPartly": "{count, plural, one{Объявление ушло {count} получателю, но часть сообщений не дошла — смотрите строку в списке} few{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} many{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке} other{Объявление ушло {count} получателям, но часть сообщений не дошла — смотрите строку в списке}}",
   "@platformAnnouncementSentPartly": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "platformAnnouncementSentPlain": "Объявление отправлено",
-
   "storageUnitBytes": "Б",
   "storageUnitKb": "КБ",
   "storageUnitMb": "МБ",
   "storageUnitGb": "ГБ",
-
   "emptyNoRecordsTitle": "Записей нет",
   "emptyNoRecordsBody": "Добавьте первую.",
-
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Клетки, случки, окролы, корма и деньги — всё записано и всегда под рукой. Приложение само напомнит, когда ставить маточник и делать прививки.",
   "onbWelcomeStart": "Начать",
@@ -1975,11 +2269,14 @@
   "@activationChecklistProgress": {
     "description": "Сколько шагов начала работы уже сделано",
     "placeholders": {
-      "done": { "type": "int" },
-      "total": { "type": "int" }
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "deathFormTitle": "Отметить падёж",
   "deathFormRabbit": "Кролик",
   "deathFormDate": "Дата",
@@ -1998,34 +2295,46 @@
   "saleFormSubmit": "Записать",
   "saleFormSaved": "Продажа записана",
   "quickRecordDeath": "Падёж",
-
   "notificationPrimerTitle": "Напомним поставить маточник",
   "notificationPrimerBody": "За два дня до окрола придёт напоминание — успеете подготовить клетку. Ещё напомним про прививки и дела на день.",
   "notificationPrimerAllow": "Включить напоминания",
   "notificationPrimerDecline": "Не сейчас",
   "settingsNotificationsOff": "Уведомления выключены",
   "settingsNotificationsTurnOn": "Включить",
-
   "rabbitFormMore": "Дополнительно",
   "rabbitFormSexRequired": "Выберите, самец это или самка",
   "rabbitFormCageNone": "Без клетки",
   "rabbitFormCageFull": "{number} — занята полностью",
   "@rabbitFormCageFull": {
     "description": "Клетка в списке выбора, куда уже некого селить",
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "commonOptional": "необязательно",
-
   "unitKg": "кг",
-
   "kindlingPlanAction": "План окролов",
   "kindlingPlanPickMonth": "План окролов на какой месяц?",
   "kindlingPlanThisMonth": "На этот месяц",
   "kindlingPlanNextMonth": "На следующий месяц",
   "kindlingPlanEmpty": "На {month} окролов не ожидается",
-  "@kindlingPlanEmpty": {"placeholders": {"month": {"type": "String"}}},
+  "@kindlingPlanEmpty": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
   "kindlingPlanSheetTitle": "План окролов — {month}",
-  "@kindlingPlanSheetTitle": {"placeholders": {"month": {"type": "String"}}},
+  "@kindlingPlanSheetTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
   "kindlingPlanNestHint": "Маточник ставят за три дня до окрола",
   "kindlingPlanColBirth": "Окрол",
   "kindlingPlanColFemale": "Самка",
@@ -2034,12 +2343,15 @@
   "kindlingPlanColNest": "Маточник",
   "kindlingPlanColMark": "Отметка",
   "kindlingPlanPrintedAt": "Напечатано {date}",
-  "@kindlingPlanPrintedAt": {"placeholders": {"date": {"type": "String"}}},
-
+  "@kindlingPlanPrintedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "commonUndo": "Вернуть",
-
   "journalKindDeletion": "Удаление",
-
   "voiceDictate": "Надиктовать",
   "voiceStop": "Остановить запись",
   "voiceUnavailable": "Этот телефон не умеет распознавать речь",
@@ -2057,7 +2369,6 @@
   "cageScanHint": "Наведите камеру на метку клетки",
   "cageScanNoCamera": "Камера недоступна. Проверьте разрешение в настройках телефона.",
   "slideToDelete": "Сдвиньте, чтобы удалить",
-
   "birthsKitsDied": "Пало",
   "birthsKitDeathAction": "Отметить падёж",
   "birthsKitsCardedHint": "Крольчата заведены карточками — падёж и отсадку отмечайте в поголовье, на карточке крольчонка.",
@@ -2065,13 +2376,15 @@
   "birthsKitDeathHint": "Осталось живых: {alive}",
   "@birthsKitDeathHint": {
     "description": "Сколько крольчат этого окрола живы на момент записи падежа",
-    "placeholders": { "alive": { "type": "int" } }
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      }
+    }
   },
   "birthsKitDeathSaved": "Записано",
   "birthsKitsAlive": "Живых",
-
   "loginCodeLabelEmail": "Код из письма",
-
   "cyclePalpationAction": "Прощупала",
   "cyclePalpationTitle": "Что показало прощупывание?",
   "cyclePalpationPregnant": "Сукрольная",
@@ -2083,17 +2396,29 @@
   "birthsWeaningAction": "Отсадили",
   "birthsWeaningTitle": "Сколько крольчат отсадили?",
   "birthsWeaningHint": "Живых в выводке: {alive}",
-  "@birthsWeaningHint": {"description": "Сколько крольчат этого окрола живы на момент отсадки", "placeholders": {"alive": {"type": "int"}}},
+  "@birthsWeaningHint": {
+    "description": "Сколько крольчат этого окрола живы на момент отсадки",
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      }
+    }
+  },
   "birthsWeaningAll": "Всех: {count}",
-  "@birthsWeaningAll": {"description": "Кнопка «отсадили весь выводок» с количеством", "placeholders": {"count": {"type": "int"}}},
+  "@birthsWeaningAll": {
+    "description": "Кнопка «отсадили весь выводок» с количеством",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "birthsWeaningFewer": "Или сколько-то меньше",
   "birthsWeaningSaved": "Отсадка записана",
-
   "subscriptionCheckFailed": "Не удалось проверить оплату — нет связи с сервером",
   "subscriptionPaymentDeclined": "Банк отклонил оплату",
   "subscriptionPaymentDeclinedHint": "Деньги не списаны. Проверьте карту и попробуйте ещё раз.",
   "subscriptionPayAgain": "Оплатить заново",
-
   "supportRequestNew": "Написать",
   "supportRequestNewTitle": "Новое обращение",
   "supportRequestsEmptyTitle": "Обращений пока нет",
@@ -2118,14 +2443,18 @@
   "platformSupportContactEmailHint": "support@example.com",
   "platformSupportContactEmailInvalid": "Проверьте адрес — в нём нет знака @",
   "platformSupportContactSaved": "Контакт поддержки сохранён",
-
   "notificationsTitle": "Уведомления",
   "notificationsEmptyTitle": "Пока тихо",
   "notificationsEmptyBody": "Здесь появится то, о чём приложение сообщало: просроченные прививки, кончающийся корм, скорый окрол.",
-
   "platformFilterDeleted": "Удалённые",
   "platformFarmDeletedShort": "Удалена {date}",
-  "@platformFarmDeletedShort": {"placeholders": {"date": {"type": "String"}}},
+  "@platformFarmDeletedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "platformFarmsDeletedEmptyTitle": "Удалённых ферм нет",
   "platformFarmsDeletedEmptyBody": "Ничего не ждёт окончательной очистки. Удалённая ферма остаётся здесь 30 дней — этого срока хватает, чтобы передумать.",
   "platformPlanDeleteDefaultWarning": "Это тариф по умолчанию. После удаления новые фермы будут появляться вовсе без тарифа, пока таким не отмечен другой.",
@@ -2134,18 +2463,63 @@
   "platformAuditEmptyTitle": "Журнал пуст",
   "platformAuditEmptyBody": "Сюда попадает каждое действие админа: смена тарифа, доступ фермы, вход под клиентом, удаление.",
   "countAuditRecords": "{count, plural, one{{count} запись} few{{count} записи} many{{count} записей} other{{count} записи}}",
-  "@countAuditRecords": {"placeholders": {"count": {"type": "int"}}},
+  "@countAuditRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditAdmin": "Админ {id}",
-  "@platformAuditAdmin": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditAdmin": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFarm": "Ферма {id}",
-  "@platformAuditFarm": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditFarm": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditWholeService": "Весь сервис",
   "platformAuditIp": "IP {ip}",
-  "@platformAuditIp": {"placeholders": {"ip": {"type": "String"}}},
+  "@platformAuditIp": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditChange": "{field}: {before} → {after}",
-  "@platformAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@platformAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditDetail": "{field}: {value}",
-  "@platformAuditDetail": {"placeholders": {"field": {"type": "String"}, "value": {"type": "String"}}},
+  "@platformAuditDetail": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditValueNone": "не задано",
   "platformAuditActionPlanCreate": "Создан тариф",
   "platformAuditActionPlanUpdate": "Изменён тариф",
@@ -2162,7 +2536,13 @@
   "platformAuditActionSupportResolve": "Обращение закрыто",
   "platformAuditActionSupportContact": "Изменён контакт поддержки",
   "platformAuditActionUnknown": "Действие «{action}»",
-  "@platformAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@platformAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFieldName": "Название",
   "platformAuditFieldLimits": "Пределы",
   "platformAuditFieldPrice": "Цена",
@@ -2178,33 +2558,77 @@
   "platformAuditPlanBecameDefault": "Стал тарифом по умолчанию",
   "platformAuditPlanNoLongerDefault": "Больше не тариф по умолчанию",
   "platformAuditPlanRef": "Тариф №{id}",
-  "@platformAuditPlanRef": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditPlanRef": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportAnswered": "Обращение №{id} — с ответом автору",
-  "@platformAuditSupportAnswered": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditSupportAnswered": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportClosed": "Обращение №{id} — без ответа",
-  "@platformAuditSupportClosed": {"placeholders": {"id": {"type": "int"}}},
-
+  "@platformAuditSupportClosed": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "feedsPaidLabel": "Сколько заплатили",
   "feedsPaidHint": "Если это закупка — сумма попадёт в расходы. Пересчитали остаток — оставьте пустым.",
-
   "staffInvitedEmailFailedBody": "Письмо на {email} отправить не удалось — перешлите работнику приглашение сами.",
-  "@staffInvitedEmailFailedBody": {"placeholders": {"email": {"type": "String"}}},
+  "@staffInvitedEmailFailedBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "staffInviteLinkLabel": "Ссылка-приглашение",
   "staffInviteCopy": "Скопировать приглашение",
   "staffInviteCopied": "Приглашение скопировано — вставьте его в сообщение работнику",
   "staffInviteMessage": "Приглашаю вас работать на моей ферме в RabbitFarm. Откройте ссылку, поставьте приложение и войдите по своему номеру: {link}",
-  "@staffInviteMessage": {"placeholders": {"link": {"type": "String"}}},
+  "@staffInviteMessage": {
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "staffExpiredInvites": "Срок вышел",
   "staffInviteCardLive": "{role} · до {date}",
-  "@staffInviteCardLive": {"placeholders": {"role": {"type": "String"}, "date": {"type": "String"}}},
+  "@staffInviteCardLive": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "staffInviteCardExpired": "{role} · срок истёк {date}",
-  "@staffInviteCardExpired": {"placeholders": {"role": {"type": "String"}, "date": {"type": "String"}}},
+  "@staffInviteCardExpired": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "staffInviteAgain": "Пригласить заново",
   "loginNoCodePhone": "Кода нет? Спросите у владельца фермы, на какой номер он вас пригласил.",
   "loginNoCodeEmail": "Кода нет? Спросите у владельца фермы, на какую почту он вас пригласил.",
-
   "platformPlanDefaultBadge": "новым фермам",
-
   "staffAccessClosedBadge": "доступ закрыт",
   "roleManagerDescription": "Ведёт поголовье, корма и финансы",
   "roleWorkerDescription": "Смотрит данные и отмечает работу",
@@ -2218,11 +2642,35 @@
   "farmAuditActionActivated": "Доступ открыт",
   "farmAuditActionOwnership": "Хозяйство передано",
   "farmAuditActionUnknown": "{action}",
-  "@farmAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@farmAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "farmAuditChange": "{field}: {before} → {after}",
-  "@farmAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@farmAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "farmAuditChanged": "Изменено: {field}",
-  "@farmAuditChanged": {"placeholders": {"field": {"type": "String"}}},
+  "@farmAuditChanged": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
   "farmAuditNoValue": "пусто",
   "errorCodeNotRecordAuthor": "Чужую запись исправляет управляющий или владелец",
   "deleteAccountTitle": "Удаление учётной записи",
@@ -2232,7 +2680,13 @@
   "deleteAccountOwnerWhatGoes": "Пропадут поголовье и клетки, кормление и корма, лечение и прививки, случки и окролы, деньги, задачи, заметки и фотографии.",
   "deleteAccountGracePeriod": "Тридцать дней данные ещё лежат на сервере: если передумаете, напишите в поддержку — хозяйство вернут. После этого срока данные стираются окончательно.",
   "deleteAccountTypeName": "Наберите название хозяйства «{name}», чтобы подтвердить",
-  "@deleteAccountTypeName": {"placeholders": {"name": {"type": "String"}}},
+  "@deleteAccountTypeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "deleteAccountTypeNameUnknown": "Наберите название своего хозяйства, чтобы подтвердить",
   "deleteAccountFarmNameHint": "Название хозяйства",
   "deleteAccountOwnerAction": "Удалить хозяйство",
@@ -2251,7 +2705,13 @@
   "healthSheetPrint": "Напечатать",
   "healthSheetShare": "Отправить таблицей",
   "healthSheetTitle": "Карта здоровья: {name}",
-  "@healthSheetTitle": {"placeholders": {"name": {"type": "String"}}},
+  "@healthSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "healthSheetNoVaccinations": "Прививок не записано",
   "healthSheetNoTreatments": "Лечения не записано",
   "healthSheetNextDate": "Следующая",
@@ -2263,11 +2723,26 @@
   "financeSheetAction": "Книга доходов и расходов",
   "financeSheetTitle": "Доходы и расходы",
   "financeSheetPeriod": "За срок с {from} по {to}",
-  "@financeSheetPeriod": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "@financeSheetPeriod": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "financeSheetEmpty": "За этот срок операций не записано",
   "financeSheetColKind": "Приход или расход",
   "exportShareSubject": "{title} — «Кроличья ферма»",
-  "@exportShareSubject": {"placeholders": {"title": {"type": "String"}}},
+  "@exportShareSubject": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "financeSheetLastMonth": "Прошлый месяц",
   "financeSheetThisYear": "Этот год",
   "formDraftRestored": "Вернули то, что вы не успели сохранить",

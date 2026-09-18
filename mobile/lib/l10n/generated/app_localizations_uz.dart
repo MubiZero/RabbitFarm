@@ -3412,6 +3412,16 @@ class AppLocalizationsUz extends AppLocalizations {
   String get rabbitFormBreedsFailed => 'Zotlarni yuklab boʻlmadi';
 
   @override
+  String get rabbitFormBreedsEmpty => 'Hozircha zot yoʻq';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Quyonni yozish uchun zot kerak. Oʻzingizda bor zotni qoʻshing.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Zot qoʻshish';
+
+  @override
   String get rabbitFormColor => 'Rangi';
 
   @override

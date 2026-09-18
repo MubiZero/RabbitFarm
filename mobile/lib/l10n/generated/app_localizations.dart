@@ -6186,6 +6186,24 @@ abstract class AppLocalizations {
   /// **'Не удалось загрузить породы'**
   String get rabbitFormBreedsFailed;
 
+  /// No description provided for @rabbitFormBreedsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пород пока нет'**
+  String get rabbitFormBreedsEmpty;
+
+  /// No description provided for @rabbitFormBreedsEmptyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода нужна, чтобы завести кролика. Заведите ту, что держите.'**
+  String get rabbitFormBreedsEmptyHint;
+
+  /// No description provided for @rabbitFormBreedsEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести породу'**
+  String get rabbitFormBreedsEmptyAction;
+
   /// No description provided for @rabbitFormColor.
   ///
   /// In ru, this message translates to:

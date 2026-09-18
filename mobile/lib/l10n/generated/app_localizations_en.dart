@@ -3402,6 +3402,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rabbitFormBreedsFailed => 'Couldn\'t load breeds';
 
   @override
+  String get rabbitFormBreedsEmpty => 'No breeds yet';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'A breed is required to add a rabbit. Add the one you keep.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Add a breed';
+
+  @override
   String get rabbitFormColor => 'Color';
 
   @override

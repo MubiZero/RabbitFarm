@@ -167,7 +167,9 @@
   "bulkHerdDone": "{count, plural, one{{count} rabbit added} other{{count} rabbits added}}",
   "@bulkHerdDone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rabbitMultiPickerTitle": "Who is in the batch",
@@ -177,21 +179,29 @@
   "rabbitMultiPickerSelected": "{count, plural, one{{count} selected} other{{count} selected}}",
   "@rabbitMultiPickerSelected": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "transactionSaleBatch": "Sell as a batch",
   "ageYears": "{count, plural, one{{count} year} other{{count} years}}",
   "@ageYears": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ageYearsMonths": "{years}y {months}m",
   "@ageYearsMonths": {
     "placeholders": {
-      "years": { "type": "int" },
-      "months": { "type": "int" }
+      "years": {
+        "type": "int"
+      },
+      "months": {
+        "type": "int"
+      }
     }
   },
   "feedTypePellets": "Pellets",
@@ -211,7 +221,9 @@
   "offlineRejectedTitle": "{count, plural, one{{count} record was not saved} other{{count} records were not saved}}",
   "@offlineRejectedTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "offlineRejectedBody": "The server rejected them — please enter them again.",
@@ -361,7 +373,11 @@
   "taskFormAssigneeHelp": "The assignee gets a notification about the task.",
   "tasksAssignedTo": "Assignee: {name}",
   "@tasksAssignedTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "taskFormNotesLabel": "Notes",
   "taskFormCreate": "Create",
@@ -631,7 +647,11 @@
   "financeAuthor": "Recorded by",
   "financeAuthorLine": "Recorded by {name}",
   "@financeAuthorLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "financeTypeIncome": "Income",
   "financeTypeExpense": "Expense",
@@ -791,12 +811,20 @@
   "settingsPurposeAllTitle": "Set the purpose for everyone?",
   "settingsPurposeAllBody": "Every live rabbit on the farm will be set to “{purpose}”. Rabbits that have left the farm stay as they are. Different values are replaced and can only be restored one by one. New rabbits will get this purpose too.",
   "@settingsPurposeAllBody": {
-    "placeholders": { "purpose": { "type": "String" } }
+    "placeholders": {
+      "purpose": {
+        "type": "String"
+      }
+    }
   },
   "settingsPurposeAllApply": "Set it",
   "settingsPurposeAllDone": "{count, plural, =0{Nothing to change — everyone was already set.} one{{count} rabbit changed.} other{{count} rabbits changed.}}",
   "@settingsPurposeAllDone": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "settingsAbout": "About",
   "settingsVersion": "Version",
@@ -1052,6 +1080,9 @@
   "rabbitFormTagEmpty": "Enter the tag number",
   "rabbitFormBreedRequired": "Select a breed",
   "rabbitFormBreedsFailed": "Couldn''t load breeds",
+  "rabbitFormBreedsEmpty": "No breeds yet",
+  "rabbitFormBreedsEmptyHint": "A breed is required to add a rabbit. Add the one you keep.",
+  "rabbitFormBreedsEmptyAction": "Add a breed",
   "rabbitFormColor": "Color",
   "rabbitFormColorHint": "Gray, white, black…",
   "rabbitFormWeight": "Weight, kg",
@@ -1197,7 +1228,11 @@
   "platformPlanDeleteTitle": "Delete plan?",
   "platformPlanDeleteFarms": "{count, plural, =0{No farm is on this plan right now.} one{{count} farm is on it — it will run without limits.} other{{count} farms are on it — they will run without limits.}}",
   "@platformPlanDeleteFarms": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "platformPlanDeleteBody": "\"{name}\" will be removed from the list, and farms on it will run without limits. Their records won''t be affected.",
   "platformPlanDeleted": "Plan deleted",
@@ -1254,7 +1289,11 @@
   "platformFarmAuditAll": "Full log",
   "platformFarmStatusExpiredWarning": "The plan expired on {date}. The nightly check will put the farm back to read-only — extend the plan first if the access is to stay.",
   "@platformFarmStatusExpiredWarning": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "platformFarmPlanForever": "Unlimited",
   "platformFarmPlanExpires": "Valid until {date}",
@@ -1375,7 +1414,6 @@
   "storageUnitGb": "GB",
   "emptyNoRecordsTitle": "No records",
   "emptyNoRecordsBody": "Add the first one.",
-
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Cages, matings, kindlings, feed and money, all recorded and always at hand. The app reminds you when to put the nest box in and when shots are due.",
   "onbWelcomeStart": "Get started",
@@ -1426,7 +1464,6 @@
   "firstStepHelpers": "Invite a helper",
   "activationChecklistFarmCreated": "Farm created",
   "activationChecklistProgress": "{done} of {total}",
-
   "deathFormTitle": "Record a death",
   "deathFormRabbit": "Rabbit",
   "deathFormDate": "Date",
@@ -1445,22 +1482,18 @@
   "saleFormSubmit": "Record",
   "saleFormSaved": "Sale recorded",
   "quickRecordDeath": "Death",
-
   "notificationPrimerTitle": "We''ll remind you about the nest box",
   "notificationPrimerBody": "Two days before kindling you''ll get a reminder, with time to prepare the cage. We''ll also remind you about vaccinations and the day''s work.",
   "notificationPrimerAllow": "Turn on reminders",
   "notificationPrimerDecline": "Not now",
   "settingsNotificationsOff": "Notifications are off",
   "settingsNotificationsTurnOn": "Turn on",
-
   "rabbitFormMore": "More details",
   "rabbitFormSexRequired": "Choose buck or doe",
   "rabbitFormCageNone": "No cage",
   "rabbitFormCageFull": "{number} — full",
   "commonOptional": "optional",
-
   "unitKg": "kg",
-
   "kindlingPlanAction": "Kindling plan",
   "kindlingPlanPickMonth": "Which month is the plan for?",
   "kindlingPlanThisMonth": "This month",
@@ -1475,11 +1508,8 @@
   "kindlingPlanColNest": "Nest box",
   "kindlingPlanColMark": "Done",
   "kindlingPlanPrintedAt": "Printed {date}",
-
   "commonUndo": "Undo",
-
   "journalKindDeletion": "Deletion",
-
   "voiceDictate": "Dictate",
   "voiceStop": "Stop recording",
   "voiceUnavailable": "This phone cannot recognise speech",
@@ -1497,7 +1527,6 @@
   "cageScanHint": "Point the camera at the cage tag",
   "cageScanNoCamera": "Camera unavailable. Check the permission in your phone settings.",
   "slideToDelete": "Slide to delete",
-
   "birthsKitsDied": "Lost",
   "birthsKitDeathAction": "Record losses",
   "birthsKitsCardedHint": "This litter has individual cards — record deaths and weaning on the kit card in the herd.",
@@ -1505,9 +1534,7 @@
   "birthsKitDeathHint": "Still alive: {alive}",
   "birthsKitDeathSaved": "Recorded",
   "birthsKitsAlive": "Alive",
-
   "loginCodeLabelEmail": "Code from the email",
-
   "cyclePalpationAction": "Palpated",
   "cyclePalpationTitle": "What did the check show?",
   "cyclePalpationPregnant": "Pregnant",
@@ -1522,12 +1549,10 @@
   "birthsWeaningAll": "All of them: {count}",
   "birthsWeaningFewer": "Or fewer",
   "birthsWeaningSaved": "Weaning recorded",
-
   "subscriptionCheckFailed": "Could not check the payment — no connection to the server",
   "subscriptionPaymentDeclined": "The bank declined the payment",
   "subscriptionPaymentDeclinedHint": "No money was taken. Check the card and try again.",
   "subscriptionPayAgain": "Pay again",
-
   "supportRequestNew": "Write",
   "supportRequestNewTitle": "New request",
   "supportRequestsEmptyTitle": "No requests yet",
@@ -1552,14 +1577,18 @@
   "platformSupportContactEmailHint": "support@example.com",
   "platformSupportContactEmailInvalid": "Check the address — it has no @ sign",
   "platformSupportContactSaved": "Support contact saved",
-
   "notificationsTitle": "Notifications",
   "notificationsEmptyTitle": "Nothing yet",
   "notificationsEmptyBody": "Here you''ll find what the app has told you: overdue vaccinations, feed running low, kindling coming up.",
-
   "platformFilterDeleted": "Deleted",
   "platformFarmDeletedShort": "Deleted {date}",
-  "@platformFarmDeletedShort": {"placeholders": {"date": {"type": "String"}}},
+  "@platformFarmDeletedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "platformFarmsDeletedEmptyTitle": "No deleted farms",
   "platformFarmsDeletedEmptyBody": "Nothing is waiting to be wiped. A deleted farm stays here for 30 days — long enough to change your mind.",
   "platformPlanDeleteDefaultWarning": "This is the default plan. Once it is gone, new farms will appear with no plan at all until another one is marked as the default.",
@@ -1568,18 +1597,63 @@
   "platformAuditEmptyTitle": "The log is empty",
   "platformAuditEmptyBody": "Every admin action lands here: plan changes, farm access, signing in as a client, deletions.",
   "countAuditRecords": "{count, plural, one{{count} record} other{{count} records}}",
-  "@countAuditRecords": {"placeholders": {"count": {"type": "int"}}},
+  "@countAuditRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditAdmin": "Admin {id}",
-  "@platformAuditAdmin": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditAdmin": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFarm": "Farm {id}",
-  "@platformAuditFarm": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditFarm": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditWholeService": "Whole service",
   "platformAuditIp": "IP {ip}",
-  "@platformAuditIp": {"placeholders": {"ip": {"type": "String"}}},
+  "@platformAuditIp": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditChange": "{field}: {before} → {after}",
-  "@platformAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@platformAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditDetail": "{field}: {value}",
-  "@platformAuditDetail": {"placeholders": {"field": {"type": "String"}, "value": {"type": "String"}}},
+  "@platformAuditDetail": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditValueNone": "not set",
   "platformAuditActionPlanCreate": "Plan created",
   "platformAuditActionPlanUpdate": "Plan changed",
@@ -1596,7 +1670,13 @@
   "platformAuditActionSupportResolve": "Support request closed",
   "platformAuditActionSupportContact": "Support contact changed",
   "platformAuditActionUnknown": "Action “{action}”",
-  "@platformAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@platformAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFieldName": "Name",
   "platformAuditFieldLimits": "Limits",
   "platformAuditFieldPrice": "Price",
@@ -1612,15 +1692,31 @@
   "platformAuditPlanBecameDefault": "Became the default plan",
   "platformAuditPlanNoLongerDefault": "No longer the default plan",
   "platformAuditPlanRef": "Plan #{id}",
-  "@platformAuditPlanRef": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditPlanRef": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportAnswered": "Request #{id} — answered to the author",
-  "@platformAuditSupportAnswered": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditSupportAnswered": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportClosed": "Request #{id} — closed without an answer",
-  "@platformAuditSupportClosed": {"placeholders": {"id": {"type": "int"}}},
-
+  "@platformAuditSupportClosed": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "feedsPaidLabel": "Amount paid",
   "feedsPaidHint": "If this was a purchase, the amount goes into expenses. Leave empty when you are just correcting the count.",
-
   "staffInvitedEmailFailedBody": "We could not send the email to {email} — forward the invitation yourself.",
   "staffInviteLinkLabel": "Invitation link",
   "staffInviteCopy": "Copy the invitation",
@@ -1632,9 +1728,7 @@
   "staffInviteAgain": "Invite again",
   "loginNoCodePhone": "No code? Ask the farm owner which number they invited you with.",
   "loginNoCodeEmail": "No code? Ask the farm owner which email address they invited you with.",
-
   "platformPlanDefaultBadge": "for new farms",
-
   "staffAccessClosedBadge": "access closed",
   "roleManagerDescription": "Runs the herd, the feed and the money",
   "roleWorkerDescription": "Reads the records and marks work done",

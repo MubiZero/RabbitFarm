@@ -1,5 +1,6 @@
 'use strict';
 const { QueryTypes } = require('sequelize');
+const { STARTER_BREEDS } = require('../src/data/starterBreeds');
 
 /**
  * Демонстрационный набор данных для разработки: три учётные записи,
@@ -139,64 +140,9 @@ module.exports = {
       farmId
     });
 
-    const breedsInserted = await seedFarmTable('breeds', [
-      {
-        name: 'Калифорнийская',
-        description: 'Мясная порода кроликов с белым окрасом и темными ушами, лапами и носом. Отличается быстрым набором веса.',
-        average_weight: 4.5,
-        average_litter_size: 8,
-        purpose: 'meat'
-      },
-      {
-        name: 'Новозеландская белая',
-        description: 'Популярная мясная порода с чисто белым окрасом. Быстро растет и дает хорошее мясо.',
-        average_weight: 5.0,
-        average_litter_size: 9,
-        purpose: 'meat'
-      },
-      {
-        name: 'Советская шиншилла',
-        description: 'Мясо-шкурковая порода с серебристо-голубым окрасом. Ценится за качественный мех.',
-        average_weight: 5.0,
-        average_litter_size: 8,
-        purpose: 'combined'
-      },
-      {
-        name: 'Серый великан',
-        description: 'Крупная порода кроликов серого окраса. Вынослива и неприхотлива в содержании.',
-        average_weight: 6.0,
-        average_litter_size: 8,
-        purpose: 'combined'
-      },
-      {
-        name: 'Фландр (Бельгийский великан)',
-        description: 'Одна из самых крупных пород кроликов. Спокойный темперамент, крупное телосложение.',
-        average_weight: 7.0,
-        average_litter_size: 7,
-        purpose: 'meat'
-      },
-      {
-        name: 'Рекс',
-        description: 'Порода с уникальным велюровым мехом. Среднего размера, спокойный характер.',
-        average_weight: 4.0,
-        average_litter_size: 6,
-        purpose: 'fur'
-      },
-      {
-        name: 'Венский голубой',
-        description: 'Мясо-шкурковая порода с красивым серо-голубым окрасом. Качественный мех и вкусное мясо.',
-        average_weight: 4.5,
-        average_litter_size: 8,
-        purpose: 'combined'
-      },
-      {
-        name: 'Белый великан',
-        description: 'Крупная порода белого цвета. Альбиносы с красными глазами. Хорошие мясные качества.',
-        average_weight: 5.5,
-        average_litter_size: 7,
-        purpose: 'combined'
-      }
-    ]);
+    // Тот же список, что получает живая регистрация: стенд и продукт не
+    // должны расходиться в том, какие породы человек видит с первого экрана.
+    const breedsInserted = await seedFarmTable('breeds', STARTER_BREEDS);
 
     const cagesInserted = await seedFarmTable('cages', [
       {

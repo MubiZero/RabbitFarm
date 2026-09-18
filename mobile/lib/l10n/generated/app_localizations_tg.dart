@@ -3394,6 +3394,16 @@ class AppLocalizationsTg extends AppLocalizations {
   String get rabbitFormBreedsFailed => 'Бор кардани зотҳо муяссар нашуд';
 
   @override
+  String get rabbitFormBreedsEmpty => 'Ҳоло зот нест';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Барои сабти харгӯш зот лозим аст. Зоти худро илова кунед.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Зот илова кардан';
+
+  @override
   String get rabbitFormColor => 'Ранг';
 
   @override

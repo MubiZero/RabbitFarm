@@ -167,7 +167,9 @@
   "bulkHerdDone": "{count, plural, one{{count} харгӯш илова шуд} other{{count} харгӯш илова шуд}}",
   "@bulkHerdDone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rabbitMultiPickerTitle": "Кӣ дар даста",
@@ -177,21 +179,29 @@
   "rabbitMultiPickerSelected": "{count, plural, one{Интихоб шуд {count}} other{Интихоб шуданд {count}}}",
   "@rabbitMultiPickerSelected": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "transactionSaleBatch": "Дастаҷамъӣ фурӯхтан",
   "ageYears": "{count, plural, one{{count} сол} other{{count} сол}}",
   "@ageYears": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ageYearsMonths": "{years} с {months} моҳ",
   "@ageYearsMonths": {
     "placeholders": {
-      "years": { "type": "int" },
-      "months": { "type": "int" }
+      "years": {
+        "type": "int"
+      },
+      "months": {
+        "type": "int"
+      }
     }
   },
   "feedTypePellets": "Гранула",
@@ -211,7 +221,9 @@
   "offlineRejectedTitle": "{count, plural, one{{count} сабт нигоҳ дошта нашуд} other{{count} сабт нигоҳ дошта нашуданд}}",
   "@offlineRejectedTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "offlineRejectedBody": "Сервер онҳоро қабул накард — аз нав нависед.",
@@ -361,7 +373,11 @@
   "taskFormAssigneeHelp": "Ба иҷрокунанда дар бораи вазифа огоҳинома меравад.",
   "tasksAssignedTo": "Иҷрокунанда: {name}",
   "@tasksAssignedTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "taskFormNotesLabel": "Қайдҳо",
   "taskFormCreate": "Сохтан",
@@ -631,7 +647,11 @@
   "financeAuthor": "Кӣ сабт кард",
   "financeAuthorLine": "Сабт кард: {name}",
   "@financeAuthorLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "financeTypeIncome": "Даромад",
   "financeTypeExpense": "Харҷ",
@@ -791,12 +811,20 @@
   "settingsPurposeAllTitle": "Ба ҳама таъинот гузошта шавад?",
   "settingsPurposeAllBody": "Ба ҳамаи харгӯшҳои зиндаи хоҷагӣ «{purpose}» гузошта мешавад. Харгӯшҳои рафта тағйир намеёбанд. Таъиноти дигар иваз мешавад ва танҳо якто-якто барқарор мешавад. Харгӯшҳои нав низ бо ҳамин таъинот сабт мешаванд.",
   "@settingsPurposeAllBody": {
-    "placeholders": { "purpose": { "type": "String" } }
+    "placeholders": {
+      "purpose": {
+        "type": "String"
+      }
+    }
   },
   "settingsPurposeAllApply": "Гузоштан",
   "settingsPurposeAllDone": "{count, plural, =0{Тағйир додан чизе набуд — дар ҳама аллакай ҳамин аст.} one{{count} харгӯш тағйир ёфт.} other{{count} харгӯш тағйир ёфт.}}",
   "@settingsPurposeAllDone": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "settingsAbout": "Дар бораи барнома",
   "settingsVersion": "Версия",
@@ -1052,6 +1080,9 @@
   "rabbitFormTagEmpty": "Рақами нишонаро ворид кунед",
   "rabbitFormBreedRequired": "Зотро интихоб кунед",
   "rabbitFormBreedsFailed": "Бор кардани зотҳо муяссар нашуд",
+  "rabbitFormBreedsEmpty": "Ҳоло зот нест",
+  "rabbitFormBreedsEmptyHint": "Барои сабти харгӯш зот лозим аст. Зоти худро илова кунед.",
+  "rabbitFormBreedsEmptyAction": "Зот илова кардан",
   "rabbitFormColor": "Ранг",
   "rabbitFormColorHint": "Хокистарӣ, сафед, сиёҳ…",
   "rabbitFormWeight": "Вазн, кг",
@@ -1197,7 +1228,11 @@
   "platformPlanDeleteTitle": "Тарифро нест кунем?",
   "platformPlanDeleteFarms": "{count, plural, =0{Ҳоло дар ин таъриф ягон ферма нест.} one{Ҳоло дар он {count} ферма ҳаст — он бе маҳдудият кор мекунад.} other{Ҳоло дар он {count} ферма ҳаст — онҳо бе маҳдудият кор мекунанд.}}",
   "@platformPlanDeleteFarms": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "platformPlanDeleteBody": "«{name}» аз рӯйхат нест мешавад, фермаҳои дар он буда бе маҳдудият кор мекунанд. Сабтҳои онҳо дахл намекунанд.",
   "platformPlanDeleted": "Тариф нест карда шуд",
@@ -1254,7 +1289,11 @@
   "platformFarmAuditAll": "Тамоми журнал",
   "platformFarmStatusExpiredWarning": "Таъриф {date} ба охир расид. Санҷиши шабона фермаро боз ба «Танҳо хондан» бармегардонад — барои нигоҳ доштани дастрасӣ аввал таърифро дароз кунед.",
   "@platformFarmStatusExpiredWarning": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "platformFarmPlanForever": "Бемуҳлат",
   "platformFarmPlanExpires": "То {date} амал мекунад",
@@ -1375,7 +1414,6 @@
   "storageUnitGb": "ГБ",
   "emptyNoRecordsTitle": "Сабт нест",
   "emptyNoRecordsBody": "Аввалинашро илова кунед.",
-
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Қафасҳо, ҷуфтшавӣ, зоиш, хӯрок ва пул — ҳама сабт мешавад ва ҳамеша дастрас аст. Барнома худаш хотиррасон мекунад, ки кай лона гузоред ва кай эм кунед.",
   "onbWelcomeStart": "Оғоз",
@@ -1426,7 +1464,6 @@
   "firstStepHelpers": "Ёрдамчиро даъват кунед",
   "activationChecklistFarmCreated": "Хоҷагӣ сохта шуд",
   "activationChecklistProgress": "{done} аз {total}",
-
   "deathFormTitle": "Талафотро қайд кардан",
   "deathFormRabbit": "Харгӯш",
   "deathFormDate": "Сана",
@@ -1445,22 +1482,18 @@
   "saleFormSubmit": "Сабт кардан",
   "saleFormSaved": "Фурӯш сабт шуд",
   "quickRecordDeath": "Талафот",
-
   "notificationPrimerTitle": "Дар бораи лонаи зоиш хотиррасон мекунем",
   "notificationPrimerBody": "Ду рӯз пеш аз зоиш хотиррасон меояд — қафасро тайёр кардан мерасед. Инчунин дар бораи эмкунӣ ва корҳои рӯз хотиррасон мекунем.",
   "notificationPrimerAllow": "Хотиррасонҳоро фаъол кардан",
   "notificationPrimerDecline": "Ҳоло не",
   "settingsNotificationsOff": "Огоҳиномаҳо хомӯшанд",
   "settingsNotificationsTurnOn": "Фаъол кардан",
-
   "rabbitFormMore": "Иловатан",
   "rabbitFormSexRequired": "Интихоб кунед: нар ё мода",
   "rabbitFormCageNone": "Бе қафас",
   "rabbitFormCageFull": "{number} — пур аст",
   "commonOptional": "ихтиёрӣ",
-
   "unitKg": "кг",
-
   "kindlingPlanAction": "Нақшаи таваллуд",
   "kindlingPlanPickMonth": "Нақша барои кадом моҳ?",
   "kindlingPlanThisMonth": "Барои моҳи ҷорӣ",
@@ -1475,11 +1508,8 @@
   "kindlingPlanColNest": "Лона",
   "kindlingPlanColMark": "Тамға",
   "kindlingPlanPrintedAt": "Чоп шуд: {date}",
-
   "commonUndo": "Баргардонидан",
-
   "journalKindDeletion": "Ҳазф",
-
   "voiceDictate": "Бо овоз гуфтан",
   "voiceStop": "Сабтро қатъ кардан",
   "voiceUnavailable": "Ин телефон нутқро намешиносад",
@@ -1497,7 +1527,6 @@
   "cageScanHint": "Камераро ба нишонаи қафас нигаронед",
   "cageScanNoCamera": "Камера дастрас нест. Иҷозатро дар танзимоти телефон санҷед.",
   "slideToDelete": "Барои нест кардан лағжонед",
-
   "birthsKitsDied": "Талаф",
   "birthsKitDeathAction": "Талафотро қайд кардан",
   "birthsKitsCardedHint": "Барои ин бача-харгӯшҳо кортҳо кушода шудаанд — талафот ва ҷудокуниро дар корти худи бача қайд кунед.",
@@ -1505,9 +1534,7 @@
   "birthsKitDeathHint": "Зинда мондаанд: {alive}",
   "birthsKitDeathSaved": "Қайд шуд",
   "birthsKitsAlive": "Зинда",
-
   "loginCodeLabelEmail": "Рамз аз мактуб",
-
   "cyclePalpationAction": "Санҷидам",
   "cyclePalpationTitle": "Санҷиш чӣ нишон дод?",
   "cyclePalpationPregnant": "Ҳомиладор",
@@ -1522,12 +1549,10 @@
   "birthsWeaningAll": "Ҳамаро: {count}",
   "birthsWeaningFewer": "Ё камтар",
   "birthsWeaningSaved": "Ҷудокунӣ қайд шуд",
-
   "subscriptionCheckFailed": "Пардохтро санҷида нашуд — бо сервер алоқа нест",
   "subscriptionPaymentDeclined": "Бонк пардохтро рад кард",
   "subscriptionPaymentDeclinedHint": "Пул гирифта нашуд. Кортро санҷед ва бори дигар кӯшиш кунед.",
   "subscriptionPayAgain": "Аз нав пардохт кардан",
-
   "supportRequestNew": "Навиштан",
   "supportRequestNewTitle": "Мурожиати нав",
   "supportRequestsEmptyTitle": "Ҳанӯз мурожиат нест",
@@ -1552,14 +1577,18 @@
   "platformSupportContactEmailHint": "support@example.com",
   "platformSupportContactEmailInvalid": "Суроғаро санҷед — дар он аломати @ нест",
   "platformSupportContactSaved": "Тамоси дастгирӣ захира шуд",
-
   "notificationsTitle": "Огоҳиномаҳо",
   "notificationsEmptyTitle": "Ҳоло чизе нест",
   "notificationsEmptyBody": "Дар ин ҷо он чизе пайдо мешавад, ки барнома хабар додааст: эмкунии мӯҳлаташ гузашта, хӯроки тамомшаванда, зоиши наздик.",
-
   "platformFilterDeleted": "Несткардашуда",
   "platformFarmDeletedShort": "{date} нест карда шуд",
-  "@platformFarmDeletedShort": {"placeholders": {"date": {"type": "String"}}},
+  "@platformFarmDeletedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "platformFarmsDeletedEmptyTitle": "Фермаи несткардашуда нест",
   "platformFarmsDeletedEmptyBody": "Чизе интизори тозакунии ниҳоӣ нест. Фермаи несткардашуда 30 рӯз дар ин ҷо мемонад — ин муҳлат барои дигар кардани қарор кофист.",
   "platformPlanDeleteDefaultWarning": "Ин тарифи пешфарз аст. Пас аз нест кардан фермаҳои нав тамоман бе тариф пайдо мешаванд, то даме ки тарифи дигар пешфарз таъин нашавад.",
@@ -1568,18 +1597,63 @@
   "platformAuditEmptyTitle": "Журнал холӣ аст",
   "platformAuditEmptyBody": "Ҳар амали админ ба ин ҷо меафтад: иваз кардани тариф, дастрасии ферма, вуруд аз номи муштарӣ, нест кардан.",
   "countAuditRecords": "{count, plural, one{{count} сабт} other{{count} сабт}}",
-  "@countAuditRecords": {"placeholders": {"count": {"type": "int"}}},
+  "@countAuditRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditAdmin": "Админ {id}",
-  "@platformAuditAdmin": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditAdmin": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFarm": "Хоҷагӣ {id}",
-  "@platformAuditFarm": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditFarm": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditWholeService": "Тамоми хизмат",
   "platformAuditIp": "IP {ip}",
-  "@platformAuditIp": {"placeholders": {"ip": {"type": "String"}}},
+  "@platformAuditIp": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditChange": "{field}: {before} → {after}",
-  "@platformAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@platformAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditDetail": "{field}: {value}",
-  "@platformAuditDetail": {"placeholders": {"field": {"type": "String"}, "value": {"type": "String"}}},
+  "@platformAuditDetail": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditValueNone": "муайян нашудааст",
   "platformAuditActionPlanCreate": "Тариф сохта шуд",
   "platformAuditActionPlanUpdate": "Тариф тағйир ёфт",
@@ -1596,7 +1670,13 @@
   "platformAuditActionSupportResolve": "Муроҷиат баста шуд",
   "platformAuditActionSupportContact": "Тамоси дастгирӣ тағйир ёфт",
   "platformAuditActionUnknown": "Амали «{action}»",
-  "@platformAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@platformAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFieldName": "Ном",
   "platformAuditFieldLimits": "Ҳудудҳо",
   "platformAuditFieldPrice": "Нарх",
@@ -1612,15 +1692,31 @@
   "platformAuditPlanBecameDefault": "Тарифи пешфарз шуд",
   "platformAuditPlanNoLongerDefault": "Дигар тарифи пешфарз нест",
   "platformAuditPlanRef": "Тариф №{id}",
-  "@platformAuditPlanRef": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditPlanRef": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportAnswered": "Муроҷиати №{id} — бо ҷавоб ба муаллиф",
-  "@platformAuditSupportAnswered": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditSupportAnswered": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportClosed": "Муроҷиати №{id} — бе ҷавоб",
-  "@platformAuditSupportClosed": {"placeholders": {"id": {"type": "int"}}},
-
+  "@platformAuditSupportClosed": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "feedsPaidLabel": "Чӣ қадар пардохт кардед",
   "feedsPaidHint": "Агар ин харид бошад, маблағ ба хароҷот меравад. Танҳо бақияро аз нав ҳисоб кардед — холӣ монед.",
-
   "staffInvitedEmailFailedBody": "Мактубро ба {email} фиристодан муяссар нашуд — даъватро худатон равон кунед.",
   "staffInviteLinkLabel": "Пайванди даъват",
   "staffInviteCopy": "Даъватро нусха бардоштан",
@@ -1632,9 +1728,7 @@
   "staffInviteAgain": "Аз нав даъват кардан",
   "loginNoCodePhone": "Рамз наомад? Аз соҳиби хоҷагӣ пурсед, ки шуморо ба кадом рақам даъват кардааст.",
   "loginNoCodeEmail": "Рамз наомад? Аз соҳиби хоҷагӣ пурсед, ки шуморо ба кадом почта даъват кардааст.",
-
   "platformPlanDefaultBadge": "ба фермаҳои нав",
-
   "staffAccessClosedBadge": "дастрасӣ баста",
   "roleManagerDescription": "Рама, хӯрок ва маблағро идора мекунад",
   "roleWorkerDescription": "Маълумотро мебинад ва корро қайд мекунад",

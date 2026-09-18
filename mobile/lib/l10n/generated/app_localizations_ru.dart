@@ -3443,6 +3443,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rabbitFormBreedsFailed => 'Не удалось загрузить породы';
 
   @override
+  String get rabbitFormBreedsEmpty => 'Пород пока нет';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Порода нужна, чтобы завести кролика. Заведите ту, что держите.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Завести породу';
+
+  @override
   String get rabbitFormColor => 'Окрас';
 
   @override

@@ -1,10 +1,11 @@
 const { Op } = require('sequelize');
-const { Farm, User, RefreshToken, TokenBlacklist, LoginOtp } = require('../models');
+const { Farm, User, Breed, RefreshToken, TokenBlacklist, LoginOtp } = require('../models');
 const JWTUtil = require('../utils/jwt');
 const jwtConfig = require('../config/jwt');
 const logger = require('../utils/logger');
 const planService = require('./planService');
 const { countryConfig } = require('../config/countries');
+const { STARTER_BREEDS } = require('../data/starterBreeds');
 
 /**
  * Authentication service
@@ -115,6 +116,16 @@ class AuthService {
       }, { transaction });
 
       await farm.update({ owner_id: user.id }, { transaction });
+
+      // Справочник пород принадлежит ферме, и пустым он превращает карточку
+      // первого кролика в тупик: поле «Порода» обязательное, список пуст,
+      // завести породу из формы нельзя. Без кролика не будет ни случки, ни
+      // кормления, ни продажи — то есть хозяйство не начнётся вовсе.
+      await Breed.bulkCreate(
+        STARTER_BREEDS.map((breed) => ({ ...breed, farm_id: farm.id })),
+        { transaction }
+      );
+
       await transaction.commit();
 
       logger.info('Farm registered, awaiting login code', { userId: user.id, farmId: farm.id });
