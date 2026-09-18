@@ -11,6 +11,7 @@ import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../providers/health_journal_provider.dart';
 import '../utils/medical_labels.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Здоровье — одна история болезней стада.
 ///
@@ -328,7 +329,7 @@ class _EntryCard extends ConsumerWidget {
                         size: 14, color: context.colors.onSurfaceVariant),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
-                      DateFormat('d MMMM y', 'ru').format(entry.at),
+                      DateFormat('d MMMM y', dateLocaleOf(context)).format(entry.at),
                       style: AppTypography.labelSm
                           .copyWith(color: context.colors.onSurfaceVariant),
                     ),
@@ -364,7 +365,7 @@ class _EntryCard extends ConsumerWidget {
   /// Чем кончилось: у лечения — исход, у прививки — когда колоть снова.
   /// Ради этой строки журнал и открывают, поэтому она заметна цветом.
   Widget _outcome(BuildContext context) {
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     if (entry.kind == HealthEntryKind.treatment) {
       final outcome = entry.outcome;

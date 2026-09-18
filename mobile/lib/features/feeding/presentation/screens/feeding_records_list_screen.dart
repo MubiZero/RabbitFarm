@@ -11,6 +11,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/feeding_record_model.dart';
 import '../providers/feeding_records_provider.dart';
 import '../utils/feed_labels.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// История кормлений.
 class FeedingRecordsListScreen extends ConsumerStatefulWidget {
@@ -161,7 +162,7 @@ class _PeriodChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
     final from = state.fromDate;
     final to = state.toDate;
 
@@ -263,7 +264,7 @@ class _RecordCard extends StatelessWidget {
                         size: 14, color: context.colors.onSurfaceVariant),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
-                      DateFormat('d MMM, HH:mm', 'ru').format(record.fedAt),
+                      DateFormat('d MMM, HH:mm', dateLocaleOf(context)).format(record.fedAt),
                       style: AppTypography.labelSm
                           .copyWith(color: context.colors.onSurfaceVariant),
                     ),

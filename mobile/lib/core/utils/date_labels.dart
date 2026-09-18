@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/l10n_context.dart';
+import '../../core/l10n/date_locale.dart';
 
 /// Срок человеческим языком.
 ///
@@ -27,7 +28,7 @@ String humanDueDate(BuildContext context, DateTime due, {DateTime? now}) {
         ? l10n.dueTomorrow(DateFormat.Hm('ru').format(due))
         : l10n.dueTomorrowPlain;
   }
-  return l10n.dueOn(DateFormat('d MMMM', 'ru').format(due));
+  return l10n.dueOn(DateFormat('d MMMM', dateLocaleOf(context)).format(due));
 }
 
 /// Срок уже прошёл — с точностью до дня. Задача, записанная на сегодняшнюю

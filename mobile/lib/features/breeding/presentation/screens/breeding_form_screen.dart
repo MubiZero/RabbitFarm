@@ -10,6 +10,7 @@ import '../../../rabbits/data/models/breeding_model.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../../rabbits/presentation/widgets/rabbit_picker.dart';
 import '../providers/breeding_provider.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Запись о случке.
 class BreedingFormScreen extends ConsumerStatefulWidget {
@@ -117,6 +118,13 @@ class _BreedingFormScreenState extends ConsumerState<BreedingFormScreen> {
     final online = ref.watch(isOnlineProvider).value ?? true;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'breeding-${_record?.id ?? 'new'}',
+        fields: {
+          'notes': _notes,
+        },
+      ),
       title:
           _isEditing ? l10n.breedingFormEditTitle : l10n.breedingFormNewTitle,
       formKey: _formKey,

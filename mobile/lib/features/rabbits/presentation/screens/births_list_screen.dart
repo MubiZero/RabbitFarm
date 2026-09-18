@@ -13,6 +13,7 @@ import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/create_kits_dialog.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Список окролов.
 class BirthsListScreen extends ConsumerWidget {
@@ -254,7 +255,7 @@ class _BirthCard extends ConsumerWidget {
                 child: Text(
                   date == null
                       ? birth.birthDate
-                      : DateFormat('d MMMM y', 'ru').format(date),
+                      : DateFormat('d MMMM y', dateLocaleOf(context)).format(date),
                   style: AppTypography.titleMd.copyWith(
                     color: context.colors.onSurface,
                   ),

@@ -1693,5 +1693,7 @@
   "financeSheetColKind": "Kirim yoki chiqim",
   "exportShareSubject": "{title} — «Quyon fermasi»",
   "financeSheetLastMonth": "Oʻtgan oy",
-  "financeSheetThisYear": "Shu yil"
+  "financeSheetThisYear": "Shu yil",
+  "formDraftRestored": "Saqlab ulgurmaganingizni qaytardik",
+  "formDraftDiscard": "Tozalash"
 }

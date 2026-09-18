@@ -11,6 +11,7 @@ import '../../../finance/presentation/providers/transactions_provider.dart';
 import '../../data/models/rabbit_model.dart';
 import '../providers/rabbits_provider.dart';
 import '../widgets/rabbit_picker.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Записать продажу кролика.
 ///
@@ -92,6 +93,14 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
     final l10n = context.l10n;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'sale-${widget.rabbit?.id ?? 'new'}',
+        fields: {
+          'amount': _amount,
+          'buyer': _buyer,
+        },
+      ),
       title: l10n.saleFormTitle,
       formKey: _formKey,
       submitLabel: l10n.saleFormSubmit,

@@ -5542,4 +5542,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get financeSheetThisYear => 'This year';
+
+  @override
+  String get formDraftRestored => 'Brought back what you had not saved';
+
+  @override
+  String get formDraftDiscard => 'Clear';
 }

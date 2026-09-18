@@ -14,6 +14,7 @@ import 'core/cache/list_cache.dart';
 import 'core/error/error_handling.dart';
 import 'core/l10n/date_locale.dart';
 import 'core/l10n/framework_locale_fallback.dart';
+import 'core/l10n/tajik_dates.dart';
 import 'core/notifications/fcm_service.dart';
 import 'core/providers/app_version.dart';
 import 'core/countries/farm_currency.dart';
@@ -99,6 +100,10 @@ Future<void> _bootstrap() async {
 
   // Даты и числа форматируются по-русски и там, где локаль не передана явно.
   await initializeDateFormatting('ru');
+  // Таджикского в таблицах `intl` нет вовсе — заводим его сами. Строго
+  // после инициализации выше: она заполняет таблицы только пока они пусты,
+  // и обратный порядок стёр бы все встроенные языки.
+  registerTajikDates();
   Intl.defaultLocale = 'ru';
 
   runApp(

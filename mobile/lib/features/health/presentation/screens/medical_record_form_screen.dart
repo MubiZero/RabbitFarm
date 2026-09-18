@@ -14,6 +14,8 @@ import '../utils/medical_labels.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../../../../core/offline_queue/offline_queue.dart';
 import '../../../../core/providers/connectivity.dart';
+import '../../../../core/l10n/date_locale.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Карта лечения: что случилось, чем лечили, чем закончилось.
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
@@ -181,6 +183,20 @@ class _MedicalRecordFormScreenState
     final l10n = context.l10n;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'medical-${_record?.id ?? 'new'}',
+        fields: {
+          'symptoms': _symptoms,
+          'diagnosis': _diagnosis,
+          'treatment': _treatment,
+          'medication': _medication,
+          'dosage': _dosage,
+          'cost': _cost,
+          'veterinarian': _veterinarian,
+          'notes': _notes,
+        },
+      ),
       title: _isEditing ? l10n.medFormEditTitle : l10n.medFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,
@@ -300,7 +316,7 @@ class _MedicalRecordFormScreenState
                 child: _endedAt == null
                     ? null
                     : Text(
-                        DateFormat('d MMMM y', 'ru').format(_endedAt!),
+                        DateFormat('d MMMM y', dateLocaleOf(context)).format(_endedAt!),
                         style: AppTypography.bodyLg
                             .copyWith(color: context.colors.onSurface),
                       ),

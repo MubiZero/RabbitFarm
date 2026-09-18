@@ -16,6 +16,7 @@ import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/rabbit_photo_model.dart';
 import '../providers/gallery_provider.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Галерея снимков кролика — в отличие от одной фотографии на карточке,
 /// снимков здесь может быть сколько угодно.
@@ -389,7 +390,7 @@ class _PhotoTile extends StatelessWidget {
                     borderRadius: AppRadius.smAll,
                   ),
                   child: Text(
-                    DateFormat('d MMM', 'ru').format(photo.takenAt!),
+                    DateFormat('d MMM', dateLocaleOf(context)).format(photo.takenAt!),
                     style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                 ),

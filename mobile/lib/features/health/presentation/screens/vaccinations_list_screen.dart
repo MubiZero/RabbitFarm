@@ -11,6 +11,7 @@ import '../../data/models/vaccination_model.dart';
 import '../providers/vaccinations_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../utils/medical_labels.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Список прививок.
 class VaccinationsListScreen extends ConsumerWidget {
@@ -143,7 +144,7 @@ class _ActiveFilters extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(vaccinationsProvider.notifier);
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -199,7 +200,7 @@ class _VaccinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final next = vaccination.nextVaccinationDate;
     final overdue = next != null && next.isBefore(DateTime.now());
-    final format = DateFormat('d MMMM y', 'ru');
+    final format = DateFormat('d MMMM y', dateLocaleOf(context));
 
     return AppCard(
       onTap: onTap,
@@ -386,7 +387,7 @@ class _FiltersSheetState extends ConsumerState<_FiltersSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final format = DateFormat('d MMM y', 'ru');
+    final format = DateFormat('d MMM y', dateLocaleOf(context));
 
     return SafeArea(
       child: Padding(
@@ -634,7 +635,7 @@ class _DetailsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final format = DateFormat('d MMMM y', 'ru');
+    final format = DateFormat('d MMMM y', dateLocaleOf(context));
     final canRecord = ref.watch(canProvider(FarmCapability.recordDailyWork));
     final canDelete = ref.watch(canProvider(FarmCapability.deleteRecords));
 

@@ -5558,4 +5558,10 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get financeSheetThisYear => 'Shu yil';
+
+  @override
+  String get formDraftRestored => 'Saqlab ulgurmaganingizni qaytardik';
+
+  @override
+  String get formDraftDiscard => 'Tozalash';
 }

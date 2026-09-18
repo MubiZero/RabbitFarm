@@ -9809,6 +9809,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Этот год'**
   String get financeSheetThisYear;
+
+  /// No description provided for @formDraftRestored.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернули то, что вы не успели сохранить'**
+  String get formDraftRestored;
+
+  /// No description provided for @formDraftDiscard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистить'**
+  String get formDraftDiscard;
 }
 
 class _AppLocalizationsDelegate

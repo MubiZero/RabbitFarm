@@ -9,6 +9,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 /// Экран отображения родословной кролика
 ///
@@ -362,7 +363,7 @@ class PedigreeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            _formatDate(rabbit.birthDate!),
+                            _formatDate(context, rabbit.birthDate!),
                             style: AppTypography.labelSm.copyWith(
                                 color: context.colors.onSurfaceVariant),
                           ),
@@ -387,8 +388,8 @@ class PedigreeScreen extends ConsumerWidget {
 
   /// Раньше здесь была собственная таблица сокращений месяцев — при живом
   /// форматировщике дат, который знает их для каждого языка.
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final date = DateTime.tryParse(raw);
-    return date == null ? raw : DateFormat('d MMM y', 'ru').format(date);
+    return date == null ? raw : DateFormat('d MMM y', dateLocaleOf(context)).format(date);
   }
 }

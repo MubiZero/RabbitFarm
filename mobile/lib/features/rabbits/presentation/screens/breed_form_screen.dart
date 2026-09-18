@@ -8,6 +8,7 @@ import '../../../../core/widgets/widgets.dart';
 import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
 import '../utils/breed_labels.dart';
+import '../../../../core/forms/form_draft.dart';
 
 /// Карточка породы.
 class BreedFormScreen extends ConsumerStatefulWidget {
@@ -83,6 +84,16 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
     final l10n = context.l10n;
 
     return AppFormScaffold(
+      // Недописанное переживает смерть приложения (core/forms/form_draft.dart).
+      draft: FormDraft(
+        key: 'breed-${_breed?.id ?? 'new'}',
+        fields: {
+          'name': _name,
+          'description': _description,
+          'weight': _weight,
+          'litter': _litterSize,
+        },
+      ),
       title: _isEditing ? l10n.breedFormEditTitle : l10n.breedFormNewTitle,
       formKey: _formKey,
       submitLabel: _isEditing ? l10n.commonSave : l10n.commonAdd,

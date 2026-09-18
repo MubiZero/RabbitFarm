@@ -21,6 +21,7 @@ import '../../../../core/utils/farm_status_labels.dart';
 import '../widgets/farm_status_sheet.dart';
 import '../widgets/farm_usage_row.dart';
 import '../widgets/plan_summary.dart';
+import '../../../../core/l10n/date_locale.dart';
 
 final _dayFormat = DateFormat('dd.MM.yyyy');
 final _momentFormat = DateFormat('dd.MM.yyyy HH:mm');
@@ -207,7 +208,7 @@ class FarmDetailScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 l10n.platformFarmStatusExpiredWarning(
-                  DateFormat('d MMMM y', 'ru').format(expiresAt),
+                  DateFormat('d MMMM y', dateLocaleOf(context)).format(expiresAt),
                 ),
                 style: TextStyle(color: AppColors.warning),
               ),
