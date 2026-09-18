@@ -20,10 +20,10 @@ const SRC = path.join(__dirname, 'src');
 const OUT = path.join(__dirname, 'dist');
 const SITE = 'https://rabbitfarm.click';
 // Куда ведут кнопки «Открыть приложение», пока страница не получила
-// config.json: сегодня приложение живёт на прежнем домене, и вести человека
-// на сам лендинг было бы кнопкой в никуда. Значение из config.json
-// перекрывает этот адрес на лету, без пересборки.
-const APP_URL = 'https://rabbitfarm.mubi.dev';
+// config.json. Значение из config.json перекрывает этот адрес на лету, без
+// пересборки: так адрес магазина или нового стенда меняется одной
+// переменной окружения.
+const APP_URL = 'https://app.rabbitfarm.click';
 const REPO = 'https://github.com/MubiZero/RabbitFarm';
 
 // Русский лежит в корне: это основной язык аудитории.
