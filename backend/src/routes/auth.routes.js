@@ -8,6 +8,7 @@ const {
   registerSchema,
   refreshTokenSchema,
   updateProfileSchema,
+  deleteAccountSchema,
   requestOtpSchema,
   verifyOtpSchema
 } = require('../validators/authValidator');
@@ -227,6 +228,34 @@ router.put(
   authenticate,
   validate(updateProfileSchema),
   authController.updateProfile
+);
+
+/**
+ * @swagger
+ * /auth/account:
+ *   delete:
+ *     summary: Удалить свою учётную запись — у владельца вместе с хозяйством
+ *     tags: [Auth]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               confirm_name:
+ *                 type: string
+ *                 description: Название хозяйства, набранное владельцем
+ *     responses:
+ *       200:
+ *         description: Удалено; у владельца данные ждут зачистки 30 дней
+ *       400:
+ *         description: Название хозяйства набрано неточно
+ */
+router.delete(
+  '/account',
+  authenticate,
+  validate(deleteAccountSchema),
+  authController.deleteAccount
 );
 
 module.exports = router;

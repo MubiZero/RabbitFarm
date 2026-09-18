@@ -9563,6 +9563,252 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Чужую запись исправляет управляющий или владелец'**
   String get errorCodeNotRecordAuthor;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление учётной записи'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись'**
+  String get deleteAccountOpen;
+
+  /// No description provided for @deleteAccountOwnerHeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это удалит хозяйство целиком'**
+  String get deleteAccountOwnerHeadline;
+
+  /// No description provided for @deleteAccountOwnerBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы владелец, поэтому вместе с вашей учётной записью уходит и хозяйство — со всеми его данными. Доступ пропадёт сразу и у вас, и у ваших работников.'**
+  String get deleteAccountOwnerBody;
+
+  /// No description provided for @deleteAccountOwnerWhatGoes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропадут поголовье и клетки, кормление и корма, лечение и прививки, случки и окролы, деньги, задачи, заметки и фотографии.'**
+  String get deleteAccountOwnerWhatGoes;
+
+  /// No description provided for @deleteAccountGracePeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тридцать дней данные ещё лежат на сервере: если передумаете, напишите в поддержку — хозяйство вернут. После этого срока данные стираются окончательно.'**
+  String get deleteAccountGracePeriod;
+
+  /// No description provided for @deleteAccountTypeName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наберите название хозяйства «{name}», чтобы подтвердить'**
+  String deleteAccountTypeName(String name);
+
+  /// No description provided for @deleteAccountTypeNameUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наберите название своего хозяйства, чтобы подтвердить'**
+  String get deleteAccountTypeNameUnknown;
+
+  /// No description provided for @deleteAccountFarmNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название хозяйства'**
+  String get deleteAccountFarmNameHint;
+
+  /// No description provided for @deleteAccountOwnerAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить хозяйство'**
+  String get deleteAccountOwnerAction;
+
+  /// No description provided for @deleteAccountOwnerDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить хозяйство?'**
+  String get deleteAccountOwnerDialogTitle;
+
+  /// No description provided for @deleteAccountOwnerDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ закроется сразу — и у вас, и у работников. Через тридцать дней данные сотрутся окончательно.'**
+  String get deleteAccountOwnerDialogBody;
+
+  /// No description provided for @deleteAccountStaffHeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это удалит вашу учётную запись'**
+  String get deleteAccountStaffHeadline;
+
+  /// No description provided for @deleteAccountStaffBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство не ваше, поэтому оно и его данные остаются. Удалится только ваш вход в приложение.'**
+  String get deleteAccountStaffBody;
+
+  /// No description provided for @deleteAccountStaffWhatStays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записи, которые вы завели — кормление, лечение, прививки, — остаются хозяйству: это его данные. Владелец сможет позвать вас заново, но это будет новая учётная запись.'**
+  String get deleteAccountStaffWhatStays;
+
+  /// No description provided for @deleteAccountStaffAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись'**
+  String get deleteAccountStaffAction;
+
+  /// No description provided for @deleteAccountStaffDialogTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить учётную запись?'**
+  String get deleteAccountStaffDialogTitle;
+
+  /// No description provided for @deleteAccountStaffDialogBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход в приложение пропадёт сразу. Вернуть учётную запись нельзя.'**
+  String get deleteAccountStaffDialogBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалено'**
+  String get deleteAccountDone;
+
+  /// No description provided for @errorCodeConfirmNameMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название хозяйства набрано неточно'**
+  String get errorCodeConfirmNameMismatch;
+
+  /// No description provided for @healthSheetAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта здоровья'**
+  String get healthSheetAction;
+
+  /// No description provided for @healthSheetPrint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напечатать'**
+  String get healthSheetPrint;
+
+  /// No description provided for @healthSheetShare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить таблицей'**
+  String get healthSheetShare;
+
+  /// No description provided for @healthSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карта здоровья: {name}'**
+  String healthSheetTitle(String name);
+
+  /// No description provided for @healthSheetNoVaccinations.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививок не записано'**
+  String get healthSheetNoVaccinations;
+
+  /// No description provided for @healthSheetNoTreatments.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лечения не записано'**
+  String get healthSheetNoTreatments;
+
+  /// No description provided for @healthSheetNextDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая'**
+  String get healthSheetNextDate;
+
+  /// No description provided for @healthSheetPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок'**
+  String get healthSheetPeriod;
+
+  /// No description provided for @healthSheetColKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что'**
+  String get healthSheetColKind;
+
+  /// No description provided for @healthSheetColWhat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцина или диагноз'**
+  String get healthSheetColWhat;
+
+  /// No description provided for @healthSheetColDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подробности'**
+  String get healthSheetColDetails;
+
+  /// No description provided for @healthSheetEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'У этого кролика ещё нет ни прививок, ни лечения'**
+  String get healthSheetEmpty;
+
+  /// No description provided for @financeSheetAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Книга доходов и расходов'**
+  String get financeSheetAction;
+
+  /// No description provided for @financeSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доходы и расходы'**
+  String get financeSheetTitle;
+
+  /// No description provided for @financeSheetPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'За срок с {from} по {to}'**
+  String financeSheetPeriod(String from, String to);
+
+  /// No description provided for @financeSheetEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'За этот срок операций не записано'**
+  String get financeSheetEmpty;
+
+  /// No description provided for @financeSheetColKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приход или расход'**
+  String get financeSheetColKind;
+
+  /// No description provided for @exportShareSubject.
+  ///
+  /// In ru, this message translates to:
+  /// **'{title} — «Кроличья ферма»'**
+  String exportShareSubject(String title);
+
+  /// No description provided for @financeSheetLastMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прошлый месяц'**
+  String get financeSheetLastMonth;
+
+  /// No description provided for @financeSheetThisYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот год'**
+  String get financeSheetThisYear;
 }
 
 class _AppLocalizationsDelegate

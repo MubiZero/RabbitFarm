@@ -71,6 +71,7 @@ import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/support/presentation/screens/support_request_screen.dart';
+import '../../features/settings/presentation/screens/delete_account_screen.dart';
 import '../../features/staff/presentation/screens/farm_audit_screen.dart';
 import '../../features/staff/presentation/screens/staff_screen.dart';
 import '../../features/platform_admin/data/models/platform_admin_models.dart';
@@ -725,6 +726,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Журнал изменений фермы. Сервер отдаёт его только владельцу и
       // управляющему (`GET /staff/audit`), и вход на экран стоит там же, где
       // состав фермы, — работник его не видит.
+      // Удаление своей учётной записи — требование магазинов приложений.
+      // Отдельный экран, а не диалог: сказать нужно много и точно.
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/settings/delete-account',
+        name: 'delete-account',
+        builder: (context, state) => const DeleteAccountScreen(),
+      ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/staff/audit',

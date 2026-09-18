@@ -5382,4 +5382,145 @@ class AppLocalizationsTg extends AppLocalizations {
   @override
   String get errorCodeNotRecordAuthor =>
       'Сабти каси дигарро танҳо мудир ё соҳиб ислоҳ мекунад';
+
+  @override
+  String get deleteAccountTitle => 'Нест кардани ҳисоб';
+
+  @override
+  String get deleteAccountOpen => 'Ҳисобро нест кардан';
+
+  @override
+  String get deleteAccountOwnerHeadline => 'Ин хоҷагиро пурра нест мекунад';
+
+  @override
+  String get deleteAccountOwnerBody =>
+      'Шумо соҳиб ҳастед, бинобар ин бо ҳисоби шумо хоҷагӣ низ меравад — бо ҳамаи маълумоташ. Дастрасӣ фавран ҳам барои шумо, ҳам барои коргаронатон қатъ мешавад.';
+
+  @override
+  String get deleteAccountOwnerWhatGoes =>
+      'Рама ва қафасҳо, хӯрокдиҳӣ ва хӯрок, табобат ва эмгузаронӣ, ҷуфткунӣ ва зоиш, пул, вазифаҳо, қайдҳо ва суратҳо нест мешаванд.';
+
+  @override
+  String get deleteAccountGracePeriod =>
+      'Сӣ рӯз маълумот ҳанӯз дар сервер мемонад: агар фикратонро дигар кунед, ба дастгирӣ нависед — хоҷагиро бармегардонанд. Пас аз ин мӯҳлат маълумот тамоман нест мешавад.';
+
+  @override
+  String deleteAccountTypeName(String name) {
+    return 'Барои тасдиқ номи хоҷагӣ «$name»-ро нависед';
+  }
+
+  @override
+  String get deleteAccountTypeNameUnknown =>
+      'Барои тасдиқ номи хоҷагии худро нависед';
+
+  @override
+  String get deleteAccountFarmNameHint => 'Номи хоҷагӣ';
+
+  @override
+  String get deleteAccountOwnerAction => 'Хоҷагиро нест кардан';
+
+  @override
+  String get deleteAccountOwnerDialogTitle => 'Хоҷагӣ нест карда шавад?';
+
+  @override
+  String get deleteAccountOwnerDialogBody =>
+      'Дастрасӣ фавран қатъ мешавад — ҳам барои шумо, ҳам барои коргарон. Пас аз сӣ рӯз маълумот тамоман нест мешавад.';
+
+  @override
+  String get deleteAccountStaffHeadline => 'Ин ҳисоби шуморо нест мекунад';
+
+  @override
+  String get deleteAccountStaffBody =>
+      'Хоҷагӣ аз они шумо нест, бинобар ин худи он ва маълумоташ мемонад. Танҳо вуруди шумо ба барнома нест мешавад.';
+
+  @override
+  String get deleteAccountStaffWhatStays =>
+      'Сабтҳое, ки шумо кардаед — хӯрокдиҳӣ, табобат, эмгузаронӣ — ба хоҷагӣ мемонанд: ин маълумоти он аст. Соҳиб метавонад шуморо аз нав даъват кунад, вале ин ҳисоби нав хоҳад буд.';
+
+  @override
+  String get deleteAccountStaffAction => 'Ҳисобро нест кардан';
+
+  @override
+  String get deleteAccountStaffDialogTitle => 'Ҳисоб нест карда шавад?';
+
+  @override
+  String get deleteAccountStaffDialogBody =>
+      'Вуруд ба барнома фавран қатъ мешавад. Ҳисобро баргардонда намешавад.';
+
+  @override
+  String get deleteAccountConfirm => 'Нест кардан';
+
+  @override
+  String get deleteAccountDone => 'Нест карда шуд';
+
+  @override
+  String get errorCodeConfirmNameMismatch =>
+      'Номи хоҷагӣ нодуруст навишта шудааст';
+
+  @override
+  String get healthSheetAction => 'Корти саломатӣ';
+
+  @override
+  String get healthSheetPrint => 'Чоп кардан';
+
+  @override
+  String get healthSheetShare => 'Ҳамчун ҷадвал фиристодан';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Корти саломатӣ: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'Эмгузаронӣ сабт нашудааст';
+
+  @override
+  String get healthSheetNoTreatments => 'Табобат сабт нашудааст';
+
+  @override
+  String get healthSheetNextDate => 'Оянда';
+
+  @override
+  String get healthSheetPeriod => 'Мӯҳлат';
+
+  @override
+  String get healthSheetColKind => 'Чӣ';
+
+  @override
+  String get healthSheetColWhat => 'Ваксина ё ташхис';
+
+  @override
+  String get healthSheetColDetails => 'Тафсилот';
+
+  @override
+  String get healthSheetEmpty =>
+      'Ин харгӯш ҳанӯз на эмгузаронӣ дорад, на табобат';
+
+  @override
+  String get financeSheetAction => 'Дафтари даромад ва хароҷот';
+
+  @override
+  String get financeSheetTitle => 'Даромад ва хароҷот';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return 'Барои мӯҳлати аз $from то $to';
+  }
+
+  @override
+  String get financeSheetEmpty => 'Дар ин мӯҳлат амалиёт сабт нашудааст';
+
+  @override
+  String get financeSheetColKind => 'Даромад ё хароҷот';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — «Фермаи харгӯш»';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Моҳи гузашта';
+
+  @override
+  String get financeSheetThisYear => 'Соли ҷорӣ';
 }

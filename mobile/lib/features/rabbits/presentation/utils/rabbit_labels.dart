@@ -8,10 +8,15 @@ import '../../../../core/theme/theme.dart';
 /// Эти три ветвления были расписаны прямо в строке карточки списка и
 /// повторялись ещё в трёх местах, каждый раз чуть иначе: где-то неизвестный
 /// пол назывался «Неизвестно», где-то не показывался вовсе.
-String sexLabel(BuildContext context, String? sex) => switch (sex) {
-      'male' => context.l10n.sexMale,
-      'female' => context.l10n.sexFemale,
-      _ => context.l10n.sexUnknown,
+String sexLabel(BuildContext context, String? sex) =>
+    sexText(context.l10n, sex);
+
+/// То же самое, но переводами-значением — для листов на печать, которые
+/// собираются после `await`.
+String sexText(AppLocalizations l10n, String? sex) => switch (sex) {
+      'male' => l10n.sexMale,
+      'female' => l10n.sexFemale,
+      _ => l10n.sexUnknown,
     };
 
 IconData rabbitSexIcon(String? sex) => switch (sex) {

@@ -10,11 +10,16 @@ import '../../data/models/vaccination_model.dart';
 /// «Лечение продолжается» в карточке не помещалось и обрезалось, а в фильтре
 /// та же строка называлась просто «Лечение». Теперь подпись одна: «Лечится».
 String medicalOutcomeLabel(BuildContext context, MedicalOutcome outcome) =>
+    medicalOutcomeText(context.l10n, outcome);
+
+/// То же самое, но переводами-значением: карта здоровья собирается после
+/// `await`, когда обращаться к `BuildContext` уже небезопасно.
+String medicalOutcomeText(AppLocalizations l10n, MedicalOutcome outcome) =>
     switch (outcome) {
-      MedicalOutcome.ongoing => context.l10n.medOutcomeOngoing,
-      MedicalOutcome.recovered => context.l10n.medOutcomeRecovered,
-      MedicalOutcome.died => context.l10n.medOutcomeDied,
-      MedicalOutcome.euthanized => context.l10n.medOutcomeEuthanized,
+      MedicalOutcome.ongoing => l10n.medOutcomeOngoing,
+      MedicalOutcome.recovered => l10n.medOutcomeRecovered,
+      MedicalOutcome.died => l10n.medOutcomeDied,
+      MedicalOutcome.euthanized => l10n.medOutcomeEuthanized,
     };
 
 Color medicalOutcomeColor(BuildContext context, MedicalOutcome outcome) =>

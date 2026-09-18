@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const accountService = require('../services/accountService');
 const otpAuthService = require('../services/otpAuthService');
 const ApiResponse = require('../utils/apiResponse');
 
@@ -124,6 +125,46 @@ class AuthController {
           res,
           'Этот номер уже занят другой учётной записью',
           'PHONE_EXISTS'
+        );
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Удалить свою учётную запись
+   * DELETE /api/v1/auth/account
+   */
+  async deleteAccount(req, res, next) {
+    try {
+      const result = await accountService.deleteAccount(req.user, {
+        confirmName: req.body.confirm_name
+      });
+
+      return ApiResponse.success(
+        res,
+        result,
+        result.scope === 'farm' ? 'Хозяйство удалено' : 'Учётная запись удалена'
+      );
+    } catch (error) {
+      if (error.message === 'USER_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Пользователь не найден');
+      }
+      if (error.message === 'FARM_NOT_FOUND') {
+        return ApiResponse.notFound(res, 'Хозяйство не найдено');
+      }
+      if (error.message === 'CONFIRM_NAME_MISMATCH') {
+        return ApiResponse.badRequest(
+          res,
+          'Название хозяйства набрано неточно',
+          'CONFIRM_NAME_MISMATCH'
+        );
+      }
+      if (error.message === 'PLATFORM_ADMIN_ACCOUNT') {
+        return ApiResponse.forbidden(
+          res,
+          'Учётную запись администратора платформы из приложения не удаляют',
+          'PLATFORM_ADMIN_ACCOUNT'
         );
       }
       next(error);

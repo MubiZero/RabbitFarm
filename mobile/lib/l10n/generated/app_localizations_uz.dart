@@ -5419,4 +5419,143 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get errorCodeNotRecordAuthor =>
       'Boshqaning yozuvini faqat menejer yoki egasi tuzatadi';
+
+  @override
+  String get deleteAccountTitle => 'Hisobni oʻchirish';
+
+  @override
+  String get deleteAccountOpen => 'Hisobni oʻchirish';
+
+  @override
+  String get deleteAccountOwnerHeadline => 'Bu xoʻjalikni butunlay oʻchiradi';
+
+  @override
+  String get deleteAccountOwnerBody =>
+      'Siz egasisiz, shuning uchun hisobingiz bilan birga xoʻjalik ham ketadi — barcha maʼlumotlari bilan. Ruxsat darhol ham sizda, ham ishchilaringizda yoʻqoladi.';
+
+  @override
+  String get deleteAccountOwnerWhatGoes =>
+      'Poda va kataklar, ozuqlantirish va ozuqa, davolash va emlash, juftlash va tugʻish, pul, vazifalar, qaydlar va suratlar oʻchadi.';
+
+  @override
+  String get deleteAccountGracePeriod =>
+      'Oʻttiz kun maʼlumot serverda turadi: fikringizdan qaytsangiz, qoʻllab-quvvatlashga yozing — xoʻjalik qaytariladi. Shu muddatdan keyin maʼlumot butunlay oʻchiriladi.';
+
+  @override
+  String deleteAccountTypeName(String name) {
+    return 'Tasdiqlash uchun xoʻjalik nomini «$name» yozing';
+  }
+
+  @override
+  String get deleteAccountTypeNameUnknown =>
+      'Tasdiqlash uchun xoʻjaligingiz nomini yozing';
+
+  @override
+  String get deleteAccountFarmNameHint => 'Xoʻjalik nomi';
+
+  @override
+  String get deleteAccountOwnerAction => 'Xoʻjalikni oʻchirish';
+
+  @override
+  String get deleteAccountOwnerDialogTitle => 'Xoʻjalik oʻchirilsinmi?';
+
+  @override
+  String get deleteAccountOwnerDialogBody =>
+      'Ruxsat darhol yopiladi — ham sizda, ham ishchilarda. Oʻttiz kundan keyin maʼlumot butunlay oʻchadi.';
+
+  @override
+  String get deleteAccountStaffHeadline => 'Bu hisobingizni oʻchiradi';
+
+  @override
+  String get deleteAccountStaffBody =>
+      'Xoʻjalik sizniki emas, shuning uchun uning oʻzi ham, maʼlumoti ham qoladi. Faqat ilovaga kirishingiz oʻchadi.';
+
+  @override
+  String get deleteAccountStaffWhatStays =>
+      'Siz kiritgan yozuvlar — ozuqlantirish, davolash, emlash — xoʻjalikda qoladi: bu uning maʼlumoti. Ega sizni qaytadan chaqira oladi, lekin bu yangi hisob boʻladi.';
+
+  @override
+  String get deleteAccountStaffAction => 'Hisobni oʻchirish';
+
+  @override
+  String get deleteAccountStaffDialogTitle => 'Hisob oʻchirilsinmi?';
+
+  @override
+  String get deleteAccountStaffDialogBody =>
+      'Ilovaga kirish darhol yoʻqoladi. Hisobni qaytarib boʻlmaydi.';
+
+  @override
+  String get deleteAccountConfirm => 'Oʻchirish';
+
+  @override
+  String get deleteAccountDone => 'Oʻchirildi';
+
+  @override
+  String get errorCodeConfirmNameMismatch => 'Xoʻjalik nomi notoʻgʻri yozilgan';
+
+  @override
+  String get healthSheetAction => 'Sogʻliq kartasi';
+
+  @override
+  String get healthSheetPrint => 'Chop etish';
+
+  @override
+  String get healthSheetShare => 'Jadval qilib yuborish';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Sogʻliq kartasi: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'Emlash yozilmagan';
+
+  @override
+  String get healthSheetNoTreatments => 'Davolash yozilmagan';
+
+  @override
+  String get healthSheetNextDate => 'Keyingisi';
+
+  @override
+  String get healthSheetPeriod => 'Muddat';
+
+  @override
+  String get healthSheetColKind => 'Nima';
+
+  @override
+  String get healthSheetColWhat => 'Vaksina yoki tashxis';
+
+  @override
+  String get healthSheetColDetails => 'Tafsilotlar';
+
+  @override
+  String get healthSheetEmpty => 'Bu quyonda hali na emlash, na davolash bor';
+
+  @override
+  String get financeSheetAction => 'Daromad va xarajat daftari';
+
+  @override
+  String get financeSheetTitle => 'Daromad va xarajat';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return '$from dan $to gacha boʻlgan muddat uchun';
+  }
+
+  @override
+  String get financeSheetEmpty => 'Bu muddatda amaliyot yozilmagan';
+
+  @override
+  String get financeSheetColKind => 'Kirim yoki chiqim';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — «Quyon fermasi»';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Oʻtgan oy';
+
+  @override
+  String get financeSheetThisYear => 'Shu yil';
 }

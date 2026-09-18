@@ -35,6 +35,9 @@ class ApiEndpoints {
   static const String updateProfile = '/auth/profile';
   // Вход всегда по коду: телефон — основной путь, почта — запасной. Пароля
   // в сервисе нет вовсе (см. README, «Accounts»).
+  // Удаление своей учётной записи. У владельца уносит хозяйство целиком,
+  // у работника — только его самого (см. backend/src/services/accountService.js).
+  static const String deleteAccount = '/auth/account';
   static const String otpRequest = '/auth/otp/request';
   static const String otpVerify = '/auth/otp/verify';
 

@@ -174,7 +174,7 @@ class OtpAuthService {
     await record.destroy();
 
     const user = await this.findUserByContact(identifier, channel, {
-      include: [{ model: Farm, as: 'farm', attributes: ['id', 'status', 'default_purpose', 'country', 'currency', 'timezone'] }]
+      include: [{ model: Farm, as: 'farm', attributes: ['id', 'name', 'status', 'default_purpose', 'country', 'currency', 'timezone'] }]
     });
 
     if (user) {
@@ -219,7 +219,7 @@ class OtpAuthService {
     }
     await invitation.update({ accepted_at: new Date() });
 
-    const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['id', 'status', 'default_purpose', 'country', 'currency', 'timezone'] });
+    const farm = await Farm.findByPk(invitation.farm_id, { attributes: ['id', 'name', 'status', 'default_purpose', 'country', 'currency', 'timezone'] });
     const userJson = newUser.toJSON();
     userJson.farm = farm ? { id: farm.id, status: farm.status } : null;
 

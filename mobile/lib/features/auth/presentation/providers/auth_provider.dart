@@ -296,6 +296,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   // Logout
+  /// Удалить свою учётную запись и выйти.
+  ///
+  /// У владельца уносит хозяйство целиком, у работника — только его самого;
+  /// решает это сервер по роли. Сессия закрывается тем же порядком, что и
+  /// при обычном выходе: возвращаться ей уже некуда.
+  Future<void> deleteAccount({String? confirmName}) async {
+    // Токен устройства отвязывается, пока сессия ещё жива: после удаления
+    // запрос ушёл бы без авторизации, и телефон продолжил бы получать пуши
+    // несуществующего хозяйства.
+    try {
+      await _ref.read(fcmServiceProvider).unregisterCurrentToken();
+    } catch (_) {
+      // Не отвязали — не повод отменять удаление: сервер снесёт токены
+      // вместе с учёткой.
+    }
+
+    await _authRepository.deleteAccount(confirmName: confirmName);
+
+    state = AuthState();
+    await _ref.read(pinRepositoryProvider).clear();
+    resetSessionData(_ref);
+  }
+
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
 

@@ -246,6 +246,20 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Удалить учётную запись — ниже выхода и без рамки: путь этот
+          // обязателен по правилам магазинов, но искать его каждый день не
+          // должны.
+          Center(
+            child: TextButton(
+              onPressed: () => context.push('/settings/delete-account'),
+              child: Text(
+                context.l10n.deleteAccountOpen,
+                style: AppTypography.bodyMd.copyWith(color: AppColors.error),
+              ),
+            ),
+          ),
           const SizedBox(height: 32),
         ],
       ),

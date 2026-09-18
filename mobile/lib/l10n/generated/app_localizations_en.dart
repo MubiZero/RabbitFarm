@@ -5403,4 +5403,143 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorCodeNotRecordAuthor =>
       'Only a manager or the owner edits records made by others';
+
+  @override
+  String get deleteAccountTitle => 'Delete account';
+
+  @override
+  String get deleteAccountOpen => 'Delete account';
+
+  @override
+  String get deleteAccountOwnerHeadline => 'This deletes the whole farm';
+
+  @override
+  String get deleteAccountOwnerBody =>
+      'You are the owner, so the farm goes with your account — with all of its data. Access ends at once, both for you and for your staff.';
+
+  @override
+  String get deleteAccountOwnerWhatGoes =>
+      'Rabbits and cages, feeding and feed, treatments and vaccinations, matings and kindlings, money, tasks, notes and photos will be gone.';
+
+  @override
+  String get deleteAccountGracePeriod =>
+      'For thirty days the data still sits on the server: if you change your mind, write to support and the farm comes back. After that it is erased for good.';
+
+  @override
+  String deleteAccountTypeName(String name) {
+    return 'Type the farm name “$name” to confirm';
+  }
+
+  @override
+  String get deleteAccountTypeNameUnknown => 'Type your farm name to confirm';
+
+  @override
+  String get deleteAccountFarmNameHint => 'Farm name';
+
+  @override
+  String get deleteAccountOwnerAction => 'Delete the farm';
+
+  @override
+  String get deleteAccountOwnerDialogTitle => 'Delete the farm?';
+
+  @override
+  String get deleteAccountOwnerDialogBody =>
+      'Access closes at once, for you and for your staff. After thirty days the data is erased for good.';
+
+  @override
+  String get deleteAccountStaffHeadline => 'This deletes your account';
+
+  @override
+  String get deleteAccountStaffBody =>
+      'The farm is not yours, so it and its data stay. Only your way into the app is deleted.';
+
+  @override
+  String get deleteAccountStaffWhatStays =>
+      'The records you entered — feeding, treatments, vaccinations — stay with the farm: they are its data. The owner can invite you again, but that will be a new account.';
+
+  @override
+  String get deleteAccountStaffAction => 'Delete account';
+
+  @override
+  String get deleteAccountStaffDialogTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountStaffDialogBody =>
+      'You lose your way into the app at once. The account cannot be brought back.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete';
+
+  @override
+  String get deleteAccountDone => 'Deleted';
+
+  @override
+  String get errorCodeConfirmNameMismatch => 'The farm name does not match';
+
+  @override
+  String get healthSheetAction => 'Health record';
+
+  @override
+  String get healthSheetPrint => 'Print';
+
+  @override
+  String get healthSheetShare => 'Send as a table';
+
+  @override
+  String healthSheetTitle(String name) {
+    return 'Health record: $name';
+  }
+
+  @override
+  String get healthSheetNoVaccinations => 'No vaccinations recorded';
+
+  @override
+  String get healthSheetNoTreatments => 'No treatments recorded';
+
+  @override
+  String get healthSheetNextDate => 'Next';
+
+  @override
+  String get healthSheetPeriod => 'Dates';
+
+  @override
+  String get healthSheetColKind => 'Kind';
+
+  @override
+  String get healthSheetColWhat => 'Vaccine or diagnosis';
+
+  @override
+  String get healthSheetColDetails => 'Details';
+
+  @override
+  String get healthSheetEmpty =>
+      'This rabbit has no vaccinations and no treatments yet';
+
+  @override
+  String get financeSheetAction => 'Income and expense book';
+
+  @override
+  String get financeSheetTitle => 'Income and expenses';
+
+  @override
+  String financeSheetPeriod(String from, String to) {
+    return 'For $from to $to';
+  }
+
+  @override
+  String get financeSheetEmpty => 'No entries recorded for these dates';
+
+  @override
+  String get financeSheetColKind => 'Income or expense';
+
+  @override
+  String exportShareSubject(String title) {
+    return '$title — Rabbit Farm';
+  }
+
+  @override
+  String get financeSheetLastMonth => 'Last month';
+
+  @override
+  String get financeSheetThisYear => 'This year';
 }

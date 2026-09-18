@@ -10,6 +10,7 @@ import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/models/transaction_model.dart';
 import '../providers/transactions_provider.dart';
+import '../widgets/finance_sheet_button.dart';
 import '../utils/transaction_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/countries/farm_currency.dart';
@@ -43,6 +44,9 @@ class _TransactionsListScreenState
       appBar: AppBar(
         title: Text(context.l10n.financeTitle),
         actions: [
+          // Бумага в банк и таблица для Excel: деньги из приложения до сих
+          // пор не доставались никак.
+          const FinanceSheetButton(),
           IconButton(
             tooltip: context.l10n.commonSummary,
             icon: const Icon(Icons.insights_outlined),
