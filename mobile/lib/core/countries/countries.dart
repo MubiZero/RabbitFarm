@@ -97,7 +97,10 @@ const kCountries = <Country>[
   ),
   Country(
     code: 'AF',
-    currencySymbol: '؋',
+    // Буквами, а не знаком «؋»: его нет в Inter, и в списке стран на месте
+    // валюты стоял пустой квадрат. Подставлять ради одного знака запасной
+    // шрифт с полтаблицы Юникода — дорого, а «AFN» читается везде.
+    currencySymbol: 'AFN',
     currencyCode: 'AFN',
     phonePrefix: '+93',
     defaultLanguage: 'tg',
