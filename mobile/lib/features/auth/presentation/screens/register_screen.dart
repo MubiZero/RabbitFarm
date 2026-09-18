@@ -8,6 +8,7 @@ import '../../../../core/utils/phone_utils.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/countries/country_picker.dart';
@@ -62,12 +63,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _handleRegister() async {
     final l10n = context.l10n;
     if (!_acceptedPrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.registerConsentRequired),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      ScaffoldMessenger.of(context).showError(l10n.registerConsentRequired);
       return;
     }
     if (_formKey.currentState!.validate()) {
@@ -108,19 +104,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             userExists = serverErrorCode(e) == 'USER_EXISTS';
           }
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: AppColors.error,
-              duration: Duration(seconds: userExists ? 6 : 4),
-              action: userExists
-                  ? SnackBarAction(
-                      label: context.l10n.loginSubmit,
-                      textColor: Colors.white,
-                      onPressed: () => context.go('/login'),
-                    )
-                  : null,
-            ),
+          ScaffoldMessenger.of(context).showError(
+            message,
+            duration: Duration(seconds: userExists ? 6 : 4),
+            action: userExists
+                ? SnackBarAction(
+                    label: context.l10n.loginSubmit,
+                    textColor: Colors.white,
+                    onPressed: () => context.go('/login'),
+                  )
+                : null,
           );
         }
       }

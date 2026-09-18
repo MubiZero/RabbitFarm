@@ -323,12 +323,7 @@ class _AddWeightDialogState extends ConsumerState<AddWeightDialog> {
 
     final state = ref.read(weightsNotifierProvider);
     if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: ${state.error}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: ${state.error}');
       return;
     }
 

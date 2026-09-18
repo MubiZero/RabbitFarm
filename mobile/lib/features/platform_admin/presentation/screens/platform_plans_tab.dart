@@ -66,12 +66,7 @@ class PlatformPlansTab extends ConsumerWidget {
       ref.invalidate(platformFarmsProvider);
       messenger.showSnackBar(SnackBar(content: Text(deleted)));
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 }

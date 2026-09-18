@@ -52,12 +52,7 @@ class PlatformSupportRequestsTab extends ConsumerWidget {
         onResolve: (answer) async {
           final error = await notifier.resolve(request.id, answer: answer);
           if (error != null && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(errorText(l10n, error)),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            ScaffoldMessenger.of(context).showError(errorText(l10n, error));
           }
         },
       ),

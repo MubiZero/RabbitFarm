@@ -7,6 +7,7 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/printing/print_html.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../rabbits/data/models/rabbit_model.dart';
 import '../../data/repositories/vaccinations_repository.dart';
 import '../providers/medical_records_provider.dart';
@@ -179,12 +180,7 @@ class _HealthSheetButtonState extends ConsumerState<HealthSheetButton> {
         );
       }
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.commonActionFailed(errorText(l10n, e))),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(l10n.commonActionFailed(errorText(l10n, e)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

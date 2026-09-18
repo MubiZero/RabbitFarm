@@ -11,6 +11,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/router/deep_links.dart';
 import '../../../../core/utils/phone_utils.dart';
 import '../../../../core/widgets/app_brand_mark.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pin_provider.dart';
@@ -126,12 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showError(Object error) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorText(context.l10n, error)),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    ScaffoldMessenger.of(context).showError(errorText(context.l10n, error));
   }
 
   Future<void> _requestCode() async {

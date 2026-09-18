@@ -305,12 +305,7 @@ class _TodayTasks extends ConsumerWidget {
       // — значит дать два разных ответа на один вопрос.
       ref.invalidate(dashboardReportProvider);
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 }

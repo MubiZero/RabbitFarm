@@ -122,11 +122,11 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     final failed = context.l10n.cagesCleanFailed;
 
     final ok = await ref.read(cagesProvider.notifier).markCleaned(cage.id);
-    messenger.showSnackBar(
-      ok
-          ? SnackBar(content: Text(done))
-          : SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-    );
+    if (ok) {
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+    } else {
+      messenger.showError(failed);
+    }
   }
 
   /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
@@ -148,9 +148,7 @@ class _CagesListScreenState extends ConsumerState<CagesListScreen> {
     );
 
     if (!ok) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
       await notifier.loadCages();
     }
   }

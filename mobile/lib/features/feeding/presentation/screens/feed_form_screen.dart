@@ -133,12 +133,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: $error'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: $error');
       await notifier.refresh();
     }
   }

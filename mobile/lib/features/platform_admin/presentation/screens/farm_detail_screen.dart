@@ -278,12 +278,7 @@ class FarmDetailScreen extends ConsumerWidget {
       // показывает то, что видит владелец.
       context.go('/today');
     } catch (error) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, error));
     }
   }
 
@@ -408,14 +403,11 @@ class FarmDetailScreen extends ConsumerWidget {
     required Object? error,
     required String success,
   }) {
-    messenger.showSnackBar(
-      error == null
-          ? SnackBar(content: Text(success))
-          : SnackBar(
-              content: Text(errorText(l10n, error)),
-              backgroundColor: AppColors.error,
-            ),
-    );
+    if (error == null) {
+      messenger.showSnackBar(SnackBar(content: Text(success)));
+    } else {
+      messenger.showError(errorText(l10n, error));
+    }
   }
 }
 

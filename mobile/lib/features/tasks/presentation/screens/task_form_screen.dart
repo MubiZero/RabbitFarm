@@ -236,9 +236,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     await pending;
 
     if (failedToDelete) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
       await list.refresh();
     }
   }

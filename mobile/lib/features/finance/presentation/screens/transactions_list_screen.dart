@@ -553,12 +553,7 @@ class _DetailsSheet extends ConsumerWidget {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: ${errorText(l10n, error)}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: ${errorText(l10n, error)}');
       await notifier.refresh();
     }
   }

@@ -7,6 +7,7 @@ import '../theme/theme.dart';
 import '../l10n/l10n_context.dart';
 import 'app_slide_to_confirm.dart';
 import '../l10n/error_text.dart';
+import 'app_snack.dart';
 
 /// Каркас экрана-формы: заголовок, прокручиваемые поля и кнопка сохранения,
 /// закреплённая внизу.
@@ -145,12 +146,7 @@ class _AppFormScaffoldState extends ConsumerState<AppFormScaffold> {
     final navigator = Navigator.of(context);
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(context.l10n, error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(context.l10n, error));
       return;
     }
 

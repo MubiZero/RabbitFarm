@@ -210,12 +210,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: ${errorText(l10n, error)}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: ${errorText(l10n, error)}');
       await notifier.refresh();
     }
   }
@@ -481,12 +476,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.txFormReceiptFailed),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      ScaffoldMessenger.of(context).showError(context.l10n.txFormReceiptFailed);
     }
   }
 

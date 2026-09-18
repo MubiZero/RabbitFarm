@@ -13,6 +13,7 @@ import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/providers/locale_provider.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../rabbits/presentation/utils/rabbit_labels.dart';
@@ -140,12 +141,7 @@ class SettingsScreen extends ConsumerWidget {
                         .read(authProvider.notifier)
                         .setDigestEnabled(value);
                     if (error != null) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(errorText(l10n, error)),
-                          backgroundColor: AppColors.error,
-                        ),
-                      );
+                      messenger.showError(errorText(l10n, error));
                     }
                   },
                 ),
@@ -614,11 +610,6 @@ Future<void> _setPurposeForAll(BuildContext context, WidgetRef ref) async {
       SnackBar(content: Text(l10n.settingsPurposeAllDone(changed))),
     );
   } catch (e) {
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(errorText(l10n, e)),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    messenger.showError(errorText(l10n, e));
   }
 }

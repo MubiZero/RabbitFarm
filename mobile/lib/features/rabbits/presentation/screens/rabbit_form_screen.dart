@@ -16,6 +16,7 @@ import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/app_date_field.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
@@ -188,13 +189,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}',
-            ),
-            backgroundColor: AppColors.error,
-          ),
+        ScaffoldMessenger.of(context).showError(
+          '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}',
         );
       }
     }
@@ -250,12 +246,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.rabbitFormPhotoFailed),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showError(context.l10n.rabbitFormPhotoFailed);
       }
     }
   }
@@ -278,12 +271,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.rabbitFormPhotoFailed),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showError(context.l10n.rabbitFormPhotoFailed);
       }
     }
   }
@@ -446,12 +436,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             body: context.l10n.planLimitRabbitsBody,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorText(context.l10n, e)),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          ScaffoldMessenger.of(context).showError(errorText(context.l10n, e));
         }
       }
     } finally {

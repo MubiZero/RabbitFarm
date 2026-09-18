@@ -8,6 +8,7 @@ import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../../domain/kindling_plan.dart';
 import '../providers/breeding_provider.dart';
@@ -149,12 +150,7 @@ class _KindlingPlanButtonState extends ConsumerState<KindlingPlanButton> {
             'kindling-plan-${month.year}-${month.month.toString().padLeft(2, '0')}',
       );
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.commonActionFailed(errorText(l10n, e))),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(l10n.commonActionFailed(errorText(l10n, e)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

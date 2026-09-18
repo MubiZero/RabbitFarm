@@ -53,12 +53,7 @@ class _Content extends ConsumerWidget {
 
     ref.listen<PaymentFlowState>(paymentFlowProvider, (previous, next) {
       if (next.status == PaymentFlowStatus.failed && next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorText(l10n, next.error)),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(context).showError(errorText(l10n, next.error));
         return;
       }
       if (previous?.status != PaymentFlowStatus.checking) return;
@@ -67,12 +62,7 @@ class _Content extends ConsumerWidget {
       // ещё не подтвердил». Раньше обрыв связи показывался человеку как
       // состояние платежа, которого никто не проверял.
       if (next.status == PaymentFlowStatus.checkFailed) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.subscriptionCheckFailed),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(context).showError(l10n.subscriptionCheckFailed);
         return;
       }
 

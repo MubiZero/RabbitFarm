@@ -87,18 +87,15 @@ class BirthsListScreen extends ConsumerWidget {
       'kits_died': birth.kitsDied + died,
     });
 
-    messenger.showSnackBar(
-      ok
-          ? SnackBar(content: Text(l10n.birthsKitDeathSaved))
-          : SnackBar(
-              content: Text(
-                l10n.commonActionFailed(
-                  errorText(l10n, ref.read(birthsProvider).error),
-                ),
-              ),
-              backgroundColor: AppColors.error,
-            ),
-    );
+    if (ok) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.birthsKitDeathSaved)));
+    } else {
+      messenger.showError(
+        l10n.commonActionFailed(
+          errorText(l10n, ref.read(birthsProvider).error),
+        ),
+      );
+    }
   }
 
   /// Отметить, что молодняк отсадили от самки.
@@ -127,18 +124,15 @@ class BirthsListScreen extends ConsumerWidget {
       'weaning_date': DateTime.now().toIso8601String().split('T').first,
     });
 
-    messenger.showSnackBar(
-      ok
-          ? SnackBar(content: Text(l10n.birthsWeaningSaved))
-          : SnackBar(
-              content: Text(
-                l10n.commonActionFailed(
-                  errorText(l10n, ref.read(birthsProvider).error),
-                ),
-              ),
-              backgroundColor: AppColors.error,
-            ),
-    );
+    if (ok) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.birthsWeaningSaved)));
+    } else {
+      messenger.showError(
+        l10n.commonActionFailed(
+          errorText(l10n, ref.read(birthsProvider).error),
+        ),
+      );
+    }
   }
 
   /// Удаление без вопроса «точно удалить?», но с окном на отмену: в перчатках
@@ -164,12 +158,7 @@ class BirthsListScreen extends ConsumerWidget {
     );
 
     if (!ok) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, ref.read(birthsProvider).error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, ref.read(birthsProvider).error));
       await notifier.loadBirths();
     }
   }

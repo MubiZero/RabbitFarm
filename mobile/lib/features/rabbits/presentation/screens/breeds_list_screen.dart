@@ -6,6 +6,7 @@ import '../providers/breeds_provider.dart';
 import '../../../../core/access/farm_access.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/undo_delete.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/l10n/l10n_context.dart';
@@ -289,12 +290,7 @@ class _BreedsListScreenState extends ConsumerState<BreedsListScreen> {
     );
 
     if (!success) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, ref.read(breedsProvider).error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, ref.read(breedsProvider).error));
       await notifier.loadBreeds();
     }
   }
