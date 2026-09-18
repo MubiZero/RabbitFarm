@@ -9,6 +9,7 @@ import '../../data/models/breed_model.dart';
 import '../providers/breeds_provider.dart';
 import '../utils/breed_labels.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Карточка породы.
 class BreedFormScreen extends ConsumerStatefulWidget {
@@ -75,7 +76,10 @@ class _BreedFormScreenState extends ConsumerState<BreedFormScreen> {
         ? await notifier.updateBreed(_breed!.id, data)
         : await notifier.createBreed(data);
 
-    if (ok) return null;
+    if (ok) {
+      ref.refreshAfter(FarmRecord.breed);
+      return null;
+    }
     return ref.read(breedsProvider).error;
   }
 

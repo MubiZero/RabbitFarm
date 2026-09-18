@@ -24,11 +24,11 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/voice/voice_input.dart';
 import '../../../cages/data/models/cage_model.dart';
 import '../../../cages/presentation/providers/cages_provider.dart';
-import '../../../cages/presentation/providers/herd_cages_provider.dart';
 import '../../../../core/widgets/plan_limit_dialog.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../../core/cache/cache_scope.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -411,8 +411,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
 
       ref.read(rabbitsListProvider.notifier).refresh();
-      ref.invalidate(cageRowsProvider);
-      ref.invalidate(cageOptionsProvider);
+      ref.refreshAfter(FarmRecord.rabbit);
       if (_selectedCageId != null) {
         ref.invalidate(cageDetailProvider(_selectedCageId!));
       }

@@ -21,6 +21,7 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../../../rabbits/presentation/widgets/rabbit_multi_picker.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -165,6 +166,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         );
       }
       await ref.read(transactionsProvider.notifier).refresh();
+      ref.refreshAfter(FarmRecord.transaction);
       return null;
     } catch (e) {
       return e;

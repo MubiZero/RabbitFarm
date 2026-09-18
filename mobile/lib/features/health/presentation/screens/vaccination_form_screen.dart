@@ -16,6 +16,7 @@ import '../../../../core/providers/connectivity.dart';
 import '../utils/medical_labels.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Форма записи о прививке.
 class VaccinationFormScreen extends ConsumerStatefulWidget {
@@ -133,7 +134,10 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
         ? await notifier.updateVaccination(_record!.id, request)
         : await notifier.createVaccination(request);
 
-    if (ok) return null;
+    if (ok) {
+      ref.refreshAfter(FarmRecord.vaccination);
+      return null;
+    }
     return ref.read(vaccinationsProvider).error ?? failed;
   }
 

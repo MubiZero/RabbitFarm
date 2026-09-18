@@ -8,6 +8,7 @@ import '../../data/models/cage_model.dart';
 import '../providers/cages_provider.dart';
 import '../utils/cage_labels.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Клетка: номер, тип, вместимость и состояние.
 class CageFormScreen extends ConsumerStatefulWidget {
@@ -97,6 +98,10 @@ class _CageFormScreenState extends ConsumerState<CageFormScreen> {
     final ok = _isEditing
         ? await notifier.updateCage(_cage!.id, data)
         : await notifier.createCage(data);
+
+    // Карта фермы, выпадающие списки клеток в формах и счётчик свободных мест
+    // на главном живут отдельно от списка, который перечитал сам notifier.
+    if (ok) ref.refreshAfter(FarmRecord.cage);
 
     if (ok) return null;
     return ref.read(cagesProvider).error;
