@@ -21,6 +21,7 @@
 | Ресурс в Coolify | Тип | Что важно знать |
 |---|---|---|
 | `rabbitfarm-api` | Application (Dockerfile) | том `/app/logs`; боевая база называется `default`, не `rabbitfarm` |
+| `rabbitfarm-landing` | Application (Dockerfile) | статический лендинг, контекст сборки `./landing` |
 | `rabbitfarm-web` | Application (Dockerfile) | Flutter-сборка под web |
 | `rabbitfarm-db` | Database (managed MySQL 8) | имя базы `default`, пользователь `mysql` |
 | `rabbitfarm-minio` | Service (шаблон MinIO) | образ с `quay.io`, бакет `rabbitfarm-uploads`, тома `minio-data` и `minio-backups` |
@@ -34,8 +35,14 @@
 
 | Сервис | Домен |
 |---|---|
+| `landing` | `https://rabbitfarm.click` |
 | `web` | `https://rabbitfarm.mubi.dev` |
 | `api` | `https://api.rabbitfarm.mubi.dev` |
+
+`landing` это витрина (см. [landing/README.md](../landing/README.md)):
+статические страницы на четырёх языках, собираются при сборке образа.
+Куда ведут её кнопки, задаёт окружение: `APP_URL` (адрес приложения) и
+`ANDROID_APK_URL` (сборка для Android; пустое значение прячет кнопку).
 
 Оба домена ведут A-записями на `207.180.237.97`, сертификаты выпущены
 Let's Encrypt, `http` отвечает редиректом на `https`.

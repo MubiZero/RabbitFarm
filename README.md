@@ -46,7 +46,13 @@ Dio. One codebase for Android, iOS and web — the web build doubles as the
 platform admin's desktop view, no separate app.
 
 **Runtime** — Docker Compose: `db`, `minio` (S3-compatible file storage),
-`api`, and `web` (nginx serving the Flutter web build).
+`api`, `web` (nginx serving the Flutter web build) and `landing` (nginx
+serving the marketing site).
+
+**Landing** — a static site at `rabbitfarm.click`, built by
+`node landing/build.js` into four language pages (Russian, Tajik, Uzbek,
+English). No framework: the people it is written for open it on a cheap
+Android phone over mobile data. See [landing/README.md](landing/README.md).
 
 ## Quick start
 
@@ -169,6 +175,7 @@ for uploads, and the backup job you have to set up yourself.
 ```
 backend/     Node API — src/{routes,controllers,services,models,middleware}
 mobile/      Flutter client — lib/features/<module>/{data,presentation}
+landing/     Static marketing site — src/{i18n,assets}, built by build.js
 docs/        Deployment, mobile builds, architecture, manual API testing
 ```
 

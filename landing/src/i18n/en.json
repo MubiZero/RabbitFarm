@@ -1,0 +1,122 @@
+{
+  "lang": "en",
+  "locale": "en",
+  "meta": {
+    "title": "RabbitFarm: rabbit farm records on your phone",
+    "description": "An app for a rabbit farm: livestock, births, cages, feed, vaccinations and money in one place. Works with no signal, speaks Russian, Tajik, Uzbek and English.",
+    "og_alt": "RabbitFarm app screen with the herd and today's tasks"
+  },
+  "nav": {
+    "modules": "What is inside",
+    "field": "In the shed",
+    "price": "What it costs",
+    "open": "Open the app"
+  },
+  "hero": {
+    "title_top": "Rabbit records",
+    "title_accent": "you keep while you work",
+    "lead": "Log births, feed and costs right at the cages. The app counts the kits, the feed left and the profit for you.",
+    "cta_primary": "Open the app",
+    "cta_secondary": "Download for Android",
+    "cta_note_web": "Opens in the browser, nothing to install.",
+    "shot_alt": "Home screen: herd, today's tasks, feed left in stock"
+  },
+  "click": {
+    "title": "One tap and the record is done",
+    "lead": "Everyday jobs sit on one screen. Pick the job and the form opens already filled in: you only type the number.",
+    "hint": "Tap a job and see what opens",
+    "items": [
+      {
+        "label": "Fed them",
+        "caption": "You mark the cage and the sack. Feed in stock goes down on its own, and the app warns you before it runs out.",
+        "alt": "Feeding record screen: cage, feed and amount"
+      },
+      {
+        "label": "Kits were born",
+        "caption": "You enter the doe and how many were born alive. The birth lands on her card, and the kits join the herd after weaning.",
+        "alt": "Birth record screen: mother, date, number of kits"
+      }
+    ]
+  },
+  "modules": {
+    "title": "The whole farm in one place",
+    "items": [
+      {
+        "name": "Herd",
+        "text": "A card per rabbit: breed, sex, weight, cage, photo and family back to the great-grandparents."
+      },
+      {
+        "name": "Breeding",
+        "text": "Matings, pregnancies, births. Before a pairing the app warns you if the two are close relatives."
+      },
+      {
+        "name": "Cages",
+        "text": "Who lives where, where there is room, who to move. An occupied cage shows the name of its tenant."
+      },
+      {
+        "name": "Feed",
+        "text": "What is left in stock, daily use, and a warning while there is still time to buy more."
+      },
+      {
+        "name": "Health",
+        "text": "Vaccinations with the next date due, treatments, diagnoses and what the medicine cost."
+      },
+      {
+        "name": "Money",
+        "text": "Income and costs by category, profit for the month, and the latest operations."
+      },
+      {
+        "name": "Staff",
+        "text": "Invite by phone number, set roles, and see in the journal who recorded what."
+      }
+    ]
+  },
+  "field": {
+    "title": "Built for the shed, not for the office",
+    "items": [
+      {
+        "name": "The signal drops, the work does not",
+        "text": "Records stay on the phone and go to the server by themselves once the network is back. Nothing to retype."
+      },
+      {
+        "name": "Hands full, so say it out loud",
+        "text": "A note or a weight can be dictated: the app recognises speech and puts the text in the field."
+      },
+      {
+        "name": "No passwords at all",
+        "text": "You sign in with a code from an SMS, and the phone itself is locked by a four-digit code."
+      },
+      {
+        "name": "Four languages",
+        "text": "Russian, Tajik, Uzbek and English. Every worker picks their own, the farm stays shared."
+      }
+    ]
+  },
+  "data": {
+    "title": "Your farm data stays yours",
+    "text": "The source code is open, so any farm can run the system on its own server. Records export to a spreadsheet and reports print on an ordinary printer.",
+    "link": "See the code on GitHub"
+  },
+  "price": {
+    "title": "What it costs",
+    "lead": "Starting is free: open a farm and enter your first rabbits. After that the plan follows the size of the farm, meaning how many rabbits and how many workers.",
+    "points": [
+      "Free to start, no card and no invoice",
+      "Card payment through Eskhata Merchant for farms in Tajikistan",
+      "Farms in other countries are invoiced by support"
+    ]
+  },
+  "cta": {
+    "title": "Try it on your own farm",
+    "lead": "A phone number, a code from an SMS, and you can enter your first rabbits. It takes a couple of minutes.",
+    "primary": "Open the app",
+    "secondary": "Download for Android",
+    "stores_soon": "The app will reach the App Store and Google Play later."
+  },
+  "footer": {
+    "lang_label": "Language",
+    "privacy": "Privacy policy",
+    "github": "Source code",
+    "rights": "Rabbit farm management"
+  }
+}
