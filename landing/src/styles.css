@@ -24,6 +24,10 @@
   --accent-wash: rgba(63, 111, 67, 0.09);
   --border: #e2e0da;
   --border-strong: #cfccc3;
+  /* Граница того, что нажимают, отвечает за понимание «сюда можно нажать»
+     и обязана держать 3:1 (WCAG 1.4.11). Декоративной рамке карточки этот
+     порог не нужен, поэтому переменных две. */
+  --border-interactive: #8b8880;
 
   /* Тень светлой темы: рассеянная + ключевая, как в m1.material.io. */
   --shadow-low: 0 1px 2px rgba(27, 27, 26, 0.07), 0 4px 12px rgba(27, 27, 26, 0.05);
@@ -57,6 +61,7 @@
     --accent-wash: rgba(127, 176, 130, 0.14);
     --border: #2e3234;
     --border-strong: #3d4245;
+    --border-interactive: #6d7270;
 
     --shadow-low: none;
     --shadow-high: none;
@@ -168,6 +173,7 @@ p {
 .brand {
   display: inline-flex;
   align-items: baseline;
+  min-height: 44px;
   gap: 2px;
   font-weight: 700;
   font-size: 1.12rem;
@@ -227,6 +233,18 @@ p {
   .topbar-nav a:not(.btn) {
     display: none;
   }
+
+  /* Цена это первый вопрос владельца хозяйства, а до секции семь экранов
+     прокрутки: ссылку на неё оставляем и на телефоне. */
+  .topbar-nav a[href="#price"] {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar-nav a[href="#price"] {
+    display: none;
+  }
 }
 
 /* --- Кнопки ------------------------------------------------------------ */
@@ -241,7 +259,7 @@ p {
   /* 56px: тот же размер, что у кнопок приложения, попадают пальцем в перчатке. */
   min-height: 56px;
   padding: 0 26px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
@@ -415,7 +433,7 @@ p {
   width: 100%;
   min-height: 64px;
   padding: 0 20px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
@@ -540,22 +558,12 @@ p {
   font-size: 1rem;
 }
 
-/* Снимок в ячейке показывает верх экрана: в карточку не влезет телефон
-   целиком, а по шапке и первым строкам модуль узнаётся сразу. */
-.module-shot {
-  margin-top: 20px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--surface-sunken);
-}
-
-.module-shot img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  object-position: top center;
+/* Крупные ячейки отличаются фоном, а не картинкой: снимок влезал в них
+   только шапкой экрана и обещал больше, чем показывал. */
+.module:nth-child(1),
+.module:nth-child(6) {
+  background: var(--accent-wash);
+  border-color: transparent;
 }
 
 @media (max-width: 900px) {
@@ -734,6 +742,13 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+}
+
+/* 44px: подпись остаётся мелкой, а палец попадает. */
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .langs {

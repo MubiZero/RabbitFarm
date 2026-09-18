@@ -47,7 +47,10 @@ const localePath = (locale) => (locale === DEFAULT_LOCALE ? '/' : `/${locale}/`)
 
 // Иконка модуля подбирается по порядку: словарь хранит только слова.
 const MODULE_ICONS = ['rabbit', 'heart-straight', 'grid-four', 'plant', 'first-aid-kit', 'coins', 'users'];
-const MODULE_SHOTS = { 0: 'herd', 5: 'finance' };
+// Снимков в карточках модулей нет намеренно: они были только у двух
+// модулей из семи и только на русской странице, и ряд выглядел так, будто
+// две функции настоящие, а пять обещаны. Ровный текстовый ряд честнее.
+// Крупные ячейки выделены фоном, а не картинкой.
 const JOB_SHOTS = ['feeding', 'birth'];
 
 /**
@@ -96,10 +99,7 @@ function renderPage(locale) {
         <article class="module reveal">
           ${icon(MODULE_ICONS[index], 'module-icon')}
           <h3>${escape(item.name)}</h3>
-          <p>${escape(item.text)}</p>${MODULE_SHOTS[index] && screenFile(locale, MODULE_SHOTS[index])
-    ? `
-          <div class="module-shot"><img src="${asset(screenFile(locale, MODULE_SHOTS[index]))}" alt="${escape(item.name)}" loading="lazy" width="640" height="1386"></div>`
-    : ''}
+          <p>${escape(item.text)}</p>
         </article>`)
     .join('');
 
