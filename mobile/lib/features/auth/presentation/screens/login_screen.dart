@@ -229,7 +229,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          // Кнопка возврата — только когда есть куда возвращаться: со
+          // знакомства вход открывается поверх, и человек, нажавший «Войти»
+          // по ошибке, должен уйти обратно, а не оказаться запертым.
           automaticallyImplyLeading: false,
+          leading: Navigator.of(context).canPop()
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              : null,
           backgroundColor: Colors.transparent,
           elevation: 0,
           actions: const [LanguagePickerButton()],

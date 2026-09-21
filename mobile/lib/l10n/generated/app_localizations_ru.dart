@@ -3085,6 +3085,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registerFailed => 'Не удалось зарегистрироваться';
 
   @override
+  String get registerContactLabel => 'Телефон или почта';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 или mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Впишите телефон или почту';
+
+  @override
   String get registerConsentPrefix => 'Я принимаю ';
 
   @override
@@ -4975,7 +4984,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onbWelcomeStart => 'Начать';
 
   @override
-  String get onbWelcomeHaveAccount => 'У меня уже есть ферма';
+  String get onbWelcomeHaveAccount => 'Войти';
 
   @override
   String get onbHerdTitle => 'Сколько у вас кроликов?';
@@ -5030,6 +5039,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onbFocusNext => 'Дальше';
 
   @override
+  String get onbCrewPair => 'Я и один помощник';
+
+  @override
+  String get onbCrewPairHint => 'Вдвоём: кто-то подменяет, когда меня нет';
+
+  @override
+  String get onbCrewTeam => 'Небольшая команда';
+
+  @override
+  String get onbCrewTeamHint => 'Три-пять человек, у каждого свои права';
+
+  @override
+  String get onbCrewBig => 'Больше пяти человек';
+
+  @override
+  String get onbCrewBigHint => 'Хозяйство со сменами и учётом, кто что сделал';
+
+  @override
   String get onbCrewTitle => 'Кто будет работать в приложении?';
 
   @override
@@ -5062,6 +5089,82 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onbSkip => 'Пропустить';
+
+  @override
+  String get onbPlanPick =>
+      'Можно выбрать другой — ферма всё равно заводится на бесплатном';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'При знакомстве вы присматривали тариф «$name». Перейти на него поможет поддержка.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Вам хватит бесплатного';
+
+  @override
+  String get onbPlanPaidTitle => 'Под ваше хозяйство подходит';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Считали по вашим ответам: сколько кроликов и кто работает';
+
+  @override
+  String get onbPlanFree => 'Бесплатно';
+
+  @override
+  String get onbPlanPerMonth => 'в месяц';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'До $count кроликов',
+      many: 'До $count кроликов',
+      few: 'До $count кроликов',
+      one: 'До $count кролика',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Кролики без ограничения';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'До $count человек в приложении',
+      many: 'До $count человек в приложении',
+      few: 'До $count человек в приложении',
+      one: 'Один человек в приложении',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Работники без ограничения';
+
+  @override
+  String get onbPlanStartFree =>
+      'Начать можно бесплатно: платить — когда хозяйство перерастёт бесплатный тариф.';
+
+  @override
+  String get onbPlanOthers => 'Другие тарифы';
+
+  @override
+  String get onbPlanContinue => 'Завести ферму';
+
+  @override
+  String get onbPlanRecommended => 'Ваш тариф';
+
+  @override
+  String get onbCountrySms => 'Код для входа придёт в SMS';
+
+  @override
+  String get onbCountryEmail => 'Код для входа придёт на почту';
 
   @override
   String get onbCountryTitle => 'Где ваше хозяйство?';

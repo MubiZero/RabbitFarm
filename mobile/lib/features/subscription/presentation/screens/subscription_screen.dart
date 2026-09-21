@@ -8,6 +8,7 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
 import '../../data/models/payment_order.dart';
@@ -79,6 +80,10 @@ class _Content extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.screenH),
       children: [
+        // Тариф, который человек присмотрел при знакомстве. Ферма заводится
+        // на бесплатном, и без этой строки его выбор просто пропадал бы —
+        // ровно тот «экран без последствий», который мы вычищали.
+        const _WantedPlanNote(),
         if (plan == null)
           AppCard(
             child: Column(
@@ -417,6 +422,41 @@ class _PayThroughSupport extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// «Вы присматривали тариф…» — память о выборе из знакомства.
+class _WantedPlanNote extends ConsumerWidget {
+  const _WantedPlanNote();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final wanted = ref.watch(onboardingAnswersProvider).value?.wantedPlan;
+    if (wanted == null || wanted.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: AppCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.subscriptionWanted(wanted),
+              style: AppTypography.bodyMd
+                  .copyWith(color: context.colors.onSurface),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () => context.push('/support'),
+                child: Text(context.l10n.subscriptionContactSupport),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

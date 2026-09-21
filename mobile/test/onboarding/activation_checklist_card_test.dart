@@ -146,6 +146,8 @@ void main() {
     ) async {
       SharedPreferences.setMockInitialValues({
         'onboarding_answers': jsonEncode({
+          // Ответ прежней пары вариантов: он лежит в настройках у тех, кто
+          // проходил знакомство до появления размеров команды.
           'crew': 'withHelpers',
           'focus': ['breeding'],
         }),

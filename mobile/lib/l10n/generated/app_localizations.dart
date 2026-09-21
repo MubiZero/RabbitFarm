@@ -5502,6 +5502,24 @@ abstract class AppLocalizations {
   /// **'Не удалось зарегистрироваться'**
   String get registerFailed;
 
+  /// No description provided for @registerContactLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон или почта'**
+  String get registerContactLabel;
+
+  /// No description provided for @registerContactHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'+992 90 555 12 34 или mail@example.com'**
+  String get registerContactHint;
+
+  /// No description provided for @registerContactEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Впишите телефон или почту'**
+  String get registerContactEmpty;
+
   /// No description provided for @registerConsentPrefix.
   ///
   /// In ru, this message translates to:
@@ -8655,7 +8673,7 @@ abstract class AppLocalizations {
   /// No description provided for @onbWelcomeHaveAccount.
   ///
   /// In ru, this message translates to:
-  /// **'У меня уже есть ферма'**
+  /// **'Войти'**
   String get onbWelcomeHaveAccount;
 
   /// No description provided for @onbHerdTitle.
@@ -8760,6 +8778,42 @@ abstract class AppLocalizations {
   /// **'Дальше'**
   String get onbFocusNext;
 
+  /// No description provided for @onbCrewPair.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я и один помощник'**
+  String get onbCrewPair;
+
+  /// No description provided for @onbCrewPairHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вдвоём: кто-то подменяет, когда меня нет'**
+  String get onbCrewPairHint;
+
+  /// No description provided for @onbCrewTeam.
+  ///
+  /// In ru, this message translates to:
+  /// **'Небольшая команда'**
+  String get onbCrewTeam;
+
+  /// No description provided for @onbCrewTeamHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Три-пять человек, у каждого свои права'**
+  String get onbCrewTeamHint;
+
+  /// No description provided for @onbCrewBig.
+  ///
+  /// In ru, this message translates to:
+  /// **'Больше пяти человек'**
+  String get onbCrewBig;
+
+  /// No description provided for @onbCrewBigHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хозяйство со сменами и учётом, кто что сделал'**
+  String get onbCrewBigHint;
+
   /// No description provided for @onbCrewTitle.
   ///
   /// In ru, this message translates to:
@@ -8825,6 +8879,108 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пропустить'**
   String get onbSkip;
+
+  /// No description provided for @onbPlanPick.
+  ///
+  /// In ru, this message translates to:
+  /// **'Можно выбрать другой — ферма всё равно заводится на бесплатном'**
+  String get onbPlanPick;
+
+  /// No description provided for @subscriptionWanted.
+  ///
+  /// In ru, this message translates to:
+  /// **'При знакомстве вы присматривали тариф «{name}». Перейти на него поможет поддержка.'**
+  String subscriptionWanted(String name);
+
+  /// No description provided for @onbPlanFreeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вам хватит бесплатного'**
+  String get onbPlanFreeTitle;
+
+  /// No description provided for @onbPlanPaidTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Под ваше хозяйство подходит'**
+  String get onbPlanPaidTitle;
+
+  /// No description provided for @onbPlanSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Считали по вашим ответам: сколько кроликов и кто работает'**
+  String get onbPlanSubtitle;
+
+  /// No description provided for @onbPlanFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бесплатно'**
+  String get onbPlanFree;
+
+  /// No description provided for @onbPlanPerMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'в месяц'**
+  String get onbPlanPerMonth;
+
+  /// No description provided for @onbPlanRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{До {count} кролика} few{До {count} кроликов} many{До {count} кроликов} other{До {count} кроликов}}'**
+  String onbPlanRabbits(int count);
+
+  /// No description provided for @onbPlanRabbitsUnlimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кролики без ограничения'**
+  String get onbPlanRabbitsUnlimited;
+
+  /// No description provided for @onbPlanStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Один человек в приложении} few{До {count} человек в приложении} many{До {count} человек в приложении} other{До {count} человек в приложении}}'**
+  String onbPlanStaff(int count);
+
+  /// No description provided for @onbPlanStaffUnlimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Работники без ограничения'**
+  String get onbPlanStaffUnlimited;
+
+  /// No description provided for @onbPlanStartFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начать можно бесплатно: платить — когда хозяйство перерастёт бесплатный тариф.'**
+  String get onbPlanStartFree;
+
+  /// No description provided for @onbPlanOthers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другие тарифы'**
+  String get onbPlanOthers;
+
+  /// No description provided for @onbPlanContinue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завести ферму'**
+  String get onbPlanContinue;
+
+  /// No description provided for @onbPlanRecommended.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваш тариф'**
+  String get onbPlanRecommended;
+
+  /// No description provided for @onbCountrySms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код для входа придёт в SMS'**
+  String get onbCountrySms;
+
+  /// No description provided for @onbCountryEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код для входа придёт на почту'**
+  String get onbCountryEmail;
 
   /// No description provided for @onbCountryTitle.
   ///

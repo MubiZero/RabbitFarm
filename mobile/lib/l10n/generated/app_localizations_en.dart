@@ -3049,6 +3049,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerFailed => 'Couldn\'t register';
 
   @override
+  String get registerContactLabel => 'Phone or email';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 or mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Enter a phone number or an email';
+
+  @override
   String get registerConsentPrefix => 'I accept the ';
 
   @override
@@ -4904,7 +4913,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbWelcomeStart => 'Get started';
 
   @override
-  String get onbWelcomeHaveAccount => 'I already have a farm';
+  String get onbWelcomeHaveAccount => 'Sign in';
 
   @override
   String get onbHerdTitle => 'How many rabbits do you keep?';
@@ -4959,16 +4968,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbFocusNext => 'Next';
 
   @override
+  String get onbCrewPair => 'Me and one helper';
+
+  @override
+  String get onbCrewPairHint => 'Two of you: someone covers when you are away';
+
+  @override
+  String get onbCrewTeam => 'A small team';
+
+  @override
+  String get onbCrewTeamHint =>
+      'Three to five people, each with their own access';
+
+  @override
+  String get onbCrewBig => 'More than five people';
+
+  @override
+  String get onbCrewBigHint => 'Shifts, and a record of who did what';
+
+  @override
   String get onbCrewTitle => 'Who will use the app?';
 
   @override
   String get onbCrewSubtitle => 'You can change this at any time.';
 
   @override
-  String get onbCrewAlone => 'Only me';
+  String get onbCrewAlone => 'Just me';
 
   @override
-  String get onbCrewAloneHint => 'No invites, no access settings';
+  String get onbCrewAloneHint => 'No invitations, no access settings';
 
   @override
   String get onbCrewHelpers => 'Me and my helpers';
@@ -4992,6 +5020,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onbSkip => 'Skip';
+
+  @override
+  String get onbPlanPick =>
+      'You can pick another — the farm still starts on the free plan';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'During the intro you were looking at the «$name» plan. Support can move you to it.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'The free plan is enough for you';
+
+  @override
+  String get onbPlanPaidTitle => 'This plan fits your farm';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Based on your answers: how many rabbits and who works with you';
+
+  @override
+  String get onbPlanFree => 'Free';
+
+  @override
+  String get onbPlanPerMonth => 'per month';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Up to $count rabbits',
+      one: 'Up to $count rabbit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Unlimited rabbits';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Up to $count people in the app',
+      one: 'One person in the app',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Unlimited people in the app';
+
+  @override
+  String get onbPlanStartFree =>
+      'Start free: you pay when the farm outgrows the free plan.';
+
+  @override
+  String get onbPlanOthers => 'Other plans';
+
+  @override
+  String get onbPlanContinue => 'Create the farm';
+
+  @override
+  String get onbPlanRecommended => 'Your plan';
+
+  @override
+  String get onbCountrySms => 'Your sign-in code arrives by SMS';
+
+  @override
+  String get onbCountryEmail => 'Your sign-in code arrives by email';
 
   @override
   String get onbCountryTitle => 'Where is your farm?';

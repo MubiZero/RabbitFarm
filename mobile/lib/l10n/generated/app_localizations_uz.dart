@@ -3058,6 +3058,15 @@ class AppLocalizationsUz extends AppLocalizations {
   String get registerFailed => 'Roʻyxatdan oʻtib boʻlmadi';
 
   @override
+  String get registerContactLabel => 'Telefon yoki pochta';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 yoki mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Telefon yoki pochtani kiriting';
+
+  @override
   String get registerConsentPrefix => 'Men ';
 
   @override
@@ -4915,7 +4924,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbWelcomeStart => 'Boshlash';
 
   @override
-  String get onbWelcomeHaveAccount => 'Menda xoʻjalik bor';
+  String get onbWelcomeHaveAccount => 'Kirish';
 
   @override
   String get onbHerdTitle => 'Nechta quyoningiz bor?';
@@ -4970,6 +4979,25 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbFocusNext => 'Keyingisi';
 
   @override
+  String get onbCrewPair => 'Men va bitta yordamchi';
+
+  @override
+  String get onbCrewPairHint => 'Ikki kishi: men yoʻqda oʻrnimni bosadi';
+
+  @override
+  String get onbCrewTeam => 'Kichik jamoa';
+
+  @override
+  String get onbCrewTeamHint => 'Uch-besh kishi, har birining oʻz huquqi';
+
+  @override
+  String get onbCrewBig => 'Besh kishidan koʻp';
+
+  @override
+  String get onbCrewBigHint =>
+      'Smenalar va kim nima qilgani hisobi bilan xoʻjalik';
+
+  @override
   String get onbCrewTitle => 'Ilovada kim ishlaydi?';
 
   @override
@@ -4979,7 +5007,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbCrewAlone => 'Faqat men';
 
   @override
-  String get onbCrewAloneHint => 'Na taklif, na ruxsat sozlamalari kerak';
+  String get onbCrewAloneHint => 'Na taklifnoma, na kirish sozlamalari';
 
   @override
   String get onbCrewHelpers => 'Men va yordamchilarim';
@@ -5002,6 +5030,78 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get onbSkip => 'Oʻtkazib yuborish';
+
+  @override
+  String get onbPlanPick =>
+      'Boshqasini ham tanlash mumkin — xoʻjalik baribir bepulda ochiladi';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'Tanishuvda siz «$name» tarifini koʻrib chiqqan edingiz. Unga oʻtishda qoʻllab-quvvatlash yordam beradi.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Sizga bepuli yetadi';
+
+  @override
+  String get onbPlanPaidTitle => 'Xoʻjaligingizga mos keladi';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Javoblaringizga qarab: nechta quyon va kim ishlaydi';
+
+  @override
+  String get onbPlanFree => 'Bepul';
+
+  @override
+  String get onbPlanPerMonth => 'oyiga';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tagacha quyon',
+      one: '$count tagacha quyon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Quyonlar cheklovsiz';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ilovada $count tagacha kishi',
+      one: 'Ilovada bir kishi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Ishchilar cheklovsiz';
+
+  @override
+  String get onbPlanStartFree =>
+      'Boshlash bepul: toʻlov xoʻjalik bepul tarifdan oshganda kerak boʻladi.';
+
+  @override
+  String get onbPlanOthers => 'Boshqa tariflar';
+
+  @override
+  String get onbPlanContinue => 'Xoʻjalik ochish';
+
+  @override
+  String get onbPlanRecommended => 'Sizning tarifingiz';
+
+  @override
+  String get onbCountrySms => 'Kirish kodi SMS orqali keladi';
+
+  @override
+  String get onbCountryEmail => 'Kirish kodi pochtaga keladi';
 
   @override
   String get onbCountryTitle => 'Xoʻjaligingiz qayerda?';

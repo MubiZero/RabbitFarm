@@ -1368,6 +1368,9 @@
   "registerSubmit": "Завести ферму",
   "registerHaveAccount": "Уже есть аккаунт?",
   "registerFailed": "Не удалось зарегистрироваться",
+  "registerContactLabel": "Телефон или почта",
+  "registerContactHint": "+992 90 555 12 34 или mail@example.com",
+  "registerContactEmpty": "Впишите телефон или почту",
   "registerConsentPrefix": "Я принимаю ",
   "registerConsentLink": "политику конфиденциальности",
   "registerConsentRequired": "Нужно принять политику конфиденциальности, чтобы продолжить",
@@ -2307,7 +2310,7 @@
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Клетки, случки, окролы, корма и деньги — всё записано и всегда под рукой. Приложение само напомнит, когда ставить маточник и делать прививки.",
   "onbWelcomeStart": "Начать",
-  "onbWelcomeHaveAccount": "У меня уже есть ферма",
+  "onbWelcomeHaveAccount": "Войти",
   "onbHerdTitle": "Сколько у вас кроликов?",
   "onbHerdSubtitle": "Примерно, вместе с молодняком.",
   "onbHerdUpTo20": "До 20",
@@ -2325,6 +2328,12 @@
   "onbFocusHealth": "Прививки и лечение",
   "onbFocusMoney": "Продажи и расходы",
   "onbFocusNext": "Дальше",
+  "onbCrewPair": "Я и один помощник",
+  "onbCrewPairHint": "Вдвоём: кто-то подменяет, когда меня нет",
+  "onbCrewTeam": "Небольшая команда",
+  "onbCrewTeamHint": "Три-пять человек, у каждого свои права",
+  "onbCrewBig": "Больше пяти человек",
+  "onbCrewBigHint": "Хозяйство со сменами и учётом, кто что сделал",
   "onbCrewTitle": "Кто будет работать в приложении?",
   "onbCrewSubtitle": "Это можно изменить в любой момент.",
   "onbCrewAlone": "Только я",
@@ -2336,6 +2345,44 @@
   "onbDoneCreate": "Создать ферму",
   "onbBack": "Назад",
   "onbSkip": "Пропустить",
+  "onbPlanPick": "Можно выбрать другой — ферма всё равно заводится на бесплатном",
+  "subscriptionWanted": "При знакомстве вы присматривали тариф «{name}». Перейти на него поможет поддержка.",
+  "@subscriptionWanted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanFreeTitle": "Вам хватит бесплатного",
+  "onbPlanPaidTitle": "Под ваше хозяйство подходит",
+  "onbPlanSubtitle": "Считали по вашим ответам: сколько кроликов и кто работает",
+  "onbPlanFree": "Бесплатно",
+  "onbPlanPerMonth": "в месяц",
+  "onbPlanRabbits": "{count, plural, one{До {count} кролика} few{До {count} кроликов} many{До {count} кроликов} other{До {count} кроликов}}",
+  "@onbPlanRabbits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbPlanRabbitsUnlimited": "Кролики без ограничения",
+  "onbPlanStaff": "{count, plural, one{Один человек в приложении} few{До {count} человек в приложении} many{До {count} человек в приложении} other{До {count} человек в приложении}}",
+  "@onbPlanStaff": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbPlanStaffUnlimited": "Работники без ограничения",
+  "onbPlanStartFree": "Начать можно бесплатно: платить — когда хозяйство перерастёт бесплатный тариф.",
+  "onbPlanOthers": "Другие тарифы",
+  "onbPlanContinue": "Завести ферму",
+  "onbPlanRecommended": "Ваш тариф",
+  "onbCountrySms": "Код для входа придёт в SMS",
+  "onbCountryEmail": "Код для входа придёт на почту",
   "onbCountryTitle": "Где ваше хозяйство?",
   "onbCountrySubtitle": "От этого зависят валюта, время и способ входа",
   "countryLine": "Страна: {country}",

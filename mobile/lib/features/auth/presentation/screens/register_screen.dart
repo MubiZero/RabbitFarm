@@ -31,13 +31,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// Телефон основной, почта запасная — те же два способа, что и на входе.
   /// Что выбрал человек. Доступен ли этот способ вообще — решает страна:
   /// туда, куда СМС не доходит, телефон не предлагается вовсе.
-  bool _byPhoneChoice = true;
 
   /// Способ, которым регистрация пойдёт на самом деле.
   ///
   /// Туда, куда код по СМС не доходит, телефон не предлагается вовсе —
   /// иначе человек введёт номер и будет ждать сообщения, которого не будет.
-  bool get _byPhone => _byPhoneChoice && ref.read(smsAvailableProvider);
+  /// Человек написал почту, если в строке есть «собака». Всё остальное —
+  /// телефон. Отдельный переключатель «Телефон / Почта» это решение только
+  /// удваивал: сначала выбери способ, потом впиши то же самое.
+  bool get _byPhone {
+    if (!ref.read(smsAvailableProvider)) return false;
+    return !_contactController.text.contains('@');
+  }
   bool _acceptedPrivacy = false;
 
   /// Кнопку нажали, а согласия нет. Держим отдельно от самого согласия:
@@ -126,6 +131,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final smsHere = ref.watch(smsAvailableProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -145,27 +151,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icon
-                Icon(
-                  Icons.person_add,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                // Title
-                Text(
-                  context.l10n.registerTitle,
-                  style: AppTypography.displayMd
-                      .copyWith(color: context.colors.onSurface),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.sm),
+                // Ни значка, ни заголовка: название экрана уже стоит в
+                // шапке, а повторять его крупно посреди формы — значит
+                // отодвинуть первое поле на пол-экрана вниз.
                 Text(
                   context.l10n.registerSubtitle,
                   style: AppTypography.bodyMd
                       .copyWith(color: context.colors.onSurfaceVariant),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
 
                 // Farm name field (optional)
                 TextFormField(
@@ -214,66 +208,44 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 // Контакт: на него придёт код для входа — пароля в сервисе
                 // нет, и другого способа попасть в аккаунт тоже.
                 //
-                // Выбор способа показывается только там, куда СМС доходит.
-                // В остальных странах предлагать телефон нечестно: человек
-                // введёт номер и будет ждать код, которого не будет, —
-                // поэтому вместо переключателя стоит объяснение.
-                if (!ref.watch(smsAvailableProvider))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.alternate_email,
-                          size: 18,
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            context.l10n.loginSmsUnavailable,
-                            style: AppTypography.labelSm.copyWith(
-                              color: context.colors.onSurfaceVariant,
-                            ),
+                // Там, куда СМС не доходит, телефон не предлагаем вовсе:
+                // человек введёт номер и будет ждать код, которого не будет.
+                if (!smsHere) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.alternate_email,
+                        size: 18,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.l10n.loginSmsUnavailable,
+                          style: AppTypography.labelSm.copyWith(
+                            color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                else
-                  SegmentedButton<bool>(
-                    segments: [
-                      ButtonSegment(
-                        value: true,
-                        icon: const Icon(Icons.phone_outlined, size: 18),
-                        label: Text(context.l10n.loginByPhone),
-                      ),
-                      ButtonSegment(
-                        value: false,
-                        icon: const Icon(Icons.alternate_email, size: 18),
-                        label: Text(context.l10n.loginByEmail),
                       ),
                     ],
-                    selected: {_byPhone},
-                    onSelectionChanged: (value) => setState(() {
-                      _byPhoneChoice = value.first;
-                      _contactController.clear();
-                    }),
                   ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                ],
                 TextFormField(
                   controller: _contactController,
-                  keyboardType: _byPhone
-                      ? TextInputType.phone
-                      : TextInputType.emailAddress,
+                  // Клавиатура с «собакой» и цифрами сразу: поле принимает и
+                  // номер, и почту, и заранее знать, что человек выберет, мы
+                  // не можем.
+                  keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
+                  onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    labelText: _byPhone
-                        ? context.l10n.loginPhoneLabel
+                    labelText: smsHere
+                        ? context.l10n.registerContactLabel
                         : context.l10n.loginEmailLabel,
-                    hintText: _byPhone
-                        ? context.l10n.loginPhoneHint
+                    hintText: smsHere
+                        ? context.l10n.registerContactHint
                         : context.l10n.loginEmailHint,
                     prefixIcon: Icon(
                       _byPhone ? Icons.phone_outlined : Icons.alternate_email,
@@ -283,16 +255,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     final raw = value?.trim() ?? '';
+                    if (raw.isEmpty) {
+                      return smsHere
+                          ? context.l10n.registerContactEmpty
+                          : context.l10n.registerEmailEmpty;
+                    }
                     if (_byPhone) {
-                      if (raw.isEmpty) return context.l10n.loginPhoneEmpty;
                       if (!isTjPhone(normalizeTjPhone(raw))) {
                         return context.l10n.loginPhoneInvalid;
                       }
-                    } else {
-                      if (raw.isEmpty) return context.l10n.registerEmailEmpty;
-                      if (!raw.contains('@') || !raw.contains('.')) {
-                        return context.l10n.registerEmailInvalid;
-                      }
+                    } else if (!raw.contains('@') || !raw.contains('.')) {
+                      return context.l10n.registerEmailInvalid;
                     }
                     return null;
                   },

@@ -3047,6 +3047,15 @@ class AppLocalizationsTg extends AppLocalizations {
   String get registerFailed => 'Бақайдгирӣ муяссар нашуд';
 
   @override
+  String get registerContactLabel => 'Телефон ё почта';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 ё mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Телефон ё почтаро нависед';
+
+  @override
   String get registerConsentPrefix => 'Ман қабул мекунам ';
 
   @override
@@ -4885,7 +4894,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbWelcomeStart => 'Оғоз';
 
   @override
-  String get onbWelcomeHaveAccount => 'Ман аллакай хоҷагӣ дорам';
+  String get onbWelcomeHaveAccount => 'Ворид шудан';
 
   @override
   String get onbHerdTitle => 'Шумо чанд харгӯш доред?';
@@ -4940,6 +4949,25 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbFocusNext => 'Минбаъд';
 
   @override
+  String get onbCrewPair => 'Ману як ёрдамчӣ';
+
+  @override
+  String get onbCrewPairHint =>
+      'Дунафарӣ: вақте ман нестам, дигаре ҷойгузин мешавад';
+
+  @override
+  String get onbCrewTeam => 'Дастаи хурд';
+
+  @override
+  String get onbCrewTeamHint => 'Се-панҷ нафар, ҳар кадом ҳуқуқи худро дорад';
+
+  @override
+  String get onbCrewBig => 'Зиёда аз панҷ нафар';
+
+  @override
+  String get onbCrewBigHint => 'Хоҷагӣ бо навбатҳо ва ҳисоби кори ҳар кас';
+
+  @override
   String get onbCrewTitle => 'Кӣ дар барнома кор мекунад?';
 
   @override
@@ -4949,7 +4977,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbCrewAlone => 'Танҳо ман';
 
   @override
-  String get onbCrewAloneHint => 'На даъват лозим аст, на танзими дастрасӣ';
+  String get onbCrewAloneHint => 'На даъватнома, на танзими дастрасӣ';
 
   @override
   String get onbCrewHelpers => 'Ман ва ёрдамчиён';
@@ -4972,6 +5000,78 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get onbSkip => 'Гузарондан';
+
+  @override
+  String get onbPlanPick =>
+      'Дигарашро низ интихоб кардан мумкин — хоҷагӣ ҳар ҳол дар ройгон кушода мешавад';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'Ҳангоми шиносоӣ шумо тарифи «$name»-ро дида будед. Барои гузаштан дастгирӣ кӯмак мекунад.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Ба шумо ройгон мерасад';
+
+  @override
+  String get onbPlanPaidTitle => 'Ба хоҷагии шумо мувофиқ аст';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Аз рӯи ҷавобҳои шумо: чанд харгӯш ва кӣ кор мекунад';
+
+  @override
+  String get onbPlanFree => 'Ройгон';
+
+  @override
+  String get onbPlanPerMonth => 'дар як моҳ';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'То $count харгӯш',
+      one: 'То $count харгӯш',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Харгӯшҳо бемаҳдудият';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'То $count нафар дар барнома',
+      one: 'Як нафар дар барнома',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Кормандон бемаҳдудият';
+
+  @override
+  String get onbPlanStartFree =>
+      'Сар кардан ройгон аст: пардохт вақте лозим мешавад, ки хоҷагӣ аз тарифи ройгон калон шавад.';
+
+  @override
+  String get onbPlanOthers => 'Тарифҳои дигар';
+
+  @override
+  String get onbPlanContinue => 'Хоҷагӣ кушодан';
+
+  @override
+  String get onbPlanRecommended => 'Тарифи шумо';
+
+  @override
+  String get onbCountrySms => 'Рамзи вуруд бо SMS меояд';
+
+  @override
+  String get onbCountryEmail => 'Рамзи вуруд ба почта меояд';
 
   @override
   String get onbCountryTitle => 'Хоҷагии шумо дар куҷост?';
