@@ -83,26 +83,21 @@ class FarmReportView extends ConsumerWidget {
       children: [
         ReportPeriodCaption(from: report.period.from, to: report.period.to),
         const SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            Expanded(
-              child: StatTile(
-                icon: Icons.pets_outlined,
-                // Поголовье — это «сколько сейчас», а не «сколько за период»:
-                // сервер считает его на момент запроса.
-                label: context.l10n.reportsPopulationNow,
-                value: '${report.population.totalRabbits}',
-                accent: AppColors.domainLivestock,
-              ),
+        StatTileRow(
+          tiles: [
+            StatTile(
+              icon: Icons.pets_outlined,
+              // Поголовье — это «сколько сейчас», а не «сколько за период»:
+              // сервер считает его на момент запроса.
+              label: context.l10n.reportsPopulationNow,
+              value: '${report.population.totalRabbits}',
+              accent: AppColors.domainLivestock,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: Icons.child_friendly_outlined,
-                label: context.l10n.reportsBirths,
-                value: '${report.breeding.births}',
-                accent: AppColors.domainBreeding,
-              ),
+            StatTile(
+              icon: Icons.child_friendly_outlined,
+              label: context.l10n.reportsBirths,
+              value: '${report.breeding.births}',
+              accent: AppColors.domainBreeding,
             ),
           ],
         ),

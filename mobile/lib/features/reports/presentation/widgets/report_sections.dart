@@ -272,24 +272,19 @@ class ReportMoneySummary extends StatelessWidget {
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: StatTile(
-                icon: Icons.arrow_upward,
-                label: context.l10n.financeIncome,
-                value: context.money(income),
-                accent: AppColors.success,
-              ),
+        StatTileRow(
+          tiles: [
+            StatTile(
+              icon: Icons.arrow_upward,
+              label: context.l10n.financeIncome,
+              value: context.money(income),
+              accent: AppColors.success,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: Icons.arrow_downward,
-                label: context.l10n.financeExpenses,
-                value: context.money(expenses),
-                accent: AppColors.error,
-              ),
+            StatTile(
+              icon: Icons.arrow_downward,
+              label: context.l10n.financeExpenses,
+              value: context.money(expenses),
+              accent: AppColors.error,
             ),
           ],
         ),
