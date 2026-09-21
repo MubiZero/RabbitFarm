@@ -172,7 +172,11 @@ p {
 
 .brand {
   display: inline-flex;
-  align-items: baseline;
+  /* По центру, а не по базовой линии: знак — картинка, и у неё базовой
+     линии нет. По baseline браузер сажает её нижним краем на строку, и
+     плашка висит ниже надписи — видно сразу, как только у знака появился
+     свой фон. */
+  align-items: center;
   min-height: 44px;
   gap: 2px;
   font-weight: 700;
@@ -193,7 +197,6 @@ p {
   width: 26px;
   height: 26px;
   margin-right: 8px;
-  align-self: center;
   padding: 3px;
   box-sizing: border-box;
   background: var(--accent);
