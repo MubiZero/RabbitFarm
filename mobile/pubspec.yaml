@@ -131,6 +131,12 @@ flutter:
         - asset: fonts/Inter-Bold.ttf
           weight: 700
 
+  # Фирменный знак: тот же контурный кролик, что на иконке приложения и на
+  # витрине. Рисунок растровый, потому что рисовать его линиями в коде — это
+  # третья копия одного и того же знака, которая разъедется с двумя первыми.
+  assets:
+    - assets/brand/
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

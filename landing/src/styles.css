@@ -186,11 +186,19 @@ p {
   color: var(--accent);
 }
 
+/* Знак — тот же, что на иконке приложения: тёмный контур на акценте.
+   Подложка здесь, а не в самом файле, потому что тот же svg встречается в
+   тексте и в og-картинке, где фон свой. */
 .brand-mark {
   width: 26px;
   height: 26px;
   margin-right: 8px;
   align-self: center;
+  padding: 3px;
+  box-sizing: border-box;
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: 7px;
 }
 
 .topbar-nav {
@@ -843,6 +851,8 @@ p {
     width: 22px;
     height: 22px;
     margin-right: 6px;
+    padding: 2px;
+    border-radius: 6px;
   }
 
   .topbar .btn {

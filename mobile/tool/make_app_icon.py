@@ -5,10 +5,17 @@
 
     python3 tool/make_app_icon.py
 
-Исходник — кролик из Noto Emoji (U+1F407), шрифт под лицензией SIL Open Font
-License 1.1, см. `tool/ICON-NOTICE.md`. Эмодзи Apple брать нельзя: их
-лицензия не разрешает использование в графике приложений, а именно ими
-кролик выглядит в macOS и iOS.
+Знак — тот же контурный кролик, что стоит на витрине
+(`landing/src/assets/mark.svg`, набор Phosphor, лицензия MIT, см.
+`tool/ICON-NOTICE.md`), тёмными линиями на сплошном акценте. Один рисунок на
+приложение и сайт: узнаваемость знака держится на повторении, а не на
+разнообразии.
+
+Растр `rabbit-mark-1024.png` рядом — это тот же SVG, отрисованный один раз;
+в самом скрипте растеризатора нет, потому что ни cairo, ни resvg на машинах
+разработки нет, а тащить их ради операции раз в несколько лет незачем.
+Перерисовать: открыть mark.svg в браузере и сохранить в PNG 1024×1024 с
+прозрачным фоном и цветом линий #0F172A.
 
 Генератора вроде `flutter_launcher_icons` в проекте намеренно нет: пакет
 тянет зависимость и свои правила ради операции, которая случается раз в
@@ -20,41 +27,35 @@ License 1.1, см. `tool/ICON-NOTICE.md`. Эмодзи Apple брать нель
 """
 import json
 import os
-import urllib.request
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SOURCE_URL = 'https://raw.githubusercontent.com/googlefonts/noto-emoji/main/png/512/emoji_u1f407.png'
-SOURCE = os.path.join(ROOT, 'tool', 'rabbit-noto-512.png')
+SOURCE = os.path.join(ROOT, 'tool', 'rabbit-mark-1024.png')
 
 S = 1024
-# AppColors.accentEmerald — акцент приложения по умолчанию — и он же глубже:
-# плоская заливка на 1024 выглядит мёртвой.
-TOP, BOTTOM = (0x10, 0xB9, 0x81), (0x04, 0x78, 0x57)
+# AppColors.accentEmerald — акцент приложения по умолчанию. Заливка ровная:
+# знак держится на контуре, и градиент под ним только спорит с линиями.
+ACCENT = (0x10, 0xB9, 0x81)
 
 # Доля холста под кролика. Для обычной иконки — максимум, для слоёв, которые
 # система обрезает под форму устройства, — с запасом: у adaptive-иконки
 # Android гарантированно видна только центральная зона 66dp из 108dp, у
 # maskable в вебе — круг в 80% ширины.
-SHARE_FLAT, SHARE_ADAPTIVE, SHARE_MASKABLE = 0.70, 0.56, 0.60
+# Контурный знак «легче» залитого силуэта и на тех же долях выглядит мельче,
+# поэтому каждая доля чуть больше прежней.
+SHARE_FLAT, SHARE_ADAPTIVE, SHARE_MASKABLE = 0.76, 0.60, 0.64
 
 ANDROID_DPI = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 
 
-def gradient(size):
-    strip = Image.new('RGB', (1, size))
-    for y in range(size):
-        k = y / (size - 1)
-        strip.putpixel((0, y), tuple(round(t + (b - t) * k) for t, b in zip(TOP, BOTTOM)))
-    return strip.resize((size, size), Image.BILINEAR)
+def background(size):
+    return Image.new('RGB', (size, size), ACCENT)
 
 
 def load_rabbit():
-    if not os.path.exists(SOURCE):
-        urllib.request.urlretrieve(SOURCE_URL, SOURCE)
     art = Image.open(SOURCE).convert('RGBA')
-    # Прозрачные поля эмодзи обрезаем: с ними кролик кажется мельче, чем
-    # занимает места, и композиция уезжает вверх.
+    # Прозрачные поля обрезаем: с ними кролик кажется мельче, чем занимает
+    # места, и композиция уезжает вверх.
     return art.crop(art.getbbox())
 
 
@@ -79,11 +80,11 @@ def save(img, path, size, keep_alpha=False):
 def main():
     rabbit = load_rabbit()
 
-    flat = gradient(S).convert('RGBA')
+    flat = background(S).convert('RGBA')
     flat.alpha_composite(layer(rabbit, S, SHARE_FLAT))
     flat = flat.convert('RGB')
 
-    maskable = gradient(S).convert('RGBA')
+    maskable = background(S).convert('RGBA')
     maskable.alpha_composite(layer(rabbit, S, SHARE_MASKABLE))
     maskable = maskable.convert('RGB')
 
