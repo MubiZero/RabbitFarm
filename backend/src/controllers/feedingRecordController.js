@@ -26,7 +26,7 @@ exports.create = async (req, res, next) => {
         where: { id: rabbit_id, farm_id: req.farmId }
       });
       if (!rabbit) {
-        return ApiResponse.error(res, 'Кролик не найден', 404);
+        return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
       }
     }
 
@@ -36,7 +36,7 @@ exports.create = async (req, res, next) => {
         where: { id: cage_id, farm_id: req.farmId }
       });
       if (!cage) {
-        return ApiResponse.error(res, 'Клетка не найдена', 404);
+        return ApiResponse.error(res, 'Клетка не найдена', 404, 'CAGE_NOT_FOUND');
       }
     }
 
@@ -87,10 +87,10 @@ exports.create = async (req, res, next) => {
     return ApiResponse.success(res, created, 'Запись о кормлении создана', 201);
   } catch (error) {
     if (error.message === 'FEED_NOT_FOUND') {
-      return ApiResponse.error(res, 'Корм не найден', 404);
+      return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
     }
     if (error.message === 'INSUFFICIENT_STOCK') {
-      return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+      return ApiResponse.error(res, 'Недостаточно корма на складе', 400, 'INSUFFICIENT_STOCK');
     }
     next(error);
   }
@@ -185,16 +185,16 @@ exports.createBulk = async (req, res, next) => {
     }, `Записей о кормлении создано: ${created}`, 201);
   } catch (error) {
     if (error.message === 'RABBIT_NOT_FOUND') {
-      return ApiResponse.error(res, 'Кролик не найден', 404);
+      return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     }
     if (error.message === 'CAGE_NOT_FOUND') {
-      return ApiResponse.error(res, 'Клетка не найдена', 404);
+      return ApiResponse.error(res, 'Клетка не найдена', 404, 'CAGE_NOT_FOUND');
     }
     if (error.message === 'FEED_NOT_FOUND') {
-      return ApiResponse.error(res, 'Корм не найден', 404);
+      return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
     }
     if (error.message === 'INSUFFICIENT_STOCK') {
-      return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+      return ApiResponse.error(res, 'Недостаточно корма на складе', 400, 'INSUFFICIENT_STOCK');
     }
     next(error);
   }
@@ -218,7 +218,7 @@ exports.getById = async (req, res, next) => {
     });
 
     if (!feedingRecord) {
-      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404, 'FEEDING_NOT_FOUND');
     }
 
     return ApiResponse.success(res, feedingRecord);
@@ -314,7 +314,7 @@ exports.getByRabbit = async (req, res, next) => {
       }
     });
     if (!rabbit) {
-      return ApiResponse.error(res, 'Кролик не найден', 404);
+      return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     }
 
     const records = await FeedingRecord.findAll({
@@ -344,17 +344,17 @@ exports.update = async (req, res, next) => {
     });
 
     if (!feedingRecord) {
-      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404, 'FEEDING_NOT_FOUND');
     }
 
     if (req.body.rabbit_id && req.body.rabbit_id !== feedingRecord.rabbit_id) {
       const rabbit = await Rabbit.findOne({ where: { id: req.body.rabbit_id, farm_id: req.farmId } });
-      if (!rabbit) return ApiResponse.error(res, 'Кролик не найден', 404);
+      if (!rabbit) return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     }
 
     if (req.body.cage_id && req.body.cage_id !== feedingRecord.cage_id) {
       const cage = await Cage.findOne({ where: { id: req.body.cage_id, farm_id: req.farmId } });
-      if (!cage) return ApiResponse.error(res, 'Клетка не найдена', 404);
+      if (!cage) return ApiResponse.error(res, 'Клетка не найдена', 404, 'CAGE_NOT_FOUND');
     }
 
     const transaction = await sequelize.transaction();
@@ -374,7 +374,7 @@ exports.update = async (req, res, next) => {
 
         if (!feed) {
           await transaction.rollback();
-          return ApiResponse.error(res, 'Корм не найден', 404);
+          return ApiResponse.error(res, 'Корм не найден', 404, 'FEED_NOT_FOUND');
         }
 
         if (feedId === feedingRecord.feed_id) {
@@ -383,7 +383,7 @@ exports.update = async (req, res, next) => {
           const newStock = parseFloat(feed.current_stock) - diff;
           if (newStock < 0) {
             await transaction.rollback();
-            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+            return ApiResponse.error(res, 'Недостаточно корма на складе', 400, 'INSUFFICIENT_STOCK');
           }
           await feed.update({ current_stock: newStock }, { transaction });
         } else {
@@ -403,7 +403,7 @@ exports.update = async (req, res, next) => {
           const newStock = parseFloat(feed.current_stock) - newQuantity;
           if (newStock < 0) {
             await transaction.rollback();
-            return ApiResponse.error(res, 'Недостаточно корма на складе', 400);
+            return ApiResponse.error(res, 'Недостаточно корма на складе', 400, 'INSUFFICIENT_STOCK');
           }
           await feed.update({ current_stock: newStock }, { transaction });
         }
@@ -450,7 +450,7 @@ exports.delete = async (req, res, next) => {
 
     if (!feedingRecord) {
       await transaction.rollback();
-      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404);
+      return ApiResponse.error(res, 'Запись о кормлении не найдена', 404, 'FEEDING_NOT_FOUND');
     }
 
     // Return stock to feed

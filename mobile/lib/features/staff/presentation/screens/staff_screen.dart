@@ -224,12 +224,7 @@ class StaffScreen extends ConsumerWidget {
         SnackBar(content: Text(isActive == false ? closed : saved)),
       );
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 
@@ -276,12 +271,7 @@ class StaffScreen extends ConsumerWidget {
       ref.invalidate(farmMembersProvider);
       messenger.showSnackBar(SnackBar(content: Text(transferred)));
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 
@@ -319,12 +309,7 @@ class StaffScreen extends ConsumerWidget {
       ref.invalidate(farmInvitationsProvider);
       messenger.showSnackBar(SnackBar(content: Text(revoked)));
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 
@@ -346,12 +331,7 @@ class StaffScreen extends ConsumerWidget {
       if (!context.mounted) return;
       await _showInvitedDialog(context, created);
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
     }
   }
 
@@ -431,12 +411,7 @@ class StaffScreen extends ConsumerWidget {
                 return;
               }
               setDialogState(() => isSending = false);
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text(errorText(l10n, e)),
-                  backgroundColor: AppColors.error,
-                ),
-              );
+              messenger.showError(errorText(l10n, e));
             }
           }
 

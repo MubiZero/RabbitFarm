@@ -39,7 +39,17 @@
     font-weight: 700;
     letter-spacing: -0.02em;
   }
-  .brand img { width: 34px; height: 34px; }
+  /* Знак с подложкой акцента — тот же, что на иконке приложения и в шапке
+     сайта. Цвет линий тёмный: на светло-зелёной плашке он и читается. */
+  .brand img {
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+    box-sizing: border-box;
+    background: #7fb082;
+    color: #14231c;
+    border-radius: 9px;
+  }
   .dot { color: #7fb082; }
   h1 {
     margin-top: 40px;

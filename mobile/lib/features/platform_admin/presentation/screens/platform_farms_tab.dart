@@ -124,14 +124,11 @@ class _PlatformFarmsTabState extends ConsumerState<PlatformFarmsTab> {
         .read(platformFarmsProvider.notifier)
         .assignPlan(farm.id, choice.planId);
 
-    messenger.showSnackBar(
-      error == null
-          ? SnackBar(content: Text(assigned))
-          : SnackBar(
-              content: Text(errorText(l10n, error)),
-              backgroundColor: AppColors.error,
-            ),
-    );
+    if (error == null) {
+      messenger.showSnackBar(SnackBar(content: Text(assigned)));
+    } else {
+      messenger.showError(errorText(l10n, error));
+    }
   }
 }
 

@@ -64,6 +64,12 @@ Future<void> _bootstrap() async {
     // Только ошибки: performance-трейсинг на этом масштабе не нужен, а на
     // бесплатном тарифе Sentry именно он лимитирован.
     options.tracesSampleRate = 0;
+    // В браузере Sentry первым делом тянет свой JS с browser.sentry-cdn.com
+    // и ЖДЁТ его — то есть первый кадр приложения стоит в очереди за чужим
+    // CDN. Фермер с одной палкой связи смотрит на белый экран из-за сбора
+    // ошибок, которых ещё не случилось. Отчёты и без этого пакета уходят:
+    // их собирает сам Dart-SDK.
+    if (kIsWeb) options.autoInitializeNativeSdk = false;
   });
   installErrorHandlers();
 

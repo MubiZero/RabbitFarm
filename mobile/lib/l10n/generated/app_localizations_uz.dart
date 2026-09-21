@@ -173,7 +173,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get pinSaved => 'Kod saqlandi';
 
   @override
-  String get pinMismatch => 'Kodlar mos kelmadi — yana urinib koʻring';
+  String get pinMismatch => 'Kodlar mos kelmadi — kodni boshidan oʻylab toping';
 
   @override
   String get pinLockPrompt => 'Kodni kiriting';
@@ -329,6 +329,17 @@ class AppLocalizationsUz extends AppLocalizations {
   String get todayNeedsAttention => 'Diqqat talab qiladi';
 
   @override
+  String get todayEmptyFarmTitle => 'Ishlar xoʻjalik bilan birga paydo boʻladi';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Kataklardan boshlang — ularga quyonlar joylashadi, ilovada esa eslatadigan narsa paydo boʻladi';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Kataklar bor — birinchi quyonlarni kiriting, ishlar oʻzi paydo boʻladi';
+
+  @override
   String get todayAllClear => 'Hammasi nazoratda — shoshilinch narsa yoʻq';
 
   @override
@@ -441,6 +452,288 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get quickNeedsConnection => 'Aloqa kerak';
+
+  @override
+  String get errorCodeSessionExpired =>
+      'Kirish muddati tugadi — qaytadan kiring';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Xoʻjalikka kirish yopilgan — egasidan soʻrang';
+
+  @override
+  String get errorCodeRegistrationClosed => 'Hisobni xoʻjalik egasi beradi';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Bu boʻlim faqat platforma maʼmuri uchun';
+
+  @override
+  String get errorCodeOtpInvalid => 'Kod notoʻgʻri';
+
+  @override
+  String get errorCodeOtpExpired => 'Kod muddati tugadi — yangisini soʻrang';
+
+  @override
+  String get errorCodeOtpLocked => 'Urinishlar juda koʻp — yangi kod soʻrang';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Kodni juda tez-tez soʻrayapsiz — biroz kuting';
+
+  @override
+  String get errorCodeRateLimited => 'Soʻrovlar juda koʻp — biroz kuting';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Ketma-ket yuklashlar koʻp — biroz kuting';
+
+  @override
+  String get errorCodeContactRequired => 'Telefon yoki pochtani kiriting';
+
+  @override
+  String get errorCodeInvalidEmail => 'Pochta xato yozilgan';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Tojik raqami kerak: +992 va toʻqqiz raqam';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'SMS yuborish hozir ishlamayapti — pochta orqali kiring';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Xat yuborish hozir ishlamayapti — telefon orqali kiring';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Xoʻjalik toʻxtatilgan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodeFarmDeleted =>
+      'Xoʻjalik oʻchirilgan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Xoʻjalik faqat oʻqish uchun — yozuvlar hozir saqlanmaydi';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Mijoz nomidan kirish — faqat oʻqish, yozuvlarni oʻzgartirib boʻlmaydi';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Ilovaning yangi versiyasi kerak — uni yangilang';
+
+  @override
+  String get errorCodeUserNotFound => 'Foydalanuvchi topilmadi';
+
+  @override
+  String get errorCodeFarmNotFound => 'Xoʻjalik topilmadi';
+
+  @override
+  String get errorCodeBirthNotFound => 'Tugʻish topilmadi';
+
+  @override
+  String get errorCodeMotherNotFound => 'Ona topilmadi';
+
+  @override
+  String get errorCodeFatherNotFound => 'Ota topilmadi';
+
+  @override
+  String get errorCodeMaleNotFound => 'Erkak quyon topilmadi';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Urgʻochi quyon topilmadi';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Juftlash topilmadi';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Yemlash yozuvi topilmadi';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Davolash yozuvi topilmadi';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Emlash yozuvi topilmadi';
+
+  @override
+  String get errorCodeNoteNotFound => 'Eslatma topilmadi';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Pul yozuvi topilmadi';
+
+  @override
+  String get errorCodePaymentNotFound => 'Toʻlov topilmadi';
+
+  @override
+  String get errorCodePlanNotFound => 'Tarif topilmadi';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Murojaat topilmadi';
+
+  @override
+  String get errorCodePhotoNotFound => 'Surat topilmadi';
+
+  @override
+  String get errorCodeMemberNotFound => 'Ishchi topilmadi';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Taklifnoma topilmadi';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Ijrochi topilmadi';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Quyon oʻlgan yoki sotilgan — unga yangi yozuv kiritilmaydi';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'Bu tugʻish uchun bolalar kartalari ochilgan — belgini oʻsha yerda qoʻying';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Kartalar soni tirik tugʻilganlardan koʻp boʻlishi mumkin emas';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Bir tugʻishda birdan oʻttizgacha bola boʻladi';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Ajratish tugʻishdan oldin boʻlishi mumkin emas';
+
+  @override
+  String get errorCodeNotAMale => 'Tanlangan quyon erkak emas';
+
+  @override
+  String get errorCodeNotAFemale => 'Tanlangan quyon urgʻochi emas';
+
+  @override
+  String get errorCodeParentIdInvalid =>
+      'Erkak yoki urgʻochi notoʻgʻri tanlangan';
+
+  @override
+  String get errorCodeBreedingSelf => 'Quyonni oʻzi bilan juftlab boʻlmaydi';
+
+  @override
+  String get errorCodeFemaleNotAvailable =>
+      'Urgʻochi hozir juftlashga tayyor emas';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Ota topilmadi yoki u erkak emas';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Ona topilmadi yoki u urgʻochi emas';
+
+  @override
+  String get errorCodeCannotBeOwnParent => 'Quyon oʻziga ota-ona boʻla olmaydi';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Jinsni endi oʻzgartirib boʻlmaydi: quyonda nasl yoki juftlash bor';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Oʻchirib boʻlmaydi: quyonning nasli bor';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Oʻchirib boʻlmaydi: quyonda juftlash bor';
+
+  @override
+  String get errorCodeRabbitHasBirths =>
+      'Oʻchirib boʻlmaydi: urgʻochida tugʻish bor';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Oʻchirib boʻlmaydi: quyonda davolash yoki emlash bor';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Oʻchirib boʻlmaydi: quyon bilan pul bogʻliq';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Avval quyonlarni koʻchiring — katak boʻsh emas';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'Zotda quyon boʻlsa, uni oʻchirib boʻlmaydi';
+
+  @override
+  String get errorCodeBreedNameExists => 'Bunday nomli zot allaqachon bor';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Bu qatordagi tamgʻalar band — boshqasidan boshlang';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Yemni oʻchirib boʻlmaydi: u bilan yemlash bor';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Ombor faqat kirim yoki chiqim bilan oʻzgaradi';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'Bir vaqtda birdan yuztagacha quyon kiritiladi';
+
+  @override
+  String get errorCodePeriodRequired => 'Yil va oyni tanlang';
+
+  @override
+  String get errorCodeFileMissing => 'Fayl tanlanmagan';
+
+  @override
+  String get errorCodeFileTooLarge => 'Fayl juda katta';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Fayl yuklanmadi — yana urinib koʻring';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Bogʻliq yozuv topilmadi — ekranni yangilang';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Xoʻjalikka tarif tayinlanmagan — qoʻllab-quvvatlashga yozing';
+
+  @override
+  String get errorCodePlanFree => 'Joriy tarif bepul — toʻlash shart emas';
+
+  @override
+  String get errorCodePlanNameExists => 'Bunday nomli tarif allaqachon bor';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Sukut tarifi boshqasiga tayinlangan — belgini oʻshandan oling';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Tarif oʻchirilgan — uni yoqing yoki boshqasini tanlang';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Qabul qiluvchilar topilmadi — eʼlon kimga yoʻnaltirilganini tekshiring';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'Xoʻjalikning egasi yoʻq — mijoz nomidan kirib boʻlmaydi';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Xoʻjalik oʻchirilmagan — tiklaydigan narsa yoʻq';
+
+  @override
+  String get errorCodePlatformAdminAccount => 'Bu platforma maʼmurining hisobi';
 
   @override
   String get errorCodeRabbitNotFound => 'Quyon topilmadi';
@@ -2528,7 +2821,23 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsAppearance => 'Tashqi koʻrinish';
 
   @override
-  String get settingsTheme => 'Mavzu';
+  String get onbLookTitle => 'Ekran qanday koʻrinsin?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Buni istalgan vaqtda sozlamalarda oʻzgartirish mumkin';
+
+  @override
+  String get onbLookLightHint => 'Quyoshda oʻqiladi — qogʻoz varagʻiday';
+
+  @override
+  String get onbLookDarkHint => 'Kechqurun molxonada koʻzni qamashtirmaydi';
+
+  @override
+  String get onbLookSystemHint => 'Telefon bilan birga oʻzgaradi';
+
+  @override
+  String get settingsTheme => 'Yorugʻ yoki qorongʻi';
 
   @override
   String get settingsAccent => 'Urgʻu rangi';
@@ -2628,7 +2937,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsThemeLight => 'Yorugʻ';
 
   @override
-  String get settingsThemeSystem => 'Tizimdagidek';
+  String get settingsThemeSystem => 'Telefondagidek';
 
   @override
   String get settingsThemeDark => 'Qorongʻi';
@@ -2747,6 +3056,15 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get registerFailed => 'Roʻyxatdan oʻtib boʻlmadi';
+
+  @override
+  String get registerContactLabel => 'Telefon yoki pochta';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 yoki mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Telefon yoki pochtani kiriting';
 
   @override
   String get registerConsentPrefix => 'Men ';
@@ -3410,6 +3728,16 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get rabbitFormBreedsFailed => 'Zotlarni yuklab boʻlmadi';
+
+  @override
+  String get rabbitFormBreedsEmpty => 'Hozircha zot yoʻq';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Quyonni yozish uchun zot kerak. Oʻzingizda bor zotni qoʻshing.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Zot qoʻshish';
 
   @override
   String get rabbitFormColor => 'Rangi';
@@ -4596,7 +4924,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbWelcomeStart => 'Boshlash';
 
   @override
-  String get onbWelcomeHaveAccount => 'Menda xoʻjalik bor';
+  String get onbWelcomeHaveAccount => 'Kirish';
 
   @override
   String get onbHerdTitle => 'Nechta quyoningiz bor?';
@@ -4651,6 +4979,25 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbFocusNext => 'Keyingisi';
 
   @override
+  String get onbCrewPair => 'Men va bitta yordamchi';
+
+  @override
+  String get onbCrewPairHint => 'Ikki kishi: men yoʻqda oʻrnimni bosadi';
+
+  @override
+  String get onbCrewTeam => 'Kichik jamoa';
+
+  @override
+  String get onbCrewTeamHint => 'Uch-besh kishi, har birining oʻz huquqi';
+
+  @override
+  String get onbCrewBig => 'Besh kishidan koʻp';
+
+  @override
+  String get onbCrewBigHint =>
+      'Smenalar va kim nima qilgani hisobi bilan xoʻjalik';
+
+  @override
   String get onbCrewTitle => 'Ilovada kim ishlaydi?';
 
   @override
@@ -4660,7 +5007,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbCrewAlone => 'Faqat men';
 
   @override
-  String get onbCrewAloneHint => 'Na taklif, na ruxsat sozlamalari kerak';
+  String get onbCrewAloneHint => 'Na taklifnoma, na kirish sozlamalari';
 
   @override
   String get onbCrewHelpers => 'Men va yordamchilarim';
@@ -4685,11 +5032,88 @@ class AppLocalizationsUz extends AppLocalizations {
   String get onbSkip => 'Oʻtkazib yuborish';
 
   @override
+  String get onbPlanPick =>
+      'Boshqasini ham tanlash mumkin — xoʻjalik baribir bepulda ochiladi';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'Tanishuvda siz «$name» tarifini koʻrib chiqqan edingiz. Unga oʻtishda qoʻllab-quvvatlash yordam beradi.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Sizga bepuli yetadi';
+
+  @override
+  String get onbPlanPaidTitle => 'Xoʻjaligingizga mos keladi';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Javoblaringizga qarab: nechta quyon va kim ishlaydi';
+
+  @override
+  String get onbPlanFree => 'Bepul';
+
+  @override
+  String get onbPlanPerMonth => 'oyiga';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tagacha quyon',
+      one: '$count tagacha quyon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Quyonlar cheklovsiz';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ilovada $count tagacha kishi',
+      one: 'Ilovada bir kishi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Ishchilar cheklovsiz';
+
+  @override
+  String get onbPlanStartFree =>
+      'Boshlash bepul: toʻlov xoʻjalik bepul tarifdan oshganda kerak boʻladi.';
+
+  @override
+  String get onbPlanOthers => 'Boshqa tariflar';
+
+  @override
+  String get onbPlanContinue => 'Xoʻjalik ochish';
+
+  @override
+  String get onbPlanRecommended => 'Sizning tarifingiz';
+
+  @override
+  String get onbCountrySms => 'Kirish kodi SMS orqali keladi';
+
+  @override
+  String get onbCountryEmail => 'Kirish kodi pochtaga keladi';
+
+  @override
   String get onbCountryTitle => 'Xoʻjaligingiz qayerda?';
 
   @override
   String get onbCountrySubtitle =>
       'Valyuta, vaqt va kirish usuli shunga bogʻliq';
+
+  @override
+  String countryLine(String country) {
+    return 'Davlat: $country';
+  }
 
   @override
   String get countryTJ => 'Tojikiston';
@@ -4705,9 +5129,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get countryRU => 'Rossiya';
-
-  @override
-  String get countryAF => 'Afgʻoniston';
 
   @override
   String get loginSmsUnavailable =>

@@ -39,26 +39,30 @@ const errorHandler = (err, req, res, next) => {
 
   // Sequelize foreign key constraint error
   if (err.name === 'SequelizeForeignKeyConstraintError') {
-    return ApiResponse.badRequest(res, 'Ссылка на связанную запись недействительна');
+    return ApiResponse.badRequest(res, 'Ссылка на связанную запись недействительна', 'RELATED_RECORD_INVALID');
   }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
-    return ApiResponse.unauthorized(res, 'Недействительный токен');
+    return ApiResponse.unauthorized(res, 'Недействительный токен', 'TOKEN_INVALID');
   }
 
   if (err.name === 'TokenExpiredError') {
-    return ApiResponse.unauthorized(res, 'Срок действия токена истёк');
+    return ApiResponse.unauthorized(res, 'Срок действия токена истёк', 'TOKEN_EXPIRED');
   }
 
   // Multer errors (file upload)
   if (err.name === 'MulterError') {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return ApiResponse.badRequest(res, 'Файл слишком большой');
+      return ApiResponse.badRequest(res, 'Файл слишком большой', 'FILE_TOO_LARGE');
     }
     // Текст самого multer английский и технический, поэтому наружу идёт либо
     // наше объяснение (userMessage), либо общая фраза; подробности — в логе.
-    return ApiResponse.badRequest(res, err.userMessage || 'Не удалось загрузить файл');
+    return ApiResponse.badRequest(
+      res,
+      err.userMessage || 'Не удалось загрузить файл',
+      'FILE_UPLOAD_FAILED'
+    );
   }
 
   // Custom application errors
@@ -76,7 +80,7 @@ const errorHandler = (err, req, res, next) => {
  * 404 Not Found handler
  */
 const notFoundHandler = (req, res, next) => {
-  ApiResponse.notFound(res, `Маршрут ${req.originalUrl} не найден`);
+  ApiResponse.notFound(res, `Маршрут ${req.originalUrl} не найден`, 'ROUTE_NOT_FOUND');
 };
 
 module.exports = {

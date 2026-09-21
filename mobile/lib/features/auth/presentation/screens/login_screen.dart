@@ -11,9 +11,11 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/router/deep_links.dart';
 import '../../../../core/utils/phone_utils.dart';
 import '../../../../core/widgets/app_brand_mark.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pin_provider.dart';
+import '../../../../core/countries/country_picker.dart';
 import '../../../../core/countries/country_provider.dart';
 
 /// Вход по коду — единственный способ попасть в аккаунт: телефон основной
@@ -125,12 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showError(Object error) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorText(context.l10n, error)),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    ScaffoldMessenger.of(context).showError(errorText(context.l10n, error));
   }
 
   Future<void> _requestCode() async {
@@ -232,7 +229,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          // Кнопка возврата — только когда есть куда возвращаться: со
+          // знакомства вход открывается поверх, и человек, нажавший «Войти»
+          // по ошибке, должен уйти обратно, а не оказаться запертым.
           automaticallyImplyLeading: false,
+          leading: Navigator.of(context).canPop()
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              : null,
           backgroundColor: Colors.transparent,
           elevation: 0,
           actions: const [LanguagePickerButton()],
@@ -290,6 +296,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Страна решает, как сюда вообще входят, а спрашивают её в
+          // знакомстве — которое можно пропустить или пройти невнимательно.
+          // Без этой строки человек с узбекским номером упирался в «неверный
+          // номер» и поменять ничего не мог.
+          const CountryPickerButton(),
+          const SizedBox(height: AppSpacing.md),
           // Телефон первым: код в SMS доходит и без интернета на телефоне,
           // почта нужна тем, у кого номер не таджикский или SMS не приходят.
           //
@@ -486,10 +498,15 @@ class _ButtonSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 20,
       width: 20,
-      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+      // Тем же цветом, что и надпись на кнопке: белый кружок на акценте
+      // давал 2,9 при норме 3 и на светлой теме почти пропадал.
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: context.colors.onPrimary,
+      ),
     );
   }
 }

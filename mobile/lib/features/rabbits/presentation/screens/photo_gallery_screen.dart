@@ -265,12 +265,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
 
     final state = ref.read(galleryNotifierProvider);
     if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, state.error!)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, state.error!));
       return;
     }
 
@@ -330,12 +325,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
 
     final state = container.read(galleryNotifierProvider);
     if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, state.error!)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, state.error!));
     }
   }
 }

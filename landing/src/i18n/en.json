@@ -10,15 +10,19 @@
     "modules": "What is inside",
     "field": "In the shed",
     "price": "What it costs",
-    "open": "Open the app"
+    "menu": "Menu",
+    "lang_short": "EN",
+    "theme": "Light or dark",
+    "top": "Back to top",
+    "click": "How it records"
   },
   "hero": {
-    "title_top": "Rabbit records",
-    "title_accent": "you keep while you work",
+    "title_before": "Rabbit records ",
+    "title_click": "in a couple of clicks",
+    "title_after": "",
     "lead": "Log births, feed and costs right at the cages. The app counts the kits, the feed left and the profit for you.",
     "cta_primary": "Open the app",
     "cta_secondary": "Download for Android",
-    "cta_note_web": "Opens in the browser, nothing to install.",
     "shot_alt": "Home screen: herd, today's tasks, feed left in stock"
   },
   "click": {
@@ -35,6 +39,21 @@
         "label": "Kits were born",
         "caption": "You enter the doe and how many were born alive. The birth lands on her card, and the kits join the herd after weaning.",
         "alt": "Birth record screen: mother, date, number of kits"
+      },
+      {
+        "label": "Weighed one",
+        "caption": "Enter the weight — the app charts how the rabbit grows and compares it with last time.",
+        "alt": "Weighing screen: weight field and growth chart"
+      },
+      {
+        "label": "Vaccinated",
+        "caption": "Mark the shot — the next one lands in the calendar by itself, with a reminder ahead of time.",
+        "alt": "Vaccination screen: drug, date and next shot"
+      },
+      {
+        "label": "Sold one",
+        "caption": "Record the sale — the rabbit leaves the herd and the money joins this month’s income.",
+        "alt": "Sale screen: buyer, weight and amount"
       }
     ]
   },
@@ -84,18 +103,13 @@
       },
       {
         "name": "No passwords at all",
-        "text": "You sign in with a code from an SMS, and the phone itself is locked by a four-digit code."
+        "text": "You sign in with a one-time code: by SMS in Tajikistan, by email everywhere else. The phone itself is locked by a four-digit code."
       },
       {
         "name": "Four languages",
         "text": "Russian, Tajik, Uzbek and English. Every worker picks their own, the farm stays shared."
       }
     ]
-  },
-  "data": {
-    "title": "Your farm data stays yours",
-    "text": "The source code is open, so any farm can run the system on its own server. Records export to a spreadsheet and reports print on an ordinary printer.",
-    "link": "See the code on GitHub"
   },
   "price": {
     "title": "What it costs",
@@ -108,15 +122,19 @@
   },
   "cta": {
     "title": "Try it on your own farm",
-    "lead": "A phone number, a code from an SMS, and you can enter your first rabbits. It takes a couple of minutes.",
+    "lead": "A phone number or an email, a one-time code, and you can enter your first rabbits. It takes a couple of minutes.",
     "primary": "Open the app",
     "secondary": "Download for Android",
     "stores_soon": "The app will reach the App Store and Google Play later."
   },
   "footer": {
-    "lang_label": "Language",
     "privacy": "Privacy policy",
     "github": "Source code",
-    "rights": "Rabbit farm management"
+    "rights": "Rabbit farm management",
+    "sections": "Sections",
+    "app": "The app",
+    "docs": "Documents",
+    "source_note": "The code is open: a farm can host the system on its own server.",
+    "lang_aria": "Page language"
   }
 }

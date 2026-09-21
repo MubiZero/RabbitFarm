@@ -9,6 +9,7 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/printing/print_html.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../health/presentation/widgets/health_sheet_button.dart'
     show SheetPrinter, SheetSharer;
 import '../providers/transactions_provider.dart';
@@ -210,12 +211,7 @@ class _FinanceSheetButtonState extends ConsumerState<FinanceSheetButton> {
         );
       }
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.commonActionFailed(errorText(l10n, e))),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(l10n.commonActionFailed(errorText(l10n, e)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

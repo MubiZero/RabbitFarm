@@ -723,12 +723,7 @@ class RabbitDetailScreen extends ConsumerWidget {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, error));
       await list.refresh();
     }
   }

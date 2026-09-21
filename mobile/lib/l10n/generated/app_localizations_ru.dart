@@ -171,7 +171,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pinSaved => 'Код сохранён';
 
   @override
-  String get pinMismatch => 'Коды не совпали — попробуйте ещё раз';
+  String get pinMismatch => 'Коды не совпали — придумайте код заново';
 
   @override
   String get pinLockPrompt => 'Введите код';
@@ -327,6 +327,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayNeedsAttention => 'Требует внимания';
 
   @override
+  String get todayEmptyFarmTitle => 'Дела появятся вместе с фермой';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Начните с клеток — в них поселятся кролики, и приложению будет о чём напоминать';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Клетки есть — заведите первых кроликов, и дела появятся сами';
+
+  @override
   String get todayAllClear => 'Всё под контролем — срочного нет';
 
   @override
@@ -439,6 +450,288 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get quickNeedsConnection => 'Нужна связь';
+
+  @override
+  String get errorCodeSessionExpired => 'Вход устарел — войдите заново';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Доступ к хозяйству закрыт — спросите владельца';
+
+  @override
+  String get errorCodeRegistrationClosed =>
+      'Учётную запись выдаёт владелец хозяйства';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Раздел только для администратора платформы';
+
+  @override
+  String get errorCodeOtpInvalid => 'Неверный код';
+
+  @override
+  String get errorCodeOtpExpired => 'Срок кода истёк — запросите новый';
+
+  @override
+  String get errorCodeOtpLocked =>
+      'Слишком много попыток — запросите новый код';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Код запрашивают слишком часто — подождите немного';
+
+  @override
+  String get errorCodeRateLimited =>
+      'Слишком много запросов — подождите немного';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Слишком много загрузок подряд — подождите немного';
+
+  @override
+  String get errorCodeContactRequired => 'Укажите телефон или почту';
+
+  @override
+  String get errorCodeInvalidEmail => 'Почта написана с ошибкой';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Нужен таджикский номер: +992 и девять цифр';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'Отправка СМС сейчас не работает — войдите по почте';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Отправка писем сейчас не работает — войдите по телефону';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Хозяйство приостановлено — напишите в поддержку';
+
+  @override
+  String get errorCodeFarmDeleted => 'Хозяйство удалено — напишите в поддержку';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Хозяйство только для чтения — записи сейчас не сохраняются';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Вход под клиентом — только чтение, менять записи нельзя';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Нужна свежая версия приложения — обновите его';
+
+  @override
+  String get errorCodeUserNotFound => 'Человек не найден';
+
+  @override
+  String get errorCodeFarmNotFound => 'Хозяйство не найдено';
+
+  @override
+  String get errorCodeBirthNotFound => 'Окрол не найден';
+
+  @override
+  String get errorCodeMotherNotFound => 'Мать не найдена';
+
+  @override
+  String get errorCodeFatherNotFound => 'Отец не найден';
+
+  @override
+  String get errorCodeMaleNotFound => 'Самец не найден';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Самка не найдена';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Случка не найдена';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Запись о кормлении не найдена';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Запись о лечении не найдена';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Запись о прививке не найдена';
+
+  @override
+  String get errorCodeNoteNotFound => 'Заметка не найдена';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Запись о деньгах не найдена';
+
+  @override
+  String get errorCodePaymentNotFound => 'Платёж не найден';
+
+  @override
+  String get errorCodePlanNotFound => 'Тариф не найден';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Обращение не найдено';
+
+  @override
+  String get errorCodePhotoNotFound => 'Фотография не найдена';
+
+  @override
+  String get errorCodeMemberNotFound => 'Работник не найден';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Приглашение не найдено';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Исполнитель не найден';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Кролик пал или продан — записи по нему больше не заводят';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'По этому окролу заведены карточки крольчат — отмечайте на них';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Карточек не может быть больше, чем родилось живыми';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Крольчат в окроле бывает от одного до тридцати';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Отсадка не может быть раньше окрола';
+
+  @override
+  String get errorCodeNotAMale => 'Выбран не самец';
+
+  @override
+  String get errorCodeNotAFemale => 'Выбрана не самка';
+
+  @override
+  String get errorCodeParentIdInvalid => 'Самец или самка выбраны неверно';
+
+  @override
+  String get errorCodeBreedingSelf => 'Кролика нельзя случить с самим собой';
+
+  @override
+  String get errorCodeFemaleNotAvailable => 'Самка сейчас не готова к случке';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Отец не найден или это не самец';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Мать не найдена или это не самка';
+
+  @override
+  String get errorCodeCannotBeOwnParent =>
+      'Кролик не может быть родителем самому себе';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Пол уже не поменять: у кролика есть потомство или случки';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Нельзя удалить: у кролика есть потомство';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Нельзя удалить: у кролика есть случки';
+
+  @override
+  String get errorCodeRabbitHasBirths => 'Нельзя удалить: у самки есть окролы';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Нельзя удалить: у кролика есть лечение или прививки';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Нельзя удалить: с кроликом связаны деньги';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Сначала переселите кроликов — клетка не пуста';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'Нельзя удалить породу, пока в ней есть кролики';
+
+  @override
+  String get errorCodeBreedNameExists => 'Порода с таким названием уже есть';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Клейма из этого ряда заняты — начните с другого';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Нельзя удалить корм: по нему есть кормления';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Склад меняют только приходом или расходом';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'За раз заводят от одного до ста кроликов';
+
+  @override
+  String get errorCodePeriodRequired => 'Выберите год и месяц';
+
+  @override
+  String get errorCodeFileMissing => 'Файл не выбран';
+
+  @override
+  String get errorCodeFileTooLarge => 'Файл слишком большой';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Файл не загрузился — попробуйте ещё раз';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Связанная запись не найдена — обновите экран';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Хозяйству не назначен тариф — напишите в поддержку';
+
+  @override
+  String get errorCodePlanFree => 'Текущий тариф бесплатный — платить не нужно';
+
+  @override
+  String get errorCodePlanNameExists => 'Тариф с таким названием уже есть';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Тариф по умолчанию уже назначен другому — снимите отметку с него';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Тариф выключен — включите его или выберите другой';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Получателей не нашлось — проверьте, кому адресовано объявление';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'У хозяйства нет владельца — войти под клиентом некем';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Хозяйство не было удалено — восстанавливать нечего';
+
+  @override
+  String get errorCodePlatformAdminAccount =>
+      'Это учётная запись администратора платформы';
 
   @override
   String get errorCodeRabbitNotFound => 'Кролик не найден';
@@ -2554,7 +2847,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAppearance => 'Внешний вид';
 
   @override
-  String get settingsTheme => 'Тема';
+  String get onbLookTitle => 'Как показывать экран?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Это можно поменять в любой момент в настройках';
+
+  @override
+  String get onbLookLightHint => 'Видно на солнце — как лист бумаги';
+
+  @override
+  String get onbLookDarkHint => 'Не слепит вечером в сарае';
+
+  @override
+  String get onbLookSystemHint => 'Меняется вместе с телефоном';
+
+  @override
+  String get settingsTheme => 'Светлая или тёмная';
 
   @override
   String get settingsAccent => 'Цвет акцента';
@@ -2655,7 +2964,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeLight => 'Светлая';
 
   @override
-  String get settingsThemeSystem => 'Как в системе';
+  String get settingsThemeSystem => 'Как в телефоне';
 
   @override
   String get settingsThemeDark => 'Тёмная';
@@ -2774,6 +3083,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get registerFailed => 'Не удалось зарегистрироваться';
+
+  @override
+  String get registerContactLabel => 'Телефон или почта';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 или mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Впишите телефон или почту';
 
   @override
   String get registerConsentPrefix => 'Я принимаю ';
@@ -3441,6 +3759,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get rabbitFormBreedsFailed => 'Не удалось загрузить породы';
+
+  @override
+  String get rabbitFormBreedsEmpty => 'Пород пока нет';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Порода нужна, чтобы завести кролика. Заведите ту, что держите.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Завести породу';
 
   @override
   String get rabbitFormColor => 'Окрас';
@@ -4656,7 +4984,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onbWelcomeStart => 'Начать';
 
   @override
-  String get onbWelcomeHaveAccount => 'У меня уже есть ферма';
+  String get onbWelcomeHaveAccount => 'Войти';
 
   @override
   String get onbHerdTitle => 'Сколько у вас кроликов?';
@@ -4711,6 +5039,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onbFocusNext => 'Дальше';
 
   @override
+  String get onbCrewPair => 'Я и один помощник';
+
+  @override
+  String get onbCrewPairHint => 'Вдвоём: кто-то подменяет, когда меня нет';
+
+  @override
+  String get onbCrewTeam => 'Небольшая команда';
+
+  @override
+  String get onbCrewTeamHint => 'Три-пять человек, у каждого свои права';
+
+  @override
+  String get onbCrewBig => 'Больше пяти человек';
+
+  @override
+  String get onbCrewBigHint => 'Хозяйство со сменами и учётом, кто что сделал';
+
+  @override
   String get onbCrewTitle => 'Кто будет работать в приложении?';
 
   @override
@@ -4745,11 +5091,92 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onbSkip => 'Пропустить';
 
   @override
+  String get onbPlanPick =>
+      'Можно выбрать другой — ферма всё равно заводится на бесплатном';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'При знакомстве вы присматривали тариф «$name». Перейти на него поможет поддержка.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Вам хватит бесплатного';
+
+  @override
+  String get onbPlanPaidTitle => 'Под ваше хозяйство подходит';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Считали по вашим ответам: сколько кроликов и кто работает';
+
+  @override
+  String get onbPlanFree => 'Бесплатно';
+
+  @override
+  String get onbPlanPerMonth => 'в месяц';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'До $count кроликов',
+      many: 'До $count кроликов',
+      few: 'До $count кроликов',
+      one: 'До $count кролика',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Кролики без ограничения';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'До $count человек в приложении',
+      many: 'До $count человек в приложении',
+      few: 'До $count человек в приложении',
+      one: 'Один человек в приложении',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Работники без ограничения';
+
+  @override
+  String get onbPlanStartFree =>
+      'Начать можно бесплатно: платить — когда хозяйство перерастёт бесплатный тариф.';
+
+  @override
+  String get onbPlanOthers => 'Другие тарифы';
+
+  @override
+  String get onbPlanContinue => 'Завести ферму';
+
+  @override
+  String get onbPlanRecommended => 'Ваш тариф';
+
+  @override
+  String get onbCountrySms => 'Код для входа придёт в SMS';
+
+  @override
+  String get onbCountryEmail => 'Код для входа придёт на почту';
+
+  @override
   String get onbCountryTitle => 'Где ваше хозяйство?';
 
   @override
   String get onbCountrySubtitle =>
       'От этого зависят валюта, время и способ входа';
+
+  @override
+  String countryLine(String country) {
+    return 'Страна: $country';
+  }
 
   @override
   String get countryTJ => 'Таджикистан';
@@ -4765,9 +5192,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get countryRU => 'Россия';
-
-  @override
-  String get countryAF => 'Афганистан';
 
   @override
   String get loginSmsUnavailable =>

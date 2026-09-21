@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../rabbits/data/models/breeding_model.dart';
 import '../providers/breeding_provider.dart';
 
@@ -37,24 +38,23 @@ Future<bool> recordPalpation(
     'is_pregnant': pregnant,
   });
 
-  messenger.showSnackBar(
-    ok
-        ? SnackBar(
-            content: Text(
-              pregnant
-                  ? l10n.cyclePalpationSavedPregnant
-                  : l10n.cyclePalpationSavedEmpty,
-            ),
-          )
-        : SnackBar(
-            content: Text(
-              l10n.commonActionFailed(
-                errorText(l10n, ref.read(breedingListProvider).error),
-              ),
-            ),
-            backgroundColor: AppColors.error,
-          ),
-  );
+  if (ok) {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          pregnant
+              ? l10n.cyclePalpationSavedPregnant
+              : l10n.cyclePalpationSavedEmpty,
+        ),
+      ),
+    );
+  } else {
+    messenger.showError(
+      l10n.commonActionFailed(
+        errorText(l10n, ref.read(breedingListProvider).error),
+      ),
+    );
+  }
 
   return ok;
 }

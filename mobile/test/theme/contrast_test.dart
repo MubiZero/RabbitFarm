@@ -1,9 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/core/theme/app_theme.dart';
+
+import '../support/contrast.dart';
 
 /// Читаемость подписей — считаемая величина, а не дело вкуса.
 ///
@@ -15,34 +15,6 @@ import 'package:mobile/core/theme/app_theme.dart';
 /// Тест сторожит не «красиво», а порог WCAG AA для обычного текста — 4.5:1.
 /// Палитру правят по одному цвету за раз, и глазами такое не ловится.
 const _minContrast = 4.5;
-
-double _relativeLuminance(Color color) {
-  double channel(double value) {
-    final c = value;
-    return c <= 0.03928 ? c / 12.92 : math.pow((c + 0.055) / 1.055, 2.4) as double;
-  }
-
-  return 0.2126 * channel(color.r) +
-      0.7152 * channel(color.g) +
-      0.0722 * channel(color.b);
-}
-
-double contrastRatio(Color a, Color b) {
-  final la = _relativeLuminance(a);
-  final lb = _relativeLuminance(b);
-  final lighter = math.max(la, lb);
-  final darker = math.min(la, lb);
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
-/// Цвет поверх подложки: бейдж рисуется прозрачностью, и считать контраст
-/// нужно с тем, что получилось, а не с самим цветом.
-Color _over(Color foreground, Color background, double alpha) => Color.fromARGB(
-      255,
-      ((foreground.r * alpha + background.r * (1 - alpha)) * 255).round(),
-      ((foreground.g * alpha + background.g * (1 - alpha)) * 255).round(),
-      ((foreground.b * alpha + background.b * (1 - alpha)) * 255).round(),
-    );
 
 void main() {
   group('надпись на сплошной заливке акцентом', () {
@@ -95,7 +67,7 @@ void main() {
     for (final surface in surfaces.entries) {
       for (final color in colors.entries) {
         test('«${color.key}» читается в теме ${surface.key.name}', () {
-          final background = _over(color.value, surface.value, badgeAlpha);
+          final background = colorOver(color.value, surface.value, badgeAlpha);
           final text = AppColors.readableOn(color.value, surface.key);
           final ratio = contrastRatio(text, background);
 

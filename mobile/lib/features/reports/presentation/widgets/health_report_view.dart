@@ -60,24 +60,19 @@ class HealthReportView extends ConsumerWidget {
         AppSpacing.xxl,
       ),
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: StatTile(
-                icon: Icons.vaccines_outlined,
-                label: context.l10n.reportsVaccinations,
-                value: '$vaccinationsTotal',
-                accent: AppColors.domainHealth,
-              ),
+        StatTileRow(
+          tiles: [
+            StatTile(
+              icon: Icons.vaccines_outlined,
+              label: context.l10n.reportsVaccinations,
+              value: '$vaccinationsTotal',
+              accent: AppColors.domainHealth,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: Icons.medical_services_outlined,
-                label: context.l10n.reportsMedicalRecords,
-                value: '$recordsTotal',
-                accent: AppColors.warning,
-              ),
+            StatTile(
+              icon: Icons.medical_services_outlined,
+              label: context.l10n.reportsMedicalRecords,
+              value: '$recordsTotal',
+              accent: AppColors.warning,
             ),
           ],
         ),

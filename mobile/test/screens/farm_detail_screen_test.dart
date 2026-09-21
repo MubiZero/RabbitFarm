@@ -663,8 +663,10 @@ void main() {
       await _settle(tester);
 
       expect(repository.impersonateCalls, ['проверка']);
+      // Слова берутся по коду отказа, а не из русского текста сервера:
+      // иначе узбекский экран отвечал бы по-русски.
       expect(
-        find.text('У фермы нет владельца — войти под клиентом некем'),
+        find.text('У хозяйства нет владельца — войти под клиентом некем'),
         findsOneWidget,
       );
       expect(find.byType(FarmDetailScreen), findsOneWidget);

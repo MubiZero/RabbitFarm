@@ -8,8 +8,10 @@ import '../../../../core/utils/phone_utils.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/api/api_error.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/countries/country_picker.dart';
 import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/error_text.dart';
 
@@ -29,14 +31,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// Телефон основной, почта запасная — те же два способа, что и на входе.
   /// Что выбрал человек. Доступен ли этот способ вообще — решает страна:
   /// туда, куда СМС не доходит, телефон не предлагается вовсе.
-  bool _byPhoneChoice = true;
 
   /// Способ, которым регистрация пойдёт на самом деле.
   ///
   /// Туда, куда код по СМС не доходит, телефон не предлагается вовсе —
   /// иначе человек введёт номер и будет ждать сообщения, которого не будет.
-  bool get _byPhone => _byPhoneChoice && ref.read(smsAvailableProvider);
+  /// Человек написал почту, если в строке есть «собака». Всё остальное —
+  /// телефон. Отдельный переключатель «Телефон / Почта» это решение только
+  /// удваивал: сначала выбери способ, потом впиши то же самое.
+  bool get _byPhone {
+    if (!ref.read(smsAvailableProvider)) return false;
+    return !_contactController.text.contains('@');
+  }
   bool _acceptedPrivacy = false;
+
+  /// Кнопку нажали, а согласия нет. Держим отдельно от самого согласия:
+  /// молчаливая кнопка — то, из-за чего человек уходит, решив, что
+  /// приложение сломано.
+  bool _consentMissed = false;
   late final TapGestureRecognizer _privacyLinkRecognizer;
 
   @override
@@ -61,12 +73,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _handleRegister() async {
     final l10n = context.l10n;
     if (!_acceptedPrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.registerConsentRequired),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      setState(() => _consentMissed = true);
       return;
     }
     if (_formKey.currentState!.validate()) {
@@ -98,28 +105,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
-          String message = errorText(l10n, e);
-          bool userExists = false;
+          // Слова подбирает `errorText` по коду отказа: русский текст
+          // сервера тут выигрывал у перевода, и узбекский экран отвечал
+          // «Пользователь с такой почтой уже существует».
+          final message = errorText(l10n, e);
+          final userExists = e is DioException &&
+              serverErrorCode(e) == 'USER_EXISTS';
 
-          if (e is DioException) {
-            message =
-                serverMessage(e) ?? e.message ?? context.l10n.registerFailed;
-            userExists = serverErrorCode(e) == 'USER_EXISTS';
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: AppColors.error,
-              duration: Duration(seconds: userExists ? 6 : 4),
-              action: userExists
-                  ? SnackBarAction(
-                      label: context.l10n.loginSubmit,
-                      textColor: Colors.white,
-                      onPressed: () => context.go('/login'),
-                    )
-                  : null,
-            ),
+          ScaffoldMessenger.of(context).showError(
+            message,
+            duration: Duration(seconds: userExists ? 6 : 4),
+            action: userExists
+                ? SnackBarAction(
+                    label: context.l10n.loginSubmit,
+                    textColor: Colors.white,
+                    onPressed: () => context.go('/login'),
+                  )
+                : null,
           );
         }
       }
@@ -129,6 +131,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final smsHere = ref.watch(smsAvailableProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -148,63 +151,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icon
-                Icon(
-                  Icons.person_add,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                // Privacy policy consent
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: _acceptedPrivacy,
-                      onChanged: (value) =>
-                          setState(() => _acceptedPrivacy = value ?? false),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: RichText(
-                          text: TextSpan(
-                            style: AppTypography.bodyMd
-                                .copyWith(color: context.colors.onSurface),
-                            children: [
-                              TextSpan(
-                                  text: context.l10n.registerConsentPrefix),
-                              TextSpan(
-                                text: context.l10n.registerConsentLink,
-                                recognizer: _privacyLinkRecognizer,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Title
-                Text(
-                  context.l10n.registerTitle,
-                  style: AppTypography.displayMd
-                      .copyWith(color: context.colors.onSurface),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.sm),
+                // Ни значка, ни заголовка: название экрана уже стоит в
+                // шапке, а повторять его крупно посреди формы — значит
+                // отодвинуть первое поле на пол-экрана вниз.
                 Text(
                   context.l10n.registerSubtitle,
                   style: AppTypography.bodyMd
                       .copyWith(color: context.colors.onSurfaceVariant),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
 
                 // Farm name field (optional)
                 TextFormField(
@@ -243,69 +198,54 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
+                // Страна уезжает на сервер вместе с регистрацией и решает
+                // валюту хозяйства и способ входа, а спрашивают её в
+                // знакомстве — которое можно и пропустить. Исправить ответ
+                // должно быть можно там, где он применяется.
+                const CountryPickerButton(),
+                const SizedBox(height: 16),
+
                 // Контакт: на него придёт код для входа — пароля в сервисе
                 // нет, и другого способа попасть в аккаунт тоже.
                 //
-                // Выбор способа показывается только там, куда СМС доходит.
-                // В остальных странах предлагать телефон нечестно: человек
-                // введёт номер и будет ждать код, которого не будет, —
-                // поэтому вместо переключателя стоит объяснение.
-                if (!ref.watch(smsAvailableProvider))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.alternate_email,
-                          size: 18,
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            context.l10n.loginSmsUnavailable,
-                            style: AppTypography.labelSm.copyWith(
-                              color: context.colors.onSurfaceVariant,
-                            ),
+                // Там, куда СМС не доходит, телефон не предлагаем вовсе:
+                // человек введёт номер и будет ждать код, которого не будет.
+                if (!smsHere) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.alternate_email,
+                        size: 18,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.l10n.loginSmsUnavailable,
+                          style: AppTypography.labelSm.copyWith(
+                            color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                else
-                  SegmentedButton<bool>(
-                    segments: [
-                      ButtonSegment(
-                        value: true,
-                        icon: const Icon(Icons.phone_outlined, size: 18),
-                        label: Text(context.l10n.loginByPhone),
-                      ),
-                      ButtonSegment(
-                        value: false,
-                        icon: const Icon(Icons.alternate_email, size: 18),
-                        label: Text(context.l10n.loginByEmail),
                       ),
                     ],
-                    selected: {_byPhone},
-                    onSelectionChanged: (value) => setState(() {
-                      _byPhoneChoice = value.first;
-                      _contactController.clear();
-                    }),
                   ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                ],
                 TextFormField(
                   controller: _contactController,
-                  keyboardType: _byPhone
-                      ? TextInputType.phone
-                      : TextInputType.emailAddress,
+                  // Клавиатура с «собакой» и цифрами сразу: поле принимает и
+                  // номер, и почту, и заранее знать, что человек выберет, мы
+                  // не можем.
+                  keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
+                  onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    labelText: _byPhone
-                        ? context.l10n.loginPhoneLabel
+                    labelText: smsHere
+                        ? context.l10n.registerContactLabel
                         : context.l10n.loginEmailLabel,
-                    hintText: _byPhone
-                        ? context.l10n.loginPhoneHint
+                    hintText: smsHere
+                        ? context.l10n.registerContactHint
                         : context.l10n.loginEmailHint,
                     prefixIcon: Icon(
                       _byPhone ? Icons.phone_outlined : Icons.alternate_email,
@@ -315,35 +255,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     final raw = value?.trim() ?? '';
+                    if (raw.isEmpty) {
+                      return smsHere
+                          ? context.l10n.registerContactEmpty
+                          : context.l10n.registerEmailEmpty;
+                    }
                     if (_byPhone) {
-                      if (raw.isEmpty) return context.l10n.loginPhoneEmpty;
                       if (!isTjPhone(normalizeTjPhone(raw))) {
                         return context.l10n.loginPhoneInvalid;
                       }
-                    } else {
-                      if (raw.isEmpty) return context.l10n.registerEmailEmpty;
-                      if (!raw.contains('@') || !raw.contains('.')) {
-                        return context.l10n.registerEmailInvalid;
-                      }
+                    } else if (!raw.contains('@') || !raw.contains('.')) {
+                      return context.l10n.registerEmailInvalid;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
 
-                const SizedBox(height: 24),
+                // Согласие стоит вплотную к кнопке, а не в шапке экрана.
+                // Раньше галочка была над заголовком, за три экрана прокрутки
+                // от «Завести ферму»: человек жал кнопку, она молчала, и он
+                // решал, что программа сломалась. Отказ объясняется здесь же,
+                // а не плашкой внизу — глаз в этот момент смотрит сюда.
+                _PrivacyConsent(
+                  accepted: _acceptedPrivacy,
+                  showError: _consentMissed,
+                  onChanged: (value) => setState(() {
+                    _acceptedPrivacy = value;
+                    if (value) _consentMissed = false;
+                  }),
+                  linkRecognizer: _privacyLinkRecognizer,
+                ),
+                const SizedBox(height: AppSpacing.lg),
 
                 // Register button
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleRegister,
                   child: authState.isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            // Тем же цветом, что и надпись на кнопке.
+                            color: context.colors.onPrimary,
                           ),
                         )
                       : Text(context.l10n.registerSubmit),
@@ -368,6 +323,83 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Согласие с политикой: галочка, текст со ссылкой и объяснение отказа.
+///
+/// Нажимается вся строка, а не квадратик в 18 пикселей: в перчатке в него не
+/// попасть. Ссылка внутри текста открывает политику и галочку не трогает.
+class _PrivacyConsent extends StatelessWidget {
+  const _PrivacyConsent({
+    required this.accepted,
+    required this.showError,
+    required this.onChanged,
+    required this.linkRecognizer,
+  });
+
+  final bool accepted;
+  final bool showError;
+  final ValueChanged<bool> onChanged;
+  final TapGestureRecognizer linkRecognizer;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.colors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => onChanged(!accepted),
+          borderRadius: AppRadius.mdAll,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IgnorePointer(
+                child: Checkbox(
+                  value: accepted,
+                  onChanged: (_) {},
+                  side: showError
+                      ? const BorderSide(color: AppColors.error, width: 2)
+                      : null,
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  child: RichText(
+                    text: TextSpan(
+                      style: AppTypography.bodyMd
+                          .copyWith(color: cs.onSurface),
+                      children: [
+                        TextSpan(text: context.l10n.registerConsentPrefix),
+                        TextSpan(
+                          text: context.l10n.registerConsentLink,
+                          recognizer: linkRecognizer,
+                          style: TextStyle(
+                            color: cs.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showError)
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.md),
+            child: Text(
+              context.l10n.registerConsentRequired,
+              style: AppTypography.labelSm.copyWith(color: AppColors.error),
+            ),
+          ),
+      ],
     );
   }
 }

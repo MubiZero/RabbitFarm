@@ -336,6 +336,41 @@ void main() {
     expect(find.text('На сегодня задач нет'), findsNothing);
   });
 
+  testWidgets('пустой ферме показывает первый шаг, а не «всё под контролем»',
+      (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        dashboard: _calmDashboard.copyWith(
+          rabbits: const RabbitStats(total: 0, male: 0, female: 0),
+          cages: const CageStats(total: 0, occupied: 0, available: 0),
+        ),
+      ),
+    );
+    await _settle(tester);
+
+    // «Всё под контролем» на ферме, где нет ни клетки, — это «делать нечего»:
+    // человек закрывает приложение в первый же день.
+    expect(find.text('Всё под контролем — срочного нет'), findsNothing);
+    expect(find.text('Дела появятся вместе с фермой'), findsOneWidget);
+    expect(find.text('Завести клетки'), findsWidgets,
+        reason: 'слова те же, что в чек-листе первых шагов');
+  });
+
+  testWidgets('клетки есть, кроликов нет — зовёт заводить кроликов',
+      (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        dashboard: _calmDashboard.copyWith(
+          rabbits: const RabbitStats(total: 0, male: 0, female: 0),
+        ),
+      ),
+    );
+    await _settle(tester);
+
+    expect(find.text('Клетки есть — заведите первых кроликов, и дела появятся '
+        'сами'), findsOneWidget);
+  });
+
   testWidgets('пустой список задач не отменяет остальных тревог', (
     tester,
   ) async {

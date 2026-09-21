@@ -11,6 +11,7 @@ import '../providers/feeds_provider.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../utils/feed_labels.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Карточка корма на складе.
 class FeedFormScreen extends ConsumerStatefulWidget {
@@ -98,6 +99,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
         );
         notifier.addFeed(created);
       }
+      ref.refreshAfter(FarmRecord.feed);
       return null;
     } catch (e) {
       return e;
@@ -131,12 +133,7 @@ class _FeedFormScreenState extends ConsumerState<FeedFormScreen> {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: $error'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: $error');
       await notifier.refresh();
     }
   }

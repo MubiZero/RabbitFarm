@@ -12,6 +12,7 @@ import '../providers/tasks_provider.dart';
 import '../utils/task_labels.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Правило повторения задачи.
 ///
@@ -192,6 +193,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ),
         );
       }
+      ref.refreshAfter(FarmRecord.task);
       return null;
     } catch (e) {
       return errorText(l10n, e);
@@ -234,9 +236,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     await pending;
 
     if (failedToDelete) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
       await list.refresh();
     }
   }

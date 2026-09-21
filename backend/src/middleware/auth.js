@@ -19,7 +19,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return ApiResponse.unauthorized(res, 'Токен не передан');
+      return ApiResponse.unauthorized(res, 'Токен не передан', 'TOKEN_MISSING');
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
@@ -31,7 +31,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     if (decoded.jti) {
       const blacklisted = await TokenBlacklist.findOne({ where: { jti: decoded.jti } });
       if (blacklisted) {
-        return ApiResponse.unauthorized(res, 'Токен отозван');
+        return ApiResponse.unauthorized(res, 'Токен отозван', 'TOKEN_REVOKED');
       }
     }
 
@@ -41,18 +41,18 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     });
 
     if (!user) {
-      return ApiResponse.unauthorized(res, 'Пользователь не найден');
+      return ApiResponse.unauthorized(res, 'Пользователь не найден', 'USER_NOT_FOUND');
     }
 
     if (!user.is_active) {
-      return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
+      return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.', 'USER_INACTIVE');
     }
 
     // Смена пароля отзывает все выданные до неё токены. Без этой проверки
     // access-токен продолжал работать до конца своего срока, и сброс пароля
     // не отбирал доступ у того, кто уже вошёл.
     if ((decoded.tv || 0) !== user.token_version) {
-      return ApiResponse.unauthorized(res, 'Токен отозван, войдите заново');
+      return ApiResponse.unauthorized(res, 'Токен отозван, войдите заново', 'TOKEN_REVOKED');
     }
 
     // Вход под клиентом (см. docs/plans/PLATFORM-ADMIN.md, 3.2): токен
@@ -117,7 +117,7 @@ const createAuthenticate = ({ allowBlockedFarm = false } = {}) => async (req, re
     withRequestContext(req, res, next);
   } catch (error) {
     if (error.message.includes('token')) {
-      return ApiResponse.unauthorized(res, error.message);
+      return ApiResponse.unauthorized(res, error.message, 'TOKEN_INVALID');
     }
     next(error);
   }
@@ -145,7 +145,7 @@ const authenticateEvenIfFarmBlocked = createAuthenticate({ allowBlockedFarm: tru
 const authorize = (allowedRoles = []) => {
   return (req, res, next) => {
     if (!req.user) {
-      return ApiResponse.unauthorized(res, 'Требуется авторизация');
+      return ApiResponse.unauthorized(res, 'Требуется авторизация', 'UNAUTHORIZED');
     }
 
     // Owner has access to everything
@@ -155,7 +155,7 @@ const authorize = (allowedRoles = []) => {
 
     // Check if user's role is in allowed roles
     if (!allowedRoles.includes(req.user.role)) {
-      return ApiResponse.forbidden(res, 'Недостаточно прав');
+      return ApiResponse.forbidden(res, 'Недостаточно прав', 'FORBIDDEN');
     }
 
     next();
@@ -169,11 +169,11 @@ const authorize = (allowedRoles = []) => {
  */
 const requirePlatformAdmin = (req, res, next) => {
   if (!req.user) {
-    return ApiResponse.unauthorized(res, 'Требуется авторизация');
+    return ApiResponse.unauthorized(res, 'Требуется авторизация', 'UNAUTHORIZED');
   }
 
   if (!req.user.is_platform_admin) {
-    return ApiResponse.forbidden(res, 'Доступно только платформенному администратору');
+    return ApiResponse.forbidden(res, 'Доступно только платформенному администратору', 'PLATFORM_ADMIN_ONLY');
   }
 
   next();

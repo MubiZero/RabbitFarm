@@ -35,7 +35,7 @@ describe('Кролик без бирки', () => {
     const breed = await request(app)
       .post(`${API}/breeds`)
       .set('Authorization', `Bearer ${ownerToken}`)
-      .send({ name: 'Серый великан' });
+      .send({ name: 'Порода без бирки' });
     breedId = breed.body.data.id;
   });
 

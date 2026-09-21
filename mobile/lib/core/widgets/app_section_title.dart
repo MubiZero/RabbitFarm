@@ -34,10 +34,19 @@ class AppSectionTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // Без подзаголовка заголовок и действие — одна строка, и равнять их
+        // надо по центру: по верху кнопка «Все задачи» вставала выше
+        // заголовка, и пара выглядела съехавшей. С подзаголовком равняем по
+        // верху — иначе кнопка уезжает к середине двух строк текста.
+        crossAxisAlignment: subtitle == null
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
+              // Иначе колонка занимает всю высоту ряда, текст прижимается к
+              // её верху, а кнопка встаёт по центру — та самая съехавшая пара.
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(

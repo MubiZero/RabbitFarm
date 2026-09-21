@@ -13,7 +13,9 @@ import '../../../../shared/widgets/logout_dialog.dart';
 import '../../../../core/l10n/error_text.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/providers/locale_provider.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/widgets/language_picker.dart';
+import '../../../../core/widgets/theme_picker.dart';
 import '../../../rabbits/presentation/providers/rabbits_provider.dart';
 import '../../../rabbits/presentation/utils/rabbit_labels.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
@@ -47,13 +49,27 @@ class SettingsScreen extends ConsumerWidget {
           _GroupCard(
             context: context,
             children: [
+              // Тем же способом, что и язык строкой ниже: название текущего
+              // выбора словами и список по нажатию. Тремя безымянными
+              // значками — солнце, шестерёнка, луна — светлую тему просто не
+              // находили: подписи были только во всплывающих подсказках,
+              // которых на телефоне не бывает.
               _SettingsTile(
-                icon: Icons.brightness_6_outlined,
+                icon: themeModeIcon(themeState.mode),
                 label: context.l10n.settingsTheme,
-                trailing: _ThemeModeToggle(
-                  mode: themeState.mode,
-                  onChanged: (m) => ref.read(themeProvider.notifier).setMode(m),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      themeModeName(context, themeState.mode),
+                      style: AppTypography.bodyMd.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right),
+                  ],
                 ),
+                onTap: () => showThemePicker(context, ref),
               ),
               _SettingsTile(
                 icon: Icons.palette_outlined,
@@ -140,12 +156,7 @@ class SettingsScreen extends ConsumerWidget {
                         .read(authProvider.notifier)
                         .setDigestEnabled(value);
                     if (error != null) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(errorText(l10n, error)),
-                          backgroundColor: AppColors.error,
-                        ),
-                      );
+                      messenger.showError(errorText(l10n, error));
                     }
                   },
                 ),
@@ -469,42 +480,6 @@ class _NotificationPermissionTileState
   }
 }
 
-class _ThemeModeToggle extends StatelessWidget {
-  final ThemeMode mode;
-  final ValueChanged<ThemeMode> onChanged;
-
-  const _ThemeModeToggle({required this.mode, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return SegmentedButton<ThemeMode>(
-      segments: [
-        ButtonSegment(
-          value: ThemeMode.light,
-          icon: const Icon(Icons.light_mode, size: 16),
-          tooltip: context.l10n.settingsThemeLight,
-        ),
-        ButtonSegment(
-          value: ThemeMode.system,
-          icon: const Icon(Icons.brightness_auto, size: 16),
-          tooltip: context.l10n.settingsThemeSystem,
-        ),
-        ButtonSegment(
-          value: ThemeMode.dark,
-          icon: const Icon(Icons.dark_mode, size: 16),
-          tooltip: context.l10n.settingsThemeDark,
-        ),
-      ],
-      selected: {mode},
-      onSelectionChanged: (s) => onChanged(s.first),
-      style: const ButtonStyle(
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-      ),
-    );
-  }
-}
-
 class _AccentPicker extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onChanged;
@@ -614,11 +589,6 @@ Future<void> _setPurposeForAll(BuildContext context, WidgetRef ref) async {
       SnackBar(content: Text(l10n.settingsPurposeAllDone(changed))),
     );
   } catch (e) {
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(errorText(l10n, e)),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    messenger.showError(errorText(l10n, e));
   }
 }

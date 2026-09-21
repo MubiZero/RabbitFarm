@@ -11,17 +11,15 @@ import '../providers/connectivity.dart';
 import '../providers/session.dart';
 import '../../features/breeding/presentation/providers/breeding_provider.dart';
 import '../../features/feeding/presentation/providers/feeding_records_provider.dart';
-import '../../features/feeding/presentation/providers/feeds_provider.dart';
 import '../../features/home/presentation/providers/journal_provider.dart';
 import '../../features/notes/data/models/note_model.dart';
 import '../../features/notes/presentation/providers/notes_provider.dart';
 import '../../features/rabbits/data/repositories/births_repository.dart';
-import '../../features/rabbits/presentation/providers/births_provider.dart';
 import '../../features/health/data/repositories/vaccinations_repository.dart';
 import '../../features/health/presentation/providers/medical_records_provider.dart';
-import '../../features/health/presentation/providers/vaccinations_provider.dart';
 import '../../features/rabbits/presentation/providers/rabbits_provider.dart';
 import '../../features/tasks/presentation/providers/tasks_provider.dart';
+import '../providers/after_write.dart';
 
 /// Действие из `FarmCapability.recordDailyWork`, отложенное до появления сети.
 ///
@@ -301,8 +299,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
     // списков уже нельзя.
     if (!mounted) return;
     await _ref.read(feedingRecordsProvider.notifier).refresh();
-    _ref.invalidate(feedsProvider);
-    _ref.invalidate(feedOptionsProvider);
+    _ref.refreshAfter(FarmRecord.feeding);
   }
 
   Future<void> _sendTaskComplete(Map<String, dynamic> payload) async {
@@ -311,7 +308,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
     if (!mounted) return;
     await _ref.read(tasksListProvider.notifier).refresh();
     _ref.invalidate(taskProvider(id));
-    _ref.invalidate(taskStatisticsProvider);
+    _ref.refreshAfter(FarmRecord.task);
   }
 
   Future<void> _sendNote(Map<String, dynamic> payload) async {
@@ -319,7 +316,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
         .read(notesRepositoryProvider)
         .createNote(NoteCreate.fromJson(payload));
     if (!mounted) return;
-    _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.note);
   }
 
   /// Карточки крольчат отсюда не заводятся: их диалогу нужен окрол с уже
@@ -332,15 +329,13 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
     // записи фоном, и списка окролов на экране может не быть вовсе —
     // поднимать его ради обновления значило бы создать провайдер, который
     // никто не слушает. Открытый экран перечитает себя сам.
-    _ref.invalidate(birthsProvider);
-    _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.birth);
   }
 
   Future<void> _sendBreeding(Map<String, dynamic> payload) async {
     await _ref.read(breedingRepositoryProvider).createBreeding(payload);
     if (!mounted) return;
-    _ref.invalidate(breedingListProvider);
-    _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.breeding);
   }
 
   /// Падёж — единственное здесь изменение существующей записи, а не новая.
@@ -351,8 +346,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
         .read(medicalRecordsRepositoryProvider)
         .createMedicalRecordFromJson(payload);
     if (!mounted) return;
-    _ref.invalidate(medicalRecordsProvider);
-    _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.medicalRecord);
   }
 
   Future<void> _sendVaccination(Map<String, dynamic> payload) async {
@@ -360,8 +354,7 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
         .read(vaccinationsRepositoryProvider)
         .createVaccinationFromJson(payload);
     if (!mounted) return;
-    _ref.invalidate(vaccinationsProvider);
-    _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.vaccination);
   }
 
   Future<void> _sendRabbitDeath(Map<String, dynamic> payload) async {
@@ -373,5 +366,6 @@ class OfflineQueueController extends StateNotifier<List<OfflineQueueItem>> {
     _ref.invalidate(rabbitsListProvider);
     _ref.invalidate(rabbitDetailProvider(id));
     _ref.invalidate(journalFeedProvider);
+    _ref.refreshAfter(FarmRecord.rabbit);
   }
 }

@@ -86,9 +86,13 @@ describe('Изоляция ферм: поголовье, породы, клет�
   describe('списки', () => {
     it('не показывает ферме Б породы фермы А', async () => {
       const res = await listBreeds(farmB.token);
+      const names = res.body.data.map((breed) => breed.name);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.map((breed) => breed.name)).toEqual(['Порода фермы Б']);
+      // Кроме своей заведённой, ферма видит стартовый справочник, который
+      // получает при регистрации, — но ни одной породы соседа.
+      expect(names).toContain('Порода фермы Б');
+      expect(names).not.toContain('Порода фермы А');
     });
 
     it('не показывает ферме Б клетки фермы А', async () => {

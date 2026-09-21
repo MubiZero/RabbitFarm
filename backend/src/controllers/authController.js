@@ -27,7 +27,7 @@ class AuthController {
       if (error.message === 'REGISTRATION_CLOSED') {
         return ApiResponse.forbidden(
           res,
-          'Регистрация закрыта. Учётную запись выдаёт владелец фермы.'
+          'Регистрация закрыта. Учётную запись выдаёт владелец фермы.', 'REGISTRATION_CLOSED'
         );
       }
       if (error.message === 'USER_EXISTS' || error.name === 'SequelizeUniqueConstraintError') {
@@ -59,13 +59,13 @@ class AuthController {
       return ApiResponse.success(res, result, 'Токен обновлен успешно');
     } catch (error) {
       if (error.message === 'INVALID_REFRESH_TOKEN') {
-        return ApiResponse.unauthorized(res, 'Неверный refresh token');
+        return ApiResponse.unauthorized(res, 'Неверный refresh token', 'TOKEN_INVALID');
       }
       if (error.message === 'REFRESH_TOKEN_EXPIRED') {
-        return ApiResponse.unauthorized(res, 'Срок действия refresh-токена истёк');
+        return ApiResponse.unauthorized(res, 'Срок действия refresh-токена истёк', 'TOKEN_EXPIRED');
       }
       if (error.message === 'USER_INACTIVE') {
-        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.', 'USER_INACTIVE');
       }
       next(error);
     }
@@ -101,7 +101,7 @@ class AuthController {
       return ApiResponse.success(res, user);
     } catch (error) {
       if (error.message === 'USER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Пользователь не найден');
+        return ApiResponse.notFound(res, 'Пользователь не найден', 'USER_NOT_FOUND');
       }
       next(error);
     }
@@ -118,7 +118,7 @@ class AuthController {
       return ApiResponse.success(res, user, 'Профиль обновлен успешно');
     } catch (error) {
       if (error.message === 'USER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Пользователь не найден');
+        return ApiResponse.notFound(res, 'Пользователь не найден', 'USER_NOT_FOUND');
       }
       if (error.message === 'PHONE_EXISTS') {
         return ApiResponse.conflict(
@@ -148,10 +148,10 @@ class AuthController {
       );
     } catch (error) {
       if (error.message === 'USER_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Пользователь не найден');
+        return ApiResponse.notFound(res, 'Пользователь не найден', 'USER_NOT_FOUND');
       }
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Хозяйство не найдено');
+        return ApiResponse.notFound(res, 'Хозяйство не найдено', 'FARM_NOT_FOUND');
       }
       if (error.message === 'CONFIRM_NAME_MISMATCH') {
         return ApiResponse.badRequest(
@@ -221,7 +221,7 @@ class AuthController {
         return ApiResponse.error(res, 'Слишком много попыток — запросите новый код', 429, 'OTP_LOCKED');
       }
       if (error.message === 'USER_INACTIVE') {
-        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.');
+        return ApiResponse.forbidden(res, 'Аккаунт отключён. Обратитесь к владельцу фермы.', 'USER_INACTIVE');
       }
       if (error.message === 'STAFF_LIMIT_REACHED') {
         return ApiResponse.badRequest(res, 'Достигнут лимит участников по тарифу фермы. Обратитесь к владельцу.', 'STAFF_LIMIT_REACHED');

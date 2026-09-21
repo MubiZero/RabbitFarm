@@ -92,7 +92,7 @@ exports.getBirthById = async (req, res, next) => {
     });
 
     if (!birth) {
-      return ApiResponse.notFound(res, 'Окрол не найден');
+      return ApiResponse.notFound(res, 'Окрол не найден', 'BIRTH_NOT_FOUND');
     }
 
     return ApiResponse.success(res, birth);
@@ -130,12 +130,12 @@ exports.createBirth = async (req, res, next) => {
 
     if (!mother) {
       await transaction.rollback();
-      return ApiResponse.notFound(res, 'Мать не найдена');
+      return ApiResponse.notFound(res, 'Мать не найдена', 'MOTHER_NOT_FOUND');
     }
 
     if (mother.status === 'dead') {
       await transaction.rollback();
-      return ApiResponse.error(res, 'Мертвый кролик не может принести потомство', 400);
+      return ApiResponse.error(res, 'Мертвый кролик не может принести потомство', 400, 'RABBIT_NOT_ACTIVE');
     }
 
     // Если указана случка, проверяем её и обновляем статус
@@ -148,7 +148,7 @@ exports.createBirth = async (req, res, next) => {
 
       if (!breeding) {
         await transaction.rollback();
-        return ApiResponse.notFound(res, 'Случка не найдена');
+        return ApiResponse.notFound(res, 'Случка не найдена', 'BREEDING_NOT_FOUND');
       }
 
       await breeding.update({ status: 'completed' }, { transaction });
@@ -295,7 +295,7 @@ exports.updateBirth = async (req, res, next) => {
     const birth = await Birth.findOne({ where: { id, farm_id: farmId } });
 
     if (!birth) {
-      return ApiResponse.notFound(res, 'Окрол не найден');
+      return ApiResponse.notFound(res, 'Окрол не найден', 'BIRTH_NOT_FOUND');
     }
 
     // Когда карточки заведены, крольчата считаются по ним — и падёж с
@@ -308,7 +308,7 @@ exports.updateBirth = async (req, res, next) => {
       return ApiResponse.error(
         res,
         'По этому окролу заведены карточки — отмечайте падёж и отсадку на карточке крольчонка',
-        409
+        409, 'BIRTH_HAS_KIT_CARDS'
       );
     }
 
@@ -322,7 +322,7 @@ exports.updateBirth = async (req, res, next) => {
         return ApiResponse.error(
           res,
           'По этому окролу заведены карточки — мать уже не поменять',
-          409
+          409, 'BIRTH_HAS_KIT_CARDS'
         );
       }
 
@@ -330,7 +330,7 @@ exports.updateBirth = async (req, res, next) => {
         where: { id: mother_id, farm_id: farmId, sex: 'female' }
       });
       if (!mother) {
-        return ApiResponse.notFound(res, 'Мать не найдена');
+        return ApiResponse.notFound(res, 'Мать не найдена', 'MOTHER_NOT_FOUND');
       }
     }
 
@@ -343,7 +343,7 @@ exports.updateBirth = async (req, res, next) => {
       return ApiResponse.error(
         res,
         'Дата отсадки не может быть раньше окрола',
-        400
+        400, 'WEANING_BEFORE_BIRTH'
       );
     }
 
@@ -411,7 +411,7 @@ exports.deleteBirth = async (req, res, next) => {
     const birth = await Birth.findOne({ where: { id, farm_id: farmId } });
 
     if (!birth) {
-      return ApiResponse.notFound(res, 'Окрол не найден');
+      return ApiResponse.notFound(res, 'Окрол не найден', 'BIRTH_NOT_FOUND');
     }
 
     await birth.destroy();
@@ -448,7 +448,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
   // не заводился вовсе, хотя записать такой окрол приложение позволяло.
   const kitCount = parseInt(count);
   if (isNaN(kitCount) || kitCount <= 0 || kitCount > 30) {
-    return ApiResponse.error(res, 'Некорректное количество крольчат (макс 30)', 400);
+    return ApiResponse.error(res, 'Некорректное количество крольчат (макс 30)', 400, 'KITS_COUNT_INVALID');
   }
 
   const transaction = await Birth.sequelize.transaction();
@@ -460,7 +460,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
     if (!birth) {
       await transaction.rollback();
-      return ApiResponse.notFound(res, 'Окрол не найден');
+      return ApiResponse.notFound(res, 'Окрол не найден', 'BIRTH_NOT_FOUND');
     }
 
     // Второй раз карточки по тому же выводку не заводятся. Ничто не мешало
@@ -473,7 +473,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
       return ApiResponse.error(
         res,
         'По этому окролу карточки уже заведены — крольчата есть в поголовье',
-        409
+        409, 'BIRTH_HAS_KIT_CARDS'
       );
     }
 
@@ -485,7 +485,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
       return ApiResponse.error(
         res,
         `В окроле родилось живыми ${birth.kits_born_alive} — карточек не может быть больше`,
-        400
+        400, 'KITS_MORE_THAN_BORN'
       );
     }
 
@@ -516,7 +516,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
     if (!mother) {
       await transaction.rollback();
-      return ApiResponse.notFound(res, 'Мать не найдена');
+      return ApiResponse.notFound(res, 'Мать не найдена', 'MOTHER_NOT_FOUND');
     }
 
     let father = null;
@@ -528,12 +528,12 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
       if (!father) {
         await transaction.rollback();
-        return ApiResponse.notFound(res, 'Отец не найден');
+        return ApiResponse.notFound(res, 'Отец не найден', 'FATHER_NOT_FOUND');
       }
 
       if (father.sex !== 'male') {
         await transaction.rollback();
-        return ApiResponse.error(res, 'Отцом может быть только самец', 400);
+        return ApiResponse.error(res, 'Отцом может быть только самец', 400, 'NOT_A_MALE');
       }
     }
 
@@ -548,7 +548,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
       if (!breed) {
         await transaction.rollback();
-        return ApiResponse.notFound(res, 'Порода не найдена');
+        return ApiResponse.notFound(res, 'Порода не найдена', 'BREED_NOT_FOUND');
       }
     }
 
@@ -570,7 +570,7 @@ exports.createKitsFromBirth = async (req, res, next) => {
 
         if (currentCount + kitCount > cage.capacity) {
           await transaction.rollback();
-          return ApiResponse.error(res, `Недостаточно места в клетке матери (свободно: ${cage.capacity - currentCount})`, 400);
+          return ApiResponse.error(res, `Недостаточно места в клетке матери (свободно: ${cage.capacity - currentCount})`, 400, 'CAGE_FULL');
         }
       }
     }

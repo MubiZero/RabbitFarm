@@ -40,10 +40,10 @@ class PlatformAdminController {
       return ApiResponse.created(res, plan, 'Тариф создан');
     } catch (error) {
       if (error.message === 'PLAN_NAME_EXISTS') {
-        return ApiResponse.conflict(res, 'Тариф с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Тариф с таким названием уже существует', 'PLAN_NAME_EXISTS');
       }
       if (error.message === 'DEFAULT_PLAN_EXISTS') {
-        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него');
+        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него', 'PLAN_DEFAULT_TAKEN');
       }
       next(error);
     }
@@ -64,13 +64,13 @@ class PlatformAdminController {
       return ApiResponse.success(res, plan, 'Тариф обновлён');
     } catch (error) {
       if (error.message === 'PLAN_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Тариф не найден');
+        return ApiResponse.notFound(res, 'Тариф не найден', 'PLAN_NOT_FOUND');
       }
       if (error.message === 'PLAN_NAME_EXISTS') {
-        return ApiResponse.conflict(res, 'Тариф с таким названием уже существует');
+        return ApiResponse.conflict(res, 'Тариф с таким названием уже существует', 'PLAN_NAME_EXISTS');
       }
       if (error.message === 'DEFAULT_PLAN_EXISTS') {
-        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него');
+        return ApiResponse.badRequest(res, 'Тариф по умолчанию уже назначен другому — сначала снимите флаг с него', 'PLAN_DEFAULT_TAKEN');
       }
       next(error);
     }
@@ -90,7 +90,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, null, 'Тариф удалён');
     } catch (error) {
       if (error.message === 'PLAN_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Тариф не найден');
+        return ApiResponse.notFound(res, 'Тариф не найден', 'PLAN_NOT_FOUND');
       }
       next(error);
     }
@@ -120,7 +120,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Ферма получена');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       next(error);
     }
@@ -145,13 +145,13 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Тариф фермы обновлён');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       if (error.message === 'PLAN_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Тариф не найден');
+        return ApiResponse.notFound(res, 'Тариф не найден', 'PLAN_NOT_FOUND');
       }
       if (error.message === 'PLAN_INACTIVE') {
-        return ApiResponse.badRequest(res, 'Тариф выключен — включите его или выберите другой');
+        return ApiResponse.badRequest(res, 'Тариф выключен — включите его или выберите другой', 'PLAN_DISABLED');
       }
       next(error);
     }
@@ -173,7 +173,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Статус фермы обновлён');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       next(error);
     }
@@ -195,7 +195,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Срок тарифа обновлён');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       next(error);
     }
@@ -225,7 +225,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Поблажка фермы обновлена');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       next(error);
     }
@@ -248,7 +248,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, data, 'Экспорт фермы готов');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       next(error);
     }
@@ -273,7 +273,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, result, 'Токен для входа под клиентом выдан');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       if (error.message === 'FARM_NO_OWNER') {
         return ApiResponse.badRequest(res, 'У фермы нет владельца — войти под клиентом некем', 'FARM_NO_OWNER');
@@ -298,7 +298,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Ферма удалена — данные будут окончательно очищены через 30 дней');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       if (error.message === 'CONFIRM_NAME_MISMATCH') {
         return ApiResponse.badRequest(
@@ -327,7 +327,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, farm, 'Ферма восстановлена');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       if (error.message === 'FARM_NOT_DELETED') {
         return ApiResponse.badRequest(res, 'Ферма не была удалена', 'FARM_NOT_DELETED');
@@ -404,7 +404,7 @@ class PlatformAdminController {
       return ApiResponse.created(res, announcement, 'Объявление отправлено');
     } catch (error) {
       if (error.message === 'FARM_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Ферма не найдена');
+        return ApiResponse.notFound(res, 'Ферма не найдена', 'FARM_NOT_FOUND');
       }
       if (error.message === 'NO_RECIPIENTS') {
         return ApiResponse.badRequest(res, 'Получателей не нашлось — проверьте, кому адресовано объявление', 'NO_RECIPIENTS');
@@ -472,7 +472,7 @@ class PlatformAdminController {
       return ApiResponse.success(res, resolved, 'Обращение отмечено разобранным');
     } catch (error) {
       if (error.message === 'SUPPORT_REQUEST_NOT_FOUND') {
-        return ApiResponse.notFound(res, 'Обращение не найдено');
+        return ApiResponse.notFound(res, 'Обращение не найдено', 'SUPPORT_REQUEST_NOT_FOUND');
       }
       next(error);
     }

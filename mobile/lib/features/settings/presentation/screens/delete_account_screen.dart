@@ -174,12 +174,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         SnackBar(content: Text(l10n.deleteAccountDone)),
       );
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, e)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, e));
       if (mounted) setState(() => _busy = false);
     }
   }

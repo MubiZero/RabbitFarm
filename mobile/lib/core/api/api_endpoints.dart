@@ -151,6 +151,10 @@ class ApiEndpoints {
   static const String reportHealth = '/reports/health';
   static const String reportFinancial = '/reports/financial';
 
+  // Тарифы. Список открыт, без входа: в знакомстве человек говорит, сколько
+  // у него кроликов, и тут же видит, во что это обойдётся.
+  static const String plans = '/plans';
+
   // Оплата продления тарифа (см. docs/plans/PLATFORM-ADMIN.md, 4.1)
   static const String payments = '/payments';
   static String paymentStatus(String invoiceId) => '/payments/$invoiceId';

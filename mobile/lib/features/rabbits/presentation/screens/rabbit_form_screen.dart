@@ -14,7 +14,9 @@ import '../../../../core/access/farm_access.dart';
 import '../../../../core/analytics/analytics.dart';
 import '../../../../core/utils/image_url_helper.dart';
 import '../../../../core/widgets/app_date_field.dart';
+import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_form_section.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../../../core/l10n/l10n_context.dart';
 import '../utils/rabbit_labels.dart';
 import '../../../../core/l10n/error_text.dart';
@@ -24,11 +26,11 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/voice/voice_input.dart';
 import '../../../cages/data/models/cage_model.dart';
 import '../../../cages/presentation/providers/cages_provider.dart';
-import '../../../cages/presentation/providers/herd_cages_provider.dart';
 import '../../../../core/widgets/plan_limit_dialog.dart';
 import '../../../../core/api/api_failure.dart';
 import '../../../../core/cache/cache_scope.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 class RabbitFormScreen extends ConsumerStatefulWidget {
   final int? rabbitId;
@@ -187,13 +189,8 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}',
-            ),
-            backgroundColor: AppColors.error,
-          ),
+        ScaffoldMessenger.of(context).showError(
+          '${context.l10n.rabbitFormLoadFailed}: ${errorText(context.l10n, e)}',
         );
       }
     }
@@ -249,12 +246,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.rabbitFormPhotoFailed),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showError(context.l10n.rabbitFormPhotoFailed);
       }
     }
   }
@@ -277,12 +271,9 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.rabbitFormPhotoFailed),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showError(context.l10n.rabbitFormPhotoFailed);
       }
     }
   }
@@ -411,8 +402,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
       }
 
       ref.read(rabbitsListProvider.notifier).refresh();
-      ref.invalidate(cageRowsProvider);
-      ref.invalidate(cageOptionsProvider);
+      ref.refreshAfter(FarmRecord.rabbit);
       if (_selectedCageId != null) {
         ref.invalidate(cageDetailProvider(_selectedCageId!));
       }
@@ -446,12 +436,7 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
             body: context.l10n.planLimitRabbitsBody,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorText(context.l10n, e)),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          ScaffoldMessenger.of(context).showError(errorText(context.l10n, e));
         }
       }
     } finally {
@@ -537,6 +522,22 @@ class _RabbitFormScreenState extends ConsumerState<RabbitFormScreen> {
                         context.l10n.rabbitFormBreedsFailed,
                         style: TextStyle(color: cs.error),
                       ),
+                    )
+                  else if (breedsState.breeds.isEmpty)
+                    // Пустой справочник раньше рисовался обычным выпадающим
+                    // полем: человек жал на него, список не открывался, а
+                    // сохранение отвечало «выберите породу». Выбрать было не
+                    // из чего, и карточка первого кролика становилась тупиком.
+                    AppEmptyState(
+                      icon: Icons.category_outlined,
+                      title: context.l10n.rabbitFormBreedsEmpty,
+                      subtitle: context.l10n.rabbitFormBreedsEmptyHint,
+                      actionLabel: context.l10n.rabbitFormBreedsEmptyAction,
+                      onAction: () async {
+                        await context.push('/breeds/form');
+                        if (!context.mounted) return;
+                        ref.invalidate(breedsProvider);
+                      },
                     )
                   else
                     DropdownButtonFormField<int>(

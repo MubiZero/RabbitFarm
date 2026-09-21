@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('./helpers/testApp');
 const { syncTestDb, closeTestDb } = require('./helpers/testDb');
-const { Farm, User } = require('../../src/models');
+const { Farm, User, Breed } = require('../../src/models');
 
 /**
  * Ферм в сервисе много, и регистрация заводит новую: каждый
@@ -85,6 +85,34 @@ describe('Регистрация', () => {
     const farm = await Farm.findByPk(res.body.data.farm_id);
 
     expect(farm.name).toBe('Ферма Четвёртый');
+  });
+
+  it('новая ферма получает породы, иначе первого кролика не завести', async () => {
+    // Живой проход упёрся ровно сюда: поле «Порода» в карточке кролика
+    // обязательное, список пуст, завести породу из формы нельзя. Без кролика
+    // не будет ни случки, ни кормления, ни продажи, то есть хозяйство не
+    // начнётся вовсе.
+    const res = await register('breeds@example.com', 'Пятый');
+
+    const breeds = await Breed.findAll({
+      where: { farm_id: res.body.data.farm_id }
+    });
+
+    expect(breeds.length).toBeGreaterThan(0);
+    expect(breeds.map((b) => b.name)).toContain('Калифорнийская');
+  });
+
+  it('породы принадлежат своей ферме, а не общие на всех', async () => {
+    const first = await User.findOne({ where: { email: 'first@example.com' } });
+    const second = await User.findOne({ where: { email: 'second@example.com' } });
+
+    const firstBreeds = await Breed.findAll({ where: { farm_id: first.farm_id } });
+    const secondBreeds = await Breed.findAll({ where: { farm_id: second.farm_id } });
+
+    expect(firstBreeds.length).toBe(secondBreeds.length);
+    // Переименование породы у одного хозяйства не должно доставать до другого.
+    expect(firstBreeds.map((b) => b.id))
+      .not.toEqual(expect.arrayContaining(secondBreeds.map((b) => b.id)));
   });
 
   it('занятая почта отвергается', async () => {

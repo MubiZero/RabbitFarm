@@ -126,14 +126,11 @@ class _FeedsListScreenState extends ConsumerState<FeedsListScreen> {
 
     // Сообщение показывается после ответа сервера, а не вместо него: раньше
     // «склад пополнен» появлялось даже при отказе, и остаток не менялся.
-    messenger.showSnackBar(
-      error == null
-          ? SnackBar(content: Text(done))
-          : SnackBar(
-              content: Text('$failed: $error'),
-              backgroundColor: AppColors.error,
-            ),
-    );
+    if (error == null) {
+      messenger.showSnackBar(SnackBar(content: Text(done)));
+    } else {
+      messenger.showError('$failed: $error');
+    }
   }
 }
 
@@ -469,12 +466,7 @@ class _FeedDetailsSheet extends ConsumerWidget {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: $error'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: $error');
       await notifier.refresh();
     }
   }

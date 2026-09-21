@@ -127,12 +127,7 @@ class _AnnouncementFormScreenState
 
     if (error != null) {
       // Форма остаётся открытой: набранный текст — единственная его копия.
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, error));
       return;
     }
 

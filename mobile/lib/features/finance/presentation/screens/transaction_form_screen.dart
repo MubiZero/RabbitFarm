@@ -21,6 +21,7 @@ import '../../../../core/l10n/error_text.dart';
 import '../../../../core/countries/farm_currency.dart';
 import '../../../rabbits/presentation/widgets/rabbit_multi_picker.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Приход или расход фермы.
 class TransactionFormScreen extends ConsumerStatefulWidget {
@@ -165,6 +166,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
         );
       }
       await ref.read(transactionsProvider.notifier).refresh();
+      ref.refreshAfter(FarmRecord.transaction);
       return null;
     } catch (e) {
       return e;
@@ -208,12 +210,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
     await pending;
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: ${errorText(l10n, error)}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: ${errorText(l10n, error)}');
       await notifier.refresh();
     }
   }
@@ -479,12 +476,7 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.txFormReceiptFailed),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      ScaffoldMessenger.of(context).showError(context.l10n.txFormReceiptFailed);
     }
   }
 

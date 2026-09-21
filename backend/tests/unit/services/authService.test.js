@@ -13,6 +13,11 @@ jest.mock('../../../src/models', () => ({
     create: jest.fn(),
     findOne: jest.fn(),
     destroy: jest.fn()
+  },
+  // Новое хозяйство получает стартовый справочник пород в той же
+  // транзакции: без пород карточка первого кролика упирается в тупик.
+  Breed: {
+    bulkCreate: jest.fn()
   }
 }));
 jest.mock('../../../src/services/planService', () => ({
@@ -22,7 +27,7 @@ jest.mock('../../../src/services/otpAuthService', () => ({
   requestOtp: jest.fn().mockResolvedValue({ success: true })
 }));
 
-const { Farm, User, RefreshToken } = require('../../../src/models');
+const { Farm, User, RefreshToken, Breed } = require('../../../src/models');
 const planService = require('../../../src/services/planService');
 const otpAuthService = require('../../../src/services/otpAuthService');
 const authService = require('../../../src/services/authService');
@@ -161,6 +166,25 @@ describe('AuthService', () => {
       })).rejects.toThrow('PHONE_LOGIN_UNAVAILABLE');
 
       expect(Farm.create).not.toHaveBeenCalled();
+    });
+
+    it('новая ферма получает стартовый справочник пород', async () => {
+      const { mockTransaction } = arrangeSuccess();
+
+      await authService.register({
+        email: 'new@example.com',
+        full_name: 'Новый Фермер'
+      });
+
+      // Породы заводятся в той же транзакции, что и сама ферма: карточка
+      // первого кролика требует породу, а завести её из формы нельзя —
+      // ферма без пород упирается в тупик на первом же шаге.
+      expect(Breed.bulkCreate).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'Калифорнийская', farm_id: 77 })
+        ]),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
     });
 
     it('заводит ферму и делает регистрирующегося её владельцем', async () => {

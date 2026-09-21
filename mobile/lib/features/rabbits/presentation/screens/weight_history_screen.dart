@@ -100,33 +100,25 @@ class WeightHistoryScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         AppSectionTitle(context.l10n.weightSummary),
-        Row(
-          children: [
-            Expanded(
-              child: StatTile(
-                icon: Icons.scale_outlined,
-                label: context.l10n.weightCurrent,
-                value: formatQuantity(latest.weight, 'кг'),
-                accent: AppColors.domainLivestock,
-              ),
+        StatTileRow(
+          tiles: [
+            StatTile(
+              icon: Icons.scale_outlined,
+              label: context.l10n.weightCurrent,
+              value: formatQuantity(latest.weight, context.l10n.unitKg),
+              accent: AppColors.domainLivestock,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: _changeIcon(trend),
-                label: context.l10n.weightTrend,
-                value: _changeText(trend),
-                accent: _changeColor(context, trend),
-              ),
+            StatTile(
+              icon: _changeIcon(trend),
+              label: context.l10n.weightTrend,
+              value: _changeText(context, trend),
+              accent: _changeColor(context, trend),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: StatTile(
-                icon: _changeIcon(totalChange),
-                label: context.l10n.weightTotalChange,
-                value: _changeText(totalChange),
-                accent: _changeColor(context, totalChange),
-              ),
+            StatTile(
+              icon: _changeIcon(totalChange),
+              label: context.l10n.weightTotalChange,
+              value: _changeText(context, totalChange),
+              accent: _changeColor(context, totalChange),
             ),
           ],
         ),
@@ -158,10 +150,10 @@ class WeightHistoryScreen extends ConsumerWidget {
     return change > 0 ? Icons.trending_up : Icons.trending_down;
   }
 
-  String _changeText(double? change) {
+  String _changeText(BuildContext context, double? change) {
     if (change == null) return '—';
     final sign = change > 0 ? '+' : '';
-    return '$sign${formatQuantity(change, 'кг')}';
+    return '$sign${formatQuantity(change, context.l10n.unitKg)}';
   }
 
   void _showAddDialog(BuildContext context, WidgetRef ref) {
@@ -211,7 +203,7 @@ class _WeightRow extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      formatQuantity(weight.weight, 'кг'),
+                      formatQuantity(weight.weight, context.l10n.unitKg),
                       style: AppTypography.titleMd
                           .copyWith(color: context.colors.onSurface),
                     ),
@@ -223,7 +215,7 @@ class _WeightRow extends StatelessWidget {
                         color: changeColor,
                       ),
                       Text(
-                        formatQuantity(change.abs(), 'кг'),
+                        formatQuantity(change.abs(), context.l10n.unitKg),
                         style:
                             AppTypography.labelSm.copyWith(color: changeColor),
                       ),
@@ -323,12 +315,7 @@ class _AddWeightDialogState extends ConsumerState<AddWeightDialog> {
 
     final state = ref.read(weightsNotifierProvider);
     if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: ${state.error}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: ${state.error}');
       return;
     }
 

@@ -31,13 +31,13 @@ class MedicalRecordController {
       });
       if (!rabbit) {
         await t.rollback();
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
 
       // Check vitality
       if (rabbit.status === 'dead' || rabbit.status === 'sold') {
         await t.rollback();
-        return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика');
+        return ApiResponse.badRequest(res, 'Нельзя добавить запись для мертвого или проданного кролика', 'RABBIT_NOT_ACTIVE');
       }
 
       // Автор берётся из сеанса, а не из тела запроса: подпись, которую
@@ -120,7 +120,7 @@ class MedicalRecordController {
       });
 
       if (!medicalRecord) {
-        return ApiResponse.notFound(res, 'Медицинская запись не найдена');
+        return ApiResponse.notFound(res, 'Медицинская запись не найдена', 'MEDICAL_RECORD_NOT_FOUND');
       }
 
       return ApiResponse.success(res, medicalRecord);
@@ -223,7 +223,7 @@ class MedicalRecordController {
         }
       });
       if (!rabbit) {
-        return ApiResponse.notFound(res, 'Кролик не найден');
+        return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
       }
 
       const medicalRecords = await MedicalRecord.findAll({
@@ -263,7 +263,7 @@ class MedicalRecordController {
 
       if (!medicalRecord) {
         await t.rollback();
-        return ApiResponse.notFound(res, 'Медицинская запись не найдена');
+        return ApiResponse.notFound(res, 'Медицинская запись не найдена', 'MEDICAL_RECORD_NOT_FOUND');
       }
 
       const oldOutcome = medicalRecord.outcome;
@@ -277,7 +277,7 @@ class MedicalRecordController {
         });
         if (!newRabbit) {
           await t.rollback();
-          return ApiResponse.notFound(res, 'Кролик не найден');
+          return ApiResponse.notFound(res, 'Кролик не найден', 'RABBIT_NOT_FOUND');
         }
       }
 
@@ -345,7 +345,7 @@ class MedicalRecordController {
       });
 
       if (!medicalRecord) {
-        return ApiResponse.notFound(res, 'Медицинская запись не найдена');
+        return ApiResponse.notFound(res, 'Медицинская запись не найдена', 'MEDICAL_RECORD_NOT_FOUND');
       }
 
       await medicalRecord.destroy();

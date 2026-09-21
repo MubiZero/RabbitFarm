@@ -52,12 +52,7 @@ class _CageDetailScreenState extends ConsumerState<CageDetailScreen> {
       await _refresh();
       messenger.showSnackBar(SnackBar(content: Text(success)));
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(failedTemplate(errorText(l10n, e))),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(failedTemplate(errorText(l10n, e)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

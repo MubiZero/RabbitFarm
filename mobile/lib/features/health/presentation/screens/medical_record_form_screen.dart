@@ -16,6 +16,7 @@ import '../../../../core/offline_queue/offline_queue.dart';
 import '../../../../core/providers/connectivity.dart';
 import '../../../../core/l10n/date_locale.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Карта лечения: что случилось, чем лечили, чем закончилось.
 class MedicalRecordFormScreen extends ConsumerStatefulWidget {
@@ -157,6 +158,7 @@ class _MedicalRecordFormScreenState
 
         await notifier.addMedicalRecord(record);
       }
+      ref.refreshAfter(FarmRecord.medicalRecord);
       return null;
     } catch (e) {
       return e;

@@ -124,12 +124,7 @@ class _FeedingRecordsListScreenState
     );
 
     if (error != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('$failed: $error'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError('$failed: $error');
       await notifier.refresh();
     }
   }

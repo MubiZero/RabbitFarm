@@ -16,20 +16,18 @@ String countryName(BuildContext context, String code) {
     'KG' => l10n.countryKG,
     'KZ' => l10n.countryKZ,
     'RU' => l10n.countryRU,
-    'AF' => l10n.countryAF,
     // Незнакомый код показываем как есть, а не подменяем Таджикистаном:
     // назвать чужую страну чужим именем хуже, чем показать две буквы.
     _ => code,
   };
 }
 
-/// Подпись под названием: чем считают деньги и как входят.
+/// Подпись под названием страны — о том, что человеку с этого будет.
 ///
-/// Человек выбирает страну один раз и последствия видит потом, поэтому
-/// сказать о них лучше здесь, а не после регистрации.
+/// Раньше здесь стояло «с · Телефон»: знак валюты и способ входа через
+/// точку. Это запись для нас, а не ответ человеку, который первый раз видит
+/// приложение. Валюта из страны и так следует, а вот куда придёт код —
+/// единственное, что меняет его следующий шаг.
 String countryHint(BuildContext context, Country country) {
-  final money = country.currencySymbol;
-  return country.sms
-      ? '$money · ${context.l10n.loginPhoneLabel}'
-      : '$money · ${context.l10n.commonEmail}';
+  return country.sms ? context.l10n.onbCountrySms : context.l10n.onbCountryEmail;
 }

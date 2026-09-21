@@ -84,9 +84,7 @@ class TasksListScreen extends ConsumerWidget {
       await ref.read(taskActionsProvider).completeTask(task.id);
       messenger.showSnackBar(SnackBar(content: Text(done)));
     } catch (_) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
     }
   }
 

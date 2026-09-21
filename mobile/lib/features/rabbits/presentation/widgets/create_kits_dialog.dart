@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n_context.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/widgets/app_snack.dart';
 import '../../data/models/birth_model.dart';
 import '../providers/births_provider.dart';
 import '../providers/rabbits_provider.dart';
@@ -67,12 +68,7 @@ class _CreateKitsDialogState extends ConsumerState<CreateKitsDialog> {
     if (mounted) setState(() => _busy = false);
 
     if (kits == null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(errorText(l10n, ref.read(birthsProvider).error)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      messenger.showError(errorText(l10n, ref.read(birthsProvider).error));
       return;
     }
 

@@ -52,7 +52,7 @@
   "pinSetupExplanation": "You''ll open the app on this phone with this code — no more waiting for a code by SMS or email.",
   "pinSkip": "Not now",
   "pinSaved": "Code saved",
-  "pinMismatch": "The codes didn''t match — try again",
+  "pinMismatch": "The codes didn''t match — pick a code again",
   "pinLockPrompt": "Enter your code",
   "pinWrong": "Wrong code",
   "pinDelete": "Delete digit",
@@ -98,6 +98,9 @@
   "todayGreetingNamed": "{greeting}, {name}!",
   "todayGreetingPlain": "{greeting}!",
   "todayNeedsAttention": "Needs attention",
+  "todayEmptyFarmTitle": "Tasks will appear once the farm does",
+  "todayEmptyFarmCages": "Start with cages — rabbits move into them, and the app gets something to remind you about",
+  "todayEmptyFarmRabbits": "The cages are ready — add your first rabbits and the tasks will follow",
   "todayAllClear": "All clear — nothing urgent",
   "todayFarmNow": "Farm right now",
   "todayStatLivestock": "Livestock",
@@ -136,6 +139,86 @@
   "navQuickTitle": "What to record",
   "quickRecordFeeding": "Log a feeding",
   "quickNeedsConnection": "Needs connection",
+  "errorCodeSessionExpired": "Your session has ended — sign in again",
+  "errorCodeUserInactive": "Your access to the farm is closed — ask the owner",
+  "errorCodeRegistrationClosed": "Accounts are created by the farm owner",
+  "errorCodePlatformAdminOnly": "This section is for the platform administrator only",
+  "errorCodeOtpInvalid": "Wrong code",
+  "errorCodeOtpExpired": "The code has expired — request a new one",
+  "errorCodeOtpLocked": "Too many attempts — request a new code",
+  "errorCodeOtpRateLimited": "You are asking for codes too often — wait a little",
+  "errorCodeRateLimited": "Too many requests — wait a little",
+  "errorCodeUploadRateLimited": "Too many uploads in a row — wait a little",
+  "errorCodeContactRequired": "Enter a phone number or an email",
+  "errorCodeInvalidEmail": "That email address is not valid",
+  "errorCodeInvalidPhone": "A Tajik number is required: +992 and nine digits",
+  "errorCodeSmsNotConfigured": "Sending SMS is not working right now — sign in by email",
+  "errorCodeEmailNotConfigured": "Sending email is not working right now — sign in by phone",
+  "errorCodeFarmSuspended": "The farm is suspended — contact support",
+  "errorCodeFarmDeleted": "The farm has been deleted — contact support",
+  "errorCodeFarmReadOnly": "The farm is read-only — records cannot be saved right now",
+  "errorCodeImpersonationReadOnly": "Signed in as the client — read-only, records cannot be changed",
+  "errorCodeUpgradeRequired": "A newer version of the app is required — please update",
+  "errorCodeUserNotFound": "That person was not found",
+  "errorCodeFarmNotFound": "Farm not found",
+  "errorCodeBirthNotFound": "Kindling not found",
+  "errorCodeMotherNotFound": "Mother not found",
+  "errorCodeFatherNotFound": "Father not found",
+  "errorCodeMaleNotFound": "Buck not found",
+  "errorCodeFemaleNotFound": "Doe not found",
+  "errorCodeBreedingNotFound": "Mating not found",
+  "errorCodeFeedingNotFound": "Feeding record not found",
+  "errorCodeMedicalRecordNotFound": "Treatment record not found",
+  "errorCodeVaccinationNotFound": "Vaccination record not found",
+  "errorCodeNoteNotFound": "Note not found",
+  "errorCodeTransactionNotFound": "Money record not found",
+  "errorCodePaymentNotFound": "Payment not found",
+  "errorCodePlanNotFound": "Plan not found",
+  "errorCodeSupportRequestNotFound": "Support request not found",
+  "errorCodePhotoNotFound": "Photo not found",
+  "errorCodeMemberNotFound": "Worker not found",
+  "errorCodeInvitationNotFound": "Invitation not found",
+  "errorCodeAssigneeNotFound": "Assignee not found",
+  "errorCodeRabbitNotActive": "The rabbit is dead or sold — no new records for it",
+  "errorCodeBirthHasKitCards": "This kindling already has kit cards — record it there",
+  "errorCodeKitsMoreThanBorn": "There cannot be more cards than kits born alive",
+  "errorCodeKitsCountInvalid": "A kindling has between one and thirty kits",
+  "errorCodeWeaningBeforeBirth": "Weaning cannot happen before the kindling",
+  "errorCodeNotAMale": "The chosen rabbit is not a buck",
+  "errorCodeNotAFemale": "The chosen rabbit is not a doe",
+  "errorCodeParentIdInvalid": "The buck or the doe is chosen incorrectly",
+  "errorCodeBreedingSelf": "A rabbit cannot be mated with itself",
+  "errorCodeFemaleNotAvailable": "The doe is not ready for mating right now",
+  "errorCodeFatherNotFoundOrInvalidSex": "The father was not found, or it is not a buck",
+  "errorCodeMotherNotFoundOrInvalidSex": "The mother was not found, or it is not a doe",
+  "errorCodeCannotBeOwnParent": "A rabbit cannot be its own parent",
+  "errorCodeSexLocked": "The sex can no longer be changed: the rabbit has offspring or matings",
+  "errorCodeRabbitHasOffspring": "Cannot delete: the rabbit has offspring",
+  "errorCodeRabbitHasBreedings": "Cannot delete: the rabbit has matings",
+  "errorCodeRabbitHasBirths": "Cannot delete: the doe has kindlings",
+  "errorCodeRabbitHasHealthRecords": "Cannot delete: the rabbit has treatments or vaccinations",
+  "errorCodeRabbitHasTransactions": "Cannot delete: money records are linked to the rabbit",
+  "errorCodeCageHasRabbits": "Move the rabbits out first — the cage is not empty",
+  "errorCodeBreedHasRabbits": "Cannot delete a breed while rabbits belong to it",
+  "errorCodeBreedNameExists": "A breed with this name already exists",
+  "errorCodeTagRangeTaken": "Tags in this range are taken — start from another one",
+  "errorCodeFeedInUse": "Cannot delete the feed: it is used in feeding records",
+  "errorCodeStockOperationInvalid": "Stock changes only by adding or subtracting",
+  "errorCodeBulkCountInvalid": "You can add between one and a hundred rabbits at once",
+  "errorCodePeriodRequired": "Choose a year and a month",
+  "errorCodeFileMissing": "No file chosen",
+  "errorCodeFileTooLarge": "The file is too large",
+  "errorCodeFileUploadFailed": "The file did not upload — try again",
+  "errorCodeRelatedRecordInvalid": "The linked record was not found — refresh the screen",
+  "errorCodeNoPlan": "The farm has no plan assigned — contact support",
+  "errorCodePlanFree": "The current plan is free — no payment needed",
+  "errorCodePlanNameExists": "A plan with this name already exists",
+  "errorCodePlanDefaultTaken": "Another plan is already the default — clear it there first",
+  "errorCodePlanDisabled": "The plan is switched off — turn it on or choose another",
+  "errorCodeNoRecipients": "No recipients matched — check who the announcement is addressed to",
+  "errorCodeFarmNoOwner": "The farm has no owner — there is nobody to sign in as",
+  "errorCodeFarmNotDeleted": "The farm was not deleted — there is nothing to restore",
+  "errorCodePlatformAdminAccount": "This is a platform administrator account",
   "errorCodeRabbitNotFound": "Rabbit not found",
   "errorCodeCageNotFound": "Cage not found",
   "errorCodeBreedNotFound": "Breed not found",
@@ -167,7 +250,9 @@
   "bulkHerdDone": "{count, plural, one{{count} rabbit added} other{{count} rabbits added}}",
   "@bulkHerdDone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rabbitMultiPickerTitle": "Who is in the batch",
@@ -177,21 +262,29 @@
   "rabbitMultiPickerSelected": "{count, plural, one{{count} selected} other{{count} selected}}",
   "@rabbitMultiPickerSelected": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "transactionSaleBatch": "Sell as a batch",
   "ageYears": "{count, plural, one{{count} year} other{{count} years}}",
   "@ageYears": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ageYearsMonths": "{years}y {months}m",
   "@ageYearsMonths": {
     "placeholders": {
-      "years": { "type": "int" },
-      "months": { "type": "int" }
+      "years": {
+        "type": "int"
+      },
+      "months": {
+        "type": "int"
+      }
     }
   },
   "feedTypePellets": "Pellets",
@@ -211,7 +304,9 @@
   "offlineRejectedTitle": "{count, plural, one{{count} record was not saved} other{{count} records were not saved}}",
   "@offlineRejectedTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "offlineRejectedBody": "The server rejected them — please enter them again.",
@@ -361,7 +456,11 @@
   "taskFormAssigneeHelp": "The assignee gets a notification about the task.",
   "tasksAssignedTo": "Assignee: {name}",
   "@tasksAssignedTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "taskFormNotesLabel": "Notes",
   "taskFormCreate": "Create",
@@ -631,7 +730,11 @@
   "financeAuthor": "Recorded by",
   "financeAuthorLine": "Recorded by {name}",
   "@financeAuthorLine": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "financeTypeIncome": "Income",
   "financeTypeExpense": "Expense",
@@ -780,7 +883,12 @@
   "farmAboutBody": "Track your rabbit farm''s livestock, feed, health, and finances.",
   "farmLogout": "Sign out",
   "settingsAppearance": "Appearance",
-  "settingsTheme": "Theme",
+  "onbLookTitle": "How should the screen look?",
+  "onbLookSubtitle": "You can change this any time in settings",
+  "onbLookLightHint": "Readable in the sun, like a sheet of paper",
+  "onbLookDarkHint": "Easy on the eyes in a dim shed",
+  "onbLookSystemHint": "Follows the phone’s own setting",
+  "settingsTheme": "Light or dark",
   "settingsAccent": "Accent color",
   "settingsLanguage": "Language",
   "settingsNotifications": "Notifications",
@@ -791,12 +899,20 @@
   "settingsPurposeAllTitle": "Set the purpose for everyone?",
   "settingsPurposeAllBody": "Every live rabbit on the farm will be set to “{purpose}”. Rabbits that have left the farm stay as they are. Different values are replaced and can only be restored one by one. New rabbits will get this purpose too.",
   "@settingsPurposeAllBody": {
-    "placeholders": { "purpose": { "type": "String" } }
+    "placeholders": {
+      "purpose": {
+        "type": "String"
+      }
+    }
   },
   "settingsPurposeAllApply": "Set it",
   "settingsPurposeAllDone": "{count, plural, =0{Nothing to change — everyone was already set.} one{{count} rabbit changed.} other{{count} rabbits changed.}}",
   "@settingsPurposeAllDone": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "settingsAbout": "About",
   "settingsVersion": "Version",
@@ -814,7 +930,7 @@
   "logoutDialogBody": "Your records stay on the server — you will see them again after signing in.",
   "logoutDialogConfirm": "Sign out",
   "settingsThemeLight": "Light",
-  "settingsThemeSystem": "System",
+  "settingsThemeSystem": "Same as the phone",
   "settingsThemeDark": "Dark",
   "settingsSubscription": "Plan",
   "subscriptionTitle": "Plan",
@@ -850,6 +966,9 @@
   "registerSubmit": "Create farm",
   "registerHaveAccount": "Already have an account?",
   "registerFailed": "Couldn''t register",
+  "registerContactLabel": "Phone or email",
+  "registerContactHint": "+992 90 555 12 34 or mail@example.com",
+  "registerContactEmpty": "Enter a phone number or an email",
   "registerConsentPrefix": "I accept the ",
   "registerConsentLink": "privacy policy",
   "registerConsentRequired": "You need to accept the privacy policy to continue",
@@ -1052,6 +1171,9 @@
   "rabbitFormTagEmpty": "Enter the tag number",
   "rabbitFormBreedRequired": "Select a breed",
   "rabbitFormBreedsFailed": "Couldn''t load breeds",
+  "rabbitFormBreedsEmpty": "No breeds yet",
+  "rabbitFormBreedsEmptyHint": "A breed is required to add a rabbit. Add the one you keep.",
+  "rabbitFormBreedsEmptyAction": "Add a breed",
   "rabbitFormColor": "Color",
   "rabbitFormColorHint": "Gray, white, black…",
   "rabbitFormWeight": "Weight, kg",
@@ -1197,7 +1319,11 @@
   "platformPlanDeleteTitle": "Delete plan?",
   "platformPlanDeleteFarms": "{count, plural, =0{No farm is on this plan right now.} one{{count} farm is on it — it will run without limits.} other{{count} farms are on it — they will run without limits.}}",
   "@platformPlanDeleteFarms": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "platformPlanDeleteBody": "\"{name}\" will be removed from the list, and farms on it will run without limits. Their records won''t be affected.",
   "platformPlanDeleted": "Plan deleted",
@@ -1254,7 +1380,11 @@
   "platformFarmAuditAll": "Full log",
   "platformFarmStatusExpiredWarning": "The plan expired on {date}. The nightly check will put the farm back to read-only — extend the plan first if the access is to stay.",
   "@platformFarmStatusExpiredWarning": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "platformFarmPlanForever": "Unlimited",
   "platformFarmPlanExpires": "Valid until {date}",
@@ -1375,11 +1505,10 @@
   "storageUnitGb": "GB",
   "emptyNoRecordsTitle": "No records",
   "emptyNoRecordsBody": "Add the first one.",
-
   "onbWelcomeTitle": "RabbitFarm",
   "onbWelcomeBody": "Cages, matings, kindlings, feed and money, all recorded and always at hand. The app reminds you when to put the nest box in and when shots are due.",
   "onbWelcomeStart": "Get started",
-  "onbWelcomeHaveAccount": "I already have a farm",
+  "onbWelcomeHaveAccount": "Sign in",
   "onbHerdTitle": "How many rabbits do you keep?",
   "onbHerdSubtitle": "Roughly, young stock included.",
   "onbHerdUpTo20": "Up to 20",
@@ -1397,10 +1526,16 @@
   "onbFocusHealth": "Vaccinations and treatment",
   "onbFocusMoney": "Sales and expenses",
   "onbFocusNext": "Next",
+  "onbCrewPair": "Me and one helper",
+  "onbCrewPairHint": "Two of you: someone covers when you are away",
+  "onbCrewTeam": "A small team",
+  "onbCrewTeamHint": "Three to five people, each with their own access",
+  "onbCrewBig": "More than five people",
+  "onbCrewBigHint": "Shifts, and a record of who did what",
   "onbCrewTitle": "Who will use the app?",
   "onbCrewSubtitle": "You can change this at any time.",
-  "onbCrewAlone": "Only me",
-  "onbCrewAloneHint": "No invites, no access settings",
+  "onbCrewAlone": "Just me",
+  "onbCrewAloneHint": "No invitations, no access settings",
   "onbCrewHelpers": "Me and my helpers",
   "onbCrewHelpersHint": "Everyone records from their own phone, and you can see who entered what",
   "onbDoneTitle": "Where we start",
@@ -1408,14 +1543,31 @@
   "onbDoneCreate": "Create my farm",
   "onbBack": "Back",
   "onbSkip": "Skip",
+  "onbPlanPick": "You can pick another — the farm still starts on the free plan",
+  "subscriptionWanted": "During the intro you were looking at the «{name}» plan. Support can move you to it.",
+  "onbPlanFreeTitle": "The free plan is enough for you",
+  "onbPlanPaidTitle": "This plan fits your farm",
+  "onbPlanSubtitle": "Based on your answers: how many rabbits and who works with you",
+  "onbPlanFree": "Free",
+  "onbPlanPerMonth": "per month",
+  "onbPlanRabbits": "{count, plural, one{Up to {count} rabbit} other{Up to {count} rabbits}}",
+  "onbPlanRabbitsUnlimited": "Unlimited rabbits",
+  "onbPlanStaff": "{count, plural, one{One person in the app} other{Up to {count} people in the app}}",
+  "onbPlanStaffUnlimited": "Unlimited people in the app",
+  "onbPlanStartFree": "Start free: you pay when the farm outgrows the free plan.",
+  "onbPlanOthers": "Other plans",
+  "onbPlanContinue": "Create the farm",
+  "onbPlanRecommended": "Your plan",
+  "onbCountrySms": "Your sign-in code arrives by SMS",
+  "onbCountryEmail": "Your sign-in code arrives by email",
   "onbCountryTitle": "Where is your farm?",
   "onbCountrySubtitle": "Currency, time and sign-in method depend on this",
+  "countryLine": "Country: {country}",
   "countryTJ": "Tajikistan",
   "countryUZ": "Uzbekistan",
   "countryKG": "Kyrgyzstan",
   "countryKZ": "Kazakhstan",
   "countryRU": "Russia",
-  "countryAF": "Afghanistan",
   "loginSmsUnavailable": "SMS codes do not reach your country — sign in by email",
   "firstStepCages": "Set up your cages",
   "firstStepRabbits": "Add your does and bucks",
@@ -1426,7 +1578,6 @@
   "firstStepHelpers": "Invite a helper",
   "activationChecklistFarmCreated": "Farm created",
   "activationChecklistProgress": "{done} of {total}",
-
   "deathFormTitle": "Record a death",
   "deathFormRabbit": "Rabbit",
   "deathFormDate": "Date",
@@ -1445,22 +1596,18 @@
   "saleFormSubmit": "Record",
   "saleFormSaved": "Sale recorded",
   "quickRecordDeath": "Death",
-
   "notificationPrimerTitle": "We''ll remind you about the nest box",
   "notificationPrimerBody": "Two days before kindling you''ll get a reminder, with time to prepare the cage. We''ll also remind you about vaccinations and the day''s work.",
   "notificationPrimerAllow": "Turn on reminders",
   "notificationPrimerDecline": "Not now",
   "settingsNotificationsOff": "Notifications are off",
   "settingsNotificationsTurnOn": "Turn on",
-
   "rabbitFormMore": "More details",
   "rabbitFormSexRequired": "Choose buck or doe",
   "rabbitFormCageNone": "No cage",
   "rabbitFormCageFull": "{number} — full",
   "commonOptional": "optional",
-
   "unitKg": "kg",
-
   "kindlingPlanAction": "Kindling plan",
   "kindlingPlanPickMonth": "Which month is the plan for?",
   "kindlingPlanThisMonth": "This month",
@@ -1475,11 +1622,8 @@
   "kindlingPlanColNest": "Nest box",
   "kindlingPlanColMark": "Done",
   "kindlingPlanPrintedAt": "Printed {date}",
-
   "commonUndo": "Undo",
-
   "journalKindDeletion": "Deletion",
-
   "voiceDictate": "Dictate",
   "voiceStop": "Stop recording",
   "voiceUnavailable": "This phone cannot recognise speech",
@@ -1497,7 +1641,6 @@
   "cageScanHint": "Point the camera at the cage tag",
   "cageScanNoCamera": "Camera unavailable. Check the permission in your phone settings.",
   "slideToDelete": "Slide to delete",
-
   "birthsKitsDied": "Lost",
   "birthsKitDeathAction": "Record losses",
   "birthsKitsCardedHint": "This litter has individual cards — record deaths and weaning on the kit card in the herd.",
@@ -1505,9 +1648,7 @@
   "birthsKitDeathHint": "Still alive: {alive}",
   "birthsKitDeathSaved": "Recorded",
   "birthsKitsAlive": "Alive",
-
   "loginCodeLabelEmail": "Code from the email",
-
   "cyclePalpationAction": "Palpated",
   "cyclePalpationTitle": "What did the check show?",
   "cyclePalpationPregnant": "Pregnant",
@@ -1522,12 +1663,10 @@
   "birthsWeaningAll": "All of them: {count}",
   "birthsWeaningFewer": "Or fewer",
   "birthsWeaningSaved": "Weaning recorded",
-
   "subscriptionCheckFailed": "Could not check the payment — no connection to the server",
   "subscriptionPaymentDeclined": "The bank declined the payment",
   "subscriptionPaymentDeclinedHint": "No money was taken. Check the card and try again.",
   "subscriptionPayAgain": "Pay again",
-
   "supportRequestNew": "Write",
   "supportRequestNewTitle": "New request",
   "supportRequestsEmptyTitle": "No requests yet",
@@ -1552,14 +1691,18 @@
   "platformSupportContactEmailHint": "support@example.com",
   "platformSupportContactEmailInvalid": "Check the address — it has no @ sign",
   "platformSupportContactSaved": "Support contact saved",
-
   "notificationsTitle": "Notifications",
   "notificationsEmptyTitle": "Nothing yet",
   "notificationsEmptyBody": "Here you''ll find what the app has told you: overdue vaccinations, feed running low, kindling coming up.",
-
   "platformFilterDeleted": "Deleted",
   "platformFarmDeletedShort": "Deleted {date}",
-  "@platformFarmDeletedShort": {"placeholders": {"date": {"type": "String"}}},
+  "@platformFarmDeletedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "platformFarmsDeletedEmptyTitle": "No deleted farms",
   "platformFarmsDeletedEmptyBody": "Nothing is waiting to be wiped. A deleted farm stays here for 30 days — long enough to change your mind.",
   "platformPlanDeleteDefaultWarning": "This is the default plan. Once it is gone, new farms will appear with no plan at all until another one is marked as the default.",
@@ -1568,18 +1711,63 @@
   "platformAuditEmptyTitle": "The log is empty",
   "platformAuditEmptyBody": "Every admin action lands here: plan changes, farm access, signing in as a client, deletions.",
   "countAuditRecords": "{count, plural, one{{count} record} other{{count} records}}",
-  "@countAuditRecords": {"placeholders": {"count": {"type": "int"}}},
+  "@countAuditRecords": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditAdmin": "Admin {id}",
-  "@platformAuditAdmin": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditAdmin": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFarm": "Farm {id}",
-  "@platformAuditFarm": {"placeholders": {"id": {"type": "String"}}},
+  "@platformAuditFarm": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditWholeService": "Whole service",
   "platformAuditIp": "IP {ip}",
-  "@platformAuditIp": {"placeholders": {"ip": {"type": "String"}}},
+  "@platformAuditIp": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditChange": "{field}: {before} → {after}",
-  "@platformAuditChange": {"placeholders": {"field": {"type": "String"}, "before": {"type": "String"}, "after": {"type": "String"}}},
+  "@platformAuditChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditDetail": "{field}: {value}",
-  "@platformAuditDetail": {"placeholders": {"field": {"type": "String"}, "value": {"type": "String"}}},
+  "@platformAuditDetail": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditValueNone": "not set",
   "platformAuditActionPlanCreate": "Plan created",
   "platformAuditActionPlanUpdate": "Plan changed",
@@ -1596,7 +1784,13 @@
   "platformAuditActionSupportResolve": "Support request closed",
   "platformAuditActionSupportContact": "Support contact changed",
   "platformAuditActionUnknown": "Action “{action}”",
-  "@platformAuditActionUnknown": {"placeholders": {"action": {"type": "String"}}},
+  "@platformAuditActionUnknown": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "platformAuditFieldName": "Name",
   "platformAuditFieldLimits": "Limits",
   "platformAuditFieldPrice": "Price",
@@ -1612,15 +1806,31 @@
   "platformAuditPlanBecameDefault": "Became the default plan",
   "platformAuditPlanNoLongerDefault": "No longer the default plan",
   "platformAuditPlanRef": "Plan #{id}",
-  "@platformAuditPlanRef": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditPlanRef": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportAnswered": "Request #{id} — answered to the author",
-  "@platformAuditSupportAnswered": {"placeholders": {"id": {"type": "int"}}},
+  "@platformAuditSupportAnswered": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "platformAuditSupportClosed": "Request #{id} — closed without an answer",
-  "@platformAuditSupportClosed": {"placeholders": {"id": {"type": "int"}}},
-
+  "@platformAuditSupportClosed": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
   "feedsPaidLabel": "Amount paid",
   "feedsPaidHint": "If this was a purchase, the amount goes into expenses. Leave empty when you are just correcting the count.",
-
   "staffInvitedEmailFailedBody": "We could not send the email to {email} — forward the invitation yourself.",
   "staffInviteLinkLabel": "Invitation link",
   "staffInviteCopy": "Copy the invitation",
@@ -1632,9 +1842,7 @@
   "staffInviteAgain": "Invite again",
   "loginNoCodePhone": "No code? Ask the farm owner which number they invited you with.",
   "loginNoCodeEmail": "No code? Ask the farm owner which email address they invited you with.",
-
   "platformPlanDefaultBadge": "for new farms",
-
   "staffAccessClosedBadge": "access closed",
   "roleManagerDescription": "Runs the herd, the feed and the money",
   "roleWorkerDescription": "Reads the records and marks work done",

@@ -171,7 +171,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pinSaved => 'Code saved';
 
   @override
-  String get pinMismatch => 'The codes didn\'t match — try again';
+  String get pinMismatch => 'The codes didn\'t match — pick a code again';
 
   @override
   String get pinLockPrompt => 'Enter your code';
@@ -328,6 +328,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todayNeedsAttention => 'Needs attention';
 
   @override
+  String get todayEmptyFarmTitle => 'Tasks will appear once the farm does';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Start with cages — rabbits move into them, and the app gets something to remind you about';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'The cages are ready — add your first rabbits and the tasks will follow';
+
+  @override
   String get todayAllClear => 'All clear — nothing urgent';
 
   @override
@@ -440,6 +451,290 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickNeedsConnection => 'Needs connection';
+
+  @override
+  String get errorCodeSessionExpired =>
+      'Your session has ended — sign in again';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Your access to the farm is closed — ask the owner';
+
+  @override
+  String get errorCodeRegistrationClosed =>
+      'Accounts are created by the farm owner';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'This section is for the platform administrator only';
+
+  @override
+  String get errorCodeOtpInvalid => 'Wrong code';
+
+  @override
+  String get errorCodeOtpExpired => 'The code has expired — request a new one';
+
+  @override
+  String get errorCodeOtpLocked => 'Too many attempts — request a new code';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'You are asking for codes too often — wait a little';
+
+  @override
+  String get errorCodeRateLimited => 'Too many requests — wait a little';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Too many uploads in a row — wait a little';
+
+  @override
+  String get errorCodeContactRequired => 'Enter a phone number or an email';
+
+  @override
+  String get errorCodeInvalidEmail => 'That email address is not valid';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'A Tajik number is required: +992 and nine digits';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'Sending SMS is not working right now — sign in by email';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Sending email is not working right now — sign in by phone';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'The farm is suspended — contact support';
+
+  @override
+  String get errorCodeFarmDeleted =>
+      'The farm has been deleted — contact support';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'The farm is read-only — records cannot be saved right now';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Signed in as the client — read-only, records cannot be changed';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'A newer version of the app is required — please update';
+
+  @override
+  String get errorCodeUserNotFound => 'That person was not found';
+
+  @override
+  String get errorCodeFarmNotFound => 'Farm not found';
+
+  @override
+  String get errorCodeBirthNotFound => 'Kindling not found';
+
+  @override
+  String get errorCodeMotherNotFound => 'Mother not found';
+
+  @override
+  String get errorCodeFatherNotFound => 'Father not found';
+
+  @override
+  String get errorCodeMaleNotFound => 'Buck not found';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Doe not found';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Mating not found';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Feeding record not found';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Treatment record not found';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Vaccination record not found';
+
+  @override
+  String get errorCodeNoteNotFound => 'Note not found';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Money record not found';
+
+  @override
+  String get errorCodePaymentNotFound => 'Payment not found';
+
+  @override
+  String get errorCodePlanNotFound => 'Plan not found';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Support request not found';
+
+  @override
+  String get errorCodePhotoNotFound => 'Photo not found';
+
+  @override
+  String get errorCodeMemberNotFound => 'Worker not found';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Invitation not found';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Assignee not found';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'The rabbit is dead or sold — no new records for it';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'This kindling already has kit cards — record it there';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'There cannot be more cards than kits born alive';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'A kindling has between one and thirty kits';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Weaning cannot happen before the kindling';
+
+  @override
+  String get errorCodeNotAMale => 'The chosen rabbit is not a buck';
+
+  @override
+  String get errorCodeNotAFemale => 'The chosen rabbit is not a doe';
+
+  @override
+  String get errorCodeParentIdInvalid =>
+      'The buck or the doe is chosen incorrectly';
+
+  @override
+  String get errorCodeBreedingSelf => 'A rabbit cannot be mated with itself';
+
+  @override
+  String get errorCodeFemaleNotAvailable =>
+      'The doe is not ready for mating right now';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'The father was not found, or it is not a buck';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'The mother was not found, or it is not a doe';
+
+  @override
+  String get errorCodeCannotBeOwnParent => 'A rabbit cannot be its own parent';
+
+  @override
+  String get errorCodeSexLocked =>
+      'The sex can no longer be changed: the rabbit has offspring or matings';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Cannot delete: the rabbit has offspring';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Cannot delete: the rabbit has matings';
+
+  @override
+  String get errorCodeRabbitHasBirths => 'Cannot delete: the doe has kindlings';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Cannot delete: the rabbit has treatments or vaccinations';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Cannot delete: money records are linked to the rabbit';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Move the rabbits out first — the cage is not empty';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'Cannot delete a breed while rabbits belong to it';
+
+  @override
+  String get errorCodeBreedNameExists =>
+      'A breed with this name already exists';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Tags in this range are taken — start from another one';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Cannot delete the feed: it is used in feeding records';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Stock changes only by adding or subtracting';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'You can add between one and a hundred rabbits at once';
+
+  @override
+  String get errorCodePeriodRequired => 'Choose a year and a month';
+
+  @override
+  String get errorCodeFileMissing => 'No file chosen';
+
+  @override
+  String get errorCodeFileTooLarge => 'The file is too large';
+
+  @override
+  String get errorCodeFileUploadFailed => 'The file did not upload — try again';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'The linked record was not found — refresh the screen';
+
+  @override
+  String get errorCodeNoPlan =>
+      'The farm has no plan assigned — contact support';
+
+  @override
+  String get errorCodePlanFree =>
+      'The current plan is free — no payment needed';
+
+  @override
+  String get errorCodePlanNameExists => 'A plan with this name already exists';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Another plan is already the default — clear it there first';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'The plan is switched off — turn it on or choose another';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'No recipients matched — check who the announcement is addressed to';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'The farm has no owner — there is nobody to sign in as';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'The farm was not deleted — there is nothing to restore';
+
+  @override
+  String get errorCodePlatformAdminAccount =>
+      'This is a platform administrator account';
 
   @override
   String get errorCodeRabbitNotFound => 'Rabbit not found';
@@ -2519,7 +2814,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearance => 'Appearance';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get onbLookTitle => 'How should the screen look?';
+
+  @override
+  String get onbLookSubtitle => 'You can change this any time in settings';
+
+  @override
+  String get onbLookLightHint => 'Readable in the sun, like a sheet of paper';
+
+  @override
+  String get onbLookDarkHint => 'Easy on the eyes in a dim shed';
+
+  @override
+  String get onbLookSystemHint => 'Follows the phone’s own setting';
+
+  @override
+  String get settingsTheme => 'Light or dark';
 
   @override
   String get settingsAccent => 'Accent color';
@@ -2619,7 +2929,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeLight => 'Light';
 
   @override
-  String get settingsThemeSystem => 'System';
+  String get settingsThemeSystem => 'Same as the phone';
 
   @override
   String get settingsThemeDark => 'Dark';
@@ -2737,6 +3047,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerFailed => 'Couldn\'t register';
+
+  @override
+  String get registerContactLabel => 'Phone or email';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 or mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Enter a phone number or an email';
 
   @override
   String get registerConsentPrefix => 'I accept the ';
@@ -3400,6 +3719,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rabbitFormBreedsFailed => 'Couldn\'t load breeds';
+
+  @override
+  String get rabbitFormBreedsEmpty => 'No breeds yet';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'A breed is required to add a rabbit. Add the one you keep.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Add a breed';
 
   @override
   String get rabbitFormColor => 'Color';
@@ -4584,7 +4913,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbWelcomeStart => 'Get started';
 
   @override
-  String get onbWelcomeHaveAccount => 'I already have a farm';
+  String get onbWelcomeHaveAccount => 'Sign in';
 
   @override
   String get onbHerdTitle => 'How many rabbits do you keep?';
@@ -4639,16 +4968,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbFocusNext => 'Next';
 
   @override
+  String get onbCrewPair => 'Me and one helper';
+
+  @override
+  String get onbCrewPairHint => 'Two of you: someone covers when you are away';
+
+  @override
+  String get onbCrewTeam => 'A small team';
+
+  @override
+  String get onbCrewTeamHint =>
+      'Three to five people, each with their own access';
+
+  @override
+  String get onbCrewBig => 'More than five people';
+
+  @override
+  String get onbCrewBigHint => 'Shifts, and a record of who did what';
+
+  @override
   String get onbCrewTitle => 'Who will use the app?';
 
   @override
   String get onbCrewSubtitle => 'You can change this at any time.';
 
   @override
-  String get onbCrewAlone => 'Only me';
+  String get onbCrewAlone => 'Just me';
 
   @override
-  String get onbCrewAloneHint => 'No invites, no access settings';
+  String get onbCrewAloneHint => 'No invitations, no access settings';
 
   @override
   String get onbCrewHelpers => 'Me and my helpers';
@@ -4674,11 +5022,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbSkip => 'Skip';
 
   @override
+  String get onbPlanPick =>
+      'You can pick another — the farm still starts on the free plan';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'During the intro you were looking at the «$name» plan. Support can move you to it.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'The free plan is enough for you';
+
+  @override
+  String get onbPlanPaidTitle => 'This plan fits your farm';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Based on your answers: how many rabbits and who works with you';
+
+  @override
+  String get onbPlanFree => 'Free';
+
+  @override
+  String get onbPlanPerMonth => 'per month';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Up to $count rabbits',
+      one: 'Up to $count rabbit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Unlimited rabbits';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Up to $count people in the app',
+      one: 'One person in the app',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Unlimited people in the app';
+
+  @override
+  String get onbPlanStartFree =>
+      'Start free: you pay when the farm outgrows the free plan.';
+
+  @override
+  String get onbPlanOthers => 'Other plans';
+
+  @override
+  String get onbPlanContinue => 'Create the farm';
+
+  @override
+  String get onbPlanRecommended => 'Your plan';
+
+  @override
+  String get onbCountrySms => 'Your sign-in code arrives by SMS';
+
+  @override
+  String get onbCountryEmail => 'Your sign-in code arrives by email';
+
+  @override
   String get onbCountryTitle => 'Where is your farm?';
 
   @override
   String get onbCountrySubtitle =>
       'Currency, time and sign-in method depend on this';
+
+  @override
+  String countryLine(String country) {
+    return 'Country: $country';
+  }
 
   @override
   String get countryTJ => 'Tajikistan';
@@ -4694,9 +5119,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countryRU => 'Russia';
-
-  @override
-  String get countryAF => 'Afghanistan';
 
   @override
   String get loginSmsUnavailable =>

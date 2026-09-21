@@ -164,14 +164,33 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('несовпавший повтор просит набрать заново', (tester) async {
+    testWidgets('несовпавший повтор возвращает к первому шагу',
+        (tester) async {
       final container = await pumpSetup(tester);
 
       await enter(tester, '1234');
       await enter(tester, '9999');
 
-      expect(find.text('Коды не совпали — попробуйте ещё раз'), findsOneWidget);
+      expect(find.text('Коды не совпали — придумайте код заново'),
+          findsOneWidget);
       expect(container.read(pinProvider).isSet, isFalse);
+      // Промахнуться можно и в первом наборе: если оставить человека на
+      // повторе, он повторяет код, которого сам не знает, и выйти отсюда
+      // нечем, кроме «не сейчас».
+      expect(find.text('Придумайте код из 4 цифр'), findsOneWidget,
+          reason: 'после несовпадения код придумывают заново, а не повторяют');
+    });
+
+    testWidgets('после несовпадения код заводится со второй попытки',
+        (tester) async {
+      final container = await pumpSetup(tester);
+
+      await enter(tester, '1234');
+      await enter(tester, '9999');
+      await enter(tester, '5555');
+      await enter(tester, '5555');
+
+      expect(container.read(pinProvider).isSet, isTrue);
     });
 
     testWidgets('совпавший повтор сохраняет код', (tester) async {

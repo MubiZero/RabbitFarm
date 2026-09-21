@@ -172,7 +172,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get pinSaved => 'Рамз захира шуд';
 
   @override
-  String get pinMismatch => 'Рамзҳо мувофиқ нашуданд — аз нав кӯшиш кунед';
+  String get pinMismatch => 'Рамзҳо мувофиқ нашуданд — рамзро аз нав созед';
 
   @override
   String get pinLockPrompt => 'Рамзро ворид кунед';
@@ -329,6 +329,17 @@ class AppLocalizationsTg extends AppLocalizations {
   String get todayNeedsAttention => 'Таваҷҷуҳ лозим аст';
 
   @override
+  String get todayEmptyFarmTitle => 'Корҳо ҳамроҳи хоҷагӣ пайдо мешаванд';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Аз қафасҳо сар кунед — дар онҳо харгӯшҳо ҷойгир мешаванд, ва барнома чизе барои хотиррасон кардан пайдо мекунад';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Қафасҳо ҳастанд — аввалин харгӯшҳоро қайд кунед, ва корҳо худ пайдо мешаванд';
+
+  @override
   String get todayAllClear => 'Ҳама зери назорат аст — фаврӣ чизе нест';
 
   @override
@@ -441,6 +452,292 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get quickNeedsConnection => 'Алоқа лозим аст';
+
+  @override
+  String get errorCodeSessionExpired =>
+      'Мӯҳлати вуруд гузашт — аз нав ворид шавед';
+
+  @override
+  String get errorCodeUserInactive =>
+      'Дастрасӣ ба хоҷагӣ баста шуд — аз соҳиб пурсед';
+
+  @override
+  String get errorCodeRegistrationClosed => 'Ҳисобро соҳиби хоҷагӣ медиҳад';
+
+  @override
+  String get errorCodePlatformAdminOnly =>
+      'Ин бахш танҳо барои маъмури платформа';
+
+  @override
+  String get errorCodeOtpInvalid => 'Рамз нодуруст';
+
+  @override
+  String get errorCodeOtpExpired => 'Мӯҳлати рамз гузашт — рамзи нав пурсед';
+
+  @override
+  String get errorCodeOtpLocked => 'Кӯшишҳо аз ҳад зиёд — рамзи нав пурсед';
+
+  @override
+  String get errorCodeOtpRateLimited =>
+      'Рамзро хеле зуд-зуд мепурсед — каме интизор шавед';
+
+  @override
+  String get errorCodeRateLimited =>
+      'Дархостҳо аз ҳад зиёд — каме интизор шавед';
+
+  @override
+  String get errorCodeUploadRateLimited =>
+      'Боркуниҳо паси ҳам зиёданд — каме интизор шавед';
+
+  @override
+  String get errorCodeContactRequired => 'Телефон ё почтаро нависед';
+
+  @override
+  String get errorCodeInvalidEmail => 'Почта нодуруст навишта шудааст';
+
+  @override
+  String get errorCodeInvalidPhone =>
+      'Рақами тоҷикӣ лозим аст: +992 ва нӯҳ рақам';
+
+  @override
+  String get errorCodeSmsNotConfigured =>
+      'Фиристодани SMS ҳоло кор намекунад — бо почта ворид шавед';
+
+  @override
+  String get errorCodeEmailNotConfigured =>
+      'Фиристодани мактуб ҳоло кор намекунад — бо телефон ворид шавед';
+
+  @override
+  String get errorCodeFarmSuspended =>
+      'Хоҷагӣ боздошта шудааст — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodeFarmDeleted =>
+      'Хоҷагӣ нест карда шуд — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodeFarmReadOnly =>
+      'Хоҷагӣ танҳо барои хондан — сабтҳо ҳоло нигоҳ дошта намешаванд';
+
+  @override
+  String get errorCodeImpersonationReadOnly =>
+      'Вуруд ба ҷои мизоҷ — танҳо хондан, сабтҳоро тағйир додан мумкин нест';
+
+  @override
+  String get errorCodeUpgradeRequired =>
+      'Нусхаи нави барнома лозим аст — онро навсозӣ кунед';
+
+  @override
+  String get errorCodeUserNotFound => 'Корбар ёфт нашуд';
+
+  @override
+  String get errorCodeFarmNotFound => 'Хоҷагӣ ёфт нашуд';
+
+  @override
+  String get errorCodeBirthNotFound => 'Зоиш ёфт нашуд';
+
+  @override
+  String get errorCodeMotherNotFound => 'Модар ёфт нашуд';
+
+  @override
+  String get errorCodeFatherNotFound => 'Падар ёфт нашуд';
+
+  @override
+  String get errorCodeMaleNotFound => 'Нарина ёфт нашуд';
+
+  @override
+  String get errorCodeFemaleNotFound => 'Модина ёфт нашуд';
+
+  @override
+  String get errorCodeBreedingNotFound => 'Ҷуфтшавӣ ёфт нашуд';
+
+  @override
+  String get errorCodeFeedingNotFound => 'Сабти хӯрокдиҳӣ ёфт нашуд';
+
+  @override
+  String get errorCodeMedicalRecordNotFound => 'Сабти табобат ёфт нашуд';
+
+  @override
+  String get errorCodeVaccinationNotFound => 'Сабти эмгузаронӣ ёфт нашуд';
+
+  @override
+  String get errorCodeNoteNotFound => 'Ёддошт ёфт нашуд';
+
+  @override
+  String get errorCodeTransactionNotFound => 'Сабти пул ёфт нашуд';
+
+  @override
+  String get errorCodePaymentNotFound => 'Пардохт ёфт нашуд';
+
+  @override
+  String get errorCodePlanNotFound => 'Таъриф ёфт нашуд';
+
+  @override
+  String get errorCodeSupportRequestNotFound => 'Муроҷиат ёфт нашуд';
+
+  @override
+  String get errorCodePhotoNotFound => 'Сурат ёфт нашуд';
+
+  @override
+  String get errorCodeMemberNotFound => 'Коргар ёфт нашуд';
+
+  @override
+  String get errorCodeInvitationNotFound => 'Даъватнома ёфт нашуд';
+
+  @override
+  String get errorCodeAssigneeNotFound => 'Иҷрокунанда ёфт нашуд';
+
+  @override
+  String get errorCodeRabbitNotActive =>
+      'Харгӯш мурд ё фурӯхта шуд — барои ӯ сабти нав намекунанд';
+
+  @override
+  String get errorCodeBirthHasKitCards =>
+      'Барои ин зоиш кортҳои харгӯшбачаҳо кушода шудаанд — дар онҳо қайд кунед';
+
+  @override
+  String get errorCodeKitsMoreThanBorn =>
+      'Шумораи кортҳо аз зиндатаваллудшудагон зиёд буда наметавонад';
+
+  @override
+  String get errorCodeKitsCountInvalid =>
+      'Дар як зоиш аз як то сӣ харгӯшбача мешавад';
+
+  @override
+  String get errorCodeWeaningBeforeBirth =>
+      'Ҷудокунӣ пеш аз зоиш шуда наметавонад';
+
+  @override
+  String get errorCodeNotAMale => 'Интихобшуда нарина нест';
+
+  @override
+  String get errorCodeNotAFemale => 'Интихобшуда модина нест';
+
+  @override
+  String get errorCodeParentIdInvalid =>
+      'Нарина ё модина нодуруст интихоб шудааст';
+
+  @override
+  String get errorCodeBreedingSelf =>
+      'Харгӯшро бо худаш ҷуфт кардан мумкин нест';
+
+  @override
+  String get errorCodeFemaleNotAvailable =>
+      'Модина ҳоло барои ҷуфтшавӣ тайёр нест';
+
+  @override
+  String get errorCodeFatherNotFoundOrInvalidSex =>
+      'Падар ёфт нашуд ё ин нарина нест';
+
+  @override
+  String get errorCodeMotherNotFoundOrInvalidSex =>
+      'Модар ёфт нашуд ё ин модина нест';
+
+  @override
+  String get errorCodeCannotBeOwnParent =>
+      'Харгӯш падару модари худаш шуда наметавонад';
+
+  @override
+  String get errorCodeSexLocked =>
+      'Ҷинсро дигар иваз кардан мумкин нест: харгӯш насл ё ҷуфтшавӣ дорад';
+
+  @override
+  String get errorCodeRabbitHasOffspring =>
+      'Нест кардан мумкин нест: харгӯш насл дорад';
+
+  @override
+  String get errorCodeRabbitHasBreedings =>
+      'Нест кардан мумкин нест: харгӯш ҷуфтшавӣ дорад';
+
+  @override
+  String get errorCodeRabbitHasBirths =>
+      'Нест кардан мумкин нест: модина зоиш дорад';
+
+  @override
+  String get errorCodeRabbitHasHealthRecords =>
+      'Нест кардан мумкин нест: харгӯш табобат ё эм дорад';
+
+  @override
+  String get errorCodeRabbitHasTransactions =>
+      'Нест кардан мумкин нест: бо харгӯш пул алоқаманд аст';
+
+  @override
+  String get errorCodeCageHasRabbits =>
+      'Аввал харгӯшҳоро кӯчонед — қафас холӣ нест';
+
+  @override
+  String get errorCodeBreedHasRabbits =>
+      'То даме ки дар зот харгӯш ҳаст, онро нест кардан мумкин нест';
+
+  @override
+  String get errorCodeBreedNameExists => 'Зот бо чунин ном аллакай ҳаст';
+
+  @override
+  String get errorCodeTagRangeTaken =>
+      'Тамғаҳои ин қатор банданд — аз дигараш сар кунед';
+
+  @override
+  String get errorCodeFeedInUse =>
+      'Хӯрокро нест кардан мумкин нест: бо он хӯрокдиҳӣ ҳаст';
+
+  @override
+  String get errorCodeStockOperationInvalid =>
+      'Анборро танҳо бо даромад ё хароҷот тағйир медиҳанд';
+
+  @override
+  String get errorCodeBulkCountInvalid =>
+      'Дар як бор аз як то сад харгӯш сабт мекунанд';
+
+  @override
+  String get errorCodePeriodRequired => 'Сол ва моҳро интихоб кунед';
+
+  @override
+  String get errorCodeFileMissing => 'Файл интихоб нашудааст';
+
+  @override
+  String get errorCodeFileTooLarge => 'Файл хеле калон аст';
+
+  @override
+  String get errorCodeFileUploadFailed =>
+      'Файл бор нашуд — бори дигар кӯшиш кунед';
+
+  @override
+  String get errorCodeRelatedRecordInvalid =>
+      'Сабти алоқаманд ёфт нашуд — экранро нав кунед';
+
+  @override
+  String get errorCodeNoPlan =>
+      'Ба хоҷагӣ таъриф таъин нашудааст — ба дастгирӣ нависед';
+
+  @override
+  String get errorCodePlanFree =>
+      'Таърифи ҳозира ройгон аст — пардохт лозим нест';
+
+  @override
+  String get errorCodePlanNameExists => 'Таъриф бо чунин ном аллакай ҳаст';
+
+  @override
+  String get errorCodePlanDefaultTaken =>
+      'Таърифи пешфарз аллакай ба дигараш таъин шудааст — аломатро аз он гиред';
+
+  @override
+  String get errorCodePlanDisabled =>
+      'Таъриф хомӯш аст — онро фаъол кунед ё дигарашро интихоб кунед';
+
+  @override
+  String get errorCodeNoRecipients =>
+      'Гирандагон ёфт нашуданд — санҷед, эълон ба кӣ нигаронида шудааст';
+
+  @override
+  String get errorCodeFarmNoOwner =>
+      'Хоҷагӣ соҳиб надорад — ба ҷои мизоҷ ворид шудан имконнопазир';
+
+  @override
+  String get errorCodeFarmNotDeleted =>
+      'Хоҷагӣ нест карда нашуда буд — барқарор кардан чизе нест';
+
+  @override
+  String get errorCodePlatformAdminAccount => 'Ин ҳисоби маъмури платформа аст';
 
   @override
   String get errorCodeRabbitNotFound => 'Харгӯш ёфт нашуд';
@@ -2513,7 +2810,23 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsAppearance => 'Намуди зоҳирӣ';
 
   @override
-  String get settingsTheme => 'Мавзӯъ';
+  String get onbLookTitle => 'Экранро чӣ гуна нишон диҳем?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Инро ҳар вақт дар танзимот иваз кардан мумкин аст';
+
+  @override
+  String get onbLookLightHint => 'Дар офтоб хонда мешавад — мисли варақи коғаз';
+
+  @override
+  String get onbLookDarkHint => 'Бегоҳӣ дар оғил чашмро намезанад';
+
+  @override
+  String get onbLookSystemHint => 'Ҳамроҳи телефон иваз мешавад';
+
+  @override
+  String get settingsTheme => 'Равшан ё торик';
 
   @override
   String get settingsAccent => 'Ранги акцент';
@@ -2613,7 +2926,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsThemeLight => 'Равшан';
 
   @override
-  String get settingsThemeSystem => 'Мисли система';
+  String get settingsThemeSystem => 'Мисли телефон';
 
   @override
   String get settingsThemeDark => 'Торик';
@@ -2732,6 +3045,15 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get registerFailed => 'Бақайдгирӣ муяссар нашуд';
+
+  @override
+  String get registerContactLabel => 'Телефон ё почта';
+
+  @override
+  String get registerContactHint => '+992 90 555 12 34 ё mail@example.com';
+
+  @override
+  String get registerContactEmpty => 'Телефон ё почтаро нависед';
 
   @override
   String get registerConsentPrefix => 'Ман қабул мекунам ';
@@ -3392,6 +3714,16 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get rabbitFormBreedsFailed => 'Бор кардани зотҳо муяссар нашуд';
+
+  @override
+  String get rabbitFormBreedsEmpty => 'Ҳоло зот нест';
+
+  @override
+  String get rabbitFormBreedsEmptyHint =>
+      'Барои сабти харгӯш зот лозим аст. Зоти худро илова кунед.';
+
+  @override
+  String get rabbitFormBreedsEmptyAction => 'Зот илова кардан';
 
   @override
   String get rabbitFormColor => 'Ранг';
@@ -4562,7 +4894,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbWelcomeStart => 'Оғоз';
 
   @override
-  String get onbWelcomeHaveAccount => 'Ман аллакай хоҷагӣ дорам';
+  String get onbWelcomeHaveAccount => 'Ворид шудан';
 
   @override
   String get onbHerdTitle => 'Шумо чанд харгӯш доред?';
@@ -4617,6 +4949,25 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbFocusNext => 'Минбаъд';
 
   @override
+  String get onbCrewPair => 'Ману як ёрдамчӣ';
+
+  @override
+  String get onbCrewPairHint =>
+      'Дунафарӣ: вақте ман нестам, дигаре ҷойгузин мешавад';
+
+  @override
+  String get onbCrewTeam => 'Дастаи хурд';
+
+  @override
+  String get onbCrewTeamHint => 'Се-панҷ нафар, ҳар кадом ҳуқуқи худро дорад';
+
+  @override
+  String get onbCrewBig => 'Зиёда аз панҷ нафар';
+
+  @override
+  String get onbCrewBigHint => 'Хоҷагӣ бо навбатҳо ва ҳисоби кори ҳар кас';
+
+  @override
   String get onbCrewTitle => 'Кӣ дар барнома кор мекунад?';
 
   @override
@@ -4626,7 +4977,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbCrewAlone => 'Танҳо ман';
 
   @override
-  String get onbCrewAloneHint => 'На даъват лозим аст, на танзими дастрасӣ';
+  String get onbCrewAloneHint => 'На даъватнома, на танзими дастрасӣ';
 
   @override
   String get onbCrewHelpers => 'Ман ва ёрдамчиён';
@@ -4651,11 +5002,88 @@ class AppLocalizationsTg extends AppLocalizations {
   String get onbSkip => 'Гузарондан';
 
   @override
+  String get onbPlanPick =>
+      'Дигарашро низ интихоб кардан мумкин — хоҷагӣ ҳар ҳол дар ройгон кушода мешавад';
+
+  @override
+  String subscriptionWanted(String name) {
+    return 'Ҳангоми шиносоӣ шумо тарифи «$name»-ро дида будед. Барои гузаштан дастгирӣ кӯмак мекунад.';
+  }
+
+  @override
+  String get onbPlanFreeTitle => 'Ба шумо ройгон мерасад';
+
+  @override
+  String get onbPlanPaidTitle => 'Ба хоҷагии шумо мувофиқ аст';
+
+  @override
+  String get onbPlanSubtitle =>
+      'Аз рӯи ҷавобҳои шумо: чанд харгӯш ва кӣ кор мекунад';
+
+  @override
+  String get onbPlanFree => 'Ройгон';
+
+  @override
+  String get onbPlanPerMonth => 'дар як моҳ';
+
+  @override
+  String onbPlanRabbits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'То $count харгӯш',
+      one: 'То $count харгӯш',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanRabbitsUnlimited => 'Харгӯшҳо бемаҳдудият';
+
+  @override
+  String onbPlanStaff(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'То $count нафар дар барнома',
+      one: 'Як нафар дар барнома',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onbPlanStaffUnlimited => 'Кормандон бемаҳдудият';
+
+  @override
+  String get onbPlanStartFree =>
+      'Сар кардан ройгон аст: пардохт вақте лозим мешавад, ки хоҷагӣ аз тарифи ройгон калон шавад.';
+
+  @override
+  String get onbPlanOthers => 'Тарифҳои дигар';
+
+  @override
+  String get onbPlanContinue => 'Хоҷагӣ кушодан';
+
+  @override
+  String get onbPlanRecommended => 'Тарифи шумо';
+
+  @override
+  String get onbCountrySms => 'Рамзи вуруд бо SMS меояд';
+
+  @override
+  String get onbCountryEmail => 'Рамзи вуруд ба почта меояд';
+
+  @override
   String get onbCountryTitle => 'Хоҷагии шумо дар куҷост?';
 
   @override
   String get onbCountrySubtitle =>
       'Асъор, вақт ва тарзи воридшавӣ аз ин вобаста аст';
+
+  @override
+  String countryLine(String country) {
+    return 'Кишвар: $country';
+  }
 
   @override
   String get countryTJ => 'Тоҷикистон';
@@ -4671,9 +5099,6 @@ class AppLocalizationsTg extends AppLocalizations {
 
   @override
   String get countryRU => 'Русия';
-
-  @override
-  String get countryAF => 'Афғонистон';
 
   @override
   String get loginSmsUnavailable =>

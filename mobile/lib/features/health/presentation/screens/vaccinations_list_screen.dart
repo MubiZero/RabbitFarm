@@ -626,9 +626,7 @@ class _DetailsSheet extends ConsumerWidget {
     // При неудаче строка возвращается на место, иначе останется впечатление,
     // что прививку удалили.
     if (!success) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
       await notifier.load();
     }
   }

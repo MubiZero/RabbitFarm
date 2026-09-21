@@ -24,7 +24,13 @@ const SITE = 'https://rabbitfarm.click';
 // пересборки: так адрес магазина или нового стенда меняется одной
 // переменной окружения.
 const APP_URL = 'https://app.rabbitfarm.click';
+
+// Приложение открывается на языке страницы, с которой человек пришёл.
+// Иначе узбекская страница уводила в интерфейс на английском: приложение
+// угадывало язык по настройкам телефона, а на дешёвом Android там английский.
+const appUrl = (locale) => `${APP_URL}?lang=${locale}`;
 const REPO = 'https://github.com/MubiZero/RabbitFarm';
+const YEAR = new Date().getFullYear();
 
 // Русский лежит в корне: это основной язык аудитории.
 const LOCALES = ['ru', 'tg', 'uz', 'en'];
@@ -51,7 +57,7 @@ const MODULE_ICONS = ['rabbit', 'heart-straight', 'grid-four', 'plant', 'first-a
 // модулей из семи и только на русской странице, и ряд выглядел так, будто
 // две функции настоящие, а пять обещаны. Ровный текстовый ряд честнее.
 // Крупные ячейки выделены фоном, а не картинкой.
-const JOB_SHOTS = ['feeding', 'birth'];
+const JOB_SHOTS = ['feeding', 'birth', 'weight', 'vaccination', 'sale'];
 
 /**
  * Снимок экрана на языке страницы. Приложение говорит на всех четырёх
@@ -78,15 +84,21 @@ function renderPage(locale) {
     .concat([`  <link rel="alternate" hreflang="x-default" href="${SITE}/">`])
     .join('\n');
 
-  const jobShots = JOB_SHOTS.map((name) => screenFile(locale, name));
   const heroShot = screenFile(locale, 'home');
 
-  const jobs = t.click.items
-    .map((item, index) => `
+  // Дело без снимка на языке страницы не показываем вовсе: пустая рамка
+  // телефона рядом с подписью читается как «эту часть ещё не сделали».
+  const jobItems = t.click.items
+    .map((item, index) => ({ item, shot: screenFile(locale, JOB_SHOTS[index]) }))
+    .filter((entry) => entry.shot);
+  const jobShots = jobItems.map((entry) => entry.shot);
+
+  const jobs = jobItems
+    .map(({ item, shot }, index) => `
           <button type="button" class="job" role="tab" id="job-${index}"
             aria-selected="${index === 0}" tabindex="${index === 0 ? 0 : -1}"
             aria-controls="job-panel"
-            data-shot="${asset(jobShots[index])}"
+            data-shot="${asset(shot)}"
             data-shot-alt="${escape(item.alt)}"
             data-caption="${escape(item.caption)}">
             ${icon('cursor-click', 'job-mark')}
@@ -120,7 +132,7 @@ function renderPage(locale) {
     .map((other) => {
       const name = { ru: 'Русский', tg: 'Тоҷикӣ', uz: 'Oʻzbekcha', en: 'English' }[other];
       const current = other === locale;
-      return `          <a class="lang" href="${localePath(other)}" lang="${other}"${current ? ' aria-current="true"' : ''}>${name}</a>`;
+      return `          <a href="${localePath(other)}" lang="${other}"${current ? ' aria-current="true"' : ''}>${name}</a>`;
     })
     .join('\n');
 
@@ -144,20 +156,61 @@ ${alternates}
 <link rel="icon" href="${asset('assets/favicon.png')}" type="image/png">
 <link rel="stylesheet" href="${asset('assets/fonts/fonts.css')}">
 <link rel="stylesheet" href="${asset('styles.css')}">
+<script src="${asset('theme-boot.js')}"></script>
 </head>
-<body>
+<body id="top">
 <header class="topbar">
   <div class="wrap topbar-inner">
     <a class="brand" href="${localePath(locale)}">
       <img class="brand-mark" src="${asset('assets/mark.svg')}" alt="" width="26" height="26">
       <span>rabbitfarm<span class="brand-dot">.click</span></span>
     </a>
-    <nav class="topbar-nav">
-      <a href="#modules">${escape(t.nav.modules)}</a>
-      <a href="#field">${escape(t.nav.field)}</a>
-      <a href="#price">${escape(t.nav.price)}</a>
-      <a class="btn btn-primary" href="${APP_URL}" data-app-link>${escape(t.nav.open)}</a>
+
+    <!-- Кнопки «Открыть приложение» в шапке больше нет: точно такая же
+         стоит в первом экране, и две одинаковые кнопки рядом — это не два
+         шанса нажать, а сомнение, туда ли ведёт первая. В шапке остались
+         ссылки на разделы, и текущий подсвечивается при прокрутке. -->
+    <nav class="topbar-nav" aria-label="${escape(t.nav.menu)}">
+      <a href="#click" data-spy="click">${escape(t.nav.click)}</a>
+      <a href="#modules" data-spy="modules">${escape(t.nav.modules)}</a>
+      <a href="#field" data-spy="field">${escape(t.nav.field)}</a>
+      <a href="#price" data-spy="price">${escape(t.nav.price)}</a>
     </nav>
+
+    <div class="topbar-tools">
+      <!-- Тема и язык живут в шапке, а не в подвале: до подвала за ними
+           нужно пролистать всю страницу — на языке, которого человек может
+           не знать. -->
+      <button type="button" class="icon-btn" data-theme-toggle
+        aria-label="${escape(t.nav.theme)}" title="${escape(t.nav.theme)}">
+        ${icon('sun', 'icon-btn-mark icon-sun')}
+        ${icon('moon', 'icon-btn-mark icon-moon')}
+      </button>
+
+      <details class="pop lang-pop">
+        <summary class="icon-btn" aria-label="${escape(t.footer.lang_aria)}"
+          title="${escape(t.footer.lang_aria)}">
+          ${icon('translate', 'icon-btn-mark')}
+          <span class="icon-btn-text">${escape(t.nav.lang_short)}</span>
+        </summary>
+        <div class="pop-sheet">
+${langs}
+        </div>
+      </details>
+
+      <details class="pop menu-pop">
+        <summary class="icon-btn" aria-label="${escape(t.nav.menu)}"
+          title="${escape(t.nav.menu)}">
+          ${icon('list', 'icon-btn-mark')}
+        </summary>
+        <nav class="pop-sheet" aria-label="${escape(t.nav.menu)}">
+          <a href="#click">${escape(t.nav.click)}</a>
+          <a href="#modules">${escape(t.nav.modules)}</a>
+          <a href="#field">${escape(t.nav.field)}</a>
+          <a href="#price">${escape(t.nav.price)}</a>
+        </nav>
+      </details>
+    </div>
   </div>
 </header>
 <span data-scroll-sentinel aria-hidden="true"></span>
@@ -166,10 +219,17 @@ ${alternates}
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <h1>${escape(t.hero.title_top)} <span class="hero-accent">${escape(t.hero.title_accent)}</span></h1>
+        <!-- «Кликов» — не украшение: домен у страницы .click, и слово
+             показывает то же, что обещает текст, — нажатие. Курсор
+             подъезжает и нажимает один раз, дальше молчит; при
+             prefers-reduced-motion не двигается вовсе. -->
+        <h1>${escape(t.hero.title_before)}<span class="click-word">
+            <span class="click-word-text">${escape(t.hero.title_click)}</span>
+            <span class="click-word-cursor" aria-hidden="true">${icon('cursor-click', '')}</span>
+          </span>${escape(t.hero.title_after)}</h1>
         <p class="hero-lead">${escape(t.hero.lead)}</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="${APP_URL}" data-app-link>
+          <a class="btn btn-primary" href="${appUrl(locale)}" data-app-link>
             ${icon('arrow-right', 'btn-icon')}
             <span>${escape(t.hero.cta_primary)}</span>
           </a>
@@ -178,7 +238,6 @@ ${alternates}
             <span>${escape(t.hero.cta_secondary)}</span>
           </a>
         </div>
-        <p class="hero-note">${escape(t.hero.cta_note_web)}</p>
       </div>
       <div class="phone">
         <img src="${asset(heroShot)}" alt="${escape(t.hero.shot_alt)}" width="640" height="1386" fetchpriority="high">
@@ -201,9 +260,9 @@ ${alternates}
         <div class="click-panel" id="job-panel" role="tabpanel" aria-labelledby="job-0">
           <div class="phone">
             <img data-job-shot src="${asset(jobShots[0])}"
-              alt="${escape(t.click.items[0].alt)}" width="640" height="1386" loading="lazy">
+              alt="${escape(jobItems[0].item.alt)}" width="640" height="1386" loading="lazy">
           </div>
-          <p class="click-caption" data-job-caption>${escape(t.click.items[0].caption)}</p>
+          <p class="click-caption" data-job-caption>${escape(jobItems[0].item.caption)}</p>
         </div>
       </div>
     </div>
@@ -226,21 +285,11 @@ ${alternates}
   </section>
 
   <section class="section" id="price">
-    <div class="wrap split">
-      <div>
-        <h2 class="section-title">${escape(t.price.title)}</h2>
-        <p class="section-lead">${escape(t.price.lead)}</p>
-        <ul class="price-points">${pricePoints}
-        </ul>
-      </div>
-      <div>
-        <h2 class="section-title">${escape(t.data.title)}</h2>
-        <p class="section-lead">${escape(t.data.text)}</p>
-        <a class="link-inline" href="${REPO}">
-          <span>${escape(t.data.link)}</span>
-          ${icon('arrow-right', 'btn-icon')}
-        </a>
-      </div>
+    <div class="wrap price-wrap">
+      <h2 class="section-title">${escape(t.price.title)}</h2>
+      <p class="section-lead">${escape(t.price.lead)}</p>
+      <ul class="price-points">${pricePoints}
+      </ul>
     </div>
   </section>
 
@@ -249,7 +298,7 @@ ${alternates}
       <h2 class="section-title">${escape(t.cta.title)}</h2>
       <p class="section-lead">${escape(t.cta.lead)}</p>
       <div class="closing-actions">
-        <a class="btn btn-primary" href="${APP_URL}" data-app-link>
+        <a class="btn btn-primary" href="${appUrl(locale)}" data-app-link>
           ${icon('arrow-right', 'btn-icon')}
           <span>${escape(t.cta.primary)}</span>
         </a>
@@ -265,20 +314,43 @@ ${alternates}
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <div>
-      <p>RabbitFarm</p>
-      <p>${escape(t.footer.rights)}</p>
+    <div class="footer-brand">
+      <a class="brand" href="${localePath(locale)}">
+        <img class="brand-mark" src="${asset('assets/mark.svg')}" alt="" width="26" height="26">
+        <span>rabbitfarm<span class="brand-dot">.click</span></span>
+      </a>
+      <p class="footer-tagline">${escape(t.footer.rights)}</p>
+      <p class="footer-note">${escape(t.footer.source_note)}</p>
     </div>
-    <nav class="footer-links">
+
+    <nav class="footer-col" aria-label="${escape(t.footer.sections)}">
+      <p class="footer-head">${escape(t.footer.sections)}</p>
+      <a href="#click">${escape(t.nav.click)}</a>
+      <a href="#modules">${escape(t.nav.modules)}</a>
+      <a href="#field">${escape(t.nav.field)}</a>
+      <a href="#price">${escape(t.nav.price)}</a>
+    </nav>
+
+    <nav class="footer-col" aria-label="${escape(t.footer.app)}">
+      <p class="footer-head">${escape(t.footer.app)}</p>
+      <a href="${appUrl(locale)}" data-app-link>${escape(t.hero.cta_primary)}</a>
+      <a href="${REPO}/releases/latest" data-android-link hidden>${escape(t.hero.cta_secondary)}</a>
+      <span class="footer-muted" data-stores-note hidden>${escape(t.cta.stores_soon)}</span>
+    </nav>
+
+    <nav class="footer-col" aria-label="${escape(t.footer.docs)}">
+      <p class="footer-head">${escape(t.footer.docs)}</p>
       <a href="${SITE}/privacy.html">${escape(t.footer.privacy)}</a>
       <a href="${REPO}">${escape(t.footer.github)}</a>
     </nav>
-    <div>
-      <p>${escape(t.footer.lang_label)}</p>
-      <div class="langs">
-${langs}
-      </div>
-    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <p>© ${YEAR} rabbitfarm.click</p>
+    <a class="footer-top" href="#top">
+      ${icon('arrow-up', 'btn-icon')}
+      <span>${escape(t.nav.top)}</span>
+    </a>
   </div>
 </footer>
 
@@ -309,7 +381,7 @@ function build() {
   }
 
   copyDir(path.join(SRC, 'assets'), path.join(OUT, 'assets'));
-  for (const file of ['styles.css', 'app.js', 'config.json', 'og.html', 'privacy.html']) {
+  for (const file of ['styles.css', 'app.js', 'theme-boot.js', 'config.json', 'og.html', 'privacy.html']) {
     fs.copyFileSync(path.join(SRC, file), path.join(OUT, file));
   }
   // Страница приглашения: её адрес уходит в SMS, и отдаёт его главный домен.

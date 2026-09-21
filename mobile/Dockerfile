@@ -38,7 +38,13 @@ COPY pubspec.yaml pubspec.lock ./
 RUN flutter pub get
 
 COPY . .
-RUN flutter build web --release --dart-define=API_URL="$API_URL" --dart-define=SENTRY_DSN="$SENTRY_DSN"
+# `--no-web-resources-cdn` кладёт canvaskit рядом с приложением вместо
+# загрузки с чужого CDN. До первого кадра приложение ходило на gstatic.com
+# за движком рисования: в кишлаке с одной палкой связи это отдельная
+# минута белого экрана, а при перебоях с чужим CDN — белый экран навсегда.
+RUN flutter build web --release --no-web-resources-cdn \
+      --dart-define=API_URL="$API_URL" \
+      --dart-define=SENTRY_DSN="$SENTRY_DSN"
 
 # --- раздача -------------------------------------------------------------
 FROM nginx:1.27-alpine AS runtime

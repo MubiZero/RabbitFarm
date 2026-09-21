@@ -6,13 +6,18 @@ import '../../../../core/countries/countries.dart';
 import '../../../../core/countries/country_labels.dart';
 import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../subscription/data/models/plan_option.dart';
+import '../../../subscription/data/plan_match.dart';
+import '../../../subscription/presentation/providers/plans_provider.dart';
 import '../../data/first_steps.dart';
 import '../../data/onboarding_answers.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/onboarding_choice_card.dart';
 import '../widgets/onboarding_step.dart';
+import '../widgets/plan_offer.dart';
 
 /// Знакомство при первом запуске.
 ///
@@ -31,10 +36,11 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
-  // Вопросов стало четыре: страна добавилась первой. От неё зависят валюта,
-  // часовой пояс и то, предлагать ли вход по СМС, поэтому спросить её нужно
-  // раньше всего остального — и до регистрации, а не после.
-  static const _questionCount = 4;
+  // Вопросов пять. Первый — страна: от неё зависят валюта, часовой пояс и
+  // то, предлагать ли вход по СМС. Второй — светлая или тёмная: ответ
+  // применяется сразу, и остаток знакомства человек видит уже в выбранном
+  // виде, а не выбирает вслепую по названию.
+  static const _questionCount = 5;
 
   int _step = 0;
   OnboardingAnswers _answers = const OnboardingAnswers();
@@ -42,6 +48,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   bool get _onQuestion => _step >= 1 && _step <= _questionCount;
 
   void _goTo(int step) => setState(() => _step = step);
+
+  /// Вход поверх знакомства: возврат остаётся, знакомство не теряется.
+  Future<void> _openLogin() async {
+    await ref.read(onboardingSeenProvider.notifier).markSeen();
+    if (mounted) context.push('/login');
+  }
 
   Future<void> _leaveTo(String route) async {
     await ref.read(onboardingSeenProvider.notifier).markSeen();
@@ -118,7 +130,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   Widget _buildStep() => switch (_step) {
         0 => _Greeting(
             onStart: () => _goTo(1),
-            onHaveAccount: () => _leaveTo('/login'),
+            // Вход открывается поверх знакомства, а не вместо него: человек,
+            // нажавший «Войти» по ошибке, раньше оказывался заперт — назад
+            // дороги не было, а знакомство считалось пройденным.
+            onHaveAccount: () => _openLogin(),
           ),
         1 => _CountryQuestion(
             onSelect: (country) async {
@@ -126,31 +141,145 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               if (mounted) _goTo(2);
             },
           ),
-        2 => _HerdQuestion(
+        2 => _LookQuestion(
+            onSelect: (mode) async {
+              await ref.read(themeProvider.notifier).setMode(mode);
+              if (mounted) _goTo(3);
+            },
+          ),
+        3 => _HerdQuestion(
             selected: _answers.herdSize,
             onSelect: (size) {
               setState(() => _answers = _answers.copyWith(herdSize: size));
-              _goTo(3);
+              _goTo(4);
             },
           ),
-        3 => _FocusQuestion(
+        4 => _FocusQuestion(
             selected: _answers.focus,
             onToggle: (focus) => setState(() {
               final next = Set<FarmFocus>.from(_answers.focus);
               next.contains(focus) ? next.remove(focus) : next.add(focus);
               _answers = _answers.copyWith(focus: next);
             }),
-            onNext: () => _goTo(4),
+            onNext: () => _goTo(5),
           ),
-        4 => _CrewQuestion(
+        5 => _CrewQuestion(
             selected: _answers.crew,
             onSelect: (crew) {
               setState(() => _answers = _answers.copyWith(crew: crew));
-              _goTo(5);
+              _goTo(6);
             },
           ),
-        _ => _Summary(answers: _answers, onCreate: () => _leaveTo('/register')),
+        6 => _Summary(answers: _answers, onCreate: () => _goTo(7)),
+        // Тариф — последним, перед самой регистрацией: к этому моменту
+        // человек уже сказал, сколько у него кроликов и работает ли он один,
+        // и цена перестаёт быть вопросом «сколько это стоит вообще».
+        _ => _PlanStep(
+            answers: _answers,
+            onPick: (plan) {
+              if (plan != null) {
+                setState(() => _answers = _answers.copyWith(
+                      wantedPlan: plan.name,
+                    ));
+              }
+              _leaveTo('/register');
+            },
+          ),
       };
+}
+
+/// Тариф под ответы знакомства.
+///
+/// Владелец хозяйства спрашивает про деньги первым, а узнавал последним —
+/// уже заведя ферму и записав триста кроликов. Здесь он видит цену до
+/// регистрации, причём не прайс-лист, а один подобранный тариф: остальные
+/// ниже и мельче, чтобы выбор не выглядел навязанным.
+///
+/// Тарифов нет или сеть недоступна — шаг молча пропускается. Застрять перед
+/// регистрацией из-за нашего списка цен человек не должен.
+class _PlanStep extends ConsumerStatefulWidget {
+  const _PlanStep({required this.answers, required this.onPick});
+
+  final OnboardingAnswers answers;
+
+  /// Отдаёт выбранный тариф наверх: ферма заводится на бесплатном, но
+  /// намерение человека не теряется — его видно на экране «Тариф».
+  final ValueChanged<PlanOption?> onPick;
+
+  @override
+  ConsumerState<_PlanStep> createState() => _PlanStepState();
+}
+
+class _PlanStepState extends ConsumerState<_PlanStep> {
+  PlanOption? _picked;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final plans = ref.watch(plansProvider);
+    final answers = widget.answers;
+    void onContinue() => widget.onPick(_picked);
+
+    return plans.when(
+      loading: () => const Center(child: DelayedSpinner()),
+      error: (_, __) {
+        // Сбой списка цен — не повод держать человека: уводим дальше сразу.
+        WidgetsBinding.instance.addPostFrameCallback((_) => onContinue());
+        return const SizedBox.shrink();
+      },
+      data: (list) {
+        final recommended = recommendedPlan(list, answers);
+        if (recommended == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => onContinue());
+          return const SizedBox.shrink();
+        }
+
+        final chosen = _picked ?? recommended;
+        final others = list.where((plan) => plan.id != chosen.id).toList();
+
+        return OnboardingStep(
+          title: chosen.isFree ? l10n.onbPlanFreeTitle : l10n.onbPlanPaidTitle,
+          subtitle: l10n.onbPlanSubtitle,
+          footer: FilledButton(
+            onPressed: onContinue,
+            child: Text(l10n.onbPlanContinue),
+          ),
+          children: [
+            PlanOfferCard(plan: chosen),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              l10n.onbPlanStartFree,
+              style: AppTypography.bodyMd
+                  .copyWith(color: context.colors.onSurfaceVariant),
+            ),
+            if (others.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                l10n.onbPlanOthers,
+                style: AppTypography.labelLg
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.onbPlanPick,
+                style: AppTypography.labelSm
+                    .copyWith(color: context.colors.onSurfaceVariant),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              for (final plan in others) ...[
+                PlanOfferCard(
+                  plan: plan,
+                  highlighted: false,
+                  onTap: () => setState(() => _picked = plan),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+            ],
+          ],
+        );
+      },
+    );
+  }
 }
 
 /// Шапка: возврат, полоска пути и выход из опроса.
@@ -297,6 +426,49 @@ class _CountryQuestion extends ConsumerWidget {
   }
 }
 
+/// Светлая или тёмная.
+///
+/// Спрашиваем в знакомстве, а не прячем в настройках: экран этого приложения
+/// читают во дворе на солнце и в сарае в сумерках, и разница между двумя
+/// ответами больше, чем кажется в тёплой комнате. Ответ применяется сразу —
+/// следующий вопрос человек видит уже в выбранном виде, то есть выбирает
+/// глазами, а не по названию.
+class _LookQuestion extends ConsumerWidget {
+  const _LookQuestion({required this.onSelect});
+
+  final ValueChanged<ThemeMode> onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final selected = ref.watch(themeProvider).mode;
+
+    final hints = {
+      ThemeMode.light: l10n.onbLookLightHint,
+      ThemeMode.dark: l10n.onbLookDarkHint,
+      ThemeMode.system: l10n.onbLookSystemHint,
+    };
+
+    return OnboardingStep(
+      title: l10n.onbLookTitle,
+      subtitle: l10n.onbLookSubtitle,
+      children: [
+        for (final mode in [ThemeMode.light, ThemeMode.dark, ThemeMode.system])
+          ...[
+          OnboardingChoiceCard(
+            icon: themeModeIcon(mode),
+            label: themeModeName(context, mode),
+            description: hints[mode],
+            selected: selected == mode,
+            onTap: () => onSelect(mode),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ],
+    );
+  }
+}
+
 class _HerdQuestion extends StatelessWidget {
   const _HerdQuestion({required this.selected, required this.onSelect});
 
@@ -393,7 +565,9 @@ class _CrewQuestion extends StatelessWidget {
 
     final options = <(FarmCrew, String, String)>[
       (FarmCrew.alone, l10n.onbCrewAlone, l10n.onbCrewAloneHint),
-      (FarmCrew.withHelpers, l10n.onbCrewHelpers, l10n.onbCrewHelpersHint),
+      (FarmCrew.pair, l10n.onbCrewPair, l10n.onbCrewPairHint),
+      (FarmCrew.team, l10n.onbCrewTeam, l10n.onbCrewTeamHint),
+      (FarmCrew.big, l10n.onbCrewBig, l10n.onbCrewBigHint),
     ];
 
     return OnboardingStep(
@@ -443,7 +617,9 @@ class _Summary extends StatelessWidget {
       if (answers.crew != null)
         switch (answers.crew!) {
           FarmCrew.alone => l10n.onbCrewAlone,
-          FarmCrew.withHelpers => l10n.onbCrewHelpers,
+          FarmCrew.pair => l10n.onbCrewPair,
+          FarmCrew.team => l10n.onbCrewTeam,
+          FarmCrew.big => l10n.onbCrewBig,
         },
     ];
   }

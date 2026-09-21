@@ -58,6 +58,7 @@ import '../../features/tasks/presentation/providers/tasks_provider.dart';
 import '../../features/notes/presentation/screens/note_form_screen.dart';
 import '../../features/notes/data/models/note_model.dart';
 import '../../features/notes/presentation/providers/notes_provider.dart';
+import '../widgets/app_snack.dart';
 import '../widgets/app_async_view.dart';
 import '../../features/rabbits/presentation/screens/photo_gallery_screen.dart';
 import '../../features/rabbits/data/models/rabbit_photo_model.dart';
@@ -144,6 +145,9 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/splash',
     refreshListenable: notifier,
     redirect: notifier.redirect,
+    // Ошибка принадлежит тому экрану, на котором случилась: дальше человек
+    // уносил её с собой (см. `app_snack.dart`).
+    observers: [ErrorSnackObserver()],
     routes: [
       // Splash
       GoRoute(

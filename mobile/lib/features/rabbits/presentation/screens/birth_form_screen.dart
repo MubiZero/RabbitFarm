@@ -13,6 +13,7 @@ import '../providers/births_provider.dart';
 import '../widgets/create_kits_dialog.dart';
 import '../widgets/rabbit_picker.dart';
 import '../../../../core/forms/form_draft.dart';
+import '../../../../core/providers/after_write.dart';
 
 /// Запись об окроле.
 class BirthFormScreen extends ConsumerStatefulWidget {
@@ -123,6 +124,8 @@ class _BirthFormScreenState extends ConsumerState<BirthFormScreen> {
         ),
       );
     }
+    ref.refreshAfter(FarmRecord.birth);
+    if (_createKits) ref.refreshAfter(FarmRecord.rabbit);
     return null;
   }
 

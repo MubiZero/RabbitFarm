@@ -88,7 +88,7 @@ class PaymentController {
     try {
       const result = await paymentService.reconcile(req.params.invoiceId);
       if (!result.found || result.payment.farm_id !== req.farmId) {
-        return ApiResponse.notFound(res, 'Платёж не найден');
+        return ApiResponse.notFound(res, 'Платёж не найден', 'PAYMENT_NOT_FOUND');
       }
 
       if (result.changed) {

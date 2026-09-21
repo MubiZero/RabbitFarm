@@ -137,9 +137,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     await pending;
 
     if (failedToDelete) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(failed), backgroundColor: AppColors.error),
-      );
+      messenger.showError(failed);
     }
   }
 

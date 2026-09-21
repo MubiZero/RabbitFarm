@@ -24,7 +24,7 @@ exports.create = async (req, res, next) => {
     });
     return ApiResponse.success(res, transaction, 'Транзакция успешно создана', 201);
   } catch (error) {
-    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
+    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     next(error);
   }
 };
@@ -34,7 +34,7 @@ exports.getById = async (req, res, next) => {
     const transaction = await transactionService.getTransactionById(req.params.id, req.farmId);
     return ApiResponse.success(res, transaction, 'Транзакция получена');
   } catch (error) {
-    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404);
+    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404, 'TRANSACTION_NOT_FOUND');
     next(error);
   }
 };
@@ -72,8 +72,8 @@ exports.update = async (req, res, next) => {
     }
     return ApiResponse.success(res, transaction, 'Транзакция успешно обновлена');
   } catch (error) {
-    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404);
-    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
+    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404, 'TRANSACTION_NOT_FOUND');
+    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     next(error);
   }
 };
@@ -83,7 +83,7 @@ exports.delete = async (req, res, next) => {
     await transactionService.deleteTransaction(req.params.id, req.farmId);
     return ApiResponse.success(res, null, 'Транзакция успешно удалена');
   } catch (error) {
-    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404);
+    if (error.message === 'TRANSACTION_NOT_FOUND') return ApiResponse.error(res, 'Транзакция не найдена', 404, 'TRANSACTION_NOT_FOUND');
     next(error);
   }
 };
@@ -102,7 +102,7 @@ exports.getRabbitTransactions = async (req, res, next) => {
     const result = await transactionService.getRabbitTransactions(req.params.rabbitId, req.farmId);
     return ApiResponse.success(res, result, 'Транзакции кролика получены');
   } catch (error) {
-    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404);
+    if (error.message === 'RABBIT_NOT_FOUND') return ApiResponse.error(res, 'Кролик не найден', 404, 'RABBIT_NOT_FOUND');
     next(error);
   }
 };
@@ -114,7 +114,7 @@ exports.getMonthlyReport = async (req, res, next) => {
     return ApiResponse.success(res, result, 'Месячный отчет получен');
   } catch (error) {
     if (error.message === 'YEAR_MONTH_REQUIRED') {
-      return ApiResponse.error(res, 'Необходимо указать год и месяц', 400);
+      return ApiResponse.error(res, 'Необходимо указать год и месяц', 400, 'PERIOD_REQUIRED');
     }
     next(error);
   }
