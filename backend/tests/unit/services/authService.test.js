@@ -168,6 +168,25 @@ describe('AuthService', () => {
       expect(Farm.create).not.toHaveBeenCalled();
     });
 
+    it('новая ферма получает стартовый справочник пород', async () => {
+      const { mockTransaction } = arrangeSuccess();
+
+      await authService.register({
+        email: 'new@example.com',
+        full_name: 'Новый Фермер'
+      });
+
+      // Породы заводятся в той же транзакции, что и сама ферма: карточка
+      // первого кролика требует породу, а завести её из формы нельзя —
+      // ферма без пород упирается в тупик на первом же шаге.
+      expect(Breed.bulkCreate).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'Калифорнийская', farm_id: 77 })
+        ]),
+        expect.objectContaining({ transaction: mockTransaction })
+      );
+    });
+
     it('заводит ферму и делает регистрирующегося её владельцем', async () => {
       const { mockTransaction, farm } = arrangeSuccess();
 
