@@ -2799,7 +2799,23 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsAppearance => 'Намуди зоҳирӣ';
 
   @override
-  String get settingsTheme => 'Мавзӯъ';
+  String get onbLookTitle => 'Экранро чӣ гуна нишон диҳем?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Инро ҳар вақт дар танзимот иваз кардан мумкин аст';
+
+  @override
+  String get onbLookLightHint => 'Дар офтоб хонда мешавад — мисли варақи коғаз';
+
+  @override
+  String get onbLookDarkHint => 'Бегоҳӣ дар оғил чашмро намезанад';
+
+  @override
+  String get onbLookSystemHint => 'Ҳамроҳи телефон иваз мешавад';
+
+  @override
+  String get settingsTheme => 'Равшан ё торик';
 
   @override
   String get settingsAccent => 'Ранги акцент';
@@ -2899,7 +2915,7 @@ class AppLocalizationsTg extends AppLocalizations {
   String get settingsThemeLight => 'Равшан';
 
   @override
-  String get settingsThemeSystem => 'Мисли система';
+  String get settingsThemeSystem => 'Мисли телефон';
 
   @override
   String get settingsThemeDark => 'Торик';

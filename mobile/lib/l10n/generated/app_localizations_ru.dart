@@ -2836,7 +2836,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAppearance => 'Внешний вид';
 
   @override
-  String get settingsTheme => 'Тема';
+  String get onbLookTitle => 'Как показывать экран?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Это можно поменять в любой момент в настройках';
+
+  @override
+  String get onbLookLightHint => 'Видно на солнце — как лист бумаги';
+
+  @override
+  String get onbLookDarkHint => 'Не слепит вечером в сарае';
+
+  @override
+  String get onbLookSystemHint => 'Меняется вместе с телефоном';
+
+  @override
+  String get settingsTheme => 'Светлая или тёмная';
 
   @override
   String get settingsAccent => 'Цвет акцента';
@@ -2937,7 +2953,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeLight => 'Светлая';
 
   @override
-  String get settingsThemeSystem => 'Как в системе';
+  String get settingsThemeSystem => 'Как в телефоне';
 
   @override
   String get settingsThemeDark => 'Тёмная';

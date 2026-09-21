@@ -77,6 +77,12 @@ void main() {
     expect(find.text('Где ваше хозяйство?'), findsOneWidget);
     await _tap(tester, 'Таджикистан');
 
+    // Второй вопрос — светлая или тёмная. Экран этого приложения читают во
+    // дворе на солнце, и ответ применяется сразу: остаток знакомства человек
+    // видит уже в выбранном виде.
+    expect(find.text('Как показывать экран?'), findsOneWidget);
+    await _tap(tester, 'Светлая');
+
     expect(find.text('Сколько у вас кроликов?'), findsOneWidget);
 
     // Ответ на вопрос с одним выбором сразу ведёт дальше: подтверждать его
@@ -103,6 +109,8 @@ void main() {
     // Страну регистрация отправит на сервер — из неё выводятся валюта
     // хозяйства и часовой пояс.
     expect(prefs.getString('selected_country'), 'TJ');
+    expect(prefs.getString('theme_mode'), 'light',
+        reason: 'ответ про вид экрана должен пережить закрытие приложения');
     expect(
       jsonDecode(prefs.getString('onboarding_answers')!),
       containsPair('herd_size', 'upTo500'),
@@ -151,6 +159,7 @@ void main() {
 
     await _tap(tester, 'Начать');
     await _tap(tester, 'Таджикистан');
+    await _tap(tester, 'Светлая');
     await _tap(tester, 'До 20');
     expect(find.text('Что записывать в первую очередь?'), findsOneWidget);
 

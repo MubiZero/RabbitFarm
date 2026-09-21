@@ -336,13 +336,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleRegister,
                   child: authState.isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            // Тем же цветом, что и надпись на кнопке.
+                            color: context.colors.onPrimary,
                           ),
                         )
                       : Text(context.l10n.registerSubmit),

@@ -5070,10 +5070,40 @@ abstract class AppLocalizations {
   /// **'Внешний вид'**
   String get settingsAppearance;
 
+  /// No description provided for @onbLookTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как показывать экран?'**
+  String get onbLookTitle;
+
+  /// No description provided for @onbLookSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это можно поменять в любой момент в настройках'**
+  String get onbLookSubtitle;
+
+  /// No description provided for @onbLookLightHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видно на солнце — как лист бумаги'**
+  String get onbLookLightHint;
+
+  /// No description provided for @onbLookDarkHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не слепит вечером в сарае'**
+  String get onbLookDarkHint;
+
+  /// No description provided for @onbLookSystemHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Меняется вместе с телефоном'**
+  String get onbLookSystemHint;
+
   /// No description provided for @settingsTheme.
   ///
   /// In ru, this message translates to:
-  /// **'Тема'**
+  /// **'Светлая или тёмная'**
   String get settingsTheme;
 
   /// No description provided for @settingsAccent.
@@ -5241,7 +5271,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsThemeSystem.
   ///
   /// In ru, this message translates to:
-  /// **'Как в системе'**
+  /// **'Как в телефоне'**
   String get settingsThemeSystem;
 
   /// No description provided for @settingsThemeDark.

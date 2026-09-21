@@ -12,8 +12,15 @@ class ThemeState {
   final ThemeMode mode;
   final int accentIndex;
 
+  /// Светлая по умолчанию, а не тёмная.
+  ///
+  /// Приложение живёт на дешёвом Android во дворе и в сарае, и чаще всего —
+  /// под открытым солнцем, где тёмный экран не читается вовсе. Полевой
+  /// проход закончился выводом «светлой темы в приложении нет»: она была,
+  /// но включать её надо было руками в настройках, а по умолчанию всем
+  /// доставалась тёмная.
   const ThemeState({
-    this.mode = ThemeMode.dark,
+    this.mode = ThemeMode.light,
     this.accentIndex = 0,
   });
 
@@ -34,13 +41,13 @@ class ThemeNotifier extends Notifier<ThemeState> {
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final modeStr = prefs.getString(_kThemeMode) ?? 'dark';
+    final modeStr = prefs.getString(_kThemeMode) ?? 'light';
     final accentIdx = prefs.getInt(_kAccentIndex) ?? 0;
 
     final mode = switch (modeStr) {
-      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
       'system' => ThemeMode.system,
-      _ => ThemeMode.dark,
+      _ => ThemeMode.light,
     };
 
     state = ThemeState(mode: mode, accentIndex: accentIdx);
@@ -50,9 +57,9 @@ class ThemeNotifier extends Notifier<ThemeState> {
     state = state.copyWith(mode: mode);
     final prefs = await SharedPreferences.getInstance();
     final str = switch (mode) {
-      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
       ThemeMode.system => 'system',
-      _ => 'dark',
+      _ => 'light',
     };
     await prefs.setString(_kThemeMode, str);
   }

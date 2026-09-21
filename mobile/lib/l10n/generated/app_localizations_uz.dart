@@ -2810,7 +2810,23 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsAppearance => 'Tashqi koʻrinish';
 
   @override
-  String get settingsTheme => 'Mavzu';
+  String get onbLookTitle => 'Ekran qanday koʻrinsin?';
+
+  @override
+  String get onbLookSubtitle =>
+      'Buni istalgan vaqtda sozlamalarda oʻzgartirish mumkin';
+
+  @override
+  String get onbLookLightHint => 'Quyoshda oʻqiladi — qogʻoz varagʻiday';
+
+  @override
+  String get onbLookDarkHint => 'Kechqurun molxonada koʻzni qamashtirmaydi';
+
+  @override
+  String get onbLookSystemHint => 'Telefon bilan birga oʻzgaradi';
+
+  @override
+  String get settingsTheme => 'Yorugʻ yoki qorongʻi';
 
   @override
   String get settingsAccent => 'Urgʻu rangi';
@@ -2910,7 +2926,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsThemeLight => 'Yorugʻ';
 
   @override
-  String get settingsThemeSystem => 'Tizimdagidek';
+  String get settingsThemeSystem => 'Telefondagidek';
 
   @override
   String get settingsThemeDark => 'Qorongʻi';

@@ -489,10 +489,15 @@ class _ButtonSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 20,
       width: 20,
-      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+      // Тем же цветом, что и надпись на кнопке: белый кружок на акценте
+      // давал 2,9 при норме 3 и на светлой теме почти пропадал.
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: context.colors.onPrimary,
+      ),
     );
   }
 }

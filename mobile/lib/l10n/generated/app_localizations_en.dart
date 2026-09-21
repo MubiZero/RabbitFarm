@@ -2803,7 +2803,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearance => 'Appearance';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get onbLookTitle => 'How should the screen look?';
+
+  @override
+  String get onbLookSubtitle => 'You can change this any time in settings';
+
+  @override
+  String get onbLookLightHint => 'Readable in the sun, like a sheet of paper';
+
+  @override
+  String get onbLookDarkHint => 'Easy on the eyes in a dim shed';
+
+  @override
+  String get onbLookSystemHint => 'Follows the phone’s own setting';
+
+  @override
+  String get settingsTheme => 'Light or dark';
 
   @override
   String get settingsAccent => 'Accent color';
@@ -2903,7 +2918,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeLight => 'Light';
 
   @override
-  String get settingsThemeSystem => 'System';
+  String get settingsThemeSystem => 'Same as the phone';
 
   @override
   String get settingsThemeDark => 'Dark';

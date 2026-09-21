@@ -75,7 +75,7 @@ class WeightChart extends StatelessWidget {
                         reservedSize: 40,
                         getTitlesWidget: (value, meta) {
                           return Text(
-                            '${value.toStringAsFixed(1)} кг',
+                            '${value.toStringAsFixed(1)} ${context.l10n.unitKg}',
                             style: AppTypography.labelSm.copyWith(
                                 color: context.colors.onSurfaceVariant),
                           );
@@ -134,7 +134,9 @@ class WeightChart extends StatelessWidget {
                             radius: 4,
                             color: Theme.of(context).colorScheme.primary,
                             strokeWidth: 2,
-                            strokeColor: Colors.white,
+                            // Ободок цветом фона, а не белым: он вырезает
+                            // точку из линии, и на светлой теме тоже.
+                            strokeColor: context.colors.surface,
                           );
                         },
                       ),
@@ -149,6 +151,11 @@ class WeightChart extends StatelessWidget {
                   ],
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
+                      // Подсказка тёмная в обеих темах: белая надпись на
+                      // светлом фоне пропадала, а менять цвет надписи вместе
+                      // с темой значит держать два расчёта контраста вместо
+                      // одного.
+                      getTooltipColor: (_) => AppColors.darkSurfaceVariant,
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
                           final index = spot.x.toInt();

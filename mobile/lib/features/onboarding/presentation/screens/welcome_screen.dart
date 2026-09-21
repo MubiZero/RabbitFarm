@@ -6,6 +6,7 @@ import '../../../../core/countries/countries.dart';
 import '../../../../core/countries/country_labels.dart';
 import '../../../../core/countries/country_provider.dart';
 import '../../../../core/l10n/l10n_context.dart';
+import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../data/first_steps.dart';
@@ -31,10 +32,11 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
-  // Вопросов стало четыре: страна добавилась первой. От неё зависят валюта,
-  // часовой пояс и то, предлагать ли вход по СМС, поэтому спросить её нужно
-  // раньше всего остального — и до регистрации, а не после.
-  static const _questionCount = 4;
+  // Вопросов пять. Первый — страна: от неё зависят валюта, часовой пояс и
+  // то, предлагать ли вход по СМС. Второй — светлая или тёмная: ответ
+  // применяется сразу, и остаток знакомства человек видит уже в выбранном
+  // виде, а не выбирает вслепую по названию.
+  static const _questionCount = 5;
 
   int _step = 0;
   OnboardingAnswers _answers = const OnboardingAnswers();
@@ -126,27 +128,33 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               if (mounted) _goTo(2);
             },
           ),
-        2 => _HerdQuestion(
+        2 => _LookQuestion(
+            onSelect: (mode) async {
+              await ref.read(themeProvider.notifier).setMode(mode);
+              if (mounted) _goTo(3);
+            },
+          ),
+        3 => _HerdQuestion(
             selected: _answers.herdSize,
             onSelect: (size) {
               setState(() => _answers = _answers.copyWith(herdSize: size));
-              _goTo(3);
+              _goTo(4);
             },
           ),
-        3 => _FocusQuestion(
+        4 => _FocusQuestion(
             selected: _answers.focus,
             onToggle: (focus) => setState(() {
               final next = Set<FarmFocus>.from(_answers.focus);
               next.contains(focus) ? next.remove(focus) : next.add(focus);
               _answers = _answers.copyWith(focus: next);
             }),
-            onNext: () => _goTo(4),
+            onNext: () => _goTo(5),
           ),
-        4 => _CrewQuestion(
+        5 => _CrewQuestion(
             selected: _answers.crew,
             onSelect: (crew) {
               setState(() => _answers = _answers.copyWith(crew: crew));
-              _goTo(5);
+              _goTo(6);
             },
           ),
         _ => _Summary(answers: _answers, onCreate: () => _leaveTo('/register')),
@@ -289,6 +297,49 @@ class _CountryQuestion extends ConsumerWidget {
             description: countryHint(context, country),
             selected: selected?.code == country.code,
             onTap: () => onSelect(country),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ],
+    );
+  }
+}
+
+/// Светлая или тёмная.
+///
+/// Спрашиваем в знакомстве, а не прячем в настройках: экран этого приложения
+/// читают во дворе на солнце и в сарае в сумерках, и разница между двумя
+/// ответами больше, чем кажется в тёплой комнате. Ответ применяется сразу —
+/// следующий вопрос человек видит уже в выбранном виде, то есть выбирает
+/// глазами, а не по названию.
+class _LookQuestion extends ConsumerWidget {
+  const _LookQuestion({required this.onSelect});
+
+  final ValueChanged<ThemeMode> onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final selected = ref.watch(themeProvider).mode;
+
+    final hints = {
+      ThemeMode.light: l10n.onbLookLightHint,
+      ThemeMode.dark: l10n.onbLookDarkHint,
+      ThemeMode.system: l10n.onbLookSystemHint,
+    };
+
+    return OnboardingStep(
+      title: l10n.onbLookTitle,
+      subtitle: l10n.onbLookSubtitle,
+      children: [
+        for (final mode in [ThemeMode.light, ThemeMode.dark, ThemeMode.system])
+          ...[
+          OnboardingChoiceCard(
+            icon: themeModeIcon(mode),
+            label: themeModeName(context, mode),
+            description: hints[mode],
+            selected: selected == mode,
+            onTap: () => onSelect(mode),
           ),
           const SizedBox(height: AppSpacing.md),
         ],
