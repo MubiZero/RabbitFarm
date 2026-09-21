@@ -113,6 +113,89 @@
     }).observe(sentinel);
   }
 
+  /* --- Светлая или тёмная ----------------------------------------------
+   * Выбор человека главнее настройки телефона и живёт на его устройстве.
+   * Пока не нажали — тема системная, и кнопка это не меняет: `data-theme`
+   * появляется только после осознанного нажатия.
+   */
+  var themeToggle = document.querySelector('[data-theme-toggle]');
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function currentTheme() {
+    return document.documentElement.dataset.theme
+      || (systemDark.matches ? 'dark' : 'light');
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch (e) {
+        /* Приватный режим: тема продержится до перезагрузки. */
+      }
+    });
+  }
+
+  /* --- Выпадающие списки шапки -----------------------------------------
+   * Сами по себе <details> открываются и без скрипта; скрипт только
+   * закрывает их так, как человек ожидает: щелчком мимо, клавишей Esc и
+   * после выбора пункта.
+   */
+  var pops = Array.prototype.slice.call(document.querySelectorAll('.pop'));
+
+  function closePops(except) {
+    pops.forEach(function (pop) {
+      if (pop !== except) pop.open = false;
+    });
+  }
+
+  pops.forEach(function (pop) {
+    pop.addEventListener('toggle', function () {
+      if (pop.open) closePops(pop);
+    });
+    pop.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        pop.open = false;
+      });
+    });
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest('.pop')) closePops(null);
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closePops(null);
+  });
+
+  /* --- Где я сейчас ----------------------------------------------------
+   * Страница длинная и адрес у неё один, поэтому в шапке подсвечивается
+   * раздел, который сейчас на экране: иначе после трёх экранов прокрутки
+   * понять, где находишься, можно только по памяти.
+   */
+  var spyLinks = Array.prototype.slice.call(document.querySelectorAll('[data-spy]'));
+
+  if (spyLinks.length && 'IntersectionObserver' in window) {
+    var sections = spyLinks
+      .map(function (link) { return document.getElementById(link.dataset.spy); })
+      .filter(Boolean);
+
+    var spyObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        spyLinks.forEach(function (link) {
+          link.classList.toggle('is-current', link.dataset.spy === entry.target.id);
+        });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+
+    sections.forEach(function (section) {
+      spyObserver.observe(section);
+    });
+  }
+
   /* --- Адреса приложения и магазинов -----------------------------------
    * Те же правила, что на странице приглашения (mobile/web/i): кнопка
    * появляется, только когда адрес задан. Кнопка «Скачать», ведущая в

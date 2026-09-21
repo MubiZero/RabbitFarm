@@ -10,15 +10,19 @@
     "modules": "Ichida nima bor",
     "field": "Quyonxonada",
     "price": "Narxi qancha",
-    "open": "Ilovani ochish"
+    "menu": "Menyu",
+    "lang_short": "UZ",
+    "theme": "Yorugʻ yoki qorongʻi",
+    "top": "Yuqoriga",
+    "click": "Qanday yoziladi"
   },
   "hero": {
-    "title_top": "Quyonlar hisobi,",
-    "title_accent": "yurgan joyda yozib boriladi",
+    "title_before": "Quyonlar hisobi ",
+    "title_click": "bir necha klikda",
+    "title_after": "",
     "lead": "Tugʻish, ozuqa va xarajatni kataklar yonida belgilang. Ilova bolalar sonini, ozuqa qoldigʻini va foydani oʻzi hisoblaydi.",
     "cta_primary": "Ilovani ochish",
     "cta_secondary": "Android uchun yuklash",
-    "cta_note_web": "Brauzerda ochiladi, hech narsa oʻrnatish shart emas.",
     "shot_alt": "Asosiy ekran: quyonlar, bugungi vazifalar, ozuqa qoldigʻi"
   },
   "click": {
@@ -35,6 +39,21 @@
         "label": "Bolalar tugʻildi",
         "caption": "Onasini va nechtasi tirik tugʻilganini yozasiz. Tugʻish ona kartasiga tushadi, bolalar ajratilgach podaga qoʻshiladi.",
         "alt": "Tugʻishni yozish ekrani: ona, sana, bolalar soni"
+      },
+      {
+        "label": "Tarozida oʻlchadim",
+        "caption": "Vaznni yozasiz — ilova quyon qanday oʻsayotganini oʻzi chizadi va oʻtgan safar bilan solishtiradi.",
+        "alt": "Vazn ekrani: vazn maydoni va oʻsish grafigi"
+      },
+      {
+        "label": "Emladim",
+        "caption": "Emlashni belgilaysiz — keyingisi taqvimga oʻzi tushadi, eslatma oldindan keladi.",
+        "alt": "Emlash ekrani: dori, sana va keyingi emlash"
+      },
+      {
+        "label": "Sotdim",
+        "caption": "Sotuvni yozasiz — quyon podadan chiqadi, pul esa oyning daromadiga qoʻshiladi.",
+        "alt": "Sotuv ekrani: xaridor, vazn va summa"
       }
     ]
   },
@@ -92,11 +111,6 @@
       }
     ]
   },
-  "data": {
-    "title": "Xoʻjalik maʼlumotlari sizniki boʻlib qoladi",
-    "text": "Dastur kodi ochiq: istagan xoʻjalik tizimni oʻz serveriga oʻrnatishi mumkin. Yozuvlar jadvalga chiqariladi, hisobotlar oddiy printerda chop etiladi.",
-    "link": "Kodni GitHubda koʻrish"
-  },
   "price": {
     "title": "Narxi qancha",
     "lead": "Boshlash bepul: xoʻjalikni ochasiz va birinchi quyonlarni yozasiz. Keyin tarif xoʻjalik hajmiga qarab, yaʼni quyonlar va ishchilar soniga qarab tanlanadi.",
@@ -114,9 +128,13 @@
     "stores_soon": "App Store va Google Playda ilova keyinroq paydo boʻladi."
   },
   "footer": {
-    "lang_label": "Til",
     "privacy": "Maxfiylik siyosati",
     "github": "Dastur kodi",
-    "rights": "Quyonchilik xoʻjaligini boshqarish"
+    "rights": "Quyonchilik xoʻjaligini boshqarish",
+    "sections": "Boʻlimlar",
+    "app": "Ilova",
+    "docs": "Hujjatlar",
+    "source_note": "Kod ochiq: xoʻjalik tizimni oʻz serveriga oʻrnatishi mumkin.",
+    "lang_aria": "Sahifa tili"
   }
 }

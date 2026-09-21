@@ -47,8 +47,12 @@
   --page: 1180px;
 }
 
+/* Тёмная тема достаётся по настройке телефона, но выбор человека главнее:
+   кнопка в шапке ставит `data-theme` на <html>, и он перебивает систему.
+   Значения перечислены дважды намеренно — на странице нет сборщика стилей,
+   а переменная не может ссылаться на блок целиком. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #16181a;
     --surface: #1f2224;
     /* В тёмной теме глубина делается светлее, а не тенью. */
@@ -66,6 +70,25 @@
     --shadow-low: none;
     --shadow-high: none;
   }
+}
+
+:root[data-theme="dark"] {
+    --bg: #16181a;
+    --surface: #1f2224;
+    /* В тёмной теме глубина делается светлее, а не тенью. */
+    --surface-sunken: #1a1d1f;
+    --text: #ecebe8;
+    --muted: #a5a39d;
+    --accent: #7fb082;
+    --accent-strong: #93bf96;
+    --accent-text: #10210f;
+    --accent-wash: rgba(127, 176, 130, 0.14);
+    --border: #2e3234;
+    --border-strong: #3d4245;
+    --border-interactive: #6d7270;
+
+    --shadow-low: none;
+    --shadow-high: none;
 }
 
 *,
@@ -137,7 +160,12 @@ p {
 
 .section-title {
   font-size: clamp(1.7rem, 3.6vw, 2.35rem);
-  max-width: 18ch;
+  /* Было 18ch — заголовок ломался на две-три строки даже там, где строка
+     помещалась целиком: «Вся ферма в одном месте» это 23 знака. Предел
+     оставлен ради длинной строки, но с запасом, а `balance` доверяет
+     браузеру выбрать место переноса, а не рвёт по счётчику символов. */
+  max-width: 30ch;
+  text-wrap: balance;
 }
 
 .section-lead {
@@ -212,6 +240,134 @@ p {
   font-size: 0.97rem;
 }
 
+/* Язык и тема — всегда справа и всегда на виду, на любой ширине: до подвала
+   за ними нужно пролистать всю страницу на языке, которого человек может не
+   знать. Остальное на телефоне уходит под кнопку меню. */
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.topbar-nav + .topbar-tools {
+  margin-left: 24px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out);
+}
+
+.icon-btn::-webkit-details-marker {
+  display: none;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+  background: var(--accent-wash);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.icon-btn-mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.icon-btn-text {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Кнопка темы показывает то, что получится по нажатию, а не то, что сейчас:
+   солнце в тёмной теме, месяц — в светлой. */
+.icon-sun { display: none; }
+.icon-moon { display: block; }
+
+:root[data-theme="dark"] .icon-sun { display: block; }
+:root[data-theme="dark"] .icon-moon { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-sun { display: block; }
+  :root:not([data-theme="light"]) .icon-moon { display: none; }
+}
+
+/* Выпадающие списки языка и меню собраны на <details>: без JavaScript они
+   тоже открываются, а закрывает их скрипт по клику мимо и по Esc. */
+.pop {
+  position: relative;
+}
+
+.pop-sheet {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-high);
+}
+
+.pop-sheet a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pop-sheet a:hover {
+  background: var(--accent-wash);
+}
+
+.pop-sheet a[aria-current="true"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.pop[open] > .icon-btn {
+  color: var(--text);
+  background: var(--accent-wash);
+}
+
+/* Меню разделов нужно только там, где ссылки не поместились в шапку. */
+.menu-pop { display: none; }
+
+/* Текущий раздел подсвечивается при прокрутке — это ответ на вопрос «где
+   я сейчас» на длинной странице без отдельных адресов. */
+.topbar-nav a[data-spy].is-current {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .topbar-nav a:not(.btn) {
   display: inline-flex;
   align-items: center;
@@ -228,8 +384,7 @@ p {
   color: var(--text);
 }
 
-.topbar-nav a:focus-visible,
-.footer-links a:focus-visible {
+.topbar-nav a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -241,19 +396,25 @@ p {
 }
 
 @media (max-width: 860px) {
-  .topbar-nav a:not(.btn) {
+  /* Разделы уходят под кнопку меню целиком: половина ссылок в шапке и
+     половина под кнопкой — это два места, где надо искать одно и то же. */
+  .topbar-nav {
     display: none;
   }
 
-  /* Цена это первый вопрос владельца хозяйства, а до секции семь экранов
-     прокрутки: ссылку на неё оставляем и на телефоне. */
-  .topbar-nav a[href="#price"] {
-    display: inline-flex;
+  .menu-pop {
+    display: block;
+  }
+
+  .topbar-inner {
+    gap: 12px;
   }
 }
 
 @media (max-width: 420px) {
-  .topbar-nav a[href="#price"] {
+  /* Подпись языка («RU») уступает место значку: в шапке остаются только
+     кнопки, без которых страницу не прочитать на своём языке. */
+  .icon-btn-text {
     display: none;
   }
 }
@@ -348,10 +509,87 @@ p {
 
 .hero h1 {
   font-size: clamp(1.9rem, 4vw, 2.9rem);
+  text-wrap: balance;
 }
 
 .hero-accent {
   color: var(--accent);
+}
+
+/* --- «в пару кликов» ---------------------------------------------------
+ * Домен у страницы .click, и слово в заголовке показывает ровно то, что
+ * обещает текст рядом: нажатие. Курсор подъезжает и нажимает один раз —
+ * дальше стоит на месте, чтобы не мельтешить под чтением.
+ */
+.click-word {
+  position: relative;
+  display: inline-block;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.click-word-text {
+  position: relative;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 2px;
+  animation: click-underline var(--dur-slow) var(--ease-out) 900ms forwards;
+}
+
+.click-word-cursor {
+  position: absolute;
+  right: -0.15em;
+  bottom: -0.45em;
+  width: 0.52em;
+  height: 0.52em;
+  opacity: 0;
+  transform: translate(0.6em, 0.5em);
+  animation: click-cursor 1.5s var(--ease-out) 300ms forwards;
+}
+
+.click-word-cursor svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Волна от нажатия — та же, что у кнопок страницы. */
+.click-word::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0.9em;
+  height: 0.9em;
+  border-radius: 50%;
+  background: var(--accent-wash);
+  transform: scale(0);
+  opacity: 0;
+  animation: click-ripple 700ms var(--ease-out) 1250ms forwards;
+}
+
+@keyframes click-underline {
+  to { background-size: 100% 2px; }
+}
+
+@keyframes click-cursor {
+  0% { opacity: 0; transform: translate(0.6em, 0.5em) scale(1); }
+  35% { opacity: 1; transform: translate(0, 0) scale(1); }
+  55% { transform: translate(0, 0) scale(0.82); }
+  70% { transform: translate(0, 0) scale(1); }
+  100% { opacity: 1; transform: translate(0, 0) scale(1); }
+}
+
+@keyframes click-ripple {
+  0% { transform: scale(0); opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-word-text { animation: none; background-size: 100% 2px; }
+  .click-word-cursor { animation: none; opacity: 1; transform: none; }
+  .click-word::after { animation: none; }
 }
 
 .hero-lead {
@@ -577,12 +815,34 @@ p {
   border-color: transparent;
 }
 
+/* На телефоне ряд из семи одинаковых карточек читается как список, который
+   листают не глядя. Поэтому ритм сохраняется и здесь: широкая карточка,
+   потом две узкие, снова широкая. */
 @media (max-width: 900px) {
+  .modules {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .module {
+    grid-column: span 1 !important;
+  }
+
+  .module:nth-child(3n + 1) {
+    grid-column: span 2 !important;
+  }
+
+  .module p {
+    font-size: 0.98rem;
+  }
+}
+
+/* Уже 480px две колонки текста становятся колодцами по пять слов. */
+@media (max-width: 480px) {
   .modules {
     grid-template-columns: 1fr;
   }
 
-  .module {
+  .module:nth-child(3n + 1) {
     grid-column: span 1 !important;
   }
 }
@@ -715,21 +975,24 @@ p {
   color: var(--muted);
 }
 
-/* --- Подвал ------------------------------------------------------------ */
+/* --- Подвал ------------------------------------------------------------
+ * Подвал — это карта сайта для того, кто дочитал: разделы, приложение и
+ * документы отдельными столбцами. Выбор языка отсюда убран наверх: искать
+ * его в самом низу страницы, написанной на чужом языке, — работа.
+ */
 
 .footer {
   border-top: 1px solid var(--border);
-  padding: 40px 0 56px;
+  padding: 48px 0 32px;
   font-size: 0.97rem;
   color: var(--muted);
 }
 
 .footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 28px 40px;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 32px 40px;
+  align-items: start;
 }
 
 .footer a {
@@ -749,48 +1012,85 @@ p {
   border-radius: 6px;
 }
 
-.footer-links {
+.footer-brand .brand {
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.footer-brand .brand:hover {
+  border-bottom-color: transparent;
+}
+
+.footer-tagline {
+  margin-top: 10px;
+  color: var(--text);
+}
+
+.footer-note {
+  margin-top: 8px;
+  max-width: 38ch;
+}
+
+.footer-col {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+}
+
+.footer-head {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* 44px: подпись остаётся мелкой, а палец попадает. */
-.footer-links a {
+.footer-col a,
+.footer-muted {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
 }
 
-.langs {
+.footer-bottom {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px 24px;
   align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
-.lang {
+.footer-top {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  text-decoration: none;
-  transition: border-color var(--dur-micro) var(--ease-out),
-    color var(--dur-micro) var(--ease-out);
 }
 
-.lang:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
+.footer-top .btn-icon {
+  width: 18px;
+  height: 18px;
 }
 
-.lang[aria-current='true'] {
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 700;
+@media (max-width: 860px) {
+  .footer-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-brand {
+    grid-column: span 1;
+  }
 }
 
 /* --- Появление при прокрутке -------------------------------------------
@@ -870,4 +1170,13 @@ p {
   .hero {
     padding: 36px 0 56px;
   }
+}
+
+/* --- Цена --------------------------------------------------------------
+ * Соседний блок «Данные фермы остаются вашими» убран: рядом с ценой он
+ * отвечал на вопрос, которого владелец хозяйства не задавал, и уводил от
+ * ответа про деньги. Ссылка на исходный код осталась в подвале.
+ */
+.price-wrap .price-points {
+  max-width: 62ch;
 }
