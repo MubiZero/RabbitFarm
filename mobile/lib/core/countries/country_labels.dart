@@ -16,7 +16,6 @@ String countryName(BuildContext context, String code) {
     'KG' => l10n.countryKG,
     'KZ' => l10n.countryKZ,
     'RU' => l10n.countryRU,
-    'AF' => l10n.countryAF,
     // Незнакомый код показываем как есть, а не подменяем Таджикистаном:
     // назвать чужую страну чужим именем хуже, чем показать две буквы.
     _ => code,

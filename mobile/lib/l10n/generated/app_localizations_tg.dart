@@ -4974,9 +4974,6 @@ class AppLocalizationsTg extends AppLocalizations {
   String get countryRU => 'Русия';
 
   @override
-  String get countryAF => 'Афғонистон';
-
-  @override
   String get loginSmsUnavailable =>
       'Дар кишвари шумо рамз бо СМС намеояд — бо почта ворид шавед';
 

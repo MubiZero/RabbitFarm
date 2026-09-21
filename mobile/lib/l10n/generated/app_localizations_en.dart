@@ -4995,9 +4995,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countryRU => 'Russia';
 
   @override
-  String get countryAF => 'Afghanistan';
-
-  @override
   String get loginSmsUnavailable =>
       'SMS codes do not reach your country — sign in by email';
 

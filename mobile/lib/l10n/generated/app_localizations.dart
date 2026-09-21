@@ -8826,12 +8826,6 @@ abstract class AppLocalizations {
   /// **'Россия'**
   String get countryRU;
 
-  /// No description provided for @countryAF.
-  ///
-  /// In ru, this message translates to:
-  /// **'Афганистан'**
-  String get countryAF;
-
   /// No description provided for @loginSmsUnavailable.
   ///
   /// In ru, this message translates to:

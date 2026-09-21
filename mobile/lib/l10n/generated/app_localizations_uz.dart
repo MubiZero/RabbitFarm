@@ -5004,9 +5004,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get countryRU => 'Rossiya';
 
   @override
-  String get countryAF => 'Afgʻoniston';
-
-  @override
   String get loginSmsUnavailable =>
       'Sizning mamlakatingizga SMS kod kelmaydi — pochta orqali kiring';
 
