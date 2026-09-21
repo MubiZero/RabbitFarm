@@ -12,6 +12,13 @@ on:
         description: 'Адрес API, который будет вшит в сборку'
         required: false
         default: 'https://api.rabbitfarm.click/api/v1'
+      # Отладочная сборка нужна, когда релизная падает на устройстве: она
+      # показывает ошибку прямо на экране, а не молча закрывается.
+      debug:
+        description: 'Собрать отладочную сборку вместо релизной'
+        type: boolean
+        required: false
+        default: false
 
 env:
   # 3.47.0, не более раннюю: freezed ^4.0.1 (апгрейд
@@ -89,8 +96,15 @@ jobs:
       - name: APK для установки на устройство
         working-directory: mobile
         run: flutter build apk --release --split-per-abi --dart-define=API_URL=$API_URL
+        if: github.event.inputs.debug != 'true'
+
+      - name: Отладочный APK
+        if: github.event.inputs.debug == 'true'
+        working-directory: mobile
+        run: flutter build apk --debug --split-per-abi --dart-define=API_URL=$API_URL
 
       - name: Пакет для Google Play
+        if: github.event.inputs.debug != 'true'
         working-directory: mobile
         run: flutter build appbundle --release --dart-define=API_URL=$API_URL
 
