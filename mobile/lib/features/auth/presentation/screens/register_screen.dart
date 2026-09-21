@@ -39,6 +39,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// иначе человек введёт номер и будет ждать сообщения, которого не будет.
   bool get _byPhone => _byPhoneChoice && ref.read(smsAvailableProvider);
   bool _acceptedPrivacy = false;
+
+  /// Кнопку нажали, а согласия нет. Держим отдельно от самого согласия:
+  /// молчаливая кнопка — то, из-за чего человек уходит, решив, что
+  /// приложение сломано.
+  bool _consentMissed = false;
   late final TapGestureRecognizer _privacyLinkRecognizer;
 
   @override
@@ -63,7 +68,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _handleRegister() async {
     final l10n = context.l10n;
     if (!_acceptedPrivacy) {
-      ScaffoldMessenger.of(context).showError(l10n.registerConsentRequired);
+      setState(() => _consentMissed = true);
       return;
     }
     if (_formKey.currentState!.validate()) {
@@ -146,42 +151,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   size: 64,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                // Privacy policy consent
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: _acceptedPrivacy,
-                      onChanged: (value) =>
-                          setState(() => _acceptedPrivacy = value ?? false),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: RichText(
-                          text: TextSpan(
-                            style: AppTypography.bodyMd
-                                .copyWith(color: context.colors.onSurface),
-                            children: [
-                              TextSpan(
-                                  text: context.l10n.registerConsentPrefix),
-                              TextSpan(
-                                text: context.l10n.registerConsentLink,
-                                recognizer: _privacyLinkRecognizer,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
                 // Title
                 Text(
                   context.l10n.registerTitle,
@@ -330,7 +299,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                const SizedBox(height: 24),
+                // Согласие стоит вплотную к кнопке, а не в шапке экрана.
+                // Раньше галочка была над заголовком, за три экрана прокрутки
+                // от «Завести ферму»: человек жал кнопку, она молчала, и он
+                // решал, что программа сломалась. Отказ объясняется здесь же,
+                // а не плашкой внизу — глаз в этот момент смотрит сюда.
+                _PrivacyConsent(
+                  accepted: _acceptedPrivacy,
+                  showError: _consentMissed,
+                  onChanged: (value) => setState(() {
+                    _acceptedPrivacy = value;
+                    if (value) _consentMissed = false;
+                  }),
+                  linkRecognizer: _privacyLinkRecognizer,
+                ),
+                const SizedBox(height: AppSpacing.lg),
 
                 // Register button
                 ElevatedButton(
@@ -367,6 +350,83 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Согласие с политикой: галочка, текст со ссылкой и объяснение отказа.
+///
+/// Нажимается вся строка, а не квадратик в 18 пикселей: в перчатке в него не
+/// попасть. Ссылка внутри текста открывает политику и галочку не трогает.
+class _PrivacyConsent extends StatelessWidget {
+  const _PrivacyConsent({
+    required this.accepted,
+    required this.showError,
+    required this.onChanged,
+    required this.linkRecognizer,
+  });
+
+  final bool accepted;
+  final bool showError;
+  final ValueChanged<bool> onChanged;
+  final TapGestureRecognizer linkRecognizer;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.colors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => onChanged(!accepted),
+          borderRadius: AppRadius.mdAll,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IgnorePointer(
+                child: Checkbox(
+                  value: accepted,
+                  onChanged: (_) {},
+                  side: showError
+                      ? const BorderSide(color: AppColors.error, width: 2)
+                      : null,
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  child: RichText(
+                    text: TextSpan(
+                      style: AppTypography.bodyMd
+                          .copyWith(color: cs.onSurface),
+                      children: [
+                        TextSpan(text: context.l10n.registerConsentPrefix),
+                        TextSpan(
+                          text: context.l10n.registerConsentLink,
+                          recognizer: linkRecognizer,
+                          style: TextStyle(
+                            color: cs.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showError)
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.md),
+            child: Text(
+              context.l10n.registerConsentRequired,
+              style: AppTypography.labelSm.copyWith(color: AppColors.error),
+            ),
+          ),
+      ],
     );
   }
 }

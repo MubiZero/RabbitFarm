@@ -327,6 +327,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todayNeedsAttention => 'Требует внимания';
 
   @override
+  String get todayEmptyFarmTitle => 'Дела появятся вместе с фермой';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Начните с клеток — в них поселятся кролики, и приложению будет о чём напоминать';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Клетки есть — заведите первых кроликов, и дела появятся сами';
+
+  @override
   String get todayAllClear => 'Всё под контролем — срочного нет';
 
   @override

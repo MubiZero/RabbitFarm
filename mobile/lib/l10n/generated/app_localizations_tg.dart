@@ -329,6 +329,17 @@ class AppLocalizationsTg extends AppLocalizations {
   String get todayNeedsAttention => 'Таваҷҷуҳ лозим аст';
 
   @override
+  String get todayEmptyFarmTitle => 'Корҳо ҳамроҳи хоҷагӣ пайдо мешаванд';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Аз қафасҳо сар кунед — дар онҳо харгӯшҳо ҷойгир мешаванд, ва барнома чизе барои хотиррасон кардан пайдо мекунад';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Қафасҳо ҳастанд — аввалин харгӯшҳоро қайд кунед, ва корҳо худ пайдо мешаванд';
+
+  @override
   String get todayAllClear => 'Ҳама зери назорат аст — фаврӣ чизе нест';
 
   @override

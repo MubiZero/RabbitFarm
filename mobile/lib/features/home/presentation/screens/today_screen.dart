@@ -14,6 +14,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../core/utils/date_labels.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../onboarding/data/first_steps.dart';
 import '../../../onboarding/presentation/widgets/activation_checklist_card.dart';
 import '../../../reports/data/models/report_model.dart';
 import '../../../reports/presentation/providers/reports_provider.dart';
@@ -103,7 +104,17 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _TodayTasks(quietWhenEmpty: alerts.isNotEmpty),
+            _TodayTasks(
+              quietWhenEmpty: alerts.isNotEmpty,
+              // Пустой ферме «всё под контролем» говорить нечестно:
+              // контролировать ещё нечего, а человек читает это как «всё
+              // хорошо, делать нечего» и закрывает приложение.
+              farmStart: switch ((d.cages.total, d.rabbits.total)) {
+                (0, _) => FirstStep.cages,
+                (_, 0) => FirstStep.rabbits,
+                _ => null,
+              },
+            ),
             if (alerts.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xl),
               AppSectionTitle(context.l10n.todayNeedsAttention),
@@ -226,7 +237,11 @@ class _TodayTasks extends ConsumerWidget {
   /// о просроченной вакцинации — это неправда.
   final bool quietWhenEmpty;
 
-  const _TodayTasks({required this.quietWhenEmpty});
+  const _TodayTasks({required this.quietWhenEmpty, this.farmStart});
+
+  /// Шаг, с которого начинается ферма, — пока его не сделали, дел на
+  /// сегодня взяться неоткуда.
+  final FirstStep? farmStart;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -264,14 +279,20 @@ class _TodayTasks extends ConsumerWidget {
     );
   }
 
-  Widget _empty(BuildContext context) => quietWhenEmpty
-      ? Text(
-          context.l10n.todayTasksNone,
-          style: AppTypography.bodyMd.copyWith(
-            color: context.colors.onSurfaceVariant,
-          ),
-        )
-      : const _AllClearCard();
+  Widget _empty(BuildContext context) {
+    // Порядок важен: на пустой ферме первый шаг полезнее и честнее всего
+    // остального, что мы могли бы здесь написать.
+    if (farmStart != null) return _FirstStepCard(farmStart!);
+
+    return quietWhenEmpty
+        ? Text(
+            context.l10n.todayTasksNone,
+            style: AppTypography.bodyMd.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          )
+        : const _AllClearCard();
+  }
 
   Widget _error(BuildContext context, WidgetRef ref, Object? error) {
     return AppCard(
@@ -478,6 +499,59 @@ class _Greeting extends ConsumerWidget {
     return firstName == null || firstName.isEmpty
         ? l10n.todayGreetingPlain(base)
         : l10n.todayGreetingNamed(base, firstName);
+  }
+}
+
+/// Ферма ещё пустая: вместо «срочного нет» — то, с чего она начинается.
+///
+/// Человек, зашедший в приложение первым делом, видел зелёную галочку и
+/// «Всё под контролем». Контролировать было нечего: ни клеток, ни кроликов.
+/// Слова те же, что в чек-листе первых шагов, и ведут туда же — два места
+/// не должны называть одно дело по-разному.
+class _FirstStepCard extends StatelessWidget {
+  const _FirstStepCard(this.step);
+
+  final FirstStep step;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final hint = switch (step) {
+      FirstStep.rabbits => l10n.todayEmptyFarmRabbits,
+      _ => l10n.todayEmptyFarmCages,
+    };
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(step.icon, size: 28, color: context.accent),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  l10n.todayEmptyFarmTitle,
+                  style: AppTypography.titleMd
+                      .copyWith(color: context.colors.onSurface),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            hint,
+            style: AppTypography.bodyMd
+                .copyWith(color: context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          FilledButton(
+            onPressed: () => context.push(step.route),
+            child: Text(step.label(context)),
+          ),
+        ],
+      ),
+    );
   }
 }
 

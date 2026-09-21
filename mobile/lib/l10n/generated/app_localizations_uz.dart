@@ -329,6 +329,17 @@ class AppLocalizationsUz extends AppLocalizations {
   String get todayNeedsAttention => 'Diqqat talab qiladi';
 
   @override
+  String get todayEmptyFarmTitle => 'Ishlar xoʻjalik bilan birga paydo boʻladi';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Kataklardan boshlang — ularga quyonlar joylashadi, ilovada esa eslatadigan narsa paydo boʻladi';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'Kataklar bor — birinchi quyonlarni kiriting, ishlar oʻzi paydo boʻladi';
+
+  @override
   String get todayAllClear => 'Hammasi nazoratda — shoshilinch narsa yoʻq';
 
   @override

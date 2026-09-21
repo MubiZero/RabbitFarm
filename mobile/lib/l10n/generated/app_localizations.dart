@@ -690,6 +690,24 @@ abstract class AppLocalizations {
   /// **'Требует внимания'**
   String get todayNeedsAttention;
 
+  /// No description provided for @todayEmptyFarmTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дела появятся вместе с фермой'**
+  String get todayEmptyFarmTitle;
+
+  /// No description provided for @todayEmptyFarmCages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начните с клеток — в них поселятся кролики, и приложению будет о чём напоминать'**
+  String get todayEmptyFarmCages;
+
+  /// No description provided for @todayEmptyFarmRabbits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клетки есть — заведите первых кроликов, и дела появятся сами'**
+  String get todayEmptyFarmRabbits;
+
   /// No description provided for @todayAllClear.
   ///
   /// In ru, this message translates to:

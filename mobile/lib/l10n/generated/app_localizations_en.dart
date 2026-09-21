@@ -328,6 +328,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todayNeedsAttention => 'Needs attention';
 
   @override
+  String get todayEmptyFarmTitle => 'Tasks will appear once the farm does';
+
+  @override
+  String get todayEmptyFarmCages =>
+      'Start with cages — rabbits move into them, and the app gets something to remind you about';
+
+  @override
+  String get todayEmptyFarmRabbits =>
+      'The cages are ready — add your first rabbits and the tasks will follow';
+
+  @override
   String get todayAllClear => 'All clear — nothing urgent';
 
   @override
