@@ -5,7 +5,18 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
+    // Объявлен, но не применён: применяем ниже и только при наличии конфига.
+    id("com.google.gms.google-services") apply false
+}
+
+// Конфиг Firebase лежит вне репозитория (см. docs/ENVIRONMENT.md), а плагин
+// без него обрывает сборку целиком. Для машины, где push не нужны — своей или
+// раннера CI, — это означало бы, что APK не собрать вовсе, поэтому плагин
+// подключается только когда файл на месте. Собранное без него приложение
+// работает полностью, кроме push-уведомлений.
+val hasFirebaseConfig = file("google-services.json").exists()
+if (hasFirebaseConfig) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 // Ключ подписи в репозитории не хранится. Положите android/key.properties

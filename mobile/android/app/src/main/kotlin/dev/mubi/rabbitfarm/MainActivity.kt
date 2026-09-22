@@ -1,4 +1,4 @@
-package com.example.mobile
+package dev.mubi.rabbitfarm
 
 import io.flutter.embedding.android.FlutterActivity
 
