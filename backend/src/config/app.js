@@ -19,7 +19,7 @@ require('dotenv').config();
  * отправленный людям, обязан продолжать работать. Прежний домен поэтому не
  * выключается, а приложение узнаёт оба (см. mobile/lib/core/router/deep_links.dart).
  */
-const publicUrl = (process.env.APP_PUBLIC_URL || 'https://rabbitfarm.mubi.dev').replace(/\/+$/, '');
+const publicUrl = (process.env.APP_PUBLIC_URL || 'https://rabbitfarm.click').replace(/\/+$/, '');
 
 module.exports = {
   publicUrl,
