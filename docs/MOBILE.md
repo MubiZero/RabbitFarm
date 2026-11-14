@@ -56,7 +56,7 @@ keyPassword=...
 
 ```bash
 cd mobile
-flutter build apk --release --dart-define=API_URL=https://api.rabbitfarm.mubi.dev/api/v1
+flutter build apk --release --dart-define=API_URL=https://api.rabbitfarm.click/api/v1
 ```
 
 ## iOS
@@ -67,7 +67,7 @@ flutter build apk --release --dart-define=API_URL=https://api.rabbitfarm.mubi.de
 
 ```bash
 cd mobile
-flutter build ipa --release --dart-define=API_URL=https://api.rabbitfarm.mubi.dev/api/v1
+flutter build ipa --release --dart-define=API_URL=https://api.rabbitfarm.click/api/v1
 ```
 
 Понадобится:

@@ -211,8 +211,7 @@ curl -X POST http://localhost:4567/api/v1/rabbits \
     "cage_id": 1,
     "status": "healthy",
     "purpose": "breeding",
-    "current_weight": 4.5,
-    "temperament": "Спокойный"
+    "current_weight": 4.5
   }'
 ```
 

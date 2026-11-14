@@ -36,8 +36,8 @@
 | Сервис | Домен |
 |---|---|
 | `landing` | `https://rabbitfarm.click` |
-| `web` | `https://rabbitfarm.mubi.dev` |
-| `api` | `https://api.rabbitfarm.mubi.dev` |
+| `web` | `https://app.rabbitfarm.click` |
+| `api` | `https://api.rabbitfarm.click` |
 
 У каждого ресурса в Coolify задан свой «watch path» (`backend/*`,
 `mobile/*`, `landing/*`): иначе любой коммит пересобирал всё, включая
@@ -51,8 +51,9 @@
 Все домены ведут A-записями на `207.180.237.97`, сертификаты выпущены
 Let's Encrypt, `http` отвечает редиректом на `https`.
 
-**Прежние адреса (`rabbitfarm.mubi.dev`, `api.rabbitfarm.mubi.dev`) не
-выключаются.** Ссылка-приглашение живёт в переписке дольше, чем занимает
+**Прежний адрес приложения `rabbitfarm.mubi.dev` не выключается** (на
+2026-11-15 отвечает), а `api.rabbitfarm.mubi.dev` уже без DNS-записи, так что
+сборки со старым API до обновления не работают. Ссылка-приглашение живёт в переписке дольше, чем занимает
 переезд, а уже установленные сборки ходят на прежний API до обновления.
 Приложение узнаёт оба домена (`mobile/lib/core/router/deep_links.dart`).
 
