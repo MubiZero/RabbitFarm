@@ -283,24 +283,7 @@ EXIF может и не найтись — пересланное через м�
 
 ## Как поднять окружение для тестов
 
-На машине, где 3307 занят чужим MySQL, тестовая база поднимается отдельным
-контейнером на 3310; на чистой машине хватает compose-стенда (`docker compose
-up -d db`, порт 3307). Прогон:
-
-```bash
-DB_HOST=127.0.0.1 DB_PORT=3307 NODE_ENV=test npx jest --runInBand
-```
-
-MinIO нужен только фото-тестам (`rabbit-gallery`, `farm-photo-feed`) — восемь
-проверок. Его API-порт 9000 compose наружу не публикует намеренно: к нему
-ходит только `api` по внутренней сети. С хоста тесты до него не достают, и
-пока порт не прокинут, эти восемь падают на любом коде. Мост на время
-прогона:
-
-```bash
-docker run -d --rm --name rabbitfarm-minio-bridge --network rabbitfarm_default \
-  -p 127.0.0.1:9000:9000 alpine/socat tcp-listen:9000,fork,reuseaddr tcp-connect:minio:9000
-```
+Один источник: [ENVIRONMENT.md](../ENVIRONMENT.md), раздел «Ловушки среды» (compose-стенд, мост до MinIO для фото-тестов, запрет `--forceExit`).
 
 Форматирование Dart — `dart format --language-version=3.6`. Версия языка
 обязательна: без флага форматтер переписывает файлы в новый стиль целиком.
