@@ -854,7 +854,7 @@ planExpiryReminderJob.js` (тот же час, что у дайджеста) —
 - **JWT** with HS256 algorithm (symmetric secret, `backend/src/config/jwt.js` — not RS256/RSA keypair)
 - **Access Token**: 15 minutes (short-lived)
 - **Refresh Token**: 7 days, stored in `refresh_tokens` table; the client keeps its copy in `flutter_secure_storage` — no httpOnly cookie exists anywhere in the stack
-- **Password**: bcrypt with salt rounds 10
+- **No passwords**: sign-in is a six-digit one-time code (SMS or email); only its hash is stored, valid ten minutes (`utils/otp.js`, `otpAuthService.js`)
 
 ### Authorization
 
@@ -931,7 +931,7 @@ const createRabbitSchema = Joi.object({
 ### Backend
 - **Connection Pooling**: MySQL pool size 10-20
 - **Query Optimization**: Use indexes, avoid N+1 queries
-- **Caching**: Redis не подключён (ни в коде, ни в зависимостях) — для MVP не потребовался
+- **Caching**: Redis (`ioredis`, `backend/src/config/redis.js`, `utils/cache.js`) кэширует сводку платформенной админки; остальные ответы не кэшируются
 - **Pagination**: Limit 20-50 items per page
 - **Compression**: gzip for responses
 - **CDN**: For static assets (future)
@@ -1001,7 +1001,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - **Файлы** `logs/combined.log` и `logs/error.log` внутри контейнера, ротация по размеру (10 МБ, 5 файлов), а не по дням. Без смонтированного тома исчезают вместе с контейнером — см. `docs/DEPLOY.md`
 
 ### Error Tracking
-- **Sentry** не подключён (ни в `backend/package.json`, ни в `mobile/pubspec.yaml`) — в проде ошибки видны только по логам и жалобам пользователей
+- **Sentry**: бэкенд (`@sentry/node`, `backend/src/instrument.js`) и приложение (`sentry_flutter`, DSN через `--dart-define=SENTRY_DSN`, опционален); алерты дублируются в Telegram
 
 ### Metrics (план, не реализовано)
 
@@ -1022,7 +1022,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 
 | # | Модуль | Backend | Mobile | Возможности |
 |---|--------|---------|--------|-------------|
-| 1 | **Auth & Farm** | ✅ | ✅ | JWT токены, Login, Register (с названием фермы), Refresh, Change Password |
+| 1 | **Auth & Farm** | ✅ | ✅ | JWT токены, вход по одноразовому коду (`/auth/otp/request`, `/auth/otp/verify`), Register (с названием фермы), Refresh, Logout |
 | 2 | **Staff** | ✅ | ✅ | Приглашения, роли, передача хозяйства фермы |
 | 3 | **Rabbits** | ✅ | ✅ | CRUD, Статистика, Фильтрация, Родословная, Галерея фото |
 | 4 | **Breeds** | ✅ | ✅ | CRUD пород, Характеристики |
@@ -1079,7 +1079,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 - 62 маршрута (`GoRoute` в `app_router.dart`)
 
 **Реализованные экраны (60, пересчитано 2026-09-10 по `presentation/screens/`):**
-1. Auth: Login, Register, ForgotPassword, ResetPassword
+1. Auth: Login (код из SMS/почты), Register, PinSetup, PinLock
 2. Onboarding: Splash — анкета до регистрации (Welcome/FarmName/FarmType/Ready)
    снесена 2026-09-10 вместе с `farmType`
 3. Home: Today, Farm, Journal, MainNavigation
@@ -1144,7 +1144,7 @@ logger.error('Database error', { error: err.message, stack: err.stack });
 ### Готовность:
 - ✅ Backend API с многоарендностью (изоляция ферм на всех операциях с данными)
 - ✅ Полнофункциональное mobile приложение
-- ✅ Безопасность (JWT, bcrypt, валидация, tenancy-хук)
+- ✅ Безопасность (JWT, одноразовые коды входа, валидация, tenancy-хук)
 - ✅ Push-уведомления (FCM) — Android; iOS код готов, доставка не настроена (нет APNs)
 - ✅ Автоматизация бизнес-процессов
 

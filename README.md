@@ -7,9 +7,10 @@ The stack is a REST API (Node + MySQL) and a Flutter client that runs on
 Android, iOS and in the browser. Everything ships together as a Docker Compose
 stack.
 
-> **The interface is in Russian.** The app is written for a Russian-speaking
-> farm and has no localisation layer yet: code, API and docs use English
-> identifiers, but every user-facing string is Russian.
+> **The interface speaks four languages**: Russian, Tajik, English and Uzbek
+> (`mobile/lib/l10n/app_{ru,tg,en,uz}.arb`). Each user picks their own; Russian
+> is the default and the most complete. Code, API and docs use English
+> identifiers.
 
 ## What it does
 
@@ -46,8 +47,8 @@ Dio. One codebase for Android, iOS and web — the web build doubles as the
 platform admin's desktop view, no separate app.
 
 **Runtime** — Docker Compose: `db`, `minio` (S3-compatible file storage),
-`api`, `web` (nginx serving the Flutter web build) and `landing` (nginx
-serving the marketing site).
+`redis` (platform summary cache), `api`, `web` (nginx serving the Flutter web
+build) and `landing` (nginx serving the marketing site).
 
 **Landing** — a static site at `rabbitfarm.click`, built by
 `node landing/build.js` into four language pages (Russian, Tajik, Uzbek,
@@ -185,7 +186,7 @@ Backend:
 cd backend
 npm install
 npm run dev              # hot reload
-npm test                 # 7 fail unless MinIO is reachable from the host (see docs/ENVIRONMENT.md)
+npm test                 # the photo suites fail unless MinIO is reachable from the host (see docs/ENVIRONMENT.md)
 npm run test:unit        # no database needed
 npm run migrate          # apply migrations
 npx sequelize-cli migration:generate --name your-change
@@ -199,7 +200,7 @@ Client:
 ```bash
 cd mobile
 flutter analyze
-flutter test             # 326 tests
+flutter test
 dart run build_runner build --delete-conflicting-outputs   # after model changes
 ```
 
@@ -233,9 +234,10 @@ shape:
 ## Contributing
 
 Issues and pull requests are welcome. Run `npm test` in `backend/` and
-`flutter analyze && flutter test` in `mobile/` before opening a PR: nothing
-runs them automatically on a pull request yet, so those checks are on you.
-(The mobile release workflow does run them, but only when a build is made.)
+`flutter analyze && flutter test` in `mobile/` before opening a PR. Backend
+tests run in CI on every push and pull request (`.github/workflows/backend.yml`);
+the mobile checks do not, they only run when a release build is made
+(`mobile-release.yml`), so those are on you.
 
 ## License
 
