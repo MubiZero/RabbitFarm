@@ -1,0 +1,237 @@
+{
+  "components": [
+    {
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;min-height:48px;padding:12px 24px;border:1.5px solid #10b981;border-radius:14px;background:#10b981;color:#0f172a;font-weight:700;text-decoration:none;font-family:Onest,system-ui,sans-serif}.ds-btn-primary:hover{background:#14c892}.ds-btn-primary:focus-visible{outline:3px solid #10b981;outline-offset:3px}",
+      "description": "Главное действие: открыть веб-версию.",
+      "html": "\u003ca class=\"ds-btn-primary\" href=\"#\"\u003eОткрыть веб-версию\u003c/a\u003e",
+      "kind": "button",
+      "name": "Primary Button",
+      "refersTo": "button-primary"
+    },
+    {
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;min-height:48px;padding:12px 24px;border:1.5px solid #8a95ab;border-radius:14px;background:#fff;color:#0f172a;font-weight:700;text-decoration:none;font-family:Onest,system-ui,sans-serif}.ds-btn-secondary:hover{border-color:#10b981}.ds-btn-secondary:focus-visible{outline:3px solid #10b981;outline-offset:3px}",
+      "description": "Второе действие, например скачать сборку.",
+      "html": "\u003ca class=\"ds-btn-secondary\" href=\"#\"\u003eСкачать для Android\u003c/a\u003e",
+      "kind": "button",
+      "name": "Secondary Button",
+      "refersTo": "button-secondary"
+    },
+    {
+      "css": ".ds-job{min-height:48px;padding:10px 20px;border:1.5px solid #10b981;border-radius:999px;background:#10b981;color:#0f172a;font:600 17px Onest,system-ui,sans-serif;cursor:pointer}.ds-job:focus-visible{outline:3px solid #10b981;outline-offset:3px}",
+      "description": "Выбор дела в разделе «Что записать».",
+      "html": "\u003cbutton class=\"ds-job\" aria-selected=\"true\"\u003eПокормил\u003c/button\u003e",
+      "kind": "chip",
+      "name": "Job Tab",
+      "refersTo": "job-tab"
+    },
+    {
+      "css": ".ds-panel{padding:28px;border:1px solid #dfe4ee;border-radius:28px;background:#fff;color:#0f172a;font:400 20px/1.4 Onest,system-ui,sans-serif}",
+      "description": "Белая панель с тонкой границей, без тени.",
+      "html": "\u003cdiv class=\"ds-panel\"\u003eОстаток корма на складе уменьшается сам.\u003c/div\u003e",
+      "kind": "card",
+      "name": "Panel",
+      "refersTo": "panel"
+    }
+  ],
+  "extensions": {
+    "breakpoints": [
+      {
+        "name": "list",
+        "value": "600px"
+      },
+      {
+        "name": "desktop",
+        "value": "900px"
+      }
+    ],
+    "colorMeta": {
+      "amber-state": {
+        "canonical": "#f59e0b",
+        "displayName": "Янтарь состояния",
+        "role": "tertiary",
+        "tonalRamp": [
+          "#492f03",
+          "#815305",
+          "#b97708",
+          "#f19b0a",
+          "#f7b23f",
+          "#f9c977",
+          "#fcdfaf",
+          "#fef5e7"
+        ]
+      },
+      "emerald": {
+        "canonical": "#10b981",
+        "displayName": "Изумруд",
+        "role": "primary",
+        "tonalRamp": [
+          "#064631",
+          "#0b7c57",
+          "#0fb27c",
+          "#14e7a1",
+          "#47efb7",
+          "#7cf4cc",
+          "#b2f8e1",
+          "#e8fdf6"
+        ]
+      },
+      "emerald-text": {
+        "canonical": "#087a56",
+        "displayName": "Изумруд для текста",
+        "role": "primary",
+        "tonalRamp": [
+          "#054833",
+          "#087e59",
+          "#0cb580",
+          "#0feca6",
+          "#43f3bb",
+          "#7af6cf",
+          "#b0fae3",
+          "#e7fdf6"
+        ]
+      },
+      "ink": {
+        "canonical": "#0f172a",
+        "displayName": "Чернила",
+        "role": "neutral",
+        "tonalRamp": [
+          "#141f38",
+          "#233663",
+          "#334e8e",
+          "#4265b9",
+          "#6b87ca",
+          "#96aada",
+          "#c1cde9",
+          "#ecf0f8"
+        ]
+      },
+      "night": {
+        "canonical": "#0a0d14",
+        "displayName": "Ночь",
+        "role": "neutral",
+        "tonalRamp": [
+          "#1a2133",
+          "#2d3a5a",
+          "#405481",
+          "#546da8",
+          "#798dbc",
+          "#a0aed0",
+          "#c7d0e3",
+          "#eef1f7"
+        ]
+      },
+      "page": {
+        "canonical": "#f4f6fb",
+        "displayName": "Страница",
+        "role": "neutral",
+        "tonalRamp": [
+          "#141f38",
+          "#243663",
+          "#334d8e",
+          "#4365b8",
+          "#6c87ca",
+          "#97aad9",
+          "#c2cde9",
+          "#ecf0f8"
+        ]
+      }
+    },
+    "motion": [
+      {
+        "name": "expo",
+        "purpose": "Все прибытия: вход первого экрана, смена сцены, состояние виджета.",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)"
+      },
+      {
+        "name": "press",
+        "purpose": "Нажатие кнопки и вкладки.",
+        "value": "120ms"
+      },
+      {
+        "name": "swap-out",
+        "purpose": "Исчезновение снимка и подписи при смене дела.",
+        "value": "140ms"
+      },
+      {
+        "name": "swap-in",
+        "purpose": "Появление нового снимка и подписи.",
+        "value": "380ms"
+      }
+    ],
+    "shadows": [
+      {
+        "name": "pop",
+        "purpose": "Всплывающий список языка.",
+        "value": "0 8px 24px rgba(15, 23, 42, 0.14)"
+      },
+      {
+        "name": "phone",
+        "purpose": "Рамка телефона на первом экране.",
+        "value": "0 28px 40px -28px rgba(15, 23, 42, 0.4)"
+      }
+    ],
+    "typographyMeta": {
+      "body": {
+        "displayName": "Body",
+        "purpose": "Основной текст, 65-75 знаков в строке."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Заголовок первого экрана, две строки, вторая изумрудная."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Заголовки секций."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Подписи, факты, кнопки."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Названия в списках возможностей."
+      }
+    }
+  },
+  "generatedAt": "2026-11-15T00:58:40Z",
+  "narrative": {
+    "donts": [
+      "Don't ставить плашку над заголовком",
+      "Don't делать ряд одинаковых карточек",
+      "Don't прятать блоки до прокрутки"
+    ],
+    "dos": [
+      "Do показывать настоящие снимки на языке страницы",
+      "Do писать без длинного тире",
+      "Do включать движение только без reduced-motion и без lite"
+    ],
+    "keyCharacteristics": [
+      "Светлая по умолчанию, тёмная по выбору",
+      "Один акцент: изумруд",
+      "Настоящие снимки, ничего из div",
+      "Одно движение: вход первого экрана",
+      "Четыре языка равноправны"
+    ],
+    "northStar": "Настоящий экран",
+    "overview": "Страница показывает продукт, а не рисует его: настоящие экраны в настоящем телефоне, светлый фон приложения, один изумруд, один шрифт. Светлая тема по умолчанию, потому что сайт читают у клетки при дневном свете.",
+    "rules": [
+      {
+        "body": "Изумруд один. Второго акцента, градиентов и цветных теней нет.",
+        "name": "The One Voice Rule",
+        "section": "colors"
+      },
+      {
+        "body": "Цветных ореолов, радиальных подсветок и свечения нет.",
+        "name": "The No Halo Rule",
+        "section": "elevation"
+      },
+      {
+        "body": "Страница проверяется на ғ, ӣ, қ, ӯ, ҳ, ҷ и на самом длинном языке.",
+        "name": "The Real Letters Rule",
+        "section": "typography"
+      }
+    ]
+  },
+  "schemaVersion": 2,
+  "title": "Design System: RabbitFarm, публичный сайт"
+}
