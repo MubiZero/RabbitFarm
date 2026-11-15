@@ -93,6 +93,7 @@ type page struct {
 	Hero       heroShots
 	Jobs       []job
 	Modules    []module
+	ModCols    [][]module
 	Year       int
 	Repo       string
 	AppURL     string
@@ -158,6 +159,8 @@ func buildPage(l string, tpl *template.Template, dicts map[string]dict) []byte {
 	for i, it := range items(sub(t, "modules")["items"]) {
 		p.Modules = append(p.Modules, module{icon(moduleIcons[i], "module-icon"), it["name"].(string), it["text"].(string)})
 	}
+	half := (len(p.Modules) + 1) / 2
+	p.ModCols = [][]module{p.Modules[:half], p.Modules[half:]}
 	var out strings.Builder
 	if err := tpl.ExecuteTemplate(&out, "index.gohtml", p); err != nil {
 		log.Fatalf("шаблон %s: %v", l, err)

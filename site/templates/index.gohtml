@@ -57,11 +57,8 @@
 
 <main>
   <section class="hero" data-hero>
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-wash" aria-hidden="true"></div>
     <div class="wrap hero-copy">
-      <p class="kicker">{{.T.hero.kicker}}</p>
-      <h1>{{.T.hero.title_before}}<em>{{.T.hero.title_click}}</em>{{.T.hero.title_after}}</h1>
+      <h1><span class="h1-line"><span>{{.T.hero.title_before}}</span></span><span class="h1-line"><em>{{.T.hero.title_click}}</em></span>{{.T.hero.title_after}}</h1>
       <p class="hero-lead">{{.T.hero.lead}}</p>
       <div class="hero-actions">
         <a class="btn btn-primary btn-lg" href="{{.AppURL}}" data-app-link>
@@ -74,16 +71,13 @@
       <p class="hero-facts">{{.T.hero.facts}}</p>
     </div>
 
-    <div class="stage">
+    <div class="stage" data-stage>
       {{- with .Hero}}
       <div class="stage-row">
-        <div class="ph ph-left"><img src="{{.Left}}" alt="" width="640" height="1386" loading="eager"></div>
-        <div class="ph ph-right"><img src="{{.Right}}" alt="" width="640" height="1386" loading="eager"></div>
-        <div class="ph ph-center"><img src="{{.Center}}" alt="{{$.T.hero.shot_alt}}" width="640" height="1386" fetchpriority="high"></div>
+        <div class="ph ph-left"><div class="ph-in"><img src="{{.Left}}" alt="" width="640" height="1386" decoding="async"></div></div>
+        <div class="ph ph-right"><div class="ph-in"><img src="{{.Right}}" alt="" width="640" height="1386" decoding="async"></div></div>
+        <div class="ph ph-center"><div class="ph-in"><img src="{{.Center}}" alt="{{$.T.hero.shot_alt}}" width="640" height="1386" fetchpriority="high"></div></div>
       </div>
-      {{- end}}
-      {{- range $i, $c := .T.hero.chips}}
-      <div class="chip chip-{{$i}}"><strong>{{$c.t}}</strong><span>{{$c.d}}</span></div>
       {{- end}}
     </div>
   </section>
@@ -106,7 +100,7 @@
         </div>
         {{- with index .Jobs 0}}
         <div class="click-panel" id="job-panel" role="tabpanel" aria-labelledby="job-0">
-          <div class="ph ph-flat"><img data-job-shot src="{{.Shot}}" alt="{{.Alt}}" width="640" height="1386" loading="lazy"></div>
+          <div class="ph-flat"><img data-job-shot src="{{.Shot}}" alt="{{.Alt}}" width="640" height="1386" loading="lazy" decoding="async"></div>
           <p class="click-caption" data-job-caption>{{.Caption}}</p>
         </div>
         {{- end}}
@@ -117,13 +111,13 @@
   <section class="section section-sunken" id="modules">
     <div class="wrap">
       <h2 class="section-title">{{.T.modules.title}}</h2>
-      <div class="modules">
-        {{- range .Modules}}
-        <article class="module reveal">
-          {{.Icon}}
-          <h3>{{.Name}}</h3>
-          <p>{{.Text}}</p>
-        </article>
+      <div class="mod-cols">
+        {{- range .ModCols}}
+        <ul class="mods">
+          {{- range .}}
+          <li>{{.Icon}}<div><h3>{{.Name}}</h3><p>{{.Text}}</p></div></li>
+          {{- end}}
+        </ul>
         {{- end}}
       </div>
     </div>
@@ -135,14 +129,14 @@
         <h2 class="section-title">{{.T.field.title}}</h2>
         <div class="field-list">
           {{- range .T.field.items}}
-          <div class="field-item reveal">
+          <div class="field-item">
             <h3>{{.name}}</h3>
             <p>{{.text}}</p>
           </div>
           {{- end}}
         </div>
       </div>
-      <div class="demo reveal" data-demo data-state="online">
+      <div class="demo" data-demo data-state="online">
         <p class="demo-title">{{.T.field.demo.title}}</p>
         <div class="demo-screen">
           <div class="demo-row"><span class="demo-dot" aria-hidden="true"></span><span class="demo-status" aria-live="polite">

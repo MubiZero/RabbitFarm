@@ -14,17 +14,17 @@
       },
       {
         "alt": "Weighing screen: weight field and growth chart",
-        "caption": "Enter the weight — the app charts how the rabbit grows and compares it with last time.",
+        "caption": "Enter the weight, the app charts how the rabbit grows and compares it with last time.",
         "label": "Weighed one"
       },
       {
         "alt": "Vaccination screen: drug, date and next shot",
-        "caption": "Mark the shot — the next one lands in the calendar by itself, with a reminder ahead of time.",
+        "caption": "Mark the shot, the next one lands in the calendar by itself, with a reminder ahead of time.",
         "label": "Vaccinated"
       },
       {
         "alt": "Sale screen: buyer, weight and amount",
-        "caption": "Record the sale — the rabbit leaves the herd and the money joins this month’s income.",
+        "caption": "Record the sale, the rabbit leaves the herd and the money joins this month’s income.",
         "label": "Sold one"
       }
     ],
@@ -79,21 +79,10 @@
     "source_note": "The code is open: a farm can host the system on its own server."
   },
   "hero": {
-    "chips": [
-      {
-        "d": "the entry goes through on its own when the network is back",
-        "t": "No signal"
-      },
-      {
-        "d": "the app tells you ahead of time",
-        "t": "Feed is running out"
-      }
-    ],
     "cta_primary": "Open the web app",
     "cta_secondary": "Download for Android",
     "facts": "No password · works offline · four languages",
-    "kicker": "App for a rabbit farm",
-    "lead": "Rabbits, births, feed, vaccinations and money. Log it at the cage, the app does the rest.",
+    "lead": "App for a rabbit farm: rabbits, births, feed, vaccinations and money. Log it at the cage, the rest counts itself.",
     "shot_alt": "Home screen: herd, today's tasks, feed left in stock",
     "title_after": "",
     "title_before": "The whole farm ",
@@ -137,7 +126,7 @@
         "text": "Invite by phone number, set roles, and see in the journal who recorded what."
       }
     ],
-    "title": "The whole farm in one place"
+    "title": "What is in the app"
   },
   "nav": {
     "click": "How it records",

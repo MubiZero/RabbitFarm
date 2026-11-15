@@ -4,7 +4,8 @@
  * стоил бы дороже всего остального.
  *
  * Всё здесь необязательно для чтения: без скрипта видны все секции,
- * работают ссылки, «Что записать» показывает первое дело.
+ * работают ссылки, «Что записать» показывает первое дело. Перспектива
+ * экранов выпрямляется прокруткой средствами CSS (композитор), не здесь.
  */
 (function () {
   'use strict';
@@ -13,33 +14,80 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   var lite = root.classList.contains('lite');
 
-  /* --- Перспектива экранов выпрямляется при прокрутке ---------------- */
+  /* --- Первый экран: слежение за указателем -----------------------------
+   * Включается только пока первый экран виден и только у мыши. Наклон
+   * ставится прямо на внутренние обёртки экранов (.ph-in), без переменных
+   * на весь блок: так браузер пересчитывает три элемента, а не поддерево.
+   */
   var hero = document.querySelector('[data-hero]');
-  if (hero && !reduce.matches && !lite) {
-    var ticking = false;
-    var update = function () {
-      var p = Math.min(1, Math.max(0, window.scrollY / (hero.offsetHeight * 0.55)));
-      hero.style.setProperty('--p', p.toFixed(3));
-      ticking = false;
-    };
-    window.addEventListener('scroll', function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }, { passive: true });
-    update();
+  var stage = document.querySelector('[data-stage]');
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (hero && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      hero.classList.toggle('is-live', entries[0].isIntersecting);
+    }).observe(hero);
   }
 
-  /* --- «Что записать»: выбор дела ----------------------------------- */
+  if (hero && stage && fine.matches && !reduce.matches && !lite) {
+    var tilts = [
+      { el: stage.querySelector('.ph-center .ph-in'), rx: 3, ry: 5, tx: 0 },
+      { el: stage.querySelector('.ph-left .ph-in'), rx: 2, ry: 3, tx: 14 },
+      { el: stage.querySelector('.ph-right .ph-in'), rx: 2, ry: 3, tx: 14 }
+    ].filter(function (t) { return t.el; });
+    var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+
+    var step = function () {
+      cx += (tx - cx) * 0.08;
+      cy += (ty - cy) * 0.08;
+      tilts.forEach(function (t) {
+        t.el.style.transform = 'translateX(' + (cx * t.tx).toFixed(2) + 'px) rotateY(' +
+          (cx * t.ry).toFixed(2) + 'deg) rotateX(' + (-cy * t.rx).toFixed(2) + 'deg)';
+      });
+      raf = Math.abs(tx - cx) > 0.002 || Math.abs(ty - cy) > 0.002 ? requestAnimationFrame(step) : 0;
+    };
+    var kick = function () { if (!raf) raf = requestAnimationFrame(step); };
+
+    hero.addEventListener('pointermove', function (event) {
+      var rect = hero.getBoundingClientRect();
+      tx = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+      ty = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+      kick();
+    }, { passive: true });
+    hero.addEventListener('pointerleave', function () { tx = 0; ty = 0; kick(); });
+  }
+
+  /* --- «Что записать»: выбор дела ----------------------------------------
+   * Снимок и подпись плавно сменяются. Новая картинка сначала
+   * декодируется, потом меняется: иначе на медленной сети экран мигнул бы
+   * пустым.
+   */
   var jobs = Array.prototype.slice.call(document.querySelectorAll('.job'));
+  var panel = document.querySelector('.click-panel');
   var shot = document.querySelector('[data-job-shot]');
   var caption = document.querySelector('[data-job-caption]');
+  var swapTimer = 0;
 
   function selectJob(button) {
     jobs.forEach(function (job) {
       job.setAttribute('aria-selected', String(job === button));
       job.tabIndex = job === button ? 0 : -1;
     });
-    if (shot) { shot.src = button.dataset.shot; shot.alt = button.dataset.shotAlt; }
-    if (caption) caption.textContent = button.dataset.caption;
+    if (!shot || !panel) return;
+
+    var next = new Image();
+    next.src = button.dataset.shot;
+    var ready = next.decode ? next.decode() : Promise.resolve();
+    ready.catch(function () { /* покажем как есть */ }).then(function () {
+      window.clearTimeout(swapTimer);
+      panel.classList.add('is-swapping');
+      swapTimer = window.setTimeout(function () {
+        shot.src = button.dataset.shot;
+        shot.alt = button.dataset.shotAlt;
+        if (caption) caption.textContent = button.dataset.caption;
+        panel.classList.remove('is-swapping');
+      }, reduce.matches ? 0 : 150);
+    });
   }
 
   jobs.forEach(function (button, index) {
@@ -60,7 +108,7 @@
   if (demo) {
     var toggle = demo.querySelector('[data-demo-toggle]');
     var states = demo.querySelectorAll('[data-demo-s]');
-    var timer = null;
+    var timer = 0;
     var show = function (state) {
       demo.dataset.state = state;
       states.forEach(function (s) { s.hidden = s.dataset.demoS !== state; });
@@ -79,21 +127,6 @@
     });
   }
 
-  /* --- Появление блоков --------------------------------------------- */
-  var revealables = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && !reduce.matches && !lite) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        io.unobserve(entry.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
-    revealables.forEach(function (el) { io.observe(el); });
-  } else {
-    revealables.forEach(function (el) { el.classList.add('is-visible'); });
-  }
-
   /* --- Граница шапки при прокрутке ----------------------------------- */
   var topbar = document.querySelector('.topbar');
   var sentinel = document.querySelector('[data-scroll-sentinel]');
@@ -105,10 +138,9 @@
 
   /* --- Светлая или тёмная -------------------------------------------- */
   var themeToggle = document.querySelector('[data-theme-toggle]');
-    if (themeToggle) {
+  if (themeToggle) {
     themeToggle.addEventListener('click', function () {
-      var current = root.dataset.theme || 'light';
-      var next = current === 'dark' ? 'light' : 'dark';
+      var next = (root.dataset.theme || 'light') === 'dark' ? 'light' : 'dark';
       root.dataset.theme = next;
       try { localStorage.setItem('theme', next); } catch (e) { /* до перезагрузки */ }
     });
