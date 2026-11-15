@@ -7,8 +7,14 @@
  *
  * Страница статическая: ни встроенных стилей, ни встроенных скриптов
  * (строгий CSP, см. _headers). Её открывают с недорогого Android на
- * мобильном интернете, поэтому тяжёлое («вау») отключается классом `lite`
- * (theme-boot.js ставит его при слабой связи или экономии трафика).
+ * мобильном интернете, поэтому всё тяжёлое отключается классом `lite`
+ * (theme-boot.js ставит его при слабой связи или экономии трафика) и
+ * настройкой «меньше движения».
+ *
+ * Движение: один отрепетированный момент (вход первого экрана), перспектива
+ * экранов выпрямляется прокруткой на композиторе (без JavaScript), остальное
+ * это отклик на действие. Блоки не прячутся до прокрутки: контент виден
+ * всегда, анимация только украшает.
  */
 
 :root {
@@ -25,18 +31,19 @@
   --em-deep: #0b8f65;
   --on-em: #0f172a;
   --em-wash: rgba(16, 185, 129, 0.12);
-  --grid: rgba(15, 23, 42, 0.07);
-  --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 30px rgba(15, 23, 42, 0.08);
-  --shadow-phone: 0 40px 70px -20px rgba(15, 23, 42, 0.35);
+  --shadow-pop: 0 8px 24px rgba(15, 23, 42, 0.14);
+  --shadow-phone: 0 28px 40px -28px rgba(15, 23, 42, 0.4);
   --bezel: #0a0d14;
+  --bezel-ring: #1d2233;
   --r-control: 14px;
   --r-panel: 20px;
-  --ease: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: 20px;
   --page: 1180px;
 }
 
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #0a0d14;
   --surface: #131720;
   --sunken: #0e121a;
@@ -46,14 +53,14 @@
   --border-strong: #5b6680;
   --em-text: #10b981;
   --em-wash: rgba(16, 185, 129, 0.14);
-  --grid: rgba(240, 244, 255, 0.07);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-phone: 0 40px 70px -20px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-phone: 0 28px 40px -28px rgba(0, 0, 0, 0.7);
   --bezel: #05070b;
+  --bezel-ring: #3a4258;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; scrollbar-color: var(--border-strong) var(--bg); }
 body {
   margin: 0;
   font-family: Onest, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -62,14 +69,19 @@ body {
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
+::selection { background: var(--em); color: var(--on-em); }
+input, textarea { caret-color: var(--em); }
 img { max-width: 100%; height: auto; }
 h1, h2, h3, p { margin: 0; }
-a { color: inherit; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 [hidden] { display: none !important; }
 :focus-visible { outline: 3px solid var(--em); outline-offset: 3px; border-radius: 6px; }
 .wrap { width: min(100% - var(--gutter) * 2, var(--page)); margin-inline: auto; }
+
+/* Страницы переключаются плавно: Chrome и Safari сами растворяют старую в новую. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; }
 
 /* --- Шапка --------------------------------------------------------- */
 .topbar { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid transparent; transition: border-color 0.2s; }
@@ -79,10 +91,10 @@ a { color: inherit; }
 .brand-mark { border-radius: 8px; background: var(--em); padding: 3px; color: var(--on-em); }
 .brand-dot { color: var(--em-text); }
 .topbar-nav { display: none; gap: 4px; }
-.topbar-nav a { padding: 10px 14px; border-radius: 10px; text-decoration: none; color: var(--muted); font-size: 15px; }
+.topbar-nav a { padding: 10px 14px; border-radius: 10px; text-decoration: none; color: var(--muted); font-size: 15px; transition: color 0.15s, background 0.15s; }
 .topbar-nav a:hover, .topbar-nav a.is-current { color: var(--text); background: var(--em-wash); }
 .topbar-tools { display: flex; align-items: center; gap: 8px; }
-.icon-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; min-width: 44px; justify-content: center; padding: 0 10px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; }
+.icon-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; min-width: 44px; justify-content: center; padding: 0 10px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; transition: background 0.15s; }
 .icon-btn::-webkit-details-marker { display: none; }
 .icon-btn:hover { background: var(--em-wash); }
 .icon-btn-mark { width: 22px; height: 22px; fill: currentColor; }
@@ -90,87 +102,110 @@ a { color: inherit; }
 :root[data-theme="dark"] .icon-sun { display: block; }
 :root[data-theme="dark"] .icon-moon { display: none; }
 .pop { position: relative; }
-.pop-sheet { position: absolute; right: 0; top: calc(100% + 6px); min-width: 180px; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); display: grid; }
+.pop-sheet { position: absolute; right: 0; top: calc(100% + 6px); min-width: 180px; padding: 6px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-pop); display: grid; }
 .pop-sheet a { padding: 12px 14px; border-radius: 10px; text-decoration: none; font-size: 15px; }
 .pop-sheet a:hover, .pop-sheet a[aria-current] { background: var(--em-wash); }
 .btn.topbar-cta { display: none; }
 
 /* --- Кнопки -------------------------------------------------------- */
-.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; border: 1.5px solid var(--border-strong); border-radius: var(--r-control); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform 0.12s var(--ease), background 0.12s; }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--em); color: var(--on-em); border-color: var(--em); box-shadow: 0 2px 0 var(--em-deep), 0 12px 24px rgba(15, 23, 42, 0.12); }
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; border: 1.5px solid var(--border-strong); border-radius: var(--r-control); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform 0.12s var(--expo), background 0.15s; }
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn-primary { background: var(--em); color: var(--on-em); border-color: var(--em); }
 .btn-primary:hover { background: #14c892; }
 .btn-lg { min-height: 56px; padding: 14px 30px; font-size: 18px; border-radius: 16px; }
-.btn-sm { min-height: 44px; padding: 8px 18px; font-size: 15px; border-radius: 12px; box-shadow: none; }
-.btn-icon { width: 20px; height: 20px; fill: currentColor; }
+.btn-sm { min-height: 44px; padding: 8px 18px; font-size: 15px; border-radius: 12px; }
+.btn-icon { width: 20px; height: 20px; fill: currentColor; transition: translate 0.25s var(--expo); }
+.btn-primary:hover .btn-icon { translate: 4px 0; }
 
 /* --- Первый экран -------------------------------------------------- */
-.hero { position: relative; overflow: hidden; padding-top: 28px; }
-.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 56px 56px; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000, transparent); mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000, transparent); }
-.hero-wash { position: absolute; left: 50%; top: -260px; width: min(1100px, 140vw); height: 700px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(16, 185, 129, 0.22), transparent); }
+.hero { position: relative; overflow: hidden; padding-top: 36px; }
 .hero-copy { position: relative; text-align: center; }
-.kicker { display: inline-flex; padding: 6px 14px; border-radius: 999px; background: var(--em-wash); color: #065f43; font-size: 14px; font-weight: 600; }
-.hero h1 { margin: 20px auto 0; max-width: 980px; font-size: clamp(38px, 7vw, 72px); line-height: 1.03; font-weight: 700; letter-spacing: -0.03em; text-wrap: balance; }
+.hero h1 { max-width: 980px; margin: 0 auto; font-size: clamp(30px, 9.4vw, 72px); line-height: 1.03; font-weight: 700; letter-spacing: -0.03em; }
+.h1-line { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.h1-line > * { display: inline-block; }
 .hero h1 em { white-space: nowrap; font-style: normal; color: var(--em-text); }
-.hero-lead { margin: 22px auto 30px; max-width: 620px; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.45; color: var(--muted); }
+.hero-lead { margin: 22px auto 30px; max-width: 640px; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.45; color: var(--muted); text-wrap: pretty; }
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .hero-facts { margin-top: 18px; font-size: 14px; color: var(--muted); }
 
-/* Три настоящих экрана веером. Перспектива выпрямляется при прокрутке:
-   --p ставит app.js (0 вверху, 1 когда экраны выпрямились). */
-.stage { --pw: clamp(250px, 58vw, 430px); --sw: calc(var(--pw) * 0.767); position: relative; margin-top: 44px; height: calc(var(--pw) * 1.3); perspective: 1800px; perspective-origin: 50% 0; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+/* Три настоящих экрана веером. Наклон выпрямляется прокруткой: это
+   scroll-driven animation, её считает композитор, а не JavaScript. Без
+   поддержки остаётся лёгкий наклон. Указатель добавляет наклон внутри
+   (.ph-in), поэтому внешний transform не конфликтует. */
+.stage { --pw: clamp(250px, 58vw, 430px); --sw: calc(var(--pw) * 0.767); position: relative; margin-top: 44px; height: calc(var(--pw) * 1.3); perspective: 1800px; perspective-origin: 50% 0; overflow: hidden; }
+.stage::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, var(--bg)); pointer-events: none; z-index: 6; }
 .stage-row { position: absolute; inset: 0; }
-.ph { position: absolute; top: 0; padding: calc(var(--w) * 0.025); border-radius: calc(var(--w) * 0.11); background: var(--bezel); box-shadow: var(--shadow-phone), inset 0 0 0 2px #1d2233; --w: var(--sw); width: var(--w); }
+.ph { --w: var(--sw); position: absolute; top: 0; width: var(--w); padding: calc(var(--w) * 0.025); border-radius: calc(var(--w) * 0.11); background: var(--bezel); box-shadow: var(--shadow-phone), inset 0 0 0 2px var(--bezel-ring); transform-style: preserve-3d; }
+.ph-in { border-radius: calc(var(--w) * 0.09); }
 .ph img { display: block; width: 100%; border-radius: calc(var(--w) * 0.09); }
-.ph-center { --w: var(--pw); left: calc(50% - var(--pw) / 2); z-index: 3; transform: rotateX(calc(18deg * (1 - var(--p, 0)))) translateY(calc(-30px * (1 - var(--p, 0)))); }
-.ph-left { left: calc(50% - var(--pw) / 2 - var(--pw) * 0.128 - var(--sw)); transform: rotateX(calc(24deg * (1 - var(--p, 0)))) rotateZ(calc(-7deg * (1 - var(--p, 0)))) translateY(30px); }
-.ph-right { left: calc(50% + var(--pw) / 2 + var(--pw) * 0.128); transform: rotateX(calc(24deg * (1 - var(--p, 0)))) rotateZ(calc(7deg * (1 - var(--p, 0)))) translateY(30px); }
-.chip { position: absolute; z-index: 5; display: none; max-width: 240px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); font-size: 14px; line-height: 1.3; }
-.chip strong { display: block; font-weight: 600; }
-.chip span { color: var(--muted); font-size: 13px; }
-.chip-0 { left: max(16px, calc(50% - 700px)); top: 70px; }
-.chip-1 { right: max(16px, calc(50% - 700px)); top: 24px; }
-@media (min-width: 1200px) { .chip { display: block; } }
+.ph-center { --w: var(--pw); left: calc(50% - var(--pw) / 2); z-index: 3; transform: rotateX(18deg) translateY(-30px); }
+.ph-left { left: calc(50% - var(--pw) / 2 - var(--pw) * 0.128 - var(--sw)); transform: rotateX(24deg) rotateZ(-7deg) translateY(30px); }
+.ph-right { left: calc(50% + var(--pw) / 2 + var(--pw) * 0.128); transform: rotateX(24deg) rotateZ(7deg) translateY(30px); }
+.hero.is-live .ph { will-change: transform; }
+
+@keyframes flatten-c { to { transform: rotateX(0deg) translateY(0); } }
+@keyframes flatten-l { to { transform: rotateX(0deg) rotateZ(0deg) translateY(0); } }
+@keyframes flatten-r { to { transform: rotateX(0deg) rotateZ(0deg) translateY(0); } }
+@supports (animation-timeline: scroll()) {
+  .js:not(.lite) .ph-center { animation: flatten-c linear both; animation-timeline: scroll(root); animation-range: 0 480px; }
+  .js:not(.lite) .ph-left { animation: flatten-l linear both; animation-timeline: scroll(root); animation-range: 0 480px; }
+  .js:not(.lite) .ph-right { animation: flatten-r linear both; animation-timeline: scroll(root); animation-range: 0 480px; }
+}
 
 /* --- Секции -------------------------------------------------------- */
 .section { padding: 88px 0; }
 .section-sunken { background: var(--sunken); }
+#modules { content-visibility: auto; contain-intrinsic-size: auto 780px; }
+#field { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+#price { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+.closing { content-visibility: auto; contain-intrinsic-size: auto 460px; }
+.footer { content-visibility: auto; contain-intrinsic-size: auto 420px; }
 .section-title { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.1; letter-spacing: -0.02em; font-weight: 700; text-wrap: balance; }
-.section-lead { margin-top: 14px; max-width: 640px; font-size: 19px; color: var(--muted); }
-.reveal { transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
-.js .reveal:not(.is-visible) { opacity: 0; transform: translateY(14px); }
+.section-lead { margin-top: 14px; max-width: 640px; font-size: 19px; color: var(--muted); text-wrap: pretty; }
 
 .click-grid { margin-top: 36px; display: grid; gap: 28px; }
 .click-jobs { display: flex; flex-wrap: wrap; gap: 10px; }
-.job { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 20px; border: 1.5px solid var(--border-strong); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
-.job-mark { width: 20px; height: 20px; fill: currentColor; color: var(--em-text); }
+.job { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 20px; border: 1.5px solid var(--border-strong); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.12s var(--expo); }
+.job:active { transform: scale(0.97); }
+.job-mark { width: 20px; height: 20px; fill: currentColor; color: var(--em-text); transition: color 0.2s; }
 .job[aria-selected="true"] { background: var(--em); border-color: var(--em); color: var(--on-em); }
 .job[aria-selected="true"] .job-mark { color: var(--on-em); }
 .click-hint { margin-top: 14px; font-size: 14px; color: var(--muted); }
-.click-panel { display: grid; gap: 24px; align-items: center; justify-items: center; padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); }
-.ph-flat { position: relative; --w: min(280px, 70vw); transform: none; }
-.click-caption { max-width: 420px; font-size: 20px; line-height: 1.4; }
+.click-panel { display: grid; place-items: center; padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; }
+.ph-flat { width: min(280px, 70vw); padding: 7px; border-radius: 34px; background: var(--bezel); }
+.ph-flat img { display: block; width: 100%; border-radius: 28px; }
+.ph-flat img, .click-caption { transition: opacity 0.38s var(--expo), translate 0.38s var(--expo); }
+.click-grid.is-swapping .ph-flat img, .click-grid.is-swapping .click-caption { opacity: 0; translate: 0 8px; transition-duration: 0.14s; }
+.click-caption { margin-top: 26px; max-width: 460px; min-height: 5.6em; font-size: 20px; line-height: 1.4; text-wrap: pretty; }
 
-.modules { margin-top: 36px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); }
-.module { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-panel); }
-.module-icon { width: 36px; height: 36px; padding: 7px; border-radius: 11px; background: var(--em-wash); fill: var(--em-text); }
-.module h3 { margin-top: 16px; font-size: 20px; }
-.module p { margin-top: 6px; color: var(--muted); font-size: 16px; }
+/* Возможности: два столбца обычного списка, без карточек. */
+.mod-cols { margin-top: 36px; display: grid; gap: 0 56px; }
+.mods { list-style: none; margin: 0; padding: 0; }
+.mods li { display: flex; gap: 16px; align-items: flex-start; padding: 22px 0; border-top: 1px solid var(--border); }
+.mods li:last-child { border-bottom: 1px solid var(--border); }
+.module-icon { flex: none; width: 40px; height: 40px; padding: 8px; border-radius: 12px; background: var(--em-wash); fill: var(--em-text); }
+.mods h3 { font-size: 20px; line-height: 1.25; }
+.mods p { margin-top: 4px; color: var(--muted); font-size: 16px; text-wrap: pretty; }
 
 .field-wrap { display: grid; gap: 40px; align-items: start; }
 .field-list { margin-top: 30px; display: grid; gap: 22px; }
 .field-item h3 { font-size: 20px; }
-.field-item p { margin-top: 4px; color: var(--muted); }
-.demo { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); }
+.field-item p { margin-top: 4px; color: var(--muted); text-wrap: pretty; }
+.demo { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; }
 .demo-title { font-weight: 700; font-size: 18px; }
 .demo-screen { margin-top: 16px; padding: 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; display: grid; gap: 14px; }
 .demo-row { display: flex; align-items: flex-start; gap: 12px; }
-.demo-dot { flex: none; margin-top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--em); transition: background 0.2s; }
+.demo-dot { position: relative; flex: none; margin-top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--em); color: #f59e0b; transition: background 0.2s; }
+.demo-dot::after { content: ""; position: absolute; inset: -3px; border: 2px solid currentColor; border-radius: 50%; opacity: 0; }
 .demo[data-state="offline"] .demo-dot { background: #f59e0b; }
+.demo[data-state="offline"] .demo-dot::after { animation: ring 1.4s var(--expo) 3; }
+.demo-status > span:not([hidden]) { display: inline-block; animation: status-in 0.36s var(--expo); }
 .demo-rec { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
-.demo-tick { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--em); color: var(--on-em); transition: opacity 0.2s, background 0.2s; }
-.demo-check { width: 16px; height: 16px; fill: currentColor; }
-.demo[data-state="offline"] .demo-tick { opacity: 0.25; background: var(--border-strong); }
+.demo-tick { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--em); color: var(--on-em); border: 2.5px solid transparent; transition: background 0.2s, border-color 0.2s; }
+.demo-check { width: 16px; height: 16px; fill: currentColor; transition: opacity 0.15s; }
+.demo[data-state="offline"] .demo-tick { background: transparent; border-color: var(--border); border-top-color: #f59e0b; animation: spin 1s linear 5; }
+.demo[data-state="offline"] .demo-check { opacity: 0; }
+.demo[data-state="sent"] .demo-tick { animation: pop 0.42s var(--expo); }
 .demo-btn { margin-top: 18px; width: 100%; }
 
 .price-wrap { text-align: center; }
@@ -182,7 +217,7 @@ a { color: inherit; }
 .closing { padding: 88px 0; background: var(--em); color: var(--on-em); text-align: center; }
 .closing .section-lead { margin-inline: auto; color: #0f172a; opacity: 0.8; }
 .closing-actions { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.closing .btn-primary { background: #0f172a; border-color: #0f172a; color: #fff; box-shadow: none; }
+.closing .btn-primary { background: #0f172a; border-color: #0f172a; color: #fff; }
 .closing .btn-primary:hover { background: #1e293b; }
 .closing .btn:not(.btn-primary) { background: transparent; border-color: #0f172a; color: #0f172a; }
 .closing-note { margin-top: 16px; font-size: 15px; }
@@ -194,43 +229,91 @@ a { color: inherit; }
 .footer-note { margin-top: 6px; font-size: 14px; color: var(--muted); max-width: 280px; }
 .footer-col { display: grid; gap: 6px; align-content: start; }
 .footer-col a { padding: 6px 0; text-decoration: none; color: var(--muted); }
-.footer-col a:hover { color: var(--text); }
+.footer-col a:hover { color: var(--text); text-decoration: underline; }
 .footer-head { font-weight: 700; margin-bottom: 4px; }
 .footer-muted { font-size: 14px; color: var(--muted); }
 .footer-bottom { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 14px; color: var(--muted); }
 .footer-top { display: inline-flex; gap: 6px; align-items: center; text-decoration: none; padding: 8px 0; }
 
+/* --- Страница 404 -------------------------------------------------- */
+.not-found { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 20px; text-align: center; }
+.not-found h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.1; }
+.not-found small { display: block; margin-top: 10px; font-size: 16px; font-weight: 400; color: var(--muted); }
+
+@media (min-width: 600px) { .mod-cols { grid-template-columns: 1fr 1fr; } .mods:first-child li:last-child { border-bottom: 0; } }
+@media (hover: hover) {
+  .job:hover:not([aria-selected="true"]) { border-color: var(--em); }
+}
 @media (min-width: 900px) {
   .topbar-nav { display: flex; }
   .btn.topbar-cta { display: inline-flex; }
-  .click-panel { grid-template-columns: auto 1fr; gap: 56px; justify-items: start; padding: 40px 56px; }
+  .stage { --pw: clamp(230px, 30vw, 430px); height: calc(var(--pw) * 1.22); }
   .field-wrap { grid-template-columns: 1.2fr 0.8fr; gap: 64px; }
   .demo { position: sticky; top: 100px; }
 }
 
-/* --- Лёгкая версия и спокойное движение ----------------------------- */
-.lite .hero-wash, .lite .ph-left, .lite .ph-right, .lite .chip { display: none; }
+/* --- Движение: только если человек не просил его убрать --------------- */
+@keyframes line-in { from { translate: 0 105%; } to { translate: 0 0; } }
+@keyframes rise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+@keyframes phone-in { from { opacity: 0; translate: 0 80px; } to { opacity: 1; translate: 0 0; } }
+@keyframes ring { from { transform: scale(0.8); opacity: 0.8; } to { transform: scale(2); opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pop { from { transform: scale(0.7); } to { transform: scale(1); } }
+@keyframes status-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.lite) .h1-line > * { animation: line-in 0.8s var(--expo) backwards; }
+  .js:not(.lite) .h1-line:nth-child(2) > * { animation-delay: 0.11s; }
+  .js:not(.lite) .hero-lead { animation: rise 0.7s var(--expo) 0.26s backwards; }
+  .js:not(.lite) .hero-actions { animation: rise 0.7s var(--expo) 0.34s backwards; }
+  .js:not(.lite) .hero-facts { animation: rise 0.7s var(--expo) 0.42s backwards; }
+  .js:not(.lite) .ph-center { animation-name: phone-in, flatten-c; animation-duration: 1s, 1s; animation-delay: 0.25s, 0s; animation-fill-mode: backwards, both; animation-timing-function: var(--expo), linear; animation-timeline: auto, scroll(root); animation-range: normal, 0 480px; }
+  .js:not(.lite) .ph-left, .js:not(.lite) .ph-right { animation-name: phone-in, flatten-l; animation-duration: 1s, 1s; animation-delay: 0.45s, 0s; animation-fill-mode: backwards, both; animation-timing-function: var(--expo), linear; animation-timeline: auto, scroll(root); animation-range: normal, 0 480px; }
+  .js:not(.lite) .ph-right { animation-name: phone-in, flatten-r; }
+}
+
+/* --- Лёгкая версия и «меньше движения» -------------------------------- */
+.lite .ph-left, .lite .ph-right { display: none; }
 .lite .stage { perspective: none; }
 .lite .ph-center { transform: none; }
-.lite .reveal { opacity: 1 !important; transform: none !important; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal, .btn, .demo-dot, .demo-tick { transition: none; }
-  .js .reveal:not(.is-visible) { opacity: 1; transform: none; }
   .ph-center, .ph-left, .ph-right { transform: none; }
+  .btn, .job, .click-panel *, .demo * { transition-duration: 0.01ms; }
+  .demo-dot::after, .demo-tick { animation: none !important; }
 }
 
+/* --- Раздел «Что записать»: список дел слева, телефон справа --------- */
+.click-jobs { scrollbar-width: none; }
+.click-jobs::-webkit-scrollbar { display: none; }
+@media (max-width: 899px) {
+  /* Пять таблеток в один ряд со сдвигом вбок, а не в четыре рваные строки. */
+  .click-jobs { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x proximity; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); padding-bottom: 4px; }
+  .job { flex: none; scroll-snap-align: start; }
+  .click-caption { font-size: 19px; min-height: 0; margin-top: 18px; }
+}
 @media (min-width: 900px) {
-  .stage { --pw: clamp(230px, 30vw, 430px); height: calc(var(--pw) * 1.22); }
-}
-@media (max-width: 600px) {
-  .modules { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .module { padding: 16px; }
-  .module h3 { font-size: 17px; }
-  .module p { font-size: 14.5px; }
+  .click-grid { grid-template-columns: 1fr minmax(300px, 380px); gap: 72px; align-items: center; }
+  .click-jobs { flex-direction: column; align-items: flex-start; }
+  .click-panel { padding: 40px; }
 }
 
-/* --- Страница 404 ---------------------------------------------------- */
-.not-found { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 20px; text-align: center; }
-.not-found h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.1; }
-.not-found small { display: block; margin-top: 10px; font-size: 16px; font-weight: 400; color: var(--muted); }
+/* --- Кнопка внизу на телефоне -------------------------------------- */
+.dock { position: fixed; inset: auto 0 0; z-index: 25; padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--border); visibility: hidden; transform: translateY(100%); transition: transform 0.35s var(--expo), visibility 0s linear 0.35s; }
+.dock.is-on { visibility: visible; transform: none; transition-delay: 0s; }
+.dock .btn { width: 100%; }
+@media (min-width: 900px) { .dock { display: none; } }
+
+/* --- Заголовки секций выезжают при входе в экран ---------------------
+   Только заголовки, и только там, где поддерживается привязка к прокрутке
+   (view timeline). Без поддержки заголовок просто стоит на месте. */
+@keyframes title-in { from { opacity: 0.001; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .js:not(.lite) .section-title { animation: title-in linear both; animation-timeline: view(); animation-range: entry 5% entry 45%; }
+  }
+}
+
+/* Элемент сетки не должен раздуваться по ширине ряда вкладок. */
+.click-grid > * { min-width: 0; }
+.click-jobs { scroll-padding-inline: var(--gutter); }

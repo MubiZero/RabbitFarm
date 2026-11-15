@@ -14,17 +14,17 @@
       },
       {
         "alt": "Vazn ekrani: vazn maydoni va oʻsish grafigi",
-        "caption": "Vaznni yozasiz — ilova quyon qanday oʻsayotganini oʻzi chizadi va oʻtgan safar bilan solishtiradi.",
+        "caption": "Vaznni yozasiz, ilova quyon qanday oʻsayotganini oʻzi chizadi va oʻtgan safar bilan solishtiradi.",
         "label": "Tarozida oʻlchadim"
       },
       {
         "alt": "Emlash ekrani: dori, sana va keyingi emlash",
-        "caption": "Emlashni belgilaysiz — keyingisi taqvimga oʻzi tushadi, eslatma oldindan keladi.",
+        "caption": "Emlashni belgilaysiz, keyingisi taqvimga oʻzi tushadi, eslatma oldindan keladi.",
         "label": "Emladim"
       },
       {
         "alt": "Sotuv ekrani: xaridor, vazn va summa",
-        "caption": "Sotuvni yozasiz — quyon podadan chiqadi, pul esa oyning daromadiga qoʻshiladi.",
+        "caption": "Sotuvni yozasiz, quyon podadan chiqadi, pul esa oyning daromadiga qoʻshiladi.",
         "label": "Sotdim"
       }
     ],
@@ -59,7 +59,7 @@
       },
       {
         "name": "Bitta ham parol yoʻq",
-        "text": "Kirish bir martalik kod bilan: Tojikistonda u SMS orqali keladi, boshqa davlatlarda — pochtaga. Telefonning oʻzida esa toʻrt xonali kod. Yodlash ham, yoʻqotish ham yoʻq."
+        "text": "Kirish bir martalik kod bilan: Tojikistonda u SMS orqali keladi, boshqa davlatlarda, pochtaga. Telefonning oʻzida esa toʻrt xonali kod. Yodlash ham, yoʻqotish ham yoʻq."
       },
       {
         "name": "Toʻrt til",
@@ -79,20 +79,9 @@
     "source_note": "Kod ochiq: xoʻjalik tizimni oʻz serveriga oʻrnatishi mumkin."
   },
   "hero": {
-    "chips": [
-      {
-        "d": "yozuv tarmoq qaytganda oʻzi ketadi",
-        "t": "Aloqa yoʻq"
-      },
-      {
-        "d": "ilova oldindan aytadi",
-        "t": "Ozuqa tugayapti"
-      }
-    ],
     "cta_primary": "Veb-versiyani ochish",
     "cta_secondary": "Android uchun yuklash",
     "facts": "Parolsiz · aloqasiz ham ishlaydi · toʻrt til",
-    "kicker": "Quyonchilik xoʻjaligi uchun ilova",
     "lead": "Quyonlar, tugʻish, ozuqa, emlash va pul. Katak yonida yozdingiz, qolganini ilova oʻzi hisoblaydi.",
     "shot_alt": "Asosiy ekran: quyonlar, bugungi vazifalar, ozuqa qoldigʻi",
     "title_after": "",
