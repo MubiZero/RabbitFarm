@@ -229,3 +229,8 @@ a { color: inherit; }
   .module h3 { font-size: 17px; }
   .module p { font-size: 14.5px; }
 }
+
+/* --- Страница 404 ---------------------------------------------------- */
+.not-found { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 20px; text-align: center; }
+.not-found h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.1; }
+.not-found small { display: block; margin-top: 10px; font-size: 16px; font-weight: 400; color: var(--muted); }
