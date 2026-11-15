@@ -30,13 +30,14 @@
   }
 
   if (hero && stage && fine.matches && !reduce.matches && !lite) {
-    // Только плоский сдвиг (параллакс). Вложенные 3D-повороты внутри уже
-    // наклонённого экрана в Safari пересекаются с плоскостью рамки и рвут
-    // картинку на диагональные куски.
+    // Двигается сам телефон целиком, а не картинка внутри рамки: плоский
+    // сдвиг свойством translate (оно не конфликтует с transform наклона).
+    // Вложенные 3D-повороты внутри наклонённого экрана в Safari пересекаются
+    // с плоскостью рамки и рвут картинку на диагональные куски.
     var tilts = [
-      { el: stage.querySelector('.ph-center .ph-in'), x: 6, y: 4 },
-      { el: stage.querySelector('.ph-left .ph-in'), x: 16, y: 8 },
-      { el: stage.querySelector('.ph-right .ph-in'), x: 16, y: 8 }
+      { el: stage.querySelector('.ph-center'), x: 8, y: 5 },
+      { el: stage.querySelector('.ph-left'), x: 18, y: 9 },
+      { el: stage.querySelector('.ph-right'), x: 18, y: 9 }
     ].filter(function (t) { return t.el; });
     var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
 
@@ -44,7 +45,7 @@
       cx += (tx - cx) * 0.08;
       cy += (ty - cy) * 0.08;
       tilts.forEach(function (t) {
-        t.el.style.transform = 'translate(' + (cx * t.x).toFixed(2) + 'px, ' + (cy * t.y).toFixed(2) + 'px)';
+        t.el.style.translate = (cx * t.x).toFixed(2) + 'px ' + (cy * t.y).toFixed(2) + 'px';
       });
       raf = Math.abs(tx - cx) > 0.002 || Math.abs(ty - cy) > 0.002 ? requestAnimationFrame(step) : 0;
     };

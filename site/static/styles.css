@@ -138,12 +138,12 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .ph { --w: var(--sw); position: absolute; top: 0; width: var(--w); padding: calc(var(--w) * 0.025); border-radius: calc(var(--w) * 0.11); background: var(--bezel); box-shadow: var(--shadow-phone), inset 0 0 0 2px var(--bezel-ring); }
 .ph-in { border-radius: calc(var(--w) * 0.09); }
 .ph img { display: block; width: 100%; border-radius: calc(var(--w) * 0.09); }
-.ph-center { --w: var(--pw); left: calc(50% - var(--pw) / 2); z-index: 3; transform: rotateX(18deg) translateY(-30px); }
-.ph-left { left: calc(50% - var(--pw) / 2 - var(--pw) * 0.128 - var(--sw)); transform: rotateX(24deg) rotateZ(-7deg) translateY(30px); }
-.ph-right { left: calc(50% + var(--pw) / 2 + var(--pw) * 0.128); transform: rotateX(24deg) rotateZ(7deg) translateY(30px); }
-.hero.is-live .ph { will-change: transform; }
+.ph-center { --w: var(--pw); left: calc(50% - var(--pw) / 2); z-index: 3; transform: rotateX(18deg); }
+.ph-left { left: calc(50% - var(--pw) / 2 - var(--pw) * 0.128 - var(--sw)); transform: rotateX(24deg) rotateZ(-7deg) translateY(56px); }
+.ph-right { left: calc(50% + var(--pw) / 2 + var(--pw) * 0.128); transform: rotateX(24deg) rotateZ(7deg) translateY(56px); }
+.hero.is-live .ph { will-change: transform, translate; }
 
-@keyframes flatten-c { to { transform: rotateX(0deg) translateY(0); } }
+@keyframes flatten-c { to { transform: rotateX(0deg); } }
 @keyframes flatten-l { to { transform: rotateX(0deg) rotateZ(0deg) translateY(0); } }
 @keyframes flatten-r { to { transform: rotateX(0deg) rotateZ(0deg) translateY(0); } }
 @supports (animation-timeline: scroll()) {
