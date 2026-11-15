@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B Бирка на клетке</title>
+<link rel="stylesheet" href="../../../landing/src/assets/fonts/fonts.css">
+<style>
+:root{--zinc:#dde1e2;--zinc-2:#cdd3d5;--wire:#9aa3a6;--ink:#161a1b;--tag:#ff5a1f;--paper:#fff;--muted:#4b5558}
+*{box-sizing:border-box;margin:0}
+body{font-family:Onest,system-ui,sans-serif;background:var(--zinc);color:var(--ink);min-height:100vh;position:relative}
+body:before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--wire) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--wire) 1.5px,transparent 1.5px);background-size:44px 44px;opacity:.38}
+nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 56px}
+.logo{display:flex;gap:10px;align-items:center;font-weight:700;font-size:19px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--ink);color:var(--tag);display:grid;place-items:center;font-style:normal;font-size:17px}
+.nav-r{display:flex;gap:26px;align-items:center;font-size:15px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--tag);color:var(--ink);font-weight:700;font-size:18px;padding:16px 28px;border-radius:14px;text-decoration:none;box-shadow:0 3px 0 #b83a0a}
+.btn.sm{font-size:15px;padding:10px 18px;border-radius:11px;background:var(--ink);color:#fff;box-shadow:none}
+header{position:relative;text-align:center;padding:30px 24px 0}
+.kicker{font-size:15px;color:var(--muted);margin-bottom:16px;font-weight:500}
+h1{font-size:72px;line-height:1.12;font-weight:700;letter-spacing:-.025em;max-width:980px;margin:0 auto}
+h1 em{font-style:normal;background:var(--tag);color:var(--ink);padding:0 .18em;border-radius:.14em;display:inline-block;line-height:1.05}
+.lead{font-size:21px;line-height:1.45;color:var(--muted);max-width:640px;margin:20px auto 28px}
+.row{position:absolute;left:50%;transform:translateX(-50%);top:535px;display:flex;gap:26px;align-items:flex-start}
+.cage{position:relative;width:190px;height:330px;border:3px solid var(--ink);border-radius:10px 10px 0 0;background:rgba(255,255,255,.35);padding-top:64px}
+.cage:before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,transparent 0 13px,rgba(22,26,27,.28) 13px 15px);}
+.hook{position:absolute;left:50%;top:-1px;width:3px;height:36px;background:var(--ink);transform:translateX(-50%)}
+.tag{position:absolute;left:50%;top:34px;transform:translateX(-50%) rotate(var(--r,0deg));width:134px;background:var(--paper);border:3px solid var(--ink);border-radius:12px;padding:8px 8px 9px;text-align:center;font-size:12px;line-height:1.2;transform-origin:top center;z-index:2}
+.tag .no{background:var(--ink);color:#fff;font-weight:700;border-radius:6px;padding:2px 0;margin-bottom:6px;font-size:14px}
+.tag .qr{width:78px;height:78px;margin:0 auto 5px;display:block}
+.tag.hot .no{background:var(--tag);color:var(--ink)}
+.st{position:absolute;left:10px;right:10px;bottom:12px;font-size:12.5px;font-weight:600;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:4px 6px;text-align:center;z-index:2}
+.big{position:absolute;left:50%;top:272px;transform:translateX(-50%) rotate(-3deg);width:230px;background:var(--paper);border:4px solid var(--ink);border-radius:16px;padding:12px;text-align:center;box-shadow:0 14px 0 -4px rgba(22,26,27,.18);z-index:5}
+.big .no{background:var(--tag);color:var(--ink);font-weight:700;border-radius:8px;padding:4px 0;font-size:20px;margin-bottom:8px}
+.big svg{width:150px;height:150px;display:block;margin:0 auto 8px}
+.big p{font-size:15px;line-height:1.25;font-weight:600}
+.big small{display:block;margin-top:2px;font-weight:400;color:var(--muted);font-size:13px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(transparent,var(--zinc-2))}
+</style></head><body>
+<nav><div class="logo"><i>🐇</i>RabbitFarm</div><div class="nav-r"><span>Что внутри</span><span>В крольчатнике</span><span>RU</span><a class="btn sm" href="#">Открыть веб-версию</a></div></nav>
+<header>
+<div class="kicker">Приложение для кроличьей фермы</div>
+<h1>Навёл камеру: открылась <em>клетка</em></h1>
+<p class="lead">Метка с кодом на каждой клетке. Кто сидит, когда окрол, чем кормили. Не надо искать номер в списке.</p>
+<a class="btn" href="#">Открыть веб-версию →</a>
+</header>
+<div class="row" id="row"></div>
+<div class="fade"></div>
+<script>
+function qr(seed,size){let s=seed,r=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};const n=21,c=size/n;let o='';for(let y=0;y<n;y++)for(let x=0;x<n;x++){const f=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);if(f)continue;if(r()>.52)o+=`<rect x="${x*c}" y="${y*c}" width="${c}" height="${c}"/>`}
+const fp=(x,y)=>`<rect x="${x*c}" y="${y*c}" width="${7*c}" height="${7*c}" fill="none" stroke="#161a1b" stroke-width="${c}"/><rect x="${(x+2)*c}" y="${(y+2)*c}" width="${3*c}" height="${3*c}"/>`;
+return `<svg viewBox="0 0 ${size} ${size}" fill="#161a1b" shape-rendering="crispEdges">${o}${fp(.5,.5).replace(/(x|y)="([\d.]+)"/g,'$1="$2"')}${fp(13.5,.5)}${fp(.5,13.5)}</svg>`}
+const cages=[["К-08","Белка","окрол через 9 дн",-2],["К-09","Малика","окрол 14 дек",3],["К-10","Барон","случка в среду",-3],["К-11","Лада","молодняк, 6 шт",2]];
+const row=document.getElementById('row');
+function cell(c,i){return `<div class="cage"><div class="hook"></div><div class="tag ${i==1?'hot':''}" style="--r:${c[3]}deg"><div class="no">${c[0]}</div><div class="qr">${qr(i*77+5,78)}</div>${c[1]}</div><div class="st">${c[2]}</div></div>`}
+row.innerHTML=cages.slice(0,2).map(cell).join('')+'<div style="width:290px"></div>'+cages.slice(2).map((c,i)=>cell(c,i+5)).join('');
+const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="no">К-09</div>${qr(1234,150)}<p>Малика<small>окрол 14 декабря · 8 крольчат в прошлый раз</small></p>`;
+row.appendChild(big);big.style.left='calc(50% )';big.style.top='-8px'
+</script>
+</body></html>
