@@ -135,7 +135,7 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .stage { --pw: clamp(250px, 58vw, 430px); --sw: calc(var(--pw) * 0.767); position: relative; margin-top: 44px; height: calc(var(--pw) * 1.3); perspective: 1800px; perspective-origin: 50% 0; overflow: hidden; }
 .stage::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, var(--bg)); pointer-events: none; z-index: 6; }
 .stage-row { position: absolute; inset: 0; }
-.ph { --w: var(--sw); position: absolute; top: 0; width: var(--w); padding: calc(var(--w) * 0.025); border-radius: calc(var(--w) * 0.11); background: var(--bezel); box-shadow: var(--shadow-phone), inset 0 0 0 2px var(--bezel-ring); transform-style: preserve-3d; }
+.ph { --w: var(--sw); position: absolute; top: 0; width: var(--w); padding: calc(var(--w) * 0.025); border-radius: calc(var(--w) * 0.11); background: var(--bezel); box-shadow: var(--shadow-phone), inset 0 0 0 2px var(--bezel-ring); }
 .ph-in { border-radius: calc(var(--w) * 0.09); }
 .ph img { display: block; width: 100%; border-radius: calc(var(--w) * 0.09); }
 .ph-center { --w: var(--pw); left: calc(50% - var(--pw) / 2); z-index: 3; transform: rotateX(18deg) translateY(-30px); }

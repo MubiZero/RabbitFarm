@@ -30,10 +30,13 @@
   }
 
   if (hero && stage && fine.matches && !reduce.matches && !lite) {
+    // Только плоский сдвиг (параллакс). Вложенные 3D-повороты внутри уже
+    // наклонённого экрана в Safari пересекаются с плоскостью рамки и рвут
+    // картинку на диагональные куски.
     var tilts = [
-      { el: stage.querySelector('.ph-center .ph-in'), rx: 3, ry: 5, tx: 0 },
-      { el: stage.querySelector('.ph-left .ph-in'), rx: 2, ry: 3, tx: 14 },
-      { el: stage.querySelector('.ph-right .ph-in'), rx: 2, ry: 3, tx: 14 }
+      { el: stage.querySelector('.ph-center .ph-in'), x: 6, y: 4 },
+      { el: stage.querySelector('.ph-left .ph-in'), x: 16, y: 8 },
+      { el: stage.querySelector('.ph-right .ph-in'), x: 16, y: 8 }
     ].filter(function (t) { return t.el; });
     var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
 
@@ -41,8 +44,7 @@
       cx += (tx - cx) * 0.08;
       cy += (ty - cy) * 0.08;
       tilts.forEach(function (t) {
-        t.el.style.transform = 'translateX(' + (cx * t.tx).toFixed(2) + 'px) rotateY(' +
-          (cx * t.ry).toFixed(2) + 'deg) rotateX(' + (-cy * t.rx).toFixed(2) + 'deg)';
+        t.el.style.transform = 'translate(' + (cx * t.x).toFixed(2) + 'px, ' + (cy * t.y).toFixed(2) + 'px)';
       });
       raf = Math.abs(tx - cx) > 0.002 || Math.abs(ty - cy) > 0.002 ? requestAnimationFrame(step) : 0;
     };
