@@ -14,3 +14,8 @@ mobile/web/i/config.json
 
 # Сборка лендинга: генерируется из landing/src (node landing/build.js).
 landing/dist/
+
+# Impeccable: рабочие снимки и копии
+.impeccable/review/
+.impeccable/mocks/src/
+.impeccable/mocks/incumbent-1440.png

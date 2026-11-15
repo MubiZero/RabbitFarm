@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="{{.T.lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.T.meta.title}}</title>
+<meta name="description" content="{{.T.meta.description}}">
+<link rel="canonical" href="{{.Canonical}}">
+{{- range .Alternates}}
+<link rel="alternate" hreflang="{{.Hreflang}}" href="{{.Href}}">
+{{- end}}
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{.T.meta.title}}">
+<meta property="og:description" content="{{.T.meta.description}}">
+<meta property="og:url" content="{{.Canonical}}">
+<meta property="og:image" content="{{.Site}}/assets/og.png">
+<meta property="og:image:alt" content="{{.T.meta.og_alt}}">
+<meta property="og:locale" content="{{.OGLocale}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/styles.css">
+<script src="/theme-boot.js"></script>
+</head>
+<body id="top">
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="{{.Path}}">
+      <img class="brand-mark" src="/assets/mark.svg" alt="" width="26" height="26">
+      <span>rabbitfarm<span class="brand-dot">.click</span></span>
+    </a>
+    <nav class="topbar-nav" aria-label="{{.T.nav.menu}}">
+      <a href="#click" data-spy="click">{{.T.nav.click}}</a>
+      <a href="#modules" data-spy="modules">{{.T.nav.modules}}</a>
+      <a href="#field" data-spy="field">{{.T.nav.field}}</a>
+      <a href="#price" data-spy="price">{{.T.nav.price}}</a>
+    </nav>
+    <div class="topbar-tools">
+      <button type="button" class="icon-btn" data-theme-toggle aria-label="{{.T.nav.theme}}" title="{{.T.nav.theme}}">
+        {{icon "sun" "icon-btn-mark icon-sun"}}{{icon "moon" "icon-btn-mark icon-moon"}}
+      </button>
+      <details class="pop lang-pop">
+        <summary class="icon-btn" aria-label="{{.T.footer.lang_aria}}" title="{{.T.footer.lang_aria}}">
+          {{icon "translate" "icon-btn-mark"}}<span class="icon-btn-text">{{.T.nav.lang_short}}</span>
+        </summary>
+        <div class="pop-sheet">
+          {{- range .Langs}}
+          <a href="{{.Href}}" lang="{{.Code}}"{{if .Current}} aria-current="true"{{end}}>{{.Name}}</a>
+          {{- end}}
+        </div>
+      </details>
+      <a class="btn btn-sm btn-primary topbar-cta" href="{{.AppURL}}" data-app-link>{{.T.hero.cta_primary}}</a>
+    </div>
+  </div>
+</header>
+<span data-scroll-sentinel aria-hidden="true"></span>
+
+<main>
+  <section class="hero" data-hero>
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="wrap hero-copy">
+      <p class="kicker">{{.T.hero.kicker}}</p>
+      <h1>{{.T.hero.title_before}}<em>{{.T.hero.title_click}}</em>{{.T.hero.title_after}}</h1>
+      <p class="hero-lead">{{.T.hero.lead}}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="{{.AppURL}}" data-app-link>
+          <span>{{.T.hero.cta_primary}}</span>{{icon "arrow-right" "btn-icon"}}
+        </a>
+        <a class="btn btn-lg" href="{{.Repo}}/releases/latest" data-android-link hidden>
+          {{icon "download-simple" "btn-icon"}}<span>{{.T.hero.cta_secondary}}</span>
+        </a>
+      </div>
+      <p class="hero-facts">{{.T.hero.facts}}</p>
+    </div>
+
+    <div class="stage">
+      {{- with .Hero}}
+      <div class="stage-row">
+        <div class="ph ph-left"><img src="{{.Left}}" alt="" width="640" height="1386" loading="eager"></div>
+        <div class="ph ph-right"><img src="{{.Right}}" alt="" width="640" height="1386" loading="eager"></div>
+        <div class="ph ph-center"><img src="{{.Center}}" alt="{{$.T.hero.shot_alt}}" width="640" height="1386" fetchpriority="high"></div>
+      </div>
+      {{- end}}
+      {{- range $i, $c := .T.hero.chips}}
+      <div class="chip chip-{{$i}}"><strong>{{$c.t}}</strong><span>{{$c.d}}</span></div>
+      {{- end}}
+    </div>
+  </section>
+
+  <section class="section" id="click">
+    <div class="wrap">
+      <h2 class="section-title">{{.T.click.title}}</h2>
+      <p class="section-lead">{{.T.click.lead}}</p>
+      <div class="click-grid">
+        <div class="click-side">
+          <div class="click-jobs" role="tablist" aria-label="{{.T.click.title}}">
+            {{- range $i, $j := .Jobs}}
+            <button type="button" class="job" role="tab" id="job-{{$i}}" aria-selected="{{if eq $i 0}}true{{else}}false{{end}}" tabindex="{{if eq $i 0}}0{{else}}-1{{end}}" aria-controls="job-panel"
+              data-shot="{{$j.Shot}}" data-shot-alt="{{$j.Alt}}" data-caption="{{$j.Caption}}">
+              {{icon "cursor-click" "job-mark"}}<span>{{$j.Label}}</span>
+            </button>
+            {{- end}}
+          </div>
+          <p class="click-hint">{{.T.click.hint}}</p>
+        </div>
+        {{- with index .Jobs 0}}
+        <div class="click-panel" id="job-panel" role="tabpanel" aria-labelledby="job-0">
+          <div class="ph ph-flat"><img data-job-shot src="{{.Shot}}" alt="{{.Alt}}" width="640" height="1386" loading="lazy"></div>
+          <p class="click-caption" data-job-caption>{{.Caption}}</p>
+        </div>
+        {{- end}}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sunken" id="modules">
+    <div class="wrap">
+      <h2 class="section-title">{{.T.modules.title}}</h2>
+      <div class="modules">
+        {{- range .Modules}}
+        <article class="module reveal">
+          {{.Icon}}
+          <h3>{{.Name}}</h3>
+          <p>{{.Text}}</p>
+        </article>
+        {{- end}}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="field">
+    <div class="wrap field-wrap">
+      <div>
+        <h2 class="section-title">{{.T.field.title}}</h2>
+        <div class="field-list">
+          {{- range .T.field.items}}
+          <div class="field-item reveal">
+            <h3>{{.name}}</h3>
+            <p>{{.text}}</p>
+          </div>
+          {{- end}}
+        </div>
+      </div>
+      <div class="demo reveal" data-demo data-state="online">
+        <p class="demo-title">{{.T.field.demo.title}}</p>
+        <div class="demo-screen">
+          <div class="demo-row"><span class="demo-dot" aria-hidden="true"></span><span class="demo-status" aria-live="polite">
+            <span data-demo-s="online">{{.T.field.demo.s0}}</span>
+            <span data-demo-s="offline" hidden>{{.T.field.demo.s1}}</span>
+            <span data-demo-s="sent" hidden>{{.T.field.demo.s2}}</span>
+          </span></div>
+          <div class="demo-rec"><strong>{{.T.field.demo.rec}}</strong><span class="demo-tick" aria-hidden="true">{{icon "check" "demo-check"}}</span></div>
+        </div>
+        <button type="button" class="btn demo-btn" data-demo-toggle hidden data-off="{{.T.field.demo.off}}" data-on="{{.T.field.demo.on}}">{{.T.field.demo.off}}</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sunken" id="price">
+    <div class="wrap price-wrap">
+      <h2 class="section-title">{{.T.price.title}}</h2>
+      <p class="section-lead">{{.T.price.lead}}</p>
+      <ul class="price-points">
+        {{- range .T.price.points}}
+        <li>{{icon "check" "price-check"}}<span>{{.}}</span></li>
+        {{- end}}
+      </ul>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="wrap">
+      <h2 class="section-title">{{.T.cta.title}}</h2>
+      <p class="section-lead">{{.T.cta.lead}}</p>
+      <div class="closing-actions">
+        <a class="btn btn-primary btn-lg" href="{{.AppURL}}" data-app-link><span>{{.T.cta.primary}}</span>{{icon "arrow-right" "btn-icon"}}</a>
+        <a class="btn btn-lg" href="{{.Repo}}/releases/latest" data-android-link hidden>{{icon "download-simple" "btn-icon"}}<span>{{.T.cta.secondary}}</span></a>
+      </div>
+      <p class="closing-note" data-stores-note hidden>{{.T.cta.stores_soon}}</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href="{{.Path}}">
+        <img class="brand-mark" src="/assets/mark.svg" alt="" width="26" height="26">
+        <span>rabbitfarm<span class="brand-dot">.click</span></span>
+      </a>
+      <p class="footer-tagline">{{.T.footer.rights}}</p>
+      <p class="footer-note">{{.T.footer.source_note}}</p>
+    </div>
+    <nav class="footer-col" aria-label="{{.T.footer.sections}}">
+      <p class="footer-head">{{.T.footer.sections}}</p>
+      <a href="#click">{{.T.nav.click}}</a>
+      <a href="#modules">{{.T.nav.modules}}</a>
+      <a href="#field">{{.T.nav.field}}</a>
+      <a href="#price">{{.T.nav.price}}</a>
+    </nav>
+    <nav class="footer-col" aria-label="{{.T.footer.app}}">
+      <p class="footer-head">{{.T.footer.app}}</p>
+      <a href="{{.AppURL}}" data-app-link>{{.T.hero.cta_primary}}</a>
+      <a href="{{.Repo}}/releases/latest" data-android-link hidden>{{.T.hero.cta_secondary}}</a>
+      <span class="footer-muted" data-stores-note hidden>{{.T.cta.stores_soon}}</span>
+    </nav>
+    <nav class="footer-col" aria-label="{{.T.footer.docs}}">
+      <p class="footer-head">{{.T.footer.docs}}</p>
+      <a href="{{.Site}}/privacy.html">{{.T.footer.privacy}}</a>
+      <a href="{{.Repo}}">{{.T.footer.github}}</a>
+    </nav>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>© {{.Year}} rabbitfarm.click</p>
+    <a class="footer-top" href="#top">{{icon "arrow-up" "btn-icon"}}<span>{{.T.nav.top}}</span></a>
+  </div>
+</footer>
+<script src="/app.js" defer></script>
+</body>
+</html>

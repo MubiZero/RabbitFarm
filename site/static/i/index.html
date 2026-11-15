@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RabbitFarm</title>
+<!--
+  Страница приглашения. Её адрес (`/i`) уходит работнику в письме и через
+  владельца, который пересылает ссылку сам. Адрес должен оставаться
+  рабочим и после переезда: приглашение лежит в переписке дольше, чем
+  занимает смена домена.
+
+  С установленным приложением сюда никто не доходит: ссылку перехватывает
+  само приложение (Universal Links на iOS, App Links на Android). Эта
+  страница — то, что видит человек без приложения, то есть как раз новый
+  работник. Поэтому она обходится без Flutter-бандла: несколько килобайт
+  вместо нескольких мегабайт на медленной сети.
+
+  Живёт на лендинге, а не в приложении: адрес `/i` уходит в SMS с главного
+  домена, а его отдаёт витрина. Ссылки на магазины и адрес веб-версии
+  приходят из `config.json`, который пишет `docker-entrypoint.sh` из
+  переменных окружения. Пока приложение не опубликовано, переменных нет,
+  файла нет, и кнопок нет тоже: вести человека в пустоту хуже, чем честно
+  сказать, что магазины будут позже.
+-->
+<link rel="stylesheet" href="/i/styles.css">
+</head>
+<body>
+<main>
+  <div class="mark">🐇</div>
+  <h1 id="title">Вас зовут в хозяйство</h1>
+  <p id="lead">Установите приложение и войдите по тому номеру или адресу, на который пришло приглашение — код придёт туда же.</p>
+
+  <a class="btn primary" id="ios" href="#" hidden>App Store</a>
+  <a class="btn primary" id="android" href="#" hidden>Google Play</a>
+  <a class="btn" id="web" href="https://app.rabbitfarm.click">Открыть в браузере</a>
+
+  <p class="soon" id="soon" hidden>Приложение скоро появится в App Store и Google Play.</p>
+</main>
+
+<script src="/i/app.js" defer></script>
+</body>
+</html>

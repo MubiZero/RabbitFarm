@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C Календарь окрола</title>
+<link rel="stylesheet" href="../../../landing/src/assets/fonts/fonts.css">
+<style>
+:root{--blue:#1747c9;--blue-2:#103aa8;--ink:#fff;--soft:#c3d3ff;--sun:#ffd23f;--card:#fff;--dark:#0e2a73}
+*{box-sizing:border-box;margin:0}
+body{font-family:Onest,system-ui,sans-serif;background:var(--blue);color:var(--ink);min-height:100vh;position:relative}
+body:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);background-size:36px 36px}
+nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 56px}
+.logo{display:flex;gap:10px;align-items:center;font-weight:700;font-size:19px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--sun);color:var(--blue);display:grid;place-items:center;font-style:normal;font-size:17px}
+.nav-r{display:flex;gap:26px;align-items:center;font-size:15px;color:var(--soft)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--sun);color:#1b2457;font-weight:700;font-size:18px;padding:16px 28px;border-radius:16px;text-decoration:none;box-shadow:0 3px 0 #b8940f}
+.btn.sm{font-size:15px;padding:10px 18px;border-radius:12px;box-shadow:none}
+header{position:relative;text-align:center;padding:30px 24px 0}
+.kicker{font-size:15px;color:var(--soft);margin-bottom:16px}
+h1{font-size:68px;line-height:1.02;font-weight:700;letter-spacing:-.02em;max-width:1000px;margin:0 auto}
+h1 em{font-style:normal;color:var(--sun)}
+.lead{font-size:21px;line-height:1.45;color:var(--soft);max-width:660px;margin:20px auto 28px}
+.plan{position:absolute;left:56px;right:56px;top:520px}
+.ruler{position:relative;height:56px;border-top:3px solid #fff;display:flex}
+.ruler i{flex:1;border-left:1.5px solid rgba(255,255,255,.55);height:16px}
+.ruler i.big{height:32px;border-left:3px solid #fff}
+.nums{display:flex;margin-top:4px;font-size:13px;color:var(--soft)}
+.nums span{flex:1;text-align:left;padding-left:8px}
+.mk{position:absolute;top:44px;width:250px}
+.mk .pin{position:absolute;top:-47px;width:3px;height:84px;background:var(--sun)}
+.mk .hl{position:absolute;top:34px;height:3px;background:var(--sun)}
+.mk .drop{position:absolute;top:34px;width:3px;height:10px;background:var(--sun)}
+.mk .c{margin-top:40px;margin-left:-1px;background:var(--card);color:#14214f;border-radius:16px;padding:14px 16px;box-shadow:0 12px 0 -6px rgba(0,0,0,.18)}
+.mk .d{font-weight:700;font-size:13px;color:var(--blue);letter-spacing:.03em;text-transform:uppercase}
+.mk .t{font-weight:700;font-size:20px;line-height:1.1;margin:2px 0 4px}
+.mk .p{font-size:14px;line-height:1.3;color:#44507d}
+.mk.last .c{background:var(--sun)}
+.mk.last .d{color:#5f4500}
+.fade{position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(transparent,var(--blue-2))}
+</style></head><body>
+<nav><div class="logo"><i>🐇</i>RabbitFarm</div><div class="nav-r"><span>Что внутри</span><span>В крольчатнике</span><span>RU</span><a class="btn sm" href="#">Открыть веб-версию</a></div></nav>
+<header>
+<div class="kicker">Приложение для кроличьей фермы</div>
+<h1>31 день от случки до окрола. <em>Помнит приложение</em></h1>
+<p class="lead">Прощупывание, маточник, окрол и прививки сами встают в задачи. Не надо вести план на гвозде.</p>
+<a class="btn" href="#">Открыть веб-версию →</a>
+</header>
+<div class="plan">
+<div class="ruler" id="ruler"></div>
+<div class="nums" id="nums"></div>
+<div class="mk" style="left:0"><div class="pin"></div><div class="c"><div class="d">День 0</div><div class="t">Случка</div><div class="p">Записали пару, дата окрола посчиталась сама.</div></div></div>
+<div class="mk" id="m14"><div class="pin"></div><div class="c"><div class="d">День 14</div><div class="t">Прощупывание</div><div class="p">Задача придёт утром. Ответ «да» или «нет» ведёт самку дальше.</div></div></div>
+<div class="mk" id="m28"><div class="pin"></div><div class="c"><div class="d">День 28</div><div class="t">Маточник в клетку</div><div class="p">Гнездо нужно заранее, за три дня до окрола.</div></div></div>
+<div class="mk last" id="m31"><div class="pin"></div><div class="c"><div class="d">День 31</div><div class="t">Окрол</div><div class="p">Записали, сколько живых. Крольчата встали в карточку матери.</div></div></div>
+</div>
+<div class="fade"></div>
+<script>
+const r=document.getElementById('ruler'),n=document.getElementById('nums');let h='',m='';
+for(let i=0;i<=31;i++){h+=`<i class="${[0,14,28,31].includes(i)?'big':''}"></i>`;m+=`<span>${i%7==0||i==31?i:''}</span>`}
+r.innerHTML=h;n.innerHTML=m;
+const W=1440-112,u=W/32;
+for(const [id,d,L] of [["m14",14,14*u-170],["m28",28,W-250-250-28],["m31",31,W-250]]){const e=document.getElementById(id);e.style.left=L+"px";const px=d*u,cx=L+125;const pin=e.querySelector(".pin");pin.style.left=(px-L)+"px";if(Math.abs(px-cx)>130){const h=document.createElement("div");h.className="hl";h.style.left=(Math.min(px,cx)-L)+"px";h.style.width=Math.abs(px-cx)+"px";e.appendChild(h);const dr=document.createElement("div");dr.className="drop";dr.style.left=(cx-L)+"px";e.appendChild(dr)}else{pin.style.height="84px";}}
+document.querySelector(".mk").querySelector(".pin").style.left="0px"
+</script>
+</body></html>
