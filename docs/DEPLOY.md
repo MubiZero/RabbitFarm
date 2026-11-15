@@ -21,7 +21,7 @@
 | Ресурс в Coolify | Тип | Что важно знать |
 |---|---|---|
 | `rabbitfarm-api` | Application (Dockerfile) | том `/app/logs`; боевая база называется `default`, не `rabbitfarm` |
-| `rabbitfarm-landing` | Application (Dockerfile) | прежний лендинг (`./landing`). С 15.11.2026 домен `rabbitfarm.click` отдаёт Cloudflare Pages, сервис не получает трафика и держится как откат; его можно остановить |
+| `rabbitfarm-landing` | Application (Dockerfile) | прежний лендинг (`./landing`). С 15.11.2026 домен `rabbitfarm.click` отдаёт Cloudflare Pages, сервис остановлен 15.11.2026 (Coolify, `exited`), собран и запускается как откат |
 | `rabbitfarm-web` | Application (Dockerfile) | Flutter-сборка под web |
 | `rabbitfarm-db` | Database (managed MySQL 8) | имя базы `default`, пользователь `mysql` |
 | `rabbitfarm-minio` | Service (шаблон MinIO) | образ с `quay.io`, бакет `rabbitfarm-uploads`, тома `minio-data` и `minio-backups` |
