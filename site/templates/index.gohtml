@@ -86,7 +86,7 @@
     <div class="wrap">
       <h2 class="section-title">{{.T.click.title}}</h2>
       <p class="section-lead">{{.T.click.lead}}</p>
-      <div class="click-grid">
+      <div class="click-grid" data-click>
         <div class="click-side">
           <div class="click-jobs" role="tablist" aria-label="{{.T.click.title}}">
             {{- range $i, $j := .Jobs}}
@@ -97,11 +97,13 @@
             {{- end}}
           </div>
           <p class="click-hint">{{.T.click.hint}}</p>
+          {{- with index .Jobs 0}}
+          <p class="click-caption" data-job-caption>{{.Caption}}</p>
+          {{- end}}
         </div>
         {{- with index .Jobs 0}}
         <div class="click-panel" id="job-panel" role="tabpanel" aria-labelledby="job-0">
           <div class="ph-flat"><img data-job-shot src="{{.Shot}}" alt="{{.Alt}}" width="640" height="1386" loading="lazy" decoding="async"></div>
-          <p class="click-caption" data-job-caption>{{.Caption}}</p>
         </div>
         {{- end}}
       </div>
@@ -210,6 +212,9 @@
     <a class="footer-top" href="#top">{{icon "arrow-up" "btn-icon"}}<span>{{.T.nav.top}}</span></a>
   </div>
 </footer>
+<div class="dock" data-dock>
+  <a class="btn btn-primary btn-lg" href="{{.AppURL}}" data-app-link tabindex="-1"><span>{{.T.hero.cta_primary}}</span>{{icon "arrow-right" "btn-icon"}}</a>
+</div>
 <script src="/app.js" defer></script>
 </body>
 </html>

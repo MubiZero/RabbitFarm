@@ -63,7 +63,7 @@
    * пустым.
    */
   var jobs = Array.prototype.slice.call(document.querySelectorAll('.job'));
-  var panel = document.querySelector('.click-panel');
+  var panel = document.querySelector('[data-click]');
   var shot = document.querySelector('[data-job-shot]');
   var caption = document.querySelector('[data-job-caption]');
   var swapTimer = 0;
@@ -90,7 +90,9 @@
     });
   }
 
+  var touched = false;
   jobs.forEach(function (button, index) {
+    button.addEventListener('pointerdown', function () { touched = true; });
     button.addEventListener('click', function () { selectJob(button); });
     button.addEventListener('keydown', function (event) {
       var step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1
@@ -102,6 +104,29 @@
       next.focus();
     });
   });
+
+  /* --- Вкладки сами показывают себя один раз -------------------------------
+   * Когда блок виден на 60%, дела переключаются по кругу один раз, чтобы
+   * было видно, что их можно нажимать. Любое касание, фокус или уход блока
+   * из виду останавливают показ насовсем. При «меньше движения» и в лёгкой
+   * версии показа нет.
+   */
+  var clickGrid = document.querySelector('[data-click]');
+  if (clickGrid && jobs.length > 1 && 'IntersectionObserver' in window && !reduce.matches && !lite) {
+    var auto = 0, idx = 0, started = false;
+    var stop = function () { window.clearInterval(auto); started = true; };
+    jobs.forEach(function (b) { b.addEventListener('focus', function () { touched = true; }); });
+    new IntersectionObserver(function (entries) {
+      if (started) return;
+      if (!entries[0].isIntersecting) { if (auto) stop(); return; }
+      started = true;
+      auto = window.setInterval(function () {
+        if (touched || document.hidden || idx >= jobs.length - 1) { window.clearInterval(auto); return; }
+        idx += 1;
+        selectJob(jobs[idx]);
+      }, 3200);
+    }, { threshold: 0.6 }).observe(clickGrid);
+  }
 
   /* --- Живой виджет «пропала связь» ---------------------------------- */
   var demo = document.querySelector('[data-demo]');
@@ -161,8 +186,11 @@
     var so = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
+        // Первый экран, закрывающий блок и подвал не относятся ни к одному
+        // пункту меню: подсветка снимается, а не остаётся на прошлом.
+        var id = entry.target.id || '';
         spy.forEach(function (link) {
-          link.classList.toggle('is-current', link.dataset.spy === entry.target.id);
+          link.classList.toggle('is-current', link.dataset.spy === id);
         });
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
@@ -170,6 +198,32 @@
       var section = document.getElementById(link.dataset.spy);
       if (section) so.observe(section);
     });
+    document.querySelectorAll('[data-hero], .closing, .footer').forEach(function (el) { so.observe(el); });
+  }
+
+  /* --- Кнопка внизу на телефоне -------------------------------------------
+   * После первого экрана единственное действие страницы уезжало вверх. Пока
+   * не видны ни первая кнопка, ни закрывающий блок, она держится внизу.
+   */
+  var dock = document.querySelector('[data-dock]');
+  if (dock && hero && 'IntersectionObserver' in window) {
+    var link = dock.querySelector('a');
+    var seen = { hero: true, closing: false };
+    var sync = function () {
+      var on = !seen.hero && !seen.closing;
+      dock.classList.toggle('is-on', on);
+      link.tabIndex = on ? 0 : -1;
+    };
+    var closing = document.querySelector('.closing');
+    var dio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.target === hero) seen.hero = e.isIntersecting && e.boundingClientRect.bottom > 220;
+        else seen.closing = e.isIntersecting;
+      });
+      sync();
+    }, { threshold: [0, 0.01] });
+    dio.observe(hero);
+    if (closing) dio.observe(closing);
   }
 
   /* --- Адреса приложения и сборки ------------------------------------ */
