@@ -1,0 +1,46 @@
+name: Site
+
+# Публичный сайт (site/): сборка на каждый pull request и выкладка на
+# Cloudflare Pages. В main выкладывается боевой rabbitfarm.click, из ветки
+# pull request: предпросмотр на <ветка>.rabbitfarm-site.pages.dev.
+#
+# Секреты репозитория: CLOUDFLARE_API_TOKEN (токен только с правом Pages Write
+# на аккаунт, создан отдельно от общего ключа) и CLOUDFLARE_ACCOUNT_ID.
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/site.yml']
+  pull_request:
+    paths: ['site/**', '.github/workflows/site.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: site/go.mod
+      - name: Проверка и сборка
+        run: |
+          go vet ./...
+          go run .
+          test -s dist/index.html
+          test -s dist/404.html
+          test -s dist/.well-known/apple-app-site-association
+      - name: Выкладка на Cloudflare Pages
+        # Из чужих форков секретов нет: там остаётся только сборка выше.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
+        run: npx --yes wrangler@4.150.0 pages deploy dist --project-name rabbitfarm-site --branch "$BRANCH" --commit-dirty=true
