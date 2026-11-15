@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A Родословная</title>
+<link rel="stylesheet" href="../../../landing/src/assets/fonts/fonts.css">
+<style>
+:root{--ground:#14452b;--ground-2:#0f3a23;--line:#d9efc9;--ink:#f4fbe9;--muted:#a9cdb0;--amber:#ffc23d;--card:#1d5a39}
+*{box-sizing:border-box;margin:0}
+body{font-family:Onest,system-ui,sans-serif;background:var(--ground);color:var(--ink);min-height:100vh;position:relative}
+body:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(217,239,201,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(217,239,201,.06) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 75%)}
+nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 56px}
+.logo{display:flex;gap:10px;align-items:center;font-weight:700;font-size:19px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--amber);display:grid;place-items:center;color:#14452b;font-style:normal;font-size:17px}
+.nav-r{display:flex;gap:26px;align-items:center;font-size:15px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--amber);color:#1c2b12;font-weight:700;font-size:18px;padding:16px 28px;border-radius:16px;text-decoration:none;box-shadow:0 2px 0 #b98a14,0 10px 24px rgba(0,0,0,.28)}
+.btn.sm{font-size:15px;padding:10px 18px;border-radius:12px}
+header{position:relative;text-align:center;padding:34px 24px 0}
+.kicker{font-size:15px;letter-spacing:.04em;color:var(--muted);margin-bottom:18px}
+h1{font-size:68px;line-height:1.02;font-weight:700;letter-spacing:-.02em;max-width:900px;margin:0 auto}
+h1 em{font-style:normal;color:var(--amber)}
+.lead{font-size:21px;line-height:1.45;color:var(--muted);max-width:640px;margin:22px auto 30px}
+.sub{margin-top:16px;font-size:14px;color:var(--muted)}
+.tree{position:absolute;left:50%;transform:translateX(-50%);top:585px;width:1240px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:200px;background:linear-gradient(transparent,var(--ground-2))}
+.n{position:absolute;background:var(--card);border:1.5px solid rgba(217,239,201,.45);border-radius:14px;padding:10px 14px;font-size:14px;line-height:1.25}
+.n b{display:block;font-size:16px}
+.n span{color:var(--muted);font-size:12.5px}
+.root{border-color:var(--amber);background:#206840}
+.warn{position:absolute;border:2px dashed var(--amber);color:var(--amber);border-radius:999px;padding:7px 16px;font-size:14px;font-weight:600;background:var(--ground)}
+svg{position:absolute;inset:0;overflow:visible}
+</style></head><body>
+<nav><div class="logo"><i>🐇</i>RabbitFarm</div><div class="nav-r"><span>Что внутри</span><span>В крольчатнике</span><span>RU</span><a class="btn sm" href="#">Открыть веб-версию</a></div></nav>
+<header>
+<div class="kicker">Приложение для кроличьей фермы</div>
+<h1>Кто чей, помнит <em>приложение</em></h1>
+<p class="lead">Родословная до прадеда, случки, окролы, корма и деньги фермы. Всё в телефоне, у каждого работника.</p>
+<a class="btn" href="#">Открыть веб-версию →</a>
+<div class="sub">Работает и без связи · русский, тоҷикӣ, o‘zbek, English</div>
+</header>
+<div class="tree" style="height:420px">
+<svg viewBox="0 0 1240 420" width="1240" height="420" fill="none" stroke="#d9efc9" stroke-opacity=".55" stroke-width="2">
+<path d="M250 210 H320 V120 H390 M320 210 V300 H390"/>
+<path d="M620 120 H680 V70 H740 M680 120 V170 H740"/>
+<path d="M620 300 H680 V250 H740 M680 300 V350 H740"/>
+<path d="M960 70 H1020 V40 H1060 M1020 70 V100 H1060"/>
+</svg>
+<div class="n root" style="left:20px;top:176px;width:230px"><b>Снежок</b><span>самец · белый · 4,5 кг<br>родился 15.01.2025</span></div>
+<div class="n" style="left:390px;top:90px;width:230px"><b>Барон</b><span>отец · 5,1 кг</span></div>
+<div class="n" style="left:390px;top:270px;width:230px"><b>Белка</b><span>мать · 4,2 кг · 6 окролов</span></div>
+<div class="n" style="left:740px;top:42px;width:220px"><b>Гром</b><span>дед по отцу</span></div>
+<div class="n" style="left:740px;top:142px;width:220px"><b>Лада</b><span>бабка по отцу</span></div>
+<div class="n" style="left:740px;top:222px;width:220px"><b>Гром</b><span>дед по матери</span></div>
+<div class="n" style="left:740px;top:322px;width:220px"><b>Пурга</b><span>бабка по матери</span></div>
+<div class="n" style="left:1060px;top:12px;width:170px"><b>Прадед</b><span>Туман</span></div>
+<div class="n" style="left:1060px;top:72px;width:170px"><b>Прабабка</b><span>Зима</span></div>
+<div class="warn" style="left:960px;top:176px;transform:translateX(-4%)">общий дед Гром · пару не ставим</div>
+<div class="fade"></div>
+</div>
+</body></html>

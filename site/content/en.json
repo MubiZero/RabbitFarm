@@ -1,0 +1,161 @@
+{
+  "click": {
+    "hint": "Tap a job and see what opens",
+    "items": [
+      {
+        "alt": "Feeding record screen: cage, feed and amount",
+        "caption": "You mark the cage and the sack. Feed in stock goes down on its own, and the app warns you before it runs out.",
+        "label": "Fed them"
+      },
+      {
+        "alt": "Birth record screen: mother, date, number of kits",
+        "caption": "You enter the doe and how many were born alive. The birth lands on her card, and the kits join the herd after weaning.",
+        "label": "Kits were born"
+      },
+      {
+        "alt": "Weighing screen: weight field and growth chart",
+        "caption": "Enter the weight — the app charts how the rabbit grows and compares it with last time.",
+        "label": "Weighed one"
+      },
+      {
+        "alt": "Vaccination screen: drug, date and next shot",
+        "caption": "Mark the shot — the next one lands in the calendar by itself, with a reminder ahead of time.",
+        "label": "Vaccinated"
+      },
+      {
+        "alt": "Sale screen: buyer, weight and amount",
+        "caption": "Record the sale — the rabbit leaves the herd and the money joins this month’s income.",
+        "label": "Sold one"
+      }
+    ],
+    "lead": "Everyday jobs sit on one screen. Pick the job and the form opens already filled in: you only type the number.",
+    "title": "One tap and the record is done"
+  },
+  "cta": {
+    "lead": "A phone number or an email, a one-time code, and you can enter your first rabbits. It takes a couple of minutes.",
+    "primary": "Open the web app",
+    "secondary": "Download for Android",
+    "stores_soon": "The app will reach the App Store and Google Play later.",
+    "title": "Try it on your own farm"
+  },
+  "field": {
+    "demo": {
+      "off": "Cut the signal",
+      "on": "Bring it back",
+      "rec": "Malika's litter, 8 kits",
+      "s0": "Online. Entries reach the server at once.",
+      "s1": "No signal. The entry waits on the phone for the network.",
+      "s2": "Back online. The entry went through on its own, no retry needed.",
+      "title": "Try it: the signal drops"
+    },
+    "items": [
+      {
+        "name": "The signal drops, the work does not",
+        "text": "Records stay on the phone and go to the server by themselves once the network is back. Nothing to retype."
+      },
+      {
+        "name": "Hands full, so say it out loud",
+        "text": "A note or a weight can be dictated: the app recognises speech and puts the text in the field."
+      },
+      {
+        "name": "No passwords at all",
+        "text": "You sign in with a one-time code: by SMS in Tajikistan, by email everywhere else. The phone itself is locked by a four-digit code."
+      },
+      {
+        "name": "Four languages",
+        "text": "Russian, Tajik, Uzbek and English. Every worker picks their own, the farm stays shared."
+      }
+    ],
+    "title": "Built for the shed, not for the office"
+  },
+  "footer": {
+    "app": "The app",
+    "docs": "Documents",
+    "github": "Source code",
+    "lang_aria": "Page language",
+    "privacy": "Privacy policy",
+    "rights": "Rabbit farm management",
+    "sections": "Sections",
+    "source_note": "The code is open: a farm can host the system on its own server."
+  },
+  "hero": {
+    "chips": [
+      {
+        "d": "the entry goes through on its own when the network is back",
+        "t": "No signal"
+      },
+      {
+        "d": "the app tells you ahead of time",
+        "t": "Feed is running out"
+      }
+    ],
+    "cta_primary": "Open the web app",
+    "cta_secondary": "Download for Android",
+    "facts": "No password · works offline · four languages",
+    "kicker": "App for a rabbit farm",
+    "lead": "Rabbits, births, feed, vaccinations and money. Log it at the cage, the app does the rest.",
+    "shot_alt": "Home screen: herd, today's tasks, feed left in stock",
+    "title_after": "",
+    "title_before": "The whole farm ",
+    "title_click": "in one phone"
+  },
+  "lang": "en",
+  "locale": "en",
+  "meta": {
+    "description": "An app for a rabbit farm: livestock, births, cages, feed, vaccinations and money in one place. Works with no signal, speaks Russian, Tajik, Uzbek and English.",
+    "og_alt": "RabbitFarm app screen with the herd and today's tasks",
+    "title": "RabbitFarm: rabbit farm records on your phone"
+  },
+  "modules": {
+    "items": [
+      {
+        "name": "Herd",
+        "text": "A card per rabbit: breed, sex, weight, cage, photo and family back to the great-grandparents."
+      },
+      {
+        "name": "Breeding",
+        "text": "Matings, pregnancies, births. Before a pairing the app warns you if the two are close relatives."
+      },
+      {
+        "name": "Cages",
+        "text": "Who lives where, where there is room, who to move. An occupied cage shows the name of its tenant."
+      },
+      {
+        "name": "Feed",
+        "text": "What is left in stock, daily use, and a warning while there is still time to buy more."
+      },
+      {
+        "name": "Health",
+        "text": "Vaccinations with the next date due, treatments, diagnoses and what the medicine cost."
+      },
+      {
+        "name": "Money",
+        "text": "Income and costs by category, profit for the month, and the latest operations."
+      },
+      {
+        "name": "Staff",
+        "text": "Invite by phone number, set roles, and see in the journal who recorded what."
+      }
+    ],
+    "title": "The whole farm in one place"
+  },
+  "nav": {
+    "click": "How it records",
+    "field": "In the shed",
+    "lang_short": "EN",
+    "menu": "Menu",
+    "modules": "What is inside",
+    "price": "What it costs",
+    "theme": "Light or dark",
+    "top": "Back to top"
+  },
+  "price": {
+    "lead": "Starting is free: open a farm and enter your first rabbits. After that the plan follows the size of the farm, meaning how many rabbits and how many workers.",
+    "points": [
+      "Free to start, no card and no invoice",
+      "Card payment through Eskhata Merchant for farms in Tajikistan",
+      "Farms in other countries are invoiced by support"
+    ],
+    "title": "What it costs"
+  }
+}
