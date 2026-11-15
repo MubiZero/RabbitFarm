@@ -21,7 +21,7 @@
 | Ресурс в Coolify | Тип | Что важно знать |
 |---|---|---|
 | `rabbitfarm-api` | Application (Dockerfile) | том `/app/logs`; боевая база называется `default`, не `rabbitfarm` |
-| `rabbitfarm-landing` | Application (Dockerfile) | статический лендинг, контекст сборки `./landing` |
+| `rabbitfarm-landing` | Application (Dockerfile) | прежний лендинг (`./landing`). С 15.11.2026 домен `rabbitfarm.click` отдаёт Cloudflare Pages, сервис не получает трафика и держится как откат; его можно остановить |
 | `rabbitfarm-web` | Application (Dockerfile) | Flutter-сборка под web |
 | `rabbitfarm-db` | Database (managed MySQL 8) | имя базы `default`, пользователь `mysql` |
 | `rabbitfarm-minio` | Service (шаблон MinIO) | образ с `quay.io`, бакет `rabbitfarm-uploads`, тома `minio-data` и `minio-backups` |
@@ -35,18 +35,21 @@
 
 | Сервис | Домен |
 |---|---|
-| `landing` | `https://rabbitfarm.click` |
+| сайт | `https://rabbitfarm.click`: Cloudflare Pages, проект `rabbitfarm-site`, папка `site/`, не Coolify (см. [site/README.md](../site/README.md)) |
 | `web` | `https://app.rabbitfarm.click` |
 | `api` | `https://api.rabbitfarm.click` |
 
 У каждого ресурса в Coolify задан свой «watch path» (`backend/*`,
-`mobile/*`, `landing/*`): иначе любой коммит пересобирал всё, включая
+`mobile/*`): иначе любой коммит пересобирал всё, включая
 сорокаминутную сборку Flutter, даже когда менялся только текст на витрине.
 
-`landing` это витрина (см. [landing/README.md](../landing/README.md)):
-статические страницы на четырёх языках, собираются при сборке образа.
-Куда ведут её кнопки, задаёт окружение: `APP_URL` (адрес приложения) и
-`ANDROID_APK_URL` (сборка для Android; пустое значение прячет кнопку).
+Сайт (витрина, страница приглашения `/i`, политика, файлы проверки ссылок)
+выкладывается отдельно, на Cloudflare Pages: `.github/workflows/site.yml`
+делает это при каждом коммите в `main`, который меняет `site/`. Куда ведут
+кнопки, задают переменные сборки `APP_URL` и `ANDROID_APK_URL` (пустое
+значение прячет кнопку). Откат: вернуть в DNS зоны `rabbitfarm.click` запись
+`A rabbitfarm.click` на `207.180.237.97` (proxied), старый сервис `landing`
+всё ещё собран.
 
 Все домены ведут A-записями на `207.180.237.97`, сертификаты выпущены
 Let's Encrypt, `http` отвечает редиректом на `https`.
