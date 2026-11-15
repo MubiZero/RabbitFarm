@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "radial-spotlight-glow",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/d.html"
+        ],
+        "createdAt": "2026-11-15T00:25:03.206Z",
+        "reason": "user confirmed: макет D выбран владельцем 15.11.2026 вместе с мягкой изумрудной подсветкой; файл хранится как запись решения"
+      },
+      {
+        "rule": "radial-spotlight-glow",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/e.html"
+        ],
+        "createdAt": "2026-11-15T00:25:03.307Z",
+        "reason": "отклонённый макет E, хранится как запись раунда решения, в сайт не идёт"
+      }
+    ]
+  }
+}
